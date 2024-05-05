@@ -27,6 +27,7 @@ import {
   SnackbarType,
   ButtonTypeEnum,
   GlobalConst,
+  CommandEnum,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
@@ -47,6 +48,8 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import Utils from '../../app/utils';
+import { RPCProposeType } from '../../app/rpc/types/RPCProposeType';
+import RPCModule from '../../app/RPCModule';
 
 type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
@@ -138,6 +141,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
   const [poolsToShield, setPoolsToShield] = useState<PoolToShieldEnum>(PoolToShieldEnum.noPoolToShield);
   const [blocksRemaining, setBlocksRemaining] = useState<number>(0);
+  const [shieldingFee, setShieldingFee] = useState<number>(0);
 
   useEffect(() => {
     let currentBl, lastBlockSe;
@@ -170,10 +174,66 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }, [addLastSnackbar, restartApp, syncingStatus.syncProcessStalled, translate]);
 
   useEffect(() => {
+    const runShieldPropose = async (): Promise<string> => {
+      try {
+        const proposeStr: string = await RPCModule.execute(CommandEnum.propose_shield, '');
+        if (proposeStr) {
+          if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+            console.log(`Error propose ${proposeStr}`);
+            return proposeStr;
+          }
+        } else {
+          console.log('Internal Error propose');
+          return 'Error: Internal RPC Error: propose';
+        }
+
+        return proposeStr;
+      } catch (error) {
+        console.log(`Critical Error propose ${error}`);
+        return `Error: ${error}`;
+      }
+    };
+
+    if (!readOnly) {
+      (async () => {
+        let proposeFee = 0;
+        const runProposeStr = await runShieldPropose();
+        if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+          // snack with error
+          console.log(runProposeStr);
+          //Alert.alert('Calculating the FEE', runProposeStr);
+        } else {
+          const runProposeJson: RPCProposeType = JSON.parse(runProposeStr);
+          if (runProposeJson.error) {
+            // snack with error
+            console.log(runProposeJson.error);
+            //Alert.alert('Calculating the FEE', runProposeJson.error);
+          } else {
+            if (runProposeJson.fee) {
+              console.log(runProposeJson.fee);
+              proposeFee = runProposeJson.fee / 10 ** 8;
+            }
+          }
+        }
+
+        setShieldingFee(proposeFee);
+        console.log(proposeFee);
+      })();
+    }
+  }, [
+    readOnly,
+    totalBalance.transparentBal,
+    totalBalance.spendablePrivate,
+    poolsToShield,
+    poolsToShieldSelectSapling,
+    poolsToShieldSelectTransparent,
+  ]);
+
+  useEffect(() => {
     setShowShieldButton(
       !readOnly &&
         totalBalance &&
-        (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > Utils.getShieldingFee(),
+        (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > shieldingFee,
     );
 
     if ((someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 && totalBalance.spendablePrivate > 0) {
@@ -185,7 +245,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     } else {
       setPoolsToShield(PoolToShieldEnum.noPoolToShield);
     }
-  }, [mode, readOnly, totalBalance, totalBalance.transparentBal, totalBalance.spendablePrivate, someUnconfirmed]);
+  }, [
+    readOnly,
+    someUnconfirmed,
+    totalBalance,
+    totalBalance.transparentBal,
+    totalBalance.spendablePrivate,
+    shieldingFee,
+  ]);
 
   useEffect(() => {
     // for basic mode always have to be 'all', It's easier for the user.
@@ -245,22 +312,32 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           true,
         );
       } else {
-        const shieldJSON: RPCShieldType = await JSON.parse(shieldStr);
+        try {
+          const shieldJSON: RPCShieldType = await JSON.parse(shieldStr);
 
-        if (shieldJSON.error) {
+          if (shieldJSON.error) {
+            createAlert(
+              setBackgroundError,
+              addLastSnackbar,
+              translate(`history.shield-title-${pools}`) as string,
+              `${translate(`history.shield-error-${pools}`)} ${shieldJSON.error}`,
+              true,
+            );
+          } else {
+            createAlert(
+              setBackgroundError,
+              addLastSnackbar,
+              translate(`history.shield-title-${pools}`) as string,
+              `${translate(`history.shield-message-${pools}`)} ${shieldJSON.txid}`,
+              true,
+            );
+          }
+        } catch (e) {
           createAlert(
             setBackgroundError,
             addLastSnackbar,
             translate(`history.shield-title-${pools}`) as string,
-            `${translate(`history.shield-error-${pools}`)} ${shieldJSON.error}`,
-            true,
-          );
-        } else {
-          createAlert(
-            setBackgroundError,
-            addLastSnackbar,
-            translate(`history.shield-title-${pools}`) as string,
-            `${translate(`history.shield-message-${pools}`)} ${shieldJSON.txid}`,
+            `${translate(`history.shield-message-${pools}`)} ${shieldStr}`,
             true,
           );
         }
@@ -357,7 +434,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     }
   };
 
-  //console.log('render header');
+  //console.log('render header', shieldingFee);
 
   return (
     <View
@@ -662,35 +739,36 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               }`,
             ) as string) +
               ` ${
-                poolsToShield === PoolToShieldEnum.saplingPoolToShield &&
-                totalBalance.spendablePrivate > Utils.getShieldingFee()
-                  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - Utils.getShieldingFee(), 8)
+                poolsToShield === PoolToShieldEnum.saplingPoolToShield && totalBalance.spendablePrivate > shieldingFee
+                  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - shieldingFee, 8)
                   : poolsToShield === PoolToShieldEnum.transparentPoolToShield &&
-                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > Utils.getShieldingFee()
+                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
                   ? Utils.parseNumberFloatToStringLocale(
-                      (someUnconfirmed ? 0 : totalBalance.transparentBal) - Utils.getShieldingFee(),
+                      (someUnconfirmed ? 0 : totalBalance.transparentBal) - shieldingFee,
                       8,
                     )
                   : poolsToShieldSelectSapling &&
                     poolsToShieldSelectTransparent &&
-                    totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) >
-                      Utils.getShieldingFee()
+                    totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
                   ? Utils.parseNumberFloatToStringLocale(
                       totalBalance.spendablePrivate +
                         (someUnconfirmed ? 0 : totalBalance.transparentBal) -
-                        Utils.getShieldingFee(),
+                        shieldingFee,
                       8,
                     )
-                  : poolsToShieldSelectSapling && totalBalance.spendablePrivate > Utils.getShieldingFee()
-                  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - Utils.getShieldingFee(), 8)
-                  : poolsToShieldSelectTransparent &&
-                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > Utils.getShieldingFee()
+                  : poolsToShieldSelectSapling && totalBalance.spendablePrivate > shieldingFee
+                  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - shieldingFee, 8)
+                  : poolsToShieldSelectTransparent && (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
                   ? Utils.parseNumberFloatToStringLocale(
-                      (someUnconfirmed ? 0 : totalBalance.transparentBal) - Utils.getShieldingFee(),
+                      (someUnconfirmed ? 0 : totalBalance.transparentBal) - shieldingFee,
                       8,
                     )
                   : 0
-              }`}
+              } ` +
+              (translate('send.fee') as string) +
+              ': ' +
+              Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
+              ' '}
           </FadeText>
           <View style={{ margin: 5, flexDirection: 'row' }}>
             <Button
@@ -712,21 +790,18 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               }
               onPress={onPressShieldFunds}
               disabled={
-                poolsToShield === PoolToShieldEnum.saplingPoolToShield &&
-                totalBalance.spendablePrivate > Utils.getShieldingFee()
+                poolsToShield === PoolToShieldEnum.saplingPoolToShield && totalBalance.spendablePrivate > shieldingFee
                   ? false
                   : poolsToShield === PoolToShieldEnum.transparentPoolToShield &&
-                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > Utils.getShieldingFee()
+                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
                   ? false
                   : poolsToShieldSelectSapling &&
                     poolsToShieldSelectTransparent &&
-                    totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) >
-                      Utils.getShieldingFee()
+                    totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
                   ? false
-                  : poolsToShieldSelectSapling && totalBalance.spendablePrivate > Utils.getShieldingFee()
+                  : poolsToShieldSelectSapling && totalBalance.spendablePrivate > shieldingFee
                   ? false
-                  : poolsToShieldSelectTransparent &&
-                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > Utils.getShieldingFee()
+                  : poolsToShieldSelectTransparent && (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
                   ? false
                   : true
               }

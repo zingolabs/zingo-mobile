@@ -97,10 +97,6 @@ export default class Utils {
     return Utils.nextToAddrID++;
   }
 
-  static getShieldingFee(): number {
-    return 0.0002;
-  }
-
   static async getDonationAddress(chain_name: ChainNameEnum): Promise<string> {
     // donations only for mainnet.
     if (chain_name === ChainNameEnum.mainChainName) {

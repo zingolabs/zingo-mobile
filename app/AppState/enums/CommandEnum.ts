@@ -1,5 +1,4 @@
 export enum CommandEnum {
-  send = 'send',
   sendprogress = 'sendprogress',
   changeserver = 'changeserver',
   wallet_kind = 'wallet_kind',
@@ -15,18 +14,26 @@ export enum CommandEnum {
   export = 'export',
   new = 'new',
   import = 'import',
-  shield = 'shield',
   exportufvk = 'exportufvk',
   sync = 'sync',
   syncstatus = 'syncstatus',
   addresses = 'addresses',
   parse_address = 'parse_address',
   parse_viewkey = 'parse_viewkey',
-  propose = 'propose',
   balance = 'balance',
   seed = 'seed',
   rescan = 'rescan',
   value_to_address = 'value_to_address',
   sends_to_address = 'sends_to_address',
   memobytes_to_address = 'memobytes_to_address',
+
+  // new commands, some are comming...
+  send_proposed = 'send_proposed',
+  shield_proposed = 'shield_proposed',
+
+  quicksend = 'quicksend',
+  quickshield = 'quickshield',
+
+  propose_send = 'propose_send',
+  propose_shield = 'propose_shield',
 }

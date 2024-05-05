@@ -332,7 +332,8 @@ export default class RPC {
   static async rpc_shieldFunds(pools: string): Promise<string> {
     try {
       // using `all` or `transparent` or `sapling`...
-      const shieldStr: string = await RPCModule.execute(CommandEnum.shield, pools);
+      const shieldStr: string = await RPCModule.execute(CommandEnum.shield_proposed, pools);
+      console.log(shieldStr);
       if (shieldStr) {
         if (shieldStr.toLowerCase().startsWith('error')) {
           console.log(`Error shield ${pools} ${shieldStr}`);
@@ -731,7 +732,7 @@ export default class RPC {
 
   async doSend(sendJSON: string): Promise<string> {
     try {
-      const sendStr: string = await RPCModule.execute(CommandEnum.send, sendJSON);
+      const sendStr: string = await RPCModule.execute(CommandEnum.send_proposed, sendJSON);
       if (sendStr) {
         if (sendStr.toLowerCase().startsWith('error')) {
           console.log(`Error send ${sendStr}`);

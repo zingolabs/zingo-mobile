@@ -143,9 +143,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   const slideAnim = useSharedValue(0);
   const { decimalSeparator } = getNumberFormatSettings();
 
-  const runPropose = async (proposeJSON: string): Promise<string> => {
+  const runSendPropose = async (proposeJSON: string): Promise<string> => {
     try {
-      const proposeStr: string = await RPCModule.execute(CommandEnum.propose, proposeJSON);
+      const proposeStr: string = await RPCModule.execute(CommandEnum.propose_send, proposeJSON);
       if (proposeStr) {
         if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error propose ${proposeStr}`);
@@ -163,7 +163,16 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   };
 
-  const calculateFeeWithPropose = async (amount: number, address: string, memo: string = ''): Promise<void> => {
+  const calculateFeeWithPropose = async (
+    amount: number,
+    address: string,
+    memo: string = '',
+    includeUAMemo: boolean = false,
+  ): Promise<void> => {
+    // if no address -> make no sense to run the propose
+    if (!address || validAddress !== 1) {
+      return;
+    }
     const proposeTransaction: SendJsonToTypeType[] = memo
       ? [
           {
@@ -173,8 +182,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                 : validAmount === -2
                 ? parseInt((maxAmount * 10 ** 8).toFixed(0), 10)
                 : 0,
-            address: validAddress === 1 ? address : '',
-            memo: memo,
+            address,
+            memo: memoTotal(memo, includeUAMemo),
           },
         ]
       : [
@@ -185,12 +194,29 @@ const Send: React.FunctionComponent<SendProps> = ({
                 : validAmount === -2
                 ? parseInt((maxAmount * 10 ** 8).toFixed(0), 10)
                 : 0,
-            address: validAddress === 1 ? address : '',
+            address,
           },
         ];
+
+    const donationTransaction: SendJsonToTypeType[] = [];
+
+    // we need to exclude 2 use cases:
+    // 1. send to self (make no sense to do a donation here)
+    // 2. send to donation UA (make no sense to do a double donation)
+    if (donation && server.chain_name === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress) {
+      donationTransaction.push({
+        address: await Utils.getDonationAddress(server.chain_name),
+        amount: parseInt(
+          (Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) * 10 ** 8).toFixed(0),
+          10,
+        ),
+        memo: Utils.getDefaultDonationMemo(translate) + '\n' + translate('settings.donation-title'),
+      });
+    }
+
     let proposeFee = 0;
-    const runProposeStr = await runPropose(JSON.stringify(proposeTransaction));
-    console.log(proposeTransaction, runProposeStr);
+    const runProposeStr = await runSendPropose(JSON.stringify([...proposeTransaction, ...donationTransaction]));
+    console.log([...proposeTransaction, ...donationTransaction]);
     if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
       // snack with error
       console.log(runProposeStr);
@@ -203,6 +229,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         //Alert.alert('Calculating the FEE', runProposeJson.error);
       } else {
         if (runProposeJson.fee) {
+          console.log(runProposeJson.fee);
           proposeFee = runProposeJson.fee / 10 ** 8;
         }
       }
@@ -1011,7 +1038,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           privacy={privacy}
                         />
                       </View>
-                      {(donation || !!fee) && (
+                      {(donation || validAddress !== 0 || validAmount !== 0) && (
                         <View
                           style={{
                             display: 'flex',
@@ -1036,12 +1063,15 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 ' '}
                             </FadeText>
                           )}
-                          {!!fee && (
-                            <FadeText>
-                              {(translate('send.fee') as string) + ': ' + Utils.parseNumberFloatToStringLocale(fee, 8)}
+                          {(validAddress !== 0 || validAmount !== 0) && (
+                            <FadeText style={{ color: fee > 0 ? colors.text : 'red' }}>
+                              {(translate('send.fee') as string) +
+                                ': ' +
+                                Utils.parseNumberFloatToStringLocale(fee, 8) +
+                                ' '}
                             </FadeText>
                           )}
-                          <FadeText>{' )'}</FadeText>
+                          <FadeText>{')'}</FadeText>
                         </View>
                       )}
                       {stillConfirming && (
