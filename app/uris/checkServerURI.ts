@@ -45,8 +45,16 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
         // error, no timeout
         return { result: false, timeout: false, new_chain_name };
       } else {
-        const infoJSON: RPCInfoType = await JSON.parse(infoStr);
-        new_chain_name = infoJSON.chain_name;
+        try {
+          const infoJSON: RPCInfoType = await JSON.parse(infoStr);
+          new_chain_name = infoJSON.chain_name;
+        } catch (e) {
+          console.log(infoStr);
+          // I have to restore the old server again.
+          await RPCModule.execute(CommandEnum.changeserver, oldUri);
+          // error, no timeout
+          return { result: false, timeout: false, new_chain_name };
+        }
       }
     }
   } catch (error: any) {

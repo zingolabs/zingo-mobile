@@ -455,29 +455,42 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           //await delay(5000);
 
           //console.log('Load Wallet Exists result', result);
+          let error = false;
           if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
-            // here result can have an `error` field for watch-only which is actually OK.
-            const resultJson: RPCSeedType = await JSON.parse(result);
-            if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
-              // Load the wallet and navigate to the transactions screen
-              const walletKindStr: string = await RPCModule.execute(CommandEnum.wallet_kind, '');
-              //console.log(walletKindStr);
-              const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
-              this.setState({
-                readOnly: walletKindJSON.kind === RPCWalletKindEnum.Seeded ? false : true,
-                actionButtonsDisabled: false,
-              });
-              this.navigateToLoadedApp();
-              //console.log('navigate to LoadedApp');
-            } else {
-              await this.walletErrorHandle(
-                result,
-                this.state.translate('loadingapp.readingwallet-label') as string,
-                1,
-                true,
-              );
+            try {
+              // here result can have an `error` field for watch-only which is actually OK.
+              const resultJson: RPCSeedType = await JSON.parse(result);
+              if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
+                // Load the wallet and navigate to the transactions screen
+                const walletKindStr: string = await RPCModule.execute(CommandEnum.wallet_kind, '');
+                //console.log(walletKindStr);
+                try {
+                  const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
+                  this.setState({
+                    readOnly: walletKindJSON.kind === RPCWalletKindEnum.Seeded ? false : true,
+                    actionButtonsDisabled: false,
+                  });
+                } catch (e) {
+                  console.log(walletKindStr);
+                  this.setState({
+                    readOnly: false,
+                    actionButtonsDisabled: false,
+                  });
+                  this.state.addLastSnackbar({ message: walletKindStr });
+                }
+                this.navigateToLoadedApp();
+                //console.log('navigate to LoadedApp');
+              } else {
+                error = true;
+              }
+            } catch (e) {
+              console.log(result);
+              error = true;
             }
           } else {
+            error = true;
+          }
+          if (error) {
             await this.walletErrorHandle(
               result,
               this.state.translate('loadingapp.readingwallet-label') as string,
@@ -876,19 +889,28 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
       //console.log(seed_ufvk);
       //console.log(result);
+      let error = false;
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
-        // here result can have an `error` field for watch-only which is actually OK.
-        const resultJson: RPCSeedType = await JSON.parse(result);
-        if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
-          this.setState({
-            actionButtonsDisabled: false,
-            readOnly: type === RestoreFromTypeEnum.seedRestoreFrom ? false : true,
-          });
-          this.navigateToLoadedApp();
-        } else {
-          this.walletErrorHandle(result, this.props.translate('loadingapp.readingwallet-label') as string, 3, false);
+        try {
+          // here result can have an `error` field for watch-only which is actually OK.
+          const resultJson: RPCSeedType = await JSON.parse(result);
+          if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
+            this.setState({
+              actionButtonsDisabled: false,
+              readOnly: type === RestoreFromTypeEnum.seedRestoreFrom ? false : true,
+            });
+            this.navigateToLoadedApp();
+          } else {
+            error = true;
+          }
+        } catch (e) {
+          console.log(result);
+          error = true;
         }
       } else {
+        error = true;
+      }
+      if (error) {
         this.walletErrorHandle(result, this.props.translate('loadingapp.readingwallet-label') as string, 3, false);
       }
     });

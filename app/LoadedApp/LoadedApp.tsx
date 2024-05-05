@@ -1158,29 +1158,34 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       let result: string = await RPCModule.loadExistingWallet(value.uri, value.chain_name);
       //console.log(result);
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
-        // here result can have an `error` field for watch-only which is actually OK.
-        const resultJson: RPCSeedType = await JSON.parse(result);
-        if (
-          !resultJson.error ||
-          (resultJson.error && resultJson.error.startsWith('This wallet is watch-only') && this.state.readOnly)
-        ) {
-          // Load the wallet and navigate to the transactions screen
-          //console.log(`wallet loaded ok ${value.uri}`);
-          if (toast) {
-            this.addLastSnackbar({
-              message: `${this.props.translate('loadedapp.readingwallet')} ${value.uri}`,
+        try {
+          // here result can have an `error` field for watch-only which is actually OK.
+          const resultJson: RPCSeedType = await JSON.parse(result);
+          if (
+            !resultJson.error ||
+            (resultJson.error && resultJson.error.startsWith('This wallet is watch-only') && this.state.readOnly)
+          ) {
+            // Load the wallet and navigate to the transactions screen
+            //console.log(`wallet loaded ok ${value.uri}`);
+            if (toast) {
+              this.addLastSnackbar({
+                message: `${this.props.translate('loadedapp.readingwallet')} ${value.uri}`,
+              });
+            }
+            await SettingsFileImpl.writeSettings(name, value);
+            this.setState({
+              server: value,
             });
+            // the server is changed, the App needs to restart the timeout tasks from the beginning
+            await this.rpc.configure();
+            // Refetch the settings to update
+            await this.rpc.fetchWalletSettings();
+            return;
+          } else {
+            error = true;
           }
-          await SettingsFileImpl.writeSettings(name, value);
-          this.setState({
-            server: value,
-          });
-          // the server is changed, the App needs to restart the timeout tasks from the beginning
-          await this.rpc.configure();
-          // Refetch the settings to update
-          await this.rpc.fetchWalletSettings();
-          return;
-        } else {
+        } catch (e) {
+          console.log(result);
           error = true;
         }
       } else {

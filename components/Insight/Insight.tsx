@@ -132,7 +132,13 @@ const Insight: React.FunctionComponent<InsightProps> = ({
         default:
           break;
       }
-      const resultJSON = await JSON.parse(resultStr);
+      let resultJSON: any;
+      try {
+        resultJSON = await JSON.parse(resultStr);
+      } catch (e) {
+        console.log(resultStr);
+        resultJSON = {};
+      }
       let amounts: { value: number; address: string; tag: string }[] = [];
       const resultJSONEntries: [string, number][] = Object.entries(resultJSON) as [string, number][];
       resultJSONEntries.forEach(([key, value]) => {
