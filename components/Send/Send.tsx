@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Text } from 'react-native';
+import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Text, Alert } from 'react-native';
 import {
   faQrcode,
   faCheck,
@@ -137,6 +137,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [donationAddress, setDonationAddress] = useState<boolean>(false);
   const [negativeMaxAount, setNegativeMaxAount] = useState<boolean>(false);
   const [sendAllClick, setSendAllClick] = useState<boolean>(false);
+  const [proposeSendLastError, setProposeSendLastError] = useState<string>('');
   const isFocused = useIsFocused();
 
   const slideAnim = useSharedValue(0);
@@ -165,11 +166,20 @@ const Send: React.FunctionComponent<SendProps> = ({
   const calculateFeeWithPropose = async (
     amount: string,
     address: string,
-    memo: string = '',
-    includeUAMemo: boolean = false,
+    memo: string,
+    includeUAMemo: boolean,
   ): Promise<void> => {
+    console.log(address, validAddress);
+    console.log(amount, validAmount);
+    console.log(validMemo);
     // if no address -> make no sense to run the propose
     if (!address || validAddress !== 1) {
+      return;
+    }
+    if (amount === '' || validAmount !== 1) {
+      return;
+    }
+    if (validMemo === -1) {
       return;
     }
     const sendPageStateCalculateFee = new SendPageStateClass(new ToAddrClass(0));
@@ -194,6 +204,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
       // snack with error
       console.log(runProposeStr);
+      setProposeSendLastError(runProposeStr);
       //Alert.alert('Calculating the FEE', runProposeStr);
     } else {
       try {
@@ -201,298 +212,26 @@ const Send: React.FunctionComponent<SendProps> = ({
         if (runProposeJson.error) {
           // snack with error
           console.log(runProposeJson.error);
+          setProposeSendLastError(runProposeStr);
           //Alert.alert('Calculating the FEE', runProposeJson.error);
         } else if (runProposeJson.fee) {
           console.log(runProposeJson.fee);
           proposeFee = runProposeJson.fee / 10 ** 8;
+          setProposeSendLastError('');
         }
       } catch (e) {
         // snack with error
         console.log(runProposeStr);
+        setProposeSendLastError(runProposeStr);
         //Alert.alert('Calculating the FEE', runProposeJson.error);
       }
     }
     setFee(proposeFee);
   };
 
-  const memoTotal = useCallback(
-    (memo: string, includeUAMemo: boolean) => {
-      return `${memo || ''}${includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`;
-    },
-    [uaAddress],
-  );
-
-  useEffect(() => {
-    if (validAddress === 0 && validAmount === 0) {
-      setFee(0);
-    } else if (validAddress !== -1 && validAmount !== -1) {
-      calculateFeeWithPropose(sendPageState.toaddr.amount, sendPageState.toaddr.to);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [validAddress, validAmount]);
-
-  useEffect(() => {
-    // transparent is not spendable.
-    const spend = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-    const max = spend - fee - (donation ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) : 0);
-    if (max >= 0) {
-      // if max is 0 then the user can send a memo with amount 0.
-      setMaxAmount(max);
-      setNegativeMaxAount(false);
-      if (sendAllClick) {
-        updateToField(null, Utils.parseNumberFloatToStringLocale(max, 8), null, null, null);
-      }
-    } else {
-      // if max is less than 0 then the user CANNOT send anything.
-      setMaxAmount(0);
-      setNegativeMaxAount(true);
-      if (sendAllClick) {
-        updateToField(null, '0', null, null, null);
-      }
-    }
-    setSpendable(spend);
-    setSendAllClick(false);
-
-    const stillConf =
-      totalBalance.orchardBal !== totalBalance.spendableOrchard ||
-      totalBalance.privateBal !== totalBalance.spendablePrivate ||
-      someUnconfirmed;
-    const showShield =
-      (someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 &&
-      (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > fee;
-    const showUpgrade =
-      (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
-    setStillConfirming(stillConf);
-    setShowShieldInfo(showShield);
-    setShowUpgradeInfo(showUpgrade);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    donation,
-    fee,
-    someUnconfirmed,
-    totalBalance.orchardBal,
-    totalBalance.privateBal,
-    totalBalance.spendableOrchard,
-    totalBalance.spendablePrivate,
-    totalBalance.transparentBal,
-  ]);
-
-  useEffect(() => {
-    const getMemoEnabled = async (address: string): Promise<boolean> => {
-      if (!netInfo.isConnected) {
-        addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
-        return false;
-      }
-      const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
-      //console.log(result);
-      if (result) {
-        if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
-          return false;
-        }
-      } else {
-        return false;
-      }
-      let resultJSON = {} as RPCParseAddressType;
-      try {
-        resultJSON = await JSON.parse(result);
-      } catch (e) {
-        return false;
-      }
-
-      //console.log('parse-memo', address, resultJSON);
-
-      return (
-        resultJSON.status === RPCParseStatusEnum.successParse &&
-        resultJSON.address_kind !== RPCAdressKindEnum.transparentAddressKind &&
-        resultJSON.chain_name === server.chain_name
-      );
-    };
-
-    const address = sendPageState.toaddr.to;
-
-    if (address) {
-      getMemoEnabled(address).then(r => {
-        setMemoEnabled(r);
-      });
-    } else {
-      setMemoEnabled(false);
-    }
-  }, [server.chain_name, netInfo.isConnected, sendPageState.toaddr.to, translate, addLastSnackbar]);
-
-  useEffect(() => {
-    const parseAdressJSON = async (address: string): Promise<boolean> => {
-      if (!netInfo.isConnected) {
-        addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
-        return false;
-      }
-      const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
-      //console.log(result);
-      if (result) {
-        if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
-          return false;
-        }
-      } else {
-        return false;
-      }
-      let resultJSON = {} as RPCParseAddressType;
-      try {
-        resultJSON = await JSON.parse(result);
-      } catch (e) {
-        return false;
-      }
-
-      //console.log('parse-address', address, resultJSON, resultJSON.status === RPCParseStatusEnum.successParse);
-
-      return resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chain_name;
-    };
-
-    var to = sendPageState.toaddr;
-
-    if (to.to) {
-      parseAdressJSON(to.to).then(r => {
-        setValidAddress(r ? 1 : -1);
-      });
-    } else {
-      setValidAddress(0);
-    }
-
-    if (to.memo) {
-      const len = Buffer.byteLength(memoTotal(to.memo, to.includeUAMemo), 'utf8');
-      if (len > 512) {
-        setValidMemo(-1);
-      } else {
-        setValidMemo(1);
-      }
-    } else {
-      setValidMemo(0);
-    }
-
-    let invalid = false;
-    if (to.amountCurrency !== '') {
-      if (isNaN(Utils.parseStringLocaleToNumberFloat(to.amountCurrency))) {
-        setValidAmount(-1); // invalid number
-        invalid = true;
-      }
-    }
-    if (!invalid) {
-      if (to.amount !== '') {
-        if (isNaN(Utils.parseStringLocaleToNumberFloat(to.amount))) {
-          setValidAmount(-1); // invalid number
-        } else {
-          if (
-            Utils.parseStringLocaleToNumberFloat(spendable.toFixed(8)) >=
-              Utils.parseStringLocaleToNumberFloat(fee.toFixed(8)) +
-                (donation ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) : 0) &&
-            Utils.parseStringLocaleToNumberFloat(to.amount) >= 0 &&
-            Utils.parseStringLocaleToNumberFloat(to.amount) <=
-              Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
-          ) {
-            setValidAmount(1); // valid
-          } else {
-            setValidAmount(-2); // invalid amount
-          }
-        }
-      } else {
-        setValidAmount(0); // empty
-      }
-    }
-  }, [
-    donation,
-    decimalSeparator,
-    server.chain_name,
-    netInfo.isConnected,
-    sendPageState.toaddr,
-    sendPageState.toaddr.to,
-    sendPageState.toaddr.amountCurrency,
-    sendPageState.toaddr.amount,
-    sendPageState.toaddr.memo,
-    sendPageState.toaddr.includeUAMemo,
-    translate,
-    addLastSnackbar,
-    spendable,
-    fee,
-    maxAmount,
-    uaAddress,
-    memoTotal,
-  ]);
-
-  useEffect(() => {
-    setSendButtonEnabled(
-      // send amount 0 with transparent address make no sense.
-      // you always get `dust` error.
-      validAddress === 1 &&
-        validAmount === 1 &&
-        validMemo !== -1 &&
-        !(!memoEnabled && Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) === 0),
-    );
-  }, [memoEnabled, sendPageState.toaddr.amount, validAddress, validAmount, validMemo]);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      slideAnim.value = withTiming(0 - titleViewHeight + 25, { duration: 100, easing: Easing.linear });
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
-    });
-
-    return () => {
-      !!keyboardDidShowListener && keyboardDidShowListener.remove();
-      !!keyboardDidHideListener && keyboardDidHideListener.remove();
-    };
-  }, [slideAnim, titleViewHeight]);
-
-  useEffect(() => {
-    (async () => {
-      if (mode === ModeEnum.basic) {
-        const price = await RPC.rpc_getZecPrice();
-        // values:
-        // 0   - initial/default value
-        // -1  - error in Gemini/zingolib.
-        // -2  - error in RPCModule, likely.
-        // > 0 - real value
-        if (price <= 0) {
-          setZecPrice(price, 0);
-        } else {
-          setZecPrice(price, Date.now());
-        }
-      }
-    })();
-  }, [mode, setZecPrice]);
-
-  useEffect(() => {
-    const items = addressBook.map((item: AddressBookFileClass) => ({
-      label: item.label,
-      value: item.address,
-    }));
-    setItemsPicker(items);
-  }, [addressBook]);
-
-  useEffect(() => {
-    (async () => {
-      if (isFocused) {
-        await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
-      } else {
-        await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
-      }
-    })();
-  }, [isFocused]);
-
-  useEffect(() => {
-    const address = sendPageState.toaddr.to;
-    if (address) {
-      (async () => {
-        const myAddress: AddressClass[] = addresses.filter((a: AddressClass) => a.address === address);
-        const sendToS = myAddress.length >= 1;
-
-        const donationA = address === (await Utils.getDonationAddress(server.chain_name));
-        setSendToSelf(sendToS);
-        setDonationAddress(donationA);
-      })();
-    } else {
-      setSendToSelf(false);
-      setDonationAddress(false);
-    }
-  }, [addresses, sendPageState.toaddr.to, server.chain_name]);
+  const memoTotal = useCallback((memoPar: string, includeUAMemoPar: boolean, uaAddressPar: string) => {
+    return `${memoPar || ''}${includeUAMemoPar ? '\nReply to: \n' + uaAddressPar : ''}`;
+  }, []);
 
   const updateToField = async (
     address: string | null,
@@ -577,6 +316,296 @@ const Send: React.FunctionComponent<SendProps> = ({
     //console.log(newState);
   };
 
+  useEffect(() => {
+    if (validAddress === 0 && validAmount === 0) {
+      setFee(0);
+    } else if (validAddress !== -1 && validAmount !== -1) {
+      calculateFeeWithPropose(
+        sendPageState.toaddr.amount,
+        sendPageState.toaddr.to,
+        sendPageState.toaddr.memo,
+        sendPageState.toaddr.includeUAMemo,
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    sendPageState.toaddr.amount,
+    sendPageState.toaddr.includeUAMemo,
+    //sendPageState.toaddr.memo,
+    sendPageState.toaddr.to,
+    validAddress,
+    validAmount,
+  ]);
+
+  useEffect(() => {
+    // transparent is not spendable.
+    const spend = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
+    const max = spend - fee - (donation ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) : 0);
+    if (max >= 0) {
+      // if max is 0 then the user can send a memo with amount 0.
+      setMaxAmount(max);
+      setNegativeMaxAount(false);
+      if (sendAllClick) {
+        updateToField(null, Utils.parseNumberFloatToStringLocale(max, 8), null, null, null);
+      }
+    } else {
+      // if max is less than 0 then the user CANNOT send anything.
+      setMaxAmount(0);
+      setNegativeMaxAount(true);
+      if (sendAllClick) {
+        updateToField(null, '0', null, null, null);
+      }
+    }
+    setSpendable(spend);
+    setSendAllClick(false);
+
+    const stillConf =
+      totalBalance.orchardBal !== totalBalance.spendableOrchard ||
+      totalBalance.privateBal !== totalBalance.spendablePrivate ||
+      someUnconfirmed;
+    const showShield =
+      (someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 &&
+      (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > fee;
+    const showUpgrade =
+      (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
+    setStillConfirming(stillConf);
+    setShowShieldInfo(showShield);
+    setShowUpgradeInfo(showUpgrade);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    donation,
+    fee,
+    someUnconfirmed,
+    totalBalance.orchardBal,
+    totalBalance.privateBal,
+    totalBalance.spendableOrchard,
+    totalBalance.spendablePrivate,
+    totalBalance.transparentBal,
+  ]);
+
+  useEffect(() => {
+    const getMemoEnabled = async (address: string): Promise<boolean> => {
+      if (!netInfo.isConnected) {
+        addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
+        return false;
+      }
+      const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
+      //console.log(result);
+      if (result) {
+        if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
+          return false;
+        }
+      } else {
+        return false;
+      }
+      let resultJSON = {} as RPCParseAddressType;
+      try {
+        resultJSON = await JSON.parse(result);
+      } catch (e) {
+        return false;
+      }
+
+      //console.log('parse-memo', address, resultJSON);
+
+      return (
+        resultJSON.status === RPCParseStatusEnum.successParse &&
+        resultJSON.address_kind !== RPCAdressKindEnum.transparentAddressKind &&
+        resultJSON.chain_name === server.chain_name
+      );
+    };
+
+    const address = sendPageState.toaddr.to;
+
+    if (address) {
+      getMemoEnabled(address).then(r => {
+        setMemoEnabled(r);
+        if (!r) {
+          updateToField(null, null, null, '', false);
+        }
+      });
+    } else {
+      setMemoEnabled(false);
+      updateToField(null, null, null, '', false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [server.chain_name, netInfo.isConnected, sendPageState.toaddr.to, translate, addLastSnackbar]);
+
+  useEffect(() => {
+    const parseAdressJSON = async (address: string): Promise<boolean> => {
+      if (!netInfo.isConnected) {
+        addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
+        return false;
+      }
+      const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
+      //console.log(result);
+      if (result) {
+        if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
+          return false;
+        }
+      } else {
+        return false;
+      }
+      let resultJSON = {} as RPCParseAddressType;
+      try {
+        resultJSON = await JSON.parse(result);
+      } catch (e) {
+        return false;
+      }
+
+      //console.log('parse-address', address, resultJSON, resultJSON.status === RPCParseStatusEnum.successParse);
+
+      return resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chain_name;
+    };
+
+    var to = sendPageState.toaddr;
+
+    if (to.to) {
+      parseAdressJSON(to.to).then(r => {
+        setValidAddress(r ? 1 : -1);
+      });
+    } else {
+      setValidAddress(0);
+    }
+
+    if (to.memo || to.includeUAMemo) {
+      const len = Buffer.byteLength(memoTotal(to.memo, to.includeUAMemo, uaAddress), 'utf8');
+      if (len > 512) {
+        setValidMemo(-1);
+      } else {
+        setValidMemo(1);
+      }
+    } else {
+      setValidMemo(0);
+    }
+
+    let invalid = false;
+    if (to.amountCurrency !== '') {
+      if (isNaN(Utils.parseStringLocaleToNumberFloat(to.amountCurrency))) {
+        setValidAmount(-1); // invalid number
+        invalid = true;
+      }
+    }
+    if (!invalid) {
+      if (to.amount !== '') {
+        if (isNaN(Utils.parseStringLocaleToNumberFloat(to.amount))) {
+          setValidAmount(-1); // invalid number
+        } else {
+          if (
+            Utils.parseStringLocaleToNumberFloat(spendable.toFixed(8)) >=
+              Utils.parseStringLocaleToNumberFloat(fee.toFixed(8)) +
+                (donation ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) : 0) &&
+            Utils.parseStringLocaleToNumberFloat(to.amount) >= 0 &&
+            Utils.parseStringLocaleToNumberFloat(to.amount) <=
+              Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
+          ) {
+            setValidAmount(1); // valid
+          } else {
+            setValidAmount(-2); // invalid amount
+          }
+        }
+      } else {
+        setValidAmount(0); // empty
+      }
+    }
+  }, [
+    donation,
+    decimalSeparator,
+    server.chain_name,
+    netInfo.isConnected,
+    sendPageState.toaddr,
+    sendPageState.toaddr.to,
+    sendPageState.toaddr.amountCurrency,
+    sendPageState.toaddr.amount,
+    sendPageState.toaddr.memo,
+    sendPageState.toaddr.includeUAMemo,
+    translate,
+    addLastSnackbar,
+    spendable,
+    fee,
+    maxAmount,
+    uaAddress,
+    memoTotal,
+  ]);
+
+  useEffect(() => {
+    setSendButtonEnabled(
+      // send amount 0 with transparent address make no sense.
+      // you always will get `dust` error.
+      validAddress === 1 &&
+        validAmount === 1 &&
+        validMemo !== -1 &&
+        fee > 0 &&
+        !(!memoEnabled && Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) === 0),
+    );
+  }, [memoEnabled, sendPageState.toaddr.amount, validAddress, validAmount, validMemo, fee]);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      slideAnim.value = withTiming(0 - titleViewHeight + 25, { duration: 100, easing: Easing.linear });
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
+    });
+
+    return () => {
+      !!keyboardDidShowListener && keyboardDidShowListener.remove();
+      !!keyboardDidHideListener && keyboardDidHideListener.remove();
+    };
+  }, [slideAnim, titleViewHeight]);
+
+  useEffect(() => {
+    (async () => {
+      if (mode === ModeEnum.basic) {
+        const price = await RPC.rpc_getZecPrice();
+        // values:
+        // 0   - initial/default value
+        // -1  - error in Gemini/zingolib.
+        // -2  - error in RPCModule, likely.
+        // > 0 - real value
+        if (price <= 0) {
+          setZecPrice(price, 0);
+        } else {
+          setZecPrice(price, Date.now());
+        }
+      }
+    })();
+  }, [mode, setZecPrice]);
+
+  useEffect(() => {
+    const items = addressBook.map((item: AddressBookFileClass) => ({
+      label: item.label,
+      value: item.address,
+    }));
+    setItemsPicker(items);
+  }, [addressBook]);
+
+  useEffect(() => {
+    (async () => {
+      if (isFocused) {
+        await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
+      } else {
+        await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
+      }
+    })();
+  }, [isFocused]);
+
+  useEffect(() => {
+    const address = sendPageState.toaddr.to;
+    if (address) {
+      (async () => {
+        const myAddress: AddressClass[] = addresses.filter((a: AddressClass) => a.address === address);
+        const sendToS = myAddress.length >= 1;
+
+        const donationA = address === (await Utils.getDonationAddress(server.chain_name));
+        setSendToSelf(sendToS);
+        setDonationAddress(donationA);
+      })();
+    } else {
+      setSendToSelf(false);
+      setDonationAddress(false);
+    }
+  }, [addresses, sendPageState.toaddr.to, server.chain_name]);
+
   const confirmSend = async () => {
     if (!netInfo.isConnected) {
       setConfirmModalVisible(false);
@@ -650,7 +679,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const countMemoBytes = (memo: string, includeUAMemo: boolean) => {
-    const len = Buffer.byteLength(memoTotal(memo, includeUAMemo), 'utf8');
+    const len = Buffer.byteLength(memoTotal(memo, includeUAMemo, uaAddress), 'utf8');
     return len;
   };
 
@@ -908,6 +937,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                           calculateFeeWithPropose(
                             Utils.parseNumberFloatToStringLocale(maxAmount, 8),
                             sendPageState.toaddr.to,
+                            sendPageState.toaddr.memo,
+                            sendPageState.toaddr.includeUAMemo,
                           );
                           setSendAllClick(true);
                           setTimeout(() => {
@@ -987,7 +1018,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                           onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null, null)}
                           onEndEditing={(e: any) => {
                             updateToField(null, e.nativeEvent.text.substring(0, 20), null, null, null);
-                            calculateFeeWithPropose(e.nativeEvent.text.substring(0, 20), ta.to);
+                            calculateFeeWithPropose(
+                              e.nativeEvent.text.substring(0, 20),
+                              ta.to,
+                              ta.memo,
+                              ta.includeUAMemo,
+                            );
                           }}
                           editable={true}
                           maxLength={20}
@@ -1013,7 +1049,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           privacy={privacy}
                         />
                       </View>
-                      {(donation || validAddress !== 0 || validAmount !== 0) && (
+                      {(donation || (validAddress !== 0 && validAmount !== 0)) && (
                         <View
                           style={{
                             display: 'flex',
@@ -1038,13 +1074,20 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 ' '}
                             </FadeText>
                           )}
-                          {(validAddress !== 0 || validAmount !== 0) && (
-                            <FadeText style={{ color: fee > 0 ? colors.text : 'red' }}>
-                              {(translate('send.fee') as string) +
-                                ': ' +
-                                Utils.parseNumberFloatToStringLocale(fee, 8) +
-                                ' '}
-                            </FadeText>
+                          {validAddress !== 0 && validAmount !== 0 && (
+                            <TouchableOpacity
+                              onPress={() => {
+                                if (proposeSendLastError) {
+                                  Alert.alert(translate('send.fee') as string, proposeSendLastError);
+                                }
+                              }}>
+                              <FadeText style={{ color: fee > 0 ? colors.text : 'red' }}>
+                                {(translate('send.fee') as string) +
+                                  ': ' +
+                                  Utils.parseNumberFloatToStringLocale(fee, 8) +
+                                  ' '}
+                              </FadeText>
+                            </TouchableOpacity>
                           )}
                           <FadeText>{')'}</FadeText>
                         </View>
@@ -1156,7 +1199,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             onEndEditing={(e: any) => {
                               updateToField(null, null, e.nativeEvent.text.substring(0, 15), null, null);
                               // re-calculate the fee with the zec amount in the other field
-                              calculateFeeWithPropose(ta.amount, ta.to);
+                              calculateFeeWithPropose(ta.amount, ta.to, ta.memo, ta.includeUAMemo);
                             }}
                             editable={true}
                             maxLength={15}
@@ -1245,6 +1288,16 @@ const Send: React.FunctionComponent<SendProps> = ({
                           onChangeText={(text: string) =>
                             updateToField(null, !ta.amount && !!text ? '0' : null, null, text, null)
                           }
+                          onEndEditing={(e: any) => {
+                            updateToField(
+                              null,
+                              !ta.amount && !!e.nativeEvent.text ? '0' : null,
+                              null,
+                              e.nativeEvent.text,
+                              null,
+                            );
+                            calculateFeeWithPropose(ta.amount, ta.to, e.nativeEvent.text, ta.includeUAMemo);
+                          }}
                           editable={true}
                           onContentSizeChange={(e: any) => {
                             if (e.nativeEvent.contentSize.height > (Platform.OS === 'android' ? 70 : 35) && !memoIcon) {
@@ -1359,7 +1412,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
                     return;
                   }
-                  // if the address is transparent - clean the memo field
+                  // if the address is transparent - clean the memo field Just in Case.
                   if (!memoEnabled) {
                     updateToField(null, null, null, '', false);
                   }

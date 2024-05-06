@@ -329,24 +329,24 @@ export default class RPC {
     return '';
   }
   */
-  static async rpc_shieldFunds(pools: string): Promise<string> {
+  static async rpc_shieldFunds(): Promise<string> {
     try {
       // using `all` or `transparent` or `sapling`...
-      const shieldStr: string = await RPCModule.execute(CommandEnum.shield_proposed, pools);
+      const shieldStr: string = await RPCModule.execute(CommandEnum.quickshield, '');
       console.log(shieldStr);
       if (shieldStr) {
         if (shieldStr.toLowerCase().startsWith('error')) {
-          console.log(`Error shield ${pools} ${shieldStr}`);
+          console.log(`Error shield ${shieldStr}`);
           return shieldStr;
         }
       } else {
-        console.log('Internal Error shield ' + pools);
-        return 'Error: Internal RPC Error: shield ' + pools;
+        console.log('Internal Error shield ');
+        return 'Error: Internal RPC Error: shield ';
       }
 
       return shieldStr;
     } catch (error) {
-      console.log(`Critical Error shield ${pools} ${error}`);
+      console.log(`Critical Error shield ${error}`);
       return `Error: ${error}`;
     }
   }
@@ -732,7 +732,7 @@ export default class RPC {
 
   async doSend(sendJSON: string): Promise<string> {
     try {
-      const sendStr: string = await RPCModule.execute(CommandEnum.send_proposed, sendJSON);
+      const sendStr: string = await RPCModule.execute(CommandEnum.quicksend, sendJSON);
       if (sendStr) {
         if (sendStr.toLowerCase().startsWith('error')) {
           console.log(`Error send ${sendStr}`);

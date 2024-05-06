@@ -306,7 +306,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // while shielding, then it going to finish the current batch
     // and after that it run the shield process.
     await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
-    const shieldStr = await RPC.rpc_shieldFunds(pools);
+    const shieldStr = await RPC.rpc_shieldFunds();
 
     if (shieldStr) {
       if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
