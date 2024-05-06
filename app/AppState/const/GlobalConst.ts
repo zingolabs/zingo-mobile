@@ -13,4 +13,6 @@ export const GlobalConst = {
   true: 'true',
   false: 'false',
   memoMaxLength: 512,
+  platformOSios: 'ios',
+  platformOSandroid: 'android',
 };

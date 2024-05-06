@@ -356,7 +356,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       mode: props.mode,
       background: props.background,
       readOnly: props.readOnly,
-      appState: Platform.OS === 'ios' ? AppStateStatusEnum.active : AppState.currentState,
+      appState: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
       setBackgroundError: this.setBackgroundError,
       addLastSnackbar: this.addLastSnackbar,
       restartApp: this.navigateToLoadingApp,
@@ -396,7 +396,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
       //console.log('LOADED', 'prior', this.state.appState, 'next', nextAppState);
-      if (Platform.OS === 'ios') {
+      if (Platform.OS === GlobalConst.platformOSios) {
         if (
           (this.state.appState === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.active) ||
           (this.state.appState === AppStateStatusEnum.active && nextAppState === AppStateStatusEnum.inactive)
@@ -428,7 +428,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         nextAppState === AppStateStatusEnum.active
       ) {
         console.log('App LOADED Android & IOS has come to the foreground!');
-        if (Platform.OS === 'ios') {
+        if (Platform.OS === GlobalConst.platformOSios) {
           //console.log('LOADED SAVED IOS foreground', nextAppState);
           this.setState({ appState: nextAppState });
         }
@@ -439,7 +439,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         // can be:
         // - true      -> the user do pass the authentication
         // - false     -> the user do NOT pass the authentication
-        // - undefined -> no biometric authentication available -> Passcode.
+        // - undefined -> no biometric authentication available -> Passcode -> Nothing.
         //console.log('BIOMETRIC FOREGROUND --------> ', resultBio);
         if (resultBio === false) {
           this.navigateToLoadingApp({ startingApp: true, biometricsFailed: true });
@@ -471,19 +471,19 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         //console.log('clear timers');
         this.setSyncingStatus(new SyncingStatusClass());
         //console.log('clear sync status state');
-        if (Platform.OS === 'ios') {
+        if (Platform.OS === GlobalConst.platformOSios) {
           //console.log('LOADED SAVED IOS background', nextAppState);
           this.setState({ appState: nextAppState });
         }
       } else {
-        if (Platform.OS === 'ios') {
+        if (Platform.OS === GlobalConst.platformOSios) {
           if (this.state.appState !== nextAppState) {
             //console.log('LOADED SAVED IOS', nextAppState);
             this.setState({ appState: nextAppState });
           }
         }
       }
-      if (Platform.OS === 'android') {
+      if (Platform.OS === GlobalConst.platformOSandroid) {
         if (this.state.appState !== nextAppState) {
           //console.log('LOADED SAVED Android', nextAppState);
           this.setState({ appState: nextAppState });
@@ -1420,7 +1420,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           addressBookOpenPriorModal: openModal,
         });
       },
-      Platform.OS === 'ios' ? 100 : 1,
+      Platform.OS === GlobalConst.platformOSios ? 100 : 1,
     );
   };
 

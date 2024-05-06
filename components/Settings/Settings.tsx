@@ -468,9 +468,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           onTintColor={colors.primary}
           boxType="square"
           animationDuration={0.1}
-          style={{ marginRight: 10, transform: Platform.OS === 'ios' ? [{ scaleX: 0.7 }, { scaleY: 0.7 }] : [] }}
+          style={{
+            marginRight: 10,
+            transform: Platform.OS === GlobalConst.platformOSios ? [{ scaleX: 0.7 }, { scaleY: 0.7 }] : [],
+          }}
         />
-        <RegText style={{ marginTop: Platform.OS === 'ios' ? 5 : 3 }}>{label}</RegText>
+        <RegText style={{ marginTop: Platform.OS === GlobalConst.platformOSios ? 5 : 3 }}>{label}</RegText>
       </View>
     );
   };

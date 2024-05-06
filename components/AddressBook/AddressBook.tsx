@@ -120,7 +120,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
         () => {
           addressBookOpenPriorModal();
         },
-        Platform.OS === 'ios' ? 100 : 1,
+        Platform.OS === GlobalConst.platformOSios ? 100 : 1,
       );
     }
   };

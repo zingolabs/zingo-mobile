@@ -7,7 +7,7 @@ import { getNumberFormatSettings } from 'react-native-localize';
 import Utils from '../../app/utils';
 import { ThemeType } from '../../app/types';
 import { SvgXml } from 'react-native-svg';
-import { CurrencyNameEnum } from '../../app/AppState';
+import { CurrencyNameEnum, GlobalConst } from '../../app/AppState';
 
 type ZecAmountProps = {
   color?: string;
@@ -88,7 +88,9 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
               fill={color}
               style={{
                 marginBottom:
-                  Platform.OS === 'android' ? size / (smallPrefix ? 4 : 6.5) : size / (smallPrefix ? 6 : 20),
+                  Platform.OS === GlobalConst.platformOSandroid
+                    ? size / (smallPrefix ? 4 : 6.5)
+                    : size / (smallPrefix ? 6 : 20),
               }}
             />
           ) : (
@@ -134,7 +136,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 color,
                 margin: 0,
                 padding: 0,
-                marginBottom: Platform.OS === 'android' ? size / 10 : size / 15,
+                marginBottom: Platform.OS === GlobalConst.platformOSandroid ? size / 10 : size / 15,
               }}>
               {splits.smallPart}
             </Text>

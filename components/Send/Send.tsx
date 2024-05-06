@@ -1252,7 +1252,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                           onFillColor={colors.primary}
                           onTintColor={colors.primary}
                           boxType="square"
-                          style={{ transform: Platform.OS === 'ios' ? [{ scaleX: 0.7 }, { scaleY: 0.7 }] : [] }}
+                          style={{
+                            transform:
+                              Platform.OS === GlobalConst.platformOSios ? [{ scaleX: 0.7 }, { scaleY: 0.7 }] : [],
+                          }}
                         />
                       </View>
                     </View>
@@ -1300,10 +1303,18 @@ const Send: React.FunctionComponent<SendProps> = ({
                           }}
                           editable={true}
                           onContentSizeChange={(e: any) => {
-                            if (e.nativeEvent.contentSize.height > (Platform.OS === 'android' ? 70 : 35) && !memoIcon) {
+                            if (
+                              e.nativeEvent.contentSize.height >
+                                (Platform.OS === GlobalConst.platformOSandroid ? 70 : 35) &&
+                              !memoIcon
+                            ) {
                               setMemoIcon(true);
                             }
-                            if (e.nativeEvent.contentSize.height <= (Platform.OS === 'android' ? 70 : 35) && memoIcon) {
+                            if (
+                              e.nativeEvent.contentSize.height <=
+                                (Platform.OS === GlobalConst.platformOSandroid ? 70 : 35) &&
+                              memoIcon
+                            ) {
                               setMemoIcon(false);
                             }
                           }}
