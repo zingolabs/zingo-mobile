@@ -24,7 +24,7 @@ import 'moment/locale/ru';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import { ButtonTypeEnum } from '../../app/AppState';
+import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
 import FadeText from '../Components/FadeText';
 import { Buffer } from 'buffer';
 
@@ -152,7 +152,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
             value={memo}
             onChangeText={(text: string) => setMemo(text)}
             editable={true}
-            maxLength={512}
+            maxLength={GlobalConst.memoMaxLength}
           />
           {memo && (
             <TouchableOpacity
@@ -173,10 +173,10 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
             style={{
               marginTop: 5,
               fontWeight: 'bold',
-              color: countMemoBytes(memo, includeUAMemo) > 512 ? 'red' : colors.text,
+              color: countMemoBytes(memo, includeUAMemo) > GlobalConst.memoMaxLength ? 'red' : colors.text,
             }}>{`${countMemoBytes(memo, includeUAMemo)} `}</FadeText>
           <FadeText style={{ marginTop: 5 }}>{translate('loadedapp.of') as string}</FadeText>
-          <FadeText style={{ marginTop: 5 }}>{' 512 '}</FadeText>
+          <FadeText style={{ marginTop: 5 }}>{' ' + GlobalConst.memoMaxLength.toString() + ' '}</FadeText>
         </View>
       </ScrollView>
       <View
@@ -191,7 +191,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
           type={ButtonTypeEnum.Primary}
           title={translate('save') as string}
           onPress={doSaveAndClose}
-          disabled={countMemoBytes(memo, includeUAMemo) > 512}
+          disabled={countMemoBytes(memo, includeUAMemo) > GlobalConst.memoMaxLength}
         />
         <Button
           type={ButtonTypeEnum.Secondary}

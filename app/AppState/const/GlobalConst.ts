@@ -12,4 +12,5 @@ export const GlobalConst = {
   success: 'success',
   true: 'true',
   false: 'false',
+  memoMaxLength: 512,
 };

@@ -469,7 +469,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     if (to.memo || to.includeUAMemo) {
       const len = Buffer.byteLength(memoTotal(to.memo, to.includeUAMemo, uaAddress), 'utf8');
-      if (len > 512) {
+      if (len > GlobalConst.memoMaxLength) {
         setValidMemo(-1);
       } else {
         setValidMemo(1);
@@ -1307,7 +1307,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               setMemoIcon(false);
                             }
                           }}
-                          maxLength={512}
+                          maxLength={GlobalConst.memoMaxLength}
                         />
                         {ta.memo && (
                           <TouchableOpacity
@@ -1350,7 +1350,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           color: validMemo === -1 ? 'red' : colors.text,
                         }}>{`${countMemoBytes(ta.memo, ta.includeUAMemo)} `}</FadeText>
                       <FadeText style={{ marginTop: 5 }}>{translate('loadedapp.of') as string}</FadeText>
-                      <FadeText style={{ marginTop: 5 }}>{' 512 '}</FadeText>
+                      <FadeText style={{ marginTop: 5 }}>{' ' + GlobalConst.memoMaxLength.toString() + ' '}</FadeText>
                     </View>
                   </>
                 )}
