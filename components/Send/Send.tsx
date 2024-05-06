@@ -27,7 +27,6 @@ import {
   AddressBookFileClass,
   AddressClass,
   CommandEnum,
-  SendJsonToTypeType,
   SendPageStateClass,
   SendProgressClass,
   ToAddrClass,
@@ -164,7 +163,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const calculateFeeWithPropose = async (
-    amount: number,
+    amount: string,
     address: string,
     memo: string = '',
     includeUAMemo: boolean = false,
@@ -173,50 +172,25 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (!address || validAddress !== 1) {
       return;
     }
-    const proposeTransaction: SendJsonToTypeType[] = memo
-      ? [
-          {
-            amount:
-              validAmount === 1
-                ? parseInt((amount * 10 ** 8).toFixed(0), 10)
-                : validAmount === -2
-                ? parseInt((maxAmount * 10 ** 8).toFixed(0), 10)
-                : 0,
-            address,
-            memo: memoTotal(memo, includeUAMemo),
-          },
-        ]
-      : [
-          {
-            amount:
-              validAmount === 1
-                ? parseInt((amount * 10 ** 8).toFixed(0), 10)
-                : validAmount === -2
-                ? parseInt((maxAmount * 10 ** 8).toFixed(0), 10)
-                : 0,
-            address,
-          },
-        ];
+    const sendPageStateCalculateFee = new SendPageStateClass(new ToAddrClass(0));
+    sendPageStateCalculateFee.toaddr.to = address;
+    sendPageStateCalculateFee.toaddr.memo = memo;
+    sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemo;
 
-    const donationTransaction: SendJsonToTypeType[] = [];
-
-    // we need to exclude 2 use cases:
-    // 1. send to self (make no sense to do a donation here)
-    // 2. send to donation UA (make no sense to do a double donation)
-    if (donation && server.chain_name === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress) {
-      donationTransaction.push({
-        address: await Utils.getDonationAddress(server.chain_name),
-        amount: parseInt(
-          (Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) * 10 ** 8).toFixed(0),
-          10,
-        ),
-        memo: Utils.getDefaultDonationMemo(translate) + '\n' + translate('settings.donation-title'),
-      });
-    }
+    sendPageStateCalculateFee.toaddr.amount =
+      validAmount === 1 ? amount : validAmount === -2 ? Utils.parseNumberFloatToStringLocale(maxAmount, 8) : '0';
 
     let proposeFee = 0;
-    const runProposeStr = await runSendPropose(JSON.stringify([...proposeTransaction, ...donationTransaction]));
-    console.log([...proposeTransaction, ...donationTransaction]);
+    const sendJson = await Utils.getSendManyJSON(
+      sendPageStateCalculateFee,
+      uaAddress,
+      addresses,
+      server,
+      donation,
+      translate,
+    );
+    const runProposeStr = await runSendPropose(JSON.stringify(sendJson));
+    console.log(sendJson);
     if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
       // snack with error
       console.log(runProposeStr);
@@ -252,10 +226,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (validAddress === 0 && validAmount === 0) {
       setFee(0);
     } else if (validAddress !== -1 && validAmount !== -1) {
-      calculateFeeWithPropose(
-        Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount),
-        sendPageState.toaddr.to,
-      );
+      calculateFeeWithPropose(sendPageState.toaddr.amount, sendPageState.toaddr.to);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validAddress, validAmount]);
@@ -934,7 +905,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                           if (fee > 0) {
                             updateToField(null, Utils.parseNumberFloatToStringLocale(maxAmount, 8), null, null, null);
                           }
-                          calculateFeeWithPropose(maxAmount, sendPageState.toaddr.to);
+                          calculateFeeWithPropose(
+                            Utils.parseNumberFloatToStringLocale(maxAmount, 8),
+                            sendPageState.toaddr.to,
+                          );
                           setSendAllClick(true);
                           setTimeout(() => {
                             setSendAllClick(false);
@@ -1013,10 +987,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null, null)}
                           onEndEditing={(e: any) => {
                             updateToField(null, e.nativeEvent.text.substring(0, 20), null, null, null);
-                            calculateFeeWithPropose(
-                              Utils.parseStringLocaleToNumberFloat(e.nativeEvent.text.substring(0, 20)),
-                              ta.to,
-                            );
+                            calculateFeeWithPropose(e.nativeEvent.text.substring(0, 20), ta.to);
                           }}
                           editable={true}
                           maxLength={20}
@@ -1185,7 +1156,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             onEndEditing={(e: any) => {
                               updateToField(null, null, e.nativeEvent.text.substring(0, 15), null, null);
                               // re-calculate the fee with the zec amount in the other field
-                              calculateFeeWithPropose(Utils.parseStringLocaleToNumberFloat(ta.amount), ta.to);
+                              calculateFeeWithPropose(ta.amount, ta.to);
                             }}
                             editable={true}
                             maxLength={15}

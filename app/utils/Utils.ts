@@ -1,9 +1,18 @@
 import { getNumberFormatSettings } from 'react-native-localize';
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
-import { ChainNameEnum, TranslateType } from '../AppState';
+import {
+  AddressClass,
+  ChainNameEnum,
+  SendJsonToTypeType,
+  SendPageStateClass,
+  ServerType,
+  ToAddrClass,
+  TranslateType,
+} from '../AppState';
 
 import randomColor from 'randomcolor';
 import RPCModule from '../RPCModule';
+import { Buffer } from 'buffer';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
@@ -182,5 +191,76 @@ export default class Utils {
     }
 
     return colorList;
+  }
+
+  static async getSendManyJSON(
+    sendPageState: SendPageStateClass,
+    uaAddress: string,
+    addresses: AddressClass[],
+    server: ServerType,
+    donation: boolean,
+    translate: (key: string) => TranslateType,
+  ): Promise<SendJsonToTypeType[]> {
+    let sendToSelf: boolean = false;
+    let donationAddress: boolean = false;
+    const json: Promise<SendJsonToTypeType[][]> = Promise.all(
+      [sendPageState.toaddr].flatMap(async (to: ToAddrClass) => {
+        const memo = `${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`;
+        const amount = parseInt((Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(0), 10);
+
+        const myAddress: AddressClass[] = addresses.filter((a: AddressClass) => a.address === to.to);
+        sendToSelf = myAddress.length >= 1;
+
+        donationAddress = to.to === (await Utils.getDonationAddress(server.chain_name));
+
+        if (memo === '') {
+          return [{ address: to.to, amount } as SendJsonToTypeType];
+        } else if (Buffer.byteLength(memo, 'utf8') <= 512) {
+          return [{ address: to.to, amount, memo } as SendJsonToTypeType];
+        } else {
+          // If the memo is more than 512 bytes, then we split it into multiple transactions.
+          // Each memo will be `(xx/yy)memo_part`. The prefix "(xx/yy)" is 7 bytes long, so
+          // we'll split the memo into 512-7 = 505 bytes length
+          const splits = Utils.utf16Split(memo, 505);
+          const tos = [];
+
+          // The first one contains all the tx value
+          tos.push({ address: to.to, amount, memo: `(1/${splits.length})${splits[0]}` } as SendJsonToTypeType);
+
+          for (let i = 1; i < splits.length; i++) {
+            tos.push({
+              address: to.to,
+              amount: 0,
+              memo: `(${i + 1}/${splits.length})${splits[i]}`,
+            } as SendJsonToTypeType);
+          }
+
+          return tos;
+        }
+      }),
+    );
+    const jsonFlat: SendJsonToTypeType[] = (await json).flat();
+
+    const donationTransaction: SendJsonToTypeType[] = [];
+
+    // we need to exclude 2 use cases:
+    // 1. send to self (make no sense to do a donation here)
+    // 2. send to donation UA (make no sense to do a double donation)
+    if (donation && server.chain_name === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress) {
+      donationTransaction.push({
+        address: await Utils.getDonationAddress(server.chain_name),
+        amount: parseInt(
+          (Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) * 10 ** 8).toFixed(0),
+          10,
+        ),
+        memo: Utils.getDefaultDonationMemo(translate) + '\n' + translate('settings.donation-title'),
+      });
+    }
+
+    console.log('Sending:');
+    console.log(jsonFlat);
+    console.log(donationTransaction);
+
+    return [...jsonFlat, ...donationTransaction];
   }
 }

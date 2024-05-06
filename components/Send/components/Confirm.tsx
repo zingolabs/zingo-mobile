@@ -36,7 +36,7 @@ type ConfirmProps = {
   openModal: () => void;
   confirmSend: () => void;
   sendAllAmount: boolean;
-  calculateFeeWithPropose: (amount: number, address: string, memo: string) => Promise<void>;
+  calculateFeeWithPropose: (amount: string, address: string, memo: string) => Promise<void>;
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
   closeModal,
@@ -234,11 +234,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   }, []);
 
   useEffect(() => {
-    calculateFeeWithPropose(
-      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount),
-      sendPageState.toaddr.to,
-      memoTotal,
-    );
+    calculateFeeWithPropose(sendPageState.toaddr.amount, sendPageState.toaddr.to, memoTotal);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
