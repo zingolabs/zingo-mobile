@@ -39,6 +39,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
     override fun doWork(): Result {
         val reactContext = ReactApplicationContext(MainApplication.getAppContext())
         val rpcModule = RPCModule(reactContext)
+        val errorPrefix = "error"
 
         Log.i("SCHEDULED_TASK_RUN", "Task running")
 
@@ -58,7 +59,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
             // check the Server, because the task can run without the App.
             val balance = uniffi.zingo.executeCommand("balance", "")
             Log.i("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
-            if (balance.lowercase().startsWith("error")) {
+            if (balance.lowercase().startsWith(errorPrefix)) {
                 // this means this task is running with the App closed
                 loadWalletFile(rpcModule)
             } else {

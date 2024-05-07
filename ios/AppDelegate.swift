@@ -20,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   private var bridge: RCTBridge!
   private var bgTask: BGProcessingTask? = nil
   private var timeStampStrStart: String? = nil
+  private let errorPrefix = "error"
 
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -246,7 +247,7 @@ extension AppDelegate {
     func stopSyncingProcess() {
         NSLog("BGTask stopSyncingProcess")
         let statusStr = executeCommand(cmd: "syncstatus", args: "")
-        if statusStr.lowercased().hasPrefix("error") {
+        if statusStr.lowercased().hasPrefix(errorPrefix) {
             NSLog("BGTask stopSyncingProcess - no lightwalled likely")
             return
         }
@@ -266,7 +267,7 @@ extension AppDelegate {
             Thread.sleep(forTimeInterval: 0.5)
 
             let newStatusStr = executeCommand(cmd: "syncstatus", args: "")
-            if newStatusStr.lowercased().hasPrefix("error") {
+            if newStatusStr.lowercased().hasPrefix(errorPrefix) {
                 NSLog("BGTask stopSyncingProcess - error getting new status")
                 return
             }
@@ -307,7 +308,7 @@ extension AppDelegate {
             let balance = executeCommand(cmd: "balance", args: "")
             let balanceStr = String(balance)
             NSLog("BGTask syncingProcessBackgroundTask - testing if server is active \(balanceStr)")
-            if balanceStr.hasPrefix("Error") {
+            if balanceStr.lowercased().hasPrefix(errorPrefix) {
                 // this task is running with the App closed.
                 self.loadWalletFile()
             } else {

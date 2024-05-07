@@ -15,6 +15,7 @@ import kotlin.concurrent.thread
 
 
 class RPCModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+    val errorPrefix = "error"
     override fun getName(): String {
         return "RPCModule"
     }
@@ -55,7 +56,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val seed = uniffi.zingo.initNew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
         // Log.i("MAIN-Seed", seed)
 
-        if (!seed.lowercase().startsWith("error")) {
+        if (!seed.lowercase().startsWith(errorPrefix)) {
             saveWallet()
         }
 
@@ -71,7 +72,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val rseed = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
         // Log.i("MAIN", rseed)
 
-        if (!rseed.lowercase().startsWith("error")) {
+        if (!rseed.lowercase().startsWith(errorPrefix)) {
             saveWallet()
         }
 
@@ -87,7 +88,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val rufvk = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
         // Log.i("MAIN", rufvk)
 
-        if (!rufvk.lowercase().startsWith("error")) {
+        if (!rufvk.lowercase().startsWith(errorPrefix)) {
             saveWallet()
         }
 
@@ -332,7 +333,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             // Log.i("execute", "Response to $cmd : $resp")
 
             // And save it if it was a sync
-            if (cmd == "sync" && !resp.lowercase().startsWith("error")) {
+            if (cmd == "sync" && !resp.lowercase().startsWith(errorPrefix)) {
                 saveWallet()
             }
 
