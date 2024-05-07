@@ -11,7 +11,6 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import java.io.File
 import java.util.*
 import org.json.JSONObject
 import java.nio.charset.StandardCharsets
@@ -51,7 +50,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundStart")
 
         // checking if the wallet file exists
-        val exists: Boolean = walletExists()
+        val exists: Boolean = rpcModule.wallet_exists()
 
         if (exists) {
             uniffi.zingo.initLogging()
@@ -92,7 +91,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         }
 
         // save the wallet file with the new data from the sync process
-        rpcModule.saveWallet()
+        rpcModule.saveWalletFile()
         Log.i("SCHEDULED_TASK_RUN", "wallet file SAVED")
 
         // save the background JSON file
@@ -157,17 +156,6 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
 
     }
 
-    private fun walletExists(): Boolean {
-        // Check if a wallet already exists
-        val file = File(MainApplication.getAppContext()?.filesDir, "wallet.dat")
-        return if (file.exists()) {
-            Log.i("SCHEDULED_TASK_RUN", "Wallet exists")
-            true
-        } else {
-            Log.i("SCHEDULED_TASK_RUN", "Wallet DOES NOT exist")
-            false
-        }
-    }
 }
 
 class BSCompanion {
