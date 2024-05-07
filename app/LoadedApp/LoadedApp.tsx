@@ -434,7 +434,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         }
         // (PIN or TouchID or FaceID)
         const resultBio = this.state.security.foregroundApp
-          ? await simpleBiometrics({ translate: this.state.translate })
+          ? await simpleBiometrics({ translate: this.props.translate })
           : true;
         // can be:
         // - true      -> the user do pass the authentication
@@ -506,7 +506,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
       this.closeAllModals();
       this.state.navigation.navigate(RouteEnums.LoadedApp, {
-        screen: this.state.translate('loadedapp.send-menu'),
+        screen: this.props.translate('loadedapp.send-menu'),
         initial: false,
       });
     });
@@ -569,7 +569,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     // Attempt to parse as URI if it starts with zcash
     // only if it is a spendable wallet
     if (url.startsWith(GlobalConst.zcash) && !this.state.readOnly) {
-      const target: string | ZcashURITargetClass = await parseZcashURI(url, this.state.translate, this.state.server);
+      const target: string | ZcashURITargetClass = await parseZcashURI(url, this.props.translate, this.state.server);
       //console.log(targets);
 
       if (typeof target !== 'string') {
@@ -579,7 +579,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           target.address &&
           this.state.sendPageState.toaddr.to !== target.address
         ) {
-          await ShowAddressAlertAsync(this.state.translate)
+          await ShowAddressAlertAsync(this.props.translate)
             .then(async () => {
               // fill the fields in the screen with the donation data
               update = true;
@@ -730,8 +730,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               let message: string = '';
               if (txNew[0].type === TransactionTypeEnum.Received) {
                 message =
-                  (this.state.translate('loadedapp.incoming-funds') as string) +
-                  (this.state.translate('history.received') as string) +
+                  (this.props.translate('loadedapp.incoming-funds') as string) +
+                  (this.props.translate('history.received') as string) +
                   ' ' +
                   Utils.parseNumberFloatToStringLocale(
                     txNew[0].txDetails.reduce((s, d) => s + d.amount, 0),
@@ -741,10 +741,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   this.state.info.currencyName;
               } else if (txNew[0].type === TransactionTypeEnum.SendToSelf) {
                 message =
-                  (this.state.translate('loadedapp.transaction-confirmed') as string) +
-                  (this.state.translate('history.sendtoself') as string) +
+                  (this.props.translate('loadedapp.transaction-confirmed') as string) +
+                  (this.props.translate('history.sendtoself') as string) +
                   (txNew[0].fee
-                    ? ((' ' + this.state.translate('send.fee')) as string) +
+                    ? ((' ' + this.props.translate('send.fee')) as string) +
                       ' ' +
                       Utils.parseNumberFloatToStringLocale(txNew[0].fee, 8) +
                       ' ' +
@@ -752,8 +752,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                     : '');
               } else {
                 message =
-                  (this.state.translate('loadedapp.payment-made') as string) +
-                  (this.state.translate('history.sent') as string) +
+                  (this.props.translate('loadedapp.payment-made') as string) +
+                  (this.props.translate('history.sent') as string) +
                   ' ' +
                   Utils.parseNumberFloatToStringLocale(
                     txNew[0].txDetails.reduce((s, d) => s + d.amount, 0),
@@ -770,7 +770,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             // the transaction is gone -> Likely Reverted by the server
             if (txNew.length === 0) {
               this.addLastSnackbar({
-                message: this.state.translate('loadedapp.transaction-reverted') as string,
+                message: this.props.translate('loadedapp.transaction-reverted') as string,
                 duration: SnackbarDurationEnum.long,
               });
             }
@@ -1019,7 +1019,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         this.state.sendPageState.toaddr.to &&
         this.state.sendPageState.toaddr.to !== (await Utils.getDonationAddress(this.state.server.chain_name))
       ) {
-        await ShowAddressAlertAsync(this.state.translate)
+        await ShowAddressAlertAsync(this.props.translate)
           .then(async () => {
             // fill the fields in the screen with the donation data
             update = true;
@@ -1036,7 +1036,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
         to.to = await Utils.getDonationAddress(this.state.server.chain_name);
         to.amount = Utils.getDefaultDonationAmount();
-        to.memo = this.state.translate('loadedapp.nymmemo') as string;
+        to.memo = this.props.translate('loadedapp.nymmemo') as string;
         to.includeUAMemo = true;
 
         uriToAddr = to;
@@ -1047,7 +1047,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
       this.closeAllModals();
       this.state.navigation.navigate(RouteEnums.LoadedApp, {
-        screen: this.state.translate('loadedapp.send-menu'),
+        screen: this.props.translate('loadedapp.send-menu'),
         initial: false,
       });
     }
@@ -1444,6 +1444,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       ufvkServerModalVisible,
       addressBookModalVisible,
       snackbars,
+      isMenuDrawerOpen,
+      mode,
+      transactions,
+      readOnly,
+      totalBalance,
     } = this.state;
     const { translate } = this.props;
     const { colors } = this.props.theme;
@@ -1484,10 +1489,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
     return (
       <ContextAppLoadedProvider value={this.state}>
-        <SideMenu
-          menu={menu}
-          isOpen={this.state.isMenuDrawerOpen}
-          onChange={(isOpen: boolean) => this.updateMenuState(isOpen)}>
+        <SideMenu menu={menu} isOpen={isMenuDrawerOpen} onChange={(isOpen: boolean) => this.updateMenuState(isOpen)}>
           <Modal
             animationType="slide"
             transparent={false}
@@ -1830,14 +1832,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
-          {this.state.mode !== ModeEnum.basic ||
-          (this.state.mode === ModeEnum.basic &&
-            (!(this.state.mode === ModeEnum.basic && this.state.transactions.length <= 0) ||
-              (!this.state.readOnly &&
-                !(
-                  this.state.mode === ModeEnum.basic &&
-                  this.state.totalBalance.spendableOrchard + this.state.totalBalance.spendablePrivate <= 0
-                )))) ? (
+          {mode !== ModeEnum.basic ||
+          (mode === ModeEnum.basic &&
+            (!(mode === ModeEnum.basic && transactions.length <= 0) ||
+              (!readOnly &&
+                !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0)))) ? (
             <Tab.Navigator
               initialRouteName={translate('loadedapp.wallet-menu') as string}
               screenOptions={({ route }) => ({
@@ -1880,11 +1879,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   </>
                 )}
               </Tab.Screen>
-              {!this.state.readOnly &&
-                !(
-                  this.state.mode === ModeEnum.basic &&
-                  this.state.totalBalance.spendableOrchard + this.state.totalBalance.spendablePrivate <= 0
-                ) && (
+              {!readOnly &&
+                !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
                   <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                     {() => (
                       <>

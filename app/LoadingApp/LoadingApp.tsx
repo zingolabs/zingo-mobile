@@ -392,7 +392,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         // (PIN or TouchID or FaceID)
         this.setState({ biometricsFailed: false });
         const resultBio = this.state.security.startApp
-          ? await simpleBiometrics({ translate: this.state.translate })
+          ? await simpleBiometrics({ translate: this.props.translate })
           : true;
         // can be:
         // - true      -> the user do pass the authentication
@@ -432,7 +432,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       if (this.state.selectServer === SelectServerEnum.auto) {
         setTimeout(() => {
           this.addLastSnackbar({
-            message: this.state.translate('loadedapp.selectingserver') as string,
+            message: this.props.translate('loadedapp.selectingserver') as string,
             duration: SnackbarDurationEnum.longer,
           });
         }, 1000);
@@ -493,7 +493,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           if (error) {
             await this.walletErrorHandle(
               result,
-              this.state.translate('loadingapp.readingwallet-label') as string,
+              this.props.translate('loadingapp.readingwallet-label') as string,
               1,
               true,
             );
@@ -600,15 +600,15 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   showDonationAlertAsync = (): Promise<void> => {
     return new Promise((resolve, reject) => {
       Alert.alert(
-        this.state.translate('loadingapp.alert-donation-title') as string,
-        this.state.translate('loadingapp.alert-donation-body') as string,
+        this.props.translate('loadingapp.alert-donation-title') as string,
+        this.props.translate('loadingapp.alert-donation-body') as string,
         [
           {
-            text: this.state.translate('confirm') as string,
+            text: this.props.translate('confirm') as string,
             onPress: () => resolve(),
           },
           {
-            text: this.state.translate('cancel') as string,
+            text: this.props.translate('cancel') as string,
             style: 'cancel',
             onPress: () => reject(),
           },
@@ -644,12 +644,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     if (this.state.mode === ModeEnum.advanced) {
       if (isEqual(actualServer, fasterServer)) {
         this.addLastSnackbar({
-          message: this.state.translate('loadedapp.selectingserversame') as string,
+          message: this.props.translate('loadedapp.selectingserversame') as string,
           duration: SnackbarDurationEnum.long,
         });
       } else {
         this.addLastSnackbar({
-          message: (this.state.translate('loadedapp.selectingserverbest') as string) + ' ' + fasterServer.uri,
+          message: (this.props.translate('loadedapp.selectingserverbest') as string) + ' ' + fasterServer.uri,
           duration: SnackbarDurationEnum.long,
         });
       }
@@ -681,7 +681,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         this.setState({ screen: 1, actionButtonsDisabled: true });
         setTimeout(() => {
           this.addLastSnackbar({
-            message: this.state.translate('loadingapp.serverfirsttry') as string,
+            message: this.props.translate('loadingapp.serverfirsttry') as string,
             duration: SnackbarDurationEnum.longer,
           });
         }, 1000);
@@ -701,7 +701,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       } else {
         // second try
         this.addLastSnackbar({
-          message: this.state.translate('loadingapp.serversecondtry') as string,
+          message: this.props.translate('loadingapp.serversecondtry') as string,
           duration: SnackbarDurationEnum.longer,
         });
         setTimeout(() => {
@@ -750,10 +750,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       return;
     }
     this.setState({ actionButtonsDisabled: true });
-    const uri: string = parseServerURI(this.state.customServerUri, this.state.translate);
+    const uri: string = parseServerURI(this.state.customServerUri, this.props.translate);
     const chain_name = this.state.customServerChainName;
     if (uri.toLowerCase().startsWith(GlobalConst.error)) {
-      this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string });
+      this.addLastSnackbar({ message: this.props.translate('settings.isuri') as string });
     } else {
       await SettingsFileImpl.writeSettings(SettingsNameEnum.server, { uri, chain_name });
       this.setState({
