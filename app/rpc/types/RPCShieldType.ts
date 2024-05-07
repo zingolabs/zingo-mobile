@@ -1,4 +1,4 @@
 export type RPCShieldType = {
+  txids?: string[];
   error?: string;
-  txid?: string;
 };

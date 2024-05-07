@@ -1,4 +1,4 @@
 export type RPCSendType = {
-  txid?: string;
+  txids?: string[];
   error?: string;
 };
