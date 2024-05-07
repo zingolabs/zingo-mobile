@@ -105,7 +105,7 @@ export default class RPC {
 
     this.inRefresh = false;
     this.inSend = false;
-    this.blocksPerBatch = 100;
+    this.blocksPerBatch = GlobalConst.blocksPerBatch;
 
     this.prev_batch_num = -1;
     this.prev_sync_id = -1;
