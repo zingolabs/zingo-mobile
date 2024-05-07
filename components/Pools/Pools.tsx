@@ -18,11 +18,11 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { ButtonTypeEnum, GlobalConst, SettingsNameEnum } from '../../app/AppState';
+import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
 
 type PoolsProps = {
   closeModal: () => void;
-  set_privacy_option: (name: SettingsNameEnum.privacy, value: boolean) => Promise<void>;
+  set_privacy_option: (value: boolean) => Promise<void>;
 };
 
 const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_option }) => {

@@ -101,14 +101,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         {contact && (
           <TouchableOpacity
             onPress={() => {
-              // make no sense to copy the label to the clipboard, it's useless.
-              //if (!oneLine) {
-              //  Clipboard.setString(contact);
-              //  addLastSnackbar({
-              //    message: translate('history.contactcopied') as string,
-              //    duration: SnackbarDurationEnum.short,
-              //  });
-              //}
               setExpandContact(true);
               if (privacy) {
                 setTimeout(() => {

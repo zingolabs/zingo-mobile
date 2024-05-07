@@ -33,7 +33,6 @@ import {
   ModeEnum,
   CurrencyEnum,
   ChainNameEnum,
-  SettingsNameEnum,
   ButtonTypeEnum,
   GlobalConst,
 } from '../../app/AppState';
@@ -71,7 +70,7 @@ type SendProps = {
   syncingStatusMoreInfoOnClick: () => void;
   poolsMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
-  set_privacy_option: (name: SettingsNameEnum.privacy, value: boolean) => Promise<void>;
+  set_privacy_option: (value: boolean) => Promise<void>;
   setPoolsToShieldSelectSapling: (v: boolean) => void;
   setPoolsToShieldSelectTransparent: (v: boolean) => void;
 };

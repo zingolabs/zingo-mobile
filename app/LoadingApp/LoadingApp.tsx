@@ -140,9 +140,6 @@ export default function LoadingApp(props: LoadingAppProps) {
       // fallback if no available language fits
       const fallback = { languageTag: LanguageEnum.en, isRTL: false };
 
-      //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
-      //console.log(RNLocalize.getLocales());
-
       const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
 
       // update layout direction
@@ -719,32 +716,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     }
   };
 
-  //usingDefaultServer_0 = async (mode: ModeEnum.basic | ModeEnum.advanced) => {
-  //  this.setState({ actionButtonsDisabled: true });
-  //  if (SERVER_DEFAULT_0) {
-  //    await SettingsFileImpl.writeSettings(SettingsNameEnum.server, SERVER_DEFAULT_0);
-  //    this.setState({ server: SERVER_DEFAULT_0 });
-  //  }
-  //  if (mode === ModeEnum.basic) {
-  //    this.setState({ actionButtonsDisabled: false }, () => this.componentDidMount());
-  //  } else {
-  //    this.setState({ actionButtonsDisabled: false });
-  //  }
-  //};
-
-  //usingDefaultServer_1 = async (mode: ModeEnum.basic | ModeEnum.advanced) => {
-  //  this.setState({ actionButtonsDisabled: true });
-  //  if (SERVER_DEFAULT_1) {
-  //    await SettingsFileImpl.writeSettings(SettingsNameEnum.server, SERVER_DEFAULT_1);
-  //    this.setState({ server: SERVER_DEFAULT_1 });
-  //  }
-  //  if (mode === ModeEnum.basic) {
-  //    this.setState({ actionButtonsDisabled: false }, () => this.componentDidMount());
-  //  } else {
-  //    this.setState({ actionButtonsDisabled: false });
-  //  }
-  //};
-
   usingCustomServer = async () => {
     if (!this.state.customServerUri) {
       return;
@@ -778,9 +749,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
       let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chain_name);
-      //if (this.state.serverErrorTries === 0 || true) {
-      //  seed = 'Error: pepe es guay';
-      //}
 
       if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
         let wallet = {} as WalletType;
@@ -798,7 +766,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         }
         // default values for wallet options
         this.set_wallet_option(WalletOptionEnum.download_memos, DownloadMemosEnum.walletMemos);
-        //await this.set_wallet_option(WalletOptionEnum.transaction_filter_threshold, '500');
         // basic mode -> same screen.
         this.setState(state => ({
           wallet,
@@ -807,13 +774,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           walletExists: true,
         }));
       } else {
-        //this.setState({ actionButtonsDisabled: false });
-        //createAlert(
-        //  this.setBackgroundError,
-        //  this.addLastSnackbar,
-        //  this.props.translate('loadingapp.creatingwallet-label') as string,
-        //  seed,
-        //);
         this.walletErrorHandle(seed, this.props.translate('loadingapp.creatingwallet-label') as string, 1, false);
       }
     });
@@ -883,9 +843,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           this.state.server.chain_name,
         );
       }
-      //if (this.state.serverErrorTries === 0 || true) {
-      //  result = 'Error: pepe es guay';
-      //}
 
       //console.log(seed_ufvk);
       //console.log(result);
@@ -916,12 +873,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     });
   };
 
-  set_wallet_option = async (name: string, value: string) => {
-    await RPC.rpc_setWalletSettingOption(name, value);
+  set_wallet_option = async (walletOption: string, value: string) => {
+    await RPC.rpc_setWalletSettingOption(walletOption, value);
   };
 
-  set_privacy_option = async (name: SettingsNameEnum.privacy, value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  set_privacy_option = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, value);
     this.setState({
       privacy: value as boolean,
     });
@@ -1244,7 +1201,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                       type={ButtonTypeEnum.Primary}
                       title={translate('loadingapp.opencurrentwallet') as string}
                       disabled={actionButtonsDisabled}
-                      onPress={this.componentDidMount}
+                      onPress={() => {
+                        // to avoid the biometric security
+                        this.setState({
+                          startingApp: false,
+                        });
+                        this.componentDidMount;
+                      }}
                       style={{ marginBottom: 10 }}
                     />
                   )}

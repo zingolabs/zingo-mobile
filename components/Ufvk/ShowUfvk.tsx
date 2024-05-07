@@ -14,14 +14,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import RegText from '../Components/RegText';
-import {
-  ButtonTypeEnum,
-  ChainNameEnum,
-  GlobalConst,
-  ModeEnum,
-  SettingsNameEnum,
-  UfvkActionEnum,
-} from '../../app/AppState';
+import { ButtonTypeEnum, ChainNameEnum, GlobalConst, ModeEnum, UfvkActionEnum } from '../../app/AppState';
 
 type TextsType = {
   new: string[];
@@ -36,7 +29,7 @@ type ShowUfvkProps = {
   onClickOK: () => void;
   onClickCancel: () => void;
   action: UfvkActionEnum;
-  set_privacy_option: (name: SettingsNameEnum.privacy, value: boolean) => Promise<void>;
+  set_privacy_option: (value: boolean) => Promise<void>;
 };
 const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);

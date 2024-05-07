@@ -29,7 +29,6 @@ import {
   CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
-  SettingsNameEnum,
   WalletOptionEnum,
   ButtonTypeEnum,
   GlobalConst,
@@ -41,22 +40,17 @@ import RNPickerSelect from 'react-native-picker-select';
 
 type SettingsProps = {
   closeModal: () => void;
-  set_wallet_option: (name: string, value: string) => Promise<void>;
-  set_server_option: (
-    name: SettingsNameEnum.server,
-    value: ServerType,
-    toast: boolean,
-    same_server_chain_name: boolean,
-  ) => Promise<void>;
-  set_currency_option: (name: SettingsNameEnum.currency, value: CurrencyEnum) => Promise<void>;
-  set_language_option: (name: SettingsNameEnum.language, value: LanguageEnum, reset: boolean) => Promise<void>;
-  set_sendAll_option: (name: SettingsNameEnum.sendAll, value: boolean) => Promise<void>;
-  set_donation_option: (name: SettingsNameEnum.donation, value: boolean) => Promise<void>;
-  set_privacy_option: (name: SettingsNameEnum.privacy, value: boolean) => Promise<void>;
-  set_mode_option: (name: SettingsNameEnum.mode, value: string) => Promise<void>;
-  set_security_option: (name: SettingsNameEnum.security, value: SecurityType) => Promise<void>;
-  set_selectServer_option: (name: SettingsNameEnum.selectServer, value: string) => Promise<void>;
-  set_rescanMenuOption_option: (name: SettingsNameEnum.rescanMenuOption, value: boolean) => Promise<void>;
+  set_wallet_option: (walletOption: string, value: string) => Promise<void>;
+  set_server_option: (value: ServerType, toast: boolean, same_server_chain_name: boolean) => Promise<void>;
+  set_currency_option: (value: CurrencyEnum) => Promise<void>;
+  set_language_option: (value: LanguageEnum, reset: boolean) => Promise<void>;
+  set_sendAll_option: (value: boolean) => Promise<void>;
+  set_donation_option: (value: boolean) => Promise<void>;
+  set_privacy_option: (value: boolean) => Promise<void>;
+  set_mode_option: (value: string) => Promise<void>;
+  set_security_option: (value: SecurityType) => Promise<void>;
+  set_selectServer_option: (value: string) => Promise<void>;
+  set_rescanMenuOption_option: (value: boolean) => Promise<void>;
 };
 
 type Options = {
@@ -341,7 +335,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         }
         // in this point the sync process is blocked, who knows why.
         // if I save the actual server before the customization... is going to work.
-        set_server_option(SettingsNameEnum.server, serverContext, false, same_server_chain_name);
+        set_server_option(serverContext, false, same_server_chain_name);
         setDisabled(false);
         return;
       } else {
@@ -360,38 +354,37 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       await set_wallet_option(WalletOptionEnum.transaction_filter_threshold, filter);
     }
     if (currencyContext !== currency) {
-      await set_currency_option(SettingsNameEnum.currency, currency);
+      await set_currency_option(currency);
     }
     if (sendAllContext !== sendAll) {
-      await set_sendAll_option(SettingsNameEnum.sendAll, sendAll);
+      await set_sendAll_option(sendAll);
     }
     if (donationContext !== donation) {
-      await set_donation_option(SettingsNameEnum.donation, donation);
+      await set_donation_option(donation);
     }
     if (privacyContext !== privacy) {
-      await set_privacy_option(SettingsNameEnum.privacy, privacy);
+      await set_privacy_option(privacy);
     }
     if (modeContext !== mode) {
-      await set_mode_option(SettingsNameEnum.mode, mode);
+      await set_mode_option(mode);
     }
     if (!isEqual(securityContext, securityObject())) {
-      await set_security_option(SettingsNameEnum.security, securityObject());
+      await set_security_option(securityObject());
     }
     if (selectServerContext !== selectServer) {
-      await set_selectServer_option(SettingsNameEnum.selectServer, selectServer);
+      await set_selectServer_option(selectServer);
     }
     if (rescanMenuOptionContext !== rescanMenuOption) {
-      await set_rescanMenuOption_option(SettingsNameEnum.rescanMenuOption, rescanMenuOption);
+      await set_rescanMenuOption_option(rescanMenuOption);
     }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
     if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== chain_nameParsed) {
       if (languageContext !== language) {
-        await set_language_option(SettingsNameEnum.language, language, false);
+        await set_language_option(language, false);
       }
       set_server_option(
-        SettingsNameEnum.server,
         { uri: serverUriParsed, chain_name: chain_nameParsed } as ServerType,
         true,
         same_server_chain_name,
@@ -399,7 +392,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       ms = 1500;
     } else {
       if (languageContext !== language) {
-        await set_language_option(SettingsNameEnum.language, language, true);
+        await set_language_option(language, true);
       }
     }
 

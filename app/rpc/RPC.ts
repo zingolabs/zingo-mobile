@@ -261,74 +261,7 @@ export default class RPC {
       return 0;
     }
   }
-  /*
-  static async rpc_getPrivKeyAsString(address: string): Promise<string> {
-    const privKeyStr = await RPCModule.execute(CommandEnum.export, address);
-    //console.log(privKeyStr);
 
-    let privKeyJSON;
-    try {
-      privKeyJSON = await JSON.parse(privKeyStr);
-    } catch (e) {}
-
-    //console.log('sk', privKeyJSON);
-
-    // 'o' - spending_key
-    // 'z' and 't' - private_key
-    if (privKeyJSON) {
-      return privKeyJSON[0].spending_key || privKeyJSON[0].private_key;
-    }
-
-    return 'Error: ' + privKeyStr;
-  }
-
-  static async rpc_getViewKeyAsString(address: string): Promise<string> {
-    const viewKeyStr = await RPCModule.execute(CommandEnum.export, address);
-    //console.log(viewKeyStr);
-
-    let viewKeyJSON;
-    try {
-      viewKeyJSON = await JSON.parse(viewKeyStr);
-    } catch (e) {}
-
-    //console.log('vk', viewKeyJSON);
-
-    // 'o' - full_viewing_key
-    // 'z' and 't' - viewing_key
-    if (viewKeyJSON) {
-      return viewKeyJSON[0].full_viewing_key || viewKeyJSON[0].viewing_key;
-    }
-
-    return 'Error: ' + viewKeyStr;
-  }
-
-  static async rpc_createNewAddress(addressType: 'tzo'): Promise<string> {
-    const addrStr = await RPCModule.execute(CommandEnum.new, addressType);
-    const addrJSON = await JSON.parse(addrStr);
-
-    //console.log(addrJSON);
-
-    if (addrJSON) {
-      // Save
-      await RPCModule.doSave();
-
-      return addrJSON[0];
-    }
-
-    return '';
-  }
-
-  static async rpc_doImportPrivKey(key: string, birthday: string): Promise<string | string[]> {
-    const args = { key, birthday: parseInt(birthday, 10), norescan: true };
-    const address = await RPCModule.execute(CommandEnum.import, JSON.stringify(args));
-
-    if (address) {
-      return address;
-    }
-
-    return '';
-  }
-  */
   static async rpc_shieldFunds(): Promise<string> {
     try {
       // using `all` or `transparent` or `sapling`...
@@ -772,7 +705,6 @@ export default class RPC {
 
   async loadWalletData() {
     await this.fetchTotalBalance();
-    //await this.fetchTandZandOTransactionsList();
     await this.fetchTandZandOTransactionsSummaries();
     await this.fetchWalletSettings();
     await this.fetchInfoAndServerHeight();
@@ -870,13 +802,6 @@ export default class RPC {
             }
           })
           .catch(error => console.log('rescan error', error));
-        //.finally(() => {
-        // with the new feature shardtree I can get an error here, but
-        // doesn't mean the sync/rescan process is finished, I have to
-        // rely on syncstatus finished instead
-        //this.inRefresh = false;
-        //this.keepAwake(false);
-        //});
       } else {
         this.doSync()
           .then(result => {
@@ -889,13 +814,6 @@ export default class RPC {
             }
           })
           .catch(error => console.log('sync error', error));
-        //.finally(() => {
-        // with the new feature shardtree I can get an error here, but
-        // doesn't mean the sync/rescan process is finished, I have to
-        // rely on syncstatus finished instead
-        //this.inRefresh = false;
-        //this.keepAwake(false);
-        //});
       }
 
       // We need to wait for the sync to finish. The sync is done when
@@ -1015,13 +933,6 @@ export default class RPC {
         //const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
         const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + witnesses_updated) / 3;
 
-        // And fetch the rest of the data.
-        //await this.loadWalletData();
-
-        //await this.fetchWalletHeight();
-        //await this.fetchWalletBirthday();
-        //await this.fetchServerHeight();
-
         let current_block = end_block + progress_blocks;
         if (current_block > this.lastServerBlockHeight) {
           current_block = this.lastServerBlockHeight;
@@ -1031,16 +942,6 @@ export default class RPC {
         // if the current block is stalled I need to restart the App
         let syncProcessStalled = false;
         if (this.prev_current_block !== -1) {
-          //console.log(
-          //  'BEFORE prev current block',
-          //  this.prev_current_block,
-          //  'current block',
-          //  current_block,
-          //  'seconds',
-          //  this.seconds_block,
-          //  'blocks',
-          //  current_block - this.prev_current_block,
-          //);
           if (current_block > 0 && this.prev_current_block === current_block) {
             this.seconds_block += 5;
             // 5 minutes
@@ -1054,17 +955,6 @@ export default class RPC {
             syncProcessStalled = false;
           }
         }
-
-        //console.log(
-        //  'AFTER prev current block',
-        //  this.prev_current_block,
-        //  'current block',
-        //  current_block,
-        //  'seconds',
-        //  this.seconds_block,
-        //  'stalled',
-        //  syncProcessStalled,
-        //);
 
         // if current block is lower than the previous current block
         // The user need to see something not confusing.
@@ -1159,38 +1049,6 @@ export default class RPC {
             this.prev_batch_num = batch_num;
             this.seconds_batch = 0;
           }
-          // save wallet every 15 seconds in the same batch.
-          /* altum suggestion - remove the mid-batch saving...
-          if (this.seconds_batch > 0 && this.seconds_batch % 15 === 0) {
-            // And fetch the rest of the data.
-            await this.loadWalletData();
-
-            await this.fetchWalletHeight();
-            await this.fetchWalletBirthday();
-            await this.fetchInfoAndServerHeight();
-
-            await RPCModule.doSave();
-
-            // store SyncStatus object for a new screen
-            this.fnSetSyncingStatus({
-              syncID: this.sync_id,
-              totalBatches: batch_total,
-              currentBatch: ss.in_progress ? batch_num + 1 : 0,
-              lastBlockWallet: this.lastWalletBlockHeight,
-              currentBlock: current_block,
-              inProgress: ss.in_progress,
-              lastError: ss.last_error,
-              blocksPerBatch: this.blocksPerBatch,
-              secondsPerBatch: this.seconds_batch,
-              process_end_block: process_end_block,
-              lastBlockServer: this.lastServerBlockHeight,
-              syncProcessStalled: false,
-            } as SyncingStatusClass);
-
-            //console.log('sync status', ss);
-            //console.log(`@@@@@@@@@@@Saving wallet. seconds: ${this.seconds_batch}`);
-          }
-          */
         }
       }, 5000);
       //console.log('create sync/rescan timer', this.syncStatusTimerID);
@@ -1495,8 +1353,6 @@ export default class RPC {
             currenttxdetails.pool = !tx.pool || tx.pool === 'None' ? undefined : tx.pool;
             currentTxList[0].txDetails.push(currenttxdetails);
           }
-
-          //currentTxList[0].txDetails.forEach(det => console.log(det.memos));
           //console.log(currentTxList[0]);
           txList = [...currentTxList, ...restTxList];
         });
@@ -1514,8 +1370,6 @@ export default class RPC {
           // using pool for `Received`
           combinedTx.txDetails = RPC.rpc_combineTxDetailsByPool(txns.txDetails);
         }
-
-        //combinedTx.txDetails.forEach(det => console.log(det.memos));
         //console.log(combinedTx);
         combinedTxList.push(combinedTx);
       });
@@ -1562,8 +1416,8 @@ export default class RPC {
           const rJson: RPCSendType = JSON.parse(r);
           if (rJson.error) {
             sendError = rJson.error;
-          } else if (rJson.txid) {
-            sendTxid = rJson.txid;
+          } else if (rJson.txids) {
+            sendTxid = rJson.txids.join(', ');
           }
         } catch (e) {
           sendError = r;
@@ -1617,7 +1471,6 @@ export default class RPC {
         if (sendId === prevSendId && !sendTxid && !sendError) {
           //console.log('progress id', sendId);
           // Still not started, so wait for more time
-          //setSendProgress(updatedProgress);
           return;
         }
 
@@ -1644,7 +1497,6 @@ export default class RPC {
         this.setInSend(progress.sending);
 
         updatedProgress.progress = progress.progress;
-        //updatedProgress.total = Math.max(progress.total, progress.progress); // sometimes, due to change, the total can be off by 1
         updatedProgress.total = 3; // until sendprogress give me a good value... 3 is better.
         updatedProgress.sendInProgress = progress.sending;
         updatedProgress.etaSeconds = progress.progress === 0 ? '...' : eta;

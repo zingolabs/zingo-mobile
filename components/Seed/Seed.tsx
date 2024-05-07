@@ -53,7 +53,7 @@ type SeedProps = {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
   action: SeedActionEnum;
-  set_privacy_option: (name: SettingsNameEnum.privacy, value: boolean) => Promise<void>;
+  set_privacy_option: (value: boolean) => Promise<void>;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
   const contextLoaded = useContext(ContextAppLoaded);

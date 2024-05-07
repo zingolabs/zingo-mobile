@@ -23,7 +23,6 @@ import {
   CurrencyEnum,
   SnackbarDurationEnum,
   PoolToShieldEnum,
-  SettingsNameEnum,
   SnackbarType,
   ButtonTypeEnum,
   GlobalConst,
@@ -67,7 +66,7 @@ type HeaderProps = {
   setComputingModalVisible?: (visible: boolean) => void;
   setBackgroundError?: (title: string, error: string) => void;
   noPrivacy?: boolean;
-  set_privacy_option?: (name: SettingsNameEnum.privacy, value: boolean) => Promise<void>;
+  set_privacy_option?: (value: boolean) => Promise<void>;
   setPoolsToShieldSelectSapling?: (v: boolean) => void;
   setPoolsToShieldSelectTransparent?: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
@@ -329,12 +328,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               `${translate(`history.shield-error-${pools}`)} ${shieldJSON.error}`,
               true,
             );
-          } else if (shieldJSON.txid) {
+          } else if (shieldJSON.txids) {
             createAlert(
               setBackgroundError,
               addLastSnackbar,
               translate(`history.shield-title-${pools}`) as string,
-              `${translate(`history.shield-message-${pools}`)} ${shieldJSON.txid}`,
+              `${translate(`history.shield-message-${pools}`)} ${shieldJSON.txids.join(', ')}`,
               true,
             );
           }
@@ -385,34 +384,59 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncingStatus.inProgress, noSyncingStatus]);
 
+  const calculateAmountToShield = (): string => {
+    return poolsToShield === PoolToShieldEnum.saplingPoolToShield && totalBalance.spendablePrivate > shieldingFee
+      ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - shieldingFee, 8)
+      : poolsToShield === PoolToShieldEnum.transparentPoolToShield &&
+        (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
+      ? Utils.parseNumberFloatToStringLocale((someUnconfirmed ? 0 : totalBalance.transparentBal) - shieldingFee, 8)
+      : poolsToShieldSelectSapling &&
+        poolsToShieldSelectTransparent &&
+        totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
+      ? Utils.parseNumberFloatToStringLocale(
+          totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) - shieldingFee,
+          8,
+        )
+      : poolsToShieldSelectSapling && totalBalance.spendablePrivate > shieldingFee
+      ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - shieldingFee, 8)
+      : poolsToShieldSelectTransparent && (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
+      ? Utils.parseNumberFloatToStringLocale((someUnconfirmed ? 0 : totalBalance.transparentBal) - shieldingFee, 8)
+      : '0';
+  };
+
+  const calculatePoolsToShield = (): string => {
+    return poolsToShield !== PoolToShieldEnum.allPoolToShield
+      ? poolsToShield
+      : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
+      ? PoolToShieldEnum.allPoolToShield
+      : poolsToShieldSelectSapling
+      ? PoolToShieldEnum.saplingPoolToShield
+      : poolsToShieldSelectTransparent
+      ? PoolToShieldEnum.transparentPoolToShield
+      : PoolToShieldEnum.allPoolToShield;
+  };
+
+  const calculateDisableButtonToShield = (): boolean => {
+    return poolsToShield === PoolToShieldEnum.saplingPoolToShield && totalBalance.spendablePrivate > shieldingFee
+      ? false
+      : poolsToShield === PoolToShieldEnum.transparentPoolToShield &&
+        (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
+      ? false
+      : poolsToShieldSelectSapling &&
+        poolsToShieldSelectTransparent &&
+        totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
+      ? false
+      : poolsToShieldSelectSapling && totalBalance.spendablePrivate > shieldingFee
+      ? false
+      : poolsToShieldSelectTransparent && (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
+      ? false
+      : true;
+  };
+
   const onPressShieldFunds = () => {
     Alert.alert(
-      translate(
-        `history.shield-title-${
-          poolsToShield !== PoolToShieldEnum.allPoolToShield
-            ? poolsToShield
-            : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
-            ? PoolToShieldEnum.allPoolToShield
-            : poolsToShieldSelectSapling
-            ? PoolToShieldEnum.saplingPoolToShield
-            : poolsToShieldSelectTransparent
-            ? PoolToShieldEnum.transparentPoolToShield
-            : PoolToShieldEnum.allPoolToShield
-        }`,
-      ) as string,
-      translate(
-        `history.shield-alert-${
-          poolsToShield !== PoolToShieldEnum.allPoolToShield
-            ? poolsToShield
-            : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
-            ? PoolToShieldEnum.allPoolToShield
-            : poolsToShieldSelectSapling
-            ? PoolToShieldEnum.saplingPoolToShield
-            : poolsToShieldSelectTransparent
-            ? PoolToShieldEnum.transparentPoolToShield
-            : PoolToShieldEnum.allPoolToShield
-        }`,
-      ) as string,
+      translate(`history.shield-title-${calculatePoolsToShield()}`) as string,
+      translate(`history.shield-alert-${calculatePoolsToShield()}`) as string,
       [
         { text: translate('confirm') as string, onPress: () => shieldFunds() },
         { text: translate('cancel') as string, style: 'cancel' },
@@ -573,21 +597,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 )}
               </>
             )}
-            {/*syncingStatus.inProgress && blocksRemaining > 0 && (
-              <View style={{ marginRight: 5 }}>
-                {mode === ModeEnum.basic ? (
-                  <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                    <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
-                  </View>
-                ) : (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                      <FadeText style={{ fontSize: 10 }}>{`${blocksRemaining}`}</FadeText>
-                    </View>
-                  </TouchableOpacity>
-                )}
-              </View>
-              )*/}
             {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
               <>
                 {mode !== ModeEnum.basic && (
@@ -611,7 +620,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         translate('change-privacy-legend')) as string)
                 }`,
               });
-              set_privacy_option(SettingsNameEnum.privacy, !privacy);
+              set_privacy_option(!privacy);
             }}>
             <View
               style={{
@@ -731,46 +740,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       {showShieldButton && !!poolsToShield && setComputingModalVisible && (
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <FadeText style={{ fontSize: 8 }}>
-            {(translate(
-              `history.shield-legend-${
-                poolsToShield !== PoolToShieldEnum.allPoolToShield
-                  ? poolsToShield
-                  : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
-                  ? PoolToShieldEnum.allPoolToShield
-                  : poolsToShieldSelectSapling
-                  ? PoolToShieldEnum.saplingPoolToShield
-                  : poolsToShieldSelectTransparent
-                  ? PoolToShieldEnum.transparentPoolToShield
-                  : PoolToShieldEnum.allPoolToShield
-              }`,
-            ) as string) +
-              ` ${
-                poolsToShield === PoolToShieldEnum.saplingPoolToShield && totalBalance.spendablePrivate > shieldingFee
-                  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - shieldingFee, 8)
-                  : poolsToShield === PoolToShieldEnum.transparentPoolToShield &&
-                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
-                  ? Utils.parseNumberFloatToStringLocale(
-                      (someUnconfirmed ? 0 : totalBalance.transparentBal) - shieldingFee,
-                      8,
-                    )
-                  : poolsToShieldSelectSapling &&
-                    poolsToShieldSelectTransparent &&
-                    totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
-                  ? Utils.parseNumberFloatToStringLocale(
-                      totalBalance.spendablePrivate +
-                        (someUnconfirmed ? 0 : totalBalance.transparentBal) -
-                        shieldingFee,
-                      8,
-                    )
-                  : poolsToShieldSelectSapling && totalBalance.spendablePrivate > shieldingFee
-                  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - shieldingFee, 8)
-                  : poolsToShieldSelectTransparent && (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
-                  ? Utils.parseNumberFloatToStringLocale(
-                      (someUnconfirmed ? 0 : totalBalance.transparentBal) - shieldingFee,
-                      8,
-                    )
-                  : 0
-              } ` +
+            {(translate(`history.shield-legend-${calculatePoolsToShield()}`) as string) +
+              ` ${calculateAmountToShield()} ` +
               (translate('send.fee') as string) +
               ': ' +
               Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
@@ -779,38 +750,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           <View style={{ margin: 5, flexDirection: 'row' }}>
             <Button
               type={ButtonTypeEnum.Primary}
-              title={
-                translate(
-                  `history.shield-${
-                    poolsToShield !== PoolToShieldEnum.allPoolToShield
-                      ? poolsToShield
-                      : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
-                      ? PoolToShieldEnum.allPoolToShield
-                      : poolsToShieldSelectSapling
-                      ? PoolToShieldEnum.saplingPoolToShield
-                      : poolsToShieldSelectTransparent
-                      ? PoolToShieldEnum.transparentPoolToShield
-                      : PoolToShieldEnum.allPoolToShield
-                  }`,
-                ) as string
-              }
+              title={translate(`history.shield-${calculatePoolsToShield()}`) as string}
               onPress={onPressShieldFunds}
-              disabled={
-                poolsToShield === PoolToShieldEnum.saplingPoolToShield && totalBalance.spendablePrivate > shieldingFee
-                  ? false
-                  : poolsToShield === PoolToShieldEnum.transparentPoolToShield &&
-                    (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
-                  ? false
-                  : poolsToShieldSelectSapling &&
-                    poolsToShieldSelectTransparent &&
-                    totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
-                  ? false
-                  : poolsToShieldSelectSapling && totalBalance.spendablePrivate > shieldingFee
-                  ? false
-                  : poolsToShieldSelectTransparent && (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
-                  ? false
-                  : true
-              }
+              disabled={calculateDisableButtonToShield()}
             />
             {mode !== ModeEnum.basic &&
               poolsToShield === PoolToShieldEnum.allPoolToShield &&

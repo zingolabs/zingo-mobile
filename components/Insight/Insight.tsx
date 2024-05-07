@@ -18,13 +18,7 @@ import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
-import {
-  ButtonTypeEnum,
-  CommandEnum,
-  SendPageStateClass,
-  SettingsNameEnum,
-  SnackbarDurationEnum,
-} from '../../app/AppState';
+import { ButtonTypeEnum, CommandEnum, SendPageStateClass, SnackbarDurationEnum } from '../../app/AppState';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -88,7 +82,7 @@ const getPercent = (percent: number) => {
 type InsightProps = {
   closeModal: () => void;
   openModal: () => void;
-  set_privacy_option: (name: SettingsNameEnum.privacy, value: boolean) => Promise<void>;
+  set_privacy_option: (value: boolean) => Promise<void>;
   setSendPageState: (s: SendPageStateClass) => void;
 };
 

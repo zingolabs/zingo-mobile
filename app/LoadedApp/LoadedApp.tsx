@@ -160,9 +160,6 @@ export default function LoadedApp(props: LoadedAppProps) {
       // fallback if no available language fits
       const fallback = { languageTag: LanguageEnum.en, isRTL: false };
 
-      //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
-      //console.log(RNLocalize.getLocales());
-
       const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
 
       // update layout direction
@@ -390,8 +387,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     (async () => {
       // Configure the RPC to start doing refreshes
       await this.rpc.configure();
-
-      //console.log(await SettingsFileImpl.readSettings());
     })();
 
     this.appstate = AppState.addEventListener('change', async nextAppState => {
@@ -862,44 +857,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       throw err;
     }
   };
-  /*
-  // Get a single private key for this address, and return it as a string.
-  getPrivKeyAsString = async (address: string): Promise<string> => {
-    const pk = await RPC.rpc_getPrivKeyAsString(address);
-    if (pk) {
-      return pk;
-    }
-    return '';
-  };
 
-  // Getter methods, which are called by the components to update the state
-  fetchAndSetSinglePrivKey = async (address: string) => {
-    const key = await RPC.rpc_getPrivKeyAsString(address);
-    const addressPrivateKeys = new Map<string, string>();
-    if (key) {
-      addressPrivateKeys.set(address, key);
-      this.setState({ addressPrivateKeys });
-    }
-  };
-
-  createNewAddress = async (addressType: 'tzo') => {
-    // Create a new address
-    const newaddress = await RPC.rpc_createNewAddress(addressType);
-    //console.log(`Created new Address ${newaddress}`);
-
-    // And then fetch the list of addresses again to refresh (totalBalance gets all addresses)
-    this.fetchTotalBalance();
-
-    const { receivePageState } = this.state;
-    const newRerenderKey = receivePageState.rerenderKey + 1;
-
-    if (newaddress) {
-      const newReceivePageState = new ReceivePageStateClass(newaddress);
-      newReceivePageState.rerenderKey = newRerenderKey;
-      this.setState({ receivePageState: newReceivePageState });
-    }
-  };
-  */
   doRefresh = async () => {
     await this.rpc.refresh(false);
   };
@@ -908,10 +866,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await this.rpc.stopSyncProcess();
     this.rpc.refresh(false, true);
   };
-
-  //fetchTotalBalance = async () => {
-  //  await this.rpc.fetchTotalBalance();
-  //};
 
   toggleMenuDrawer = () => {
     this.setState({
@@ -997,11 +951,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         [
           {
             text: translate('confirm') as string,
-            onPress: async () => await this.set_donation_option(SettingsNameEnum.donation, true),
+            onPress: async () => await this.set_donation_option(true),
           },
           {
             text: translate('cancel') as string,
-            onPress: async () => await this.set_donation_option(SettingsNameEnum.donation, false),
+            onPress: async () => await this.set_donation_option(false),
             style: 'cancel',
           },
         ],
@@ -1053,19 +1007,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  set_wallet_option = async (name: string, value: string): Promise<void> => {
-    await RPC.rpc_setWalletSettingOption(name, value);
+  set_wallet_option = async (walletOption: string, value: string): Promise<void> => {
+    await RPC.rpc_setWalletSettingOption(walletOption, value);
 
     // Refetch the settings updated
     this.rpc.fetchWalletSettings();
   };
 
-  set_server_option = async (
-    name: SettingsNameEnum.server,
-    value: ServerType,
-    toast: boolean,
-    same_server_chain_name: boolean,
-  ): Promise<void> => {
+  set_server_option = async (value: ServerType, toast: boolean, same_server_chain_name: boolean): Promise<void> => {
     //console.log(value, same_server_chain_name);
     // here I know the server was changed, clean all the tasks before anything.
     await this.rpc.clearTimers();
@@ -1100,7 +1049,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 message: `${this.props.translate('loadedapp.readingwallet')} ${value.uri}`,
               });
             }
-            await SettingsFileImpl.writeSettings(name, value);
+            await SettingsFileImpl.writeSettings(SettingsNameEnum.server, value);
             this.setState({
               server: value,
             });
@@ -1153,8 +1102,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  set_currency_option = async (name: SettingsNameEnum.currency, value: CurrencyEnum): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  set_currency_option = async (value: CurrencyEnum): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, value);
     this.setState({
       currency: value as CurrencyEnum,
     });
@@ -1163,8 +1112,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_language_option = async (name: SettingsNameEnum.language, value: string, reset: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  set_language_option = async (value: string, reset: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.language, value);
     this.setState({
       language: value as LanguageEnum,
     });
@@ -1176,8 +1125,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  set_sendAll_option = async (name: SettingsNameEnum.sendAll, value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  set_sendAll_option = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.sendAll, value);
     this.setState({
       sendAll: value as boolean,
     });
@@ -1186,8 +1135,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_donation_option = async (name: SettingsNameEnum.donation, value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  set_donation_option = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.donation, value);
     this.setState({
       donation: value as boolean,
     });
@@ -1196,8 +1145,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_privacy_option = async (name: SettingsNameEnum.privacy, value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  set_privacy_option = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, value);
     this.setState({
       privacy: value as boolean,
     });
@@ -1206,8 +1155,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_mode_option = async (name: SettingsNameEnum.mode, value: string): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  set_mode_option = async (value: string): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, value);
     this.setState({
       mode: value as ModeEnum,
       poolsToShieldSelectSapling: true,
@@ -1220,8 +1169,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_security_option = async (name: SettingsNameEnum.security, value: SecurityType): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  set_security_option = async (value: SecurityType): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.security, value);
     this.setState({
       security: value as SecurityType,
     });
@@ -1230,8 +1179,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_selectServer_option = async (name: SettingsNameEnum.selectServer, value: string): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  set_selectServer_option = async (value: string): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, value);
     this.setState({
       selectServer: value as SelectServerEnum,
     });
@@ -1240,8 +1189,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_rescanMenuOption_option = async (name: SettingsNameEnum.rescanMenuOption, value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  set_rescanMenuOption_option = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenuOption, value);
     this.setState({
       rescanMenuOption: value as boolean,
     });
@@ -1255,7 +1204,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
-      await this.set_mode_option(SettingsNameEnum.mode, ModeEnum.advanced);
+      await this.set_mode_option(ModeEnum.advanced);
     }
     navigation.reset({
       index: 0,

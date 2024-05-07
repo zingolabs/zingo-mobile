@@ -15,13 +15,13 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import { AddressClass, AddressKindEnum, ModeEnum, SettingsNameEnum } from '../../app/AppState';
+import { AddressClass, AddressKindEnum, ModeEnum } from '../../app/AppState';
 
 type ReceiveProps = {
   setUaAddress: (uaAddress: string) => void;
   toggleMenuDrawer: () => void;
   syncingStatusMoreInfoOnClick: () => void;
-  set_privacy_option: (name: SettingsNameEnum.privacy, value: boolean) => Promise<void>;
+  set_privacy_option: (value: boolean) => Promise<void>;
   setUfvkViewModalVisible?: (v: boolean) => void;
 };
 
@@ -139,12 +139,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     switch (route.key) {
       case 'uaddr': {
         let uaddr = translate('receive.noaddress') as string;
-        //let uaddrKind = '';
-        //let receivers = '';
         if (uaddrs.length > 0) {
           uaddr = uaddrs[uindex].address;
-          //uaddrKind = uaddrs[oindex].addressKind;
-          //receivers = uaddrs[oindex].receivers;
         }
 
         return (
@@ -166,10 +162,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       }
       case 'zaddr': {
         let zaddr = translate('receive.noaddress') as string;
-        //let zaddrKind = '';
         if (zaddrs.length > 0) {
           zaddr = zaddrs[zindex].address;
-          //zaddrKind = zaddrs[zindex].addressKind;
         }
 
         return (
@@ -191,10 +185,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       }
       case 'taddr': {
         let taddr = translate('receive.noaddress') as string;
-        //let taddrKind = '';
         if (taddrs.length > 0) {
           taddr = taddrs[tindex].address;
-          //taddrKind = taddrs[tindex].addressKind;
         }
 
         return (

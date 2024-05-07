@@ -75,10 +75,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
-    //const valid = await validateKey(ufvkText);
-    //if (!valid) {
-    //  return;
-    //}
     onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
   };
 

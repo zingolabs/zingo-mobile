@@ -15,7 +15,6 @@ import {
   ButtonTypeEnum,
   ChainNameEnum,
   SendPageStateClass,
-  SettingsNameEnum,
   SnackbarDurationEnum,
   TransactionType,
   TransactionTypeEnum,
@@ -42,7 +41,7 @@ type TxDetailProps = {
   tx: TransactionType;
   closeModal: () => void;
   openModal: () => void;
-  set_privacy_option: (name: SettingsNameEnum.privacy, value: boolean) => Promise<void>;
+  set_privacy_option: (value: boolean) => Promise<void>;
   setSendPageState: (s: SendPageStateClass) => void;
 };
 
