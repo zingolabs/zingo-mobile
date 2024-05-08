@@ -264,29 +264,29 @@ class RPCModule: NSObject {
 
   func loadExistingWallet(server: String, chainhint: String) throws -> String {
     let documentsDirectory = try getDocumentsDirectory()
-    let walletData = try self.readWallet()
+    //let walletData = try self.readWallet()
     // first attemp with the new format -> decoded data
     // I need to encode first
-    let walletEncodedString = walletData.base64EncodedString()
-    let seed = initFromB64(serveruri: server, datab64: walletEncodedString, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
-    let seedStr = String(seed)
+    //let walletEncodedString = walletData.base64EncodedString()
+    //let seed = initFromB64(serveruri: server, datab64: walletEncodedString, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+    //let seedStr = String(seed)
     // trying to read an old wallet with the new format
     // the content is unreadable for zingolib
-    if seedStr.lowercased().hasPrefix("error: don't know how to read wallet version") {
-      NSLog("First attemp: \(seedStr)")
+    //if seedStr.lowercased().hasPrefix("error: don't know how to read wallet version") {
+    //  NSLog("First attemp: \(seedStr)")
       // second attemp with the old format -> Utf8 encoded
       let walletEncodedUtf8String = try self.readWalletUtf8String()
       let seed2 = initFromB64(serveruri: server, datab64: walletEncodedUtf8String, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
       let seedStr2 = String(seed2)
-      NSLog("Second attemp: \(seedStr2)")
+      //NSLog("Second attemp: \(seedStr2)")
       // if we have two error, put them together.
-      if seedStr2.lowercased().hasPrefix(errorPrefix) {
-        return "First: " + seedStr + "Second: " + seedStr2
-      } else {
+      //if seedStr2.lowercased().hasPrefix(errorPrefix) {
+      //  return "First: " + seedStr + "Second: " + seedStr2
+      //} else {
         return seedStr2
-      }
-    }
-    return seedStr
+      //}
+    //}
+    //return seedStr
   }
 
   @objc(loadExistingWallet:chainhint:resolve:reject:)
