@@ -80,9 +80,9 @@ class RPCModule: NSObject {
     // save the decoded binary data
     guard let base64DecodedData = Data(base64Encoded: base64EncodedString) else {
       throw FileError.saveFileDecodingError("Error decoding b64 content to save wallet file")
-}
+    }
     let fileName = try getFileName(walletFileName)
-        do {
+    do {
       try base64DecodedData.write(to: URL(fileURLWithPath: fileName))
     } catch {
       throw FileError.writeFileError("Error writting wallet file error: \(error.localizedDescription)")
