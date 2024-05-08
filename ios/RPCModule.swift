@@ -80,9 +80,9 @@ class RPCModule: NSObject {
     // save the decoded binary data
     guard let base64DecodedData = Data(base64Encoded: base64EncodedString) else {
       throw FileError.saveFileDecodingError("Error decoding b64 content to save wallet file")
-    }
+}
     let fileName = try getFileName(walletFileName)
-    do {
+        do {
       try base64DecodedData.write(to: URL(fileURLWithPath: fileName))
     } catch {
       throw FileError.writeFileError("Error writting wallet file error: \(error.localizedDescription)")
@@ -185,6 +185,8 @@ class RPCModule: NSObject {
   }
 
   func saveWalletInternal() throws {
+    // this encoded string have to be `WITH PADDING`
+    // We need to use rust STANDARD Engine to decode/encode.
     let walletEncodedString = saveToB64()
     try self.saveWalletFile(walletEncodedString)
   }
@@ -266,20 +268,22 @@ class RPCModule: NSObject {
     // first attemp with the new format -> decoded data
     // I need to encode first
     let walletEncodedString = walletData.base64EncodedString()
-    var seed = initFromB64(serveruri: server, datab64: walletEncodedString, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
-    var seedStr = String(seed)
+    let seed = initFromB64(serveruri: server, datab64: walletEncodedString, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+    let seedStr = String(seed)
     // trying to read an old wallet with the new format
     // the content is unreadable for zingolib
     if seedStr.lowercased().hasPrefix("error: don't know how to read wallet version") {
       NSLog("First attemp: \(seedStr)")
       // second attemp with the old format -> Utf8 encoded
       let walletEncodedUtf8String = try self.readWalletUtf8String()
-      var seed2 = initFromB64(serveruri: server, datab64: walletEncodedUtf8String, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
-      var seedStr2 = String(seed2)
+      let seed2 = initFromB64(serveruri: server, datab64: walletEncodedUtf8String, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+      let seedStr2 = String(seed2)
       NSLog("Second attemp: \(seedStr2)")
       // if we have two error, put them together.
       if seedStr2.lowercased().hasPrefix(errorPrefix) {
-        return 'First: ' + seedStr + 'Second: ' + seedStr2
+        return "First: " + seedStr + "Second: " + seedStr2
+      } else {
+        return seedStr2
       }
     }
     return seedStr
