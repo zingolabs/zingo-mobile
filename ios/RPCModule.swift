@@ -173,8 +173,8 @@ class RPCModule: NSObject {
   }
 
   func saveWalletBackupInternal() throws {
-    let walletData = try readWallet()
-    try self.saveWalletBackupFile(walletData.base64EncodedString())
+    let walletData = try readWalletUtf8String()
+    try self.saveWalletBackupFile(walletData)
   }
 
   func createNewWallet(server: String, chainhint: String) throws -> String {
@@ -267,9 +267,9 @@ class RPCModule: NSObject {
   func restoreExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
       let backupData = try self.readWalletBackup()
-      let walletData = try self.readWallet()
-      try self.saveWalletFile(backupData.base64EncodedString())
-      try self.saveWalletBackupFile(walletData.base64EncodedString())
+      let walletData = try self.readWalletUtf8String()
+      try self.saveWalletFile(backupData)
+      try self.saveWalletBackupFile(walletData)
       resolve("true")
     } catch {
       NSLog("Restoring existing wallet backup error: \(error.localizedDescription)")
