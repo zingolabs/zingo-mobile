@@ -270,8 +270,8 @@ class RPCModule: NSObject {
     let walletEncodedString = walletData.base64EncodedString()
     let seed = initFromB64(serveruri: server, datab64: walletEncodedString, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
     let seedStr = String(seed)
-     trying to read an old wallet with the new format
-     the content is unreadable for zingolib
+    // trying to read an old wallet with the new format
+    // the content is unreadable for zingolib
     if seedStr.lowercased().hasPrefix("error: don't know how to read wallet version") {
       NSLog("First attemp: \(seedStr)")
       // second attemp with the old format -> Utf8 encoded

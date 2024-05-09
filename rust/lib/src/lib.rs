@@ -171,7 +171,7 @@ pub fn init_from_b64(
     }
     let decoded_bytes = match STANDARD.decode(&base64_data) {
         Ok(b) => b,
-                Err(e) => {
+        Err(e) => {
             return format!("Error: Decoding Base64: {}, Size: {}", e, base64_data.len());
         }
     };
