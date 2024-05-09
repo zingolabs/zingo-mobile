@@ -26,6 +26,7 @@ class RPCModule: NSObject {
     case readWalletUtf8StringError(String)
     case readWalletDecodedDataError(String)
     case saveFileDecodingError(String)
+    case saveFileError(String)
     case writeFileError(String)
     case deleteFileError(String)
   }
@@ -186,7 +187,11 @@ class RPCModule: NSObject {
 
   func saveWalletInternal() throws {
     let walletEncodedString = saveToB64()
-    try self.saveWalletFile(walletEncodedString)
+    if (!walletEncodedString.lowercased().hasPrefix(errorPrefix)) {
+      try self.saveWalletFile(walletEncodedString)
+    } else {
+      throw FileError.saveFileError("Error saving wallet error: \(walletEncodedString)")
+    }
   }
 
   func saveWalletBackupInternal() throws {
