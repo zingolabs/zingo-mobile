@@ -77,28 +77,18 @@ class RPCModule: NSObject {
   }
 
   func saveWalletFile(_ base64EncodedString: String) throws {
-    // need to decode the content first.
-    // save the decoded binary data
-    guard let base64DecodedData = Data(base64Encoded: base64EncodedString) else {
-      throw FileError.saveFileDecodingError("Error decoding b64 content to save wallet file")
-    }
     let fileName = try getFileName(walletFileName)
     do {
-      try base64DecodedData.write(to: URL(fileURLWithPath: fileName))
+      try base64EncodedString.write(toFile: fileName, atomically: true, encoding: .utf8)
     } catch {
       throw FileError.writeFileError("Error writting wallet file error: \(error.localizedDescription)")
     }
   }
   
   func saveWalletBackupFile(_ base64EncodedString: String) throws {
-    // we need to decode the content first.
-    // save the decoded binary data
-    guard let base64DecodedData = Data(base64Encoded: base64EncodedString) else {
-      throw FileError.saveFileDecodingError("Error decoding b64 content to save wallet backup file")
-    }
     let fileName = try getFileName(walletBackupFileName)
     do {
-      try base64DecodedData.write(to: URL(fileURLWithPath: fileName))
+      try base64EncodedString.write(toFile: fileName, atomically: true, encoding: .utf8)
     } catch {
       throw FileError.writeFileError("Error writting wallet backup file error: \(error.localizedDescription)")
     }
@@ -113,7 +103,6 @@ class RPCModule: NSObject {
     }
   }
 
-  // old way to read the wallet file -> Encoded Utf8 String
   func readWalletUtf8String() throws -> String {
     let fileName = try getFileName(walletFileName)
     do {
@@ -124,21 +113,10 @@ class RPCModule: NSObject {
     }
   }
 
-  // new way to read the wallet file -> Decoded Data
-  func readWallet() throws -> Data {
-    let fileName = try getFileName(walletFileName)
-    do {
-      let content = try Data(contentsOf: URL(fileURLWithPath: fileName))
-      return content
-    } catch {
-      throw FileError.readWalletDecodedDataError("Error reading new wallet format error: \(error.localizedDescription)")
-    }
-  }
-
-  func readWalletBackup() throws -> Data {
+  func readWalletBackup() throws -> String {
     let fileName = try getFileName(walletBackupFileName)
     do {
-      let content = try Data(contentsOf: URL(fileURLWithPath: fileName))
+      let content = try String(contentsOfFile: fileName, encoding: .utf8)
       return content
     } catch {
       throw FileError.readWalletDecodedDataError("Error reading new wallet backup format error: \(error.localizedDescription)")
@@ -267,22 +245,9 @@ class RPCModule: NSObject {
 
   func loadExistingWallet(server: String, chainhint: String) throws -> String {
     let documentsDirectory = try getDocumentsDirectory()
-    let walletData = try self.readWallet()
-    // first attemp with the new format -> decoded data
-    // I need to encode first
-    let walletEncodedString = walletData.base64EncodedString()
-    var seed = initFromB64(serveruri: server, datab64: walletEncodedString, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
-    var seedStr = String(seed)
-    // trying to read an old wallet with the new format
-    // the content is unreadable for zingolib
-    if seedStr.lowercased().hasPrefix("error: don't know how to read wallet version") {
-      NSLog("First attemp: \(seedStr)")
-      // second attemp with the old format -> Utf8 encoded
-      let walletEncodedUtf8String = try self.readWalletUtf8String()
-      seed = initFromB64(serveruri: server, datab64: walletEncodedUtf8String, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
-      seedStr = String(seed)
-      NSLog("Second attemp: \(seedStr)")
-    }
+    let walletEncodedUtf8String = try self.readWalletUtf8String()
+    let seed = initFromB64(serveruri: server, datab64: walletEncodedUtf8String, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+    let seedStr = String(seed)
     return seedStr
   }
 
