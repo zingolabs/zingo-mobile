@@ -109,7 +109,7 @@ class RPCModule: NSObject {
       let content = try String(contentsOfFile: fileName, encoding: .utf8)
       return content
     } catch {
-      throw FileError.readWalletUtf8StringError("Error reading old wallet format error: \(error.localizedDescription)")
+      throw FileError.readWalletUtf8StringError("Error reading wallet format error: \(error.localizedDescription)")
     }
   }
 
@@ -119,7 +119,7 @@ class RPCModule: NSObject {
       let content = try String(contentsOfFile: fileName, encoding: .utf8)
       return content
     } catch {
-      throw FileError.readWalletDecodedDataError("Error reading new wallet backup format error: \(error.localizedDescription)")
+      throw FileError.readWalletDecodedDataError("Error reading wallet backup format error: \(error.localizedDescription)")
     }
   }
 
@@ -165,7 +165,7 @@ class RPCModule: NSObject {
 
   func saveWalletInternal() throws {
     let walletEncodedString = saveToB64()
-    if (!walletEncodedString.lowercased().hasPrefix(errorPrefix)) {
+    if !walletEncodedString.lowercased().hasPrefix(errorPrefix) {
       try self.saveWalletFile(walletEncodedString)
     } else {
       throw FileError.saveFileError("Error saving wallet error: \(walletEncodedString)")
@@ -333,12 +333,6 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(getLatestBlock:resolve:reject:)
-  func getLatestBlock(_ server: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["server": server, "resolve": resolve]
-      self.getLatestBlockAsync(dict)
-  }
-
   func getLatestBlockAsync(_ dict: [AnyHashable: Any]) {
     if let server = dict["server"] as? String,
        let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
@@ -351,6 +345,12 @@ class RPCModule: NSObject {
           resolve("Error: [Native] Getting server latest block. Argument problem.")
       }
     }
+  }
+  
+  @objc(getLatestBlock:resolve:reject:)
+  func getLatestBlock(_ server: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["server": server, "resolve": resolve]
+      self.getLatestBlockAsync(dict)
   }
 
 }
