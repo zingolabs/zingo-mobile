@@ -9,7 +9,8 @@ use android_logger::{Config, FilterBuilder};
 #[cfg(target_os = "android")]
 use log::Level;
 
-use base64::{decode, encode};
+use base64::Engine;
+use base64::engine::general_purpose::STANDARD;
 use std::cell::RefCell;
 use std::sync::{Arc, Mutex};
 use zingoconfig::{construct_lightwalletd_uri, ChainType, RegtestNetwork, ZingoConfig};
@@ -168,10 +169,10 @@ pub fn init_from_b64(
         Ok((c, h)) => (config, _lightwalletd_uri) = (c, h),
         Err(s) => return s,
     }
-    let decoded_bytes = match decode(&base64_data) {
+    let decoded_bytes = match STANDARD.decode(&base64_data) {
         Ok(b) => b,
         Err(e) => {
-            return format!("Error: Decoding Base64: {}", e);
+            return format!("Error: Decoding Base64: {}, Size: {}, Content: {}", e, base64_data.len(), base64_data);
         }
     };
 
@@ -198,8 +199,10 @@ pub fn save_to_b64() -> String {
         lightclient = lc.borrow().as_ref().unwrap().clone();
     };
 
+    // we need to use STANDARD because swift is expecting the encoded String with padding
+    // I tried with STANDARD_NO_PAD and the decoding return `nil`.
     match lightclient.export_save_buffer_runtime() {
-        Ok(buf) => encode(&buf),
+        Ok(buf) => STANDARD.encode(&buf),
         Err(e) => {
             format!("Error: {}", e)
         }

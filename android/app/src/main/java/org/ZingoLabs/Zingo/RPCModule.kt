@@ -356,7 +356,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     fun saveWallet() {
         // Get the encoded wallet file
-        val b64encoded = uniffi.rustlib.saveToB64()
+        val b64encoded: String = uniffi.rustlib.saveToB64()
+        if (b64encoded.lowercase().startsWith("error")) {
+            // with error don't save the file. Obviously.
+            Log.e("MAIN", "Couldn't save the wallet. $b64encoded")
+            return
+        }
         // Log.i("MAIN", b64encoded)
 
         try {
