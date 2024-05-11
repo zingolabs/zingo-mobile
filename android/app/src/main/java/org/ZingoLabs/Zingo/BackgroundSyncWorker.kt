@@ -31,6 +31,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
+import org.ZingoLabs.Zingo.Constants.*
 
 class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
 
@@ -50,7 +51,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundStart")
 
         // checking if the wallet file exists
-        val exists: Boolean = rpcModule.wallet_exists()
+        val exists: Boolean = rpcModule.fileExists(walletFileName.value)
 
         if (exists) {
             uniffi.zingo.initLogging()
