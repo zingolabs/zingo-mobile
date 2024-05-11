@@ -28,7 +28,9 @@ export default class BackgroundFileImpl {
     const fileName = await this.getFileName();
 
     try {
-      const r = JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString()) as BackgroundType;
+      const rStr = (await RNFS.readFile(fileName, 'utf8')).toString();
+      console.log('background string', rStr);
+      const r = JSON.parse(rStr) as BackgroundType;
       console.log('background json', r);
       return r;
     } catch (err) {

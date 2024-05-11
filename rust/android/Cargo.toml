@@ -8,22 +8,12 @@ edition = "2021"
 ci = []
 regchest = []
 
-[dependencies]
-jni = { version = "0.19.0", default-features = false }
-android_logger = "0.11"
-log = { workspace = true }
-rustlib = { path = "../lib" }
-
 [dev-dependencies]
-tokio =  { version = "1.24.2", features = ["full"] }
 zingoconfig = { workspace = true }
-zingo-testutils = { git="https://github.com/zingolabs/zingolib", default-features=true, branch = "stable" }
-darkside-tests = { git="https://github.com/zingolabs/zingolib", default-features=true, branch = "stable" }
-json = "0.12.4"
-env_logger = "0.10.0"
 zingomobile_utils = { path = "../zingomobile_utils" }
 regchest_utils = { git="https://github.com/zingolabs/zingo-regchest", default-features=true, branch = "dev" }
-
-[lib]
-crate-type = ["dylib"]
-
+zingo-testutils = { git="https://github.com/zingolabs/zingolib", default-features=true, branch = "stable" }
+darkside-tests = { git="https://github.com/zingolabs/zingolib", default-features=true, branch = "stable" }
+tokio =  { version = "1.24", features = [ "full" ] }
+json = "0.12.4"
+env_logger = "0.10.0"

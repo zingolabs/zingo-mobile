@@ -19,10 +19,38 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     },
     // new servers (not default)
     {
-      uri: 'https://test.zec.rocks:443',
+      uri: 'https://zec.rocks:443',
       region: translate('settings.usa') as string,
       chain_name: 'main',
       default: true,
+      latency: null,
+    },
+    {
+      uri: 'https://na.zec.rocks:443',
+      region: translate('settings.na') as string,
+      chain_name: 'main',
+      default: false,
+      latency: null,
+    },
+    {
+      uri: 'https://sa.zec.rocks:443',
+      region: translate('settings.sa') as string,
+      chain_name: 'main',
+      default: false,
+      latency: null,
+    },
+    {
+      uri: 'https://eu.zec.rocks:443',
+      region: translate('settings.ea') as string,
+      chain_name: 'main',
+      default: false,
+      latency: null,
+    },
+    {
+      uri: 'https://ap.zec.rocks:443',
+      region: translate('settings.ao') as string,
+      chain_name: 'main',
+      default: false,
       latency: null,
     },
     {
