@@ -8,9 +8,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 
-//import android.util.Log
 import java.io.File
-import java.io.InputStream
 import kotlin.concurrent.thread
 import org.ZingoLabs.Zingo.Constants.*
 
@@ -19,20 +17,36 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return "RPCModule"
     }
 
-    private fun getFile(file: String): File {
-        return File(MainApplication.getAppContext()?.filesDir, file)
+    private fun getDocumentDirectory(): String {
+        return reactContext.applicationContext.filesDir.absolutePath
     }
 
     fun fileExists(fileName: String): Boolean {
-        // Check if a wallet already exists
-        val file = getFile(fileName)
+        // Check if a file already exists
+        val file = File(MainApplication.getAppContext()?.filesDir, fileName)
         return if (file.exists()) {
-            Log.i("SCHEDULED_TASK_RUN", "Wallet exists")
+            Log.i("SCHEDULED_TASK_RUN", "File $fileName exists")
             true
         } else {
-            Log.i("SCHEDULED_TASK_RUN", "Wallet DOES NOT exist")
+            Log.i("SCHEDULED_TASK_RUN", "File $fileName DOES NOT exist")
             false
         }
+    }
+
+    private fun readFile(fileName: String): ByteArray {
+        val file = MainApplication.getAppContext()!!.openFileInput(fileName)
+        return file.readBytes()
+    }
+
+    private fun writeFile(fileName: String, fileBytes: ByteArray) {
+        val file = MainApplication.getAppContext()?.openFileOutput(fileName, Context.MODE_PRIVATE)
+        file?.write(fileBytes)
+        file?.close()
+    }
+
+    private fun deleteFile(fileName: String): Boolean {
+        val file = MainApplication.getAppContext()?.getFileStreamPath(fileName)
+        return file!!.delete()
     }
 
     @ReactMethod
@@ -47,13 +61,15 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         promise.resolve(fileExists(walletBackupFileName.value))
     }
 
-    fun saveWalletFile() {
+    fun saveWalletFile(): Boolean {
+        uniffi.zingo.initLogging()
+
         // Get the encoded wallet file
         val b64encoded: String = uniffi.zingo.saveToB64()
         if (b64encoded.lowercase().startsWith("error")) {
             // with error don't save the file. Obviously.
             Log.e("MAIN", "Couldn't save the wallet. $b64encoded")
-            return
+            return false
         }
         // Log.i("MAIN", b64encoded)
 
@@ -62,44 +78,41 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             Log.i("MAIN", "file size: ${fileBytes.size} bytes")
 
             // Save file to disk
-            val file = MainApplication.getAppContext()?.openFileOutput(walletFileName.value, Context.MODE_PRIVATE)
-            file?.write(fileBytes)
-            file?.close()
+            writeFile(walletFileName.value, fileBytes)
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the wallet")
+            return false
         }
+        return true
     }
 
-    private fun saveWalletBackupFile() {
+    private fun saveWalletBackupFile(): Boolean {
         // Get the encoded wallet file
         // Read the file
-        val fileRead = MainApplication.getAppContext()!!.openFileInput(walletFileName.value)
-        val fileBytes = fileRead.readBytes()
+        val fileBytes = readFile(walletFileName.value)
         // Log.i("MAIN", b64encoded)
 
         try {
             // Log.i("MAIN", "file size${fileBytes.size}")
 
             // Save file to disk
-            val file = MainApplication.getAppContext()?.openFileOutput(walletBackupFileName.value, Context.MODE_PRIVATE)
-            file?.write(fileBytes)
-            file?.close()
+            writeFile(walletBackupFileName.value, fileBytes)
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the wallet backup")
+            return false
         }
+        return true
     }
 
     fun saveBackgroundFile(json: String) {
         // Log.i("MAIN", b64encoded)
 
         try {
-            val fileBytes: ByteArray = json.toByteArray()
+            val fileBytes = json.toByteArray()
             Log.i("MAIN", "file background size: ${fileBytes.size} bytes")
 
             // Save file to disk
-            val file = MainApplication.getAppContext()?.openFileOutput(backgroundFileName.value, Context.MODE_PRIVATE)
-            file?.write(fileBytes)
-            file?.close()
+            writeFile(backgroundFileName.value, fileBytes)
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the background file")
         }
@@ -107,51 +120,45 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun createNewWallet(server: String, chainhint: String, promise: Promise) {
-        // Log.i("MAIN", "Creating new wallet")
-
         uniffi.zingo.initLogging()
 
         // Create a seed
-        val seed = uniffi.zingo.initNew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
+        val resp = uniffi.zingo.initNew(server, getDocumentDirectory(), chainhint, true)
         // Log.i("MAIN-Seed", seed)
 
-        if (!seed.lowercase().startsWith(errorPrefix.value)) {
+        if (!resp.lowercase().startsWith(errorPrefix.value)) {
             saveWalletFile()
         }
 
-        promise.resolve(seed)
+        promise.resolve(resp)
     }
 
     @ReactMethod
     fun restoreWalletFromSeed(seed: String, birthday: String, server: String, chainhint: String, promise: Promise) {
-        // Log.i("MAIN", "Restoring wallet with seed $seed")
-
         uniffi.zingo.initLogging()
 
-        val rseed = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
-        // Log.i("MAIN", rseed)
+        val resp = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), getDocumentDirectory(), chainhint, true)
+        // Log.i("MAIN", seed)
 
-        if (!rseed.lowercase().startsWith(errorPrefix.value)) {
+        if (!resp.lowercase().startsWith(errorPrefix.value)) {
             saveWalletFile()
         }
 
-        promise.resolve(rseed)
+        promise.resolve(resp)
     }
 
     @ReactMethod
     fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, chainhint: String, promise: Promise) {
-        // Log.i("MAIN", "Restoring wallet with ufvk $ufvk")
-
         uniffi.zingo.initLogging()
 
-        val rufvk = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
-        // Log.i("MAIN", rufvk)
+        val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), getDocumentDirectory(), chainhint, true)
+        // Log.i("MAIN", ufvk)
 
-        if (!rufvk.lowercase().startsWith(errorPrefix.value)) {
+        if (!resp.lowercase().startsWith(errorPrefix.value)) {
             saveWalletFile()
         }
 
-        promise.resolve(rufvk)
+        promise.resolve(resp)
     }
 
     @ReactMethod
@@ -161,9 +168,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     fun loadExistingWalletNative(server: String, chainhint: String): String {
         // Read the file
-        val file: InputStream = MainApplication.getAppContext()?.openFileInput(walletFileName.value)!!
-        val fileBytes = file.readBytes()
-        file.close()
+        val fileBytes = readFile(walletFileName.value)
 
         val middle0w = 0
         val middle1w = 6000000 // 6_000_000 - 8 pieces
@@ -325,7 +330,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return uniffi.zingo.initFromB64(
             server,
             fileb64.toString(),
-            reactContext.applicationContext.filesDir.absolutePath,
+            getDocumentDirectory(),
             chainhint, true
         )
     }
@@ -333,29 +338,25 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun restoreExistingWalletBackup(promise: Promise) {
         // Read the file backup
-        val fileBackup = MainApplication.getAppContext()!!.openFileInput(walletBackupFileName.value)
-        val fileBytesBackup = fileBackup.readBytes()
+        val fileBytesBackup = readFile(walletBackupFileName.value)
 
         // Read the file wallet
-        val fileWallet = MainApplication.getAppContext()!!.openFileInput(walletFileName.value)
-        val fileBytesWallet = fileWallet.readBytes()
+        val fileBytesWallet = readFile(walletFileName.value)
 
         try {
             // Save file to disk wallet (with the backup)
-            val fileWallet2 = MainApplication.getAppContext()?.openFileOutput(walletFileName.value, Context.MODE_PRIVATE)
-            fileWallet2?.write(fileBytesBackup)
-            fileWallet2?.close()
+            writeFile(walletFileName.value, fileBytesBackup)
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the wallet with the backup")
+            promise.resolve(false)
         }
 
         try {
             // Save file to disk backup (with the wallet)
-            val fileBackup2 = MainApplication.getAppContext()?.openFileOutput(walletBackupFileName.value, Context.MODE_PRIVATE)
-            fileBackup2?.write(fileBytesWallet)
-            fileBackup2?.close()
+            writeFile(walletBackupFileName.value, fileBytesWallet)
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the backup with the wallet")
+            promise.resolve(false)
         }
 
         promise.resolve(true)
@@ -363,28 +364,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
-        val file = MainApplication.getAppContext()?.getFileStreamPath(walletFileName.value)
-        if (file!!.delete()) {
-            promise.resolve(true)
-        } else {
-            promise.resolve(false)
-        }
+        promise.resolve(deleteFile(walletFileName.value))
     }
 
     @ReactMethod
     fun deleteExistingWalletBackup(promise: Promise) {
-        val file = MainApplication.getAppContext()?.getFileStreamPath(walletBackupFileName.value)
-        if (file!!.delete()) {
-            promise.resolve(true)
-        } else {
-            promise.resolve(false)
-        }
+        promise.resolve(deleteFile(walletBackupFileName.value))
     }
 
     @ReactMethod
     fun execute(cmd: String, args: String, promise: Promise) {
         thread {
-
             uniffi.zingo.initLogging()
 
             // Log.i("execute", "Executing $cmd with $args")
@@ -402,22 +392,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun doSave(promise: Promise) {
-        saveWalletFile()
-
-        promise.resolve(true)
+        promise.resolve(saveWalletFile())
     }
 
     @ReactMethod
     fun doSaveBackup(promise: Promise) {
-        saveWalletBackupFile()
-
-        promise.resolve(true)
+        promise.resolve(saveWalletBackupFile())
     }
 
     @ReactMethod
     fun getLatestBlock(server: String, promise: Promise) {
-        // Log.i("MAIN", "Initialize Light Client")
-
         uniffi.zingo.initLogging()
 
         // Initialize Light Client
@@ -428,8 +412,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun getDonationAddress(promise: Promise) {
-        // Log.i("MAIN", "Initialize Light Client")
-
         uniffi.zingo.initLogging()
 
         // Initialize Light Client
