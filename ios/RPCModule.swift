@@ -11,11 +11,6 @@ import React
 @objc(RPCModule)
 class RPCModule: NSObject {
   
-  private let walletFileName = "wallet.dat.txt"
-  private let walletBackupFileName = "wallet.backup.dat.txt"
-  private let backgroundFileName = "background.json"
-  private let errorPrefix = "error"
-  
   @objc
   static func requiresMainQueueSetup() -> Bool {
       return true
@@ -23,9 +18,7 @@ class RPCModule: NSObject {
   
   enum FileError: Error {
     case documentsDirectoryNotFoundError(String)
-    case readWalletUtf8StringError(String)
-    case readWalletDecodedDataError(String)
-    case saveFileDecodingError(String)
+    case readWalletError(String)
     case saveFileError(String)
     case writeFileError(String)
     case deleteFileError(String)
@@ -46,8 +39,8 @@ class RPCModule: NSObject {
     return fileName
   }
   
-  func fileExists(_ fileName: String) -> String {
-    let fileExists = FileManager.default.fileExists(atPath: fileName)
+  func fileExists(_ fileName: String) throws -> String {
+    let fileExists = try FileManager.default.fileExists(atPath: getFileName(fileName))
     if fileExists {
       return "true"
     } else {
@@ -55,25 +48,22 @@ class RPCModule: NSObject {
     }
   }
   
-  func wallet_exists() -> Bool {
-    do {
-      let fileName = try getFileName(walletFileName)
-      if (fileExists(fileName) == "true") {
-        return true
-      } else {
-        return false
-      }
-    } catch {
-      NSLog("wallet exists error: \(error.localizedDescription)")
-      return false
-    }
+  func readFile(_ fileName: String) throws -> Data {
+    return try Data(contentsOf: URL(fileURLWithPath: getFileName(fileName)))
+  }
+  
+  func writeFile(_ fileName: String, fileData: Data) throws {
+    try fileData.write(to: URL(fileURLWithPath: getFileName(fileName)), options: .atomic)
+  }
+  
+  func deleteFile(_ fileName: String) throws {
+    try FileManager.default.removeItem(atPath: getFileName(fileName))
   }
   
   @objc(walletExists:reject:)
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      let fileName = try getFileName(walletFileName)
-      resolve(fileExists(fileName))
+      resolve(try fileExists(Constants.WalletFileName.rawValue))
     } catch {
       NSLog("wallet exists error: \(error.localizedDescription)")
       resolve("false")
@@ -83,66 +73,59 @@ class RPCModule: NSObject {
   @objc(walletBackupExists:reject:)
   func walletBackupExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      let fileName = try getFileName(walletBackupFileName)
-      resolve(fileExists(fileName))
+      resolve(try fileExists(Constants.WalletBackupFileName.rawValue))
     } catch {
       NSLog("wallet backup exists error: \(error.localizedDescription)")
       resolve("false")
     }
   }
 
-  func saveWalletFile(_ base64EncodedString: String) throws {
-    let fileName = try getFileName(walletFileName)
+  func saveWalletFile(_ base64DecodedData: Data) throws {
     NSLog("save wallet file name \(fileName)")
     do {
-      try base64EncodedString.write(toFile: fileName, atomically: true, encoding: .utf8)
+      try writeFile(Constants.WalletFileName.rawValue, fileData: base64DecodedData)
     } catch {
       throw FileError.writeFileError("Error writting wallet file error: \(error.localizedDescription)")
     }
   }
   
-  func saveWalletBackupFile(_ base64EncodedString: String) throws {
-    let fileName = try getFileName(walletBackupFileName)
+  func saveWalletBackupFile(_ base64DecodedData: Data) throws {
     do {
-      try base64EncodedString.write(toFile: fileName, atomically: true, encoding: .utf8)
+      try writeFile(Constants.WalletBackupFileName.rawValue, fileData: base64DecodedData)
     } catch {
       throw FileError.writeFileError("Error writting wallet backup file error: \(error.localizedDescription)")
     }
   }
 
-  func saveBackgroundFile(_ data: String) throws {
-    let fileName = try getFileName(backgroundFileName)
+  func saveBackgroundFile(_ jsonString: String) throws {
     do {
-      try data.write(toFile: fileName, atomically: true, encoding: .utf8)
+      // the content of this JSON can be represented safely in utf8 before storing as Data.
+      let jsonData = jsonString.data(using: .utf8)!
+      try writeFile(Constants.BackgroundFileName.rawValue, fileData: jsonData)
     } catch {
       throw FileError.writeFileError("Error writting background file error: \(error.localizedDescription)")
     }
   }
 
-  func readWalletUtf8String() throws -> String {
-    let fileName = try getFileName(walletFileName)
+  func readWallet() throws -> Data {
     do {
-      let content = try String(contentsOfFile: fileName, encoding: .utf8)
-      return content
+      return try readFile(Constants.WalletFileName.rawValue)
     } catch {
-      throw FileError.readWalletUtf8StringError("Error reading wallet format error: \(error.localizedDescription)")
+      throw FileError.readWalletError("Error reading wallet format error: \(error.localizedDescription)")
     }
   }
 
-  func readWalletBackup() throws -> String {
-    let fileName = try getFileName(walletBackupFileName)
+  func readWalletBackup() throws -> Data {
     do {
-      let content = try String(contentsOfFile: fileName, encoding: .utf8)
-      return content
+      return try readFile(Constants.WalletBackupFileName.rawValue)
     } catch {
-      throw FileError.readWalletDecodedDataError("Error reading wallet backup format error: \(error.localizedDescription)")
+      throw FileError.readWalletError("Error reading wallet backup format error: \(error.localizedDescription)")
     }
   }
 
   func deleteExistingWallet() throws {
-    let fileName = try getFileName(walletFileName)
     do {
-      try FileManager.default.removeItem(atPath: fileName)
+      try deleteFile(Constants.WalletFileName.rawValue)
     } catch {
       throw FileError.deleteFileError("Error deleting wallet error: \(error.localizedDescription)")
     }
@@ -160,9 +143,8 @@ class RPCModule: NSObject {
   }
   
   func deleteExistingWalletBackup() throws {
-    let fileName = try getFileName(walletBackupFileName)
     do {
-      try FileManager.default.removeItem(atPath: fileName)
+      try deleteFile(Constants.WalletBackupFileName.rawValue)
     } catch {
       throw FileError.deleteFileError("Error deleting wallet backup error: \(error.localizedDescription)")
     }
@@ -181,23 +163,23 @@ class RPCModule: NSObject {
 
   func saveWalletInternal() throws {
     let walletEncodedString = saveToB64()
-    if !walletEncodedString.lowercased().hasPrefix(errorPrefix) {
-      try self.saveWalletFile(walletEncodedString)
+    if !walletEncodedString.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
+      let walletDecodedData = Data(base64Encoded: walletEncodedString)!
+      try self.saveWalletFile(walletDecodedData)
     } else {
       throw FileError.saveFileError("Error saving wallet error: \(walletEncodedString)")
     }
   }
 
   func saveWalletBackupInternal() throws {
-    let walletData = try readWalletUtf8String()
+    let walletData = try readWallet()
     try self.saveWalletBackupFile(walletData)
   }
 
   func createNewWallet(server: String, chainhint: String) throws -> String {
-    let documentsDirectory = try getDocumentsDirectory()
-    let seed = initNew(serveruri: server, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+    let seed = initNew(serveruri: server, datadir: try getDocumentsDirectory(), chainhint: chainhint, monitorMempool: true)
     let seedStr = String(seed)
-    if !seedStr.lowercased().hasPrefix(errorPrefix) {
+    if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
     }
     return seedStr
@@ -216,10 +198,9 @@ class RPCModule: NSObject {
   }
   
   func restoreWalletFromSeed(server: String, chainhint: String, restoreSeed: String, birthday: String) throws -> String {
-    let documentsDirectory = try getDocumentsDirectory()
-    let seed = initFromSeed(serveruri: server, seed: restoreSeed, birthday: UInt64(birthday) ?? 0, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+    let seed = initFromSeed(serveruri: server, seed: restoreSeed, birthday: UInt64(birthday) ?? 0, datadir: try getDocumentsDirectory(), chainhint: chainhint, monitorMempool: true)
     let seedStr = String(seed)
-    if !seedStr.lowercased().hasPrefix(errorPrefix) {
+    if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
     }
     return seedStr
@@ -238,10 +219,9 @@ class RPCModule: NSObject {
   }
   
   func restoreWalletFromUfvk(server: String, chainhint: String, restoreUfvk: String, birthday: String) throws -> String {
-    let documentsDirectory = try getDocumentsDirectory()
-    let ufvk = initFromUfvk(serveruri: server, ufvk: restoreUfvk, birthday: UInt64(birthday) ?? 0, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+    let ufvk = initFromUfvk(serveruri: server, ufvk: restoreUfvk, birthday: UInt64(birthday) ?? 0, datadir: try getDocumentsDirectory(), chainhint: chainhint, monitorMempool: true)
     let ufvkStr = String(ufvk)
-    if !ufvkStr.lowercased().hasPrefix(errorPrefix) {
+    if !ufvkStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
     }
     return ufvkStr
@@ -260,9 +240,9 @@ class RPCModule: NSObject {
   }
 
   func loadExistingWallet(server: String, chainhint: String) throws -> String {
-    let documentsDirectory = try getDocumentsDirectory()
-    let walletEncodedUtf8String = try self.readWalletUtf8String()
-    let seed = initFromB64(serveruri: server, datab64: walletEncodedUtf8String, datadir: documentsDirectory, chainhint: chainhint, monitorMempool: true)
+    let walletDecoded = try self.readWallet()
+    let walletEncoded = walletDecoded.base64EncodedString()
+    let seed = initFromB64(serveruri: server, datab64: walletEncoded, datadir: try getDocumentsDirectory(), chainhint: chainhint, monitorMempool: true)
     let seedStr = String(seed)
     return seedStr
   }
@@ -283,7 +263,7 @@ class RPCModule: NSObject {
   func restoreExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
       let backupData = try self.readWalletBackup()
-      let walletData = try self.readWalletUtf8String()
+      let walletData = try self.readWallet()
       try self.saveWalletFile(backupData)
       try self.saveWalletBackupFile(walletData)
       resolve("true")
@@ -321,20 +301,22 @@ class RPCModule: NSObject {
        let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       let resp = executeCommand(cmd: method, args: args)
       let respStr = String(resp)
-      if method == "sync" && !respStr.lowercased().hasPrefix(errorPrefix) {
+      if method == "sync" && !respStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
         // Also save the wallet after sync
         do {
           try self.saveWalletInternal()
         } catch {
-          NSLog("Executing a command error: \(error.localizedDescription)")
-          resolve("Error: [Native] Executing command. \(error.localizedDescription)")
+          let err = "Error: [Native] Executing command. \(error.localizedDescription)"
+          NSLog(err)
+          resolve(err)
         }
       }
       resolve(respStr)
     } else {
-      NSLog("Error executing a command. Command argument problem.")
+      let err = "Error: [Native] Executing command. Command argument problem."
+      NSLog(err)
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        resolve("Error: [Native] Executing command. Command argument problem.")
+        resolve(err)
       }
     }
   }
@@ -356,9 +338,10 @@ class RPCModule: NSObject {
       let respStr = String(resp)
       resolve(respStr)
     } else {
-      NSLog("Error getting latest block server. Argument problem")
+      let err = "Error: [Native] Getting server latest block. Argument problem."
+      NSLog(err)
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          resolve("Error: [Native] Getting server latest block. Argument problem.")
+          resolve(err)
       }
     }
   }
@@ -369,25 +352,104 @@ class RPCModule: NSObject {
       self.getLatestBlockAsync(dict)
   }
 
-  @objc(getDonationAddress:reject:)
-  func getDonationAddress(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      self.getDonationAddressAsync(dict)
-  }
-
   func getDonationAddressAsync(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           let resp = getDeveloperDonationAddress()
           let respStr = String(resp)
           resolve(respStr)
       } else {
-          NSLog("Error getting latest block server")
+          let err = "Error: [Native] Getting developer donation address. Command arguments problem."
+          NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-              resolve("Error: [Native] Getting developer donation address. Command arguments problem.")
+              resolve(err)
           }
       }
   }
 
-
+  @objc(getDonationAddress:reject:)
+  func getDonationAddress(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      self.getDonationAddressAsync(dict)
+  }
+  
+  @objc(updatingNewVersion:resolve:reject:)
+  func updatingNewVersion(_ newVersion: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    let newVersionArray = newVersion.split(separator: ".")
+    let firstNumberArray = newVersionArray[0].split(separator: "-")
+    let firstNumber = firstNumberArray[1]
+    let secondNumber = newVersionArray[1]
+    let thirdNumberArray = newVersionArray[2].split(separator: " ")
+    let thirdNumber = thirdNumberArray[0]
+    NSLog("New version: \(firstNumber).\(secondNumber).\(thirdNumber)")
+    // zingo-1.3.9 (XXX)
+    if Int(firstNumber) ?? 0 >= 1 && Int(secondNumber) ?? 0 >= 3 && Int(thirdNumber) ?? 0 >= 9 {
+      // in the installation/update to 1.3.9 the wallet file name change
+      NSLog("Updating version: \(newVersion)")
+      do {
+        if try fileExists(Constants.OldWalletFileName.rawValue) == "true" && fileExists(Constants.WalletFileName.rawValue) == "false" {
+          // copy the wallet file content to the new file name.
+          let contentEncodedUftString = try String(contentsOfFile: getFileName(Constants.OldWalletFileName.rawValue), encoding: .utf8)
+          let contentDecodedData = Data(base64Encoded: contentEncodedUftString)!
+          // new file
+          do {
+            try writeFile(Constants.WalletFileName.rawValue, fileData: contentDecodedData)
+            NSLog("New wallet file created")
+          } catch {
+            NSLog("Couldn't copy the old wallet file to the new file")
+            resolve("false")
+          }
+          // backup of old wallet
+          do {
+            try contentEncodedUftString.write(toFile: getFileName(Constants.OldWalletDeletedFileName.rawValue), atomically: true, encoding: .utf8)
+            NSLog("New wallet file backup created")
+          } catch {
+            NSLog("Couldn't copy the old wallet file to the new backup file")
+            resolve("false")
+          }
+          //old wallet
+          do {
+            try deleteFile(Constants.OldWalletFileName.rawValue)
+            NSLog("Old wallet deleted")
+          } catch {
+            NSLog("Couldn't delete the old wallet file")
+            resolve("false")
+          }
+        }
+        if try fileExists(Constants.OldWalletBackupFileName.rawValue) == "true" && fileExists(Constants.WalletBackupFileName.rawValue) == "false" {
+          // copy the wallet backup file content to the new file name.
+          let contentEncodedUftString = try String(contentsOfFile: getFileName(Constants.OldWalletBackupFileName.rawValue), encoding: .utf8)
+          let contentDecodedData = Data(base64Encoded: contentEncodedUftString)!
+          // new file
+          do {
+            try writeFile(Constants.WalletBackupFileName.rawValue, fileData: contentDecodedData)
+            NSLog("New wallet backup file created")
+          } catch {
+            NSLog("Couldn't copy the old wallet backup file to the new backup file")
+            resolve("false")
+          }
+          // backup of old backup wallet
+          do {
+            try contentEncodedUftString.write(toFile: getFileName(Constants.OldWalletDeletedBackupFileName.rawValue), atomically: true, encoding: .utf8)
+            NSLog("New wallet file backup created")
+          } catch {
+            NSLog("Couldn't copy the old wallet backup file to the new backup file")
+            resolve("false")
+          }
+          //old wallet
+          do {
+            try deleteFile(Constants.OldWalletBackupFileName.rawValue)
+            NSLog("Old wallet deleted")
+          } catch {
+            NSLog("Couldn't delete the old wallet file")
+            resolve("false")
+          }
+        }
+      } catch {
+        NSLog("Error in file exists error: \(error.localizedDescription)")
+        resolve("false")
+      }
+    }
+    resolve("true")
+  }
 
 }
