@@ -25,10 +25,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         // Check if a file already exists
         val file = File(MainApplication.getAppContext()?.filesDir, fileName)
         return if (file.exists()) {
-            Log.i("SCHEDULED_TASK_RUN", "File $fileName exists")
+            Log.i("MAIN", "File $fileName exists")
             true
         } else {
-            Log.i("SCHEDULED_TASK_RUN", "File $fileName DOES NOT exist")
+            Log.i("MAIN", "File $fileName DOES NOT exist")
             false
         }
     }
@@ -52,13 +52,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun walletExists(promise: Promise) {
         // Check if a wallet already exists
-        promise.resolve(fileExists(walletFileName.value))
+        promise.resolve(fileExists(WalletFileName.value))
     }
 
     @ReactMethod
     fun walletBackupExists(promise: Promise) {
         // Check if a wallet backup already exists
-        promise.resolve(fileExists(walletBackupFileName.value))
+        promise.resolve(fileExists(WalletBackupFileName.value))
     }
 
     fun saveWalletFile(): Boolean {
@@ -78,7 +78,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             Log.i("MAIN", "file size: ${fileBytes.size} bytes")
 
             // Save file to disk
-            writeFile(walletFileName.value, fileBytes)
+            writeFile(WalletFileName.value, fileBytes)
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the wallet")
             return false
@@ -89,14 +89,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     private fun saveWalletBackupFile(): Boolean {
         // Get the encoded wallet file
         // Read the file
-        val fileBytes = readFile(walletFileName.value)
+        val fileBytes = readFile(WalletFileName.value)
         // Log.i("MAIN", b64encoded)
 
         try {
             // Log.i("MAIN", "file size${fileBytes.size}")
 
             // Save file to disk
-            writeFile(walletBackupFileName.value, fileBytes)
+            writeFile(WalletBackupFileName.value, fileBytes)
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the wallet backup")
             return false
@@ -112,7 +112,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             Log.i("MAIN", "file background size: ${fileBytes.size} bytes")
 
             // Save file to disk
-            writeFile(backgroundFileName.value, fileBytes)
+            writeFile(BackgroundFileName.value, fileBytes)
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the background file")
         }
@@ -126,7 +126,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val resp = uniffi.zingo.initNew(server, getDocumentDirectory(), chainhint, true)
         // Log.i("MAIN-Seed", seed)
 
-        if (!resp.lowercase().startsWith(errorPrefix.value)) {
+        if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
             saveWalletFile()
         }
 
@@ -140,7 +140,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val resp = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), getDocumentDirectory(), chainhint, true)
         // Log.i("MAIN", seed)
 
-        if (!resp.lowercase().startsWith(errorPrefix.value)) {
+        if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
             saveWalletFile()
         }
 
@@ -154,7 +154,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), getDocumentDirectory(), chainhint, true)
         // Log.i("MAIN", ufvk)
 
-        if (!resp.lowercase().startsWith(errorPrefix.value)) {
+        if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
             saveWalletFile()
         }
 
@@ -168,7 +168,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     fun loadExistingWalletNative(server: String, chainhint: String): String {
         // Read the file
-        val fileBytes = readFile(walletFileName.value)
+        val fileBytes = readFile(WalletFileName.value)
 
         val middle0w = 0
         val middle1w = 6000000 // 6_000_000 - 8 pieces
@@ -338,14 +338,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun restoreExistingWalletBackup(promise: Promise) {
         // Read the file backup
-        val fileBytesBackup = readFile(walletBackupFileName.value)
+        val fileBytesBackup = readFile(WalletBackupFileName.value)
 
         // Read the file wallet
-        val fileBytesWallet = readFile(walletFileName.value)
+        val fileBytesWallet = readFile(WalletFileName.value)
 
         try {
             // Save file to disk wallet (with the backup)
-            writeFile(walletFileName.value, fileBytesBackup)
+            writeFile(WalletFileName.value, fileBytesBackup)
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the wallet with the backup")
             promise.resolve(false)
@@ -353,7 +353,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         try {
             // Save file to disk backup (with the wallet)
-            writeFile(walletBackupFileName.value, fileBytesWallet)
+            writeFile(WalletBackupFileName.value, fileBytesWallet)
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the backup with the wallet")
             promise.resolve(false)
@@ -364,12 +364,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
-        promise.resolve(deleteFile(walletFileName.value))
+        promise.resolve(deleteFile(WalletFileName.value))
     }
 
     @ReactMethod
     fun deleteExistingWalletBackup(promise: Promise) {
-        promise.resolve(deleteFile(walletBackupFileName.value))
+        promise.resolve(deleteFile(WalletBackupFileName.value))
     }
 
     @ReactMethod
@@ -382,7 +382,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             // Log.i("execute", "Response to $cmd : $resp")
 
             // And save it if it was a sync
-            if (cmd == "sync" && !resp.lowercase().startsWith(errorPrefix.value)) {
+            if (cmd == "sync" && !resp.lowercase().startsWith(ErrorPrefix.value)) {
                 saveWalletFile()
             }
 
@@ -418,6 +418,78 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val resp = uniffi.zingo.getDeveloperDonationAddress()
 
         promise.resolve(resp)
+    }
+
+    @ReactMethod
+    fun updatingNewVersion(newVersion: String, promise: Promise) {
+        val newVersionArray = newVersion.split(".")
+        val firstNumberArray = newVersionArray[0].split("-")
+        val firstNumber = firstNumberArray[1]
+        val secondNumber = newVersionArray[1]
+        val thirdNumberArray = newVersionArray[2].split(" ")
+        val thirdNumber = thirdNumberArray[0]
+        Log.i("MAIN", "New version: $firstNumber . $secondNumber . $thirdNumber ")
+        // zingo-1.3.9 (XXX)
+        if (firstNumber.toInt() >= 1 && secondNumber.toInt() >= 3 && thirdNumber.toInt() >= 9) {
+            // in the installation/update to 1.3.9 the wallet file name change
+            Log.i("MAIN", "Updating version: $newVersion")
+            if (fileExists(OldWalletFileName.value) && !fileExists(WalletFileName.value)) {
+                // copy the wallet file content to the new file name.
+                val fileBytesOldWallet = readFile(OldWalletFileName.value)
+                // new file
+                try {
+                    writeFile(WalletFileName.value, fileBytesOldWallet)
+                    Log.i("MAIN", "New wallet file created")
+                } catch (e: IllegalArgumentException) {
+                    Log.e("MAIN", "Couldn't copy the old wallet file to the new file")
+                    promise.resolve(false)
+                }
+                // backup of old wallet
+                try {
+                    writeFile(OldWalletDeletedFileName.value, fileBytesOldWallet)
+                    Log.i("MAIN", "New wallet file backup created")
+                } catch (e: IllegalArgumentException) {
+                    Log.e("MAIN", "Couldn't copy the old wallet file to the backup file")
+                    promise.resolve(false)
+                }
+                // old wallet
+                try {
+                    deleteFile(OldWalletFileName.value)
+                    Log.i("MAIN", "Old wallet deleted")
+                } catch (e: IllegalArgumentException) {
+                    Log.e("MAIN", "Couldn't delete the old wallet file")
+                    promise.resolve(false)
+                }
+            }
+            if (fileExists(OldWalletBackupFileName.value) && !fileExists(WalletBackupFileName.value)) {
+                val fileBytesOldWalletBackup = readFile(OldWalletBackupFileName.value)
+                // new file
+                try {
+                    writeFile(WalletBackupFileName.value, fileBytesOldWalletBackup)
+                    Log.i("MAIN", "New wallet backup file created")
+                } catch (e: IllegalArgumentException) {
+                    Log.e("MAIN", "Couldn't copy the wallet backup file to the new backup file")
+                    promise.resolve(false)
+                }
+                // backup of old backup wallet
+                try {
+                    writeFile(OldWalletDeletedBackupFileName.value, fileBytesOldWalletBackup)
+                    Log.i("MAIN", "New wallet backup file created")
+                } catch (e: IllegalArgumentException) {
+                    Log.e("MAIN", "Couldn't copy the wallet backup file to the new backup file")
+                    promise.resolve(false)
+                }
+                // old backup wallet
+                try {
+                    deleteFile(OldWalletBackupFileName.value)
+                    Log.i("MAIN", "Old wallet backup deleted")
+                } catch (e: IllegalArgumentException) {
+                    Log.e("MAIN", "Couldn't delete the old wallet backup file")
+                    promise.resolve(false)
+                }
+            }
+        }
+        promise.resolve(true)
     }
 
 }

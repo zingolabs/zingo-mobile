@@ -411,6 +411,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
     this.setState({ actionButtonsDisabled: true });
 
+    // Here the App have to called a native process if it's
+    // fresh install or update
+    if (this.state.firstLaunchingMessage) {
+      await RPCModule.updatingNewVersion(this.state.translate('version') as string);
+    }
+
     // Here the App ask about the new donation feature if needed.
     // only for Advance Users
     if (this.state.donationAlert && this.state.mode === ModeEnum.advanced) {

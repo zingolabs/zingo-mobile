@@ -1,14 +1,18 @@
 package org.ZingoLabs.Zingo
 
 enum class Constants(val value: String) {
-    // old wallet files - same content - no changes in Android
-    oldWalletFileName ("wallet.dat"),
-    oldWalletBackupFileName("wallet.backup.dat"),
+    // old wallet files backup - same content
+    OldWalletDeletedFileName ("wallet.dat.old"),
+    OldWalletDeletedBackupFileName("wallet.backup.dat.old"),
+
+    // old wallet files - same content - we need to delete them
+    OldWalletFileName ("wallet.dat"),
+    OldWalletBackupFileName("wallet.backup.dat"),
 
     // NEW wallet files - same content - no changes in Android
-    walletFileName("wallet.decoded.dat"),
-    walletBackupFileName("wallet.backup.decoded.dat"),
+    WalletFileName("wallet.decoded.dat"),
+    WalletBackupFileName("wallet.backup.decoded.dat"),
 
-    backgroundFileName("background.json"),
-    errorPrefix("error"),
+    BackgroundFileName("background.json"),
+    ErrorPrefix("error"),
 }
