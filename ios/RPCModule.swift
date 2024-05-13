@@ -42,8 +42,10 @@ class RPCModule: NSObject {
   func fileExists(_ fileName: String) throws -> String {
     let fileExists = try FileManager.default.fileExists(atPath: getFileName(fileName))
     if fileExists {
+      NSLog("File exists \(fileName)")
       return "true"
     } else {
+      NSLog("File DOES not exists \(fileName)")
       return "false"
     }
   }
@@ -99,9 +101,8 @@ class RPCModule: NSObject {
 
   func saveBackgroundFile(_ jsonString: String) throws {
     do {
-      // the content of this JSON can be represented safely in utf8 before storing as Data.
-      let jsonData = jsonString.data(using: .utf8)!
-      try writeFile(Constants.BackgroundFileName.rawValue, fileData: jsonData)
+      // the content of this JSON can be represented safely in utf8.
+      try jsonString.write(toFile: getFileName(Constants.BackgroundFileName.rawValue), atomically: true, encoding: .utf8)
     } catch {
       throw FileError.writeFileError("Error writting background file error: \(error.localizedDescription)")
     }
