@@ -50,7 +50,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundStart")
 
         // checking if the wallet file exists
-        val exists: Boolean = rpcModule.fileExists(walletFileName.value)
+        val exists: Boolean = rpcModule.fileExists(WalletFileName.value)
 
         if (exists) {
             uniffi.zingo.initLogging()
@@ -58,7 +58,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
             // check the Server, because the task can run without the App.
             val balance = uniffi.zingo.executeCommand("balance", "")
             Log.i("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
-            if (balance.lowercase().startsWith(errorPrefix.value)) {
+            if (balance.lowercase().startsWith(ErrorPrefix.value)) {
                 // this means this task is running with the App closed
                 loadWalletFile(rpcModule)
             } else {
