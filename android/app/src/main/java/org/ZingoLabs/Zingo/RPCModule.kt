@@ -68,6 +68,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun saveWalletFile() {
         // Get the encoded wallet file
         val b64encoded = uniffi.zingo.saveToB64()
+        if (b64encoded.lowercase().startsWith("error")) {
+            // with error don't save the file. Obviously.
+            Log.e("MAIN", "Couldn't save the wallet. $b64encoded")
+            return
+        }
         // Log.i("MAIN", b64encoded)
 
         try {
@@ -425,67 +430,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         saveWalletBackupFile()
 
         promise.resolve(true)
-    }
-
-    fun saveWallet() {
-        // Get the encoded wallet file
-        val b64encoded: String = uniffi.zingo.saveToB64()
-        if (b64encoded.lowercase().startsWith("error")) {
-            // with error don't save the file. Obviously.
-            Log.e("MAIN", "Couldn't save the wallet. $b64encoded")
-            return
-        }
-        // Log.i("MAIN", b64encoded)
-
-        try {
-            val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            Log.i("MAIN", "file size: ${fileBytes.size} bytes")
-
-            // Save file to disk
-            val file = MainApplication.getAppContext()?.openFileOutput("wallet.dat", Context.MODE_PRIVATE)
-            file?.write(fileBytes)
-            file?.close()
-        } catch (e: IllegalArgumentException) {
-            Log.e("MAIN", "Couldn't save the wallet")
-        }
-    }
-
-    private fun saveWalletBackup() {
-        // Get the encoded wallet file
-        // val b64encoded = save()
-        // Read the file
-        val fileRead = MainApplication.getAppContext()!!.openFileInput("wallet.dat")
-        val fileBytes = fileRead.readBytes()
-        // val fileb64 = Base64.encodeToString(fileBytes, Base64.NO_WRAP)
-        // Log.i("MAIN", b64encoded)
-
-        try {
-            // val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            // Log.i("MAIN", "file size${fileBytes.size}")
-
-            // Save file to disk
-            val file = MainApplication.getAppContext()?.openFileOutput("wallet.backup.dat", Context.MODE_PRIVATE)
-            file?.write(fileBytes)
-            file?.close()
-        } catch (e: IllegalArgumentException) {
-            Log.e("MAIN", "Couldn't save the wallet backup")
-        }
-    }
-
-    fun saveBackgroundFile(json: String) {
-        // Log.i("MAIN", b64encoded)
-
-        try {
-            val fileBytes: ByteArray = json.toByteArray()
-            Log.i("MAIN", "file background size: ${fileBytes.size} bytes")
-
-            // Save file to disk
-            val file = MainApplication.getAppContext()?.openFileOutput("background.json", Context.MODE_PRIVATE)
-            file?.write(fileBytes)
-            file?.close()
-        } catch (e: IllegalArgumentException) {
-            Log.e("MAIN", "Couldn't save the background file")
-        }
     }
 
     @ReactMethod
