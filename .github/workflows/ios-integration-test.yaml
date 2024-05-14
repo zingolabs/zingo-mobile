@@ -45,9 +45,8 @@ jobs:
         working-directory: ios
         run: |
           xcodebuild \
-          -project ZingoMobile.xcodeproj \
-          -target ZingoMobileTests \ 
-          -sdk iphonesimulator \
-          -destination 'platform=iOS Simulator,name=iPhone 12,OS=14.3' \
-          build test
-
+            -project ZingoMobile.xcodeproj \
+            -scheme ZingoMobile \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 12,OS=14.3' \
+            build test
