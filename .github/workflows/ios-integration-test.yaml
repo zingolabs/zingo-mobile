@@ -43,11 +43,10 @@ jobs:
 
       - name: Launch Simulator
         run: |
-          xcrun simctl list
           xcrun simctl boot "iPhone 14"
 
       - name: Run integration tests
         working-directory: ios
         run: |
-          xcodebuild -project ZingoMobile.xcodeproj -scheme ZingoMobileTests build test
+          xcodebuild -project ZingoMobile.xcodeproj -target ZingoMobileTests -scheme ZingoMobile build test
 
