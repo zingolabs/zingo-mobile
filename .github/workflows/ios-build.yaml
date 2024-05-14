@@ -72,12 +72,12 @@ jobs:
 
       - name: Install rust Target
         run: |
-          sudo rustup target add aarch64-apple-ios-sim
+          sudo rustup target add x86_64-apple-ios
       
       - name: Build Universal rust lib & uniffi lib and copy to ios folder
         working-directory: ./rust/ios
         run: |
-          sudo ./buildsimulator.sh
+          sudo ./buildci.sh
       
       - name: Upload native rust
         uses: actions/upload-artifact@v4
