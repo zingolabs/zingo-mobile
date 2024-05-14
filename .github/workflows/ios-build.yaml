@@ -69,11 +69,15 @@ jobs:
       - name: Install Cargo Lipo
         run: |
           sudo cargo install cargo-lipo
+
+      - name: Install rust Target
+        run: |
+          rustup target add aarch64-apple-ios-sim
       
       - name: Build Universal rust lib & uniffi lib and copy to ios folder
         working-directory: ./rust/ios
         run: |
-          sudo ./build.sh
+          sudo ./buildsimulator.sh
       
       - name: Upload native rust
         uses: actions/upload-artifact@v4
