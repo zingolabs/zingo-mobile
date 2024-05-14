@@ -47,6 +47,7 @@ jobs:
           xcrun simctl boot "iPhone 14"
 
       - name: Run integration tests
+        working-directory: ios
         run: |
           xcodebuild -project ZingoMobile.xcodeproj -scheme ZingoMobileTests build test
 
