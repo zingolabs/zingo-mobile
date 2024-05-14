@@ -46,7 +46,7 @@ jobs:
           sudo gem install bundler
           bundle install
 
-      -name: Launch Simulator
+      - name: Launch Simulator
         run: |
           xcrun instruments -w "iPhone 15"
 
