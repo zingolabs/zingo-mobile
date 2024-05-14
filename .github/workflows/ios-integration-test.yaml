@@ -49,5 +49,5 @@ jobs:
           -target ZingoMobileTests \ 
           -sdk iphonesimulator \
           -destination 'platform=iOS Simulator,name=iPhone 12,OS=14.3' \
-          test
+          build test
 
