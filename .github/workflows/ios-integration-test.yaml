@@ -37,7 +37,7 @@ jobs:
           fail-on-cache-miss: true
       
       - name: Setup Xcode
-        uses: actions/setup-xcode@v2
+        uses: maxim-lobanov/setup-xcode@v2
         with:
           xcode-version: "15.3"
 
