@@ -43,6 +43,7 @@ jobs:
 
       - name: Launch Simulator
         run: |
+          xcrun simctl list
           xcrun simctl boot "iPhone 15"
 
       - name: Run integration tests
