@@ -48,5 +48,5 @@ jobs:
       - name: Run integration tests
         working-directory: ios
         run: |
-          xcodebuild -project ZingoMobile.xcodeproj -target ZingoMobileTests -scheme ZingoMobile build test
+          xcodebuild -project ZingoMobile.xcodeproj -target ZingoMobileTests build test
 
