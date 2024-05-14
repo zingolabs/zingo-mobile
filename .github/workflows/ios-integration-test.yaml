@@ -41,6 +41,15 @@ jobs:
         with:
           xcode-version: latest
 
+      -name: Yarn Install
+        run: |
+          yarn
+
+      -name: Pod Install
+        working-directory: ios
+        run: |
+          pod install
+
       - name: Run integration tests
         working-directory: ios
         run: |
