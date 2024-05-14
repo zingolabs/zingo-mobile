@@ -41,6 +41,11 @@ jobs:
         with:
           xcode-version: latest
 
+      - name: Add Xcode tools to PATH
+        run: |
+          sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+          sudo xcodebuild -runFirstLaunch
+
       - name: Launch Simulator
         run: |
           xcrun instruments -w "iPhone 15"
