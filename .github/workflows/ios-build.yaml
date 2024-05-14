@@ -72,7 +72,7 @@ jobs:
 
       - name: Install rust Target
         run: |
-          rustup target add aarch64-apple-ios-sim
+          sudo rustup target add aarch64-apple-ios-sim
       
       - name: Build Universal rust lib & uniffi lib and copy to ios folder
         working-directory: ./rust/ios
