@@ -1,4 +1,4 @@
-name: Integration test
+name: Android Integration test
 
 on:
   workflow_call:
@@ -21,8 +21,8 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
-  build-test-artifacts:
-    name: Build test artifacts
+  android-build-test-artifacts:
+    name: Android Build test artifacts
     runs-on: macos-12
     steps:
       - name: Set envs for zingolib CI
@@ -59,8 +59,8 @@ jobs:
           name: nextest-archive-${{ env.ABI }}
           path: ./rust/nextest-archive-${{ env.ABI }}.tar.zst
 
-  integration-test:
-    name: Integration test
+  android-integration-test:
+    name: Android Integration test
     runs-on: macos-12
     needs: build-test-artifacts
     strategy:

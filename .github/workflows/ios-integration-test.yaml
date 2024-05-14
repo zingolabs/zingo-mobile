@@ -1,4 +1,4 @@
-name: Integration test
+name: IOS Integration test
 
 on:
   workflow_call:
@@ -16,8 +16,8 @@ env:
   REPO-OWNER: ${{ github.repository_owner }}
 
 jobs:
-  integration-test:
-    name: Integration test
+  ios-integration-test:
+    name: IOS Integration test
     runs-on: macos-12
     steps:
       - name: Set envs for zingolib CI
