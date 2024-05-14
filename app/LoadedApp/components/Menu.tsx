@@ -173,7 +173,9 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
             </RegText>
           )}
           {mode !== ModeEnum.basic && (
-            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.VoteForNym)} style={item}>
+            <RegText
+              onPress={() => onItemSelectedWrapper(MenuItemEnum.VoteForNym)}
+              style={{ ...item, color: colors.primary }}>
               {translate('loadedapp.votefornym') as string}
             </RegText>
           )}
