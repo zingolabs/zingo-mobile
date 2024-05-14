@@ -41,12 +41,13 @@ jobs:
         with:
           xcode-version: latest
 
-      - name: Launch Simulator
-        run: |
-          xcrun simctl boot "iPhone 14"
-
       - name: Run integration tests
         working-directory: ios
         run: |
-          xcodebuild -project ZingoMobile.xcodeproj -target ZingoMobileTests build test
+          xcodebuild \
+          -project ZingoMobile.xcodeproj \
+          -target ZingoMobileTests \ 
+          -sdk iphonesimulator \
+          -destination 'platform=iOS Simulator,name=iPhone 12,OS=14.3' \
+          test
 
