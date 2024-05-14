@@ -149,13 +149,26 @@ describe('Component Settings - test', () => {
   test('Settings - snapshot', () => {
     const settings = render(
       <ContextAppLoadedProvider value={state}>
-        <Settings
+        {/*<Settings
           closeModal={onClose}
           set_wallet_option={onSetOption}
           set_server_option={onSetOption}
           set_currency_option={onSetOption}
           set_language_option={onSetOption}
           set_sendAll_option={onSetOption}
+          set_donation_option={onSetOption}
+          set_privacy_option={onSetOption}
+          set_mode_option={onSetOption}
+          set_security_option={onSetOption}
+          set_selectServer_option={onSetOption}
+          set_rescanMenuOption_option={onSetOption}
+        />*/}
+        <Settings
+          closeModal={onClose}
+          set_wallet_option={onSetOption}
+          set_server_option={onSetOption}
+          set_currency_option={onSetOption}
+          set_language_option={onSetOption}
           set_donation_option={onSetOption}
           set_privacy_option={onSetOption}
           set_mode_option={onSetOption}

@@ -44,7 +44,7 @@ type SettingsProps = {
   set_server_option: (value: ServerType, toast: boolean, same_server_chain_name: boolean) => Promise<void>;
   set_currency_option: (value: CurrencyEnum) => Promise<void>;
   set_language_option: (value: LanguageEnum, reset: boolean) => Promise<void>;
-  set_sendAll_option: (value: boolean) => Promise<void>;
+  //set_sendAll_option: (value: boolean) => Promise<void>;
   set_donation_option: (value: boolean) => Promise<void>;
   set_privacy_option: (value: boolean) => Promise<void>;
   set_mode_option: (value: string) => Promise<void>;
@@ -63,7 +63,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   set_server_option,
   set_currency_option,
   set_language_option,
-  set_sendAll_option,
+  //set_sendAll_option,
   set_donation_option,
   set_privacy_option,
   set_mode_option,
@@ -79,7 +79,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     server: serverContext,
     currency: currencyContext,
     language: languageContext,
-    sendAll: sendAllContext,
+    //sendAll: sendAllContext,
     donation: donationContext,
     privacy: privacyContext,
     mode: modeContext,
@@ -109,11 +109,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     LANGUAGES = languagesArray as Options[];
   }
 
-  const sendAllsArray = translate('settings.sendalls');
-  let SENDALLS: Options[] = [];
-  if (typeof sendAllsArray === 'object') {
-    SENDALLS = sendAllsArray as Options[];
-  }
+  // temporary hide
+  //const sendAllsArray = translate('settings.sendalls');
+  //let SENDALLS: Options[] = [];
+  //if (typeof sendAllsArray === 'object') {
+  //  SENDALLS = sendAllsArray as Options[];
+  //}
 
   const donationsArray = translate('settings.donations');
   let DONATIONS: Options[] = [];
@@ -153,7 +154,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [customServerChainName, setCustomServerChainName] = useState<string>('');
   const [currency, setCurrency] = useState<CurrencyEnum>(currencyContext);
   const [language, setLanguage] = useState<LanguageEnum>(languageContext);
-  const [sendAll, setSendAll] = useState<boolean>(sendAllContext);
+  //const [sendAll, setSendAll] = useState<boolean>(sendAllContext);
   const [donation, setDonation] = useState<boolean>(donationContext);
   const [privacy, setPrivacy] = useState<boolean>(privacyContext);
   const [mode, setMode] = useState<string>(modeContext);
@@ -263,7 +264,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       serverContext.chain_name === chain_nameParsed &&
       currencyContext === currency &&
       languageContext === language &&
-      sendAllContext === sendAll &&
+      //sendAllContext === sendAll &&
       donationContext === donation &&
       privacyContext === privacy &&
       modeContext === mode &&
@@ -356,9 +357,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (currencyContext !== currency) {
       await set_currency_option(currency);
     }
-    if (sendAllContext !== sendAll) {
-      await set_sendAll_option(sendAll);
-    }
+    //if (sendAllContext !== sendAll) {
+    //  await set_sendAll_option(sendAll);
+    //}
     if (donationContext !== donation) {
       await set_donation_option(donation);
     }
@@ -571,7 +572,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               )}
             </View>
 
-            <View style={{ display: 'flex', margin: 10 }}>
+            {/*<View style={{ display: 'flex', margin: 10 }}>
               <BoldText>{translate('settings.sendall-title') as string}</BoldText>
             </View>
 
@@ -583,7 +584,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 sendAll,
                 'sendall',
               )}
-            </View>
+            </View>*/}
 
             <View style={{ display: 'flex', margin: 10 }}>
               <BoldText>{translate('settings.rescanmenuoption-title') as string}</BoldText>

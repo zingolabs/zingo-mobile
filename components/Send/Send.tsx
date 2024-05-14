@@ -97,7 +97,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendPageState,
     navigation,
     zecPrice,
-    sendAll,
+    //sendAll,
     netInfo,
     privacy,
     server,
@@ -135,7 +135,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [sendToSelf, setSendToSelf] = useState<boolean>(false);
   const [donationAddress, setDonationAddress] = useState<boolean>(false);
   const [negativeMaxAount, setNegativeMaxAount] = useState<boolean>(false);
-  const [sendAllClick, setSendAllClick] = useState<boolean>(false);
+  //const [sendAllClick, setSendAllClick] = useState<boolean>(false);
   const [proposeSendLastError, setProposeSendLastError] = useState<string>('');
   const isFocused = useIsFocused();
 
@@ -344,19 +344,19 @@ const Send: React.FunctionComponent<SendProps> = ({
       // if max is 0 then the user can send a memo with amount 0.
       setMaxAmount(max);
       setNegativeMaxAount(false);
-      if (sendAllClick) {
-        updateToField(null, Utils.parseNumberFloatToStringLocale(max, 8), null, null, null);
-      }
+      //if (sendAllClick) {
+      //  updateToField(null, Utils.parseNumberFloatToStringLocale(max, 8), null, null, null);
+      //}
     } else {
       // if max is less than 0 then the user CANNOT send anything.
       setMaxAmount(0);
       setNegativeMaxAount(true);
-      if (sendAllClick) {
-        updateToField(null, '0', null, null, null);
-      }
+      //if (sendAllClick) {
+      //  updateToField(null, '0', null, null, null);
+      //}
     }
     setSpendable(spend);
-    setSendAllClick(false);
+    //setSendAllClick(false);
 
     const stillConf =
       totalBalance.orchardBal !== totalBalance.spendableOrchard ||
@@ -370,7 +370,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     setStillConfirming(stillConf);
     setShowShieldInfo(showShield);
     setShowUpgradeInfo(showUpgrade);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     donation,
     fee,
@@ -713,7 +712,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         transparent={false}
         visible={confirmModalVisible}
         onRequestClose={() => setConfirmModalVisible(false)}>
-        <Confirm
+        {/*<Confirm
           calculatedFee={fee}
           donationAmount={
             donation && server.chain_name === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress
@@ -732,6 +731,22 @@ const Send: React.FunctionComponent<SendProps> = ({
             Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) ===
               Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
           }
+          calculateFeeWithPropose={calculateFeeWithPropose}
+        />*/}
+        <Confirm
+          calculatedFee={fee}
+          donationAmount={
+            donation && server.chain_name === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress
+              ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+              : 0
+          }
+          closeModal={() => {
+            setConfirmModalVisible(false);
+          }}
+          openModal={() => {
+            setConfirmModalVisible(true);
+          }}
+          confirmSend={confirmSend}
           calculateFeeWithPropose={calculateFeeWithPropose}
         />
       </Modal>
@@ -927,7 +942,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}>
                       <FadeText>{`${translate('send.amount')}`}</FadeText>
                     </View>
-                    {sendAll && mode !== ModeEnum.basic && (
+                    {/*sendAll && mode !== ModeEnum.basic && (
                       <TouchableOpacity
                         onPress={() => {
                           if (fee > 0) {
@@ -958,7 +973,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <RegText color={colors.primary}>{translate('send.sendall') as string}</RegText>
                         </View>
                       </TouchableOpacity>
-                    )}
+                    )*/}
                   </View>
                   {validAmount === -1 && <ErrorText>{translate('send.invalidnumber') as string}</ErrorText>}
                   {validAmount === -2 && <ErrorText>{translate('send.invalidamount') as string}</ErrorText>}
@@ -1409,15 +1424,15 @@ const Send: React.FunctionComponent<SendProps> = ({
                     updateToField(null, Utils.getDefaultDonationAmount(), null, null, false);
                     return;
                   }
-                  if (
-                    validAmount === 1 &&
-                    sendPageState.toaddr.amount &&
-                    mode !== ModeEnum.basic &&
-                    Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) ===
-                      Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
-                  ) {
-                    addLastSnackbar({ message: `${translate('send.sendall-message') as string}` });
-                  }
+                  //if (
+                  //  validAmount === 1 &&
+                  //  sendPageState.toaddr.amount &&
+                  //  mode !== ModeEnum.basic &&
+                  //  Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) ===
+                  //    Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
+                  //) {
+                  //  addLastSnackbar({ message: `${translate('send.sendall-message') as string}` });
+                  //}
                   if (!netInfo.isConnected) {
                     addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
                     return;

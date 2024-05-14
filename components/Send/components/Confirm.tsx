@@ -35,7 +35,7 @@ type ConfirmProps = {
   closeModal: () => void;
   openModal: () => void;
   confirmSend: () => void;
-  sendAllAmount: boolean;
+  //sendAllAmount: boolean;
   calculateFeeWithPropose: (amount: string, address: string, memo: string, includeUAMemo: boolean) => Promise<void>;
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
@@ -43,7 +43,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   confirmSend,
   calculatedFee,
   donationAmount,
-  sendAllAmount,
+  //sendAllAmount,
   openModal,
   calculateFeeWithPropose,
 }) => {
@@ -387,7 +387,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <Button
             type={ButtonTypeEnum.Primary}
-            title={sendAllAmount ? (translate('send.confirm-button-all') as string) : (translate('confirm') as string)}
+            title={
+              /*sendAllAmount ? (translate('send.confirm-button-all') as string) :*/ translate('confirm') as string
+            }
             onPress={() => confirmSendBiometrics()}
           />
           <Button
