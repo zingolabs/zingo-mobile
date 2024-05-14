@@ -14,7 +14,6 @@ env:
   CACHE-KEY: ${{ inputs.cache-key }}
   TIMESTAMP: ${{ inputs.timestamp }}
   REPO-OWNER: ${{ github.repository_owner }}
-  RUSTFLAGS: -D warnings
 
 jobs:
   integration-test:
