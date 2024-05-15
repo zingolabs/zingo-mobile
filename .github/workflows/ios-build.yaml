@@ -31,7 +31,7 @@ jobs:
         id: check-build-cache
         uses: actions/cache@v4
         with:
-          path: ios
+          path: rust/lib/Generated
           key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
           lookup-only: true
   
@@ -77,16 +77,16 @@ jobs:
       - name: Build Universal rust lib & uniffi lib and copy to ios folder
         working-directory: rust/lib
         run: |
-          sudo cargo run --release --bin uniffi-bindgen generate ./src/zingo.udl --language swift --out-dir ../../ios
+          sudo cargo run --release --bin uniffi-bindgen generate ./src/zingo.udl --language swift --out-dir ./Generated
           sudo cargo lipo --release --targets x86_64-apple-ios
-          sudo cp ../target/universal/release/libzingo.a ../../ios/libuniffi_zingo.a
-          ls -l ../../ios
+          sudo cp ../target/universal/release/libzingo.a ./Generated/libuniffi_zingo.a
+          ls -l ./Generated
       
       - name: Upload native rust
         uses: actions/upload-artifact@v4
         with:
           name: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
-          path: ios
+          path: rust/lib/Generated
       
   cache-native-ios-uniffi:
     name: Cache native rust
@@ -106,11 +106,11 @@ jobs:
         uses: actions/download-artifact@v4
         with: 
           name: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
-          path: ios
+          path: rust/lib/Generated
       
       - name: Cache native rust
         uses: actions/cache@v4
         with:
-          path: ios
+          path: rust/lib/Generated
           key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
 
