@@ -20,8 +20,8 @@ import RNPickerSelect from 'react-native-picker-select';
 import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
-import ZecAmount from '../Components/ZecAmount';
-import CurrencyAmount from '../Components/CurrencyAmount';
+//import ZecAmount from '../Components/ZecAmount';
+//import CurrencyAmount from '../Components/CurrencyAmount';
 import Button from '../Components/Button';
 import {
   AddressBookFileClass,
@@ -31,7 +31,7 @@ import {
   SendProgressClass,
   ToAddrClass,
   ModeEnum,
-  CurrencyEnum,
+  //CurrencyEnum,
   ChainNameEnum,
   ButtonTypeEnum,
   GlobalConst,
@@ -92,14 +92,14 @@ const Send: React.FunctionComponent<SendProps> = ({
   const context = useContext(ContextAppLoaded);
   const {
     translate,
-    info,
+    //info,
     totalBalance,
     sendPageState,
     navigation,
     zecPrice,
     //sendAll,
     netInfo,
-    privacy,
+    //privacy,
     server,
     setBackgroundError,
     addLastSnackbar,
@@ -134,7 +134,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [updatingToField, setUpdatingToField] = useState<boolean>(false);
   const [sendToSelf, setSendToSelf] = useState<boolean>(false);
   const [donationAddress, setDonationAddress] = useState<boolean>(false);
-  const [negativeMaxAount, setNegativeMaxAount] = useState<boolean>(false);
+  //const [negativeMaxAount, setNegativeMaxAount] = useState<boolean>(false);
   //const [sendAllClick, setSendAllClick] = useState<boolean>(false);
   const [proposeSendLastError, setProposeSendLastError] = useState<string>('');
   const isFocused = useIsFocused();
@@ -144,7 +144,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const runSendPropose = async (proposeJSON: string): Promise<string> => {
     try {
-      const proposeStr: string = await RPCModule.execute(CommandEnum.propose_send, proposeJSON);
+      const proposeStr: string = await RPCModule.execute(CommandEnum.send, proposeJSON);
       if (proposeStr) {
         if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error propose ${proposeStr}`);
@@ -173,21 +173,22 @@ const Send: React.FunctionComponent<SendProps> = ({
     console.log(validMemo);
     // if no address -> make no sense to run the propose
     if (!address || validAddress !== 1) {
+      setFee(0);
       return;
     }
     if (amount === '' || validAmount !== 1) {
+      setFee(0);
       return;
     }
     if (validMemo === -1) {
+      setFee(0);
       return;
     }
     const sendPageStateCalculateFee = new SendPageStateClass(new ToAddrClass(0));
     sendPageStateCalculateFee.toaddr.to = address;
     sendPageStateCalculateFee.toaddr.memo = memo;
     sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemo;
-
-    sendPageStateCalculateFee.toaddr.amount =
-      validAmount === 1 ? amount : validAmount === -2 ? Utils.parseNumberFloatToStringLocale(maxAmount, 8) : '0';
+    sendPageStateCalculateFee.toaddr.amount = amount;
 
     let proposeFee = 0;
     const sendJson = await Utils.getSendManyJSON(
@@ -343,14 +344,14 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (max >= 0) {
       // if max is 0 then the user can send a memo with amount 0.
       setMaxAmount(max);
-      setNegativeMaxAount(false);
+      //setNegativeMaxAount(false);
       //if (sendAllClick) {
       //  updateToField(null, Utils.parseNumberFloatToStringLocale(max, 8), null, null, null);
       //}
     } else {
       // if max is less than 0 then the user CANNOT send anything.
       setMaxAmount(0);
-      setNegativeMaxAount(true);
+      //setNegativeMaxAount(true);
       //if (sendAllClick) {
       //  updateToField(null, '0', null, null, null);
       //}
@@ -1053,7 +1054,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     </View>
 
                     <View style={{ display: 'flex', flexDirection: 'column' }}>
-                      <View
+                      {/*<View
                         style={{
                           display: 'flex',
                           flexDirection: 'row',
@@ -1069,7 +1070,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           amtZec={maxAmount}
                           privacy={privacy}
                         />
-                      </View>
+                      </View>*/}
                       {(donation || (validAddress !== 0 && validAmount !== 0)) && (
                         <View
                           style={{
@@ -1228,7 +1229,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         </View>
                       </View>
 
-                      <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                      {/*<View style={{ flexDirection: 'column', alignItems: 'center' }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <RegText style={{ marginTop: 11, fontSize: 12.5 }}>
                             {translate('send.spendable') as string}
@@ -1244,7 +1245,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         <View style={{ marginLeft: 5 }}>
                           <PriceFetcher setZecPrice={setZecPrice} />
                         </View>
-                      </View>
+                      </View>*/}
                     </View>
                   )}
                 </View>
@@ -1411,13 +1412,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                 accessibilityLabel={'title ' + translate('send.button')}
                 type={ButtonTypeEnum.Primary}
                 title={
-                  validAmount === 1 &&
+                  /*validAmount === 1 &&
                   sendPageState.toaddr.amount &&
                   mode !== ModeEnum.basic &&
                   Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) ===
                     Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
                     ? (translate('send.button-all') as string)
-                    : (translate('send.button') as string)
+                    :*/ translate('send.button') as string
                 }
                 disabled={!sendButtonEnabled}
                 onPress={() => {

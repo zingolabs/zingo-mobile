@@ -264,8 +264,7 @@ export default class RPC {
 
   static async rpc_shieldFunds(): Promise<string> {
     try {
-      // using `all` or `transparent` or `sapling`...
-      const shieldStr: string = await RPCModule.execute(CommandEnum.quickshield, '');
+      const shieldStr: string = await RPCModule.execute(CommandEnum.confirm, '');
       console.log(shieldStr);
       if (shieldStr) {
         if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -665,7 +664,8 @@ export default class RPC {
 
   async doSend(sendJSON: string): Promise<string> {
     try {
-      const sendStr: string = await RPCModule.execute(CommandEnum.quicksend, sendJSON);
+      console.log('NOT USING THIS:', sendJSON);
+      const sendStr: string = await RPCModule.execute(CommandEnum.confirm, '');
       if (sendStr) {
         if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error send ${sendStr}`);

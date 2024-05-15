@@ -28,12 +28,8 @@ export enum CommandEnum {
   memobytes_to_address = 'memobytes_to_address',
 
   // new commands, some are comming...
-  send_proposed = 'send_proposed',
-  shield_proposed = 'shield_proposed',
-
-  quicksend = 'quicksend',
-  quickshield = 'quickshield',
-
-  propose_send = 'propose_send',
-  propose_shield = 'propose_shield',
+  send = 'send',
+  shield = 'shield',
+  // this works for both: send & shield
+  confirm = 'confirm',
 }

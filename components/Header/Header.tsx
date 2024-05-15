@@ -175,7 +175,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   useEffect(() => {
     const runShieldPropose = async (): Promise<string> => {
       try {
-        const proposeStr: string = await RPCModule.execute(CommandEnum.propose_shield, '');
+        const proposeStr: string = await RPCModule.execute(CommandEnum.shield, '');
         if (proposeStr) {
           if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error propose ${proposeStr}`);
@@ -305,6 +305,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // while shielding, then it going to finish the current batch
     // and after that it run the shield process.
     await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
+    // because I don't what the user is doing, I need to the re-run the shield
+    // command right before the confirmation
+    const proposeStr: string = await RPCModule.execute(CommandEnum.shield, '');
+    console.log(proposeStr);
     const shieldStr = await RPC.rpc_shieldFunds();
 
     if (shieldStr) {
