@@ -80,6 +80,7 @@ jobs:
           sudo cargo run --release --bin uniffi-bindgen generate ./src/zingo.udl --language swift --out-dir ../../ios
           sudo cargo lipo --release --targets x86_64-apple-ios
           sudo cp ../target/universal/release/libzingo.a ../../ios/libuniffi_zingo.a
+          ls -l ../../ios
       
       - name: Upload native rust
         uses: actions/upload-artifact@v4
