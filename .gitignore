@@ -28,7 +28,9 @@ ios/libuniffi_zingo.a
 ios/zingo.swift
 ios/zingoFFI.h
 ios/zingoFFI.modulemap
-rust/lib/Generated/
+rust/lib/Generated/zingo.swift
+rust/lib/Generated/zingoFFI.h
+rust/lib/Generated/zingoFFI.modulemap
 
 # Android/IntelliJ
 #
