@@ -48,6 +48,7 @@ jobs:
       - name: Pod Install
         working-directory: ios
         run: |
+          ls -l
           pod install
 
       - name: Run integration tests
