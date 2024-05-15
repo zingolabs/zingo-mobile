@@ -75,9 +75,11 @@ jobs:
           sudo rustup target add x86_64-apple-ios
       
       - name: Build Universal rust lib & uniffi lib and copy to ios folder
-        working-directory: ./rust/ios
+        working-directory: rust/lib
         run: |
-          sudo ./buildci.sh
+          cargo run --release --bin uniffi-bindgen generate ./src/zingo.udl --language swift --out-dir ../../ios
+          cargo lipo --release --targets x86_64-apple-ios
+          cp ../target/universal/release/libzingo.a ../../ios/libuniffi_zingo.a
       
       - name: Upload native rust
         uses: actions/upload-artifact@v4
