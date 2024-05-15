@@ -73,6 +73,11 @@ jobs:
       - name: Install rust Target
         run: |
           sudo rustup target add x86_64-apple-ios
+
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
       
       - name: Build Universal rust lib & uniffi lib and copy to ios folder
         working-directory: rust/lib

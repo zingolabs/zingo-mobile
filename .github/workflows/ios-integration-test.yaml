@@ -29,6 +29,11 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
       - name: Native rust cache
         uses: actions/cache@v4
         with:
@@ -37,8 +42,10 @@ jobs:
           fail-on-cache-miss: true
 
       - name: Copy libs to ios folder
+        working-directory: rust/lib/Generated
         run: |
-          cp rust/lib/Generated/*.* ios
+          ls -l
+          cp . ../../../ios
       
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
