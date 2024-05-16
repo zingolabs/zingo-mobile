@@ -575,7 +575,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       {validAddress === 1 && !memoEnabled && (
         <FadeText
-          style={{ textAlign: 'center', marginHorizontal: 10, color: colors.zingo, opacity: 1, fontWeight: '700' }}>
+          style={{ textAlign: 'center', marginHorizontal: 10, marginTop: 5, color: colors.zingo, opacity: 1, fontWeight: '700' }}>
           {translate('warning-binance') as string}
         </FadeText>
       )}

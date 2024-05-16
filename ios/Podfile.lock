@@ -252,13 +252,13 @@ PODS:
     - React-Core
   - react-native-camera/RN (4.2.1):
     - React-Core
-  - react-native-keep-awake (1.2.2):
+  - react-native-keep-awake (1.2.3):
     - React-Core
   - react-native-netinfo (9.5.0):
     - React-Core
-  - react-native-pager-view (6.2.3):
+  - react-native-pager-view (6.3.1):
     - React-Core
-  - react-native-safe-area-context (4.8.2):
+  - react-native-safe-area-context (4.10.1):
     - React-Core
   - react-native-simple-biometrics (1.5.2):
     - React-Core
@@ -330,18 +330,18 @@ PODS:
     - React-perflogger (= 0.70.7)
   - ReactNativeART (1.2.0):
     - React
-  - RNCAsyncStorage (1.21.0):
+  - RNCAsyncStorage (1.23.1):
     - React-Core
   - RNCCheckbox (0.5.17):
     - BEMCheckBox (~> 1.4)
     - React-Core
   - RNCClipboard (1.5.1):
     - React-Core
-  - RNCPicker (2.6.1):
+  - RNCPicker (2.7.5):
     - React-Core
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.14.1):
+  - RNGestureHandler (2.16.2):
     - React-Core
   - RNLocalize (2.2.6):
     - React-Core
@@ -381,7 +381,7 @@ PODS:
     - React-RCTImage
   - RNSnackbar (2.6.2):
     - React-Core
-  - RNSVG (13.14.0):
+  - RNSVG (13.14.1):
     - React-Core
   - Yoga (1.14.0)
 
@@ -590,10 +590,10 @@ SPEC CHECKSUMS:
   React-logger: e9f407f9fdf3f3ce7749ae6f88affe63e8446019
   react-native-biometrics: 352e5a794bfffc46a0c86725ea7dc62deb085bdc
   react-native-camera: 3eae183c1d111103963f3dd913b65d01aef8110f
-  react-native-keep-awake: ad1d67f617756b139536977a0bf06b27cec0714a
+  react-native-keep-awake: 5cfb49d1b2ee4321b2ffbc651e2d6d64d6f66772
   react-native-netinfo: 48c5f79a84fbc3ba1d28a8b0d04adeda72885fa8
-  react-native-pager-view: c29d484f19c49ff19525a94105e4ab2c4d4ae273
-  react-native-safe-area-context: 0ee144a6170530ccc37a0fd9388e28d06f516a89
+  react-native-pager-view: 08a419bd1acbca67de125a336ccf579118c5fe16
+  react-native-safe-area-context: dcab599c527c2d7de2d76507a523d20a0b83823d
   react-native-simple-biometrics: 0f8ace5091780426188cef7f7593259effcd448e
   React-perflogger: 52a94f38c19a518d05726624b49bfc192639374d
   React-RCTActionSheet: 7b89fe64a852bc3ae39b91dbd142ef09931ef3f7
@@ -608,18 +608,18 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 7cec9ed92ebde8309902530bb566819645c84ee5
   ReactCommon: 0253d197eaa7f6689dcd3e7d5360449ab93e10df
   ReactNativeART: 78edc68dd4a1e675338cd0cd113319cf3a65f2ab
-  RNCAsyncStorage: 618d03a5f52fbccb3d7010076bc54712844c18ef
+  RNCAsyncStorage: 826b603ae9c0f88b5ac4e956801f755109fa4d5c
   RNCCheckbox: a3ca9978cb0846b981d28da4e9914bd437403d77
   RNCClipboard: 41d8d918092ae8e676f18adada19104fa3e68495
-  RNCPicker: b18aaf30df596e9b1738e7c1f9ee55402a229dca
+  RNCPicker: 3e2c37a8328f368ce14da050cdc8231deb5fc9f9
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
-  RNGestureHandler: e98441928705d9d1184b599d7c1c6df2dd4f7724
+  RNGestureHandler: 7d8bc16a05220fa1827ff734e418d9044b0cce3d
   RNLocalize: d4b8af4e442d4bcca54e68fc687a2129b4d71a81
   RNPermissions: dcdb7b99796bbeda6975a6e79ad519c41b251b1c
   RNReanimated: 0bc0f8512be90069d838fd80436c42644ca0b55b
   RNScreens: fa9b582d85ae5d62c91c66003b5278458fed7aaa
   RNSnackbar: 3727b42bf6c4314a53c18185b5203e915a4ab020
-  RNSVG: d00c8f91c3cbf6d476451313a18f04d220d4f396
+  RNSVG: af3907ac5d4fa26a862b75a16d8f15bc74f2ceda
   Yoga: 92d086bb705a41cc588599b51db726ba7b1d341c
 
 PODFILE CHECKSUM: fae9e1859005693a8f37b3ae6aa24667b97431f9
