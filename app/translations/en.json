@@ -24,6 +24,7 @@
   "donation": "Thanks for supporting Zingo!",
   "restarting": "Error connecting to the Server, the App will restart in a few seconds.",
   "change-privacy": "New privacy policy: ",
+  "warning-binance": "WARNING: Binance is collecting and holding user funds without timely recourse. Do NOT deposit into Binance from this Wallet.",
   "addressbook": {
     "title": "Address Book",
     "end": "End",
