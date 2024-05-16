@@ -219,11 +219,11 @@ export default class Utils {
         } else if (Buffer.byteLength(memo, 'utf8') <= GlobalConst.memoMaxLength) {
           return [{ address: to.to, amount, memo } as SendJsonToTypeType];
         } else {
-          // If the memo is more than 512 bytes, then we split it into multiple transactions.
+          // If the memo is more than 511 bytes, then we split it into multiple transactions.
           // Each memo will be `(xx/yy)memo_part`. The prefix "(xx/yy)" is 7 bytes long, so
-          // we'll split the memo into 512-7 = 505 bytes length
+          // we'll split the memo into 511-7 = 505 bytes length
           // this make sense if we make long memos... in the future.
-          const splits = Utils.utf16Split(memo, 512 - 7);
+          const splits = Utils.utf16Split(memo, 511 - 7);
           const tos = [];
 
           // The first one contains all the tx value
