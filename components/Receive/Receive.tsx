@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, ReactNode, useEffect } from 'react';
 import { Dimensions, View } from 'react-native';
-import { TabView, TabBar, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
+import { TabView, TabBar, SceneRendererProps, Route, NavigationState, TabBarItem } from 'react-native-tab-view';
 import { useTheme } from '@react-navigation/native';
 
 import SingleAddress from '../Components/SingleAddress';
@@ -271,6 +271,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           indicatorStyle={{ backgroundColor: colors.primary }}
           style={{ backgroundColor: colors.background }}
           renderLabel={renderLabelCustom}
+          renderTabBarItem={p => <TabBarItem {...p} key={p.route.key} />}
         />
       </View>
     );
