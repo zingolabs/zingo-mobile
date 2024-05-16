@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo!",
-  "version": "zingo-1.3.8 (174)",
+  "version": "zingo-1.3.9 (176)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -24,6 +24,7 @@
   "donation": "Gracias por apoyar Zingo!",
   "restarting": "Error conectando con el servidor, la Aplicación se reiniciará en breves segundos.",
   "change-privacy": "Nueva Política de Privacidad: ",
+  "warning-binance": "ADVERTENCIA: Binance recopila y retiene los fondos de los usuarios sin un recurso oportuno. NO deposite en Binance desde este Monedero.",
   "addressbook": {
     "title": "Libreta de Direcciones",
     "end": "Fin",
