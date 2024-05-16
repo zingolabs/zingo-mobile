@@ -382,9 +382,11 @@ class RPCModule: NSObject {
     let thirdNumberArray = newVersionArray[2].split(separator: " ")
     let thirdNumber = thirdNumberArray[0]
     NSLog("New version: \(firstNumber).\(secondNumber).\(thirdNumber)")
-    // zingo-1.3.9 (XXX)
-    if Int(firstNumber) ?? 0 >= 1 && Int(secondNumber) ?? 0 >= 3 && Int(thirdNumber) ?? 0 >= 9 {
-      // in the installation/update to 1.3.9 the wallet file name change
+    // zingo-1.3.10 (XXX)
+    if Int(firstNumber) ?? 0 > 1 || 
+      (Int(firstNumber) ?? 0 == 1 && Int(secondNumber) ?? 0 > 3) || 
+      (Int(firstNumber) ?? 0 == 1 && Int(secondNumber) ?? 0 == 3 && Int(thirdNumber) ?? 0 >= 10) {
+      // in the installation/update to 1.3.10 the wallet file name change
       NSLog("Updating version: \(newVersion)")
       do {
         if try fileExists(Constants.OldWalletFileName.rawValue) == "true" && fileExists(Constants.WalletFileName.rawValue) == "false" {

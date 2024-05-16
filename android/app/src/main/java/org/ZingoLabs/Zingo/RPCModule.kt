@@ -429,9 +429,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         val thirdNumberArray = newVersionArray[2].split(" ")
         val thirdNumber = thirdNumberArray[0]
         Log.i("MAIN", "New version: $firstNumber . $secondNumber . $thirdNumber ")
-        // zingo-1.3.9 (XXX)
-        if (firstNumber.toInt() >= 1 && secondNumber.toInt() >= 3 && thirdNumber.toInt() >= 9) {
-            // in the installation/update to 1.3.9 the wallet file name change
+        // zingo-1.3.10 (XXX)
+        if (firstNumber.toInt() > 1 || 
+            (firstNumber.toInt() == 1 && secondNumber.toInt() > 3) || 
+            (firstNumber.toInt() == 1 && secondNumber.toInt() == 3 && thirdNumber.toInt() >= 10)) {
+            // in the installation/update to 1.3.10 the wallet file name change
             Log.i("MAIN", "Updating version: $newVersion")
             if (fileExists(OldWalletFileName.value) && !fileExists(WalletFileName.value)) {
                 // copy the wallet file content to the new file name.
