@@ -1,8 +1,8 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import { View } from 'react-native';
 import Snackbar from 'react-native-snackbar';
-import SnackbarType from '../../app/AppState/types/SnackbarType';
-import { TranslateType } from '../../app/AppState';
+import { SnackbarType } from '../../app/AppState';
+import { SnackbarDurationEnum, TranslateType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import { useTheme } from '@react-navigation/native';
 
@@ -33,7 +33,13 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     if (snackbars.length > 0 && !snacking) {
       const currentSnackbar = snackbars[0];
       //console.log('show snackbar', currentSnackbar);
-      setDuration(currentSnackbar.duration === 'longer' ? 8000 : currentSnackbar.duration === 'short' ? 1000 : 4000);
+      setDuration(
+        currentSnackbar.duration === SnackbarDurationEnum.longer
+          ? 8000
+          : currentSnackbar.duration === SnackbarDurationEnum.short
+          ? 1000
+          : 4000,
+      );
       setSnacking(true);
       Snackbar.show({
         text: currentSnackbar.message,
@@ -68,6 +74,14 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
       return () => clearTimeout(timer);
     }
   }, [duration, handleSnackbarClose, snackbars, snackbars.length]);
+
+  useEffect(() => {
+    return () => {
+      setTimeout(() => {
+        Snackbar.dismiss();
+      }, 2000);
+    };
+  }, []);
 
   //console.log('snackbars', snackbars);
 

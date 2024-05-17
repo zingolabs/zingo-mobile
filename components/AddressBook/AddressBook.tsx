@@ -4,10 +4,18 @@ import { View, ScrollView, SafeAreaView, Keyboard, Platform } from 'react-native
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { AddressBookFileClass, SendPageStateClass } from '../../app/AppState';
+import {
+  AddressBookActionEnum,
+  AddressBookFileClass,
+  ButtonTypeEnum,
+  GlobalConst,
+  SendPageStateClass,
+} from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -36,7 +44,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
 
   const [currentItem, setCurrentItem] = useState<number | null>(null);
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
-  const [action, setAction] = useState<'Add' | 'Modify' | 'Delete' | null>(null);
+  const [action, setAction] = useState<AddressBookActionEnum | null>(null);
 
   const slideAnim = useSharedValue(0);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -59,7 +67,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+    (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
   }, []);
 
   useEffect(() => {
@@ -71,9 +79,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
       if (addressBookCurrentAddress) {
         const index: number = abs.findIndex((i: AddressBookFileClass) => i.address === addressBookCurrentAddress);
         if (index === -1) {
-          setAction('Add');
+          setAction(AddressBookActionEnum.Add);
         } else {
-          setAction('Modify');
+          setAction(AddressBookActionEnum.Modify);
         }
         setCurrentItem(index);
       }
@@ -100,7 +108,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
 
   const newAddressBookItem = () => {
     setCurrentItem(-1);
-    setAction('Add');
+    setAction(AddressBookActionEnum.Add);
   };
 
   const cancel = () => {
@@ -112,17 +120,17 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
         () => {
           addressBookOpenPriorModal();
         },
-        Platform.OS === 'ios' ? 100 : 1,
+        Platform.OS === GlobalConst.platformOSios ? 100 : 1,
       );
     }
   };
 
-  const doAction = async (a: 'Add' | 'Modify' | 'Delete', label: string, address: string) => {
+  const doAction = async (a: AddressBookActionEnum, label: string, address: string) => {
     if (!label || !address) {
       return;
     }
     let ab: AddressBookFileClass[] = [];
-    if (a === 'Delete') {
+    if (a === AddressBookActionEnum.Delete) {
       ab = await AddressBookFileImpl.removeAddressBookItem(label, address);
     } else {
       ab = await AddressBookFileImpl.writeAddressBookItem(label, address);
@@ -257,7 +265,11 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
               marginTop: 5,
               marginBottom: 30,
             }}>
-            <Button type="Secondary" title={translate('addressbook.loadmore') as string} onPress={loadMoreClicked} />
+            <Button
+              type={ButtonTypeEnum.Secondary}
+              title={translate('addressbook.loadmore') as string}
+              onPress={loadMoreClicked}
+            />
           </View>
         ) : (
           <>
@@ -288,12 +300,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
           }}>
           <Button
             testID="addressbook.button.new"
-            type="Primary"
+            type={ButtonTypeEnum.Primary}
             title={translate('addressbook.new') as string}
             onPress={() => newAddressBookItem()}
           />
           <Button
-            type="Secondary"
+            type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
             style={{ marginLeft: 10 }}
             onPress={closeModal}

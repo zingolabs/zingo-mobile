@@ -7,11 +7,12 @@ import SendPageStateClass from './classes/SendPageStateClass';
 import SendProgressClass from './classes/SendProgressClass';
 import ReceivePageStateClass from './classes/ReceivePageStateClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
+import AddressBookFileClass from './classes/AddressBookFileClass';
+import SyncingStatusClass from './classes/SyncingStatusClass';
 
 import TransactionType from './types/TransactionType';
 import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
-import SyncingStatusClass from './classes/SyncingStatusClass';
 import ZecPriceType from './types/ZecPriceType';
 import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
@@ -19,13 +20,19 @@ import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
-import AddressBookFileClass from './classes/AddressBookFileClass';
 import SecurityType from './types/SecurityType';
+
+import { MenuItemEnum } from './enums/MenuItemEnum';
+import { LanguageEnum } from './enums/LanguageEnum';
+import { CurrencyEnum } from './enums/CurrencyEnum';
+import { ModeEnum } from './enums/ModeEnum';
+import { SelectServerEnum } from './enums/SelectServerEnum';
+import { AppStateStatus } from 'react-native';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  appState: string;
+  appState: AppStateStatus;
   netInfo: NetInfoType;
 
   // The total confirmed and unconfirmed balance in this wallet
@@ -68,7 +75,7 @@ export default interface AppStateLoaded {
 
   isMenuDrawerOpen: boolean;
 
-  selectedMenuDrawerItem: string;
+  selectedMenuDrawerItem: MenuItemEnum | null;
 
   aboutModalVisible: boolean;
 
@@ -100,11 +107,12 @@ export default interface AppStateLoaded {
   uaAddress: string;
 
   server: ServerType;
-  language: 'en' | 'es' | 'pt';
-  currency: 'USD' | '';
+  language: LanguageEnum;
+  currency: CurrencyEnum;
 
   zecPrice: ZecPriceType;
   sendAll: boolean;
+  donation: boolean;
   background: BackgroundType;
 
   translate: (key: string) => TranslateType;
@@ -116,7 +124,7 @@ export default interface AppStateLoaded {
   poolsToShieldSelectSapling: boolean;
   poolsToShieldSelectTransparent: boolean;
 
-  mode: 'basic' | 'advanced';
+  mode: ModeEnum;
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
   restartApp: (s: any) => void;
@@ -127,7 +135,8 @@ export default interface AppStateLoaded {
   addressBookCurrentAddress: string;
   addressBookOpenPriorModal: () => void;
   security: SecurityType;
-  selectServer: 'auto' | 'list' | 'custom';
+  selectServer: SelectServerEnum;
+  rescanMenuOption: boolean;
 
   // eslint-disable-next-line semi
 }

@@ -625,7 +625,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               }
             }
           >
-            99999translated text25.00%
+            99999translated text25%
           </Text>
         </View>
         <View
@@ -670,7 +670,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             }
             testID="syncreport.syncednow"
           >
-            200001translated text50.00%
+            200001translated text50%
           </Text>
         </View>
         <View
@@ -715,7 +715,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             }
             testID="syncreport.notyetsynced"
           >
-            100000translated text25.00%
+            100000translated text25%
           </Text>
         </View>
         <View

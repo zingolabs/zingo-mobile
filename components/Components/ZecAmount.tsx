@@ -7,13 +7,14 @@ import { getNumberFormatSettings } from 'react-native-localize';
 import Utils from '../../app/utils';
 import { ThemeType } from '../../app/types';
 import { SvgXml } from 'react-native-svg';
+import { CurrencyNameEnum, GlobalConst } from '../../app/AppState';
 
 type ZecAmountProps = {
   color?: string;
   size?: number;
   amtZec?: number;
   style?: TextStyle;
-  currencyName: string;
+  currencyName?: CurrencyNameEnum;
   privacy?: boolean;
   smallPrefix?: boolean;
   testID?: string;
@@ -48,10 +49,6 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
     size = 24;
   }
 
-  if (!currencyName) {
-    currencyName = '---';
-  }
-
   if (!color) {
     color = colors.money;
   }
@@ -72,8 +69,6 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
     <path d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"/>
   </svg>`;
 
-  //console.log(xml);
-
   return (
     <View style={{ ...style, flexDirection: 'row', margin: 5 }}>
       <TouchableOpacity disabled={!privacyHigh} onPress={onPress}>
@@ -85,7 +80,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
             margin: 0,
             padding: 0,
           }}>
-          {currencyName === 'ZEC' ? (
+          {!!currencyName && currencyName === CurrencyNameEnum.ZEC ? (
             <SvgXml
               width={size * 2 * (smallPrefix ? 0.7 : 1)}
               height={size * (smallPrefix ? 0.7 : 1)}
@@ -93,7 +88,9 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
               fill={color}
               style={{
                 marginBottom:
-                  Platform.OS === 'android' ? size / (smallPrefix ? 4 : 6.5) : size / (smallPrefix ? 6 : 20),
+                  Platform.OS === GlobalConst.platformOSandroid
+                    ? size / (smallPrefix ? 4 : 6.5)
+                    : size / (smallPrefix ? 6 : 20),
               }}
             />
           ) : (
@@ -104,7 +101,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 margin: 0,
                 padding: 0,
               }}>
-              {currencyName}
+              {currencyName ? currencyName : '---'}
             </Text>
           )}
           {privacyHigh ? (
@@ -128,7 +125,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 margin: 0,
                 padding: 0,
               }}>
-              {' ' + Utils.toLocaleFloat(splits.bigPart)}
+              {' ' + splits.bigPart}
             </Text>
           )}
           {splits.smallPart !== '0000' && !privacyHigh && (
@@ -139,7 +136,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
                 color,
                 margin: 0,
                 padding: 0,
-                marginBottom: Platform.OS === 'android' ? size / 10 : size / 15,
+                marginBottom: Platform.OS === GlobalConst.platformOSandroid ? size / 10 : size / 15,
               }}>
               {splits.smallPart}
             </Text>

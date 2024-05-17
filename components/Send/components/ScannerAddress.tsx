@@ -8,6 +8,9 @@ import Scanner from '../../Components/Scanner';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+import { CommandEnum, GlobalConst } from '../../../app/AppState';
+import { RPCParseStatusEnum } from '../../../app/rpc/enums/RPCParseStatusEnum';
 
 type ScannerAddressProps = {
   setAddress: (address: string) => void;
@@ -21,36 +24,36 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
 
   const validateAddress = async (scannedAddress: string) => {
     if (!netInfo.isConnected) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
-    if (scannedAddress.toLowerCase().startsWith('zcash:')) {
+    if (scannedAddress.toLowerCase().startsWith(GlobalConst.zcash)) {
       setAddress(scannedAddress);
       closeModal();
       return;
     }
 
-    const result: string = await RPCModule.execute('parse_address', scannedAddress);
+    const result: string = await RPCModule.execute(CommandEnum.parse_address, scannedAddress);
     if (result) {
-      if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
-        addLastSnackbar({ message: translate('scanner.nozcash-error') as string, type: 'Primary' });
+      if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
+        addLastSnackbar({ message: translate('scanner.nozcash-error') as string });
         return;
       }
     } else {
-      addLastSnackbar({ message: translate('scanner.nozcash-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('scanner.nozcash-error') as string });
       return;
     }
     let resultJSON = {} as RPCParseAddressType;
     try {
       resultJSON = await JSON.parse(result);
     } catch (e) {
-      addLastSnackbar({ message: translate('scanner.nozcash-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('scanner.nozcash-error') as string });
       return;
     }
 
     //console.log('parse-1', scannedAddress, resultJSON);
 
-    const valid = resultJSON.status === 'success' && server.chain_name === resultJSON.chain_name;
+    const valid = resultJSON.status === RPCParseStatusEnum.successParse && server.chain_name === resultJSON.chain_name;
 
     if (valid) {
       setAddress(scannedAddress);

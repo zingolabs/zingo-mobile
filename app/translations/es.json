@@ -7,7 +7,7 @@
   "workingonit": "Estamos trabajando en esta funcionalidad.",
   "firstlaunchingmessage-title": "Optimizando Zingo!",
   "firstlaunchingmessage-body": "Esto puede tardar un poco, dependiendo del historial de transacciones. Mantenga la aplicación abierta hasta que finalice el proceso.",
-  "firstlaunchingmessage-footer": "Disculpe las molestias.",
+  "firstlaunchingmessage-footer": "Gracias.",
   "biometricsfailed-title": "¡Bienvenido!",
   "biometricsfailed-body": "Por seguridad, la aplicación está bloqueada.",
   "biometricsfailed-footer": "Usa el método de autenticación para desbloquear.",
@@ -21,7 +21,7 @@
   "confirm": "Confirmar",
   "menudrawer-acc": "Abrir Menú Lateral",
   "menu-acc": "Abrir Menú",
-  "donation": "Gracias por apoyar Zingo!",
+  "donation": "Gracias por apoyar ZingoLabs!",
   "restarting": "Error conectando con el servidor, la Aplicación se reiniciará en breves segundos.",
   "change-privacy": "Nueva Política de Privacidad: ",
   "warning-binance": "ADVERTENCIA: Binance recopila y retiene los fondos de los usuarios sin un recurso oportuno. NO deposite en Binance desde este Monedero.",
@@ -83,7 +83,9 @@
     "alert-newwallet-title": "CREAR UN NUEVO MONEDERO",
     "alert-newwallet-body": "Puedes confirmar que realmente quieres crear un nuevo monedero y perder el acceso al monedero actual.",
     "serverfirsttry": "Intentando realizar la acción con un servidor diferente. El servidor actual puede estar fallando.",
-    "serversecondtry": "No parece haber ningún problema con el servidor. Ocurre algo diferente."
+    "serversecondtry": "No parece haber ningún problema con el servidor. Ocurre algo diferente.",
+    "alert-donation-title": "APOYAR A ZINGOLABS",
+    "alert-donation-body": "¿Quieres ayudar a ZingoLabs a que Zcash sea más útil? Opta por dar una propina de un Zenny (0.01 ZEC) a ZingoLabs con cada transacción! Si es así, presione confirmar, de lo contrario presione Cancelar."
   },
   "loadedapp": {
     "about": "Sobre Zingo!",
@@ -102,6 +104,8 @@
     "insight": "Visión Financiera",
     "loadwalletfromseed-basic": "Restaurar monedero",
     "addressbook": "Libreta de Direcciones",
+    "tipzingolabs-basic": "Apoyar a ZingoLabs",
+    "votefornym": "Vota por Nym",
     "restoremainnet-error": "Esta opción está solamente disponible para la Red: 'Mainnet'.",
     "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",
@@ -125,8 +129,14 @@
     "readingwallet": "Leyendo satisfactoriamente el monedero activo usando el Servidor:",
     "restorewallet-title": "Opción Avanzada",
     "restorewallet-alert": "Confirmar que quiere restaurar un nuevo monedero usando su frase semilla.",
-    "selectingserver": "Chequeando los servidores de la lista para seleccionar el más optimizado.",
-    "selectingserversame": "Su servidor actual ya es el más optimizado."
+    "selectingserver": "Determinando el mejor lightwalletd.",
+    "selectingserversame": "Su servidor actual ya es el más optimizado.",
+    "selectingserverbest": "En este momento este es el servidor más optimizado:",
+    "nymmemo": "Necesito seguridad de red Nym",
+    "incoming-funds": "Fondos entrantes\n",
+    "transaction-confirmed": "Transacción confirmada\n",
+    "payment-made": "Pago realizado\n",
+    "transaction-reverted": "La transacción fue revertida por el servidor, vuelva a intentarlo."
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",
@@ -176,6 +186,10 @@
       {
         "value": "pt",
         "text": "Toda la información estará en Portugués."
+      },
+      {
+        "value": "ru",
+        "text": "Toda la información estará en Ruso."
       }
     ],
     "sendalls": [
@@ -186,6 +200,16 @@
       {
         "value": false,
         "text": "Desactiva el botón para enviar toda la cantidad porque puede ser un riesgo tenerlo activado."
+      }
+    ],
+    "donations": [
+      {
+        "value": true,
+        "text": "Envía un Zenny (0.01 ZEC) a ZingoLabs en cada transacción."
+      },
+      {
+        "value": false,
+        "text": "No pagar para incentivar un sistema más seguro."
       }
     ],
     "privacys": [
@@ -208,6 +232,16 @@
         "text": "Modo Avanzado, para el usuario avanzado."
       }
     ],
+    "rescanmenuoptions": [
+      {
+        "value": true,
+        "text": "Activar/Mostrar la opción de menú para re-escanear el monedero."
+      },
+      {
+        "value": false,
+        "text": "Desactivar/Ocultar la opción de menú para re-escanear el monedero."
+      }
+    ],
     "nochanges": "No se han registrado cambios.",
     "ismemo": "Necesitas escoger una opción de Memos para poder guardar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder guardar.",
@@ -215,10 +249,10 @@
     "isuri": "Necesitas rellenar una URI válida para el Servidor.",
     "title": "Parámetros",
     "server-title": "SERVIDOR",
-    "server-auto": "Automatico",
+    "server-auto": "Automático",
     "server-list": "Lista",
     "server-custom": "Personalizado",
-    "server-auto-text": "La proxima vez que se inicie la aplicacion, calculara cual es el mejor servidor de la lista y lo pondra como activo.",
+    "server-auto-text": "La próxima vez que la aplicación se inicie, calculará cuál es el mejor servidor de la lista y lo hará activo.",
     "server-list-text": "Selecciona un servidor de la lista.",
     "server-custom-text": "Rellena la informacion del servidor que quieres usar.",
     "threshold-title": "UMBRAL PARA EL FILTRO DE TRANSACCIONES",
@@ -234,8 +268,10 @@
     "language-title": "IDIOMA",
     "islanguage": "Necesitas escoger un Idioma para poder guardar.",
     "sendall-title": "EL BOTON 'Enviar todo'",
+    "donation-title": "Propina para ZingoLabs",
     "privacy-title": "Cambiar entre Alta Privacidad o Normal",
     "mode-title": "Cambiar entre Modo Básico o Avanzado",
+    "rescanmenuoption-title": "LA OPCIÓN DE MENU RE-ESCANEAR",
     "value-currency-": "Sin moneda",
     "value-currency-USD": "US Dólares",
     "value-language-en": "Inglés",
@@ -243,6 +279,8 @@
     "value-language-pt": "Portugués",
     "value-sendall-true": "Activar",
     "value-sendall-false": "Desactivar",
+    "value-donation-true": "Si",
+    "value-donation-false": "No",
     "value-privacy-true": "Alta",
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",
@@ -252,6 +290,8 @@
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest",
+    "value-rescanmenuoption-true": "Activar",
+    "value-rescanmenuoption-false": "Desactivar",
     "security-title": "USAR LA SEGURIDAD DEL DISPOSITIVO",
     "security-startapp": "Al inicar la aplicación",
     "security-foregroundapp": "Aplicación va a Primer Plano",
@@ -272,7 +312,8 @@
     "france": "Francia",
     "netherlands": "Paises Bajos",
     "uk": "Reino Unido",
-    "select-placeholder": "Elige un Servidor..."
+    "select-placeholder": "Elige un Servidor...",
+    "value-language-ru": "Ruso"
   },
   "info": {
     "version": "Versión",
@@ -374,7 +415,7 @@
     "confirm-title": "Confirmar Transacción",
     "sending-title": "Procesando",
     "confirm-amount": "Cantidad",
-    "fee": "Comisión por Transacción",
+    "fee": "Comisión",
     "confirm-button-all": "Confirmar Enviar Todo",
     "amount": "   Cantidad",
     "to": "A",
@@ -388,7 +429,7 @@
     "nofetchprice": "Buscar precio en USD",
     "sendall": "Enviar Todo",
     "sendall-message": "Estas a punto de enviar toda la cantidad en tu monedero",
-    "includeua": "Incluir tu DU:",
+    "includeua": "Incluir tu Dirección de Vuelta:",
     "confirm-memo": "Memo",
     "duplicate-nullifier-error": "Tus fondos están todavía confirmándose y probablemente sincronizándose. Puedes esperar hasta que tus fondos estén confirmados o puedes intentar enviar una cantidad más pequeña, ¡La creación de la Transacción ha fallado!",
     "dust-error": "La cantidad que estás intentando enviar a una dirección Transparente es realmente ínfima, ¡La creación de la Transacción ha fallado!",
@@ -402,7 +443,9 @@
     "amountrevealed": "Monto Revelado",
     "deshielded": "Desblindada",
     "lose-address-title": "SELECCIONAR UNA NUEVA DIRECCIÓN",
-    "lose-address-alert": "Ya tienes una dirección válida en el campo de dirección. ¿Desea sustituirla?"
+    "lose-address-alert": "Ya tienes una dirección válida en el campo de dirección. ¿Desea sustituirla?",
+    "confirm-donation": "Donación",
+    "donation-minimum-message": "La cantidad mínima para donaciones es un Zenny (0,01 ZEC), inténtalo de nuevo y gracias."
   },
   "receive": {
     "u-title": "Dirección Unificada",
@@ -464,7 +507,7 @@
     "amount": "Cantidad",
     "memo": "Memo",
     "memocopied": "Memo copiado al portapapeles",
-    "txfee": "Comisión por Transacción",
+    "txfee": "Comisión",
     "title-acc": "Pantalla del Monedero",
     "list-acc": "Lista de Transacciones",
     "pools": "pools...",
@@ -600,5 +643,6 @@
     "oneentry": "URI Debería tener al menos una entrada",
     "parseerror": "En este momento no es posible verificar la dirección en el Servidor"
   },
-  "donation-button": "Donar a Zingo "
+  "donation-button": "Donar a ZingoLabs ",
+  "donation-legend": "Estás donando a ZingoLabs activamente, Gracias"
 }

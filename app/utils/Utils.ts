@@ -1,8 +1,19 @@
 import { getNumberFormatSettings } from 'react-native-localize';
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
-import { TranslateType } from '../AppState';
+import {
+  AddressClass,
+  ChainNameEnum,
+  GlobalConst,
+  SendJsonToTypeType,
+  SendPageStateClass,
+  ServerType,
+  ToAddrClass,
+  TranslateType,
+} from '../AppState';
 
 import randomColor from 'randomcolor';
+import RPCModule from '../RPCModule';
+import { Buffer } from 'buffer';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
@@ -40,27 +51,35 @@ export default class Utils {
       return { bigPart: '--', smallPart: '' };
     }
 
-    let bigPart = Utils.maxPrecision(zecValue);
-    let smallPart = '';
+    const { decimalSeparator } = getNumberFormatSettings();
 
-    if (bigPart.indexOf('.') >= 0) {
-      const decimalPart = bigPart.substr(bigPart.indexOf('.') + 1);
+    const intPart = parseInt(Utils.parseNumberFloatToStringLocale(zecValue, 8), 10);
+    let bigPart = Utils.parseNumberFloatToStringLocale(zecValue, 8);
+    let smallPart = '';
+    let decimalPart = '';
+
+    if (bigPart.indexOf(`${decimalSeparator}`) >= 0) {
+      decimalPart = bigPart.substr(bigPart.indexOf(`${decimalSeparator}`) + 1);
       if (decimalPart.length > 4) {
         smallPart = decimalPart.substr(4);
-        bigPart = bigPart.substr(0, bigPart.length - smallPart.length);
+        decimalPart = decimalPart.substr(0, decimalPart.length - smallPart.length);
 
         // Pad the small part with trailing 0s
         while (smallPart.length < 4) {
           smallPart += '0';
         }
+      } else {
+        while (decimalPart.length < 4) {
+          decimalPart += '0';
+        }
+        smallPart = '0000';
       }
+    } else {
+      decimalPart = '0000';
+      smallPart = '0000';
     }
 
-    // if (smallPart === '0000') {
-    //   smallPart = '';
-    // }
-
-    return { bigPart, smallPart };
+    return { bigPart: intPart + decimalSeparator + decimalPart, smallPart };
   }
 
   static splitStringIntoChunks(s: string, numChunks: number): string[] {
@@ -88,33 +107,24 @@ export default class Utils {
     return Utils.nextToAddrID++;
   }
 
-  static getFallbackDefaultFee(): number {
-    return 0.0001;
-  }
-
-  static getDonationAddress(chain_name: 'main' | 'test' | 'regtest'): string {
+  static async getDonationAddress(chain_name: ChainNameEnum): Promise<string> {
     // donations only for mainnet.
-    if (chain_name === 'main') {
+    if (chain_name === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
-      return 'u1w47nzy4z5g9zvm4h2s4ztpl8vrdmlclqz5sz02742zs5j3tz232u4safvv9kplg7g06wpk5fx0k0rx3r9gg4qk6nkg4c0ey57l0dyxtatqf8403xat7vyge7mmen7zwjcgvryg22khtg3327s6mqqkxnpwlnrt27kxhwg37qys2kpn2d2jl2zkk44l7j7hq9az82594u3qaescr3c9v';
+      const ua: string = await RPCModule.getDonationAddress();
+      return ua;
     }
     return '';
   }
 
   static getDefaultDonationAmount(): string {
-    return '0.01';
+    const { decimalSeparator } = getNumberFormatSettings();
+
+    return '0' + decimalSeparator + '01';
   }
 
   static getDefaultDonationMemo(translate: (key: string) => TranslateType): string {
     return translate('donation') as string;
-  }
-
-  static getZecToCurrencyString(price: number, zecValue: number, currency: 'USD' | ''): string {
-    if (!price || !zecValue) {
-      return `${currency} --`;
-    }
-
-    return `${currency} ${(price * zecValue).toFixed(2)}`;
   }
 
   static utf16Split(s: string, chunksize: number): string[] {
@@ -145,27 +155,22 @@ export default class Utils {
     return ans;
   }
 
-  static parseLocaleFloat(stringNumber: string): number {
-    const { decimalSeparator, groupingSeparator } = getNumberFormatSettings();
+  static parseStringLocaleToNumberFloat(stringValue: string): number {
+    const { decimalSeparator } = getNumberFormatSettings();
 
-    return Number(
-      stringNumber
-        .replace(new RegExp(`\\${groupingSeparator}`, 'g'), '')
-        .replace(new RegExp(`\\${decimalSeparator}`), '.'),
-    );
+    return Number(stringValue.replace(new RegExp(`\\${decimalSeparator}`), '.'));
   }
 
-  static toLocaleFloat(stringNumber: string): string {
-    const { decimalSeparator, groupingSeparator } = getNumberFormatSettings();
+  static parseNumberFloatToStringLocale(numberValue: number, toFixed: number): string {
+    const { decimalSeparator } = getNumberFormatSettings();
 
-    return stringNumber
-      .replace(new RegExp(',', 'g'), '_')
-      .replace(new RegExp('\\.'), decimalSeparator)
-      .replace(new RegExp('_', 'g'), groupingSeparator);
+    let stringValue = Utils.maxPrecisionTrimmed(Number(numberValue.toFixed(toFixed)));
+
+    return stringValue.replace(new RegExp('\\.'), `${decimalSeparator}`);
   }
 
-  static getBlockExplorerTxIDURL(txid: string, chain_name: 'main' | 'test' | 'regtest'): string {
-    if (chain_name === 'test') {
+  static getBlockExplorerTxIDURL(txid: string, chain_name: ChainNameEnum): string {
+    if (chain_name === ChainNameEnum.testChainName) {
       return `https://testnet.zcashblockexplorer.com/transactions/${txid}`;
     } else {
       return `https://zcashblockexplorer.com/transactions/${txid}`;
@@ -187,5 +192,77 @@ export default class Utils {
     }
 
     return colorList;
+  }
+
+  static async getSendManyJSON(
+    sendPageState: SendPageStateClass,
+    uaAddress: string,
+    addresses: AddressClass[],
+    server: ServerType,
+    donation: boolean,
+    translate: (key: string) => TranslateType,
+  ): Promise<SendJsonToTypeType[]> {
+    let sendToSelf: boolean = false;
+    let donationAddress: boolean = false;
+    const json: Promise<SendJsonToTypeType[][]> = Promise.all(
+      [sendPageState.toaddr].flatMap(async (to: ToAddrClass) => {
+        const memo = `${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`;
+        const amount = parseInt((Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(0), 10);
+
+        const myAddress: AddressClass[] = addresses.filter((a: AddressClass) => a.address === to.to);
+        sendToSelf = myAddress.length >= 1;
+
+        donationAddress = to.to === (await Utils.getDonationAddress(server.chain_name));
+
+        if (memo === '') {
+          return [{ address: to.to, amount } as SendJsonToTypeType];
+        } else if (Buffer.byteLength(memo, 'utf8') <= GlobalConst.memoMaxLength) {
+          return [{ address: to.to, amount, memo } as SendJsonToTypeType];
+        } else {
+          // If the memo is more than 512 bytes, then we split it into multiple transactions.
+          // Each memo will be `(xx/yy)memo_part`. The prefix "(xx/yy)" is 7 bytes long, so
+          // we'll split the memo into 512-7 = 505 bytes length
+          // this make sense if we make long memos... in the future.
+          const splits = Utils.utf16Split(memo, 512 - 7);
+          const tos = [];
+
+          // The first one contains all the tx value
+          tos.push({ address: to.to, amount, memo: `(1/${splits.length})${splits[0]}` } as SendJsonToTypeType);
+
+          for (let i = 1; i < splits.length; i++) {
+            tos.push({
+              address: to.to,
+              amount: 0,
+              memo: `(${i + 1}/${splits.length})${splits[i]}`,
+            } as SendJsonToTypeType);
+          }
+
+          return tos;
+        }
+      }),
+    );
+    const jsonFlat: SendJsonToTypeType[] = (await json).flat();
+
+    const donationTransaction: SendJsonToTypeType[] = [];
+
+    // we need to exclude 2 use cases:
+    // 1. send to self (make no sense to do a donation here)
+    // 2. send to donation UA (make no sense to do a double donation)
+    if (donation && server.chain_name === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress) {
+      donationTransaction.push({
+        address: await Utils.getDonationAddress(server.chain_name),
+        amount: parseInt(
+          (Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) * 10 ** 8).toFixed(0),
+          10,
+        ),
+        memo: Utils.getDefaultDonationMemo(translate) + '\n' + translate('settings.donation-title'),
+      });
+    }
+
+    console.log('Sending:');
+    console.log(jsonFlat);
+    console.log(donationTransaction);
+
+    return [...jsonFlat, ...donationTransaction];
   }
 }

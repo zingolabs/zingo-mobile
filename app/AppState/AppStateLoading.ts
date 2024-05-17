@@ -13,10 +13,17 @@ import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
 import SecurityType from './types/SecurityType';
 
+import { CurrencyEnum } from './enums/CurrencyEnum';
+import { LanguageEnum } from './enums/LanguageEnum';
+import { ModeEnum } from './enums/ModeEnum';
+import { SelectServerEnum } from './enums/SelectServerEnum';
+import { ChainNameEnum } from './enums/ChainNameEnum';
+import { AppStateStatus } from 'react-native';
+
 export default interface AppStateLoading {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  appState: string;
+  appState: AppStateStatus;
   netInfo: NetInfoType;
 
   screen: number;
@@ -27,11 +34,12 @@ export default interface AppStateLoading {
   info: InfoType;
 
   server: ServerType;
-  currency: 'USD' | '';
-  language: 'en' | 'es' | 'pt';
+  currency: CurrencyEnum;
+  language: LanguageEnum;
 
   zecPrice: ZecPriceType;
   sendAll: boolean;
+  donation: boolean;
   background: BackgroundType;
 
   translate: (key: string) => TranslateType;
@@ -43,9 +51,9 @@ export default interface AppStateLoading {
 
   customServerShow: boolean;
   customServerUri: string;
-  customServerChainName: 'main' | 'test' | 'regtest';
+  customServerChainName: ChainNameEnum;
 
-  mode: 'basic' | 'advanced';
+  mode: ModeEnum;
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
 
@@ -53,8 +61,10 @@ export default interface AppStateLoading {
   biometricsFailed: boolean;
   startingApp: boolean;
   security: SecurityType;
-  selectServer: 'auto' | 'list' | 'custom';
+  selectServer: SelectServerEnum;
   serverErrorTries: number;
+  donationAlert: boolean;
+  rescanMenuOption: boolean;
 
   // eslint-disable-next-line semi
 }

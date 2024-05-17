@@ -7,23 +7,31 @@ import { faAddressCard, faQrcode, faTrashCan, faPencil, faArrowUp } from '@forta
 //import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import FadeText from '../../Components/FadeText';
-import { AddressBookFileClass, SendPageStateClass, ToAddrClass } from '../../../app/AppState';
+import {
+  AddressBookActionEnum,
+  AddressBookFileClass,
+  SendPageStateClass,
+  ToAddrClass,
+  ModeEnum,
+  RouteEnums,
+} from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
 
 type AbSummaryLineProps = {
   index: number;
   item: AddressBookFileClass;
   setCurrentItem: (b: number) => void;
-  setAction: (action: 'Add' | 'Modify' | 'Delete') => void;
+  setAction: (action: AddressBookActionEnum) => void;
   setSendPageState: (s: SendPageStateClass) => void;
   closeModal: () => void;
   handleScrollToTop: () => void;
-  doAction: (action: 'Add' | 'Modify' | 'Delete', label: string, address: string) => void;
+  doAction: (action: AddressBookActionEnum, label: string, address: string) => void;
 };
 const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   index,
@@ -52,7 +60,10 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
       translate('addressbook.delete-title') as string,
       translate('addressbook.delete-alert') as string,
       [
-        { text: translate('confirm') as string, onPress: () => doAction('Delete', item.label, item.address) },
+        {
+          text: translate('confirm') as string,
+          onPress: () => doAction(AddressBookActionEnum.Delete, item.label, item.address),
+        },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
       { cancelable: false, userInterfaceStyle: 'light' },
@@ -76,7 +87,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           <TouchableOpacity
             onPress={() => {
               setCurrentItem(index);
-              setAction('Modify');
+              setAction(AddressBookActionEnum.Modify);
               handleScrollToTop();
             }}>
             <View style={{ flexDirection: 'row', marginBottom: 5 }}>
@@ -104,31 +115,32 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             style={{ zIndex: 999, padding: 10 }}
             onPress={() => {
               setCurrentItem(index);
-              setAction('Modify');
+              setAction(AddressBookActionEnum.Modify);
               handleScrollToTop();
             }}>
             <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faPencil} color={colors.money} />
           </TouchableOpacity>
         </View>
-        {!readOnly && !(mode === 'basic' && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
-          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-            <TouchableOpacity
-              style={{ zIndex: 999, padding: 10 }}
-              onPress={() => {
-                // enviar
-                const sendPageState = new SendPageStateClass(new ToAddrClass(0));
-                sendPageState.toaddr.to = item.address;
-                setSendPageState(sendPageState);
-                closeModal();
-                navigation.navigate('LoadedApp', {
-                  screen: translate('loadedapp.send-menu'),
-                  initial: false,
-                });
-              }}>
-              <FontAwesomeIcon size={30} icon={faArrowUp} color={colors.primary} />
-            </TouchableOpacity>
-          </View>
-        )}
+        {!readOnly &&
+          !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
+            <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+              <TouchableOpacity
+                style={{ zIndex: 999, padding: 10 }}
+                onPress={() => {
+                  // enviar
+                  const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+                  sendPageState.toaddr.to = item.address;
+                  setSendPageState(sendPageState);
+                  closeModal();
+                  navigation.navigate(RouteEnums.LoadedApp, {
+                    screen: translate('loadedapp.send-menu'),
+                    initial: false,
+                  });
+                }}>
+                <FontAwesomeIcon size={30} icon={faArrowUp} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          )}
         <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
           <TouchableOpacity style={{ zIndex: 999, padding: 10 }} onPress={() => onPressDelete()}>
             <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faTrashCan} color={colors.money} />

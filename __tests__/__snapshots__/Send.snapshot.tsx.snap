@@ -246,7 +246,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
-                "marginTop": 10,
               }
             }
           >
@@ -331,7 +330,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       "fontSize": 20,
                       "fontWeight": "600",
                       "marginRight": 5,
-                      "marginTop": 22,
+                      "marginTop": 18,
                       "opacity": 1,
                       "transform": [
                         {
@@ -547,6 +546,71 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                         </Text>
                       </View>
                     </View>
+                  </View>
+                </View>
+                <View
+                  accessible={true}
+                  collapsable={false}
+                  focusable={true}
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  style={
+                    {
+                      "opacity": 1,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#011401",
+                        "borderRadius": 10,
+                        "display": "flex",
+                        "flexDirection": "row",
+                        "marginTop": 5,
+                        "padding": 5,
+                      }
+                    }
+                  >
+                    <
+                      color="#18bd18"
+                      icon={
+                        {
+                          "icon": [
+                            512,
+                            512,
+                            [
+                              "info-circle",
+                            ],
+                            "f05a",
+                            "M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z",
+                          ],
+                          "iconName": "circle-info",
+                          "prefix": "fas",
+                        }
+                      }
+                      size={20}
+                      style={
+                        {
+                          "marginRight": 5,
+                        }
+                      }
+                    />
+                    <Text
+                      style={
+                        {
+                          "color": "#c3c3c3",
+                          "opacity": 0.65,
+                        }
+                      }
+                    >
+                      text translated
+                    </Text>
                   </View>
                 </View>
                 <View
@@ -1254,7 +1318,6 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
-                "marginTop": 10,
               }
             }
           >
@@ -1339,7 +1402,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       "fontSize": 20,
                       "fontWeight": "600",
                       "marginRight": 5,
-                      "marginTop": 22,
+                      "marginTop": 18,
                       "opacity": 1,
                       "transform": [
                         {
@@ -1552,10 +1615,75 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                           }
                           testID="undefined.big-part"
                         >
-                           0.0000
+                           0.5000
                         </Text>
                       </View>
                     </View>
+                  </View>
+                </View>
+                <View
+                  accessible={true}
+                  collapsable={false}
+                  focusable={true}
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  style={
+                    {
+                      "opacity": 1,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#011401",
+                        "borderRadius": 10,
+                        "display": "flex",
+                        "flexDirection": "row",
+                        "marginTop": 5,
+                        "padding": 5,
+                      }
+                    }
+                  >
+                    <
+                      color="#18bd18"
+                      icon={
+                        {
+                          "icon": [
+                            512,
+                            512,
+                            [
+                              "info-circle",
+                            ],
+                            "f05a",
+                            "M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z",
+                          ],
+                          "iconName": "circle-info",
+                          "prefix": "fas",
+                        }
+                      }
+                      size={20}
+                      style={
+                        {
+                          "marginRight": 5,
+                        }
+                      }
+                    />
+                    <Text
+                      style={
+                        {
+                          "color": "#c3c3c3",
+                          "opacity": 0.65,
+                        }
+                      }
+                    >
+                      text translated
+                    </Text>
                   </View>
                 </View>
                 <View
@@ -1785,7 +1913,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                             }
                           }
                         >
-                           0.00
+                           16.66
                         </Text>
                       </View>
                     </View>

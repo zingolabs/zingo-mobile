@@ -4,9 +4,11 @@ import { View, ScrollView, Modal, RefreshControl } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+
 import { useTheme } from '@react-navigation/native';
 
-import { SendPageStateClass, TransactionType } from '../../app/AppState';
+import { ButtonTypeEnum, SendPageStateClass, TransactionType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -22,7 +24,7 @@ type HistoryProps = {
   syncingStatusMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  set_privacy_option: (value: boolean) => Promise<void>;
   setPoolsToShieldSelectSapling: (v: boolean) => void;
   setPoolsToShieldSelectTransparent: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
@@ -151,7 +153,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
               marginTop: 10,
               marginBottom: 30,
             }}>
-            <Button type="Secondary" title={translate('history.loadmore') as string} onPress={loadMoreClicked} />
+            <Button
+              type={ButtonTypeEnum.Secondary}
+              title={translate('history.loadmore') as string}
+              onPress={loadMoreClicked}
+            />
           </View>
         ) : (
           <>

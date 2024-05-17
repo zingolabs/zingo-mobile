@@ -18,10 +18,11 @@ import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
-import { SendPageStateClass } from '../../app/AppState';
+import { ButtonTypeEnum, CommandEnum, SendPageStateClass, SnackbarDurationEnum } from '../../app/AppState';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
 
 type DataType = {
   svg: {
@@ -81,7 +82,7 @@ const getPercent = (percent: number) => {
 type InsightProps = {
   closeModal: () => void;
   openModal: () => void;
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  set_privacy_option: (value: boolean) => Promise<void>;
   setSendPageState: (s: SendPageStateClass) => void;
 };
 
@@ -111,21 +112,27 @@ const Insight: React.FunctionComponent<InsightProps> = ({
       let resultStr: string = '';
       switch (tab) {
         case 'sent':
-          resultStr = await RPCModule.execute('value_to_address', '');
+          resultStr = await RPCModule.execute(CommandEnum.value_to_address, '');
           //console.log('################# value', resultStr);
           break;
         case 'sends':
-          resultStr = await RPCModule.execute('sends_to_address', '');
+          resultStr = await RPCModule.execute(CommandEnum.sends_to_address, '');
           //console.log('################# sends', resultStr);
           break;
         case 'memobytes':
-          resultStr = await RPCModule.execute('memobytes_to_address', '');
+          resultStr = await RPCModule.execute(CommandEnum.memobytes_to_address, '');
           //console.log('################# memobytes', resultStr);
           break;
         default:
           break;
       }
-      const resultJSON = await JSON.parse(resultStr);
+      let resultJSON: any;
+      try {
+        resultJSON = await JSON.parse(resultStr);
+      } catch (e) {
+        console.log(resultStr);
+        resultJSON = {};
+      }
       let amounts: { value: number; address: string; tag: string }[] = [];
       const resultJSONEntries: [string, number][] = Object.entries(resultJSON) as [string, number][];
       resultJSONEntries.forEach(([key, value]) => {
@@ -193,8 +200,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({
                   Clipboard.setString(item.address);
                   addLastSnackbar({
                     message: translate('history.addresscopied') as string,
-                    type: 'Primary',
-                    duration: 'short',
+                    duration: SnackbarDurationEnum.short,
                   });
                   selectExpandAddress(index);
                 }
@@ -245,7 +251,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({
             <RegText>{getPercent(percent)}</RegText>
             {tab === 'sent' ? (
               <ZecAmount
-                currencyName={info.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName}
                 size={15}
                 amtZec={item.value}
                 style={{ marginHorizontal: 5 }}
@@ -407,7 +413,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

@@ -8,7 +8,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import TxDetail from '../components/History/components/TxDetail';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
-import { TransactionType } from '../app/AppState';
+import { CurrencyNameEnum, PoolEnum, TransactionType, TransactionTypeEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -51,6 +51,10 @@ jest.mock('moment/locale/pt', () => () => ({
   defineLocale: jest.fn(),
 }));
 
+jest.mock('moment/locale/ru', () => () => ({
+  defineLocale: jest.fn(),
+}));
+
 jest.mock('react-native-gesture-handler', () => {
   const View = require('react-native').View;
   return {
@@ -85,10 +89,10 @@ describe('Component History TxDetail - test', () => {
   const onSetOption = jest.fn();
 
   test('History TxDetail - sent transaction with 2 addresses', () => {
-    state.info.currencyName = 'ZEC';
+    state.info.currencyName = CurrencyNameEnum.ZEC;
     state.totalBalance.total = 1.12345678;
     const tx = {
-      type: 'Sent',
+      type: TransactionTypeEnum.Sent,
       fee: 0.0001,
       confirmations: 22,
       txid: 'sent-txid-1234567890',
@@ -129,10 +133,10 @@ describe('Component History TxDetail - test', () => {
   });
 
   test('History TxDetail - self sent transaction', () => {
-    state.info.currencyName = 'ZEC';
+    state.info.currencyName = CurrencyNameEnum.ZEC;
     state.totalBalance.total = 1.12345678;
     const txSelfSend = {
-      type: 'SendToSelf',
+      type: TransactionTypeEnum.SendToSelf,
       fee: 0.0001,
       confirmations: 12,
       txid: 'sendtoself-txid-1234567890',
@@ -164,10 +168,10 @@ describe('Component History TxDetail - test', () => {
   });
 
   test('History TxDetail - received transaction with 2 pools', () => {
-    state.info.currencyName = 'ZEC';
+    state.info.currencyName = CurrencyNameEnum.ZEC;
     state.totalBalance.total = 1.12345678;
     const txSelfSend = {
-      type: 'Received',
+      type: TransactionTypeEnum.Received,
       confirmations: 133,
       txid: 'receive-txid-1234567890',
       time: Date.now(),
@@ -176,13 +180,13 @@ describe('Component History TxDetail - test', () => {
         {
           address: '',
           amount: 0.77654321,
-          pool: 'Orchard',
+          pool: PoolEnum.OrchardPool,
           memos: ['hola', '  & ', 'hello'],
         },
         {
           address: '',
           amount: 0.1,
-          pool: 'Sapling',
+          pool: PoolEnum.SaplingPool,
           memos: ['hello', '  & ', 'hola'],
         },
       ],

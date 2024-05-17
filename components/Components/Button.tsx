@@ -4,9 +4,10 @@ import { TouchableOpacity, Text, View, TextStyle } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { ThemeType } from '../../app/types';
+import { ButtonTypeEnum } from '../../app/AppState';
 
 type ButtonProps = {
-  type: string;
+  type: ButtonTypeEnum;
   title: string;
   disabled?: boolean;
   onPress: () => void;
@@ -27,15 +28,15 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   testID,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
-  // type: 'Primary' or 'Secondary'
+  // type: Primary or Secondary
   const styleButton: TextStyle =
-    type === 'Primary'
+    type === ButtonTypeEnum.Primary
       ? {
           backgroundColor: disabled ? colors.primaryDisabled : colors.primary,
           borderColor: disabled ? colors.primaryDisabled : colors.text,
           borderWidth: 2,
         }
-      : type === 'Secondary'
+      : type === ButtonTypeEnum.Secondary
       ? {
           backgroundColor: disabled ? colors.secondaryDisabled : colors.background,
           borderColor: disabled ? colors.primaryDisabled : colors.primary,
@@ -82,7 +83,8 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         }}>
         <Text
           style={{
-            color: type === 'Primary' ? colors.background : disabled ? colors.primaryDisabled : colors.primary,
+            color:
+              type === ButtonTypeEnum.Primary ? colors.background : disabled ? colors.primaryDisabled : colors.primary,
             fontWeight: 'bold',
             textTransform: 'uppercase',
             fontSize: 16,

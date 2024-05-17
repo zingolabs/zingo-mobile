@@ -16,6 +16,9 @@ import RegText from './RegText';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+import { CommandEnum, GlobalConst } from '../../app/AppState';
+import { RPCParseStatusEnum } from '../../app/rpc/enums/RPCParseStatusEnum';
 
 type InputTextAddressProps = {
   address: string;
@@ -40,12 +43,12 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
   useEffect(() => {
     const parseAdressJSON = async (addr: string): Promise<boolean> => {
       if (!netInfo.isConnected) {
-        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+        addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
         return false;
       }
-      const result: string = await RPCModule.execute('parse_address', addr);
+      const result: string = await RPCModule.execute(CommandEnum.parse_address, addr);
       if (result) {
-        if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
+        if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
           return false;
         }
       } else {
@@ -59,9 +62,9 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
         return false;
       }
 
-      //console.log('parse-address', address, resultJSON.status === 'success');
+      //console.log('parse-address', address, resultJSON.status === RPCParseStatusEnum.success);
 
-      return resultJSON.status === 'success' && resultJSON.chain_name === server.chain_name;
+      return resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chain_name;
     };
 
     if (address) {

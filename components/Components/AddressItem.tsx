@@ -5,7 +5,14 @@ import Clipboard from '@react-native-community/clipboard';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from './RegText';
 import Utils from '../../app/utils';
-import { AddressBookFileClass, SendPageStateClass, ToAddrClass } from '../../app/AppState';
+import {
+  AddressBookFileClass,
+  SendPageStateClass,
+  ToAddrClass,
+  ModeEnum,
+  SnackbarDurationEnum,
+  RouteEnums,
+} from '../../app/AppState';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -13,6 +20,7 @@ import { faAddressCard, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
 
 type AddressItemProps = {
   address: string;
@@ -93,15 +101,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         {contact && (
           <TouchableOpacity
             onPress={() => {
-              // make no sense to copy the label to the clipboard, it's useless.
-              //if (!oneLine) {
-              //  Clipboard.setString(contact);
-              //  addLastSnackbar({
-              //    message: translate('history.contactcopied') as string,
-              //    type: 'Primary',
-              //    duration: 'short',
-              //  });
-              //}
               setExpandContact(true);
               if (privacy) {
                 setTimeout(() => {
@@ -132,8 +131,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 Clipboard.setString(address);
                 addLastSnackbar({
                   message: translate('history.addresscopied') as string,
-                  type: 'Primary',
-                  duration: 'short',
+                  duration: SnackbarDurationEnum.short,
                 });
                 setExpandAddress(true);
                 if (privacy) {
@@ -182,7 +180,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         setSendPageState &&
         contact &&
         !readOnly &&
-        !(mode === 'basic' && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
+        !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
           <TouchableOpacity
             style={{ marginLeft: 10 }}
             onPress={() => {
@@ -191,7 +189,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               sendPageState.toaddr.to = address;
               setSendPageState(sendPageState);
               closeModal();
-              navigation.navigate('LoadedApp', {
+              navigation.navigate(RouteEnums.LoadedApp, {
                 screen: translate('loadedapp.send-menu'),
                 initial: false,
               });

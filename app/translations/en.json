@@ -7,7 +7,7 @@
   "workingonit": "We are working on this feature.",
   "firstlaunchingmessage-title": "Optimizing Zingo!",
   "firstlaunchingmessage-body": "This may take a while, depending on the transaction history. Please keep the app open until the process finishes.",
-  "firstlaunchingmessage-footer": "Sorry for the inconvenience.",
+  "firstlaunchingmessage-footer": "Thanks.",
   "biometricsfailed-title": "Welcome!",
   "biometricsfailed-body": "For security, the application is locked.",
   "biometricsfailed-footer": "Use the authentication method to unlock.",
@@ -21,7 +21,7 @@
   "confirm": "Confirm",
   "menudrawer-acc": "Open Menu Drawer",
   "menu-acc": "Open Menu",
-  "donation": "Thanks for supporting Zingo!",
+  "donation": "Thanks for supporting ZingoLabs!",
   "restarting": "Error connecting to the Server, the App will restart in a few seconds.",
   "change-privacy": "New privacy policy: ",
   "warning-binance": "WARNING: Binance is collecting and holding user funds without timely recourse. Do NOT deposit into Binance from this Wallet.",
@@ -83,7 +83,9 @@
     "alert-newwallet-title": "CREATE A NEW WALLET",
     "alert-newwallet-body": "Can you confirm that you really want to create a new wallet and lose access to the current wallet.",
     "serverfirsttry": "Trying to perform the action with a different server. The current server may be failing.",
-    "serversecondtry": "It doesn't seem to be any problem with the server. Someting else is happening."
+    "serversecondtry": "It doesn't seem to be any problem with the server. Someting else is happening.",
+    "alert-donation-title": "TIP ZINGOLABS",
+    "alert-donation-body": "Do you want to help ZingoLabs make Zcash more useful? Opt in to tip one Zenny (0.01 ZEC) to ZingoLabs with each transaction! If so, press confirm, otherwise press Cancel."
   },
   "loadedapp": {
     "about": "About Zingo!",
@@ -102,6 +104,8 @@
     "insight": "Financial Insight",
     "loadwalletfromseed-basic": "Restore wallet",
     "addressbook": "Address Book",
+    "tipzingolabs-basic": "Tip ZingoLabs",
+    "votefornym": "Vote for Nym",
     "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
@@ -125,8 +129,14 @@
     "readingwallet": "Reading successfully the wallet with the server:",
     "restorewallet-title": "Advanced Option",
     "restorewallet-alert": "Confirm that you want to restore a new wallet using your seed phrase.",
-    "selectingserver": "Checking the servers in the list to select the most optimized one.",
-    "selectingserversame": "Your actual server is the most optimized one already."
+    "selectingserver": "Determining the best lightwalletd.",
+    "selectingserversame": "Your actual server is the most optimized one already.",
+    "selectingserverbest": "In this moment this is the most optimized server:",
+    "nymmemo": "I need Nym network security",
+    "incoming-funds": "Incoming funds\n",
+    "transaction-confirmed": "Transaction confirmed\n",
+    "payment-made": "Payment made\n",
+    "transaction-reverted": "The transaction was reverted by the server, try again."
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",
@@ -176,6 +186,10 @@
       {
         "value": "pt",
         "text": "All the information will be in Portuguese."
+      },
+      {
+        "value": "ru",
+        "text": "All the information will be in Russian."
       }
     ],
     "sendalls": [
@@ -186,6 +200,16 @@
       {
         "value": false,
         "text": "Disable the sending all button because could be a risk to have it."
+      }
+    ],
+    "donations": [
+      {
+        "value": true,
+        "text": "Tip ZingoLabs a Zenny (0.01 ZEC) in every transaction."
+      },
+      {
+        "value": false,
+        "text": "Don't pay to incentivize a more secure system."
       }
     ],
     "privacys": [
@@ -206,6 +230,16 @@
       {
         "value": "advanced",
         "text": "Advanced Mode, for the advanced user."
+      }
+    ],
+    "rescanmenuoptions": [
+      {
+        "value": true,
+        "text": "Enable/Show the menu option to rescan the wallet."
+      },
+      {
+        "value": false,
+        "text": "Disable/Hide the menu option to rescan the wallet."
       }
     ],
     "nochanges": "No changes registered.",
@@ -234,8 +268,10 @@
     "language-title": "LANGUAGE",
     "islanguage": "You need to choose a language to save.",
     "sendall-title": "THE BUTTON 'Send All' (Amount)",
+    "donation-title": "Tip ZingoLabs",
     "privacy-title": "Switch between High or Normal Privacy",
     "mode-title": "Switch between Basic or Advanced Mode",
+    "rescanmenuoption-title": "THE RESCAN MENU OPTION",
     "value-currency-": "No currency",
     "value-currency-USD": "US Dollar",
     "value-language-en": "English",
@@ -243,6 +279,8 @@
     "value-language-pt": "Portuguese",
     "value-sendall-true": "Enable",
     "value-sendall-false": "Disable",
+    "value-donation-true": "Yes",
+    "value-donation-false": "No",
     "value-privacy-true": "High",
     "value-privacy-false": "Normal",
     "privacy": "Priv: ",
@@ -252,6 +290,8 @@
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest",
+    "value-rescanmenuoption-true": "Enable",
+    "value-rescanmenuoption-false": "Disable",
     "security-title": "APPLY DEVICE SECURITY TO SCREENS/OPTIONS",
     "security-startapp": "When the App starts",
     "security-foregroundapp": "When the App go to the Foreground",
@@ -272,7 +312,8 @@
     "france": "France",
     "netherlands": "Netherlands",
     "uk": "UK",
-    "select-placeholder": "Choose a Server..."
+    "select-placeholder": "Choose a Server...",
+    "value-language-ru": "Russian"
   },
   "info": {
     "version": "Version",
@@ -388,7 +429,7 @@
     "nofetchprice": "Fetch Price in USD",
     "sendall": "Send All",
     "sendall-message": "Your are about to send the entire amount in your wallet",
-    "includeua": "Include your UA:",
+    "includeua": "Include your Return Address:",
     "confirm-memo": "Memo",
     "duplicate-nullifier-error": "Your funds are still confirming and probably syncing. You can wait until the funds are confirmed or you can try to send now with a lower amount. The Transaction build failed!",
     "dust-error": "The amount that you are trying to send to a Transparent address is really tiny. The Transaction build failed!",
@@ -402,7 +443,9 @@
     "amountrevealed": "Amount Revealed",
     "deshielded": "Deshielded",
     "lose-address-title": "SELECT A NEW ADDRESS",
-    "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?"
+    "lose-address-alert": "You already have a valid address in the address field. Do you want to replace it?",
+    "confirm-donation": "Donation",
+    "donation-minimum-message": "The minimum amount for donations is a Zenny (0.01 ZEC), Try again and Thanks."
   },
   "receive": {
     "u-title": "Unified Address",
@@ -600,5 +643,6 @@
     "oneentry": "URI Should have at least 1 entry",
     "parseerror": "Right now it is not possible to verify the address with the server"
   },
-  "donation-button": "Donate To Zingo "
+  "donation-button": "Donate To ZingoLabs ",
+  "donation-legend": "You are donating to ZingoLabs activately, Thanks"
 }

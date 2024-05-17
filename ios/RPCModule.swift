@@ -54,6 +54,20 @@ class RPCModule: NSObject {
     }
   }
   
+  func wallet_exists() -> Bool {
+    do {
+      let fileName = try getFileName(walletFileName)
+      if (fileExists(fileName) == "true") {
+        return true
+      } else {
+        return false
+      }
+    } catch {
+      NSLog("wallet exists error: \(error.localizedDescription)")
+      return false
+    }
+  }
+  
   @objc(walletExists:reject:)
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
@@ -352,5 +366,26 @@ class RPCModule: NSObject {
       let dict: [String: Any] = ["server": server, "resolve": resolve]
       self.getLatestBlockAsync(dict)
   }
+
+  @objc(getDonationAddress:reject:)
+  func getDonationAddress(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      self.getDonationAddressAsync(dict)
+  }
+
+  func getDonationAddressAsync(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getDeveloperDonationAddress()
+          let respStr = String(resp)
+          resolve(respStr)
+      } else {
+          NSLog("Error getting latest block server")
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+              resolve("Error: [Native] Getting developer donation address. Command arguments problem.")
+          }
+      }
+  }
+
+
 
 }

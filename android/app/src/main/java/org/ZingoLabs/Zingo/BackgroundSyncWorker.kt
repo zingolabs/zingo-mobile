@@ -11,7 +11,6 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import java.io.File
 import java.util.*
 import org.json.JSONObject
 import java.nio.charset.StandardCharsets
@@ -39,6 +38,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
     override fun doWork(): Result {
         val reactContext = ReactApplicationContext(MainApplication.getAppContext())
         val rpcModule = RPCModule(reactContext)
+        val errorPrefix = "error"
 
         Log.i("SCHEDULED_TASK_RUN", "Task running")
 
@@ -50,15 +50,15 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundStart")
 
         // checking if the wallet file exists
-        val exists: Boolean = walletExists()
+        val exists: Boolean = rpcModule.wallet_exists()
 
         if (exists) {
-            uniffi.rustlib.initLogging()
+            uniffi.zingo.initLogging()
 
             // check the Server, because the task can run without the App.
-            val balance = uniffi.rustlib.executeCommand("balance", "")
+            val balance = uniffi.zingo.executeCommand("balance", "")
             Log.i("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
-            if (balance.lowercase().startsWith("error")) {
+            if (balance.lowercase().startsWith(errorPrefix)) {
                 // this means this task is running with the App closed
                 loadWalletFile(rpcModule)
             } else {
@@ -68,14 +68,14 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
             }
 
             // interrupt sync to false, just in case it is true.
-            val noInterrupting = uniffi.rustlib.executeCommand("interrupt_sync_after_batch", "false")
+            val noInterrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "false")
             Log.i("SCHEDULED_TASK_RUN", "Not interrupting sync: $noInterrupting")
 
             // the task is running here blocking this execution until this process finished:
             // 1. finished the syncing.
 
             Log.i("SCHEDULED_TASK_RUN", "sync BEGIN")
-            val syncing = uniffi.rustlib.executeCommand("sync", "")
+            val syncing = uniffi.zingo.executeCommand("sync", "")
             Log.i("SCHEDULED_TASK_RUN", "sync END: $syncing")
 
         } else {
@@ -91,7 +91,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         }
 
         // save the wallet file with the new data from the sync process
-        rpcModule.saveWallet()
+        rpcModule.saveWalletFile()
         Log.i("SCHEDULED_TASK_RUN", "wallet file SAVED")
 
         // save the background JSON file
@@ -123,7 +123,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
     }
 
     private fun stopSyncingProcess() {
-        var status = uniffi.rustlib.executeCommand("syncstatus", "")
+        var status = uniffi.zingo.executeCommand("syncstatus", "")
         Log.i("SCHEDULED_TASK_RUN", "status response $status")
 
         var data: ByteArray = status.toByteArray(StandardCharsets.UTF_8)
@@ -135,13 +135,13 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
 
         while (inProgress) {
             // interrupt
-            val interrupting = uniffi.rustlib.executeCommand("interrupt_sync_after_batch", "true")
+            val interrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "true")
             Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $interrupting")
 
             // blocking the thread for 0.5 seconds.
             Thread.sleep(500)
 
-            status = uniffi.rustlib.executeCommand("syncstatus", "")
+            status = uniffi.zingo.executeCommand("syncstatus", "")
             Log.i("SCHEDULED_TASK_RUN", "status response $status")
 
             data = status.toByteArray(StandardCharsets.UTF_8)
@@ -156,17 +156,6 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
 
     }
 
-    private fun walletExists(): Boolean {
-        // Check if a wallet already exists
-        val file = File(MainApplication.getAppContext()?.filesDir, "wallet.dat")
-        return if (file.exists()) {
-            Log.i("SCHEDULED_TASK_RUN", "Wallet exists")
-            true
-        } else {
-            Log.i("SCHEDULED_TASK_RUN", "Wallet DOES NOT exist")
-            false
-        }
-    }
 }
 
 class BSCompanion {
@@ -242,7 +231,7 @@ class BSCompanion {
             val reactContext = ReactApplicationContext(MainApplication.getAppContext())
 
             // run interrupt sync, just in case.
-            val interrupting = uniffi.rustlib.executeCommand("interrupt_sync_after_batch", "true")
+            val interrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "true")
             Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $interrupting")
 
             Log.i("SCHEDULING_TASK", "Cancel background Task")

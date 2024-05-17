@@ -1,13 +1,15 @@
+import { ChainNameEnum } from '../enums/ChainNameEnum';
+import { CurrencyNameEnum } from '../enums/CurrencyNameEnum';
+
 export default interface InfoType {
-  chain_name: 'main' | 'test' | 'regtest';
+  chain_name: ChainNameEnum;
   serverUri: string;
   latestBlock: number;
   connections: number;
   version: string;
   verificationProgress: number;
-  currencyName: string;
+  currencyName: CurrencyNameEnum;
   solps: number;
-  defaultFee: number;
   zingolib: string;
   // eslint-disable-next-line semi
 }

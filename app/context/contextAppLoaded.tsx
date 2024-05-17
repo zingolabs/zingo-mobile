@@ -22,13 +22,18 @@ import {
   ServerType,
   AddressBookFileClass,
   SecurityType,
+  LanguageEnum,
+  ModeEnum,
+  CurrencyEnum,
+  SelectServerEnum,
+  SnackbarType,
+  AppStateStatusEnum,
 } from '../AppState';
-import SnackbarType from '../AppState/types/SnackbarType';
 
 export const defaultAppStateLoaded: AppStateLoaded = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
-  appState: '',
+  appState: AppStateStatusEnum.unknown,
   netInfo: {} as NetInfoType,
 
   syncingStatus: new SyncingStatusClass(),
@@ -44,7 +49,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   sendProgress: new SendProgressClass(0, 0, 0),
   wallet: {} as WalletType,
   isMenuDrawerOpen: false,
-  selectedMenuDrawerItem: '',
+  selectedMenuDrawerItem: null,
   aboutModalVisible: false,
   computingModalVisible: false,
   settingsModalVisible: false,
@@ -66,14 +71,15 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   uaAddress: '',
 
   server: {} as ServerType,
-  currency: '',
-  language: 'en',
+  currency: CurrencyEnum.noCurrency,
+  language: LanguageEnum.en,
 
   zecPrice: {
     zecPrice: 0,
     date: 0,
   } as ZecPriceType,
   sendAll: false,
+  donation: false,
   background: {
     batches: 0,
     message: '',
@@ -88,7 +94,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   readOnly: false,
   poolsToShieldSelectSapling: true,
   poolsToShieldSelectTransparent: true,
-  mode: 'advanced',
+  mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
   restartApp: () => {},
@@ -98,7 +104,8 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   addressBookCurrentAddress: '',
   addressBookOpenPriorModal: () => {},
   security: {} as SecurityType,
-  selectServer: 'auto',
+  selectServer: SelectServerEnum.auto,
+  rescanMenuOption: false,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

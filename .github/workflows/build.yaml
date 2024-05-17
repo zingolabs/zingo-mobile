@@ -124,17 +124,17 @@ jobs:
       
       - name: LLVM Strip
         working-directory: ./rust/target
-        run: llvm-strip ./${{ env.TARGET }}/release/librustlib.so
+        run: llvm-strip ./${{ env.TARGET }}/release/libzingo.so
 
       - name: Rename the rust lib for uniffi compatibility
         working-directory: ./rust/target/${{ env.TARGET }}/release
-        run: mv ./librustlib.so ./libuniffi_rustlib.so
+        run: mv ./libzingo.so ./libuniffi_zingo.so
       
       - name: Upload native rust
         uses: actions/upload-artifact@v4
         with:
           name: native-librust-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-          path: rust/target/${{ env.TARGET }}/release/libuniffi_rustlib.so
+          path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
       
   cache-native-librust:
     name: Cache native rust

@@ -13,6 +13,8 @@ import AddressItem from './AddressItem';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+import { SnackbarDurationEnum } from '../../app/AppState';
 
 type SingleAddressProps = {
   address: string;
@@ -54,7 +56,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
   const doCopy = () => {
     if (address) {
       Clipboard.setString(address);
-      addLastSnackbar({ message: translate('history.addresscopied') as string, type: 'Primary', duration: 'short' });
+      addLastSnackbar({
+        message: translate('history.addresscopied') as string,
+        duration: SnackbarDurationEnum.short,
+      });
     }
   };
 
@@ -73,8 +78,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                 Clipboard.setString(address);
                 addLastSnackbar({
                   message: translate('history.addresscopied') as string,
-                  type: 'Primary',
-                  duration: 'short',
+                  duration: SnackbarDurationEnum.short,
                 });
                 setExpandQRAddress(true);
                 if (privacy) {
@@ -207,8 +211,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
               Clipboard.setString(address);
               addLastSnackbar({
                 message: translate('history.addresscopied') as string,
-                type: 'Primary',
-                duration: 'short',
+                duration: SnackbarDurationEnum.short,
               });
             }
           }}>

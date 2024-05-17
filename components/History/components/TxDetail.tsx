@@ -5,13 +5,19 @@ import Clipboard from '@react-native-community/clipboard';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+
 import { useTheme } from '@react-navigation/native';
 
 import {
   AddressBookFileClass,
   AddressClass,
+  ButtonTypeEnum,
+  ChainNameEnum,
   SendPageStateClass,
+  SnackbarDurationEnum,
   TransactionType,
+  TransactionTypeEnum,
   TxDetailType,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
@@ -35,7 +41,7 @@ type TxDetailProps = {
   tx: TransactionType;
   closeModal: () => void;
   openModal: () => void;
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  set_privacy_option: (value: boolean) => Promise<void>;
   setSendPageState: (s: SendPageStateClass) => void;
 };
 
@@ -56,7 +62,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
 
   useEffect(() => {
     const spendCo =
-      tx.confirmations === 0 ? colors.primaryDisabled : tx.type === 'Received' ? colors.primary : colors.text;
+      tx.confirmations === 0
+        ? colors.primaryDisabled
+        : tx.type === TransactionTypeEnum.Received
+        ? colors.primary
+        : colors.text;
     setSpendColor(spendCo);
   }, [colors.primary, colors.primaryDisabled, colors.text, tx.confirmations, tx.type]);
 
@@ -124,14 +134,14 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
             borderColor: colors.border,
           }}>
           <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
-            {tx.type === 'Sent'
+            {tx.type === TransactionTypeEnum.Sent
               ? (translate('history.sent') as string)
-              : tx.type === 'Received'
+              : tx.type === TransactionTypeEnum.Received
               ? (translate('history.received') as string)
               : (translate('history.sendtoself') as string)}
           </BoldText>
           <ZecAmount
-            currencyName={info.currencyName ? info.currencyName : ''}
+            currencyName={info.currencyName}
             size={36}
             amtZec={tx.txDetails.reduce((s, d) => s + d.amount, 0)}
             privacy={privacy}
@@ -167,8 +177,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                   Clipboard.setString(tx.txid);
                   addLastSnackbar({
                     message: translate('history.txcopied') as string,
-                    type: 'Primary',
-                    duration: 'short',
+                    duration: SnackbarDurationEnum.short,
                   });
                   setExpandTxid(true);
                 }
@@ -178,7 +187,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
               {expandTxid && !!tx.txid && (
                 <>
                   <RegText>{tx.txid}</RegText>
-                  {server.chain_name !== 'regtest' && (
+                  {server.chain_name !== ChainNameEnum.regtestChainName && (
                     <TouchableOpacity onPress={() => handleTxIDClick(tx.txid)}>
                       <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
                         {translate('history.viewexplorer') as string}
@@ -194,12 +203,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
             <View style={{ display: 'flex', marginTop: 10 }}>
               <FadeText>{translate('history.txfee') as string}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ZecAmount
-                  amtZec={tx.fee}
-                  size={18}
-                  currencyName={info.currencyName ? info.currencyName : ''}
-                  privacy={privacy}
-                />
+                <ZecAmount amtZec={tx.fee} size={18} currencyName={info.currencyName} privacy={privacy} />
               </View>
             </View>
           )}
@@ -212,7 +216,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
             if (memoTotal.includes('\nReply to: \n')) {
               let memoArray = memoTotal.split('\nReply to: \n');
               const memoPoped = memoArray.pop();
-              memoUA = memoPoped ? memoPoped.toString() : '';
+              memoUA = memoPoped ? memoPoped : '';
               memo = memoArray.join('');
             } else {
               memo = memoTotal;
@@ -251,12 +255,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                 <View style={{ marginTop: 10 }}>
                   <FadeText>{translate('history.amount') as string}</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <ZecAmount
-                      amtZec={txd.amount}
-                      size={18}
-                      currencyName={info.currencyName ? info.currencyName : ''}
-                      privacy={privacy}
-                    />
+                    <ZecAmount amtZec={txd.amount} size={18} currencyName={info.currencyName} privacy={privacy} />
                     {!!tx.zec_price && (
                       <CurrencyAmount price={tx.zec_price} amtZec={txd.amount} currency={currency} privacy={privacy} />
                     )}
@@ -272,8 +271,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                           Clipboard.setString(memo);
                           addLastSnackbar({
                             message: translate('history.memocopied') as string,
-                            type: 'Primary',
-                            duration: 'short',
+                            duration: SnackbarDurationEnum.short,
                           });
                         }}>
                         <RegText>{memo}</RegText>
@@ -282,18 +280,16 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                     {!!memoUA && (
                       <TouchableOpacity
                         onPress={() => {
+                          Clipboard.setString(memoUA);
                           if (!thisWalletAddress(memoUA)) {
                             addLastSnackbar({
                               message: translate('history.address-http') as string,
-                              type: 'Primary',
-                              duration: 'long',
+                              duration: SnackbarDurationEnum.long,
                             });
                           }
-                          Clipboard.setString(memoUA);
                           addLastSnackbar({
                             message: translate('history.addresscopied') as string,
-                            type: 'Primary',
-                            duration: 'short',
+                            duration: SnackbarDurationEnum.short,
                           });
                         }}>
                         <RegText>{'\nReply to:'}</RegText>
@@ -331,7 +327,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
         </View>
       </ScrollView>
       <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10 }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

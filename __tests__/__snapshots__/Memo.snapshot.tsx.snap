@@ -39,14 +39,15 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
             "borderWidth": 1,
             "flexDirection": "row",
             "flexGrow": 1,
-            "maxHeight": 667,
-            "minHeight": 667,
+            "maxHeight": 533.6,
+            "minHeight": 400.2,
             "minWidth": 48,
           }
         }
       >
         <TextInput
           editable={true}
+          maxLength={512}
           multiline={true}
           onChangeText={[Function]}
           style={
@@ -124,6 +125,50 @@ memo10"
           />
         </View>
       </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "justifyContent": "flex-end",
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontWeight": "bold",
+              "marginTop": 5,
+              "opacity": 0.65,
+            }
+          }
+        >
+          60 
+        </Text>
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "marginTop": 5,
+              "opacity": 0.65,
+            }
+          }
+        >
+          translated text
+        </Text>
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "marginTop": 5,
+              "opacity": 0.65,
+            }
+          }
+        >
+           512 
+        </Text>
+      </View>
     </View>
   </RCTScrollView>
   <View
@@ -138,6 +183,11 @@ memo10"
     }
   >
     <View
+      accessibilityState={
+        {
+          "disabled": false,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}

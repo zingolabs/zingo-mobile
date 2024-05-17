@@ -4,7 +4,7 @@ import { SafeAreaView, Text, View, ActivityIndicator } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { ThemeType } from '../types';
-import { TranslateType } from '../AppState';
+import { ButtonTypeEnum, TranslateType } from '../AppState';
 import Button from '../../components/Components/Button';
 
 type LaunchingProps = {
@@ -102,7 +102,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                 {props.translate('biometricsfailed-footer') as string}
               </Text>
               <Button
-                type="Primary"
+                type={ButtonTypeEnum.Primary}
                 title={props.translate('biometricsfailed-button') as string}
                 onPress={() => props.tryAgain && props.tryAgain()}
                 style={{ marginBottom: 10, marginTop: 10 }}
