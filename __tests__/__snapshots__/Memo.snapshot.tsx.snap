@@ -47,7 +47,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
       >
         <TextInput
           editable={true}
-          maxLength={512}
+          maxLength={511}
           multiline={true}
           onChangeText={[Function]}
           style={
@@ -166,7 +166,7 @@ memo10"
             }
           }
         >
-           512 
+           511 
         </Text>
       </View>
     </View>
