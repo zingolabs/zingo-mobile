@@ -12,11 +12,11 @@ env:
   REPO-OWNER: ${{ github.repository_owner }}
 
 jobs:
-  check-build-cache:
+  ios-check-build-cache:
     name: Check build cache
     runs-on: macos-12
     outputs:
-      cache-found: ${{ steps.set-cache-found.outputs.cache-found }}
+      ios-cache-found: ${{ steps.ios-set-cache-found.outputs.ios-cache-found }}
     steps:     
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -28,7 +28,7 @@ jobs:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
         
       - name: Check if native rust cache exists
-        id: check-build-cache
+        id: ios-check-build-cache
         uses: actions/cache@v4
         with:
           path: rust/lib/Generated
@@ -36,13 +36,13 @@ jobs:
           lookup-only: true
   
       - name: Set cache-found
-        id: set-cache-found
-        run: echo "cache-found=${{ steps.check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+        id: ios-set-cache-found
+        run: echo "ios-cache-found=${{ steps.ios-check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
   
-  build:
+  ios-build:
     name: Build native rust
-    needs: check-build-cache
-    if: ${{ needs.check-build-cache.outputs.cache-found != 'true' }}
+    needs: ios-check-build-cache
+    if: ${{ needs.ios-check-build-cache.outputs.ios-cache-found != 'true' }}
     runs-on: macos-12
     env:
       RUSTUP_HOME: /root/.rustup
@@ -90,7 +90,7 @@ jobs:
       
   cache-native-ios-uniffi:
     name: Cache native rust
-    needs: build
+    needs: ios-build
     runs-on: macos-12
     steps:
       - name: Set envs for zingolib CI
@@ -114,7 +114,7 @@ jobs:
           ls -l
       
       - name: Cache native rust
-        uses: actions/cache/save@v4
+        uses: actions/cache@v4
         with:
           path: rust/lib/Generated
           key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}

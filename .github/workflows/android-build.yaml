@@ -16,11 +16,11 @@ env:
   REPO-OWNER: ${{ github.repository_owner }}
 
 jobs:
-  check-build-cache:
+  android-check-build-cache:
     name: Check build cache
     runs-on: macos-12
     outputs:
-      cache-found: ${{ steps.set-cache-found.outputs.cache-found }}
+      android-cache-found: ${{ steps.android-set-cache-found.outputs.android-cache-found }}
     steps:     
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -32,7 +32,7 @@ jobs:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
         
       - name: Check if native rust cache exists
-        id: check-build-cache
+        id: android-check-build-cache
         uses: actions/cache@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
@@ -40,13 +40,13 @@ jobs:
           lookup-only: true
   
       - name: Set cache-found
-        id: set-cache-found
-        run: echo "cache-found=${{ steps.check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+        id: android-set-cache-found
+        run: echo "android-cache-found=${{ steps.android-check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
   
-  build:
+  android-build:
     name: Build native rust
-    needs: check-build-cache
-    if: ${{ needs.check-build-cache.outputs.cache-found != 'true' }}
+    needs: android-check-build-cache
+    if: ${{ needs.android-check-build-cache.outputs.android-cache-found != 'true' }}
     runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:008
@@ -138,7 +138,7 @@ jobs:
       
   cache-native-android-uniffi:
     name: Cache native rust
-    needs: build
+    needs: android-build
     runs-on: macos-12
     steps:
       - name: Set envs for zingolib CI
