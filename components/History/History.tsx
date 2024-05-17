@@ -25,10 +25,11 @@ type HistoryProps = {
   setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
   set_privacy_option: (value: boolean) => Promise<void>;
-  setPoolsToShieldSelectSapling: (v: boolean) => void;
-  setPoolsToShieldSelectTransparent: (v: boolean) => void;
+  //setPoolsToShieldSelectSapling: (v: boolean) => void;
+  //setPoolsToShieldSelectTransparent: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
   setSendPageState: (s: SendPageStateClass) => void;
+  setShieldingAmount: (value: number) => void;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -39,10 +40,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
   setZecPrice,
   setComputingModalVisible,
   set_privacy_option,
-  setPoolsToShieldSelectSapling,
-  setPoolsToShieldSelectTransparent,
+  //setPoolsToShieldSelectSapling,
+  //setPoolsToShieldSelectTransparent,
   setUfvkViewModalVisible,
   setSendPageState,
+  setShieldingAmount,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, transactions, language, setBackgroundError, addLastSnackbar } = context;
@@ -106,10 +108,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
         setComputingModalVisible={setComputingModalVisible}
         setBackgroundError={setBackgroundError}
         set_privacy_option={set_privacy_option}
-        setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
-        setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
+        //setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
+        //setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
         setUfvkViewModalVisible={setUfvkViewModalVisible}
         addLastSnackbar={addLastSnackbar}
+        setShieldingAmount={setShieldingAmount}
       />
 
       <ScrollView

@@ -92,8 +92,8 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   setBackgroundError: () => {},
   privacy: false,
   readOnly: false,
-  poolsToShieldSelectSapling: true,
-  poolsToShieldSelectTransparent: true,
+  //poolsToShieldSelectSapling: true,
+  //poolsToShieldSelectTransparent: true,
   mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
@@ -106,6 +106,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
   rescanMenuOption: false,
+  shieldingAmount: 0,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);

@@ -71,8 +71,9 @@ type SendProps = {
   poolsMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
   set_privacy_option: (value: boolean) => Promise<void>;
-  setPoolsToShieldSelectSapling: (v: boolean) => void;
-  setPoolsToShieldSelectTransparent: (v: boolean) => void;
+  setShieldingAmount: (value: number) => void;
+  //setPoolsToShieldSelectSapling: (v: boolean) => void;
+  //setPoolsToShieldSelectTransparent: (v: boolean) => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -86,8 +87,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   poolsMoreInfoOnClick,
   setZecPrice,
   set_privacy_option,
-  setPoolsToShieldSelectSapling,
-  setPoolsToShieldSelectTransparent,
+  setShieldingAmount,
+  //setPoolsToShieldSelectSapling,
+  //setPoolsToShieldSelectTransparent,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -110,6 +112,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     donation,
     addresses,
     uaAddress,
+    shieldingAmount,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
@@ -363,23 +366,22 @@ const Send: React.FunctionComponent<SendProps> = ({
       totalBalance.orchardBal !== totalBalance.spendableOrchard ||
       totalBalance.privateBal !== totalBalance.spendablePrivate ||
       someUnconfirmed;
-    const showShield =
-      (someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 &&
-      (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > fee;
-    const showUpgrade =
-      (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
+    const showShield = (someUnconfirmed ? 0 : shieldingAmount) > 0;
+    //const showUpgrade =
+    //  (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
     setStillConfirming(stillConf);
     setShowShieldInfo(showShield);
-    setShowUpgradeInfo(showUpgrade);
+    //setShowUpgradeInfo(showUpgrade);
+    setShowUpgradeInfo(false);
   }, [
     donation,
     fee,
+    shieldingAmount,
     someUnconfirmed,
     totalBalance.orchardBal,
     totalBalance.privateBal,
     totalBalance.spendableOrchard,
     totalBalance.spendablePrivate,
-    totalBalance.transparentBal,
   ]);
 
   useEffect(() => {
@@ -780,9 +782,10 @@ const Send: React.FunctionComponent<SendProps> = ({
             setComputingModalVisible={setComputingModalVisible}
             setBackgroundError={setBackgroundError}
             set_privacy_option={set_privacy_option}
-            setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
-            setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
+            //setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
+            //setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
             addLastSnackbar={addLastSnackbar}
+            setShieldingAmount={setShieldingAmount}
           />
         </View>
       </Animated.View>

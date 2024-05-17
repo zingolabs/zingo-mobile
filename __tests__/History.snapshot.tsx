@@ -196,9 +196,10 @@ describe('Component History - test', () => {
           setZecPrice={onFunction}
           setComputingModalVisible={onFunction}
           set_privacy_option={onFunction}
-          setPoolsToShieldSelectSapling={onFunction}
-          setPoolsToShieldSelectTransparent={onFunction}
+          //setPoolsToShieldSelectSapling={onFunction}
+          //setPoolsToShieldSelectTransparent={onFunction}
           setSendPageState={onFunction}
+          setShieldingAmount={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
@@ -222,9 +223,10 @@ describe('Component History - test', () => {
           setZecPrice={onFunction}
           setComputingModalVisible={onFunction}
           set_privacy_option={onFunction}
-          setPoolsToShieldSelectSapling={onFunction}
-          setPoolsToShieldSelectTransparent={onFunction}
+          //setPoolsToShieldSelectSapling={onFunction}
+          //setPoolsToShieldSelectTransparent={onFunction}
           setSendPageState={onFunction}
+          setShieldingAmount={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

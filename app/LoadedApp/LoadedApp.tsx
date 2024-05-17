@@ -664,13 +664,17 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.setState({ ufvkViewModalVisible: value });
   };
 
-  setPoolsToShieldSelectSapling = (value: boolean) => {
-    this.setState({ poolsToShieldSelectSapling: value });
+  setShieldingAmount = (value: number) => {
+    this.setState({ shieldingAmount: value });
   };
 
-  setPoolsToShieldSelectTransparent = (value: boolean) => {
-    this.setState({ poolsToShieldSelectTransparent: value });
-  };
+  //setPoolsToShieldSelectSapling = (value: boolean) => {
+  //  this.setState({ poolsToShieldSelectSapling: value });
+  //};
+
+  //setPoolsToShieldSelectTransparent = (value: boolean) => {
+  //  this.setState({ poolsToShieldSelectTransparent: value });
+  //};
 
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
@@ -1159,8 +1163,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, value);
     this.setState({
       mode: value as ModeEnum,
-      poolsToShieldSelectSapling: true,
-      poolsToShieldSelectTransparent: true,
+      //poolsToShieldSelectSapling: true,
+      //poolsToShieldSelectTransparent: true,
     });
     // this function change the Theme in the App component.
     this.props.toggleTheme(value as ModeEnum);
@@ -1824,7 +1828,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                           <Text>{translate('loading') as string}</Text>
                         </View>
                       }>
-                      <History
+                      {/*<History
                         doRefresh={this.doRefresh}
                         toggleMenuDrawer={this.toggleMenuDrawer}
                         syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
@@ -1836,6 +1840,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                         setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                         setSendPageState={this.setSendPageState}
+                      />*/}
+                      <History
+                        doRefresh={this.doRefresh}
+                        toggleMenuDrawer={this.toggleMenuDrawer}
+                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                        setZecPrice={this.setZecPrice}
+                        setComputingModalVisible={this.setComputingModalVisible}
+                        set_privacy_option={this.set_privacy_option}
+                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                        setSendPageState={this.setSendPageState}
+                        setShieldingAmount={this.setShieldingAmount}
                       />
                     </Suspense>
                   </>
@@ -1852,7 +1868,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                               <Text>{translate('loading') as string}</Text>
                             </View>
                           }>
-                          <Send
+                          {/*<Send
                             setSendPageState={this.setSendPageState}
                             sendTransaction={this.sendTransaction}
                             clearToAddr={this.clearToAddr}
@@ -1865,6 +1881,19 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                             set_privacy_option={this.set_privacy_option}
                             setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
                             setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                          />*/}
+                          <Send
+                            setSendPageState={this.setSendPageState}
+                            sendTransaction={this.sendTransaction}
+                            clearToAddr={this.clearToAddr}
+                            setSendProgress={this.setSendProgress}
+                            toggleMenuDrawer={this.toggleMenuDrawer}
+                            syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                            poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                            setZecPrice={this.setZecPrice}
+                            setComputingModalVisible={this.setComputingModalVisible}
+                            set_privacy_option={this.set_privacy_option}
+                            setShieldingAmount={this.setShieldingAmount}
                           />
                         </Suspense>
                       </>

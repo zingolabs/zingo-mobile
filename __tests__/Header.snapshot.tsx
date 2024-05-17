@@ -64,10 +64,11 @@ describe('Component Header - test', () => {
           setComputingModalVisible={onFunction}
           setBackgroundError={onFunction}
           set_privacy_option={onFunction}
-          setPoolsToShieldSelectSapling={onFunction}
-          setPoolsToShieldSelectTransparent={onFunction}
+          //setPoolsToShieldSelectSapling={onFunction}
+          //setPoolsToShieldSelectTransparent={onFunction}
           setUfvkViewModalVisible={onFunction}
           addLastSnackbar={onFunction}
+          setShieldingAmount={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

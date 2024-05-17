@@ -121,8 +121,8 @@ export default interface AppStateLoaded {
 
   privacy: boolean;
   readOnly: boolean;
-  poolsToShieldSelectSapling: boolean;
-  poolsToShieldSelectTransparent: boolean;
+  //poolsToShieldSelectSapling: boolean;
+  //poolsToShieldSelectTransparent: boolean;
 
   mode: ModeEnum;
   snackbars: SnackbarType[];
@@ -137,6 +137,8 @@ export default interface AppStateLoaded {
   security: SecurityType;
   selectServer: SelectServerEnum;
   rescanMenuOption: boolean;
+
+  shieldingAmount: number;
 
   // eslint-disable-next-line semi
 }
