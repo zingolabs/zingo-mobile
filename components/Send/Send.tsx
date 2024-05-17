@@ -787,7 +787,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         </View>
       </Animated.View>
 
-      {validAddress === 1 && !memoEnabled && (
+      {validAddress === 1 && !memoEnabled && !sendToSelf && (
         <FadeText
           style={{
             textAlign: 'center',
