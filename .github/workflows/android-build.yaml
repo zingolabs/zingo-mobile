@@ -33,7 +33,7 @@ jobs:
         
       - name: Check if native rust cache exists
         id: android-check-build-cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
           key: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
@@ -157,7 +157,7 @@ jobs:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
       
       - name: Cache native rust
-        uses: actions/cache@v4
+        uses: actions/cache/save@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
           key: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}

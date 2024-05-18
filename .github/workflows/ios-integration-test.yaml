@@ -40,7 +40,7 @@ jobs:
         working-directory: rust/lib/Generated
         run: |
           ls -l
-          cp . ../../../ios
+          cp ./*.* ../../../ios
       
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1

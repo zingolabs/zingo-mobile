@@ -121,7 +121,7 @@ jobs:
           workspaces: rust
 
       - name: Native rust cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ABI }}
           key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
