@@ -80,7 +80,6 @@ jobs:
           sudo cargo run --release --bin uniffi-bindgen generate ./src/zingo.udl --language swift --out-dir ./Generated
           sudo cargo lipo --release --targets x86_64-apple-ios
           sudo cp ../target/universal/release/libzingo.a ./Generated/libuniffi_zingo.a
-          ls -l ./Generated
       
       - name: Upload native rust
         uses: actions/upload-artifact@v4
@@ -107,11 +106,6 @@ jobs:
         with: 
           name: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
           path: rust/lib/Generated
-
-      - name: Check Dowloaded files
-        working-directory: rust/lib/Generated
-        run: |
-          ls -l
       
       - name: Cache native rust
         uses: actions/cache/save@v4

@@ -18,7 +18,7 @@ env:
 jobs:
   ios-integration-test:
     name: IOS Integration test
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -39,7 +39,6 @@ jobs:
       - name: Copy libs to ios folder
         working-directory: rust/lib/Generated
         run: |
-          ls -l
           cp ./*.* ../../../ios
       
       - name: Setup Xcode
@@ -54,7 +53,6 @@ jobs:
       - name: Pod Install
         working-directory: ios
         run: |
-          ls -l 
           pod install
 
       - name: Run integration tests
