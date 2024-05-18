@@ -56,4 +56,4 @@ jobs:
           xcodebuild test \
             -workspace ZingoMobile.xcworkspace \
             -scheme ZingoMobile \
-            -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2' \
+            -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2'
