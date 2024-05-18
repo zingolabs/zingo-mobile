@@ -40,11 +40,6 @@ jobs:
         working-directory: rust/lib/Generated
         run: |
           cp ./*.* ../../../ios
-      
-      - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest
 
       - name: Yarn Install
         run: |
@@ -63,4 +58,4 @@ jobs:
             -scheme ZingoMobile \
             -sdk iphonesimulator \
             -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2' \
-            build test
+            clean build test
