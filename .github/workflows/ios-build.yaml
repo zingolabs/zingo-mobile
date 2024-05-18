@@ -29,7 +29,7 @@ jobs:
         
       - name: Check if native rust cache exists
         id: ios-check-build-cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: rust/lib/Generated
           key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
@@ -114,7 +114,7 @@ jobs:
           ls -l
       
       - name: Cache native rust
-        uses: actions/cache@v4
+        uses: actions/cache/save@v4
         with:
           path: rust/lib/Generated
           key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}

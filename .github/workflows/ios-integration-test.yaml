@@ -30,7 +30,7 @@ jobs:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
       - name: Native rust cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: rust/lib/Generated
           key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
