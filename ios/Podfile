@@ -37,6 +37,9 @@ target 'ZingoMobile' do
       existing_flags = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
       existing_flags << '_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION'
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = existing_flags
+      if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] < '12.4'
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.4'
+      end
   end
   end
 end
