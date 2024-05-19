@@ -14,7 +14,7 @@ env:
 jobs:
   ios-check-build-cache:
     name: Check build cache
-    runs-on: macos-12
+    runs-on: macos-13
     outputs:
       ios-cache-found: ${{ steps.ios-set-cache-found.outputs.ios-cache-found }}
     steps:     
@@ -43,7 +43,7 @@ jobs:
     name: Build native rust
     needs: ios-check-build-cache
     if: ${{ needs.ios-check-build-cache.outputs.ios-cache-found != 'true' }}
-    runs-on: macos-12
+    runs-on: macos-13
     env:
       RUSTUP_HOME: /root/.rustup
     steps:
@@ -90,7 +90,7 @@ jobs:
   cache-native-ios-uniffi:
     name: Cache native rust
     needs: ios-build
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
