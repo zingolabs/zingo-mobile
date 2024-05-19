@@ -42,7 +42,7 @@ class RPCModule: NSObject {
   func getFileName(_ file: String) throws -> String {
     let documentsDirectory = try getDocumentsDirectory()
     let fileName = "\(documentsDirectory)/\(file)"
-    NSLog("get file name \(fileName)")
+    //NSLog("get file name \(fileName)")
     return fileName
   }
   

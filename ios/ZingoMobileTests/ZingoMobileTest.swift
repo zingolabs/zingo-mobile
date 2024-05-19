@@ -83,9 +83,6 @@ class ZingoMobileTests: XCTestCase {
       NSLog("Test create New Wallet OK \(newWalletOK)")
       XCTAssertFalse(newWalletOK.lowercased().hasPrefix(errorPrefix), "Create New Wallet fails \(newWalletOK)")
 
-      // save the wallet in internal storage
-      try rpcmodule.saveWalletInternal()
-
       // load wallet from file
       let loadWalletOK = try rpcmodule.loadExistingWallet(server: serverOK, chainhint: chainhint)
       NSLog("Test Load Wallet OK \(loadWalletOK)")
