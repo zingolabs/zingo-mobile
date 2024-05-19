@@ -26,12 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     let jsCodeLocation: URL
 
-    #if targetEnvironment(simulator)
-    jsCodeLocation = URL(string: "http://localhost:8081/index.bundle?platform=ios")
-    #else
     jsCodeLocation = RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index", fallbackResource: nil)
-    #endif
-    
     let rootView = RCTRootView(bundleURL: jsCodeLocation, moduleName: "Zingo!", initialProperties: nil, launchOptions: launchOptions)
     let rootViewController = UIViewController()
     rootViewController.view = rootView

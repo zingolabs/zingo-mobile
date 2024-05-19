@@ -18,17 +18,17 @@ class ZingoMobileTests: XCTestCase {
   
   private let errorPrefix = "error"
 
-    func findSubview(in view: UIView, matching test: (UIView) -> Bool) -> Bool {
-        if test(view) {
-            return true
-        }
-        for subview in view.subviews {
-            if findSubview(in: subview, matching: test) {
-                return true
-            }
-        }
-        return false
-    }
+    //func findSubview(in view: UIView, matching test: (UIView) -> Bool) -> Bool {
+    //    if test(view) {
+    //        return true
+    //    }
+    //    for subview in view.subviews {
+    //        if findSubview(in: subview, matching: test) {
+    //            return true
+    //        }
+    //    }
+    //    return false
+    //}
 
     func testRendersWelcomeScreen() {
         guard let vc = UIApplication.shared.delegate?.window??.rootViewController else {
