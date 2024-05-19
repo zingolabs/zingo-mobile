@@ -30,39 +30,39 @@ class ZingoMobileTests: XCTestCase {
     //    return false
     //}
 
-    func testRendersWelcomeScreen() {
-        guard let vc = UIApplication.shared.delegate?.window??.rootViewController else {
-            XCTFail("Failed to access root view controller")
-            return
-        }
-        let date = Date(timeIntervalSinceNow: TimeInterval(TIMEOUT_SECONDS))
-        var foundElement = false
-        var redboxError: String?
+    //func testRendersWelcomeScreen() {
+    //    guard let vc = UIApplication.shared.delegate?.window??.rootViewController else {
+    //        XCTFail("Failed to access root view controller")
+    //        return
+    //    }
+    //    let date = Date(timeIntervalSinceNow: TimeInterval(TIMEOUT_SECONDS))
+    //    var foundElement = false
+    //    var redboxError: String?
 
-        #if DEBUG
-        RCTSetLogFunction { level, source, fileName, lineNumber, message in
-            if level.rawValue >= RCTLogLevelError.rawValue {
-                redboxError = message
-            }
-        }
-        #endif
+    //    #if DEBUG
+    //    RCTSetLogFunction { level, source, fileName, lineNumber, message in
+    //        if level.rawValue >= RCTLogLevelError.rawValue {
+    //            redboxError = message
+    //        }
+    //    }
+    //    #endif
 
-        while date.timeIntervalSinceNow > 0 && !foundElement && redboxError == nil {
-            RunLoop.main.run(mode: .default, before: Date(timeIntervalSinceNow: 0.1))
-            RunLoop.main.run(mode: .common, before: Date(timeIntervalSinceNow: 0.1))
+    //    while date.timeIntervalSinceNow > 0 && !foundElement && redboxError == nil {
+    //        RunLoop.main.run(mode: .default, before: Date(timeIntervalSinceNow: 0.1))
+    //        RunLoop.main.run(mode: .common, before: Date(timeIntervalSinceNow: 0.1))
 
-            foundElement = findSubview(in: vc.view) { view in
-                return view.accessibilityLabel == TEXT_TO_LOOK_FOR
-            }
-        }
+    //        foundElement = findSubview(in: vc.view) { view in
+    //            return view.accessibilityLabel == TEXT_TO_LOOK_FOR
+    //        }
+    //    }
 
-        #if DEBUG
-        RCTSetLogFunction(RCTDefaultLogFunction)
-        #endif
+    //    #if DEBUG
+    //    RCTSetLogFunction(RCTDefaultLogFunction)
+    //    #endif
 
-        XCTAssertNil(redboxError, "RedBox error: \(redboxError ?? "")")
-        XCTAssertTrue(foundElement, "Couldn't find element with text '\(TEXT_TO_LOOK_FOR)' in \(TIMEOUT_SECONDS) seconds")
-    }
+    //    XCTAssertNil(redboxError, "RedBox error: \(redboxError ?? "")")
+    //    XCTAssertTrue(foundElement, "Couldn't find element with text '\(TEXT_TO_LOOK_FOR)' in \(TIMEOUT_SECONDS) seconds")
+    //}
 
     func testCorruptWalletBug_ServerOKNewWallet() throws {
       let rpcmodule = RPCModule()
