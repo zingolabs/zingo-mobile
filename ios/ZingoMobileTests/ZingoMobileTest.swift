@@ -11,12 +11,7 @@ import UIKit
 import React
 import XCTest
 
-let TIMEOUT_SECONDS = 60
-let TEXT_TO_LOOK_FOR = "Zingo!"
-
 class ZingoMobileTests: XCTestCase {
-  
-  private let errorPrefix = "error"
 
   func testCorruptWalletBug_ServerOKNewWallet() throws {
     let rpcmodule = RPCModule()
@@ -35,12 +30,12 @@ class ZingoMobileTests: XCTestCase {
     // create a new wallet
     let newWalletOK = try rpcmodule.createNewWallet(server: serverOK, chainhint: chainhint)
     NSLog("Test create New Wallet OK \(newWalletOK)")
-    XCTAssertFalse(newWalletOK.lowercased().hasPrefix(errorPrefix), "Create New Wallet fails \(newWalletOK)")
+    XCTAssertFalse(newWalletOK.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue), "Create New Wallet fails \(newWalletOK)")
 
     // load wallet from file
     let loadWalletOK = try rpcmodule.loadExistingWallet(server: serverOK, chainhint: chainhint)
     NSLog("Test Load Wallet OK \(loadWalletOK)")
-    XCTAssertFalse(loadWalletOK.lowercased().hasPrefix(errorPrefix), "Load Wallet from file fails \(loadWalletOK)")
+    XCTAssertFalse(loadWalletOK.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue), "Load Wallet from file fails \(loadWalletOK)")
 
     // delete the wallet file
     try rpcmodule.deleteExistingWallet()
@@ -65,18 +60,18 @@ class ZingoMobileTests: XCTestCase {
     // create a new wallet, expecting ERROR.
     let newWalletKO = try rpcmodule.createNewWallet(server: serverKO, chainhint: chainhint)
     NSLog("Test create New Wallet KO \(newWalletKO)")
-    XCTAssertTrue(newWalletKO.lowercased().hasPrefix(errorPrefix), "Create New Wallet NOT fails, and it have to \(newWalletKO)")
+    XCTAssertTrue(newWalletKO.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue), "Create New Wallet NOT fails, and it have to \(newWalletKO)")
 
-    if (rpcmodule.wallet_exists()) {
+    if (try rpcmodule.fileExists(Constants.WalletFileName.rawValue)) {
       // load wallet from file, expecting ERROR.
       let loadWalletKO = try rpcmodule.loadExistingWallet(server: serverKO, chainhint: chainhint)
       NSLog("Test create Load Wallet KO \(loadWalletKO)")
-      XCTAssertTrue(newWalletKO.lowercased().hasPrefix(errorPrefix), "Load Wallet from file NOT fails, and it have to \(newWalletKO)")
+      XCTAssertTrue(newWalletKO.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue), "Load Wallet from file NOT fails, and it have to \(newWalletKO)")
       
       // load wallet from file, expecting CORRUPT WALLET BUG.
       let loadWalletOK = try rpcmodule.loadExistingWallet(server: serverOK, chainhint: chainhint)
       NSLog("Test create Load Wallet KO \(loadWalletOK)")
-      XCTAssertFalse(loadWalletOK.lowercased().hasPrefix(errorPrefix), "Load Wallet from file fails \(loadWalletOK)")
+      XCTAssertFalse(loadWalletOK.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue), "Load Wallet from file fails \(loadWalletOK)")
     } else {
       NSLog("Test no wallet file, imposible to load by Server KO")
     }
