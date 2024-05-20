@@ -15,8 +15,7 @@ zingodisclosure@proton.me
 3. Rust (https://www.rust-lang.org/tools/install)
 4. Rustup iOS targets (`rustup target add aarch64-apple-ios aarch64-apple-ios-sim`)
 5. Cargo-lipo (`cargo install cargo-lipo`)
-6. Cbindgen (`cargo install cbindgen`)
-7. Cocaopods (`sudo gem install cocoapods`)
+6. Cocaopods (`sudo gem install cocoapods`)
 
 ## Building for physical device
 1. Clone the repository.

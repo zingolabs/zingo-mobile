@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, dev]
+    branches: [main, dev, stable]
   workflow_dispatch:
 
 jobs:
@@ -16,21 +16,34 @@ jobs:
   create-cache-key:
     uses: ./.github/workflows/create-cache-key.yaml
     
-  build:
+  android-build:
     strategy:
       matrix:
         arch: [ x86_64, armeabi-v7a ]
-    uses: ./.github/workflows/build.yaml
+    uses: ./.github/workflows/android-build.yaml
     needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
        
-  integration-test:
-    uses: ./.github/workflows/integration-test.yaml
-    needs: [ create-timestamp, create-cache-key, build ]
+  android-integration-test:
+    uses: ./.github/workflows/android-integration-test.yaml
+    needs: [ create-timestamp, create-cache-key, android-build ]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: armeabi-v7a
  
+  ios-build:
+    uses: ./.github/workflows/ios-build.yaml
+    needs: create-cache-key
+    with:
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+
+  ios-integration-test:
+    uses: ./.github/workflows/ios-integration-test.yaml
+    needs: [ create-timestamp, create-cache-key, ios-build ]
+    with:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      

@@ -42,6 +42,7 @@ class RPCModule: NSObject {
   func getFileName(_ file: String) throws -> String {
     let documentsDirectory = try getDocumentsDirectory()
     let fileName = "\(documentsDirectory)/\(file)"
+    //NSLog("get file name \(fileName)")
     return fileName
   }
   
@@ -92,6 +93,7 @@ class RPCModule: NSObject {
 
   func saveWalletFile(_ base64EncodedString: String) throws {
     let fileName = try getFileName(walletFileName)
+    NSLog("save wallet file name \(fileName)")
     do {
       try base64EncodedString.write(toFile: fileName, atomically: true, encoding: .utf8)
     } catch {
