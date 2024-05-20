@@ -83,7 +83,6 @@ class RPCModule: NSObject {
   }
 
   func saveWalletFile(_ base64DecodedData: Data) throws {
-    NSLog("save wallet file name \(fileName)")
     do {
       try writeFile(Constants.WalletFileName.rawValue, fileData: base64DecodedData)
     } catch {
