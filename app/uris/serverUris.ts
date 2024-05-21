@@ -2,13 +2,14 @@ import { ServerUrisType, TranslateType, ChainNameEnum } from '../AppState';
 
 const serverUris = (translate: (key: string) => TranslateType | void): ServerUrisType[] => {
   return [
-    // default servers
+    // default servers (2)
     {
-      uri: 'https://mainnet.lightwalletd.com:9067',
-      region: translate('settings.na') as string,
+      uri: 'https://zec.rocks:443', // this will be the default server.
+      region: translate('settings.usa') as string,
       chain_name: ChainNameEnum.mainChainName,
       default: true,
       latency: null,
+      obsolete: false,
     },
     {
       uri: 'https://lwd1.zcash-infra.com:9067',
@@ -16,21 +17,16 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chain_name: ChainNameEnum.mainChainName,
       default: true,
       latency: null,
+      obsolete: false,
     },
-    // new servers (not default)
-    {
-      uri: 'https://zec.rocks:443',
-      region: translate('settings.usa') as string,
-      chain_name: ChainNameEnum.mainChainName,
-      default: true,
-      latency: null,
-    },
+    // new servers (not default) (11)
     {
       uri: 'https://na.zec.rocks:443',
       region: translate('settings.na') as string,
       chain_name: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
+      obsolete: false,
     },
     {
       uri: 'https://sa.zec.rocks:443',
@@ -38,6 +34,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chain_name: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
+      obsolete: false,
     },
     {
       uri: 'https://eu.zec.rocks:443',
@@ -45,6 +42,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chain_name: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
+      obsolete: false,
     },
     {
       uri: 'https://ap.zec.rocks:443',
@@ -52,34 +50,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chain_name: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
-    },
-    {
-      uri: 'https://na.lightwalletd.com:443',
-      region: translate('settings.na') as string,
-      chain_name: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-    },
-    {
-      uri: 'https://sa.lightwalletd.com:443',
-      region: translate('settings.sa') as string,
-      chain_name: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-    },
-    {
-      uri: 'https://eu.lightwalletd.com:443',
-      region: translate('settings.ea') as string,
-      chain_name: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
-    },
-    {
-      uri: 'https://ai.lightwalletd.com:443',
-      region: translate('settings.ao') as string,
-      chain_name: ChainNameEnum.mainChainName,
-      default: false,
-      latency: null,
+      obsolete: false,
     },
     {
       uri: 'https://lwd2.zcash-infra.com:9067',
@@ -87,6 +58,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chain_name: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
+      obsolete: false,
     },
     {
       uri: 'https://lwd3.zcash-infra.com:9067',
@@ -94,6 +66,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chain_name: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
+      obsolete: false,
     },
     {
       uri: 'https://lwd4.zcash-infra.com:9067',
@@ -101,6 +74,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chain_name: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
+      obsolete: false,
     },
     {
       uri: 'https://lwd5.zcash-infra.com:9067',
@@ -108,6 +82,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chain_name: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
+      obsolete: false,
     },
     {
       uri: 'https://lwd6.zcash-infra.com:9067',
@@ -115,6 +90,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chain_name: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
+      obsolete: false,
     },
     {
       uri: 'https://lwd7.zcash-infra.com:9067',
@@ -122,6 +98,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chain_name: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
+      obsolete: false,
     },
     {
       uri: 'https://lwd8.zcash-infra.com:9067',
@@ -129,6 +106,48 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       chain_name: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
+      obsolete: false,
+    },
+    // obsolete servers (5)
+    {
+      uri: 'https://mainnet.lightwalletd.com:9067',
+      region: translate('settings.na') as string,
+      chain_name: ChainNameEnum.mainChainName,
+      default: true,
+      latency: null,
+      obsolete: true,
+    },
+    {
+      uri: 'https://na.lightwalletd.com:443',
+      region: translate('settings.na') as string,
+      chain_name: ChainNameEnum.mainChainName,
+      default: false,
+      latency: null,
+      obsolete: true,
+    },
+    {
+      uri: 'https://sa.lightwalletd.com:443',
+      region: translate('settings.sa') as string,
+      chain_name: ChainNameEnum.mainChainName,
+      default: false,
+      latency: null,
+      obsolete: true,
+    },
+    {
+      uri: 'https://eu.lightwalletd.com:443',
+      region: translate('settings.ea') as string,
+      chain_name: ChainNameEnum.mainChainName,
+      default: false,
+      latency: null,
+      obsolete: true,
+    },
+    {
+      uri: 'https://ai.lightwalletd.com:443',
+      region: translate('settings.ao') as string,
+      chain_name: ChainNameEnum.mainChainName,
+      default: false,
+      latency: null,
+      obsolete: true,
     },
   ];
 };

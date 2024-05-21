@@ -101,12 +101,22 @@ export default class SettingsFileImpl {
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.selectServer)) {
         // this is the first time the App have selection server
-        // here just exists 4 options:
-        // - lightwalletd or zcash-infra (default)
+        // here just exists 5 options:
+        // - lightwalletd (obsolete) -> auto
+        // - zcash-infra (default) -> auto
         // - custom server -> mainnet (new - not default)
         // - custom server -> mainnet (not in the list)
         // - custom server -> testnet or regtest
         if (
+          serverUris(() => {})
+            .filter((s: ServerUrisType) => s.obsolete)
+            .find((s: ServerUrisType) =>
+              isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, settings.server as ServerType),
+            )
+        ) {
+          // obsolete servers -> auto - to make easier and faster UX to the user
+          settings.selectServer = SelectServerEnum.auto;
+        } else if (
           serverUris(() => {})
             .filter((s: ServerUrisType) => s.default)
             .find((s: ServerUrisType) =>
@@ -116,18 +126,30 @@ export default class SettingsFileImpl {
           // default servers -> auto - to make easier and faster UX to the user
           settings.selectServer = SelectServerEnum.auto;
         } else if (
-          serverUris(() => {})
-            .filter((s: ServerUrisType) => !s.default)
-            .find((s: ServerUrisType) =>
-              isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, settings.server as ServerType),
-            )
+          serverUris(() => {}).find((s: ServerUrisType) =>
+            isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, settings.server as ServerType),
+          )
         ) {
-          // new servers -> in the list - the user changed the default server in some point
+          // new servers (not default & not obsolete) -> in the list - the user changed the default server in some point
           settings.selectServer = SelectServerEnum.list;
         } else {
           // new servers -> not in the list - the user changed the default server in some point to
           // another totally unknown or the user is using a non mainnet server.
           settings.selectServer = SelectServerEnum.custom;
+        }
+      } else {
+        // this is not the first time, but I have to change the obsolete servers to `auto`.
+        // do nothing if the user select a obsolte one as a custom server, this is user's choice.
+        if (
+          serverUris(() => {})
+            .filter((s: ServerUrisType) => s.obsolete)
+            .find((s: ServerUrisType) =>
+              isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, settings.server as ServerType),
+            ) &&
+          settings.selectServer !== SelectServerEnum.custom
+        ) {
+          // obsolete servers -> auto - to make easier and faster UX to the user
+          settings.selectServer = SelectServerEnum.auto;
         }
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.donation)) {

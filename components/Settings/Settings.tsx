@@ -207,10 +207,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }, []); // only the first time
 
   useEffect(() => {
-    const items = serverUris(translate).map((item: ServerUrisType) => ({
-      label: (item.region ? item.region + ' ' : '') + item.uri,
-      value: item.uri,
-    }));
+    // avoiding obsolete ones
+    const items = serverUris(translate)
+      .filter((s: ServerUrisType) => !s.obsolete)
+      .map((item: ServerUrisType) => ({
+        label: (item.region ? item.region + ' ' : '') + item.uri,
+        value: item.uri,
+      }));
     setItemsPicker(items);
   }, [translate]);
 
@@ -647,7 +650,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         setCustomIcon(farCircle);
                         setSelectServer(SelectServerEnum.list);
                         setListServerUri(item);
-                        const cnItem = serverUris(translate).find((s: ServerUrisType) => s.uri === item);
+                        // avoiding obsolete ones
+                        const cnItem = serverUris(translate)
+                          .filter((s: ServerUrisType) => !s.obsolete)
+                          .find((s: ServerUrisType) => s.uri === item);
                         if (cnItem) {
                           setListServerChainName(cnItem.chain_name);
                         } else {

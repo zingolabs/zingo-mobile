@@ -171,12 +171,10 @@ export default class Utils {
 
   static getBlockExplorerTxIDURL(txid: string, chain_name: ChainNameEnum): string {
     if (chain_name === ChainNameEnum.testChainName) {
-      return `https://testnet.zcashblockexplorer.com/transactions/${txid}`;
+      return `https://blockexplorer.one/zcash/testnet/tx/${txid}`;
     } else {
-      return `https://zcashblockexplorer.com/transactions/${txid}`;
+      return `https://3xpl.com/zcash/transaction/${txid}`;
     }
-    // updated a new server
-    //return `https://blockchair.com/zcash/transaction/${txid}`;
   }
 
   static generateColorList(numColors: number): string[] {

@@ -6,6 +6,7 @@ export default interface ServerUrisType {
   region: string;
   default: boolean;
   latency: number | null;
+  obsolete: boolean;
 
   // eslint-disable-next-line semi
 }

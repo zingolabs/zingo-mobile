@@ -616,7 +616,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   };
 
   selectTheBestServer = async (aDifferentOne: boolean) => {
-    const servers = await selectingServer(serverUris(this.props.translate));
+    // avoiding obsolete ones
+    const servers = await selectingServer(serverUris(this.props.translate).filter((s: ServerUrisType) => !s.obsolete));
     const actualServer = this.state.server;
     let fasterServer: ServerType = this.state.server;
     if (servers.length > 0) {
