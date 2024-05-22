@@ -665,6 +665,8 @@ export default class RPC {
   async doSend(sendJSON: string): Promise<string> {
     try {
       console.log('NOT USING THIS:', sendJSON);
+      const preSendStr: String = await RPCModule.execute(CommandEnum.send, sendJSON);
+      console.log(preSendStr);
       const sendStr: string = await RPCModule.execute(CommandEnum.confirm, '');
       if (sendStr) {
         if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1403,7 +1405,7 @@ export default class RPC {
       } catch (e) {}
     }
 
-    //console.log('prev progress id', prevSendId);
+    console.log('prev progress id', prevSendId);
 
     // sometimes we need the result of send as well
     let sendError: string = '';
@@ -1447,7 +1449,8 @@ export default class RPC {
     const sendTxPromise = new Promise<string>((resolve, reject) => {
       const intervalID = setInterval(async () => {
         const pro: string = await this.doSendProgress();
-        if (pro && pro.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log('send progress', pro);
+        if (pro && pro.toLowerCase().startsWith(GlobalConst.error) && !sendTxid && !sendError) {
           return;
         }
         let progress = {} as RPCSendProgressType;
@@ -1456,7 +1459,10 @@ export default class RPC {
           progress = await JSON.parse(pro);
           sendId = progress.id;
         } catch (e) {
-          return;
+          console.log(e);
+          if (!sendTxid && !sendError) {
+            return;
+          }
         }
 
         // because I don't know what the user are doing, I force every 2 seconds
@@ -1469,7 +1475,7 @@ export default class RPC {
         // if the send command fails really fast then the sendID never change.
         // In this case I need to finish this promise right away.
         if (sendId === prevSendId && !sendTxid && !sendError) {
-          //console.log('progress id', sendId);
+          console.log('progress id', sendId);
           // Still not started, so wait for more time
           return;
         }
