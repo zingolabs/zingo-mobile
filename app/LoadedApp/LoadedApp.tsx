@@ -764,7 +764,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   this.state.info.currencyName;
                 title = this.props.translate('loadedapp.send-menu') as string;
               }
-              createAlert(this.setBackgroundError, this.addLastSnackbar, title, message);
+              createAlert(this.setBackgroundError, this.addLastSnackbar, title, message, true);
             }
             // the transaction is gone -> Likely Reverted by the server
             if (txNew.length === 0) {
@@ -773,6 +773,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 this.addLastSnackbar,
                 this.props.translate('loadedapp.send-menu') as string,
                 this.props.translate('loadedapp.transaction-reverted') as string,
+                true,
               );
             }
           });
