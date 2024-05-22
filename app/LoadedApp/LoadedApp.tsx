@@ -60,7 +60,6 @@ import {
   SnackbarType,
   AppStateStatusEnum,
   GlobalConst,
-  SnackbarDurationEnum,
   TransactionTypeEnum,
 } from '../AppState';
 import Utils from '../utils';
@@ -727,6 +726,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             // the transaction is confirmed
             if (txNew.length > 0 && txNew[0].confirmations > 0) {
               let message: string = '';
+              let title: string = '';
               if (txNew[0].type === TransactionTypeEnum.Received) {
                 message =
                   (this.props.translate('loadedapp.incoming-funds') as string) +
@@ -738,6 +738,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   ) +
                   ' ' +
                   this.state.info.currencyName;
+                title = this.props.translate('loadedapp.uas-menu') as string;
               } else if (txNew[0].type === TransactionTypeEnum.SendToSelf) {
                 message =
                   (this.props.translate('loadedapp.transaction-confirmed') as string) +
@@ -749,6 +750,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                       ' ' +
                       this.state.info.currencyName
                     : '');
+                title = this.props.translate('loadedapp.send-menu') as string;
               } else {
                 message =
                   (this.props.translate('loadedapp.payment-made') as string) +
@@ -760,18 +762,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   ) +
                   ' ' +
                   this.state.info.currencyName;
+                title = this.props.translate('loadedapp.send-menu') as string;
               }
-              this.addLastSnackbar({
-                message,
-                duration: SnackbarDurationEnum.long,
-              });
+              createAlert(this.setBackgroundError, this.addLastSnackbar, title, message);
             }
             // the transaction is gone -> Likely Reverted by the server
             if (txNew.length === 0) {
-              this.addLastSnackbar({
-                message: this.props.translate('loadedapp.transaction-reverted') as string,
-                duration: SnackbarDurationEnum.long,
-              });
+              createAlert(
+                this.setBackgroundError,
+                this.addLastSnackbar,
+                this.props.translate('loadedapp.send-menu') as string,
+                this.props.translate('loadedapp.transaction-reverted') as string,
+              );
             }
           });
       this.setState({ transactions, somePending: pending > 0 });
