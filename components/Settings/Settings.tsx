@@ -642,18 +642,18 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       color: colors.primary,
                     }}
                     useNativeAndroidPickerStyle={false}
-                    onValueChange={(item: string) => {
+                    onValueChange={(itemValue: string) => {
                       //console.log(JSON.stringify(item));
-                      if (item) {
+                      if (itemValue) {
                         setAutoIcon(farCircle);
                         setListIcon(faDotCircle);
                         setCustomIcon(farCircle);
                         setSelectServer(SelectServerEnum.list);
-                        setListServerUri(item);
+                        setListServerUri(itemValue);
                         // avoiding obsolete ones
-                        const cnItem = serverUris(translate)
-                          .filter((s: ServerUrisType) => !s.obsolete)
-                          .find((s: ServerUrisType) => s.uri === item);
+                        const cnItem = serverUris(translate).find(
+                          (s: ServerUrisType) => s.uri === itemValue && !s.obsolete,
+                        );
                         if (cnItem) {
                           setListServerChainName(cnItem.chain_name);
                         } else {

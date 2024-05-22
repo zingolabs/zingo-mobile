@@ -138,13 +138,13 @@ describe('Component History - test', () => {
         {
           address: '',
           amount: 0.77654321,
-          pool: PoolEnum.OrchardPool,
+          pool_type: PoolEnum.OrchardPool,
           memos: ['hola', '  & ', 'hello'],
         },
         {
           address: '',
           amount: 0.1,
-          pool: PoolEnum.SaplingPool,
+          pool_type: PoolEnum.SaplingPool,
           memos: ['hello', '  & ', 'hola'],
         },
       ],

@@ -113,7 +113,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     transactions,
     wallet,
     restartApp,
-    someUnconfirmed,
+    somePending,
     security,
     language,
     shieldingAmount,
@@ -234,21 +234,21 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         console.log(proposeFee, proposeAmount);
       })();
     }
-  }, [readOnly, setShieldingAmount, totalBalance.transparentBal, someUnconfirmed]);
+  }, [readOnly, setShieldingAmount, totalBalance.transparentBal, somePending]);
 
   useEffect(() => {
-    setShowShieldButton(!readOnly && (someUnconfirmed ? 0 : shieldingAmount) > 0);
+    setShowShieldButton(!readOnly && (somePending ? 0 : shieldingAmount) > 0);
 
-    //if ((someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 && totalBalance.spendablePrivate > 0) {
+    //if ((somePending ? 0 : totalBalance.transparentBal) > 0 && totalBalance.spendablePrivate > 0) {
     //  setPoolsToShield(PoolToShieldEnum.allPoolToShield);
-    //} else if ((someUnconfirmed ? 0 : totalBalance.transparentBal) > 0) {
+    //} else if ((somePending ? 0 : totalBalance.transparentBal) > 0) {
     //  setPoolsToShield(PoolToShieldEnum.transparentPoolToShield);
     //} else if (totalBalance.spendablePrivate > 0) {
     //  setPoolsToShield(PoolToShieldEnum.saplingPoolToShield);
     //} else {
     //  setPoolsToShield(PoolToShieldEnum.noPoolToShield);
     //}
-  }, [readOnly, shieldingAmount, someUnconfirmed]);
+  }, [readOnly, shieldingAmount, somePending]);
 
   /*
   useEffect(() => {
@@ -386,21 +386,21 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     //return poolsToShield === PoolToShieldEnum.saplingPoolToShield && totalBalance.spendablePrivate > shieldingFee
     //  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - shieldingFee, 8)
     //  : poolsToShield === PoolToShieldEnum.transparentPoolToShield &&
-    //    (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
-    //  ? Utils.parseNumberFloatToStringLocale((someUnconfirmed ? 0 : totalBalance.transparentBal) - shieldingFee, 8)
+    //    (somePending ? 0 : totalBalance.transparentBal) > shieldingFee
+    //  ? Utils.parseNumberFloatToStringLocale((somePending ? 0 : totalBalance.transparentBal) - shieldingFee, 8)
     //  : poolsToShieldSelectSapling &&
     //    poolsToShieldSelectTransparent &&
-    //    totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
+    //    totalBalance.spendablePrivate + (somePending ? 0 : totalBalance.transparentBal) > shieldingFee
     //  ? Utils.parseNumberFloatToStringLocale(
-    //      totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) - shieldingFee,
+    //      totalBalance.spendablePrivate + (somePending ? 0 : totalBalance.transparentBal) - shieldingFee,
     //      8,
     //    )
     //  : poolsToShieldSelectSapling && totalBalance.spendablePrivate > shieldingFee
     //  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - shieldingFee, 8)
-    //  : poolsToShieldSelectTransparent && (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
-    //  ? Utils.parseNumberFloatToStringLocale((someUnconfirmed ? 0 : totalBalance.transparentBal) - shieldingFee, 8)
+    //  : poolsToShieldSelectTransparent && (somePending ? 0 : totalBalance.transparentBal) > shieldingFee
+    //  ? Utils.parseNumberFloatToStringLocale((somePending ? 0 : totalBalance.transparentBal) - shieldingFee, 8)
     //  : '0';
-    return Utils.parseNumberFloatToStringLocale(someUnconfirmed ? 0 : shieldingAmount, 8);
+    return Utils.parseNumberFloatToStringLocale(somePending ? 0 : shieldingAmount, 8);
   };
 
   const calculatePoolsToShield = (): string => {
@@ -420,18 +420,18 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     //return poolsToShield === PoolToShieldEnum.saplingPoolToShield && totalBalance.spendablePrivate > shieldingFee
     //  ? false
     //  : poolsToShield === PoolToShieldEnum.transparentPoolToShield &&
-    //    (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
+    //    (somePending ? 0 : totalBalance.transparentBal) > shieldingFee
     //  ? false
     //  : poolsToShieldSelectSapling &&
     //    poolsToShieldSelectTransparent &&
-    //    totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
+    //    totalBalance.spendablePrivate + (somePending ? 0 : totalBalance.transparentBal) > shieldingFee
     //  ? false
     //  : poolsToShieldSelectSapling && totalBalance.spendablePrivate > shieldingFee
     //  ? false
-    //  : poolsToShieldSelectTransparent && (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
+    //  : poolsToShieldSelectTransparent && (somePending ? 0 : totalBalance.transparentBal) > shieldingFee
     //  ? false
     //  : true;
-    return (someUnconfirmed ? 0 : shieldingAmount) <= shieldingFee;
+    return (somePending ? 0 : shieldingAmount) <= shieldingFee;
   };
 
   const onPressShieldFunds = () => {

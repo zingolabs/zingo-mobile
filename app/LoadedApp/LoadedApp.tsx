@@ -713,8 +713,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
     if (deepDiff(this.state.transactions, transactions)) {
       //console.log('fetch transactions');
-      // set someUnconfirmed as well here when I know there is something new in transactions
-      const unconfirmed: number =
+      // set somePending as well here when I know there is something new in transactions
+      const pending: number =
         transactions.length > 0 ? transactions.filter((tx: TransactionType) => tx.confirmations === 0).length : 0;
       // if a transaction go from 0 confirmations to > 0 -> Show a message about a transaction is confirmed
       this.state.transactions.length > 0 &&
@@ -774,7 +774,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               });
             }
           });
-      this.setState({ transactions, someUnconfirmed: unconfirmed > 0 });
+      this.setState({ transactions, somePending: pending > 0 });
     }
   };
 

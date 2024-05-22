@@ -20,8 +20,8 @@ import RNPickerSelect from 'react-native-picker-select';
 import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
 import RegText from '../Components/RegText';
-//import ZecAmount from '../Components/ZecAmount';
-//import CurrencyAmount from '../Components/CurrencyAmount';
+import ZecAmount from '../Components/ZecAmount';
+import CurrencyAmount from '../Components/CurrencyAmount';
 import Button from '../Components/Button';
 import {
   AddressBookFileClass,
@@ -31,7 +31,7 @@ import {
   SendProgressClass,
   ToAddrClass,
   ModeEnum,
-  //CurrencyEnum,
+  CurrencyEnum,
   ChainNameEnum,
   ButtonTypeEnum,
   GlobalConst,
@@ -94,19 +94,19 @@ const Send: React.FunctionComponent<SendProps> = ({
   const context = useContext(ContextAppLoaded);
   const {
     translate,
-    //info,
+    info,
     totalBalance,
     sendPageState,
     navigation,
     zecPrice,
     //sendAll,
     netInfo,
-    //privacy,
+    privacy,
     server,
     setBackgroundError,
     addLastSnackbar,
     mode,
-    someUnconfirmed,
+    somePending,
     addressBook,
     language,
     donation,
@@ -137,7 +137,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [updatingToField, setUpdatingToField] = useState<boolean>(false);
   const [sendToSelf, setSendToSelf] = useState<boolean>(false);
   const [donationAddress, setDonationAddress] = useState<boolean>(false);
-  //const [negativeMaxAount, setNegativeMaxAount] = useState<boolean>(false);
+  const [negativeMaxAount, setNegativeMaxAount] = useState<boolean>(false);
   //const [sendAllClick, setSendAllClick] = useState<boolean>(false);
   const [proposeSendLastError, setProposeSendLastError] = useState<string>('');
   const isFocused = useIsFocused();
@@ -177,14 +177,17 @@ const Send: React.FunctionComponent<SendProps> = ({
     // if no address -> make no sense to run the propose
     if (!address || validAddress !== 1) {
       setFee(0);
+      setProposeSendLastError('');
       return;
     }
     if (amount === '' || validAmount !== 1) {
       setFee(0);
+      setProposeSendLastError('');
       return;
     }
     if (validMemo === -1) {
       setFee(0);
+      setProposeSendLastError('');
       return;
     }
     const sendPageStateCalculateFee = new SendPageStateClass(new ToAddrClass(0));
@@ -322,6 +325,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     if (validAddress === 0 && validAmount === 0) {
       setFee(0);
+      setProposeSendLastError('');
     } else if (validAddress !== -1 && validAmount !== -1) {
       calculateFeeWithPropose(
         sendPageState.toaddr.amount,
@@ -343,18 +347,24 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     // transparent is not spendable.
     const spend = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-    const max = spend - fee - (donation ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) : 0);
+    //const max = spend - fee - (donation ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) : 0);
+    // removing the fee in this calculation, for now.
+    const max =
+      spend -
+      (donation && !sendToSelf && !donationAddress
+        ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+        : 0);
     if (max >= 0) {
       // if max is 0 then the user can send a memo with amount 0.
       setMaxAmount(max);
-      //setNegativeMaxAount(false);
+      setNegativeMaxAount(false);
       //if (sendAllClick) {
       //  updateToField(null, Utils.parseNumberFloatToStringLocale(max, 8), null, null, null);
       //}
     } else {
       // if max is less than 0 then the user CANNOT send anything.
       setMaxAmount(0);
-      //setNegativeMaxAount(true);
+      setNegativeMaxAount(true);
       //if (sendAllClick) {
       //  updateToField(null, '0', null, null, null);
       //}
@@ -365,19 +375,20 @@ const Send: React.FunctionComponent<SendProps> = ({
     const stillConf =
       totalBalance.orchardBal !== totalBalance.spendableOrchard ||
       totalBalance.privateBal !== totalBalance.spendablePrivate ||
-      someUnconfirmed;
-    const showShield = (someUnconfirmed ? 0 : shieldingAmount) > 0;
+      somePending;
+    const showShield = (somePending ? 0 : shieldingAmount) > 0;
     //const showUpgrade =
-    //  (someUnconfirmed ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
+    //  (somePending ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
     setStillConfirming(stillConf);
     setShowShieldInfo(showShield);
     //setShowUpgradeInfo(showUpgrade);
     setShowUpgradeInfo(false);
   }, [
     donation,
-    fee,
+    sendToSelf,
+    donationAddress,
     shieldingAmount,
-    someUnconfirmed,
+    somePending,
     totalBalance.orchardBal,
     totalBalance.privateBal,
     totalBalance.spendableOrchard,
@@ -486,6 +497,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         invalid = true;
       }
     }
+    console.log('spendable', spendable, 'maxAmount', maxAmount, 'Amount', to.amount);
     if (!invalid) {
       if (to.amount !== '') {
         if (isNaN(Utils.parseStringLocaleToNumberFloat(to.amount))) {
@@ -493,8 +505,11 @@ const Send: React.FunctionComponent<SendProps> = ({
         } else {
           if (
             Utils.parseStringLocaleToNumberFloat(spendable.toFixed(8)) >=
-              Utils.parseStringLocaleToNumberFloat(fee.toFixed(8)) +
-                (donation ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) : 0) &&
+              // avoiding to use the fee in calculations, for now.
+              //Utils.parseStringLocaleToNumberFloat(fee.toFixed(8)) +
+              (donation && !sendToSelf && !donationAddress
+                ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+                : 0) &&
             Utils.parseStringLocaleToNumberFloat(to.amount) >= 0 &&
             Utils.parseStringLocaleToNumberFloat(to.amount) <=
               Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
@@ -510,6 +525,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   }, [
     donation,
+    sendToSelf,
+    donationAddress,
     decimalSeparator,
     server.chain_name,
     netInfo.isConnected,
@@ -1057,7 +1074,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     </View>
 
                     <View style={{ display: 'flex', flexDirection: 'column' }}>
-                      {/*<View
+                      <View
                         style={{
                           display: 'flex',
                           flexDirection: 'row',
@@ -1073,8 +1090,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                           amtZec={maxAmount}
                           privacy={privacy}
                         />
-                      </View>*/}
-                      {(donation || (validAddress !== 0 && validAmount !== 0)) && (
+                      </View>
+                      {((donation && !sendToSelf && !donationAddress) || (validAddress !== 0 && validAmount !== 0)) && (
                         <View
                           style={{
                             display: 'flex',
@@ -1232,7 +1249,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         </View>
                       </View>
 
-                      {/*<View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                      <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <RegText style={{ marginTop: 11, fontSize: 12.5 }}>
                             {translate('send.spendable') as string}
@@ -1248,7 +1265,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         <View style={{ marginLeft: 5 }}>
                           <PriceFetcher setZecPrice={setZecPrice} />
                         </View>
-                      </View>*/}
+                      </View>
                     </View>
                   )}
                 </View>
@@ -1464,6 +1481,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 title={translate('send.clear') as string}
                 onPress={() => {
                   setFee(0);
+                  setProposeSendLastError('');
                   clearToAddr();
                 }}
               />

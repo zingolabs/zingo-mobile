@@ -35,7 +35,7 @@ export default interface AppStateLoaded {
   appState: AppStateStatus;
   netInfo: NetInfoType;
 
-  // The total confirmed and unconfirmed balance in this wallet
+  // The total confirmed and pending balance in this wallet
   totalBalance: TotalBalanceClass;
 
   // A map type that contains address -> privatekey mapping, for display on the receive page
@@ -128,7 +128,7 @@ export default interface AppStateLoaded {
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
   restartApp: (s: any) => void;
-  someUnconfirmed: boolean;
+  somePending: boolean;
 
   addressBook: AddressBookFileClass[];
   launchAddressBook: (add: string, close: () => void, open: () => void) => void;

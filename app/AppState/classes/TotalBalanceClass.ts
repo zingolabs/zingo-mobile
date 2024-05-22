@@ -2,10 +2,10 @@ export default class TotalBalanceClass {
   // Total t address, confirmed and spendable
   transparentBal: number;
 
-  // Total private, confirmed + unconfirmed
+  // Total private, confirmed + pending
   privateBal: number;
 
-  // Total orchard, confirmed + unconfirmed
+  // Total orchard, confirmed + pending
   orchardBal: number;
 
   // Total private, confirmed funds that are spendable
@@ -14,7 +14,7 @@ export default class TotalBalanceClass {
   // Total orchard, confirmed funds that are spendable
   spendableOrchard: number;
 
-  // Total unconfirmed + spendable
+  // Total pending + spendable
   total: number;
 
   constructor() {

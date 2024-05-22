@@ -223,7 +223,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
             }
             return (
               <View
-                key={txd.address + txd.pool}
+                key={txd.address + txd.pool_type}
                 style={{
                   display: 'flex',
                   marginTop: tx.txDetails.length > 1 ? 10 : 0,
@@ -245,10 +245,10 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                   </View>
                 )}
 
-                {!!txd.pool && (
+                {!!txd.pool_type && (
                   <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
                     <FadeText>{translate('history.pool') as string}</FadeText>
-                    <RegText>{txd.pool}</RegText>
+                    <RegText>{txd.pool_type}</RegText>
                   </View>
                 )}
 

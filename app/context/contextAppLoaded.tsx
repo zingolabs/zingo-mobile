@@ -98,7 +98,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
   restartApp: () => {},
-  someUnconfirmed: false,
+  somePending: false,
   addressBook: [] as AddressBookFileClass[],
   launchAddressBook: () => {},
   addressBookCurrentAddress: '',

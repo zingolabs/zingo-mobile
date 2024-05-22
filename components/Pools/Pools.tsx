@@ -27,7 +27,7 @@ type PoolsProps = {
 
 const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate, privacy, addLastSnackbar, someUnconfirmed, language } = context;
+  const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -151,7 +151,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
             </DetailLine>
           </View>
 
-          {someUnconfirmed && (
+          {somePending && (
             <View
               style={{
                 display: 'flex',

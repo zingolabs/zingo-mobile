@@ -420,11 +420,11 @@ export default class RPC {
     // First, group by pool.
     const m = new Map<PoolEnum, TxDetailType[]>();
     txdetails
-      .filter(i => i.pool !== undefined)
+      .filter(i => i.pool_type !== undefined)
       .forEach(i => {
-        const coll = m.get(i.pool as PoolEnum);
+        const coll = m.get(i.pool_type as PoolEnum);
         if (!coll) {
-          m.set(i.pool as PoolEnum, [i]);
+          m.set(i.pool_type as PoolEnum, [i]);
         } else {
           coll.push(i);
         }
@@ -432,7 +432,7 @@ export default class RPC {
 
     // Reduce the groups to a single TxDetail, combining memos and summing amounts
     const reducedDetailedTxns: TxDetailType[] = [];
-    m.forEach((txns, pool) => {
+    m.forEach((txns, pool_type) => {
       const totalAmount = txns.reduce((sum, i) => sum + i.amount, 0);
 
       const memos = txns
@@ -456,7 +456,7 @@ export default class RPC {
         address: '',
         amount: totalAmount,
         memos: memos && memos.length > 0 ? [memos.join('')] : undefined,
-        pool: pool,
+        pool_type: pool_type,
       };
 
       reducedDetailedTxns.push(detail);
@@ -1216,7 +1216,7 @@ export default class RPC {
       let allAddresses: AddressClass[] = [];
 
       addressesJSON.forEach((u: RPCAddressType) => {
-        // If this has any unconfirmed txns, show that in the UI
+        // If this has any pending txns, show that in the UI
         const receivers: string =
           (u.receivers.orchard_exists ? ReceiverEnum.o : '') +
           (u.receivers.sapling ? ReceiverEnum.z : '') +
@@ -1314,7 +1314,7 @@ export default class RPC {
           if (!currentTxList[0].type && !!type) {
             currentTxList[0].type = type;
           }
-          if (tx.unconfirmed) {
+          if (tx.pending) {
             currentTxList[0].confirmations = 0;
           } else if (!currentTxList[0].confirmations) {
             currentTxList[0].confirmations = this.lastServerBlockHeight
@@ -1331,10 +1331,10 @@ export default class RPC {
             currentTxList[0].zec_price = tx.price;
           }
 
-          //if (tx.txid.startsWith('426e')) {
-          //console.log('tran: ', tx);
-          //console.log('--------------------------------------------------');
-          //}
+          if (tx.txid.startsWith('b3962e572c359b453f27921d9371fcd4e1b1f95b7879117439d0f931fc50600f')) {
+            console.log('tran: ', tx);
+            console.log('--------------------------------------------------');
+          }
 
           let currenttxdetails: TxDetailType = {} as TxDetailType;
           if (tx.kind === TransactionTypeEnum.Fee) {
@@ -1350,7 +1350,7 @@ export default class RPC {
             currenttxdetails.address = !tx.to_address || tx.to_address === 'None' ? '' : tx.to_address;
             currenttxdetails.amount = tx.amount / 10 ** 8;
             currenttxdetails.memos = !tx.memos ? undefined : tx.memos;
-            currenttxdetails.pool = !tx.pool || tx.pool === 'None' ? undefined : tx.pool;
+            currenttxdetails.pool_type = !tx.pool_type || tx.pool_type === 'None' ? undefined : tx.pool_type;
             currentTxList[0].txDetails.push(currenttxdetails);
           }
           //console.log(currentTxList[0]);

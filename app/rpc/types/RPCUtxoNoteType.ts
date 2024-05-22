@@ -8,5 +8,5 @@ export type RPCUtxoNoteType = {
   address: string;
   spent_at_height: number;
   spent: string;
-  unconfirmed_spent: string;
+  pending_spent: string;
 };
