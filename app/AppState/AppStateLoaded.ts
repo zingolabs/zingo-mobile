@@ -2,17 +2,17 @@ import { StackScreenProps } from '@react-navigation/stack';
 
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import AddressClass from './classes/AddressClass';
-import AddressBookClass from './classes/AddressBookClass';
 import ErrorModalDataClass from './classes/ErrorModalDataClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import SendProgressClass from './classes/SendProgressClass';
 import ReceivePageStateClass from './classes/ReceivePageStateClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
+import AddressBookFileClass from './classes/AddressBookFileClass';
+import SyncingStatusClass from './classes/SyncingStatusClass';
 
 import TransactionType from './types/TransactionType';
 import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
-import SyncingStatusClass from './classes/SyncingStatusClass';
 import ZecPriceType from './types/ZecPriceType';
 import BackgroundType from './types/BackgroundType';
 import { TranslateType } from './types/TranslateType';
@@ -20,11 +20,19 @@ import NetInfoType from './types/NetInfoType';
 import BackgroundErrorType from './types/BackgroundErrorType';
 import ServerType from './types/ServerType';
 import SnackbarType from './types/SnackbarType';
+import SecurityType from './types/SecurityType';
+
+import { MenuItemEnum } from './enums/MenuItemEnum';
+import { LanguageEnum } from './enums/LanguageEnum';
+import { CurrencyEnum } from './enums/CurrencyEnum';
+import { ModeEnum } from './enums/ModeEnum';
+import { SelectServerEnum } from './enums/SelectServerEnum';
+import { AppStateStatus } from 'react-native';
 
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  appState: string;
+  appState: AppStateStatus;
   netInfo: NetInfoType;
 
   // The total confirmed and unconfirmed balance in this wallet
@@ -37,9 +45,6 @@ export default interface AppStateLoaded {
   // List of all addresses in the wallet, including change addresses and addresses
   // that don't have any balance or are unused
   addresses: AddressClass[];
-
-  // List of Address / Label pairs
-  addressBook: AddressBookClass[];
 
   // List of all T and Z and O transactions
   transactions: TransactionType[];
@@ -70,7 +75,7 @@ export default interface AppStateLoaded {
 
   isMenuDrawerOpen: boolean;
 
-  selectedMenuDrawerItem: string;
+  selectedMenuDrawerItem: MenuItemEnum | null;
 
   aboutModalVisible: boolean;
 
@@ -95,17 +100,19 @@ export default interface AppStateLoaded {
   syncReportModalVisible: boolean;
   poolsModalVisible: boolean;
   insightModalVisible: boolean;
+  addressBookModalVisible: boolean;
 
   newServer: ServerType;
 
   uaAddress: string;
 
   server: ServerType;
-  language: 'en' | 'es';
-  currency: 'USD' | '';
+  language: LanguageEnum;
+  currency: CurrencyEnum;
 
   zecPrice: ZecPriceType;
   sendAll: boolean;
+  donation: boolean;
   background: BackgroundType;
 
   translate: (key: string) => TranslateType;
@@ -117,11 +124,19 @@ export default interface AppStateLoaded {
   poolsToShieldSelectSapling: boolean;
   poolsToShieldSelectTransparent: boolean;
 
-  mode: 'basic' | 'advanced';
+  mode: ModeEnum;
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
   restartApp: (s: any) => void;
   someUnconfirmed: boolean;
+
+  addressBook: AddressBookFileClass[];
+  launchAddressBook: (add: string, close: () => void, open: () => void) => void;
+  addressBookCurrentAddress: string;
+  addressBookOpenPriorModal: () => void;
+  security: SecurityType;
+  selectServer: SelectServerEnum;
+  rescanMenuOption: boolean;
 
   // eslint-disable-next-line semi
 }

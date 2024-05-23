@@ -87,6 +87,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
                 "fontWeight": "600",
                 "marginHorizontal": 5,
                 "minHeight": 100,
+                "textAlignVertical": "top",
               }
             }
             value=""
@@ -124,7 +125,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
                 "prefix": "fas",
               }
             }
-            size={48}
+            size={35}
           />
         </View>
       </View>

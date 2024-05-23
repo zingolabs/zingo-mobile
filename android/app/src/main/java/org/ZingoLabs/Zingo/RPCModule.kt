@@ -3,7 +3,6 @@ package org.ZingoLabs.Zingo
 import android.content.Context
 import android.util.Log
 import android.util.Base64
-import androidx.work.PeriodicWorkRequest
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
@@ -12,28 +11,43 @@ import com.facebook.react.bridge.Promise
 //import android.util.Log
 import java.io.File
 import java.io.InputStream
-import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 
 class RPCModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-    //companion object {
-    //    const val TAG = "RPCModule"
-    //}
-
+    private val walletFileName = "wallet.dat"
+    private val walletBackupFileName = "wallet.backup.dat"
+    private val backgroundFileName = "background.json"
+    private val errorPrefix = "error"
     override fun getName(): String {
         return "RPCModule"
+    }
+
+    private fun getFile(file: String): File {
+        return File(MainApplication.getAppContext()?.filesDir, file)
+    }
+
+    fun wallet_exists(): Boolean {
+        // Check if a wallet already exists
+        val file = getFile(walletFileName)
+        return if (file.exists()) {
+            Log.i("SCHEDULED_TASK_RUN", "Wallet exists")
+            true
+        } else {
+            Log.i("SCHEDULED_TASK_RUN", "Wallet DOES NOT exist")
+            false
+        }
     }
 
     @ReactMethod
     fun walletExists(promise: Promise) {
         // Check if a wallet already exists
-        val file = File(MainApplication.getAppContext()?.filesDir, "wallet.dat")
+        val file = getFile(walletFileName)
         if (file.exists()) {
-             // Log.w("MAIN", "Wallet exists")
+             // Log.i("MAIN", "Wallet exists")
             promise.resolve(true)
         } else {
-             // Log.w("MAIN", "Wallet DOES NOT exist")
+             // Log.i("MAIN", "Wallet DOES NOT exist")
             promise.resolve(false)
         }
     }
@@ -41,28 +55,86 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     @ReactMethod
     fun walletBackupExists(promise: Promise) {
         // Check if a wallet backup already exists
-        val file = File(MainApplication.getAppContext()?.filesDir, "wallet.backup.dat")
+        val file = getFile(walletBackupFileName)
         if (file.exists()) {
-            // Log.w("MAIN", "Wallet backup exists")
+            // Log.i("MAIN", "Wallet backup exists")
             promise.resolve(true)
         } else {
-            // Log.w("MAIN", "Wallet backup DOES NOT exist")
+            // Log.i("MAIN", "Wallet backup DOES NOT exist")
             promise.resolve(false)
+        }
+    }
+
+    fun saveWalletFile() {
+        // Get the encoded wallet file
+        val b64encoded = uniffi.zingo.saveToB64()
+        if (b64encoded.lowercase().startsWith("error")) {
+            // with error don't save the file. Obviously.
+            Log.e("MAIN", "Couldn't save the wallet. $b64encoded")
+            return
+        }
+        // Log.i("MAIN", b64encoded)
+
+        try {
+            val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
+            Log.i("MAIN", "file size: ${fileBytes.size} bytes")
+
+            // Save file to disk
+            val file = MainApplication.getAppContext()?.openFileOutput(walletFileName, Context.MODE_PRIVATE)
+            file?.write(fileBytes)
+            file?.close()
+        } catch (e: IllegalArgumentException) {
+            Log.e("MAIN", "Couldn't save the wallet")
+        }
+    }
+
+    private fun saveWalletBackupFile() {
+        // Get the encoded wallet file
+        // Read the file
+        val fileRead = MainApplication.getAppContext()!!.openFileInput(walletFileName)
+        val fileBytes = fileRead.readBytes()
+        // Log.i("MAIN", b64encoded)
+
+        try {
+            // Log.i("MAIN", "file size${fileBytes.size}")
+
+            // Save file to disk
+            val file = MainApplication.getAppContext()?.openFileOutput(walletBackupFileName, Context.MODE_PRIVATE)
+            file?.write(fileBytes)
+            file?.close()
+        } catch (e: IllegalArgumentException) {
+            Log.e("MAIN", "Couldn't save the wallet backup")
+        }
+    }
+
+    fun saveBackgroundFile(json: String) {
+        // Log.i("MAIN", b64encoded)
+
+        try {
+            val fileBytes: ByteArray = json.toByteArray()
+            Log.i("MAIN", "file background size: ${fileBytes.size} bytes")
+
+            // Save file to disk
+            val file = MainApplication.getAppContext()?.openFileOutput(backgroundFileName, Context.MODE_PRIVATE)
+            file?.write(fileBytes)
+            file?.close()
+        } catch (e: IllegalArgumentException) {
+            Log.e("MAIN", "Couldn't save the background file")
         }
     }
 
     @ReactMethod
     fun createNewWallet(server: String, chainhint: String, promise: Promise) {
-        // Log.w("MAIN", "Creating new wallet")
+        // Log.i("MAIN", "Creating new wallet")
 
-        RustFFI.initlogging()
+        uniffi.zingo.initLogging()
 
         // Create a seed
-        val seed = RustFFI.initnew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
-        // Log.w("MAIN-Seed", seed)
+        val seed = uniffi.zingo.initNew(server, reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
+        // Log.i("MAIN-Seed", seed)
 
-        if (!seed.startsWith("Error")) {
-            saveWallet()
+        if (!seed.lowercase().startsWith(errorPrefix)) {
+            saveWalletFile()
         }
 
         promise.resolve(seed)
@@ -70,15 +142,15 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun restoreWalletFromSeed(seed: String, birthday: String, server: String, chainhint: String, promise: Promise) {
-        // Log.w("MAIN", "Restoring wallet with seed $seed")
+        // Log.i("MAIN", "Restoring wallet with seed $seed")
 
-        RustFFI.initlogging()
+        uniffi.zingo.initLogging()
 
-        val rseed = RustFFI.initfromseed(server, seed, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
-        // Log.w("MAIN", rseed)
+        val rseed = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
+        // Log.i("MAIN", rseed)
 
-        if (!rseed.startsWith("Error")) {
-            saveWallet()
+        if (!rseed.lowercase().startsWith(errorPrefix)) {
+            saveWalletFile()
         }
 
         promise.resolve(rseed)
@@ -86,15 +158,15 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, chainhint: String, promise: Promise) {
-        // Log.w("MAIN", "Restoring wallet with ufvk $ufvk")
+        // Log.i("MAIN", "Restoring wallet with ufvk $ufvk")
 
-        RustFFI.initlogging()
+        uniffi.zingo.initLogging()
 
-        val rufvk = RustFFI.initfromufvk(server, ufvk, birthday, reactContext.applicationContext.filesDir.absolutePath, chainhint, "true")
-        // Log.w("MAIN", rufvk)
+        val rufvk = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
+        // Log.i("MAIN", rufvk)
 
-        if (!rufvk.startsWith("Error")) {
-            saveWallet()
+        if (!rufvk.lowercase().startsWith(errorPrefix)) {
+            saveWalletFile()
         }
 
         promise.resolve(rufvk)
@@ -102,13 +174,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun loadExistingWallet(server: String, chainhint: String, promise: Promise) {
+        promise.resolve(loadExistingWalletNative(server, chainhint))
+    }
+
+    fun loadExistingWalletNative(server: String, chainhint: String): String {
         // Read the file
-        val file: InputStream = MainApplication.getAppContext()?.openFileInput("wallet.dat")!!
-        var fileBytes = file.readBytes()
+        val file: InputStream = MainApplication.getAppContext()?.openFileInput(walletFileName)!!
+        val fileBytes = file.readBytes()
         file.close()
 
-        val middle0w =        0
-        val middle1w =  6000000 // 6_000_000 - 8 pieces
+        val middle0w = 0
+        val middle1w = 6000000 // 6_000_000 - 8 pieces
         val middle2w = 12000000
         val middle3w = 18000000
         val middle4w = 24000000
@@ -119,34 +195,139 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         var fileb64 = StringBuilder("")
         if (middle8w <= middle1w) {
-            fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle0w, middle8w - middle0w, Base64.NO_WRAP))
+            fileb64 = fileb64.append(
+                Base64.encodeToString(
+                    fileBytes,
+                    middle0w,
+                    middle8w - middle0w,
+                    Base64.NO_WRAP
+                )
+            )
         } else {
-            fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle0w, middle1w - middle0w, Base64.NO_WRAP))
+            fileb64 = fileb64.append(
+                Base64.encodeToString(
+                    fileBytes,
+                    middle0w,
+                    middle1w - middle0w,
+                    Base64.NO_WRAP
+                )
+            )
             if (middle8w <= middle2w) {
-                fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle1w, middle8w - middle1w, Base64.NO_WRAP))
+                fileb64 = fileb64.append(
+                    Base64.encodeToString(
+                        fileBytes,
+                        middle1w,
+                        middle8w - middle1w,
+                        Base64.NO_WRAP
+                    )
+                )
             } else {
-                fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle1w, middle2w - middle1w, Base64.NO_WRAP))
+                fileb64 = fileb64.append(
+                    Base64.encodeToString(
+                        fileBytes,
+                        middle1w,
+                        middle2w - middle1w,
+                        Base64.NO_WRAP
+                    )
+                )
                 if (middle8w <= middle3w) {
-                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle2w, middle8w - middle2w, Base64.NO_WRAP))
+                    fileb64 = fileb64.append(
+                        Base64.encodeToString(
+                            fileBytes,
+                            middle2w,
+                            middle8w - middle2w,
+                            Base64.NO_WRAP
+                        )
+                    )
                 } else {
-                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle2w, middle3w - middle2w, Base64.NO_WRAP))
+                    fileb64 = fileb64.append(
+                        Base64.encodeToString(
+                            fileBytes,
+                            middle2w,
+                            middle3w - middle2w,
+                            Base64.NO_WRAP
+                        )
+                    )
                     if (middle8w <= middle4w) {
-                        fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle3w, middle8w - middle3w, Base64.NO_WRAP))
+                        fileb64 = fileb64.append(
+                            Base64.encodeToString(
+                                fileBytes,
+                                middle3w,
+                                middle8w - middle3w,
+                                Base64.NO_WRAP
+                            )
+                        )
                     } else {
-                        fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle3w, middle4w - middle3w, Base64.NO_WRAP))
+                        fileb64 = fileb64.append(
+                            Base64.encodeToString(
+                                fileBytes,
+                                middle3w,
+                                middle4w - middle3w,
+                                Base64.NO_WRAP
+                            )
+                        )
                         if (middle8w <= middle5w) {
-                            fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle4w, middle8w - middle4w, Base64.NO_WRAP))
+                            fileb64 = fileb64.append(
+                                Base64.encodeToString(
+                                    fileBytes,
+                                    middle4w,
+                                    middle8w - middle4w,
+                                    Base64.NO_WRAP
+                                )
+                            )
                         } else {
-                            fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle4w, middle5w - middle4w, Base64.NO_WRAP))
+                            fileb64 = fileb64.append(
+                                Base64.encodeToString(
+                                    fileBytes,
+                                    middle4w,
+                                    middle5w - middle4w,
+                                    Base64.NO_WRAP
+                                )
+                            )
                             if (middle8w <= middle6w) {
-                                fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle5w, middle8w - middle5w, Base64.NO_WRAP))
+                                fileb64 = fileb64.append(
+                                    Base64.encodeToString(
+                                        fileBytes,
+                                        middle5w,
+                                        middle8w - middle5w,
+                                        Base64.NO_WRAP
+                                    )
+                                )
                             } else {
-                                fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle5w, middle6w - middle5w, Base64.NO_WRAP))
+                                fileb64 = fileb64.append(
+                                    Base64.encodeToString(
+                                        fileBytes,
+                                        middle5w,
+                                        middle6w - middle5w,
+                                        Base64.NO_WRAP
+                                    )
+                                )
                                 if (middle8w <= middle7w) {
-                                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle6w, middle8w - middle6w, Base64.NO_WRAP))
+                                    fileb64 = fileb64.append(
+                                        Base64.encodeToString(
+                                            fileBytes,
+                                            middle6w,
+                                            middle8w - middle6w,
+                                            Base64.NO_WRAP
+                                        )
+                                    )
                                 } else {
-                                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle6w, middle7w - middle6w, Base64.NO_WRAP))
-                                    fileb64 = fileb64.append(Base64.encodeToString(fileBytes, middle7w, middle8w - middle7w, Base64.NO_WRAP))
+                                    fileb64 = fileb64.append(
+                                        Base64.encodeToString(
+                                            fileBytes,
+                                            middle6w,
+                                            middle7w - middle6w,
+                                            Base64.NO_WRAP
+                                        )
+                                    )
+                                    fileb64 = fileb64.append(
+                                        Base64.encodeToString(
+                                            fileBytes,
+                                            middle7w,
+                                            middle8w - middle7w,
+                                            Base64.NO_WRAP
+                                        )
+                                    )
                                 }
                             }
                         }
@@ -155,30 +336,31 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             }
         }
 
-        RustFFI.initlogging()
+        uniffi.zingo.initLogging()
 
-        val wseed = RustFFI.initfromb64(server,
+        Log.i("MAIN", "file size: $middle8w")
+
+        return uniffi.zingo.initFromB64(
+            server,
             fileb64.toString(),
             reactContext.applicationContext.filesDir.absolutePath,
-            chainhint, "true")
-        // Log.w("MAIN", wseed)
-
-        promise.resolve(wseed)
+            chainhint, true
+        )
     }
 
     @ReactMethod
     fun restoreExistingWalletBackup(promise: Promise) {
         // Read the file backup
-        val fileBackup = MainApplication.getAppContext()!!.openFileInput("wallet.backup.dat")
+        val fileBackup = MainApplication.getAppContext()!!.openFileInput(walletBackupFileName)
         val fileBytesBackup = fileBackup.readBytes()
 
         // Read the file wallet
-        val fileWallet = MainApplication.getAppContext()!!.openFileInput("wallet.dat")
+        val fileWallet = MainApplication.getAppContext()!!.openFileInput(walletFileName)
         val fileBytesWallet = fileWallet.readBytes()
 
         try {
             // Save file to disk wallet (with the backup)
-            val fileWallet2 = MainApplication.getAppContext()?.openFileOutput("wallet.dat", Context.MODE_PRIVATE)
+            val fileWallet2 = MainApplication.getAppContext()?.openFileOutput(walletFileName, Context.MODE_PRIVATE)
             fileWallet2?.write(fileBytesBackup)
             fileWallet2?.close()
         } catch (e: IllegalArgumentException) {
@@ -187,7 +369,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         try {
             // Save file to disk backup (with the wallet)
-            val fileBackup2 = MainApplication.getAppContext()?.openFileOutput("wallet.backup.dat", Context.MODE_PRIVATE)
+            val fileBackup2 = MainApplication.getAppContext()?.openFileOutput(walletBackupFileName, Context.MODE_PRIVATE)
             fileBackup2?.write(fileBytesWallet)
             fileBackup2?.close()
         } catch (e: IllegalArgumentException) {
@@ -199,7 +381,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
-        val file = MainApplication.getAppContext()?.getFileStreamPath("wallet.dat")
+        val file = MainApplication.getAppContext()?.getFileStreamPath(walletFileName)
         if (file!!.delete()) {
             promise.resolve(true)
         } else {
@@ -209,7 +391,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun deleteExistingWalletBackup(promise: Promise) {
-        val file = MainApplication.getAppContext()?.getFileStreamPath("wallet.backup.dat")
+        val file = MainApplication.getAppContext()?.getFileStreamPath(walletBackupFileName)
         if (file!!.delete()) {
             promise.resolve(true)
         } else {
@@ -217,35 +399,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
-
-    @ReactMethod
-    fun doSend(sendJSON: String, promise: Promise) {
-        // Run on a new thread so as to not block the UI
-        thread {
-
-            RustFFI.initlogging()
-
-            // Log.w("send", "Trying to send $sendJSON")
-            val result = RustFFI.execute("send", sendJSON)
-            // Log.w("send", "Send Result: $result")
-
-            promise.resolve(result)
-        }
-    }
-
     @ReactMethod
     fun execute(cmd: String, args: String, promise: Promise) {
         thread {
 
-            RustFFI.initlogging()
+            uniffi.zingo.initLogging()
 
-            // Log.w("execute", "Executing $cmd with $args")
-            val resp = RustFFI.execute(cmd, args)
-            // Log.w("execute", "Response to $cmd : $resp")
+            // Log.i("execute", "Executing $cmd with $args")
+            val resp = uniffi.zingo.executeCommand(cmd, args)
+            // Log.i("execute", "Response to $cmd : $resp")
 
             // And save it if it was a sync
-            if (cmd == "sync" && !resp.startsWith("Error")) {
-                saveWallet()
+            if (cmd == "sync" && !resp.lowercase().startsWith(errorPrefix)) {
+                saveWalletFile()
             }
 
             promise.resolve(resp)
@@ -254,66 +420,38 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun doSave(promise: Promise) {
-        saveWallet()
+        saveWalletFile()
 
         promise.resolve(true)
     }
 
     @ReactMethod
     fun doSaveBackup(promise: Promise) {
-        saveWalletBackup()
+        saveWalletBackupFile()
 
         promise.resolve(true)
     }
 
-    private fun saveWallet() {
-        // Get the encoded wallet file
-        val b64encoded = RustFFI.save()
-        // Log.w("MAIN", b64encoded)
+    @ReactMethod
+    fun getLatestBlock(server: String, promise: Promise) {
+        // Log.i("MAIN", "Initialize Light Client")
 
-        try {
-            val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            Log.w("MAIN", "file size: ${fileBytes.size} bytes")
+        uniffi.zingo.initLogging()
 
-            // Save file to disk
-            val file = MainApplication.getAppContext()?.openFileOutput("wallet.dat", Context.MODE_PRIVATE)
-            file?.write(fileBytes)
-            file?.close()
-        } catch (e: IllegalArgumentException) {
-            Log.e("MAIN", "Couldn't save the wallet")
-        }
-    }
+        // Initialize Light Client
+        val resp = uniffi.zingo.getLatestBlockServer(server)
 
-    private fun saveWalletBackup() {
-        // Get the encoded wallet file
-        // val b64encoded = save()
-        // Read the file
-        val fileRead = MainApplication.getAppContext()!!.openFileInput("wallet.dat")
-        val fileBytes = fileRead.readBytes()
-        // val fileb64 = Base64.encodeToString(fileBytes, Base64.NO_WRAP)
-        // Log.w("MAIN", b64encoded)
-
-        try {
-            // val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            // Log.w("MAIN", "file size${fileBytes.size}")
-
-            // Save file to disk
-            val file = MainApplication.getAppContext()?.openFileOutput("wallet.backup.dat", Context.MODE_PRIVATE)
-            file?.write(fileBytes)
-            file?.close()
-        } catch (e: IllegalArgumentException) {
-            Log.e("MAIN", "Couldn't save the wallet backup")
-        }
+        promise.resolve(resp)
     }
 
     @ReactMethod
-    fun getLatestBlock(server: String, promise: Promise) {
-        // Log.w("MAIN", "Initialize Light Client")
+    fun getDonationAddress(promise: Promise) {
+        // Log.i("MAIN", "Initialize Light Client")
 
-        RustFFI.initlogging()
+        uniffi.zingo.initLogging()
 
         // Initialize Light Client
-        val resp = RustFFI.getlatestblock(server)
+        val resp = uniffi.zingo.getDeveloperDonationAddress()
 
         promise.resolve(resp)
     }

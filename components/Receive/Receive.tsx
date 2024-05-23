@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, ReactNode, useEffect } from 'react';
 import { Dimensions, View } from 'react-native';
-import { TabView, TabBar, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
+import { TabView, TabBar, SceneRendererProps, Route, NavigationState, TabBarItem } from 'react-native-tab-view';
 import { useTheme } from '@react-navigation/native';
 
 import SingleAddress from '../Components/SingleAddress';
@@ -10,12 +10,18 @@ import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import RegText from '../Components/RegText';
 import { Scene } from 'react-native-tab-view/lib/typescript/src/types';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
+import 'moment/locale/ru';
+
+import { AddressClass, AddressKindEnum, ModeEnum } from '../../app/AppState';
 
 type ReceiveProps = {
   setUaAddress: (uaAddress: string) => void;
   toggleMenuDrawer: () => void;
   syncingStatusMoreInfoOnClick: () => void;
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  set_privacy_option: (value: boolean) => Promise<void>;
   setUfvkViewModalVisible?: (v: boolean) => void;
 };
 
@@ -27,47 +33,51 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   setUfvkViewModalVisible,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addresses, uaAddress, mode, addLastSnackbar } = context;
+  const { translate, addresses, uaAddress, mode, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
-  const [index, setIndex] = useState(0);
+  moment.locale(language);
+
+  const [index, setIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
 
-  const [displayAddress, setDisplayAddress] = useState(uaAddress);
-  const [oindex, setOIndex] = useState(0);
-  const [zindex, setZIndex] = useState(0);
-  const [tindex, setTIndex] = useState(0);
-
-  const uaddrs = addresses.filter(a => a.addressKind === 'u') || [];
-  const zaddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 'z') || [];
-  const taddrs = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === 't') || [];
+  const [uindex, setUIndex] = useState<number>(0);
+  const [zindex, setZIndex] = useState<number>(0);
+  const [tindex, setTIndex] = useState<number>(0);
+  const [uaddrs, setUaddrs] = useState<AddressClass[]>([]);
+  const [zaddrs, setZaddrs] = useState<AddressClass[]>([]);
+  const [taddrs, setTaddrs] = useState<AddressClass[]>([]);
 
   const dimensions = {
     width: Dimensions.get('screen').width,
     height: Dimensions.get('screen').height,
   };
 
-  if (displayAddress) {
-    const displayAddressIndex = uaddrs.findIndex(a => a.address === displayAddress);
+  useEffect(() => {
+    if (addresses && addresses.length && uaAddress) {
+      const uadd = addresses.filter(a => a.addressKind === AddressKindEnum.u) || [];
+      const zadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === AddressKindEnum.z) || [];
+      const tadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === AddressKindEnum.t) || [];
+      setUaddrs(uadd);
+      setZaddrs(zadd);
+      setTaddrs(tadd);
 
-    if (oindex !== displayAddressIndex && displayAddressIndex >= 0) {
-      setOIndex(displayAddressIndex);
-      setUaAddress(displayAddress);
+      const uaAddressIndex = uadd.findIndex(a => a.address === uaAddress);
+      setUIndex(uaAddressIndex);
     }
-  }
+  }, [addresses, uaAddress]);
 
-  const prev = (type: string) => {
-    setDisplayAddress('');
-    if (type === 'u') {
+  const prev = (type: AddressKindEnum) => {
+    if (type === AddressKindEnum.u) {
       if (uaddrs.length === 0) {
         return;
       }
-      let newIndex = oindex - 1;
+      let newIndex = uindex - 1;
       if (newIndex < 0) {
         newIndex = uaddrs.length - 1;
       }
-      setOIndex(newIndex);
+      setUIndex(newIndex);
       setUaAddress(uaddrs[newIndex].address);
-    } else if (type === 'z') {
+    } else if (type === AddressKindEnum.z) {
       if (zaddrs.length === 0) {
         return;
       }
@@ -76,7 +86,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         newIndex = zaddrs.length - 1;
       }
       setZIndex(newIndex);
-    } else if (type === 't') {
+    } else if (type === AddressKindEnum.t) {
       if (taddrs.length === 0) {
         return;
       }
@@ -88,22 +98,21 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     }
   };
 
-  const next = (type: string) => {
-    setDisplayAddress('');
-    if (type === 'u') {
+  const next = (type: AddressKindEnum) => {
+    if (type === AddressKindEnum.u) {
       if (uaddrs.length === 0) {
         return;
       }
-      const newIndex = (oindex + 1) % uaddrs.length;
-      setOIndex(newIndex);
+      const newIndex = (uindex + 1) % uaddrs.length;
+      setUIndex(newIndex);
       setUaAddress(uaddrs[newIndex].address);
-    } else if (type === 'z') {
+    } else if (type === AddressKindEnum.z) {
       if (zaddrs.length === 0) {
         return;
       }
       const newIndex = (zindex + 1) % zaddrs.length;
       setZIndex(newIndex);
-    } else if (type === 't') {
+    } else if (type === AddressKindEnum.t) {
       if (taddrs.length === 0) {
         return;
       }
@@ -119,7 +128,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       { key: 'zaddr', title: translate('receive.z-title') as string },
       { key: 'taddr', title: translate('receive.t-title') as string },
     ];
-    setRoutes(mode === 'basic' ? basicModeRoutes : advancedModeRoutes);
+    setRoutes(mode === ModeEnum.basic ? basicModeRoutes : advancedModeRoutes);
   }, [mode, translate]);
 
   const renderScene: (
@@ -130,28 +139,22 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     switch (route.key) {
       case 'uaddr': {
         let uaddr = translate('receive.noaddress') as string;
-        let uaddrKind = '';
-        //let receivers = '';
         if (uaddrs.length > 0) {
-          uaddr = uaddrs[oindex].address;
-          uaddrKind = uaddrs[oindex].addressKind;
-          //receivers = uaddrs[oindex].receivers;
+          uaddr = uaddrs[uindex].address;
         }
 
         return (
-          mode &&
           !!addresses &&
           !!uaAddress && (
             <SingleAddress
               address={uaddr}
-              addressKind={uaddrKind}
-              index={oindex}
+              index={uindex}
               total={uaddrs.length}
               prev={() => {
-                prev('u');
+                prev(AddressKindEnum.u);
               }}
               next={() => {
-                next('u');
+                next(AddressKindEnum.u);
               }}
             />
           )
@@ -159,26 +162,22 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       }
       case 'zaddr': {
         let zaddr = translate('receive.noaddress') as string;
-        let zaddrKind = '';
         if (zaddrs.length > 0) {
           zaddr = zaddrs[zindex].address;
-          zaddrKind = zaddrs[zindex].addressKind;
         }
 
         return (
-          mode &&
           !!addresses &&
           !!uaAddress && (
             <SingleAddress
               address={zaddr}
-              addressKind={zaddrKind}
               index={zindex}
               total={zaddrs.length}
               prev={() => {
-                prev('z');
+                prev(AddressKindEnum.z);
               }}
               next={() => {
-                next('z');
+                next(AddressKindEnum.z);
               }}
             />
           )
@@ -186,26 +185,22 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       }
       case 'taddr': {
         let taddr = translate('receive.noaddress') as string;
-        let taddrKind = '';
         if (taddrs.length > 0) {
           taddr = taddrs[tindex].address;
-          taddrKind = taddrs[tindex].addressKind;
         }
 
         return (
-          mode &&
           !!addresses &&
           !!uaAddress && (
             <SingleAddress
               address={taddr}
-              addressKind={taddrKind}
               index={tindex}
               total={taddrs.length}
               prev={() => {
-                prev('t');
+                prev(AddressKindEnum.t);
               }}
               next={() => {
-                next('t');
+                next(AddressKindEnum.t);
               }}
             />
           )
@@ -220,11 +215,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       color: string;
     },
   ) => ReactNode = ({ route, focused, color }) => (
-    <View style={{ width: (dimensions.width - 20) / (mode === 'basic' ? 1 : 3), alignItems: 'center' }}>
+    <View style={{ width: (dimensions.width - 20) / (mode === ModeEnum.basic ? 1 : 3), alignItems: 'center' }}>
       <RegText
         style={{
-          fontWeight: mode === 'basic' ? 'normal' : focused ? 'bold' : 'normal',
-          fontSize: mode === 'basic' ? 14 : focused ? 15 : 14,
+          fontWeight: mode === ModeEnum.basic ? 'normal' : focused ? 'bold' : 'normal',
+          fontSize: mode === ModeEnum.basic ? 14 : focused ? 15 : 14,
           color: color,
         }}>
         {route.title ? route.title : ''}
@@ -270,6 +265,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           indicatorStyle={{ backgroundColor: colors.primary }}
           style={{ backgroundColor: colors.background }}
           renderLabel={renderLabelCustom}
+          renderTabBarItem={p => <TabBarItem {...p} key={p.route.key} />}
         />
       </View>
     );

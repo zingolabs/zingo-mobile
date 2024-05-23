@@ -7,6 +7,7 @@
 		<string>com.transistorsoft.fetch</string>
 		<string>Zingo_Refresh_Task_ID</string>
 		<string>Zingo_Processing_Task_ID</string>
+		<string>Zingo_Processing_Scheduler_Task_ID</string>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
@@ -90,5 +91,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Allow Zingo! to use FaceID to improve the security and privacy?</string>
 </dict>
 </plist>

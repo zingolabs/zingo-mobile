@@ -4,21 +4,24 @@ import { Text, View, TextStyle, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
 
-import Utils from '../../app/utils';
 import { ThemeType } from '../../app/types';
+import Utils from '../../app/utils';
+import { CurrencyEnum } from '../../app/AppState';
 
 type CurrencyAmountProps = {
   price?: number;
   amtZec?: number;
   style?: TextStyle;
-  currency: 'USD' | '';
+  currency: CurrencyEnum;
   privacy?: boolean;
 };
 
 const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({ price, style, amtZec, currency, privacy }) => {
   const [privacyHigh, setPrivacyHigh] = useState<boolean>(privacy || false);
+  const [currencyString, setCurrencyString] = useState<string>('');
   const { colors } = useTheme() as unknown as ThemeType;
   const { decimalSeparator } = getNumberFormatSettings();
+  const zeroString = '0';
 
   useEffect(() => {
     setPrivacyHigh(privacy || false);
@@ -30,24 +33,27 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({ price, s
     }
   }, [privacyHigh, privacy]);
 
-  var currencyString;
+  useEffect(() => {
+    var currencyStr;
 
-  if (typeof price === 'undefined' || typeof amtZec === 'undefined' || price <= 0) {
-    currencyString = '-' + decimalSeparator + '--';
-  } else {
-    const currencyAmount = price * amtZec;
-    currencyString = currencyAmount.toFixed(2);
-    if (currencyString === '0.00' && amtZec > 0) {
-      currencyString = '< 0.01';
+    if (typeof price === 'undefined' || typeof amtZec === 'undefined' || price <= 0) {
+      currencyStr = '-' + decimalSeparator + '--';
+    } else {
+      const currencyAmo = price * amtZec;
+      currencyStr = Utils.parseNumberFloatToStringLocale(currencyAmo, 2);
+      if (currencyStr === zeroString && amtZec > 0) {
+        currencyStr = '< 0' + decimalSeparator + '01';
+      }
     }
-  }
+    setCurrencyString(currencyStr);
+  }, [amtZec, decimalSeparator, price]);
 
   const onPress = () => {
     setPrivacyHigh(false);
     setTimeout(() => setPrivacyHigh(true), 5000);
   };
 
-  if (currency === 'USD') {
+  if (currency === CurrencyEnum.USDCurrency) {
     return (
       <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
         <TouchableOpacity disabled={!privacyHigh} onPress={onPress}>
@@ -59,7 +65,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({ price, s
               </Text>
             ) : (
               <Text style={{ color: colors.money, fontSize: 20, fontWeight: '700', ...style }}>
-                {' ' + Utils.toLocaleFloat(currencyString)}
+                {' ' + currencyString}
               </Text>
             )}
           </View>

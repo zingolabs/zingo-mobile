@@ -1,10 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView, TouchableOpacity, Modal, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { faQrcode } from '@fortawesome/free-solid-svg-icons';
+import { faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import Animated, { EasingNode } from 'react-native-reanimated';
+import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
@@ -15,6 +15,12 @@ import { ContextAppLoading } from '../../app/context';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import { RPCParseViewKeyType } from '../../app/rpc/types/RPCParseViewKeyType';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
+import 'moment/locale/ru';
+import { ButtonTypeEnum, CommandEnum, GlobalConst } from '../../app/AppState';
+import { RPCParseStatusEnum } from '../../app/rpc/enums/RPCParseStatusEnum';
 
 type ImportUfvkProps = {
   onClickCancel: () => void;
@@ -22,33 +28,24 @@ type ImportUfvkProps = {
 };
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, onClickOK }) => {
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, info, server, mode, addLastSnackbar } = context;
+  const { translate, netInfo, info, server, mode, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
 
-  const [ufvkText, setUfvkText] = useState('');
-  const [birthday, setBirthday] = useState('');
-  const [qrcodeModalVisible, setQrcodeModalVisible] = useState(false);
-  const [titleViewHeight, setTitleViewHeight] = useState(0);
-  const [latestBlock, setLatestBlock] = useState(0);
+  const [seedufvkText, setSeedufvkText] = useState<string>('');
+  const [birthday, setBirthday] = useState<string>('');
+  const [qrcodeModalVisible, setQrcodeModalVisible] = useState<boolean>(false);
+  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
+  const [latestBlock, setLatestBlock] = useState<number>(0);
 
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useSharedValue(0);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      Animated.timing(slideAnim, {
-        toValue: 0 - titleViewHeight + 25,
-        duration: 100,
-        easing: EasingNode.linear,
-        //useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0 - titleViewHeight + 25, { duration: 100, easing: Easing.linear });
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 100,
-        easing: EasingNode.linear,
-        //useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
     });
 
     return () => {
@@ -64,7 +61,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
       (async () => {
         const resp: string = await RPCModule.getLatestBlock(server.uri);
         //console.log(resp);
-        if (resp && !resp.toLowerCase().startsWith('error')) {
+        if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
           setLatestBlock(Number(resp));
         } else {
           //console.log('error latest block', resp);
@@ -75,47 +72,43 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
 
   const okButton = async () => {
     if (!netInfo.isConnected) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
-    //const valid = await validateKey(ufvkText);
-    //if (!valid) {
-    //  return;
-    //}
-    onClickOK(ufvkText.trim(), Number(birthday));
+    onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
   };
 
   // zingolib interfase have no way to initialize a `lightclient` with no action associated...
   // the validation of the ufvk will be when we try to `restore from ufvk'...
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const validateKey = async (scannedKey: string): Promise<boolean> => {
-    const result: string = await RPCModule.execute('parse_viewkey', scannedKey);
+    const result: string = await RPCModule.execute(CommandEnum.parse_viewkey, scannedKey);
     //console.log(result);
     if (result) {
-      if (result.toLowerCase().startsWith('error')) {
-        addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
+      if (result.toLowerCase().startsWith(GlobalConst.error)) {
+        addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
         return false;
       }
     } else {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
+      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
       return false;
     }
     let resultJSON = {} as RPCParseViewKeyType;
     try {
       resultJSON = await JSON.parse(result);
     } catch (e) {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
+      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
       return false;
     }
 
     //console.log('parse ufvk', scannedKey, resultJSON);
 
-    const valid = resultJSON.status === 'success' && resultJSON.chain_name === server.chain_name;
+    const valid = resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chain_name;
 
     if (valid) {
       return true;
     } else {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
+      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
       return false;
     }
   };
@@ -134,7 +127,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
         transparent={false}
         visible={qrcodeModalVisible}
         onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScannerUfvk setUfvkText={setUfvkText} closeModal={() => setQrcodeModalVisible(false)} />
+        <ScannerUfvk setUfvkText={setSeedufvkText} closeModal={() => setQrcodeModalVisible(false)} />
       </Modal>
 
       <Animated.View style={{ marginTop: slideAnim }}>
@@ -199,17 +192,26 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
                 minHeight: 100,
                 marginHorizontal: 5,
                 backgroundColor: 'transparent',
+                textAlignVertical: 'top',
               }}
-              value={ufvkText}
-              onChangeText={setUfvkText}
+              value={seedufvkText}
+              onChangeText={setSeedufvkText}
               editable={true}
             />
           </View>
+          {seedufvkText && (
+            <TouchableOpacity
+              onPress={() => {
+                setSeedufvkText('');
+              }}>
+              <FontAwesomeIcon style={{ margin: 0 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             onPress={() => {
               setQrcodeModalVisible(true);
             }}>
-            <FontAwesomeIcon size={48} icon={faQrcode} color={colors.border} />
+            <FontAwesomeIcon size={35} icon={faQrcode} color={colors.border} />
           </TouchableOpacity>
         </View>
 
@@ -271,9 +273,16 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Primary" title={translate('import.button') as string} onPress={okButton} />
         <Button
-          type="Secondary"
+          type={ButtonTypeEnum.Primary}
+          title={translate('import.button') as string}
+          onPress={() => {
+            Keyboard.dismiss();
+            okButton();
+          }}
+        />
+        <Button
+          type={ButtonTypeEnum.Secondary}
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}
           onPress={onClickCancel}

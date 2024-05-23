@@ -9,6 +9,8 @@ import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import RPC from '../../app/rpc';
 import RegText from './RegText';
+import { ThemeType } from '../../app/types';
+import { ModeEnum } from '../../app/AppState';
 
 type PriceFetcherProps = {
   setZecPrice?: (p: number, d: number) => void;
@@ -17,10 +19,12 @@ type PriceFetcherProps = {
 
 const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice, textBefore }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, addLastSnackbar, mode } = context;
-  const [refreshMinutes, setRefreshMinutes] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const { colors } = useTheme();
+  const { translate, zecPrice, addLastSnackbar, mode, language } = context;
+  const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
+  const [refreshMinutes, setRefreshMinutes] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fn = () => {
@@ -55,10 +59,10 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
       // -2  - error in RPCModule, likely.
       // > 0 - real value
       if (price === -1) {
-        addLastSnackbar({ message: translate('info.errorgemini') as string, type: 'Primary' });
+        addLastSnackbar({ message: translate('info.errorgemini') as string });
       }
       if (price === -2) {
-        addLastSnackbar({ message: translate('info.errorrpcmodule') as string, type: 'Primary' });
+        addLastSnackbar({ message: translate('info.errorrpcmodule') as string });
       }
       if (price <= 0) {
         setZecPrice(price, 0);
@@ -78,7 +82,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
         { text: translate('send.fetch-button') as string, onPress: () => onPressFetch() },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
-      { cancelable: true, userInterfaceStyle: 'light' },
+      { cancelable: false, userInterfaceStyle: 'light' },
     );
   };
 
@@ -102,7 +106,9 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
         </View>
       )}
       {!loading && (
-        <TouchableOpacity disabled={loading} onPress={() => (mode === 'basic' ? onPressFetch() : onPressFetchAlert())}>
+        <TouchableOpacity
+          disabled={loading}
+          onPress={() => (mode === ModeEnum.basic ? onPressFetch() : onPressFetchAlert())}>
           <View
             style={{
               flexDirection: 'row',

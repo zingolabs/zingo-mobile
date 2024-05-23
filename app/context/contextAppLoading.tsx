@@ -11,13 +11,20 @@ import {
   NetInfoType,
   BackgroundErrorType,
   ServerType,
+  SecurityType,
+  LanguageEnum,
+  ModeEnum,
+  CurrencyEnum,
+  SelectServerEnum,
+  ChainNameEnum,
+  SnackbarType,
+  AppStateStatusEnum,
 } from '../AppState';
-import SnackbarType from '../AppState/types/SnackbarType';
 
 export const defaultAppStateLoading: AppStateLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
-  appState: '',
+  appState: AppStateStatusEnum.unknown,
   netInfo: {} as NetInfoType,
 
   screen: 0,
@@ -28,17 +35,20 @@ export const defaultAppStateLoading: AppStateLoading = {
   info: {} as InfoType,
 
   server: {} as ServerType,
-  currency: '',
-  language: 'en',
+  currency: CurrencyEnum.noCurrency,
+  language: LanguageEnum.en,
 
   zecPrice: {
     zecPrice: 0,
     date: 0,
   } as ZecPriceType,
   sendAll: false,
+  donation: false,
   background: {
     batches: 0,
+    message: '',
     date: 0,
+    dateEnd: 0,
   } as BackgroundType,
 
   translate: () => '',
@@ -48,11 +58,18 @@ export const defaultAppStateLoading: AppStateLoading = {
   readOnly: false,
   customServerShow: false,
   customServerUri: '',
-  customServerChainName: 'main',
-  mode: 'basic',
+  customServerChainName: ChainNameEnum.mainChainName,
+  mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
   firstLaunchingMessage: false,
+  biometricsFailed: false,
+  startingApp: true,
+  security: {} as SecurityType,
+  selectServer: SelectServerEnum.auto,
+  serverErrorTries: 0,
+  donationAlert: false,
+  rescanMenuOption: false,
 };
 
 export const ContextAppLoading = React.createContext(defaultAppStateLoading);

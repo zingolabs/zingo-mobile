@@ -7,51 +7,40 @@ import { useTheme } from '@react-navigation/native';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
-import FadeText from './FadeText';
-//import Button from '../../Button';
-import Utils from '../../app/utils';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
+import AddressItem from './AddressItem';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
+import 'moment/locale/ru';
+import { SnackbarDurationEnum } from '../../app/AppState';
 
 type SingleAddressProps = {
   address: string;
-  addressKind: string;
   index: number;
   total: number;
   prev: () => void;
   next: () => void;
+  ufvk?: boolean;
 };
 
-const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
-  address,
-  addressKind,
-  index,
-  total,
-  prev,
-  next,
-}) => {
+const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, index, total, prev, next, ufvk }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, privacy, addLastSnackbar } = context;
-  //console.log(`Addresses ${addresses}: ${multipleAddresses}`);
+  const { translate, privacy, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
-  const [expandAddress, setExpandAddress] = useState(false);
-  const [expandQRAddress, setExpandQRAddress] = useState(false);
+  moment.locale(language);
+
+  const [expandQRAddress, setExpandQRAddress] = useState<boolean>(false);
+  const [multi, setMulti] = useState<boolean>(false);
 
   useEffect(() => {
     if (privacy) {
-      setExpandAddress(false);
       setExpandQRAddress(false);
     } else {
-      setExpandAddress(true);
       setExpandQRAddress(true);
     }
   }, [privacy]);
-
-  useEffect(() => {
-    if (!expandAddress && !privacy) {
-      setExpandAddress(true);
-    }
-  }, [expandAddress, privacy]);
 
   useEffect(() => {
     if (!expandQRAddress && !privacy) {
@@ -59,17 +48,18 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
     }
   }, [expandQRAddress, privacy]);
 
-  const multi = total > 1;
-
-  // 30 characters per line
-  const numLines = addressKind === 't' ? 2 : address.length / 30;
-  const numChars = addressKind === 't' ? 5 : 12;
-  const chunks = Utils.splitStringIntoChunks(address, Number(numLines.toFixed(0)));
+  useEffect(() => {
+    const mult = total > 1;
+    setMulti(mult);
+  }, [total]);
 
   const doCopy = () => {
     if (address) {
       Clipboard.setString(address);
-      addLastSnackbar({ message: translate('history.addresscopied') as string, type: 'Primary', duration: 'short' });
+      addLastSnackbar({
+        message: translate('history.addresscopied') as string,
+        duration: SnackbarDurationEnum.short,
+      });
     }
   };
 
@@ -88,8 +78,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 Clipboard.setString(address);
                 addLastSnackbar({
                   message: translate('history.addresscopied') as string,
-                  type: 'Primary',
-                  duration: 'short',
+                  duration: SnackbarDurationEnum.short,
                 });
                 setExpandQRAddress(true);
                 if (privacy) {
@@ -99,22 +88,64 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 }
               }
             }}>
-            {expandQRAddress ? (
-              <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
-            ) : (
-              <View
-                style={{
-                  width: 200,
-                  height: 200,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderWidth: 1,
-                  borderColor: colors.text,
-                }}>
-                <Text style={{ color: colors.zingo, textDecorationLine: 'underline', marginTop: 15, minHeight: 48 }}>
-                  {translate('seed.tapreveal') as string}
-                </Text>
-              </View>
+            {!!address && (
+              <>
+                {ufvk ? (
+                  <>
+                    {expandQRAddress ? (
+                      <QRCode
+                        value={address}
+                        size={200}
+                        ecl="L"
+                        backgroundColor={colors.border}
+                        logo={require('../../assets/img/logobig-zingo.png')}
+                        logoSize={35}
+                        logoBackgroundColor={colors.border}
+                        logoBorderRadius={10} /* android not soported */
+                        logoMargin={5}
+                      />
+                    ) : (
+                      <View
+                        style={{
+                          width: 200,
+                          height: 200,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderWidth: 1,
+                          borderColor: colors.text,
+                        }}>
+                        <Text
+                          style={{
+                            color: colors.zingo,
+                            textDecorationLine: 'underline',
+                            marginTop: 15,
+                            minHeight: 48,
+                          }}>
+                          {translate('seed.tapreveal') as string}
+                        </Text>
+                      </View>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {privacy ? (
+                      <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
+                    ) : (
+                      <QRCode
+                        value={address}
+                        size={200}
+                        ecl="L"
+                        backgroundColor={colors.border}
+                        logo={require('../../assets/img/logobig-zingo.png')}
+                        logoSize={35}
+                        logoBackgroundColor={colors.border}
+                        logoBorderRadius={10} /* android not soported */
+                        logoMargin={5}
+                      />
+                    )}
+                  </>
+                )}
+              </>
             )}
           </TouchableOpacity>
         </View>
@@ -180,64 +211,20 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
               Clipboard.setString(address);
               addLastSnackbar({
                 message: translate('history.addresscopied') as string,
-                type: 'Primary',
-                duration: 'short',
+                duration: SnackbarDurationEnum.short,
               });
-              setExpandAddress(true);
-              if (privacy) {
-                setTimeout(() => {
-                  setExpandAddress(false);
-                }, 5000);
-              }
             }
           }}>
           <View
             style={{
               display: 'flex',
               flexDirection: 'row',
-              flexWrap: 'wrap',
               justifyContent: 'center',
               marginBottom: 30,
             }}>
-            {!expandAddress && <FadeText>{Utils.trimToSmall(address, numChars)}</FadeText>}
-            {expandAddress &&
-              chunks.map(c => (
-                <FadeText
-                  key={c}
-                  style={{
-                    flexBasis: '100%',
-                    textAlign: 'center',
-                    fontFamily: 'verdana',
-                    fontSize: 16,
-                    color: colors.text,
-                  }}>
-                  {c}
-                </FadeText>
-              ))}
+            <AddressItem address={address} closeModal={() => {}} openModal={() => {}} />
           </View>
         </TouchableOpacity>
-
-        {/*multi && (
-          <View style={{ display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'center', marginBottom: 100 }}>
-            <Button
-              type="Secondary"
-              title={translate('receive.prev')}
-              style={{ width: '25%', margin: 10 }}
-              onPress={prev}
-            />
-            <FadeText>
-              {index + 1}
-              {translate('receive.of')}
-              {total}
-            </FadeText>
-            <Button
-              type="Secondary"
-              title={translate('receive.next')}
-              style={{ width: '25%', margin: 10 }}
-              onPress={next}
-            />
-          </View>
-        )*/}
       </ScrollView>
     </View>
   );

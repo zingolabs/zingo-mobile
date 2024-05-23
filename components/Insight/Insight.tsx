@@ -17,6 +17,12 @@ import Utils from '../../app/utils';
 import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
+import AddressItem from '../Components/AddressItem';
+import { ButtonTypeEnum, CommandEnum, SendPageStateClass, SnackbarDurationEnum } from '../../app/AppState';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
+import 'moment/locale/ru';
 
 type DataType = {
   svg: {
@@ -75,13 +81,22 @@ const getPercent = (percent: number) => {
 
 type InsightProps = {
   closeModal: () => void;
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  openModal: () => void;
+  set_privacy_option: (value: boolean) => Promise<void>;
+  setSendPageState: (s: SendPageStateClass) => void;
 };
 
-const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privacy_option }) => {
+const Insight: React.FunctionComponent<InsightProps> = ({
+  closeModal,
+  set_privacy_option,
+  openModal,
+  setSendPageState,
+}) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, privacy, addLastSnackbar } = context;
+  const { info, translate, privacy, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
+
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -97,21 +112,27 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
       let resultStr: string = '';
       switch (tab) {
         case 'sent':
-          resultStr = await RPCModule.execute('value_to_address', '');
+          resultStr = await RPCModule.execute(CommandEnum.value_to_address, '');
           //console.log('################# value', resultStr);
           break;
         case 'sends':
-          resultStr = await RPCModule.execute('sends_to_address', '');
+          resultStr = await RPCModule.execute(CommandEnum.sends_to_address, '');
           //console.log('################# sends', resultStr);
           break;
         case 'memobytes':
-          resultStr = await RPCModule.execute('memobytes_to_address', '');
+          resultStr = await RPCModule.execute(CommandEnum.memobytes_to_address, '');
           //console.log('################# memobytes', resultStr);
           break;
         default:
           break;
       }
-      const resultJSON = await JSON.parse(resultStr);
+      let resultJSON: any;
+      try {
+        resultJSON = await JSON.parse(resultStr);
+      } catch (e) {
+        console.log(resultStr);
+        resultJSON = {};
+      }
       let amounts: { value: number; address: string; tag: string }[] = [];
       const resultJSONEntries: [string, number][] = Object.entries(resultJSON) as [string, number][];
       resultJSONEntries.forEach(([key, value]) => {
@@ -170,7 +191,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
               justifyContent: 'center',
             }}>
             {(!expandAddress[index] || item.address === 'fee') && (
-              <FontAwesomeIcon style={{ margin: 5 }} size={20} icon={faQrcode} color={item.svg.fill} />
+              <FontAwesomeIcon style={{ margin: 5 }} size={45} icon={faQrcode} color={item.svg.fill} />
             )}
             {!!item.tag && <FadeText style={{ marginHorizontal: 5 }}>{item.tag}</FadeText>}
             <TouchableOpacity
@@ -179,8 +200,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
                   Clipboard.setString(item.address);
                   addLastSnackbar({
                     message: translate('history.addresscopied') as string,
-                    type: 'Primary',
-                    duration: 'short',
+                    duration: SnackbarDurationEnum.short,
                   });
                   selectExpandAddress(index);
                 }
@@ -191,6 +211,18 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
                   flexDirection: 'column',
                   flexWrap: 'wrap',
                 }}>
+                {item.address !== 'fee' && (
+                  <AddressItem
+                    address={item.address}
+                    oneLine={true}
+                    onlyContact={true}
+                    withIcon={true}
+                    withSendIcon={true}
+                    setSendPageState={setSendPageState}
+                    closeModal={closeModal}
+                    openModal={openModal}
+                  />
+                )}
                 {!expandAddress[index] && !!item.address && (
                   <RegText>
                     {item.address.length > (dimensions.width < 500 ? 10 : 20)
@@ -219,7 +251,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
             <RegText>{getPercent(percent)}</RegText>
             {tab === 'sent' ? (
               <ZecAmount
-                currencyName={info.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName}
                 size={15}
                 amtZec={item.value}
                 style={{ marginHorizontal: 5 }}
@@ -381,7 +413,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, set_privac
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

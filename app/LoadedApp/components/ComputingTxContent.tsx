@@ -8,12 +8,16 @@ import { ThemeType } from '../../types';
 import CircularProgress from '../../../components/Components/CircularProgress';
 import { ContextAppLoaded } from '../../context';
 import Header from '../../../components/Header';
-import FadeText from '../../../components/Components/FadeText';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
+import 'moment/locale/ru';
 
 const ComputingTxContent: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
-  const { sendProgress: progress, translate, syncingStatus } = context;
+  const { sendProgress: progress, translate, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
 
   return (
     <SafeAreaView
@@ -39,40 +43,11 @@ const ComputingTxContent: React.FunctionComponent = () => {
           height: '70%',
         }}>
         <RegText>{translate('loadedapp.computingtx') as string}</RegText>
-        {!(progress && progress.sendInProgress) && (
+        {progress && progress.sendInProgress ? (
           <>
-            <RegText>{translate('loadedapp.syncing') as string}</RegText>
-            {syncingStatus.inProgress && syncingStatus.currentBlock > 0 && !!syncingStatus.lastBlockServer && (
-              <ActivityIndicator size="large" color={colors.primary} />
-            )}
-          </>
-        )}
-        {__DEV__ && !(progress && progress.sendInProgress) && (
-          <>
-            {syncingStatus.inProgress && syncingStatus.currentBatch > 0 && (
-              <FadeText>
-                {(translate('report.processingbatch') as string) +
-                  syncingStatus.currentBatch +
-                  (translate('report.totalbatches') as string) +
-                  syncingStatus.totalBatches}
-              </FadeText>
-            )}
-            {syncingStatus.inProgress && syncingStatus.currentBlock > 0 && !!syncingStatus.lastBlockServer && (
-              <FadeText>
-                {(translate('report.processingblock') as string) +
-                  syncingStatus.currentBlock +
-                  (translate('report.totalblocks') as string) +
-                  syncingStatus.lastBlockServer}
-              </FadeText>
-            )}
-          </>
-        )}
-        {!(progress && progress.sendInProgress) && <RegText>{translate('wait') as string}</RegText>}
-        {progress && progress.sendInProgress && (
-          <>
-            <RegText>{`${translate('loadedapp.step')} ${progress.progress} ${translate('loadedapp.of')} ${
-              progress.total
-            }`}</RegText>
+            <RegText style={{ marginTop: 20 }}>{`${translate('loadedapp.step')} ${progress.progress} ${translate(
+              'loadedapp.of',
+            )} ${progress.total}`}</RegText>
             <RegText style={{ marginBottom: 20 }}>{`${translate('loadedapp.eta')} ${progress.etaSeconds} ${translate(
               'loadedapp.sec',
             )}`}</RegText>
@@ -84,7 +59,12 @@ const ComputingTxContent: React.FunctionComponent = () => {
               progressPercent={((progress.progress + 1) * 100) / 4}
             />
           </>
+        ) : (
+          <>
+            <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
+          </>
         )}
+        <RegText>{translate('wait') as string}</RegText>
       </View>
     </SafeAreaView>
   );

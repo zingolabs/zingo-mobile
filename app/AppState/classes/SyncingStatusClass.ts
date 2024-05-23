@@ -1,3 +1,5 @@
+import { GlobalConst } from '../const/GlobalConst';
+
 export default class SyncingStatusClass {
   // sync ID
   syncID: number;
@@ -33,7 +35,7 @@ export default class SyncingStatusClass {
     this.syncID = -1;
     this.totalBatches = 0;
     this.currentBatch = 0;
-    this.blocksPerBatch = 100; // this is set in zingolib
+    this.blocksPerBatch = GlobalConst.blocksPerBatch;
     this.lastBlockWallet = 0;
     this.currentBlock = 0;
     this.inProgress = false;

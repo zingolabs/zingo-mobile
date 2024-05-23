@@ -19,13 +19,6 @@ exports[`Component DetailLine - test DetailLine children - snapshot 1`] = `
   >
     label
   </Text>
-  <View
-    style={
-      {
-        "width": 10,
-      }
-    }
-  />
   <View />
 </View>
 `;
@@ -50,23 +43,34 @@ exports[`Component DetailLine - test DetailLine value - snapshot 1`] = `
     label
   </Text>
   <View
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
     style={
       {
-        "width": 10,
-      }
-    }
-  />
-  <Text
-    style={
-      {
-        "color": "rgb(28, 28, 30)",
-        "fontSize": 18,
-        "fontWeight": "600",
         "opacity": 1,
       }
     }
   >
-    value
-  </Text>
+    <Text
+      style={
+        {
+          "color": "rgb(28, 28, 30)",
+          "fontSize": 18,
+          "fontWeight": "600",
+          "opacity": 1,
+        }
+      }
+    >
+      value
+    </Text>
+  </View>
 </View>
 `;

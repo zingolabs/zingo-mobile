@@ -11,6 +11,11 @@ import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import RegText from '../Components/RegText';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
+import 'moment/locale/ru';
+import { ButtonTypeEnum, ChainNameEnum, CurrencyEnum } from '../../app/AppState';
 
 type InfoProps = {
   closeModal: () => void;
@@ -19,8 +24,9 @@ type InfoProps = {
 
 const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, currency, zecPrice, privacy } = context;
+  const { info, translate, currency, zecPrice, privacy, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  moment.locale(language);
 
   return (
     <SafeAreaView
@@ -51,7 +57,6 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
             label={translate('info.version') as string}
             value={translate('zingo') + ' ' + translate('version')}
           />
-          <DetailLine label={translate('info.zingolib') as string} value={info.zingolib} />
           <DetailLine
             label={translate('info.serverversion') as string}
             value={info.version ? info.version : (translate('loading') as string)}
@@ -65,11 +70,11 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
             value={
               !info.chain_name
                 ? (translate('loading') as string)
-                : info.chain_name === 'main'
+                : info.chain_name === ChainNameEnum.mainChainName
                 ? 'Mainnet'
-                : info.chain_name === 'test'
+                : info.chain_name === ChainNameEnum.testChainName
                 ? 'Testnet'
-                : info.chain_name === 'regtest'
+                : info.chain_name === ChainNameEnum.regtestChainName
                 ? 'Regtest'
                 : (translate('info.unknown') as string) + ' (' + info.chain_name + ')'
             }
@@ -78,7 +83,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
             label={translate('info.serverblock') as string}
             value={info.latestBlock ? info.latestBlock.toString() : (translate('loading') as string)}
           />
-          {currency === 'USD' && (
+          {currency === CurrencyEnum.USDCurrency && (
             <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
               <DetailLine label={translate('info.zecprice') as string}>
                 {zecPrice.zecPrice === -1 && (
@@ -105,7 +110,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );

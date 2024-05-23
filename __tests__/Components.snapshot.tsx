@@ -12,6 +12,7 @@ import BoldText from '../components/Components/BoldText';
 import FadeText from '../components/Components/FadeText';
 import ErrorText from '../components/Components/ErrorText';
 import RegText from '../components/Components/RegText';
+import { CurrencyEnum, CurrencyNameEnum } from '../app/AppState';
 
 jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {
@@ -21,6 +22,7 @@ jest.mock('react-native-localize', () => ({
     };
   },
 }));
+jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
 // test suite
 describe('Component Components - test', () => {
@@ -31,7 +33,7 @@ describe('Component Components - test', () => {
         price={1.12345678}
         amtZec={39.99}
         style={{ backgroundColor: 'red' }}
-        currency={'USD'}
+        currency={CurrencyEnum.USDCurrency}
         privacy={true}
       />,
     );
@@ -40,7 +42,12 @@ describe('Component Components - test', () => {
 
   test('CurrencyAmount Normal Privacy - snapshot', () => {
     const currencyAmount = render(
-      <CurrencyAmount price={1.12345678} amtZec={39.99} style={{ backgroundColor: 'red' }} currency={'USD'} />,
+      <CurrencyAmount
+        price={1.12345678}
+        amtZec={39.99}
+        style={{ backgroundColor: 'red' }}
+        currency={CurrencyEnum.USDCurrency}
+      />,
     );
     expect(currencyAmount.toJSON()).toMatchSnapshot();
   });
@@ -52,7 +59,7 @@ describe('Component Components - test', () => {
         size={20}
         amtZec={1.12345678}
         style={{ backgroundColor: 'red' }}
-        currencyName={'ZEC'}
+        currencyName={CurrencyNameEnum.ZEC}
         privacy={true}
       />,
     );
@@ -61,7 +68,13 @@ describe('Component Components - test', () => {
 
   test('ZecAmount Normal Privacy - snapshot', () => {
     const zecAmount = render(
-      <ZecAmount color={'red'} size={20} amtZec={1.12345678} style={{ backgroundColor: 'red' }} currencyName={'ZEC'} />,
+      <ZecAmount
+        color={'red'}
+        size={20}
+        amtZec={1.12345678}
+        style={{ backgroundColor: 'red' }}
+        currencyName={CurrencyNameEnum.ZEC}
+      />,
     );
     expect(zecAmount.toJSON()).toMatchSnapshot();
   });

@@ -8,6 +8,15 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import History from '../components/History';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import {
+  AddressKindEnum,
+  CurrencyEnum,
+  CurrencyNameEnum,
+  ModeEnum,
+  PoolEnum,
+  ReceiverEnum,
+  TransactionTypeEnum,
+} from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -46,6 +55,14 @@ jest.mock('moment', () => {
 jest.mock('moment/locale/es', () => () => ({
   defineLocale: jest.fn(),
 }));
+jest.mock('moment/locale/pt', () => () => ({
+  defineLocale: jest.fn(),
+}));
+
+jest.mock('moment/locale/ru', () => () => ({
+  defineLocale: jest.fn(),
+}));
+
 jest.mock('react-native-gesture-handler', () => {
   const View = require('react-native').View;
   return {
@@ -77,7 +94,7 @@ describe('Component History - test', () => {
   const state = defaultAppStateLoaded;
   state.transactions = [
     {
-      type: 'Sent',
+      type: TransactionTypeEnum.Sent,
       fee: 0.0001,
       confirmations: 22,
       txid: 'sent-txid-1234567890',
@@ -97,7 +114,7 @@ describe('Component History - test', () => {
       ],
     },
     {
-      type: 'SendToSelf',
+      type: TransactionTypeEnum.SendToSelf,
       fee: 0.0001,
       confirmations: 12,
       txid: 'sendtoself-txid-1234567890',
@@ -112,7 +129,7 @@ describe('Component History - test', () => {
       ],
     },
     {
-      type: 'Received',
+      type: TransactionTypeEnum.Received,
       confirmations: 133,
       txid: 'receive-txid-1234567890',
       time: Date.now(),
@@ -121,13 +138,13 @@ describe('Component History - test', () => {
         {
           address: '',
           amount: 0.77654321,
-          pool: 'Orchard',
+          pool: PoolEnum.OrchardPool,
           memos: ['hola', '  & ', 'hello'],
         },
         {
           address: '',
           amount: 0.1,
-          pool: 'Sapling',
+          pool: PoolEnum.SaplingPool,
           memos: ['hello', '  & ', 'hola'],
         },
       ],
@@ -138,37 +155,37 @@ describe('Component History - test', () => {
     {
       uaAddress: 'UA-12345678901234567890',
       address: 'UA-12345678901234567890',
-      addressKind: 'u',
+      addressKind: AddressKindEnum.u,
       containsPending: false,
-      receivers: 'ozt',
+      receivers: ReceiverEnum.o + ReceiverEnum.z + ReceiverEnum.t,
     },
     {
       uaAddress: 'UA-12345678901234567890',
       address: 'sapling-12345678901234567890',
-      addressKind: 'z',
+      addressKind: AddressKindEnum.z,
       containsPending: false,
-      receivers: 'z',
+      receivers: ReceiverEnum.z,
     },
     {
       uaAddress: 'UA-12345678901234567890',
       address: 'transparent-12345678901234567890',
-      addressKind: 't',
+      addressKind: AddressKindEnum.t,
       containsPending: false,
-      receivers: 't',
+      receivers: ReceiverEnum.t,
     },
   ];
   state.translate = () => 'text translated';
-  state.info.currencyName = 'ZEC';
+  state.info.currencyName = CurrencyNameEnum.ZEC;
   state.totalBalance.total = 1.12345678;
   const onFunction = jest.fn();
 
   test('History no currency, privacy normal & mode basic - snapshot', () => {
     // no currency
-    state.currency = '';
+    state.currency = CurrencyEnum.noCurrency;
     // privacy normal
     state.privacy = false;
     // mode basic
-    state.mode = 'basic';
+    state.mode = ModeEnum.basic;
     const history = render(
       <ContextAppLoadedProvider value={state}>
         <History
@@ -181,6 +198,7 @@ describe('Component History - test', () => {
           set_privacy_option={onFunction}
           setPoolsToShieldSelectSapling={onFunction}
           setPoolsToShieldSelectTransparent={onFunction}
+          setSendPageState={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
@@ -189,11 +207,11 @@ describe('Component History - test', () => {
 
   test('History currency USD, privacy high & mode advanced - snapshot', () => {
     // no currency
-    state.currency = 'USD';
+    state.currency = CurrencyEnum.USDCurrency;
     // privacy normal
     state.privacy = true;
     // mode basic
-    state.mode = 'advanced';
+    state.mode = ModeEnum.advanced;
     const history = render(
       <ContextAppLoadedProvider value={state}>
         <History
@@ -206,6 +224,7 @@ describe('Component History - test', () => {
           set_privacy_option={onFunction}
           setPoolsToShieldSelectSapling={onFunction}
           setPoolsToShieldSelectTransparent={onFunction}
+          setSendPageState={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

@@ -10,9 +10,17 @@ import {
   WalletSettingsClass,
   TranslateType,
   SyncingStatusClass,
+  CommandEnum,
+  ChainNameEnum,
+  TransactionTypeEnum,
+  PoolEnum,
+  WalletOptionEnum,
+  CurrencyNameEnum,
+  AddressKindEnum,
+  ReceiverEnum,
+  GlobalConst,
 } from '../AppState';
 import RPCModule from '../RPCModule';
-import Utils from '../utils';
 import { RPCAddressType } from './types/RPCAddressType';
 import { RPCBalancesType } from './types/RPCBalancesType';
 import { RPCNotesType } from './types/RPCNotesType';
@@ -20,15 +28,15 @@ import { RPCOrchardNoteType } from './types/RPCOrchardNoteType';
 import { RPCSaplingNoteType } from './types/RPCSaplingNoteType';
 import { RPCUtxoNoteType } from './types/RPCUtxoNoteType';
 import { RPCInfoType } from './types/RPCInfoType';
-import { RPCDefaultFeeType } from './types/RPCDefaultFeeType';
 import { RPCWalletHeight } from './types/RPCWalletHeightType';
 import { RPCSeedType } from './types/RPCSeedType';
 import { RPCSyncStatusType } from './types/RPCSyncStatusType';
 import { RPCGetOptionType } from './types/RPCGetOptionType';
 import { RPCSendProgressType } from './types/RPCSendProgressType';
 import { RPCSyncRescan } from './types/RPCSyncRescanType';
-import { RPCUfvkType } from './types/RPCUfvkType';
 import { RPCSummariesType } from './types/RPCSummariesType';
+import { RPCUfvkType } from './types/RPCUfvkType';
+import { RPCSendType } from './types/RPCSendType';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -97,7 +105,7 @@ export default class RPC {
 
     this.inRefresh = false;
     this.inSend = false;
-    this.blocksPerBatch = 100;
+    this.blocksPerBatch = GlobalConst.blocksPerBatch;
 
     this.prev_batch_num = -1;
     this.prev_sync_id = -1;
@@ -115,10 +123,10 @@ export default class RPC {
 
   static async rpc_setInterruptSyncAfterBatch(value: string): Promise<void> {
     try {
-      const resultStr: string = await RPCModule.execute('interrupt_sync_after_batch', value);
+      const resultStr: string = await RPCModule.execute(CommandEnum.interrupt_sync_after_batch, value);
 
       if (resultStr) {
-        if (resultStr.toLowerCase().startsWith('error')) {
+        if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error setting interrupt_sync_after_batch ${resultStr}`);
         }
       } else {
@@ -136,11 +144,11 @@ export default class RPC {
       // -1  - error in Gemini/zingolib.
       // -2  - error in RPCModule, likely.
       // > 0 - real value
-      const resultStr: string = await RPCModule.execute('updatecurrentprice', '');
+      const resultStr: string = await RPCModule.execute(CommandEnum.updatecurrentprice, '');
       //console.log(resultStr);
 
       if (resultStr) {
-        if (resultStr.toLowerCase().startsWith('error') || isNaN(parseFloat(resultStr))) {
+        if (resultStr.toLowerCase().startsWith(GlobalConst.error) || isNaN(parseFloat(resultStr))) {
           console.log(`Error fetching price ${resultStr}`);
           return -1;
         } else {
@@ -158,10 +166,10 @@ export default class RPC {
 
   static async rpc_setWalletSettingOption(name: string, value: string): Promise<string> {
     try {
-      const resultStr: string = await RPCModule.execute('setoption', `${name}=${value}`);
+      const resultStr: string = await RPCModule.execute(CommandEnum.setoption, `${name}=${value}`);
 
       if (resultStr) {
-        if (resultStr.toLowerCase().startsWith('error')) {
+        if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error setting option ${resultStr}`);
           return resultStr;
         }
@@ -180,9 +188,9 @@ export default class RPC {
   // Special method to get the Info object. This is used both internally and by the Loading screen
   static async rpc_getInfoObject(): Promise<InfoType> {
     try {
-      const infoStr: string = await RPCModule.execute('info', '');
+      const infoStr: string = await RPCModule.execute(CommandEnum.info, '');
       if (infoStr) {
-        if (infoStr.toLowerCase().startsWith('error')) {
+        if (infoStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error info ${infoStr}`);
           return {} as InfoType;
         }
@@ -192,21 +200,9 @@ export default class RPC {
       }
       const infoJSON: RPCInfoType = await JSON.parse(infoStr);
 
-      const defaultFeeStr: string = await RPCModule.execute('defaultfee', '');
-      if (defaultFeeStr) {
-        if (defaultFeeStr.toLowerCase().startsWith('error')) {
-          console.log(`Error defaultfee ${defaultFeeStr}`);
-          return {} as InfoType;
-        }
-      } else {
-        console.log('Internal Error defaultfee');
-        return {} as InfoType;
-      }
-      const defaultFeeJSON: RPCDefaultFeeType = await JSON.parse(defaultFeeStr);
-
-      let zingolibStr: string = await RPCModule.execute('version', '');
+      let zingolibStr: string = await RPCModule.execute(CommandEnum.version, '');
       if (zingolibStr) {
-        if (zingolibStr.toLowerCase().startsWith('error')) {
+        if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error zingolib version ${zingolibStr}`);
           zingolibStr = '<error>';
         }
@@ -223,15 +219,14 @@ export default class RPC {
         connections: 1,
         version: `${infoJSON.vendor}/${infoJSON.git_commit.substring(0, 6)}/${infoJSON.version}`,
         verificationProgress: 1,
-        currencyName: infoJSON.chain_name === 'main' ? 'ZEC' : 'TAZ',
+        currencyName: infoJSON.chain_name === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.TAZ,
         solps: 0,
-        defaultFee: defaultFeeJSON.defaultfee / 10 ** 8 || Utils.getFallbackDefaultFee(),
         zingolib: zingolibStr,
       };
 
       return info;
     } catch (error) {
-      console.log(`Critical Error info and/or defaultfee ${error}`);
+      console.log(`Critical Error info ${error}`);
       return {} as InfoType;
     }
   }
@@ -248,9 +243,9 @@ export default class RPC {
 
   static async rpc_fetchWalletHeight(): Promise<number> {
     try {
-      const heightStr: string = await RPCModule.execute('height', '');
+      const heightStr: string = await RPCModule.execute(CommandEnum.height, '');
       if (heightStr) {
-        if (heightStr.toLowerCase().startsWith('error')) {
+        if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error wallet height ${heightStr}`);
           return 0;
         }
@@ -266,102 +261,36 @@ export default class RPC {
       return 0;
     }
   }
-  /*
-  static async rpc_getPrivKeyAsString(address: string): Promise<string> {
-    const privKeyStr = await RPCModule.execute('export', address);
-    //console.log(privKeyStr);
 
-    let privKeyJSON;
-    try {
-      privKeyJSON = await JSON.parse(privKeyStr);
-    } catch (e) {}
-
-    //console.log('sk', privKeyJSON);
-
-    // 'o' - spending_key
-    // 'z' and 't' - private_key
-    if (privKeyJSON) {
-      return privKeyJSON[0].spending_key || privKeyJSON[0].private_key;
-    }
-
-    return 'Error: ' + privKeyStr;
-  }
-
-  static async rpc_getViewKeyAsString(address: string): Promise<string> {
-    const viewKeyStr = await RPCModule.execute('export', address);
-    //console.log(viewKeyStr);
-
-    let viewKeyJSON;
-    try {
-      viewKeyJSON = await JSON.parse(viewKeyStr);
-    } catch (e) {}
-
-    //console.log('vk', viewKeyJSON);
-
-    // 'o' - full_viewing_key
-    // 'z' and 't' - viewing_key
-    if (viewKeyJSON) {
-      return viewKeyJSON[0].full_viewing_key || viewKeyJSON[0].viewing_key;
-    }
-
-    return 'Error: ' + viewKeyStr;
-  }
-
-  static async rpc_createNewAddress(addressType: 'tzo'): Promise<string> {
-    const addrStr = await RPCModule.execute('new', addressType);
-    const addrJSON = await JSON.parse(addrStr);
-
-    //console.log(addrJSON);
-
-    if (addrJSON) {
-      // Save
-      await RPCModule.doSave();
-
-      return addrJSON[0];
-    }
-
-    return '';
-  }
-
-  static async rpc_doImportPrivKey(key: string, birthday: string): Promise<string | string[]> {
-    const args = { key, birthday: parseInt(birthday, 10), norescan: true };
-    const address = await RPCModule.execute('import', JSON.stringify(args));
-
-    if (address) {
-      return address;
-    }
-
-    return '';
-  }
-  */
-  static async rpc_shieldFunds(pools: string): Promise<string> {
+  static async rpc_shieldFunds(): Promise<string> {
     try {
       // using `all` or `transparent` or `sapling`...
-      const shieldStr: string = await RPCModule.execute('shield', pools);
+      const shieldStr: string = await RPCModule.execute(CommandEnum.quickshield, '');
+      console.log(shieldStr);
       if (shieldStr) {
-        if (shieldStr.toLowerCase().startsWith('error')) {
-          console.log(`Error shield ${pools} ${shieldStr}`);
+        if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error shield ${shieldStr}`);
           return shieldStr;
         }
       } else {
-        console.log('Internal Error shield ' + pools);
-        return 'Error: Internal RPC Error: shield ' + pools;
+        console.log('Internal Error shield ');
+        return 'Error: Internal RPC Error: shield ';
       }
 
       return shieldStr;
     } catch (error) {
-      console.log(`Critical Error shield ${pools} ${error}`);
+      console.log(`Critical Error shield ${error}`);
       return `Error: ${error}`;
     }
   }
 
   static async rpc_fetchWallet(readOnly: boolean): Promise<WalletType> {
     if (readOnly) {
-      // viewing key
+      // only viewing key & birthday
       try {
-        const ufvkStr: string = await RPCModule.execute('exportufvk', '');
+        const ufvkStr: string = await RPCModule.execute(CommandEnum.exportufvk, '');
         if (ufvkStr) {
-          if (ufvkStr.toLowerCase().startsWith('error')) {
+          if (ufvkStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error ufvk ${ufvkStr}`);
             return {} as WalletType;
           }
@@ -369,19 +298,27 @@ export default class RPC {
           console.log('Internal Error ufvk');
           return {} as WalletType;
         }
-        const ufvk: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
+        const RPCufvk: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
 
-        return ufvk;
+        const wallet: WalletType = {} as WalletType;
+        if (RPCufvk.birthday) {
+          wallet.birthday = RPCufvk.birthday;
+        }
+        if (RPCufvk.ufvk) {
+          wallet.ufvk = RPCufvk.ufvk;
+        }
+
+        return wallet;
       } catch (error) {
-        console.log(`Critical Error ufvk / get_birthday ${error}`);
+        console.log(`Critical Error ufvk ${error}`);
         return {} as WalletType;
       }
     } else {
-      // seed
+      // seed & viewing key & birthday
       try {
-        const seedStr: string = await RPCModule.execute('seed', '');
+        const seedStr: string = await RPCModule.execute(CommandEnum.seed, '');
         if (seedStr) {
-          if (seedStr.toLowerCase().startsWith('error')) {
+          if (seedStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error seed ${seedStr}`);
             return {} as WalletType;
           }
@@ -390,15 +327,35 @@ export default class RPC {
           return {} as WalletType;
         }
         const RPCseed: RPCSeedType = await JSON.parse(seedStr);
-        const seed: WalletType = {} as WalletType;
+
+        const ufvkStr: string = await RPCModule.execute(CommandEnum.exportufvk, '');
+        if (ufvkStr) {
+          if (ufvkStr.toLowerCase().startsWith(GlobalConst.error)) {
+            console.log(`Error ufvk ${ufvkStr}`);
+            return {} as WalletType;
+          }
+        } else {
+          console.log('Internal Error ufvk');
+          return {} as WalletType;
+        }
+        const RPCufvk: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
+
+        const wallet: WalletType = {} as WalletType;
         if (RPCseed.seed) {
-          seed.seed = RPCseed.seed;
+          wallet.seed = RPCseed.seed;
         }
         if (RPCseed.birthday) {
-          seed.birthday = RPCseed.birthday;
+          wallet.birthday = RPCseed.birthday;
+        }
+        if (RPCufvk.ufvk) {
+          wallet.ufvk = RPCufvk.ufvk;
         }
 
-        return seed;
+        if (RPCseed.birthday !== RPCufvk.birthday) {
+          console.log('seed birthday', RPCseed.birthday, 'ufvk birthday', RPCufvk.birthday);
+        }
+
+        return wallet;
       } catch (error) {
         console.log(`Critical Error seed ${error}`);
         return {} as WalletType;
@@ -430,24 +387,20 @@ export default class RPC {
 
       const memos = txns
         .filter(i => i.memos && i.memos.length > 0)
-        .map(i => {
-          const combinedMemo = i.memos
-            ?.filter(memo => memo)
-            .map(memo => {
-              const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
-              const tags = memo.match(rex);
-              if (tags && tags.length >= 4) {
-                return { num: parseInt(tags[1], 10), memo: tags[3] };
-              }
+        .map(a => a.memos)
+        .flat()
+        .map(memo => {
+          const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
+          const tags = memo?.match(rex);
+          if (tags && tags.length >= 4) {
+            return { num: parseInt(tags[1], 10), memo: tags[3] };
+          }
 
-              // Just return as is
-              return { num: 0, memo };
-            })
-            .sort((a, b) => a.num - b.num)
-            .map(a => a.memo);
-          return combinedMemo && combinedMemo.length > 0 ? combinedMemo.join('') : undefined;
+          // Just return as is
+          return { num: 0, memo };
         })
-        .map(a => a);
+        .sort((a, b) => a.num - b.num)
+        .map(a => a.memo);
 
       const detail: TxDetailType = {
         address: toaddr,
@@ -466,13 +419,13 @@ export default class RPC {
   // Remember to add up both amounts and combine memos
   static rpc_combineTxDetailsByPool(txdetails: TxDetailType[]): TxDetailType[] {
     // First, group by pool.
-    const m = new Map<'Orchard' | 'Sapling' | 'Transparent', TxDetailType[]>();
+    const m = new Map<PoolEnum, TxDetailType[]>();
     txdetails
       .filter(i => i.pool !== undefined)
       .forEach(i => {
-        const coll = m.get(i.pool as 'Orchard' | 'Sapling' | 'Transparent');
+        const coll = m.get(i.pool as PoolEnum);
         if (!coll) {
-          m.set(i.pool as 'Orchard' | 'Sapling' | 'Transparent', [i]);
+          m.set(i.pool as PoolEnum, [i]);
         } else {
           coll.push(i);
         }
@@ -485,24 +438,20 @@ export default class RPC {
 
       const memos = txns
         .filter(i => i.memos && i.memos.length > 0)
-        .map(i => {
-          const combinedMemo = i.memos
-            ?.filter(memo => memo)
-            .map(memo => {
-              const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
-              const tags = memo.match(rex);
-              if (tags && tags.length >= 4) {
-                return { num: parseInt(tags[1], 10), memo: tags[3] };
-              }
+        .map(a => a.memos)
+        .flat()
+        .map(memo => {
+          const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
+          const tags = memo?.match(rex);
+          if (tags && tags.length >= 4) {
+            return { num: parseInt(tags[1], 10), memo: tags[3] };
+          }
 
-              // Just return as is
-              return { num: 0, memo };
-            })
-            .sort((a, b) => a.num - b.num)
-            .map(a => a.memo);
-          return combinedMemo && combinedMemo.length > 0 ? combinedMemo.join('') : undefined;
+          // Just return as is
+          return { num: 0, memo };
         })
-        .map(a => a);
+        .sort((a, b) => a.num - b.num)
+        .map(a => a.memo);
 
       const detail: TxDetailType = {
         address: '',
@@ -517,8 +466,17 @@ export default class RPC {
     return reducedDetailedTxns;
   }
 
-  // this is only for the first time when the App is booting.
+  // this is only for the first time when the App is booting, but
+  // there are more cases:
+  // - LoadedApp mounting component.
+  // - App go to Foreground.
+  // - Internet from Not Connected to Connected.
+  // - Cambio de Servidor.
   async configure(): Promise<void> {
+    // First things first, I need to stop an existing sync process (if any)
+    // clean start.
+    await this.stopSyncProcess();
+
     // every 30 seconds the App try to Sync the new blocks.
     if (!this.refreshTimerID) {
       this.refreshTimerID = setInterval(() => {
@@ -562,6 +520,40 @@ export default class RPC {
     setTimeout(() => {
       this.refresh(true);
     }, 1000);
+  }
+
+  sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+  async stopSyncProcess(): Promise<void> {
+    let returnStatus = await this.doSyncStatus();
+    if (returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
+      return;
+    }
+    let ss = {} as RPCSyncStatusType;
+    try {
+      ss = await JSON.parse(returnStatus);
+    } catch (e) {
+      return;
+    }
+
+    console.log('stop sync process. in progress', ss.in_progress);
+
+    while (ss.in_progress) {
+      // interrupting sync process
+      await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
+
+      // sleep for half second
+      await this.sleep(500);
+
+      returnStatus = await this.doSyncStatus();
+      ss = await JSON.parse(returnStatus);
+
+      console.log('stop sync process. in progress', ss.in_progress);
+    }
+    console.log('stop sync process. STOPPED');
+
+    // NOT interrupting sync process
+    await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
   }
 
   async clearTimers(): Promise<void> {
@@ -613,9 +605,9 @@ export default class RPC {
 
   async doRescan(): Promise<string> {
     try {
-      const rescanStr: string = await RPCModule.execute('rescan', '');
+      const rescanStr: string = await RPCModule.execute(CommandEnum.rescan, '');
       if (rescanStr) {
-        if (rescanStr.toLowerCase().startsWith('error')) {
+        if (rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error rescan ${rescanStr}`);
           return rescanStr;
         }
@@ -633,9 +625,9 @@ export default class RPC {
 
   async doSync(): Promise<string> {
     try {
-      const syncStr: string = await RPCModule.execute('sync', '');
+      const syncStr: string = await RPCModule.execute(CommandEnum.sync, '');
       if (syncStr) {
-        if (syncStr.toLowerCase().startsWith('error')) {
+        if (syncStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error sync ${syncStr}`);
           return syncStr;
         }
@@ -653,9 +645,9 @@ export default class RPC {
 
   async doSyncStatus(): Promise<string> {
     try {
-      const syncStatusStr: string = await RPCModule.execute('syncstatus', '');
+      const syncStatusStr: string = await RPCModule.execute(CommandEnum.syncstatus, '');
       if (syncStatusStr) {
-        if (syncStatusStr.toLowerCase().startsWith('error')) {
+        if (syncStatusStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error sync status ${syncStatusStr}`);
           return syncStatusStr;
         }
@@ -673,9 +665,9 @@ export default class RPC {
 
   async doSend(sendJSON: string): Promise<string> {
     try {
-      const sendStr: string = await RPCModule.execute('send', sendJSON);
+      const sendStr: string = await RPCModule.execute(CommandEnum.quicksend, sendJSON);
       if (sendStr) {
-        if (sendStr.toLowerCase().startsWith('error')) {
+        if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error send ${sendStr}`);
           return sendStr;
         }
@@ -693,9 +685,9 @@ export default class RPC {
 
   async doSendProgress(): Promise<string> {
     try {
-      const sendProgressStr: string = await RPCModule.execute('sendprogress', '');
+      const sendProgressStr: string = await RPCModule.execute(CommandEnum.sendprogress, '');
       if (sendProgressStr) {
-        if (sendProgressStr.toLowerCase().startsWith('error')) {
+        if (sendProgressStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error send progress ${sendProgressStr}`);
           return sendProgressStr;
         }
@@ -713,7 +705,6 @@ export default class RPC {
 
   async loadWalletData() {
     await this.fetchTotalBalance();
-    //await this.fetchTandZandOTransactionsList();
     await this.fetchTandZandOTransactionsSummaries();
     await this.fetchWalletSettings();
     await this.fetchInfoAndServerHeight();
@@ -803,46 +794,32 @@ export default class RPC {
         this.doRescan()
           .then(result => {
             console.log('rescan finished', result);
-            if (result && !result.toLowerCase().startsWith('error')) {
+            if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
               const resultJSON: RPCSyncRescan = JSON.parse(result);
-              if (resultJSON.result === 'success' && resultJSON.latest_block) {
+              if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
                 this.latest_block = resultJSON.latest_block;
               }
             }
           })
           .catch(error => console.log('rescan error', error));
-        //.finally(() => {
-        // with the new feature shardtree I can get an error here, but
-        // doesn't mean the sync/rescan process is finished, I have to
-        // rely on syncstatus finished instead
-        //this.inRefresh = false;
-        //this.keepAwake(false);
-        //});
       } else {
         this.doSync()
           .then(result => {
             console.log('sync finished', result);
-            if (result && !result.toLowerCase().startsWith('error')) {
+            if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
               const resultJSON: RPCSyncRescan = JSON.parse(result);
-              if (resultJSON.result === 'success' && resultJSON.latest_block) {
+              if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
                 this.latest_block = resultJSON.latest_block;
               }
             }
           })
           .catch(error => console.log('sync error', error));
-        //.finally(() => {
-        // with the new feature shardtree I can get an error here, but
-        // doesn't mean the sync/rescan process is finished, I have to
-        // rely on syncstatus finished instead
-        //this.inRefresh = false;
-        //this.keepAwake(false);
-        //});
       }
 
       // We need to wait for the sync to finish. The sync is done when
       this.syncStatusTimerID = setInterval(async () => {
         const returnStatus = await this.doSyncStatus();
-        if (returnStatus.toLowerCase().startsWith('error')) {
+        if (returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
           return;
         }
         let ss = {} as RPCSyncStatusType;
@@ -956,32 +933,15 @@ export default class RPC {
         //const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
         const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + witnesses_updated) / 3;
 
-        // And fetch the rest of the data.
-        //await this.loadWalletData();
-
-        //await this.fetchWalletHeight();
-        //await this.fetchWalletBirthday();
-        //await this.fetchServerHeight();
-
         let current_block = end_block + progress_blocks;
         if (current_block > this.lastServerBlockHeight) {
           current_block = this.lastServerBlockHeight;
         }
-        current_block = parseInt(current_block.toFixed(0), 10);
+        current_block = Number(current_block.toFixed(0));
 
         // if the current block is stalled I need to restart the App
         let syncProcessStalled = false;
         if (this.prev_current_block !== -1) {
-          //console.log(
-          //  'BEFORE prev current block',
-          //  this.prev_current_block,
-          //  'current block',
-          //  current_block,
-          //  'seconds',
-          //  this.seconds_block,
-          //  'blocks',
-          //  current_block - this.prev_current_block,
-          //);
           if (current_block > 0 && this.prev_current_block === current_block) {
             this.seconds_block += 5;
             // 5 minutes
@@ -995,17 +955,6 @@ export default class RPC {
             syncProcessStalled = false;
           }
         }
-
-        //console.log(
-        //  'AFTER prev current block',
-        //  this.prev_current_block,
-        //  'current block',
-        //  current_block,
-        //  'seconds',
-        //  this.seconds_block,
-        //  'stalled',
-        //  syncProcessStalled,
-        //);
 
         // if current block is lower than the previous current block
         // The user need to see something not confusing.
@@ -1100,38 +1049,6 @@ export default class RPC {
             this.prev_batch_num = batch_num;
             this.seconds_batch = 0;
           }
-          // save wallet every 15 seconds in the same batch.
-          /* altum suggestion - remove the mid-batch saving...
-          if (this.seconds_batch > 0 && this.seconds_batch % 15 === 0) {
-            // And fetch the rest of the data.
-            await this.loadWalletData();
-
-            await this.fetchWalletHeight();
-            await this.fetchWalletBirthday();
-            await this.fetchInfoAndServerHeight();
-
-            await RPCModule.doSave();
-
-            // store SyncStatus object for a new screen
-            this.fnSetSyncingStatus({
-              syncID: this.sync_id,
-              totalBatches: batch_total,
-              currentBatch: ss.in_progress ? batch_num + 1 : 0,
-              lastBlockWallet: this.lastWalletBlockHeight,
-              currentBlock: current_block,
-              inProgress: ss.in_progress,
-              lastError: ss.last_error,
-              blocksPerBatch: this.blocksPerBatch,
-              secondsPerBatch: this.seconds_batch,
-              process_end_block: process_end_block,
-              lastBlockServer: this.lastServerBlockHeight,
-              syncProcessStalled: false,
-            } as SyncingStatusClass);
-
-            //console.log('sync status', ss);
-            //console.log(`@@@@@@@@@@@Saving wallet. seconds: ${this.seconds_batch}`);
-          }
-          */
         }
       }, 5000);
       //console.log('create sync/rescan timer', this.syncStatusTimerID);
@@ -1159,9 +1076,12 @@ export default class RPC {
 
   async fetchWalletSettings(): Promise<void> {
     try {
-      const download_memos_str: string = await RPCModule.execute('getoption', 'download_memos');
+      const download_memos_str: string = await RPCModule.execute(
+        CommandEnum.getoption,
+        WalletOptionEnum.download_memos,
+      );
       if (download_memos_str) {
-        if (download_memos_str.toLowerCase().startsWith('error')) {
+        if (download_memos_str.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error download memos ${download_memos_str}`);
           return;
         }
@@ -1172,11 +1092,11 @@ export default class RPC {
       const download_memos_json: RPCGetOptionType = await JSON.parse(download_memos_str);
 
       const transaction_filter_threshold_str: string = await RPCModule.execute(
-        'getoption',
-        'transaction_filter_threshold',
+        CommandEnum.getoption,
+        WalletOptionEnum.transaction_filter_threshold,
       );
       if (transaction_filter_threshold_str) {
-        if (transaction_filter_threshold_str.toLowerCase().startsWith('error')) {
+        if (transaction_filter_threshold_str.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error transaction filter threshold ${transaction_filter_threshold_str}`);
           return;
         }
@@ -1210,9 +1130,9 @@ export default class RPC {
   // This method will get the total balances
   async fetchTotalBalance() {
     try {
-      const addressesStr: string = await RPCModule.execute('addresses', '');
+      const addressesStr: string = await RPCModule.execute(CommandEnum.addresses, '');
       if (addressesStr) {
-        if (addressesStr.toLowerCase().startsWith('error')) {
+        if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error addresses ${addressesStr}`);
           return;
         }
@@ -1222,9 +1142,9 @@ export default class RPC {
       }
       const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr);
 
-      const balanceStr: string = await RPCModule.execute('balance', '');
+      const balanceStr: string = await RPCModule.execute(CommandEnum.balance, '');
       if (balanceStr) {
-        if (balanceStr.toLowerCase().startsWith('error')) {
+        if (balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error balance ${balanceStr}`);
           return;
         }
@@ -1252,9 +1172,9 @@ export default class RPC {
       this.fnSetTotalBalance(balance);
 
       // Fetch pending notes and UTXOs
-      const pendingNotes: string = await RPCModule.execute('notes', '');
+      const pendingNotes: string = await RPCModule.execute(CommandEnum.notes, '');
       if (pendingNotes) {
-        if (pendingNotes.toLowerCase().startsWith('error')) {
+        if (pendingNotes.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error notes ${pendingNotes}`);
           return;
         }
@@ -1298,25 +1218,25 @@ export default class RPC {
       addressesJSON.forEach((u: RPCAddressType) => {
         // If this has any unconfirmed txns, show that in the UI
         const receivers: string =
-          (u.receivers.orchard_exists ? 'o' : '') +
-          (u.receivers.sapling ? 'z' : '') +
-          (u.receivers.transparent ? 't' : '');
+          (u.receivers.orchard_exists ? ReceiverEnum.o : '') +
+          (u.receivers.sapling ? ReceiverEnum.z : '') +
+          (u.receivers.transparent ? ReceiverEnum.t : '');
         if (u.address) {
-          const abu = new AddressClass(u.address, u.address, 'u', receivers);
+          const abu = new AddressClass(u.address, u.address, AddressKindEnum.u, receivers);
           if (pendingAddress.has(abu.address)) {
             abu.containsPending = true;
           }
           allAddresses.push(abu);
         }
         if (u.receivers.sapling) {
-          const abz = new AddressClass(u.address, u.receivers.sapling, 'z', receivers);
+          const abz = new AddressClass(u.address, u.receivers.sapling, AddressKindEnum.z, receivers);
           if (pendingAddress.has(abz.address)) {
             abz.containsPending = true;
           }
           allAddresses.push(abz);
         }
         if (u.receivers.transparent) {
-          const abt = new AddressClass(u.address, u.receivers.transparent, 't', receivers);
+          const abt = new AddressClass(u.address, u.receivers.transparent, AddressKindEnum.t, receivers);
           if (pendingAddress.has(abt.address)) {
             abt.containsPending = true;
           }
@@ -1333,9 +1253,9 @@ export default class RPC {
 
   async fetchWalletHeight(): Promise<void> {
     try {
-      const heightStr: string = await RPCModule.execute('height', '');
+      const heightStr: string = await RPCModule.execute(CommandEnum.height, '');
       if (heightStr) {
-        if (heightStr.toLowerCase().startsWith('error')) {
+        if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error wallet height ${heightStr}`);
           return;
         }
@@ -1363,10 +1283,10 @@ export default class RPC {
   // Fetch all T and Z and O transactions
   async fetchTandZandOTransactionsSummaries() {
     try {
-      const summariesStr: string = await RPCModule.execute('summaries', '');
+      const summariesStr: string = await RPCModule.execute(CommandEnum.summaries, '');
       //console.log(summariesStr);
       if (summariesStr) {
-        if (summariesStr.toLowerCase().startsWith('error')) {
+        if (summariesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error txs summaries ${summariesStr}`);
           return;
         }
@@ -1381,7 +1301,7 @@ export default class RPC {
       let txList: TransactionType[] = [];
 
       summariesJSON
-        //.filter(tx => tx.kind !== 'Fee')
+        //.filter(tx => tx.kind !== TransactionTypeEnum.Fee)
         .forEach((tx: RPCSummariesType) => {
           let currentTxList: TransactionType[] = txList.filter(t => t.txid === tx.txid);
           if (currentTxList.length === 0) {
@@ -1390,7 +1310,7 @@ export default class RPC {
           }
           let restTxList: TransactionType[] = txList.filter(t => t.txid !== tx.txid);
 
-          const type = tx.kind === 'Fee' ? 'Sent' : tx.kind;
+          const type = tx.kind === TransactionTypeEnum.Fee ? TransactionTypeEnum.Sent : tx.kind;
           if (!currentTxList[0].type && !!type) {
             currentTxList[0].type = type;
           }
@@ -1412,16 +1332,16 @@ export default class RPC {
           }
 
           //if (tx.txid.startsWith('426e')) {
-          //  console.log('tran: ', tx);
-          //  console.log('--------------------------------------------------');
+          //console.log('tran: ', tx);
+          //console.log('--------------------------------------------------');
           //}
 
           let currenttxdetails: TxDetailType = {} as TxDetailType;
-          if (tx.kind === 'Fee') {
+          if (tx.kind === TransactionTypeEnum.Fee) {
             currentTxList[0].fee = (currentTxList[0].fee ? currentTxList[0].fee : 0) + tx.amount / 10 ** 8;
             if (currentTxList[0].txDetails.length === 0) {
               // when only have 1 item with `Fee`, we assume this tx is `SendToSelf`.
-              currentTxList[0].type = 'SendToSelf';
+              currentTxList[0].type = TransactionTypeEnum.SendToSelf;
               currenttxdetails.address = '';
               currenttxdetails.amount = 0;
               currentTxList[0].txDetails.push(currenttxdetails);
@@ -1433,8 +1353,6 @@ export default class RPC {
             currenttxdetails.pool = !tx.pool || tx.pool === 'None' ? undefined : tx.pool;
             currentTxList[0].txDetails.push(currenttxdetails);
           }
-
-          //currentTxList[0].txDetails.forEach(det => console.log(det.memos));
           //console.log(currentTxList[0]);
           txList = [...currentTxList, ...restTxList];
         });
@@ -1445,15 +1363,13 @@ export default class RPC {
       const combinedTxList: TransactionType[] = [];
       txList.forEach((txns: TransactionType) => {
         const combinedTx = txns;
-        if (txns.type === 'Sent' || txns.type === 'SendToSelf') {
+        if (txns.type === TransactionTypeEnum.Sent || txns.type === TransactionTypeEnum.SendToSelf) {
           // using address for `Sent` & `SendToSelf`
           combinedTx.txDetails = RPC.rpc_combineTxDetailsByAddress(txns.txDetails);
         } else {
           // using pool for `Received`
           combinedTx.txDetails = RPC.rpc_combineTxDetailsByPool(txns.txDetails);
         }
-
-        //combinedTx.txDetails.forEach(det => console.log(det.memos));
         //console.log(combinedTx);
         combinedTxList.push(combinedTx);
       });
@@ -1479,7 +1395,7 @@ export default class RPC {
     // First, get the previous send progress id, so we know which ID to track
     const prev: string = await this.doSendProgress();
     let prevSendId = -1;
-    if (prev && !prev.toLowerCase().startsWith('error')) {
+    if (prev && !prev.toLowerCase().startsWith(GlobalConst.error)) {
       let prevProgress = {} as RPCSendProgressType;
       try {
         prevProgress = await JSON.parse(prev);
@@ -1489,10 +1405,31 @@ export default class RPC {
 
     //console.log('prev progress id', prevSendId);
 
+    // sometimes we need the result of send as well
+    let sendError: string = '';
+    let sendTxid: string = '';
+
     // This is async, so fire and forget
     this.doSend(JSON.stringify(sendJson))
-      .then(r => console.log('End Send OK: ' + r))
-      .catch(e => console.log('End Send ERROR: ' + e))
+      .then(r => {
+        try {
+          const rJson: RPCSendType = JSON.parse(r);
+          if (rJson.error) {
+            sendError = rJson.error;
+          } else if (rJson.txids) {
+            sendTxid = rJson.txids.join(', ');
+          }
+        } catch (e) {
+          sendError = r;
+        }
+        console.log('End Send OK: ' + r);
+      })
+      .catch(e => {
+        if (e && e.message) {
+          sendError = e.message;
+        }
+        console.log('End Send ERROR: ' + e);
+      })
       .finally(() => {
         // sending is over
         this.setInSend(false);
@@ -1510,7 +1447,7 @@ export default class RPC {
     const sendTxPromise = new Promise<string>((resolve, reject) => {
       const intervalID = setInterval(async () => {
         const pro: string = await this.doSendProgress();
-        if (pro && pro.toLowerCase().startsWith('error')) {
+        if (pro && pro.toLowerCase().startsWith(GlobalConst.error)) {
           return;
         }
         let progress = {} as RPCSendProgressType;
@@ -1525,18 +1462,19 @@ export default class RPC {
         // because I don't know what the user are doing, I force every 2 seconds
         // the interrupt flag to true if the sync_interrupt is false
         if (!progress.sync_interrupt) {
-          await RPC.rpc_setInterruptSyncAfterBatch('true');
+          await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
         }
 
         const updatedProgress = new SendProgressClass(0, 0, 0);
-        if (sendId === prevSendId) {
+        // if the send command fails really fast then the sendID never change.
+        // In this case I need to finish this promise right away.
+        if (sendId === prevSendId && !sendTxid && !sendError) {
           //console.log('progress id', sendId);
           // Still not started, so wait for more time
-          //setSendProgress(updatedProgress);
           return;
         }
 
-        //console.log('progress', progress);
+        console.log('progress', progress);
 
         // Calculate ETA.
         let secondsPerComputation = 3; // default
@@ -1559,12 +1497,18 @@ export default class RPC {
         this.setInSend(progress.sending);
 
         updatedProgress.progress = progress.progress;
-        //updatedProgress.total = Math.max(progress.total, progress.progress); // sometimes, due to change, the total can be off by 1
         updatedProgress.total = 3; // until sendprogress give me a good value... 3 is better.
         updatedProgress.sendInProgress = progress.sending;
         updatedProgress.etaSeconds = progress.progress === 0 ? '...' : eta;
 
-        if (!progress.txid && !progress.error) {
+        // exists a possible problem:
+        // if the send process is really fast (likely an error) and sendprogress is over
+        // in this moment.
+
+        // sometimes the progress.sending is false and txid and error are null
+        // in this moment I can use the values from the command send
+
+        if (!progress.txid && !progress.error && !sendTxid && !sendError) {
           // Still processing
           setSendProgress(updatedProgress);
           return;
@@ -1577,12 +1521,37 @@ export default class RPC {
         if (progress.txid) {
           // And refresh data (full refresh)
           this.refresh(true);
-
+          // send process is about to finish - reactivate the syncing flag
+          if (progress.sync_interrupt) {
+            await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
+          }
           resolve(progress.txid);
         }
 
         if (progress.error) {
+          // send process is about to finish - reactivate the syncing flag
+          if (progress.sync_interrupt) {
+            await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
+          }
           reject(progress.error);
+        }
+
+        if (sendTxid) {
+          // And refresh data (full refresh)
+          this.refresh(true);
+          // send process is about to finish - reactivate the syncing flag
+          if (progress.sync_interrupt) {
+            await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
+          }
+          resolve(sendTxid);
+        }
+
+        if (sendError) {
+          // send process is about to finish - reactivate the syncing flag
+          if (progress.sync_interrupt) {
+            await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
+          }
+          reject(sendError);
         }
       }, 2000); // Every 2 seconds
     });
@@ -1594,11 +1563,12 @@ export default class RPC {
     const exists = await RPCModule.walletExists();
 
     //console.log('jc change wallet', exists);
-    if (exists && exists !== 'false') {
+    if (exists && exists !== GlobalConst.false) {
+      await this.stopSyncProcess();
       await RPCModule.doSaveBackup();
       const result = await RPCModule.deleteExistingWallet();
 
-      if (!(result && result !== 'false')) {
+      if (!(result && result !== GlobalConst.false)) {
         return this.translate('rpc.deletewallet-error');
       }
     } else {
@@ -1611,10 +1581,11 @@ export default class RPC {
     const exists = await RPCModule.walletExists();
 
     //console.log('jc change wallet', exists);
-    if (exists && exists !== 'false') {
+    if (exists && exists !== GlobalConst.false) {
+      await this.stopSyncProcess();
       const result = await RPCModule.deleteExistingWallet();
 
-      if (!(result && result !== 'false')) {
+      if (!(result && result !== GlobalConst.false)) {
         return this.translate('rpc.deletewallet-error');
       }
     } else {
@@ -1627,11 +1598,12 @@ export default class RPC {
     const existsBackup = await RPCModule.walletBackupExists();
 
     //console.log('jc restore backup', existsBackup);
-    if (existsBackup && existsBackup !== 'false') {
+    if (existsBackup && existsBackup !== GlobalConst.false) {
       const existsWallet = await RPCModule.walletExists();
 
       //console.log('jc restore wallet', existsWallet);
-      if (existsWallet && existsWallet !== 'false') {
+      if (existsWallet && existsWallet !== GlobalConst.false) {
+        await this.stopSyncProcess();
         await RPCModule.restoreExistingWalletBackup();
       } else {
         return this.translate('rpc.walletnotfound-error');

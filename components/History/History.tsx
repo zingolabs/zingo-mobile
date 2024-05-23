@@ -3,9 +3,12 @@ import React, { useContext, useState, useEffect, useCallback, useMemo } from 're
 import { View, ScrollView, Modal, RefreshControl } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
+import 'moment/locale/pt';
+import 'moment/locale/ru';
+
 import { useTheme } from '@react-navigation/native';
 
-import { TransactionType } from '../../app/AppState';
+import { ButtonTypeEnum, SendPageStateClass, TransactionType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -21,10 +24,11 @@ type HistoryProps = {
   syncingStatusMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  set_privacy_option: (value: boolean) => Promise<void>;
   setPoolsToShieldSelectSapling: (v: boolean) => void;
   setPoolsToShieldSelectTransparent: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
+  setSendPageState: (s: SendPageStateClass) => void;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -38,13 +42,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
   setPoolsToShieldSelectSapling,
   setPoolsToShieldSelectTransparent,
   setUfvkViewModalVisible,
+  setSendPageState,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, transactions, language, setBackgroundError, addLastSnackbar } = context;
+  const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const { colors } = useTheme() as unknown as ThemeType;
-  const [isTxDetailModalShowing, setTxDetailModalShowing] = useState(false);
+  const [isTxDetailModalShowing, setTxDetailModalShowing] = useState<boolean>(false);
   const [txDetail, setTxDetail] = useState<TransactionType>({} as TransactionType);
   const [numTx, setNumTx] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(numTx < (transactions.length || 0));
@@ -85,7 +90,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
         <TxDetail
           tx={txDetail}
           closeModal={() => setTxDetailModalShowing(false)}
+          openModal={() => setTxDetailModalShowing(true)}
           set_privacy_option={set_privacy_option}
+          setSendPageState={setSendPageState}
         />
       </Modal>
 
@@ -146,7 +153,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
               marginTop: 10,
               marginBottom: 30,
             }}>
-            <Button type="Secondary" title={translate('history.loadmore') as string} onPress={loadMoreClicked} />
+            <Button
+              type={ButtonTypeEnum.Secondary}
+              title={translate('history.loadmore') as string}
+              onPress={loadMoreClicked}
+            />
           </View>
         ) : (
           <>

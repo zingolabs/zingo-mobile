@@ -8,6 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Pools from '../components/Pools';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { CurrencyNameEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -46,7 +47,7 @@ describe('Component Pools - test', () => {
   //snapshot test
   const state = defaultAppStateLoaded;
   state.translate = () => 'translated text';
-  state.info.currencyName = 'ZEC';
+  state.info.currencyName = CurrencyNameEnum.ZEC;
   state.totalBalance.total = 1.12345678;
   state.totalBalance.orchardBal = 0.6;
   state.totalBalance.spendableOrchard = 0.3;

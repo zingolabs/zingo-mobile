@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, Alert } from 'react-native';
+import { View, ScrollView, SafeAreaView, Alert, ActivityIndicator } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import Button from '../Components/Button';
@@ -9,7 +9,12 @@ import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import SingleAddress from '../Components/SingleAddress';
 import RPC from '../../app/rpc';
-import FadeText from '../Components/FadeText';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
+import 'moment/locale/ru';
+import RegText from '../Components/RegText';
+import { ButtonTypeEnum, ChainNameEnum, GlobalConst, ModeEnum, UfvkActionEnum } from '../../app/AppState';
 
 type TextsType = {
   new: string[];
@@ -23,16 +28,17 @@ type TextsType = {
 type ShowUfvkProps = {
   onClickOK: () => void;
   onClickCancel: () => void;
-  action: 'change' | 'view' | 'backup' | 'server';
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  action: UfvkActionEnum;
+  set_privacy_option: (value: boolean) => Promise<void>;
 };
 const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, wallet, server, netInfo, mode, addLastSnackbar } = context;
-  const { ufvk } = wallet;
+  const { translate, wallet, server, netInfo, mode, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
-  const [times, setTimes] = useState(0);
-  const [texts, setTexts] = useState({} as TextsType);
+  moment.locale(language);
+
+  const [times, setTimes] = useState<number>(0);
+  const [texts, setTexts] = useState<TextsType>({} as TextsType);
 
   useEffect(() => {
     const buttonTextsArray = translate('ufvk.buttontexts');
@@ -41,24 +47,28 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
       buttonTexts = buttonTextsArray as TextsType;
       setTexts(buttonTexts);
     }
-    setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
+    setTimes(
+      action === UfvkActionEnum.change || action === UfvkActionEnum.backup || action === UfvkActionEnum.server ? 1 : 0,
+    );
   }, [action, translate]);
 
+  // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+    (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
   }, []);
 
   const onPressOK = () => {
     Alert.alert(
       !!texts && !!texts[action] ? texts[action][3] : '',
-      (action === 'change'
+      (action === UfvkActionEnum.change
         ? (translate('ufvk.change-warning') as string)
-        : action === 'backup'
+        : action === UfvkActionEnum.backup
         ? (translate('ufvk.backup-warning') as string)
-        : action === 'server'
+        : action === UfvkActionEnum.server
         ? (translate('ufvk.server-warning') as string)
         : '') +
-        (server.chain_name !== 'main' && (action === 'change' || action === 'server')
+        (server.chain_name !== ChainNameEnum.mainChainName &&
+        (action === UfvkActionEnum.change || action === UfvkActionEnum.server)
           ? '\n' + (translate('ufvk.mainnet-warning') as string)
           : ''),
       [
@@ -68,7 +78,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         },
         { text: translate('cancel') as string, onPress: () => onClickCancel(), style: 'cancel' },
       ],
-      { cancelable: true, userInterfaceStyle: 'light' },
+      { cancelable: false, userInterfaceStyle: 'light' },
     );
   };
 
@@ -99,21 +109,17 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
-        <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
-          {action === 'backup' || action === 'change' || action === 'server'
+        <RegText style={{ marginTop: 0, padding: 20, textAlign: 'center', fontWeight: '900' }}>
+          {action === UfvkActionEnum.backup || action === UfvkActionEnum.change || action === UfvkActionEnum.server
             ? (translate(`ufvk.text-readonly-${action}`) as string)
             : (translate('ufvk.text-readonly') as string)}
-        </FadeText>
+        </RegText>
 
         <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
-          <SingleAddress
-            address={ufvk || ''}
-            addressKind={'u'}
-            index={0}
-            total={1}
-            prev={() => null}
-            next={() => null}
-          />
+          {!!wallet.ufvk && (
+            <SingleAddress address={wallet.ufvk} ufvk={true} index={0} total={1} prev={() => null} next={() => null} />
+          )}
+          {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}
         </View>
 
         <View style={{ marginBottom: 30 }} />
@@ -127,19 +133,23 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           marginVertical: 5,
         }}>
         <Button
-          type={mode === 'basic' ? 'Secondary' : 'Primary'}
+          type={mode === ModeEnum.basic ? ButtonTypeEnum.Secondary : ButtonTypeEnum.Primary}
           style={{
-            backgroundColor: mode === 'basic' ? colors.background : colors.primary,
+            backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
           }}
           title={
-            mode === 'basic' ? (translate('cancel') as string) : !!texts && !!texts[action] ? texts[action][times] : ''
+            mode === ModeEnum.basic
+              ? (translate('cancel') as string)
+              : !!texts && !!texts[action]
+              ? texts[action][times]
+              : ''
           }
           onPress={() => {
-            if (!ufvk) {
+            if (!wallet.ufvk) {
               return;
             }
             if (!netInfo.isConnected && times > 0) {
-              addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+              addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
               return;
             }
             if (times === 0) {
@@ -151,7 +161,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         />
         {times > 0 && (
           <Button
-            type="Secondary"
+            type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
             style={{ marginLeft: 10 }}
             onPress={onClickCancel}

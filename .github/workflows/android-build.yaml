@@ -1,0 +1,164 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      cache-key:
+        required: true
+        type: string
+      arch:
+        required: true
+        type: string
+
+env:
+  CACHE-KEY: ${{ inputs.cache-key }}
+  ARCH: ${{ inputs.arch }}
+  REPO-OWNER: ${{ github.repository_owner }}
+
+jobs:
+  android-check-build-cache:
+    name: Check build cache
+    runs-on: macos-12
+    outputs:
+      android-cache-found: ${{ steps.android-set-cache-found.outputs.android-cache-found }}
+    steps:     
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+            
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+        
+      - name: Check if native rust cache exists
+        id: android-check-build-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/src/main/jniLibs/${{ env.ARCH }}
+          key: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          lookup-only: true
+  
+      - name: Set cache-found
+        id: android-set-cache-found
+        run: echo "android-cache-found=${{ steps.android-check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+  
+  android-build:
+    name: Build native rust
+    needs: android-check-build-cache
+    if: ${{ needs.android-check-build-cache.outputs.android-cache-found != 'true' }}
+    runs-on: ubuntu-22.04
+    container:
+      image: zingodevops/android_builder:008
+    env:
+      RUSTUP_HOME: /root/.rustup
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+            
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+        
+      - name: Cargo update for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: |
+          echo "zingolib_ref=$(echo ${GITHUB_REF} | sed 's/\//\\\//g')" >> $GITHUB_ENV
+          sed -i "/^zingolib\|^zingoconfig/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
+          if cat rust/lib/Cargo.toml | grep "^zingolib\|^zingoconfig" | grep -q "branch"; then exit 1; fi
+          cd rust
+          cargo update -p zingolib -p zingoconfig --aggressive
+          cargo install --version ^3 cargo-ndk
+          rustup default nightly
+      
+      - name: Set envs for x86_64
+        if: ${{ env.ARCH == 'x86_64' }}
+        run: |
+          echo "TARGET=x86_64-linux-android" >> $GITHUB_ENV
+          echo "CC=x86_64-linux-android" >> $GITHUB_ENV
+          echo "OPENSSL_PATH=x86_64" >> $GITHUB_ENV
+      
+      - name: Set envs for x86
+        if: ${{ env.ARCH == 'x86' }}
+        run: |
+          echo "TARGET=i686-linux-android" >> $GITHUB_ENV
+          echo "CC=i686-linux-android" >> $GITHUB_ENV
+          echo "OPENSSL_PATH=x86" >> $GITHUB_ENV
+      
+      - name: Set envs for arm64-v8a
+        if: ${{ env.ARCH == 'arm64-v8a' }}
+        run: |
+          echo "TARGET=aarch64-linux-android" >> $GITHUB_ENV
+          echo "CC=aarch64-linux-android" >> $GITHUB_ENV
+          echo "OPENSSL_PATH=aarch64" >> $GITHUB_ENV
+      
+      - name: Set envs for armeabi-v7a
+        if: ${{ env.ARCH == 'armeabi-v7a' }}
+        run: |
+          echo "TARGET=armv7-linux-androideabi" >> $GITHUB_ENV
+          echo "CC=armv7a-linux-androideabi" >> $GITHUB_ENV
+          echo "OPENSSL_PATH=armv7" >> $GITHUB_ENV
+
+      - name: Cargo NDK
+        run: |
+          cargo install --version ^3 cargo-ndk
+          rustup default nightly
+
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+      
+      - name: Cargo build
+        working-directory: ./rust/lib
+        run: cargo ndk --target ${{ env.TARGET }} build --release -Z build-std 
+        env:
+          AR: llvm-ar
+          LD: ld
+          RANLIB: llvm-ranlib
+          CC: ${{ env.CC }}24-clang
+          OPENSSL_DIR: /opt/openssl-3.1.3/${{ env.OPENSSL_PATH }}
+          CARGO_FEATURE_STD: true
+      
+      - name: LLVM Strip
+        working-directory: ./rust/target
+        run: llvm-strip ./${{ env.TARGET }}/release/libzingo.so
+
+      - name: Rename the rust lib for uniffi compatibility
+        working-directory: ./rust/target/${{ env.TARGET }}/release
+        run: mv ./libzingo.so ./libuniffi_zingo.so
+      
+      - name: Upload native rust
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
+      
+  cache-native-android-uniffi:
+    name: Cache native rust
+    needs: android-build
+    runs-on: macos-12
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+            
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+            
+      - name: Download native rust
+        uses: actions/download-artifact@v4
+        with: 
+          name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          path: android/app/src/main/jniLibs/${{ env.ARCH }}
+      
+      - name: Cache native rust
+        uses: actions/cache/save@v4
+        with:
+          path: android/app/src/main/jniLibs/${{ env.ARCH }}
+          key: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+

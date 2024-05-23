@@ -1,6 +1,11 @@
+import { ChainNameEnum } from '../../AppState';
+import { RPCAdressKindEnum } from '../enums/RPCAddressKindEnum';
+import { RPCParseStatusEnum } from '../enums/RPCParseStatusEnum';
+import { RPCPoolsEnum } from '../enums/RPCPoolsEnum';
+
 export type RPCParseViewKeyType = {
-  status: 'success' | 'Invalid address';
-  chain_name?: 'main' | 'test' | 'regtest';
-  address_kind?: 'ufvk';
-  pools_available?: 'orchard' | 'sapling' | 'transparent'[];
+  status: RPCParseStatusEnum;
+  chain_name?: ChainNameEnum;
+  address_kind?: RPCAdressKindEnum.ufvkAddressKind;
+  pools_available?: RPCPoolsEnum[];
 };

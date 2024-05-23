@@ -9,6 +9,15 @@ import { render } from '@testing-library/react-native';
 import Send from '../components/Send';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
 import { ThemeType } from '../app/types';
+import {
+  ModeEnum,
+  CurrencyEnum,
+  TransactionTypeEnum,
+  PoolEnum,
+  CurrencyNameEnum,
+  AddressKindEnum,
+  ReceiverEnum,
+} from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -23,16 +32,6 @@ jest.mock('react-native-localize', () => ({
   },
 }));
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-jest.mock('react-native-reanimated', () => {
-  return class Reanimated {
-    public static Value() {
-      return jest.fn(() => {});
-    }
-    public static View() {
-      return '';
-    }
-  };
-});
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
 
@@ -72,6 +71,7 @@ jest.mock('@react-navigation/native', () => ({
   useIsFocused: jest.fn(),
   useTheme: () => Theme,
 }));
+jest.mock('react-native-picker-select', () => 'RNPickerSelect');
 
 // test suite
 describe('Component Send - test', () => {
@@ -79,7 +79,7 @@ describe('Component Send - test', () => {
   const state = defaultAppStateLoaded;
   state.transactions = [
     {
-      type: 'Sent',
+      type: TransactionTypeEnum.Sent,
       fee: 0.0001,
       confirmations: 22,
       txid: 'sent-txid-1234567890',
@@ -99,7 +99,7 @@ describe('Component Send - test', () => {
       ],
     },
     {
-      type: 'SendToSelf',
+      type: TransactionTypeEnum.SendToSelf,
       fee: 0.0001,
       confirmations: 12,
       txid: 'sendtoself-txid-1234567890',
@@ -114,7 +114,7 @@ describe('Component Send - test', () => {
       ],
     },
     {
-      type: 'Received',
+      type: TransactionTypeEnum.Received,
       confirmations: 133,
       txid: 'receive-txid-1234567890',
       time: Date.now(),
@@ -123,13 +123,13 @@ describe('Component Send - test', () => {
         {
           address: '',
           amount: 0.77654321,
-          pool: 'Orchard',
+          pool: PoolEnum.OrchardPool,
           memos: ['hola', '  & ', 'hello'],
         },
         {
           address: '',
           amount: 0.1,
-          pool: 'Sapling',
+          pool: PoolEnum.SaplingPool,
           memos: ['hello', '  & ', 'hola'],
         },
       ],
@@ -140,30 +140,29 @@ describe('Component Send - test', () => {
     {
       uaAddress: 'UA-12345678901234567890',
       address: 'UA-12345678901234567890',
-      addressKind: 'u',
+      addressKind: AddressKindEnum.u,
       containsPending: false,
-      receivers: 'ozt',
+      receivers: ReceiverEnum.o + ReceiverEnum.z + ReceiverEnum.t,
     },
     {
       uaAddress: 'UA-12345678901234567890',
       address: 'sapling-12345678901234567890',
-      addressKind: 'z',
+      addressKind: AddressKindEnum.z,
       containsPending: false,
-      receivers: 'z',
+      receivers: ReceiverEnum.z,
     },
     {
       uaAddress: 'UA-12345678901234567890',
       address: 'transparent-12345678901234567890',
-      addressKind: 't',
+      addressKind: AddressKindEnum.t,
       containsPending: false,
-      receivers: 't',
+      receivers: ReceiverEnum.t,
     },
   ];
   state.translate = () => 'text translated';
-  state.currency = 'USD';
-  state.info.currencyName = 'ZEC';
+  state.currency = CurrencyEnum.USDCurrency;
+  state.info.currencyName = CurrencyNameEnum.ZEC;
   state.zecPrice.zecPrice = 33.33;
-  state.info.defaultFee = 10000;
   state.totalBalance.total = 1.12345678;
   state.totalBalance.orchardBal = 0.6;
   state.totalBalance.spendableOrchard = 0.3;
@@ -179,11 +178,11 @@ describe('Component Send - test', () => {
 
   test('Send no currency, privacy normal & mode basic - snapshot', () => {
     // no currency
-    state.currency = '';
+    state.currency = CurrencyEnum.noCurrency;
     // privacy normal
     state.privacy = false;
     // mode basic
-    state.mode = 'basic';
+    state.mode = ModeEnum.basic;
     const send = render(
       <ContextAppLoadedProvider value={state}>
         <Send
@@ -207,11 +206,11 @@ describe('Component Send - test', () => {
 
   test('Send currency USD, privacy high & mode advanced - snapshot', () => {
     // no currency
-    state.currency = 'USD';
+    state.currency = CurrencyEnum.USDCurrency;
     // privacy normal
     state.privacy = true;
     // mode basic
-    state.mode = 'advanced';
+    state.mode = ModeEnum.advanced;
     const send = render(
       <ContextAppLoadedProvider value={state}>
         <Send

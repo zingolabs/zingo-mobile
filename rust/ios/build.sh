@@ -1,7 +1,11 @@
 #!/bin/bash
 
-cargo lipo --release
-cbindgen src/lib.rs -l c > rust.h
+cd ../lib
+cargo run --release --bin uniffi-bindgen generate ../lib/src/zingo.udl --language swift --out-dir ./Generated
+cargo lipo --release --targets aarch64-apple-ios
 
-cp ../target/universal/release/librustios.a ../../ios
-cp rust.h ../../ios/
+cp ./Generated/zingo.swift ../../ios
+cp ./Generated/zingoFFI.h ../../ios
+cp ./Generated/zingoFFI.modulemap ../../ios
+
+cp ../target/universal/release/libzingo.a ../../ios/libuniffi_zingo.a

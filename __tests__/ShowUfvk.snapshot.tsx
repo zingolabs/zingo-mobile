@@ -8,6 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { ShowUfvk } from '../components/Ufvk';
 import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { CurrencyNameEnum, UfvkActionEnum } from '../app/AppState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -46,7 +47,7 @@ describe('Component ShowUfvk - test', () => {
   //snapshot test
   const state = defaultAppStateLoaded;
   state.translate = () => 'text translated';
-  state.info.currencyName = 'ZEC';
+  state.info.currencyName = CurrencyNameEnum.ZEC;
   state.totalBalance.total = 1.12345678;
   state.wallet.ufvk =
     'uview1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890';
@@ -55,7 +56,12 @@ describe('Component ShowUfvk - test', () => {
   test('ShowUfvk - snapshot', () => {
     const ufvk = render(
       <ContextAppLoadedProvider value={state}>
-        <ShowUfvk onClickCancel={onClose} onClickOK={onOK} action="view" set_privacy_option={jest.fn()} />
+        <ShowUfvk
+          onClickCancel={onClose}
+          onClickOK={onOK}
+          action={UfvkActionEnum.view}
+          set_privacy_option={jest.fn()}
+        />
       </ContextAppLoadedProvider>,
     );
     expect(ufvk.toJSON()).toMatchSnapshot();

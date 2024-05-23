@@ -1,23 +1,44 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, SafeAreaView, ScrollView, TouchableOpacity, Text, TextInput, Keyboard, Alert } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-community/clipboard';
-import Animated, { EasingNode } from 'react-native-reanimated';
+import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
-import { InfoType, NetInfoType, ServerType, TranslateType, WalletType } from '../../app/AppState';
+import {
+  InfoType,
+  LanguageEnum,
+  NetInfoType,
+  ServerType,
+  TranslateType,
+  WalletType,
+  ModeEnum,
+  ChainNameEnum,
+  SnackbarDurationEnum,
+  SeedActionEnum,
+  SettingsNameEnum,
+  SnackbarType,
+  ButtonTypeEnum,
+  GlobalConst,
+} from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import RPC from '../../app/rpc';
 import Header from '../Header';
 import Utils from '../../app/utils';
 import { createAlert } from '../../app/createAlert';
-import SnackbarType from '../../app/AppState/types/SnackbarType';
 import SettingsFileImpl from '../Settings/SettingsFileImpl';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
+import 'moment/locale/ru';
+
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 type TextsType = {
   new: string[];
@@ -31,8 +52,8 @@ type TextsType = {
 type SeedProps = {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
-  action: 'new' | 'change' | 'view' | 'restore' | 'backup' | 'server';
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  action: SeedActionEnum;
+  set_privacy_option: (value: boolean) => Promise<void>;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
   const contextLoaded = useContext(ContextAppLoaded);
@@ -43,10 +64,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     server: ServerType,
     netInfo: NetInfoType,
     privacy: boolean,
-    mode: 'basic' | 'advanced',
+    mode: ModeEnum.basic | ModeEnum.advanced,
     setBackgroundError: (title: string, error: string) => void,
-    addLastSnackbar: (snackbar: SnackbarType) => void;
-  if (action === 'new' || action === 'restore') {
+    addLastSnackbar: (snackbar: SnackbarType) => void,
+    language: LanguageEnum;
+  if (action === SeedActionEnum.new || action === SeedActionEnum.restore) {
     wallet = contextLoading.wallet;
     translate = contextLoading.translate;
     info = contextLoading.info;
@@ -56,6 +78,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     mode = contextLoading.mode;
     setBackgroundError = contextLoading.setBackgroundError;
     addLastSnackbar = contextLoading.addLastSnackbar;
+    language = contextLoading.language;
   } else {
     wallet = contextLoaded.wallet;
     translate = contextLoaded.translate;
@@ -66,21 +89,24 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     mode = contextLoaded.mode;
     setBackgroundError = contextLoaded.setBackgroundError;
     addLastSnackbar = contextLoaded.addLastSnackbar;
+    language = contextLoaded.language;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
-  const [seedPhrase, setSeedPhrase] = useState('');
-  const [birthdayNumber, setBirthdayNumber] = useState('');
-  const [times, setTimes] = useState(0);
-  const [texts, setTexts] = useState({} as TextsType);
-  const [readOnly, setReadOnly] = useState(true);
-  const [titleViewHeight, setTitleViewHeight] = useState(0);
-  const [latestBlock, setLatestBlock] = useState(0);
-  const [expandSeed, setExpandSeed] = useState(false);
-  const [expandBirthday, setExpandBithday] = useState(false);
-  const [basicFirstViewSeed, setBasicFirstViewSeed] = useState(true);
+  moment.locale(language);
 
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const [seedPhrase, setSeedPhrase] = useState<string>('');
+  const [birthdayNumber, setBirthdayNumber] = useState<string>('');
+  const [times, setTimes] = useState<number>(0);
+  const [texts, setTexts] = useState<TextsType>({} as TextsType);
+  const [readOnly, setReadOnly] = useState<boolean>(true);
+  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
+  const [latestBlock, setLatestBlock] = useState<number>(0);
+  const [expandSeed, setExpandSeed] = useState<boolean>(false);
+  const [expandBirthday, setExpandBithday] = useState<boolean>(false);
+  const [basicFirstViewSeed, setBasicFirstViewSeed] = useState<boolean>(true);
+
+  const slideAnim = useSharedValue(0);
 
   useEffect(() => {
     (async () => {
@@ -118,29 +144,25 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
       setTexts(buttonTexts);
     }
     setReadOnly(
-      action === 'new' || action === 'view' || action === 'change' || action === 'backup' || action === 'server',
+      action === SeedActionEnum.new ||
+        action === SeedActionEnum.view ||
+        action === SeedActionEnum.change ||
+        action === SeedActionEnum.backup ||
+        action === SeedActionEnum.server,
     );
-    setTimes(action === 'change' || action === 'backup' || action === 'server' ? 1 : 0);
+    setTimes(
+      action === SeedActionEnum.change || action === SeedActionEnum.backup || action === SeedActionEnum.server ? 1 : 0,
+    );
     setSeedPhrase(wallet.seed || '');
     setBirthdayNumber((wallet.birthday && wallet.birthday.toString()) || '');
   }, [action, wallet.seed, wallet.birthday, wallet, translate]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      Animated.timing(slideAnim, {
-        toValue: 0 - titleViewHeight + 25,
-        duration: 100,
-        easing: EasingNode.linear,
-        //useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0 - titleViewHeight + 25, { duration: 100, easing: Easing.linear });
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 100,
-        easing: EasingNode.linear,
-        //useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
     });
 
     return () => {
@@ -150,14 +172,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   }, [slideAnim, titleViewHeight]);
 
   useEffect(() => {
-    if (action === 'restore') {
+    if (action === SeedActionEnum.restore) {
       if (info.latestBlock) {
         setLatestBlock(info.latestBlock);
       } else {
         (async () => {
           const resp: string = await RPCModule.getLatestBlock(server.uri);
           //console.log(resp);
-          if (resp && !resp.toLowerCase().startsWith('error')) {
+          if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
             setLatestBlock(Number(resp));
           } else {
             //console.log('error latest block', resp);
@@ -185,30 +207,32 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     translate,
   ]);
 
+  // because this screen is fired from more places than the menu.
   useEffect(() => {
-    if (action !== 'new' && action !== 'restore') {
-      (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+    if (action !== SeedActionEnum.new && action !== SeedActionEnum.restore) {
+      (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
     }
   }, [action]);
 
   const onPressOK = () => {
     Alert.alert(
       !!texts && !!texts[action] ? texts[action][3] : '',
-      (action === 'change'
+      (action === SeedActionEnum.change
         ? (translate('seed.change-warning') as string)
-        : action === 'backup'
+        : action === SeedActionEnum.backup
         ? (translate('seed.backup-warning') as string)
-        : action === 'server'
+        : action === SeedActionEnum.server
         ? (translate('seed.server-warning') as string)
         : '') +
-        (server.chain_name !== 'main' && (action === 'change' || action === 'server')
+        (server.chain_name !== ChainNameEnum.mainChainName &&
+        (action === SeedActionEnum.change || action === SeedActionEnum.server)
           ? '\n' + (translate('seed.mainnet-warning') as string)
           : ''),
       [
         {
           text: translate('confirm') as string,
           onPress: () => {
-            if (action === 'restore') {
+            if (action === SeedActionEnum.restore) {
               // waiting while closing the keyboard, just in case.
               setTimeout(async () => {
                 onClickOK(seedPhrase, Number(birthdayNumber));
@@ -220,7 +244,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         },
         { text: translate('cancel') as string, onPress: () => onClickCancel(), style: 'cancel' },
       ],
-      { cancelable: true, userInterfaceStyle: 'light' },
+      { cancelable: false, userInterfaceStyle: 'light' },
     );
   };
 
@@ -254,7 +278,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             netInfo={netInfo}
             mode={mode}
             addLastSnackbar={addLastSnackbar}
-            receivedLegend={action === 'view' ? !basicFirstViewSeed : false}
+            receivedLegend={action === SeedActionEnum.view ? !basicFirstViewSeed : false}
           />
         </View>
       </Animated.View>
@@ -269,13 +293,13 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
-        <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
+        <RegText style={{ marginTop: 0, padding: 20, textAlign: 'center', fontWeight: '900' }}>
           {readOnly
-            ? action === 'backup' || action === 'change' || action === 'server'
+            ? action === SeedActionEnum.backup || action === SeedActionEnum.change || action === SeedActionEnum.server
               ? (translate(`seed.text-readonly-${action}`) as string)
               : (translate('seed.text-readonly') as string)
             : (translate('seed.text-no-readonly') as string)}
-        </FadeText>
+        </RegText>
         <View
           style={{
             margin: 10,
@@ -293,8 +317,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   if (addLastSnackbar) {
                     addLastSnackbar({
                       message: translate('seed.tapcopy-seed-message') as string,
-                      type: 'Primary',
-                      duration: 'short',
+                      duration: SnackbarDurationEnum.short,
                     });
                   }
                   setExpandSeed(true);
@@ -314,40 +337,49 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               </RegText>
             </TouchableOpacity>
           ) : (
-            <View
-              accessible={true}
-              accessibilityLabel={translate('seed.seed-acc') as string}
-              style={{
-                margin: 0,
-                borderWidth: 1,
-                borderRadius: 10,
-                borderColor: colors.text,
-                maxWidth: '100%',
-                maxHeight: '70%',
-                minWidth: '95%',
-                minHeight: 100,
-              }}>
-              <TextInput
-                testID="seed.seedinput"
-                placeholder={translate('seed.seedplaceholder') as string}
-                placeholderTextColor={colors.placeholder}
-                multiline
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View
+                accessible={true}
+                accessibilityLabel={translate('seed.seed-acc') as string}
                 style={{
-                  color: colors.text,
-                  fontWeight: '600',
-                  fontSize: 16,
-                  minWidth: '95%',
+                  margin: 0,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  borderColor: colors.text,
+                  width: 'auto',
+                  flex: 1,
                   minHeight: 100,
-                  marginLeft: 5,
-                  backgroundColor: 'transparent',
-                }}
-                value={seedPhrase}
-                onChangeText={(text: string) => setSeedPhrase(text)}
-                editable={true}
-              />
+                }}>
+                <TextInput
+                  testID="seed.seedinput"
+                  placeholder={translate('seed.seedplaceholder') as string}
+                  placeholderTextColor={colors.placeholder}
+                  multiline
+                  style={{
+                    color: colors.text,
+                    fontWeight: '600',
+                    fontSize: 16,
+                    minHeight: 100,
+                    marginLeft: 5,
+                    backgroundColor: 'transparent',
+                    textAlignVertical: 'top',
+                  }}
+                  value={seedPhrase}
+                  onChangeText={(text: string) => setSeedPhrase(text)}
+                  editable={true}
+                />
+              </View>
+              {seedPhrase && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setSeedPhrase('');
+                  }}>
+                  <FontAwesomeIcon style={{ marginLeft: 5 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+                </TouchableOpacity>
+              )}
             </View>
           )}
-          {action !== 'restore' && (
+          {action !== SeedActionEnum.restore && (
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <View />
               <TouchableOpacity
@@ -357,8 +389,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                     if (addLastSnackbar) {
                       addLastSnackbar({
                         message: translate('seed.tapcopy-seed-message') as string,
-                        type: 'Primary',
-                        duration: 'short',
+                        duration: SnackbarDurationEnum.short,
                       });
                     }
                   }
@@ -390,8 +421,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
                   if (addLastSnackbar) {
                     addLastSnackbar({
                       message: translate('seed.tapcopy-birthday-message') as string,
-                      type: 'Primary',
-                      duration: 'short',
+                      duration: SnackbarDurationEnum.short,
                     });
                   }
                   setExpandBithday(true);
@@ -467,12 +497,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         }}>
         <Button
           testID="seed.button.OK"
-          type={mode === 'basic' ? 'Secondary' : 'Primary'}
+          type={mode === ModeEnum.basic ? ButtonTypeEnum.Secondary : ButtonTypeEnum.Primary}
           style={{
-            backgroundColor: mode === 'basic' ? colors.background : colors.primary,
+            backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
           }}
           title={
-            mode === 'basic'
+            mode === ModeEnum.basic
               ? !basicFirstViewSeed
                 ? (translate('seed.showtransactions') as string)
                 : (translate('close') as string)
@@ -484,33 +514,27 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             if (!seedPhrase) {
               return;
             }
-            if (!netInfo.isConnected && (times > 0 || action === 'restore')) {
+            if (!netInfo.isConnected && (times > 0 || action === SeedActionEnum.restore)) {
               if (addLastSnackbar) {
-                addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+                addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
               }
               return;
             }
             // the user just see the seed for the first time.
-            if (mode === 'basic' && !basicFirstViewSeed) {
-              await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
+            if (mode === ModeEnum.basic && !basicFirstViewSeed) {
+              await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
             }
             if (times === 0) {
-              if (action === 'restore') {
-                // waiting while closing the keyboard, just in case.
-                setTimeout(async () => {
-                  onClickOK(seedPhrase, Number(birthdayNumber));
-                }, 100);
-              } else {
-                onClickOK(seedPhrase, Number(birthdayNumber));
-              }
+              Keyboard.dismiss();
+              onClickOK(seedPhrase, Number(birthdayNumber));
             } else if (times === 1) {
               onPressOK();
             }
           }}
         />
-        {(times > 0 || action === 'restore') && (
+        {(times > 0 || action === SeedActionEnum.restore) && (
           <Button
-            type="Secondary"
+            type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
             style={{ marginLeft: 10 }}
             onPress={onClickCancel}

@@ -41,8 +41,10 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         style={
           {
             "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "900",
             "marginTop": 0,
-            "opacity": 0.65,
+            "opacity": 1,
             "padding": 20,
             "textAlign": "center",
           }
@@ -222,8 +224,8 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(242, 242, 242)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(28, 28, 30)",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -255,16 +257,14 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        >
-          text translated
-        </Text>
+        />
       </View>
     </View>
     <View
@@ -371,8 +371,10 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         style={
           {
             "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "900",
             "marginTop": 0,
-            "opacity": 0.65,
+            "opacity": 1,
             "padding": 20,
             "textAlign": "center",
           }
@@ -552,8 +554,8 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(242, 242, 242)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(28, 28, 30)",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -585,16 +587,14 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        >
-          text translated
-        </Text>
+        />
       </View>
     </View>
     <View
@@ -701,8 +701,10 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         style={
           {
             "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "900",
             "marginTop": 0,
-            "opacity": 0.65,
+            "opacity": 1,
             "padding": 20,
             "textAlign": "center",
           }
@@ -882,8 +884,8 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(242, 242, 242)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(28, 28, 30)",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -915,16 +917,14 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        >
-          text translated
-        </Text>
+        />
       </View>
     </View>
   </View>
@@ -972,8 +972,10 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
         style={
           {
             "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "900",
             "marginTop": 0,
-            "opacity": 0.65,
+            "opacity": 1,
             "padding": 20,
             "textAlign": "center",
           }
@@ -994,40 +996,97 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
         }
       >
         <View
-          accessibilityLabel="text translated"
-          accessible={true}
           style={
             {
-              "borderColor": "rgb(28, 28, 30)",
-              "borderRadius": 10,
-              "borderWidth": 1,
-              "margin": 0,
-              "maxHeight": "70%",
-              "maxWidth": "100%",
-              "minHeight": 100,
-              "minWidth": "95%",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
             }
           }
         >
-          <TextInput
-            editable={true}
-            multiline={true}
-            onChangeText={[Function]}
-            placeholder="text translated"
+          <View
+            accessibilityLabel="text translated"
+            accessible={true}
             style={
               {
-                "backgroundColor": "transparent",
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 16,
-                "fontWeight": "600",
-                "marginLeft": 5,
+                "borderColor": "rgb(28, 28, 30)",
+                "borderRadius": 10,
+                "borderWidth": 1,
+                "flex": 1,
+                "margin": 0,
                 "minHeight": 100,
-                "minWidth": "95%",
+                "width": "auto",
               }
             }
-            testID="seed.seedinput"
-            value="pepe lolo titi"
-          />
+          >
+            <TextInput
+              editable={true}
+              multiline={true}
+              onChangeText={[Function]}
+              placeholder="text translated"
+              style={
+                {
+                  "backgroundColor": "transparent",
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 16,
+                  "fontWeight": "600",
+                  "marginLeft": 5,
+                  "minHeight": 100,
+                  "textAlignVertical": "top",
+                }
+              }
+              testID="seed.seedinput"
+              value="pepe lolo titi"
+            />
+          </View>
+          <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <
+              icon={
+                {
+                  "icon": [
+                    384,
+                    512,
+                    [
+                      128473,
+                      10005,
+                      10006,
+                      10060,
+                      215,
+                      "close",
+                      "multiply",
+                      "remove",
+                      "times",
+                    ],
+                    "f00d",
+                    "M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z",
+                  ],
+                  "iconName": "xmark",
+                  "prefix": "fas",
+                }
+              }
+              size={25}
+              style={
+                {
+                  "marginLeft": 5,
+                }
+              }
+            />
+          </View>
         </View>
       </View>
       <View
@@ -1132,8 +1191,8 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(242, 242, 242)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(28, 28, 30)",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -1165,16 +1224,14 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        >
-          text translated
-        </Text>
+        />
       </View>
     </View>
     <View
@@ -1281,8 +1338,10 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         style={
           {
             "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "900",
             "marginTop": 0,
-            "opacity": 0.65,
+            "opacity": 1,
             "padding": 20,
             "textAlign": "center",
           }
@@ -1462,8 +1521,8 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(242, 242, 242)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(28, 28, 30)",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -1495,16 +1554,14 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        >
-          text translated
-        </Text>
+        />
       </View>
     </View>
     <View
@@ -1611,8 +1668,10 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         style={
           {
             "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "900",
             "marginTop": 0,
-            "opacity": 0.65,
+            "opacity": 1,
             "padding": 20,
             "textAlign": "center",
           }
@@ -1792,8 +1851,8 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(242, 242, 242)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "rgb(0, 122, 255)",
+          "borderColor": "rgb(28, 28, 30)",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -1825,16 +1884,14 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "rgb(242, 242, 242)",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
               "textTransform": "uppercase",
             }
           }
-        >
-          text translated
-        </Text>
+        />
       </View>
     </View>
   </View>

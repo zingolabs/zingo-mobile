@@ -13,7 +13,16 @@ import { ThemeType } from '../app/types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { I18n } from 'i18n-js';
 import { StackScreenProps } from '@react-navigation/stack';
-import { ServerType } from '../app/AppState';
+import {
+  BackgroundType,
+  AddressBookFileClass,
+  ServerType,
+  LanguageEnum,
+  ModeEnum,
+  SelectServerEnum,
+  ChainNameEnum,
+  CurrencyEnum,
+} from '../app/AppState';
 
 // Crea un mock para el constructor de I18n
 jest.mock('i18n-js', () => ({
@@ -112,20 +121,38 @@ describe('Component LoadedApp - test', () => {
       },
     };
     const translate = () => 'text traslated';
-    const language = 'en';
-    const currency = '';
+    const language = LanguageEnum.en;
+    const currency = CurrencyEnum.noCurrency;
     const server: ServerType = {
       uri: 'https://mainnet.lightwalletd.com:9067',
-      chain_name: 'main',
+      chain_name: ChainNameEnum.mainChainName,
     };
     const sendAll = false;
+    const rescanMenuOption = false;
+    const donation = false;
     const privacy = false;
-    const mode = 'basic';
-    const background = {
+    const mode = ModeEnum.basic;
+    const background: BackgroundType = {
       batches: 0,
+      message: '',
       date: 0,
+      dateEnd: 0,
     };
     const readOnly = false;
+    const toggleTheme = jest.fn();
+    const addressBook = [] as AddressBookFileClass[];
+    const security = {
+      startApp: true,
+      foregroundApp: true,
+      sendConfirm: true,
+      seedScreen: true,
+      ufvkScreen: true,
+      rescanScreen: true,
+      settingsScreen: true,
+      changeWalletScreen: true,
+      restoreWalletBackupScreen: true,
+    };
+    const selectServer = SelectServerEnum.auto;
     const receive = render(
       <LoadedAppClass
         navigation={navigationMock}
@@ -136,10 +163,16 @@ describe('Component LoadedApp - test', () => {
         currency={currency}
         server={server}
         sendAll={sendAll}
+        donation={donation}
         privacy={privacy}
         mode={mode}
         background={background}
         readOnly={readOnly}
+        toggleTheme={toggleTheme}
+        addressBook={addressBook}
+        security={security}
+        selectServer={selectServer}
+        rescanMenuOption={rescanMenuOption}
       />,
     );
     expect(receive.toJSON()).toMatchSnapshot();
