@@ -52,6 +52,7 @@ import {
   AppStateStatusEnum,
   ButtonTypeEnum,
   GlobalConst,
+  EventListenerEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -523,7 +524,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       }
     })();
 
-    this.appstate = AppState.addEventListener('change', async nextAppState => {
+    this.appstate = AppState.addEventListener(EventListenerEnum.change, async nextAppState => {
       //console.log('LOADING', 'next', nextAppState, 'prior', this.state.appState);
       if (
         (this.state.appState === AppStateStatusEnum.inactive ||

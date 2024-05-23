@@ -61,6 +61,7 @@ import {
   AppStateStatusEnum,
   GlobalConst,
   TransactionTypeEnum,
+  EventListenerEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -387,7 +388,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       await this.rpc.configure();
     })();
 
-    this.appstate = AppState.addEventListener('change', async nextAppState => {
+    this.appstate = AppState.addEventListener(EventListenerEnum.change, async nextAppState => {
       //console.log('LOADED', 'prior', this.state.appState, 'next', nextAppState);
       if (Platform.OS === GlobalConst.platformOSios) {
         if (
@@ -491,7 +492,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
     })();
 
-    this.linking = Linking.addEventListener('url', async ({ url }) => {
+    this.linking = Linking.addEventListener(EventListenerEnum.url, async ({ url }) => {
       //console.log(url);
       if (url !== null) {
         this.readUrl(url);

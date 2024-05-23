@@ -51,6 +51,7 @@ import { AddressKindEnum } from './enums/AddressKindEnum';
 import { ReceiverEnum } from './enums/ReceiverEnum';
 import { PrivacyLevelFromEnum } from './enums/PrivacyLevelFromEnum';
 import { SecurityTypeEnum } from './enums/SecurityTypeEnum';
+import { EventListenerEnum } from './enums/EventListenerEnum';
 
 import { GlobalConst } from './const/GlobalConst';
 
@@ -111,5 +112,6 @@ export {
   ReceiverEnum,
   PrivacyLevelFromEnum,
   SecurityTypeEnum,
+  EventListenerEnum,
   GlobalConst,
 };
