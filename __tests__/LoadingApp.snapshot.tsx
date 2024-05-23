@@ -151,7 +151,7 @@ describe('Component LoadingApp - test', () => {
     };
     const selectServer = SelectServerEnum.auto;
     const donationAlert = false;
-    const receive = render(
+    const loadingapp = render(
       <LoadingAppClass
         navigation={navigationMock}
         route={routeMock}
@@ -173,6 +173,6 @@ describe('Component LoadingApp - test', () => {
         rescanMenuOption={rescanMenuOption}
       />,
     );
-    expect(receive.toJSON()).toMatchSnapshot();
+    expect(loadingapp.toJSON()).toMatchSnapshot();
   });
 });

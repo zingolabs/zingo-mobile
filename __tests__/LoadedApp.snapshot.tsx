@@ -152,7 +152,7 @@ describe('Component LoadedApp - test', () => {
       restoreWalletBackupScreen: true,
     };
     const selectServer = SelectServerEnum.auto;
-    const receive = render(
+    const loadedapp = render(
       <LoadedAppClass
         navigation={navigationMock}
         route={routeMock}
@@ -174,6 +174,6 @@ describe('Component LoadedApp - test', () => {
         rescanMenuOption={rescanMenuOption}
       />,
     );
-    expect(receive.toJSON()).toMatchSnapshot();
+    expect(loadedapp.toJSON()).toMatchSnapshot();
   });
 });
