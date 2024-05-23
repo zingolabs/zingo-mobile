@@ -404,7 +404,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           // re-activate the interruption sync flag
           await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
           // setting value for background task Android
-          await AsyncStorage.setItem('@background', 'yes');
+          await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
           //console.log('background yes in storage');
           this.rpc.setInRefresh(false);
           await this.rpc.clearTimers();
@@ -441,7 +441,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           // reading background task info
           await this.fetchBackgroundSyncing();
           // setting value for background task Android
-          await AsyncStorage.setItem('@background', 'no');
+          await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
           //console.log('background no in storage');
           await this.rpc.configure();
           //console.log('configure start timers Android & IOS');
@@ -458,7 +458,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         // re-activate the interruption sync flag
         await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
         // setting value for background task Android
-        await AsyncStorage.setItem('@background', 'yes');
+        await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
         //console.log('background yes in storage');
         this.rpc.setInRefresh(false);
         await this.rpc.clearTimers();
@@ -696,9 +696,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       // only if the user doesn't see the seed the first time
       if (!basicFirstViewSeed) {
         // only if the App are in foreground
-        const background = await AsyncStorage.getItem('@background');
+        const background = await AsyncStorage.getItem(GlobalConst.background);
         // only if the wallet have some transactions
-        if (background === 'no' && transactions.length > 0) {
+        if (background === GlobalConst.no && transactions.length > 0) {
           // I need to check this out in the seed screen.
           await this.fetchWallet();
           this.setState({ seedViewModalVisible: true });

@@ -16,4 +16,7 @@ export const GlobalConst = {
   platformOSios: 'ios',
   platformOSandroid: 'android',
   blocksPerBatch: 100,
+  yes: 'yes',
+  no: 'no',
+  background: '@background',
 };
