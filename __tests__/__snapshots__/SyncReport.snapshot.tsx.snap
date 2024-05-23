@@ -170,24 +170,35 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             Sync ID
           </Text>
           <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               {
-                "width": 10,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
                 "opacity": 1,
               }
             }
           >
-            1 - (translated text)
-          </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                }
+              }
+            >
+              1 - (translated text)
+            </Text>
+          </View>
         </View>
         <View
           style={
@@ -613,9 +624,8 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
                 "color": "rgb(28, 28, 30)",
               }
             }
-            testID="syncreport.syncedbefore"
           >
-            99999translated text25.00%
+            99999translated text25%
           </Text>
         </View>
         <View
@@ -660,7 +670,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             }
             testID="syncreport.syncednow"
           >
-            200001translated text50.00%
+            200001translated text50%
           </Text>
         </View>
         <View
@@ -705,7 +715,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             }
             testID="syncreport.notyetsynced"
           >
-            100000translated text25.00%
+            100000translated text25%
           </Text>
         </View>
         <View
@@ -737,25 +747,36 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             translated text
           </Text>
           <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               {
-                "width": 10,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
                 "opacity": 1,
               }
             }
-            testID="syncreport.currentbatch"
           >
-            translated text5translated text50
-          </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                }
+              }
+              testID="syncreport.currentbatch"
+            >
+              translated text5translated text50
+            </Text>
+          </View>
         </View>
         <View
           style={
@@ -776,25 +797,36 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             translated text
           </Text>
           <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               {
-                "width": 10,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
                 "opacity": 1,
               }
             }
-            testID="syncreport.blocksperbatch"
           >
-            100
-          </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                }
+              }
+              testID="syncreport.blocksperbatch"
+            >
+              100
+            </Text>
+          </View>
         </View>
         <View
           style={
@@ -823,24 +855,35 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               translated text
             </Text>
             <View
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "width": 10,
-                }
-              }
-            />
-            <Text
-              style={
-                {
-                  "color": "rgb(28, 28, 30)",
-                  "fontSize": 18,
-                  "fontWeight": "600",
                   "opacity": 1,
                 }
               }
             >
-              122
-            </Text>
+              <Text
+                style={
+                  {
+                    "color": "rgb(28, 28, 30)",
+                    "fontSize": 18,
+                    "fontWeight": "600",
+                    "opacity": 1,
+                  }
+                }
+              >
+                122
+              </Text>
+            </View>
           </View>
           <ActivityIndicator
             color="rgb(0, 122, 255)"
@@ -876,24 +919,35 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             translated text
           </Text>
           <View
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               {
-                "width": 10,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "rgb(28, 28, 30)",
-                "fontSize": 18,
-                "fontWeight": "600",
                 "opacity": 1,
               }
             }
           >
-            translated text1800100translated text1900100
-          </Text>
+            <Text
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                }
+              }
+            >
+              translated text1800100translated text1900100
+            </Text>
+          </View>
         </View>
       </View>
     </View>
@@ -937,7 +991,6 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
-      testID="syncreport.button.close"
     >
       <View
         style={

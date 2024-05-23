@@ -2,32 +2,41 @@
 App Store: [https://apps.apple.com/app/zingo/id1668209531](https://apps.apple.com/app/zingo/id1668209531)  
 Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo](https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo)
 
+# Security Vulnerability Disclosure
+
+If you believe you have discovered a security issue, please contact us at:
+
+zingodisclosure@proton.me
+
 # iOS
 ## Prerequisites
 1. Yarn
 2. NodeJS (recommended version 17+)
 3. Rust (https://www.rust-lang.org/tools/install)
-4. Rustup iOS targets (`rustup target add aarch64-apple-ios x86_64-apple-ios aarch64-apple-ios-sim`)
+4. Rustup iOS targets (`rustup target add aarch64-apple-ios aarch64-apple-ios-sim`)
 5. Cargo-lipo (`cargo install cargo-lipo`)
-6. Cbindgen (`cargo install cbindgen`)
-7. Cocaopods (`sudo gem install cocoapods`)
+6. Cocaopods (`sudo gem install cocoapods`)
 
 ## Building for physical device
-1. In the `rust/ios` directory, run: <br />
+1. Clone the repository.
+2. Go to the cloned repo `cd zingo-mobile`.
+3. In the `rust/ios` directory, run: <br />
    `./build.sh` <br />
    This step may take a long time.
-2. From the root of the project, run: <br />
+4. From the root of the project, run: <br />
    `yarn`
-3. In the `ios` directory, run: <br />
+5. In the `ios` directory, run: <br />
    `pod install`
 
 ## Building for simulator
-1. In the `rust/ios` directory, run: <br />
+1. Clone the repository.
+2. Go to the cloned repo `cd zingo-mobile`.
+3. In the `rust/ios` directory, run: <br />
    `./buildsimulator.sh` <br />
    This step may take a long time.
-2. From the root of the project, run: <br />
+4. From the root of the project, run: <br />
    `yarn`
-3. In the `ios` directory, run: <br />
+5. In the `ios` directory, run: <br />
    `pod install`
 
 ## Launching the app
@@ -67,10 +76,12 @@ Also, make sure your JAVA_HOME is set, for example: <br />
 `export JAVA_HOME="/usr/lib/jvm/jdk-18.0.2"`
 
 ## Building
-1. In the `rust` directory, run: <br />
+1. Clone the repository.
+2. Go to the cloned repo `cd zingo-mobile`.
+3. In the `rust` directory, run: <br />
    `./build.sh` <br />
    This step may take a long time.
-2. From the root of the project, run: <br />
+4. From the root of the project, run: <br />
    `yarn`
 
 ## Launching the app
@@ -152,8 +163,6 @@ lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Tests
    `cargo nextest run e2e`
    or run a specific test: <br />
    `cargo nextest run e2e::test_name`
-   or run a specific darkside test: <br />
-   `cargo nextest run e2e::darkside::test_name`
 
 Regchest is still under development and currently not able to run darkside end-to-end tests: <br />
 `cargo nextest run --features regchest -E 'test(e2e) and not test(darkside)'`
