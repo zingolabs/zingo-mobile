@@ -447,7 +447,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   };
 
   const ufvkShowModal = async () => {
-    const resultBio = security.ufvkScreen ? await simpleBiometrics({ translate: translate }) : true;
+    const resultBio = security.seedUfvkScreen ? await simpleBiometrics({ translate: translate }) : true;
     // can be:
     // - true      -> the user do pass the authentication
     // - false     -> the user do NOT pass the authentication

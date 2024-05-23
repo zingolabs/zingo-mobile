@@ -88,6 +88,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     security: securityContext,
     selectServer: selectServerContext,
     rescanMenuOption: rescanMenuOptionContext,
+    readOnly,
   } = context;
 
   const memosArray = translate('settings.memos');
@@ -162,8 +163,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [startApp, setStartApp] = useState<boolean>(securityContext.startApp);
   const [foregroundApp, setForegroundApp] = useState<boolean>(securityContext.foregroundApp);
   const [sendConfirm, setSendConfirm] = useState<boolean>(securityContext.sendConfirm);
-  const [seedScreen, setSeedScreen] = useState<boolean>(securityContext.seedScreen);
-  const [ufvkScreen, setUfvkScreen] = useState<boolean>(securityContext.ufvkScreen);
+  const [seedUfvkScreen, setSeedUfvkScreen] = useState<boolean>(securityContext.seedUfvkScreen);
   const [rescanScreen, setRescanScreen] = useState<boolean>(securityContext.rescanScreen);
   const [settingsScreen, setSettingsScreen] = useState<boolean>(securityContext.settingsScreen);
   const [changeWalletScreen, setChangeWalletScreen] = useState<boolean>(securityContext.changeWalletScreen);
@@ -236,8 +236,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       startApp,
       foregroundApp,
       sendConfirm,
-      seedScreen,
-      ufvkScreen,
+      seedUfvkScreen,
       rescanScreen,
       settingsScreen,
       changeWalletScreen,
@@ -810,14 +809,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               translate('settings.security-sendconfirm') as string,
             )}
             {securityCheckBox(
-              seedScreen,
-              setSeedScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
-              translate('settings.security-seedscreen') as string,
-            )}
-            {securityCheckBox(
-              ufvkScreen,
-              setUfvkScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
-              translate('settings.security-ufvkscreen') as string,
+              seedUfvkScreen,
+              setSeedUfvkScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
+              readOnly
+                ? (translate('settings.security-ufvkscreen') as string)
+                : (translate('settings.security-seedscreen') as string),
             )}
             {securityCheckBox(
               rescanScreen,

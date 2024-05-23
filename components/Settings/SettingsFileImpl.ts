@@ -3,6 +3,7 @@ import * as RNFS from 'react-native-fs';
 import {
   ChainNameEnum,
   SecurityType,
+  SecurityTypeEnum,
   SelectServerEnum,
   ServerType,
   ServerUrisType,
@@ -91,8 +92,7 @@ export default class SettingsFileImpl {
           startApp: true,
           foregroundApp: true,
           sendConfirm: true,
-          seedScreen: true,
-          ufvkScreen: true,
+          seedUfvkScreen: true,
           rescanScreen: true,
           settingsScreen: true,
           changeWalletScreen: true,
@@ -155,6 +155,32 @@ export default class SettingsFileImpl {
       if (!settings.hasOwnProperty(SettingsNameEnum.donation)) {
         // this means the App shows up an Alert asking about the tip/donation new feature.
         settings.firstUpdateWithDonation = true;
+      }
+      // old security options that have to be removed and to add the new one.
+      if (settings.hasOwnProperty(SettingsNameEnum.security)) {
+        const sec: SecurityType = settings.security;
+        // old security options
+        if (
+          sec.hasOwnProperty(SecurityTypeEnum.seedScreen) &&
+          sec.hasOwnProperty(SecurityTypeEnum.ufvkScreen) &&
+          !sec.hasOwnProperty(SecurityTypeEnum.seedUfvkScreen)
+        ) {
+          let numTrues: number = 0;
+          if (sec.seedScreen) {
+            numTrues += 1;
+            delete sec.seedScreen;
+          }
+          if (sec.ufvkScreen) {
+            numTrues += 1;
+            delete sec.ufvkScreen;
+          }
+          if (numTrues >= 1) {
+            sec.seedUfvkScreen = true;
+          } else {
+            sec.seedUfvkScreen = false;
+          }
+          settings.security = sec;
+        }
       }
       return settings;
     } catch (err) {
