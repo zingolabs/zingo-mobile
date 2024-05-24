@@ -99,10 +99,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                         ecl="L"
                         backgroundColor={colors.border}
                         logo={require('../../assets/img/logobig-zingo.png')}
-                        logoSize={35}
+                        logoSize={30}
                         logoBackgroundColor={colors.border}
-                        logoBorderRadius={10} /* android not soported */
-                        logoMargin={5}
+                        logoBorderRadius={5} /* android not soported */
+                        logoMargin={3}
                       />
                     ) : (
                       <View
@@ -137,10 +137,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                         ecl="L"
                         backgroundColor={colors.border}
                         logo={require('../../assets/img/logobig-zingo.png')}
-                        logoSize={35}
+                        logoSize={30}
                         logoBackgroundColor={colors.border}
-                        logoBorderRadius={10} /* android not soported */
-                        logoMargin={5}
+                        logoBorderRadius={5} /* android not soported */
+                        logoMargin={3}
                       />
                     )}
                   </>
