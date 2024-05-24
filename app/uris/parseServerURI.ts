@@ -28,8 +28,9 @@ const parseServerURI = (uri: string, translate: (key: string) => TranslateType):
       // looking for 443
       port = GlobalConst.port443;
     }
-    // by default -> 9067
-    // for some `lightwalletd` -> 443
+    // by default              -> 9067
+    // for some `lightwalletd` ->  443
+    // for `zec.rocks`         ->  443
     if (!port) {
       port =
         uri.includes('na.lightwalletd') ||
