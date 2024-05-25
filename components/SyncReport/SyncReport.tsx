@@ -361,7 +361,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                           borderRightWidth: 1,
                           borderLeftColor: colors.primary,
                           borderLeftWidth: 1,
-                          width: ((points[1] * 100) / maxBlocks).toString() + '%',
+                          width: `${(points[1] * 100) / maxBlocks}%`,
                         }}
                       />
                     ))}
@@ -385,7 +385,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                           borderLeftWidth: 1,
                           borderRightColor: 'blue',
                           borderRightWidth: server_1_percent > 0 ? 1 : 0,
-                          width: server_1_percent.toString() + '%',
+                          width: `${server_1_percent}%`,
                         }}
                       />
                     )}
@@ -396,7 +396,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                           backgroundColor: 'yellow',
                           borderRightColor: 'yellow',
                           borderRightWidth: server_2_percent > 0 ? 1 : 0,
-                          width: server_2_percent.toString() + '%',
+                          width: `${server_2_percent}%`,
                           borderBottomColor: 'blue',
                           borderBottomWidth: 5,
                         }}
@@ -409,7 +409,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                           backgroundColor: '#333333',
                           borderRightColor: colors.primary,
                           borderRightWidth: 1,
-                          width: server_3_percent.toString() + '%',
+                          width: `${server_3_percent}%`,
                         }}
                       />
                     )}
@@ -525,7 +525,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                       <View
                         style={{
                           height: 10,
-                          width: wallet_old_synced_percent.toString() + '%',
+                          width: `${wallet_old_synced_percent}%`,
                           backgroundColor: 'lightyellow',
                           borderLeftColor: colors.primary,
                           borderLeftWidth: 1,
@@ -538,7 +538,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                       <View
                         style={{
                           height: 10,
-                          width: wallet_new_synced_percent.toString() + '%',
+                          width: `${wallet_new_synced_percent}%`,
                           backgroundColor: 'orange',
                           borderRightColor: 'orange',
                           borderRightWidth: wallet_new_synced_percent > 0 ? 1 : 0,
@@ -552,7 +552,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                           backgroundColor: '#333333',
                           borderRightColor: colors.primary,
                           borderRightWidth: 1,
-                          width: wallet_for_synced_percent.toString() + '%',
+                          width: `${wallet_for_synced_percent}%`,
                         }}
                       />
                     )}

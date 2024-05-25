@@ -146,6 +146,23 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 }
               >
                 <View
+                  accessibilityState={
+                    {
+                      "busy": undefined,
+                      "checked": undefined,
+                      "disabled": undefined,
+                      "expanded": undefined,
+                      "selected": undefined,
+                    }
+                  }
+                  accessibilityValue={
+                    {
+                      "max": undefined,
+                      "min": undefined,
+                      "now": undefined,
+                      "text": undefined,
+                    }
+                  }
                   accessible={true}
                   collapsable={false}
                   focusable={true}
@@ -197,6 +214,23 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 </View>
                 <View
                   accessibilityLabel="text translated"
+                  accessibilityState={
+                    {
+                      "busy": undefined,
+                      "checked": undefined,
+                      "disabled": undefined,
+                      "expanded": undefined,
+                      "selected": undefined,
+                    }
+                  }
+                  accessibilityValue={
+                    {
+                      "max": undefined,
+                      "min": undefined,
+                      "now": undefined,
+                      "text": undefined,
+                    }
+                  }
                   accessible={true}
                   collapsable={false}
                   focusable={true}
@@ -424,7 +458,19 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     <View
                       accessibilityState={
                         {
+                          "busy": undefined,
+                          "checked": undefined,
                           "disabled": false,
+                          "expanded": undefined,
+                          "selected": undefined,
+                        }
+                      }
+                      accessibilityValue={
+                        {
+                          "max": undefined,
+                          "min": undefined,
+                          "now": undefined,
+                          "text": undefined,
                         }
                       }
                       accessible={true}
@@ -549,6 +595,23 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   </View>
                 </View>
                 <View
+                  accessibilityState={
+                    {
+                      "busy": undefined,
+                      "checked": undefined,
+                      "disabled": undefined,
+                      "expanded": undefined,
+                      "selected": undefined,
+                    }
+                  }
+                  accessibilityValue={
+                    {
+                      "max": undefined,
+                      "min": undefined,
+                      "now": undefined,
+                      "text": undefined,
+                    }
+                  }
                   accessible={true}
                   collapsable={false}
                   focusable={true}
@@ -727,7 +790,19 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     <View
                       accessibilityState={
                         {
+                          "busy": undefined,
+                          "checked": undefined,
                           "disabled": false,
+                          "expanded": undefined,
+                          "selected": undefined,
+                        }
+                      }
+                      accessibilityValue={
+                        {
+                          "max": undefined,
+                          "min": undefined,
+                          "now": undefined,
+                          "text": undefined,
                         }
                       }
                       accessible={true}
@@ -791,7 +866,19 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   <View
                     accessibilityState={
                       {
+                        "busy": undefined,
+                        "checked": undefined,
                         "disabled": false,
+                        "expanded": undefined,
+                        "selected": undefined,
+                      }
+                    }
+                    accessibilityValue={
+                      {
+                        "max": undefined,
+                        "min": undefined,
+                        "now": undefined,
+                        "text": undefined,
                       }
                     }
                     accessible={true}
@@ -879,7 +966,19 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               accessibilityLabel="title text translated"
               accessibilityState={
                 {
+                  "busy": undefined,
+                  "checked": undefined,
                   "disabled": true,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
                 }
               }
               accessible={true}
@@ -941,6 +1040,23 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               </View>
             </View>
             <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
               accessible={true}
               collapsable={false}
               focusable={true}
@@ -1153,6 +1269,23 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 }
               >
                 <View
+                  accessibilityState={
+                    {
+                      "busy": undefined,
+                      "checked": undefined,
+                      "disabled": undefined,
+                      "expanded": undefined,
+                      "selected": undefined,
+                    }
+                  }
+                  accessibilityValue={
+                    {
+                      "max": undefined,
+                      "min": undefined,
+                      "now": undefined,
+                      "text": undefined,
+                    }
+                  }
                   accessible={true}
                   collapsable={false}
                   focusable={true}
@@ -1204,6 +1337,23 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 </View>
                 <View
                   accessibilityLabel="text translated"
+                  accessibilityState={
+                    {
+                      "busy": undefined,
+                      "checked": undefined,
+                      "disabled": undefined,
+                      "expanded": undefined,
+                      "selected": undefined,
+                    }
+                  }
+                  accessibilityValue={
+                    {
+                      "max": undefined,
+                      "min": undefined,
+                      "now": undefined,
+                      "text": undefined,
+                    }
+                  }
                   accessible={true}
                   collapsable={false}
                   focusable={true}
@@ -1431,7 +1581,19 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     <View
                       accessibilityState={
                         {
+                          "busy": undefined,
+                          "checked": undefined,
                           "disabled": true,
+                          "expanded": undefined,
+                          "selected": undefined,
+                        }
+                      }
+                      accessibilityValue={
+                        {
+                          "max": undefined,
+                          "min": undefined,
+                          "now": undefined,
+                          "text": undefined,
                         }
                       }
                       accessible={true}
@@ -1557,6 +1719,23 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   </View>
                 </View>
                 <View
+                  accessibilityState={
+                    {
+                      "busy": undefined,
+                      "checked": undefined,
+                      "disabled": undefined,
+                      "expanded": undefined,
+                      "selected": undefined,
+                    }
+                  }
+                  accessibilityValue={
+                    {
+                      "max": undefined,
+                      "min": undefined,
+                      "now": undefined,
+                      "text": undefined,
+                    }
+                  }
                   accessible={true}
                   collapsable={false}
                   focusable={true}
@@ -1735,7 +1914,19 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     <View
                       accessibilityState={
                         {
+                          "busy": undefined,
+                          "checked": undefined,
                           "disabled": true,
+                          "expanded": undefined,
+                          "selected": undefined,
+                        }
+                      }
+                      accessibilityValue={
+                        {
+                          "max": undefined,
+                          "min": undefined,
+                          "now": undefined,
+                          "text": undefined,
                         }
                       }
                       accessible={true}
@@ -1799,7 +1990,19 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   <View
                     accessibilityState={
                       {
+                        "busy": undefined,
+                        "checked": undefined,
                         "disabled": false,
+                        "expanded": undefined,
+                        "selected": undefined,
+                      }
+                    }
+                    accessibilityValue={
+                      {
+                        "max": undefined,
+                        "min": undefined,
+                        "now": undefined,
+                        "text": undefined,
                       }
                     }
                     accessible={true}
@@ -1887,7 +2090,19 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               accessibilityLabel="title text translated"
               accessibilityState={
                 {
+                  "busy": undefined,
+                  "checked": undefined,
                   "disabled": true,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
                 }
               }
               accessible={true}
@@ -1949,6 +2164,23 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               </View>
             </View>
             <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
               accessible={true}
               collapsable={false}
               focusable={true}

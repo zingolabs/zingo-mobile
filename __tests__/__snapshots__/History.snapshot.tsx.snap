@@ -74,6 +74,23 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           }
         >
           <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -113,6 +130,23 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         </View>
       </View>
       <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
         accessible={true}
         collapsable={false}
         focusable={true}
@@ -152,6 +186,23 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         />
       </View>
       <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
         accessible={true}
         collapsable={false}
         focusable={true}
@@ -247,7 +298,19 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         <View
           accessibilityState={
             {
+              "busy": undefined,
+              "checked": undefined,
               "disabled": false,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
             }
           }
           accessible={true}
@@ -390,7 +453,19 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         <View
           accessibilityState={
             {
+              "busy": undefined,
+              "checked": undefined,
               "disabled": false,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
             }
           }
           accessible={true}
@@ -455,7 +530,19 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         <View
           accessibilityState={
             {
+              "busy": undefined,
+              "checked": undefined,
               "disabled": false,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
             }
           }
           accessible={true}
@@ -561,6 +648,23 @@ exports[`Component History - test History currency USD, privacy high & mode adva
       >
         <View
           accessibilityLabel="text translated"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -642,7 +746,21 @@ exports[`Component History - test History currency USD, privacy high & mode adva
     accessible={true}
     refreshControl={
       <RefreshControlMock
-        onRefresh={[MockFunction]}
+        onRefresh={
+          [MockFunction] {
+            "calls": [
+              [
+                0,
+              ],
+            ],
+            "results": [
+              {
+                "type": "return",
+                "value": undefined,
+              },
+            ],
+          }
+        }
         refreshing={false}
         tintColor="rgb(28, 28, 30)"
         title="text translated"
@@ -820,7 +938,19 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               <View
                 accessibilityState={
                   {
+                    "busy": undefined,
+                    "checked": undefined,
                     "disabled": false,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
                   }
                 }
                 accessible={true}
@@ -1084,7 +1214,19 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               <View
                 accessibilityState={
                   {
+                    "busy": undefined,
+                    "checked": undefined,
                     "disabled": false,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
                   }
                 }
                 accessible={true}
@@ -1348,7 +1490,19 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               <View
                 accessibilityState={
                   {
+                    "busy": undefined,
+                    "checked": undefined,
                     "disabled": false,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
                   }
                 }
                 accessible={true}
@@ -1570,7 +1724,19 @@ exports[`Component History - test History no currency, privacy normal & mode bas
         <View
           accessibilityState={
             {
+              "busy": undefined,
+              "checked": undefined,
               "disabled": true,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
             }
           }
           accessible={true}
@@ -1756,6 +1922,23 @@ exports[`Component History - test History no currency, privacy normal & mode bas
       >
         <View
           accessibilityLabel="text translated"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -2015,7 +2198,19 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               <View
                 accessibilityState={
                   {
+                    "busy": undefined,
+                    "checked": undefined,
                     "disabled": true,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
                   }
                 }
                 accessible={true}
@@ -2294,7 +2489,19 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               <View
                 accessibilityState={
                   {
+                    "busy": undefined,
+                    "checked": undefined,
                     "disabled": true,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
                   }
                 }
                 accessible={true}
@@ -2559,7 +2766,19 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               <View
                 accessibilityState={
                   {
+                    "busy": undefined,
+                    "checked": undefined,
                     "disabled": true,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
                   }
                 }
                 accessible={true}
