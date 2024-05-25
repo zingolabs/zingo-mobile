@@ -37,7 +37,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [amountColor, setAmountColor] = useState<string>('');
+  const [amountColor, setAmountColor] = useState<string>(colors.primaryDisabled);
   const [txIcon, setTxIcon] = useState<IconDefinition>(faRefresh);
   const [displayAddress, setDisplayAddress] = useState<React.JSX.Element | null>(null);
   const [haveMemo, setHaveMemo] = useState<boolean>(false);

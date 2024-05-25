@@ -3,13 +3,15 @@ package org.ZingoLabs.Zingo
 import android.app.Application
 import android.content.Context
 import com.facebook.react.*
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint
+import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
 import java.lang.ref.WeakReference
 
 
 class MainApplication : Application(), ReactApplication {
 
-    private val mReactNativeHost: ReactNativeHost = object : ReactNativeHost(this) {
+    private val mReactNativeHost: ReactNativeHost = object : DefaultReactNativeHost(this) {
         override fun getUseDeveloperSupport(): Boolean {
             return BuildConfig.DEBUG
         }
@@ -26,6 +28,10 @@ class MainApplication : Application(), ReactApplication {
         override fun getJSMainModuleName(): String {
             return "index"
         }
+
+        override val isNewArchEnabled: Boolean = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
+ 
+        override val isHermesEnabled: Boolean = BuildConfig.IS_HERMES_ENABLED
     }
 
     override fun getReactNativeHost(): ReactNativeHost {
@@ -38,6 +44,10 @@ class MainApplication : Application(), ReactApplication {
 
 
         SoLoader.init(this, false)
+        if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+            // If you opted-in for the New Architecture, we load the native entry point for this app.
+            DefaultNewArchitectureEntryPoint.load()
+        }
     }
 
     companion object {

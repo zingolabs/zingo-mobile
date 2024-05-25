@@ -57,7 +57,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [spendColor, setSpendColor] = useState<string>('');
+  const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
 
   useEffect(() => {

@@ -3,7 +3,9 @@ package org.ZingoLabs.Zingo
 import android.os.Bundle
 import android.util.Log
 import com.facebook.react.ReactActivity
-
+import com.facebook.react.ReactActivityDelegate
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
+import com.facebook.react.defaults.DefaultReactActivityDelegate;
 
 class MainActivity : ReactActivity() {
     /**
@@ -20,7 +22,13 @@ class MainActivity : ReactActivity() {
         super.onCreate(null)
     }
 
-
+    override fun createReactActivityDelegate(): ReactActivityDelegate? {
+        return DefaultReactActivityDelegate(
+            this,
+            mainComponentName,  // If you opted-in for the New Architecture, we enable the Fabric Renderer.
+            DefaultNewArchitectureEntryPoint.fabricEnabled
+        )
+    }
     override fun onPause() {
         Log.i("ON_PAUSE", "Pausing main activity - Background")
         // oreo 8.0 (SDK 26)
