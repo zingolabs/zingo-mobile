@@ -159,7 +159,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       // fallback if no available language fits
       const fallback = { languageTag: LanguageEnum.en, isRTL: false };
 
-      const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
+      const { languageTag, isRTL } = RNLocalize.findBestLanguageTag(Object.keys(file)) || fallback;
 
       // update layout direction
       I18nManager.forceRTL(isRTL);

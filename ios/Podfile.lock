@@ -16,8 +16,6 @@ PODS:
     - hermes-engine/Pre-built (= 0.72.14)
   - hermes-engine/Pre-built (0.72.14)
   - libevent (2.1.12)
-  - Permission-Camera (3.6.1):
-    - RNPermissions
   - RCT-Folly (2021.07.22.00):
     - boost
     - DoubleConversion
@@ -465,9 +463,9 @@ PODS:
   - RNGestureHandler (2.16.2):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
-  - RNLocalize (2.2.6):
+  - RNLocalize (3.1.0):
     - React-Core
-  - RNPermissions (3.6.1):
+  - RNPermissions (4.1.5):
     - React-Core
   - RNReanimated (3.7.0):
     - RCT-Folly (= 2021.07.22.00)
@@ -491,7 +489,6 @@ DEPENDENCIES:
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
-  - Permission-Camera (from `../node_modules/react-native-permissions/ios/Camera`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
@@ -567,8 +564,6 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
-  Permission-Camera:
-    :path: "../node_modules/react-native-permissions/ios/Camera"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -678,7 +673,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   BEMCheckBox: 5ba6e37ade3d3657b36caecc35c8b75c6c2b1a4e
-  boost: a7c83b31436843459a1961bfd74b96033dc77234
+  boost: 7dcd2de282d72e344012f7d6564d024930a6a440
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: d98eefb42c5a64cb28ef966bd9096c76770d8f24
   FBReactNativeSpec: 53d4eb00e8e1b6e987a3dd5906d2afe131cc54c8
@@ -686,8 +681,7 @@ SPEC CHECKSUMS:
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   hermes-engine: b213bace5f31766ad1434d2d9b2cbf04cf92a2b6
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
-  Permission-Camera: bf6791b17c7f614b6826019fcfdcc286d3a107f6
-  RCT-Folly: 0080d0a6ebf2577475bda044aa59e2ca1f909cda
+  RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: 264adaca1d8b1a9c078761891898d4142df05313
   RCTTypeSafety: 279a89da7058a69899778a127be73fab38b84499
   React: 725b4e11f6ffb43d6f9b14e82879073623db4071
@@ -733,8 +727,8 @@ SPEC CHECKSUMS:
   RNCPicker: f58e790450cb0a74c09dd1c677bd1de41a5741b9
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   RNGestureHandler: 982741f345785f2927e7b28f67dc83679cf3bfc8
-  RNLocalize: d4b8af4e442d4bcca54e68fc687a2129b4d71a81
-  RNPermissions: dcdb7b99796bbeda6975a6e79ad519c41b251b1c
+  RNLocalize: e8694475db034bf601e17bd3dfa8986565e769eb
+  RNPermissions: f431badf1db91c3cdb75340403e9dfcca9dc3154
   RNReanimated: ecb91ff4632995ac36c21e32a777a425953cffc3
   RNScreens: 8ba3eeb8f5cb9f13662df564e785d64ef7214bf2
   RNSnackbar: 3727b42bf6c4314a53c18185b5203e915a4ab020
@@ -742,6 +736,6 @@ SPEC CHECKSUMS:
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: c32e0be1a17f8f1f0e633a3122f7666441f52c82
 
-PODFILE CHECKSUM: e3d66de87f7aa4b0322f7cf4b5a6a7e8f16ca307
+PODFILE CHECKSUM: c9cecc573a259bf0e0ca3708539e7fbcae548299
 
 COCOAPODS: 1.15.2
