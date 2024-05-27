@@ -15,7 +15,7 @@ class MainActivity : ReactActivity() {
 
     private var isStarting = true
     override fun getMainComponentName(): String {
-        return "Zingo!"
+        return "Zingo"
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("ON_CREATE", "Starting main activity")

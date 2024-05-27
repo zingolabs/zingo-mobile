@@ -1,11 +1,11 @@
 {
-  "zingo": "Zingo!",
+  "zingo": "Zingo",
   "version": "zingo-1.3.10 (177)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
   "workingonit": "Estamos trabajando en esta funcionalidad.",
-  "firstlaunchingmessage-title": "Optimizando Zingo!",
+  "firstlaunchingmessage-title": "Optimizando Zingo",
   "firstlaunchingmessage-body": "Esto puede tardar un poco, dependiendo del historial de transacciones. Mantenga la aplicación abierta hasta que finalice el proceso.",
   "firstlaunchingmessage-footer": "Gracias.",
   "biometricsfailed-title": "¡Bienvenido!",
@@ -88,7 +88,7 @@
     "alert-donation-body": "¿Quieres ayudar a ZingoLabs a que Zcash sea más útil? Opta por dar una propina de un Zenny (0.01 ZEC) a ZingoLabs con cada transacción! Si es así, presione confirmar, de lo contrario presione Cancelar."
   },
   "loadedapp": {
-    "about": "Sobre Zingo!",
+    "about": "Sobre Zingo",
     "info": "Información del Servidor",
     "options": "Opciones",
     "settings": "Parámetros",
@@ -559,7 +559,7 @@
     "copyright": [
       "Copyright (c) 2024, ZingoLabs.",
       "Construida con React Native.",
-      "La Licencia MIT (MIT) Copyright (c) 2024 Zingo!",
+      "La Licencia MIT (MIT) Copyright (c) 2024 Zingo",
       "Por la presente se otorga permiso, sin cargo, a cualquier persona que obtenga una copia de este software y los archivos de documentación asociados (el 'Software'), para operar con el Software sin restricciones, incluidos, entre otros, los derechos de uso, copia, modificación, fusión, publicar, distribuir, otorgar sublicencias y/o vender copias del Software, y permitir que las personas a las que se les proporcione el Software lo hagan, sujeto a las siguientes condiciones:",
       "El aviso de derechos de autor anterior y este aviso de permiso se incluirán en todas las copias o partes sustanciales del Software.",
       "EL SOFTWARE SE PROPORCIONA 'TAL CUAL', SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUYENDO, ENTRE OTRAS, LAS GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD PARA UN FIN DETERMINADO Y NO VIOLACIÓN. EN NINGÚN CASO LOS AUTORES O LOS TITULARES DE LOS DERECHOS DE AUTOR SERÁN RESPONSABLES DE CUALQUIER RECLAMACIÓN, DAÑOS U OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO O DE CUALQUIER OTRO TIPO, QUE SURJA DE, FUERA DE O EN RELACIÓN CON EL SOFTWARE O EL USO U OTROS TRATOS EN EL SOFTWARE."

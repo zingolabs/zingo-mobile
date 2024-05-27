@@ -275,7 +275,10 @@ dependencies {
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.14.+"
     
     // JUnit test runners
-    androidTestImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+
+    // Kotlin extensions for androidx.test.ext.junit
+    androidTestImplementation "androidx.test.ext:junit-ktx:1.1.5"
 
     // uniffi needs this
     implementation "net.java.dev.jna:jna:5.9.0@aar"

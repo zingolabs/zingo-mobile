@@ -114,14 +114,14 @@ class ExecuteAddressesFromSeed {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
-        val initFromSeedJson = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val addressesJson = uniffi.zingo.executeCommand("addresses", "")
+        val addressesJson: String = uniffi.zingo.executeCommand("addresses", "")
         println("\nAddresses:")
         println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
@@ -145,20 +145,20 @@ class ExecuteAddressesFromUfvk {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
-        val initFromUfvkJson = uniffi.zingo.initFromUfvk(server, ufvk, birthday, datadir, chainhint, monitorMempool)
+        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(server, ufvk, birthday, datadir, chainhint, monitorMempool)
         println("\nInit From UFVK:")
         println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
         assertThat(initFromUfvk.error).startsWith("This wallet is watch-only")
 
-        val exportUfvkJson = uniffi.zingo.executeCommand("exportufvk", "")
+        val exportUfvkJson: String = uniffi.zingo.executeCommand("exportufvk", "")
         println("\nExport Ufvk:")
         println(exportUfvkJson)
         val exportUfvk: ExportUfvk = mapper.readValue(exportUfvkJson)
         assertThat(exportUfvk.ufvk).isEqualTo(Ufvk.ABANDON)
         assertThat(exportUfvk.birthday).isEqualTo(1)
 
-        val addressesJson = uniffi.zingo.executeCommand("addresses", "")
+        val addressesJson: String = uniffi.zingo.executeCommand("addresses", "")
         println("\nAddresses:")
         println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
@@ -182,14 +182,14 @@ class ExecuteVersionFromSeed {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
-        val initFromSeedJson = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val version = uniffi.zingo.executeCommand("version", "")
+        val version: String = uniffi.zingo.executeCommand("version", "")
         println("\nVersion:")
         println(version)
         assertThat(version).isNotNull()
@@ -210,26 +210,26 @@ class ExecuteSyncFromSeed {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
-        val initFromSeedJson = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val infoJson = uniffi.zingo.executeCommand("info", "")
+        val infoJson: String = uniffi.zingo.executeCommand("info", "")
         println("\nInfo:")
         println(infoJson)
         val info: Info = mapper.readValue(infoJson)
         assertThat(info.latest_block_height).isGreaterThan(0)
 
-        var heightJson = uniffi.zingo.executeCommand("height", "")
+        var heightJson: String = uniffi.zingo.executeCommand("height", "")
         println("\nHeight pre-sync:")
         println(heightJson)
         val heightPreSync: Height = mapper.readValue(heightJson)
         assertThat(heightPreSync.height).isEqualTo(0)
 
-        val syncJson = uniffi.zingo.executeCommand("sync", "")
+        val syncJson: String = uniffi.zingo.executeCommand("sync", "")
         println("\nSync:")
         println(syncJson)
         val sync: Sync = mapper.readValue(syncJson)
@@ -243,7 +243,7 @@ class ExecuteSyncFromSeed {
         val heightPostSync: Height = mapper.readValue(heightJson)
         assertThat(heightPostSync.height).isEqualTo(info.latest_block_height)
 
-        val syncStatusJson = uniffi.zingo.executeCommand("syncstatus", "")
+        val syncStatusJson: String = uniffi.zingo.executeCommand("syncstatus", "")
         println("\nSync status:")
         println(syncStatusJson)
         val syncStatus: SyncStatus = mapper.readValue(syncStatusJson)
@@ -263,36 +263,36 @@ class ExecuteSendFromOrchard {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
-        val initFromSeedJson = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        var syncJson = uniffi.zingo.executeCommand("sync", "")
+        var syncJson: String = uniffi.zingo.executeCommand("sync", "")
         println("\nSync:")
         println(syncJson)
 
-        var balanceJson = uniffi.zingo.executeCommand("balance", "")
+        var balanceJson: String = uniffi.zingo.executeCommand("balance", "")
         println("\nBalance pre-send:")
         println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
         assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(1000000)
         assertThat(balancePreSend.transparent_balance).isEqualTo(0)
 
-        val addressesJson = uniffi.zingo.executeCommand("addresses", "")
+        val addressesJson: String = uniffi.zingo.executeCommand("addresses", "")
         println("\nAddresses:")
         println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
 
         val send = Send(addresses[0].receivers.transparent, 100000, null)
 
-        val txidJson = uniffi.zingo.executeCommand("send", mapper.writeValueAsString(listOf(send)))
+        val txidJson: String = uniffi.zingo.executeCommand("send", mapper.writeValueAsString(listOf(send)))
         println("\nTXID:")
         println(txidJson)
 
-        val sendProgressJson = uniffi.zingo.executeCommand("sendprogress", "")
+        val sendProgressJson: String = uniffi.zingo.executeCommand("sendprogress", "")
         println("\nSend progress:")
         println(sendProgressJson)
 
@@ -320,22 +320,22 @@ class UpdateCurrentPriceAndSummariesFromSeed {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
-        val initFromSeedJson = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val price = uniffi.zingo.executeCommand("updatecurrentprice", "")
+        val price: String = uniffi.zingo.executeCommand("updatecurrentprice", "")
         println("\nPrice:")
         println(price)
 
-        val syncJson = uniffi.zingo.executeCommand("sync", "")
+        val syncJson: String = uniffi.zingo.executeCommand("sync", "")
         println("\nSync:")
         println(syncJson)
 
-        val summariesJson = uniffi.zingo.executeCommand("summaries", "")
+        val summariesJson: String = uniffi.zingo.executeCommand("summaries", "")
         println("\nSummaries:")
         println(summariesJson)
         val summaries: List<Summaries> = mapper.readValue(summariesJson)
@@ -348,7 +348,7 @@ class UpdateCurrentPriceAndSummariesFromSeed {
         assertThat(summaries.size).isIn(Range.closed(4, 5))
         // first item have to be a `Received`
         assertThat(summaries[0].kind).isEqualTo("Received")
-        assertThat(summaries[0].pool).isEqualTo("Orchard")
+        assertThat(summaries[0].pool_type).isEqualTo("Orchard")
         assertThat(summaries[0].amount).isEqualTo(1000000)
         // second item have to be a `Sent`
         assertThat(summaries[1].kind).isEqualTo("Sent")
@@ -387,18 +387,18 @@ class ExecuteSaplingBalanceFromSeed {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
-        val initFromSeedJson = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
         assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val syncJson = uniffi.zingo.executeCommand("sync", "")
+        val syncJson:String = uniffi.zingo.executeCommand("sync", "")
         println("\nSync:")
         println(syncJson)
         
-        val summariesJson = uniffi.zingo.executeCommand("summaries", "")
+        val summariesJson: String = uniffi.zingo.executeCommand("summaries", "")
         println("\nSummaries:")
         println(summariesJson)
 
@@ -417,7 +417,7 @@ class ExecuteSaplingBalanceFromSeed {
         // sapling pool = 0
         // transparent =  0
 
-        val balanceJson = uniffi.zingo.executeCommand("balance", "")
+        val balanceJson:String = uniffi.zingo.executeCommand("balance", "")
         println("\nBalance:")
         println(balanceJson)
         val balance: Balance = mapper.readValue(balanceJson)

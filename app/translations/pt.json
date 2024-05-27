@@ -1,11 +1,11 @@
 {
-  "zingo": "Zingo!",
+  "zingo": "Zingo",
   "version": "zingo-1.3.10 (177)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
   "workingonit": "Estamos trabalhando neste recurso.",
-  "firstlaunchingmessage-title": "Otimizando a Zingo!",
+  "firstlaunchingmessage-title": "Otimizando a Zingo",
   "firstlaunchingmessage-body": "Isso pode demorar um pouco, dependendo do histórico de transações. Por favor, mantenha o aplicativo aberto até que o processo termine",
   "firstlaunchingmessage-footer": "Obrigado.",
   "biometricsfailed-title": "Bem-vindo!",
@@ -88,7 +88,7 @@
     "alert-donation-body": "Você quer ajudar o ZingoLabs a tornar o Zcash mais útil? Opte por dar uma gorjeta de um Zenny (0.01 ZEC) para ZingoLabs em cada transação! Se sim, pressione confirmar, caso contrário, pressione Cancelar."
   },
   "loadedapp": {
-    "about": "Sobre a Zingo!",
+    "about": "Sobre a Zingo",
     "info": "Informações do Servidor",
     "options": "Opções",
     "settings": "Configurações",
@@ -559,7 +559,7 @@
     "copyright": [
       "Copyright (c) 2024, ZingoLabs.",
       "Construído com React Native.",
-      "A licença do MIT (MIT) Copyright (c) 2024 Zingo!",
+      "A licença do MIT (MIT) Copyright (c) 2024 Zingo",
       "A permissão é concedida gratuitamente a qualquer pessoa que obtenha uma cópia deste software e dos arquivos de documentação associados, para negociá-lo sem restrições, incluindo, sem limitações, direitos de usar, copiar, modificar, mesclar, publicar, distribuir, sublicenciar e/ou vender cópias do Software e permitir que as pessoas a quem o mesmo seja fornecido o façam, sujeito às seguintes condições:",
       "O aviso de direitos autorais acima e este aviso de permissão serão incluídos em todas as cópias ou partes substanciais do Software.",
       "O SOFTWARE É FORNECIDO 'COMO ESTÁ', SEM GARANTIA ALGUMA, SEJA EXPRESSA OU IMPLÍCITA, MAS NÃO SE LIMITANDO ÀS GARANTIAS DE COMERCIALIZAÇÃO, ADEQUAÇÃO A UM DETERMINADO FIM E SEM VIOLAÇÕES. EM HIPÓTESE ALGUMA OS AUTORES OU DETENTORES DE DIREITOS AUTORAIS SERÃO RESPONSÁVEIS POR QUALQUER RECLAMAÇÃO, DANOS OU OUTRAS RESPONSABILIDADES, SEJA EM UMA AÇÃO DE CONTRATO, ATO ILÍCITO OU DE OUTRA FORMA, DECORRENTE A ALGO RELACIONADO A CONEXÃO, A USABILIDADE OU OUTRAS NEGOCIAÇÕES NO SOFTWARE."

@@ -1636,7 +1636,7 @@
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
-"@react-native-community/checkbox@^0.5.14":
+"@react-native-community/checkbox@^0.5.17":
   version "0.5.17"
   resolved "https://registry.yarnpkg.com/@react-native-community/checkbox/-/checkbox-0.5.17.tgz#80dd335ca5c61ac2ca4525a21d8fef3f7a021ef7"
   integrity sha512-ZZx/eOH3SIxBg+hvA2zRd7lX5zPQEWcZU8C8Dn7WLdpJkiTkPmIUDFHWrmzxCnwZcyoD+BIt6gUZPKGGb9WmeQ==
@@ -7378,10 +7378,10 @@ react-native-gesture-handler@^2.7.1:
     lodash "^4.17.21"
     prop-types "^15.7.2"
 
-react-native-localize@^2.2.4:
-  version "2.2.6"
-  resolved "https://registry.yarnpkg.com/react-native-localize/-/react-native-localize-2.2.6.tgz#484f8c700bc629f230066e819265f80f6dd3ef58"
-  integrity sha512-EZETlC1ZlW/4g6xfsNCwAkAw5BDL2A6zk/08JjFR/GRGxYuKRD7iP1hHn1+h6DEu+xROjPpoNeXfMER2vkTVIQ==
+react-native-localize@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-localize/-/react-native-localize-3.1.0.tgz#1b322c05af21fd3d78d44e9b747d872ab5155b10"
+  integrity sha512-A7Rrxl8vuAr5FAqtMFrM5ELLdmszohK6FoHL6qlgxx4HScyOnadoZksbvKHbn+zV5nE8kud2Z4kJM10cN120Zg==
 
 react-native-option-menu@^1.1.3:
   version "1.1.3"
@@ -7398,15 +7398,15 @@ react-native-passcode-auth@^1.0.0:
   resolved "https://registry.yarnpkg.com/react-native-passcode-auth/-/react-native-passcode-auth-1.0.0.tgz#250f543923a39608f99e23ce609381e723a6c1ae"
   integrity sha512-uEP0ebMWfwvERHG1OjYy5pgx7T7z7VsvvZ/IK/m6PYlYC11cZq6Fwy5K26RBMJJvqp0UU1S76T7jgmGHYiHypA==
 
-react-native-permissions@3.6.1:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-3.6.1.tgz#73adcc1cef8cd57a9ef167b4507405f4ff5749c4"
-  integrity sha512-fzPpPQXeD34inUccqtoResSwYubfrwUguP4qrVUUv8+KSMjYSaHGoS5HaIJLZHlN9gO+TvLJZ2L5ZljTsb6qnQ==
-
 react-native-permissions@^2.0.2:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-2.2.2.tgz#3d2a63f6b7d6be52fc86e30f77412a9566283028"
   integrity sha512-ihf4shQDSX5Oo9ChQXb9kr13mmyyNem5MaEvOpr3dCjhBOBWyEMztXm9/uPK1Qg5PsNpaYLa1KpcPZDCw87LXg==
+
+react-native-permissions@^4.1.5:
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-4.1.5.tgz#db4d1ddbf076570043f4fd4168f54bb6020aec92"
+  integrity sha512-r6VMRacASmtRHS+GZ+5HQCp9p9kiE+UU9magHOZCXZLTJitdTuVHWZRrb4v4oqZGU+zAp3mZhTQftuMMv+WLUg==
 
 react-native-picker-select@^9.1.3:
   version "9.1.3"

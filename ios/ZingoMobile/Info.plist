@@ -12,7 +12,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Zingo!</string>
+	<string>Zingo</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -92,6 +92,6 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Allow Zingo! to use FaceID to improve the security and privacy?</string>
+	<string>Allow Zingo to use FaceID to improve the security and privacy?</string>
 </dict>
 </plist>

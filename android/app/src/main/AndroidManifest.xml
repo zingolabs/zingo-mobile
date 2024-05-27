@@ -1,15 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
-
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.CAMERA"
+        tools:ignore="PermissionImpliesUnsupportedChromeOsHardware" />
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
     <application
       android:name=".MainApplication"
@@ -23,25 +21,22 @@
       <uses-library android:name="org.apache.http.legacy" android:required="false"/>
       <activity
         android:name=".MainActivity"
-        android:label="@string/app_name"
         android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
         android:launchMode="singleTask"
         android:screenOrientation="portrait"
         android:windowSoftInputMode="adjustResize"
         android:exported="true"
-          tools:ignore="LockedOrientationActivity">
+        tools:ignore="LockedOrientationActivity">
         <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+            <action   android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-        <intent-filter>
             <action   android:name="android.intent.action.VIEW" />
             <category android:name="android.intent.category.DEFAULT" />
             <category android:name="android.intent.category.BROWSABLE" />
             <data     android:scheme="zcash"/>
         </intent-filter>
       </activity>
-      <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+      <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false" />
     </application>
 
     <queries>
