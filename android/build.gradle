@@ -33,14 +33,14 @@ allprojects {
 // this is not the best solution, but while the libraries have no namespace...
 // https://discuss.gradle.org/t/namespace-not-specified-for-agp-8-0-0/45850/5
 
-subprojects {
-   afterEvaluate { project ->
-       if (project.hasProperty('android')) {
-           project.android {
-               if (namespace == null) {
-                   namespace project.group
-               }
-           }
-       }
-   }
-}
+//subprojects {
+//   afterEvaluate { project ->
+//       if (project.hasProperty('android')) {
+//           project.android {
+//               if (namespace == null) {
+//                   namespace project.group
+//               }
+//           }
+//       }
+//   }
+//}
