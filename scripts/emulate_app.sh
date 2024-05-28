@@ -232,8 +232,8 @@ else
     fi
     echo "AVD found: ${avd_name}"
         
-    echo -e "\nRunning yarn install..."
-    yarn install
+    echo -e "\nRunning yarn..."
+    yarn
 
     echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug -PsplitApk=true

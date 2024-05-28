@@ -83,9 +83,8 @@ fi
 # Setup working directory
 cd $(git rev-parse --show-toplevel)
 
-echo -e "\nRunning yarn install..."
-# yarn global add node-gyp
-yarn install
+echo -e "\nRunning yarn..."
+yarn
 
 cd android
 

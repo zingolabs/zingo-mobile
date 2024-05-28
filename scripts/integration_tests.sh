@@ -210,9 +210,8 @@ if [ ! -d "./android/app" ]; then
     exit 1
 fi
 
-echo -e "\nRunning yarn install..."
-yarn global add node-gyp
-yarn install
+echo -e "\nRunning yarn..."
+yarn
 
 cd android
 
