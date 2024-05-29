@@ -68,7 +68,21 @@ class RPCModule: NSObject {
       return false
     }
   }
-  
+
+  func walletBackup_exists() -> Bool {
+    do {
+      let fileName = try getFileName(walletBackupFileName)
+      if (fileExists(fileName) == "true") {
+        return true
+      } else {
+        return false
+      }
+    } catch {
+      NSLog("wallet backup exists error: \(error.localizedDescription)")
+      return false
+    }
+  }
+
   @objc(walletExists:reject:)
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
@@ -151,8 +165,12 @@ class RPCModule: NSObject {
   @objc(deleteExistingWallet:reject:)
   func deleteExistingWallet(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      try self.deleteExistingWallet()
-      resolve("true")
+      if wallet_exists() {
+        try self.deleteExistingWallet()
+        resolve("true")
+      } else {
+        resolve("false")
+      }
     } catch {
       NSLog("\(error.localizedDescription)")
       resolve("false")
@@ -171,8 +189,12 @@ class RPCModule: NSObject {
   @objc(deleteExistingWalletBackup:reject:)
   func deleteExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      try self.deleteExistingWalletBackup()
-      resolve("true")
+      if walletBackup_exists() {
+        try self.deleteExistingWalletBackup()
+        resolve("true")
+      } else {
+        resolve("false")
+      }
     } catch {
       NSLog("\(error.localizedDescription)")
       resolve("false")
