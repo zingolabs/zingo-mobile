@@ -65,35 +65,35 @@ RUN echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml \
 
 # Install and setup OpenSSL
 WORKDIR /opt
-RUN curl --proto '=https' --tlsv1.2 https://www.openssl.org/source/openssl-3.1.3.tar.gz -o openssl-3.1.3.tar.gz \
-    && tar xvf openssl-3.1.3.tar.gz \
-    && rm -rf openssl-3.1.3.tar.gz
+RUN curl -LO https://www.openssl.org/source/openssl-3.3.1.tar.gz -o openssl-3.3.1.tar.gz \
+    && tar xvf openssl-3.3.1.tar.gz \
+    && rm -rf openssl-3.3.1.tar.gz
 ENV OPENSSL_STATIC=yes
-WORKDIR /opt/openssl-3.1.3 
+WORKDIR /opt/openssl-3.3.1 
 RUN mkdir x86 \
     && mkdir aarch64 \
     && mkdir armv7 \
     && mkdir x86_64
 # -mno-outline-atomics removed
-RUN ./Configure --prefix=/opt/openssl-3.1.3/aarch64 android-arm64 \
+RUN ./Configure --prefix=/opt/openssl-3.3.1/aarch64 android-arm64 \
     -U__ANDROID_API__ -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
-RUN ./Configure --prefix=/opt/openssl-3.1.3/armv7 android-arm \
+RUN ./Configure --prefix=/opt/openssl-3.3.1/armv7 android-arm \
     -U__ANDROID_API__ -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
-RUN ./Configure --prefix=/opt/openssl-3.1.3/x86 android-x86 -latomic -DBROKEN_CLANG_ATOMICS \
+RUN ./Configure --prefix=/opt/openssl-3.3.1/x86 android-x86 -latomic -DBROKEN_CLANG_ATOMICS \
     -U__ANDROID_API__ -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
-RUN ./Configure --prefix=/opt/openssl-3.1.3/x86_64 android-x86_64 \
+RUN ./Configure --prefix=/opt/openssl-3.3.1/x86_64 android-x86_64 \
     -U__ANDROID_API__  -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
