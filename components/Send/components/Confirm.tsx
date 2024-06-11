@@ -36,7 +36,12 @@ type ConfirmProps = {
   openModal: () => void;
   confirmSend: () => void;
   //sendAllAmount: boolean;
-  calculateFeeWithPropose: (amount: string, address: string, memo: string, includeUAMemo: boolean) => Promise<void>;
+  calculateSpendableAndFeeWithPropose: (
+    amount: string,
+    address: string,
+    memo: string,
+    includeUAMemo: boolean,
+  ) => Promise<void>;
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
   closeModal,
@@ -45,7 +50,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   donationAmount,
   //sendAllAmount,
   openModal,
-  calculateFeeWithPropose,
+  calculateSpendableAndFeeWithPropose,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -234,7 +239,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   }, []);
 
   useEffect(() => {
-    calculateFeeWithPropose(
+    calculateSpendableAndFeeWithPropose(
       sendPageState.toaddr.amount,
       sendPageState.toaddr.to,
       sendPageState.toaddr.memo,

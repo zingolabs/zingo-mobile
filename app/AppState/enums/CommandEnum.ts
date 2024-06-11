@@ -27,9 +27,12 @@ export enum CommandEnum {
   sends_to_address = 'sends_to_address',
   memobytes_to_address = 'memobytes_to_address',
 
-  // new commands, some are comming...
+  // calculate the max soendable amount in the wallet
+  spendablebalance = 'spendablebalance',
+  // new commands to create a proposal
   send = 'send',
+  sendall = 'sendall',
   shield = 'shield',
-  // this works for both: send & shield
+  // this works for all: send, sendall & shield
   confirm = 'confirm',
 }

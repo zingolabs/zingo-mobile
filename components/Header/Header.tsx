@@ -47,7 +47,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import Utils from '../../app/utils';
-import { RPCProposeType } from '../../app/rpc/types/RPCProposeType';
+import { RPCShieldProposeType } from '../../app/rpc/types/RPCShieldProposeType';
 import RPCModule from '../../app/RPCModule';
 
 type HeaderProps = {
@@ -207,7 +207,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           //Alert.alert('Calculating the FEE', runProposeStr);
         } else {
           try {
-            const runProposeJson: RPCProposeType = JSON.parse(runProposeStr);
+            const runProposeJson: RPCShieldProposeType = JSON.parse(runProposeStr);
             if (runProposeJson.error) {
               // snack with error
               console.log(runProposeJson.error);
