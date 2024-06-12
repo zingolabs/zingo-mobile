@@ -138,7 +138,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [updatingToField, setUpdatingToField] = useState<boolean>(false);
   const [sendToSelf, setSendToSelf] = useState<boolean>(false);
   const [donationAddress, setDonationAddress] = useState<boolean>(false);
-  const [negativeMaxAount, setNegativeMaxAount] = useState<boolean>(false);
+  const [negativeMaxAmount, setNegativeMaxAmount] = useState<boolean>(false);
   //const [sendAllClick, setSendAllClick] = useState<boolean>(false);
   const [proposeSendLastError, setProposeSendLastError] = useState<string>('');
   const [spendableBalanceLastError, setSpendableBalanceLastError] = useState<string>('');
@@ -170,109 +170,164 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   };
 
-  const calculateSpendableAndFeeWithPropose = async (
-    amount: string,
-    address: string,
-    memo: string,
-    includeUAMemo: boolean,
-  ): Promise<void> => {
-    console.log(address, validAddress);
-    console.log(amount, validAmount);
-    console.log(validMemo);
-    // if no address -> make no sense to run the propose
-    if (!address || validAddress !== 1) {
-      setFee(0);
-      setProposeSendLastError('');
-      setSpendableBalanceLastError('');
-      return;
-    }
-    if (amount === '' || validAmount !== 1) {
-      setFee(0);
-      setProposeSendLastError('');
-      setSpendableBalanceLastError('');
-      return;
-    }
-    if (validMemo === -1) {
-      setFee(0);
-      setProposeSendLastError('');
-      setSpendableBalanceLastError('');
-      return;
-    }
-    const sendPageStateCalculateFee = new SendPageStateClass(new ToAddrClass(0));
-    sendPageStateCalculateFee.toaddr.to = address;
-    sendPageStateCalculateFee.toaddr.memo = memo;
-    sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemo;
-    sendPageStateCalculateFee.toaddr.amount = amount;
+  const defaultValueFee = (): void => {
+    setFee(0);
+    setProposeSendLastError('');
+  };
 
-    const sendJson = await Utils.getSendManyJSON(
-      sendPageStateCalculateFee,
-      uaAddress,
-      addresses,
-      server,
-      donation,
-      translate,
-    );
-    // fee
-    let proposeFee = 0;
-    const runProposeStr = await runSendPropose(JSON.stringify(sendJson), CommandEnum.send);
-    console.log(sendJson);
-    if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
-      // snack with error
-      console.log(runProposeStr);
-      setProposeSendLastError(runProposeStr);
-      //Alert.alert('Calculating the FEE', runProposeStr);
+  const defaultValuesSpendableMaxAmount = useCallback((): void => {
+    setSpendable(totalBalance.spendableOrchard + totalBalance.spendablePrivate);
+    const max =
+      totalBalance.spendableOrchard +
+      totalBalance.spendablePrivate -
+      (donation && !sendToSelf && !donationAddress
+        ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+        : 0);
+    if (max >= 0) {
+      // if max is 0 then the user can send a memo with amount 0.
+      setMaxAmount(max);
+      setNegativeMaxAmount(false);
     } else {
-      try {
-        const runProposeJson: RPCSendProposeType = JSON.parse(runProposeStr);
-        if (runProposeJson.error) {
-          // snack with error
-          console.log(runProposeJson.error);
-          setProposeSendLastError(runProposeStr);
-          //Alert.alert('Calculating the FEE', runProposeJson.error);
-        } else if (runProposeJson.fee) {
-          console.log(runProposeJson.fee);
-          proposeFee = runProposeJson.fee / 10 ** 8;
-          setProposeSendLastError('');
-        }
-      } catch (e) {
+      // if max is less than 0 then the user CANNOT send anything.
+      setMaxAmount(0);
+      setNegativeMaxAmount(true);
+    }
+    setSpendableBalanceLastError('');
+  }, [donation, donationAddress, sendToSelf, totalBalance.spendableOrchard, totalBalance.spendablePrivate]);
+
+  const calculateFeeWithPropose = useCallback(
+    async (amount: string, address: string, memo: string, includeUAMemo: boolean): Promise<void> => {
+      // if no address -> make no sense to run the propose
+      if (!address || validAddress !== 1) {
+        defaultValueFee();
+        return;
+      }
+      if (amount === '' || validAmount !== 1) {
+        defaultValueFee();
+        return;
+      }
+      if (validMemo === -1) {
+        defaultValueFee();
+        return;
+      }
+      const sendPageStateCalculateFee = new SendPageStateClass(new ToAddrClass(0));
+      sendPageStateCalculateFee.toaddr.to = address;
+      sendPageStateCalculateFee.toaddr.memo = memo;
+      sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemo;
+      sendPageStateCalculateFee.toaddr.amount = amount;
+
+      const sendJson = await Utils.getSendManyJSON(
+        sendPageStateCalculateFee,
+        uaAddress,
+        addresses,
+        server,
+        donation,
+        translate,
+      );
+      // fee
+      let proposeFee = 0;
+      const runProposeStr = await runSendPropose(JSON.stringify(sendJson), CommandEnum.send);
+      console.log(sendJson);
+      if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
         console.log(runProposeStr);
         setProposeSendLastError(runProposeStr);
-        //Alert.alert('Calculating the FEE', runProposeJson.error);
-      }
-    }
-    setFee(proposeFee);
-    // spendable
-    let spendableBalance = 0;
-    const runSpendableBalanceStr = await RPCModule.execute(CommandEnum.spendablebalance, address);
-    console.log(runSpendableBalanceStr);
-    if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
-      // snack with error
-      console.log(runSpendableBalanceStr);
-      setSpendableBalanceLastError(runSpendableBalanceStr);
-      //Alert.alert('Calculating the FEE', runProposeStr);
-    } else {
-      try {
-        const runProposeJson: RPCSpendablebalanceType = JSON.parse(runSpendableBalanceStr);
-        if (runProposeJson.error) {
+        //Alert.alert('Calculating the FEE', runProposeStr);
+      } else {
+        try {
+          const runProposeJson: RPCSendProposeType = JSON.parse(runProposeStr);
+          if (runProposeJson.error) {
+            // snack with error
+            console.log(runProposeJson.error);
+            setProposeSendLastError(runProposeJson.error);
+            //Alert.alert('Calculating the FEE', runProposeJson.error);
+          } else if (runProposeJson.fee) {
+            console.log(runProposeJson.fee);
+            proposeFee = runProposeJson.fee / 10 ** 8;
+            setProposeSendLastError('');
+          }
+        } catch (e) {
           // snack with error
-          console.log(runProposeJson.error);
-          setSpendableBalanceLastError(runSpendableBalanceStr);
+          console.log(runProposeStr);
+          setProposeSendLastError(runProposeStr);
           //Alert.alert('Calculating the FEE', runProposeJson.error);
-        } else if (runProposeJson.balance) {
-          console.log(runProposeJson.balance);
-          spendableBalance = runProposeJson.balance / 10 ** 8;
-          setSpendableBalanceLastError('');
         }
-      } catch (e) {
+      }
+      setFee(proposeFee);
+    },
+    [addresses, donation, server, translate, uaAddress, validAddress, validAmount, validMemo],
+  );
+
+  const calculateSpendableBalance = useCallback(
+    async (address: string): Promise<void> => {
+      // if no address -> make no sense to run the propose
+      if (!address || validAddress !== 1) {
+        defaultValuesSpendableMaxAmount();
+        return;
+      }
+      // spendable
+      let spendableBalance = totalBalance.spendableOrchard + totalBalance.spendablePrivate;
+      const runSpendableBalanceStr = await RPCModule.execute(CommandEnum.spendablebalance, address);
+      console.log(runSpendableBalanceStr);
+      if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
         console.log(runSpendableBalanceStr);
         setSpendableBalanceLastError(runSpendableBalanceStr);
-        //Alert.alert('Calculating the FEE', runProposeJson.error);
+        //Alert.alert('Calculating the FEE', runProposeStr);
+      } else {
+        try {
+          const runSpendableBalanceJson: RPCSpendablebalanceType = JSON.parse(runSpendableBalanceStr);
+          if (runSpendableBalanceJson.error) {
+            // snack with error
+            console.log(runSpendableBalanceJson.error);
+            setSpendableBalanceLastError(runSpendableBalanceJson.error);
+            //Alert.alert('Calculating the FEE', runProposeJson.error);
+          } else if (runSpendableBalanceJson.balance) {
+            console.log(runSpendableBalanceJson.balance);
+            spendableBalance = runSpendableBalanceJson.balance / 10 ** 8;
+            setSpendableBalanceLastError('');
+          }
+        } catch (e) {
+          // snack with error
+          console.log(runSpendableBalanceStr);
+          setSpendableBalanceLastError(runSpendableBalanceStr);
+          //Alert.alert('Calculating the FEE', runProposeJson.error);
+        }
       }
-    }
-    setSpendable(spendableBalance);
-  };
+      setSpendable(spendableBalance);
+      // max amount
+      const max =
+        spendableBalance -
+        (donation && !sendToSelf && !donationAddress
+          ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+          : 0);
+      if (max >= 0) {
+        // if max is 0 then the user can send a memo with amount 0.
+        setMaxAmount(max);
+        setNegativeMaxAmount(false);
+        //if (sendAllClick) {
+        //  updateToField(null, Utils.parseNumberFloatToStringLocale(max, 8), null, null, null);
+        //}
+      } else {
+        // if max is less than 0 then the user CANNOT send anything.
+        setMaxAmount(0);
+        setNegativeMaxAmount(true);
+        //if (sendAllClick) {
+        //  updateToField(null, '0', null, null, null);
+        //}
+      }
+      //setSendAllClick(false);
+    },
+    [
+      defaultValuesSpendableMaxAmount,
+      donation,
+      donationAddress,
+      sendToSelf,
+      totalBalance.spendableOrchard,
+      totalBalance.spendablePrivate,
+      validAddress,
+    ],
+  );
 
   const memoTotal = useCallback((memoPar: string, includeUAMemoPar: boolean, uaAddressPar: string) => {
     return `${memoPar || ''}${includeUAMemoPar ? '\nReply to: \n' + uaAddressPar : ''}`;
@@ -362,67 +417,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   useEffect(() => {
-    if (validAddress === 0 && validAmount === 0) {
-      setFee(0);
-      setProposeSendLastError('');
-      setSpendableBalanceLastError('');
-    } else if (validAddress !== -1 && validAmount !== -1) {
-      calculateSpendableAndFeeWithPropose(
-        sendPageState.toaddr.amount,
-        sendPageState.toaddr.to,
-        sendPageState.toaddr.memo,
-        sendPageState.toaddr.includeUAMemo,
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    sendPageState.toaddr.amount,
-    sendPageState.toaddr.includeUAMemo,
-    //sendPageState.toaddr.memo,
-    sendPageState.toaddr.to,
-    validAddress,
-    validAmount,
-  ]);
-
-  useEffect(() => {
-    // transparent is not spendable.
-    // with no recipient address, estimate a spendable from the balances is better than nothing.
-    let spend: number = 0;
-    if (sendPageState.toaddr.to && validAddress === 1) {
-      calculateSpendableAndFeeWithPropose(
-        sendPageState.toaddr.amount,
-        sendPageState.toaddr.to,
-        sendPageState.toaddr.memo,
-        sendPageState.toaddr.includeUAMemo,
-      );
-    } else {
-      spend = totalBalance.spendablePrivate + totalBalance.spendableOrchard;
-    }
-    //const max = spend - fee - (donation ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) : 0);
-    // removing the fee in this calculation, for now.
-    const max =
-      spend -
-      (donation && !sendToSelf && !donationAddress
-        ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
-        : 0);
-    if (max >= 0) {
-      // if max is 0 then the user can send a memo with amount 0.
-      setMaxAmount(max);
-      setNegativeMaxAount(false);
-      //if (sendAllClick) {
-      //  updateToField(null, Utils.parseNumberFloatToStringLocale(max, 8), null, null, null);
-      //}
-    } else {
-      // if max is less than 0 then the user CANNOT send anything.
-      setMaxAmount(0);
-      setNegativeMaxAount(true);
-      //if (sendAllClick) {
-      //  updateToField(null, '0', null, null, null);
-      //}
-    }
-    setSpendable(spend);
-    //setSendAllClick(false);
-
     const stillConf =
       totalBalance.orchardBal !== totalBalance.spendableOrchard ||
       totalBalance.privateBal !== totalBalance.spendablePrivate ||
@@ -434,22 +428,37 @@ const Send: React.FunctionComponent<SendProps> = ({
     setShowShieldInfo(showShield);
     //setShowUpgradeInfo(showUpgrade);
     setShowUpgradeInfo(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    donation,
-    sendToSelf,
-    donationAddress,
     shieldingAmount,
     somePending,
     totalBalance.orchardBal,
     totalBalance.privateBal,
     totalBalance.spendableOrchard,
     totalBalance.spendablePrivate,
-    sendPageState.toaddr.amount,
-    sendPageState.toaddr.to,
-    sendPageState.toaddr.memo,
-    sendPageState.toaddr.includeUAMemo,
   ]);
+
+  useEffect(() => {
+    calculateFeeWithPropose(
+      sendPageState.toaddr.amount,
+      sendPageState.toaddr.to,
+      sendPageState.toaddr.memo,
+      sendPageState.toaddr.includeUAMemo,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    calculateFeeWithPropose,
+    sendPageState.toaddr.amount,
+    sendPageState.toaddr.amountCurrency,
+    sendPageState.toaddr.includeUAMemo,
+    // don't have to recalculate the fee if the memo change.
+    //sendPageState.toaddr.memo,
+    sendPageState.toaddr.to,
+  ]);
+
+  useEffect(() => {
+    // transparent is not spendable.
+    calculateSpendableBalance(sendPageState.toaddr.to);
+  }, [calculateSpendableBalance, sendPageState.toaddr.to]);
 
   useEffect(() => {
     const getMemoEnabled = async (address: string): Promise<boolean> => {
@@ -553,7 +562,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         invalid = true;
       }
     }
-    console.log('spendable', spendable, 'maxAmount', maxAmount, 'Amount', to.amount);
     if (!invalid) {
       if (to.amount !== '') {
         if (isNaN(Utils.parseStringLocaleToNumberFloat(to.amount))) {
@@ -758,6 +766,16 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   //console.log('render Send - 4', sendPageState);
+  console.log(
+    'Render, spendable',
+    spendable,
+    'maxAmount',
+    maxAmount,
+    'Fee',
+    fee,
+    'Amount',
+    sendPageState.toaddr.amount,
+  );
 
   const returnPage = (
     <View
@@ -807,7 +825,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) ===
               Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
           }
-          calculateSpendableAndFeeWithPropose={calculateSpendableAndFeeWithPropose}
+          calculateFeeWithPropose={calculateFeeWithPropose}
         />*/}
         <Confirm
           calculatedFee={fee}
@@ -823,7 +841,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             setConfirmModalVisible(true);
           }}
           confirmSend={confirmSend}
-          calculateSpendableAndFeeWithPropose={calculateSpendableAndFeeWithPropose}
+          calculateFeeWithPropose={calculateFeeWithPropose}
         />
       </Modal>
 
@@ -927,7 +945,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                           backgroundColor: 'transparent',
                         }}
                         value={ta.to}
-                        onChangeText={(text: string) => updateToField(text, null, null, null, null)}
+                        onChangeText={(text: string) => {
+                          updateToField(text, null, null, null, null);
+                        }}
                         editable={true}
                       />
                     </View>
@@ -1116,7 +1136,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null, null)}
                           onEndEditing={(e: any) => {
                             updateToField(null, e.nativeEvent.text.substring(0, 20), null, null, null);
-                            calculateSpendableAndFeeWithPropose(
+                            calculateFeeWithPropose(
                               e.nativeEvent.text.substring(0, 20),
                               ta.to,
                               ta.memo,
@@ -1130,32 +1150,30 @@ const Send: React.FunctionComponent<SendProps> = ({
                     </View>
 
                     <View style={{ display: 'flex', flexDirection: 'column' }}>
-                      {validAddress !== 0 && validAmount !== 0 && (
-                        <TouchableOpacity
-                          onPress={() => {
-                            if (spendableBalanceLastError) {
-                              Alert.alert(translate('send.spendable') as string, spendableBalanceLastError);
-                            }
+                      <TouchableOpacity
+                        onPress={() => {
+                          if (spendableBalanceLastError) {
+                            Alert.alert(translate('send.spendable') as string, spendableBalanceLastError);
+                          }
+                        }}>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'flex-start',
+                            alignItems: 'center',
+                            marginTop: 5,
                           }}>
-                          <View
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              justifyContent: 'flex-start',
-                              alignItems: 'center',
-                              marginTop: 5,
-                            }}>
-                            <RegText style={{ fontSize: 14 }}>{translate('send.spendable') as string}</RegText>
-                            <ZecAmount
-                              currencyName={info.currencyName}
-                              color={stillConfirming || negativeMaxAount ? 'red' : colors.money}
-                              size={15}
-                              amtZec={maxAmount}
-                              privacy={privacy}
-                            />
-                          </View>
-                        </TouchableOpacity>
-                      )}
+                          <RegText style={{ fontSize: 14 }}>{translate('send.spendable') as string}</RegText>
+                          <ZecAmount
+                            currencyName={info.currencyName}
+                            color={stillConfirming || negativeMaxAmount ? 'red' : colors.money}
+                            size={15}
+                            amtZec={maxAmount}
+                            privacy={privacy}
+                          />
+                        </View>
+                      </TouchableOpacity>
                       {((donation && !sendToSelf && !donationAddress) || (validAddress !== 0 && validAmount !== 0)) && (
                         <View
                           style={{
@@ -1306,7 +1324,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             onEndEditing={(e: any) => {
                               updateToField(null, null, e.nativeEvent.text.substring(0, 15), null, null);
                               // re-calculate the fee with the zec amount in the other field
-                              calculateSpendableAndFeeWithPropose(ta.amount, ta.to, ta.memo, ta.includeUAMemo);
+                              calculateFeeWithPropose(ta.amount, ta.to, ta.memo, ta.includeUAMemo);
                             }}
                             editable={true}
                             maxLength={15}
@@ -1406,7 +1424,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               e.nativeEvent.text,
                               null,
                             );
-                            calculateSpendableAndFeeWithPropose(ta.amount, ta.to, e.nativeEvent.text, ta.includeUAMemo);
+                            calculateFeeWithPropose(ta.amount, ta.to, e.nativeEvent.text, ta.includeUAMemo);
                           }}
                           editable={true}
                           onContentSizeChange={(e: any) => {
@@ -1545,8 +1563,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                 style={{ marginLeft: 10 }}
                 title={translate('send.clear') as string}
                 onPress={() => {
-                  setFee(0);
-                  setProposeSendLastError('');
+                  defaultValueFee();
+                  defaultValuesSpendableMaxAmount();
                   clearToAddr();
                 }}
               />

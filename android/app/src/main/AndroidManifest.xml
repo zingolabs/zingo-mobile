@@ -28,14 +28,15 @@
         android:exported="true"
         tools:ignore="LockedOrientationActivity">
         <intent-filter>
-            <action   android:name="android.intent.action.MAIN" />
+            <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        <intent-filter>
             <action   android:name="android.intent.action.VIEW" />
             <category android:name="android.intent.category.DEFAULT" />
             <category android:name="android.intent.category.BROWSABLE" />
             <data     android:scheme="zcash"/>
-        </intent-filter>
-      </activity>
+        </intent-filter>      </activity>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false" />
     </application>
 
