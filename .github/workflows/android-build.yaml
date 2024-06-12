@@ -18,7 +18,7 @@ env:
 jobs:
   android-check-build-cache:
     name: Check build cache
-    runs-on: macos-14
+    runs-on: macos-13
     outputs:
       android-cache-found: ${{ steps.android-set-cache-found.outputs.android-cache-found }}
     steps:     
@@ -139,7 +139,7 @@ jobs:
   cache-native-android-uniffi:
     name: Cache native rust
     needs: android-build
-    runs-on: macos-14
+    runs-on: macos-13
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
