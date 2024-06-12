@@ -80,24 +80,26 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     }
 
     let from: PrivacyLevelFromEnum = PrivacyLevelFromEnum.nonePrivacyLevel;
+    const totalAmount: number = Utils.parseStringLocaleToNumberFloat(
+      Utils.parseNumberFloatToStringLocale(
+        Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee,
+        8,
+      ),
+    );
+
     // amount + fee
-    if (
-      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
-      totalBalance.spendableOrchard
-    ) {
+    if (totalAmount <= totalBalance.spendableOrchard) {
       from = PrivacyLevelFromEnum.orchardPrivacyLevel;
     } else if (
       totalBalance.spendableOrchard > 0 &&
-      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
-        totalBalance.spendableOrchard + totalBalance.spendablePrivate
+      totalAmount <= totalBalance.spendableOrchard + totalBalance.spendablePrivate
     ) {
       from = PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel;
-    } else if (
-      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
-      totalBalance.spendablePrivate
-    ) {
+    } else if (totalAmount <= totalBalance.spendablePrivate) {
       from = PrivacyLevelFromEnum.saplingPrivacyLevel;
     }
+
+    //console.log(from);
 
     if (from === PrivacyLevelFromEnum.nonePrivacyLevel) {
       return '-';
@@ -115,10 +117,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     try {
       resultJSON = await JSON.parse(result);
     } catch (e) {
+      //console.log(e);
       return '-';
     }
 
-    //console.log('parse-address', address, resultJSON.status === RPCParseStatusEnum.success);
+    //console.log('parse-address', sendPageState.toaddr.to, resultJSON.status === RPCParseStatusEnum.successParse);
 
     if (resultJSON.status !== RPCParseStatusEnum.successParse || resultJSON.chain_name !== server.chain_name) {
       return '-';
