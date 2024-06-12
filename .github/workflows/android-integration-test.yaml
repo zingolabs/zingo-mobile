@@ -102,6 +102,8 @@ jobs:
 
       - name: Install Docker (MacOs X)
         uses: douglascamata/setup-docker-macos-action@v1-alpha
+        with:
+          upgrade-qemu: true
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
