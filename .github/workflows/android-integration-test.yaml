@@ -100,14 +100,11 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Install Colima
-        run: brew install colima
+      - name: Install Docker (MacOs X)
+        uses: douglascamata/setup-docker-macos-action@v1-alpha.10
 
-      - name: Install Docker
-        run: brew install --formula docker
-
-      - name: Start Colima
-        run: colima start
+      - name: Setup Qemu docker
+        uses: docker/setup-qemu-action@v3
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
