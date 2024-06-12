@@ -18,7 +18,7 @@ env:
 jobs:
   ios-integration-test:
     name: IOS Integration test
-    runs-on: macos-14
+    runs-on: macos-13
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
