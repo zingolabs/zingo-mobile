@@ -664,7 +664,7 @@ export default class RPC {
 
   async doSend(sendJSON: string): Promise<string> {
     try {
-      console.log('NOT USING THIS:', sendJSON);
+      console.log('send JSON', sendJSON);
       const preSendStr: String = await RPCModule.execute(CommandEnum.send, sendJSON);
       console.log(preSendStr);
       const sendStr: string = await RPCModule.execute(CommandEnum.confirm, '');
