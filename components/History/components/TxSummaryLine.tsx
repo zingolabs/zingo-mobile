@@ -122,10 +122,16 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
               <FadeText
                 style={{ opacity: 1, fontWeight: 'bold', color: amountColor, fontSize: displayAddress ? 14 : 18 }}>
-                {tx.type === TransactionTypeEnum.Sent
+                {tx.type === TransactionTypeEnum.Sent && tx.confirmations === 0
+                  ? (translate('history.sending') as string)
+                  : tx.type === TransactionTypeEnum.Sent && tx.confirmations > 0
                   ? (translate('history.sent') as string)
-                  : tx.type === TransactionTypeEnum.Received
+                  : tx.type === TransactionTypeEnum.Received && tx.confirmations === 0
+                  ? (translate('history.receiving') as string)
+                  : tx.type === TransactionTypeEnum.Received && tx.confirmations > 0
                   ? (translate('history.received') as string)
+                  : tx.type === TransactionTypeEnum.SendToSelf && tx.confirmations === 0
+                  ? (translate('history.sendingtoself') as string)
                   : (translate('history.sendtoself') as string)}
               </FadeText>
               <FadeText>{tx.time ? moment((tx.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
