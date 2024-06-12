@@ -102,8 +102,8 @@ jobs:
 
       - name: Install docker
         run: |
-          brew install --formula docker
           brew install colima
+          brew install --formula docker
           colima start -f
 
       - name: Pull regchest docker image
