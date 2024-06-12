@@ -61,7 +61,7 @@ jobs:
 
   android-integration-test:
     name: Android Integration test
-    runs-on: macos-14
+    runs-on: macos-latest
     needs: android-build-test-artifacts
     strategy:
       matrix:
@@ -100,11 +100,14 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Install docker
-        run: |
-          brew install colima
-          brew install --formula docker
-          colima start -f
+      - name: Install Colima
+        run: brew install colima
+
+      - name: Install Docker
+        run: brew install --formula docker
+
+      - name: Start Colima
+        run: colima start
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
