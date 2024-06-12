@@ -101,7 +101,7 @@ jobs:
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
       - name: Install Docker (MacOs X)
-        uses: douglascamata/setup-docker-macos-action@v1-alpha.10
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
 
       - name: Setup Qemu docker
         uses: docker/setup-qemu-action@v3
