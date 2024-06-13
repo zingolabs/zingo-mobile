@@ -60,12 +60,11 @@ jobs:
           pod install
 
       - name: Run integration tests
-        working-directory: ios
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 60
           max_attempts: 3
-          command: xcodebuild test \
+          command: ./ios/xcodebuild test \
             -workspace ZingoMobile.xcworkspace \
             -scheme ZingoMobile \
             -sdk iphonesimulator \
