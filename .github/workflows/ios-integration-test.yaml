@@ -64,9 +64,11 @@ jobs:
         with:
           timeout_minutes: 60
           max_attempts: 3
-          command: ios/xcodebuild test \
-            -workspace ZingoMobile.xcworkspace \
-            -scheme ZingoMobile \
-            -sdk iphonesimulator \
-            -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2'
+          command: |
+            cd ios
+            xcodebuild test \
+              -workspace ZingoMobile.xcworkspace \
+              -scheme ZingoMobile \
+              -sdk iphonesimulator \
+              -configuration Debug \
+              -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2'
