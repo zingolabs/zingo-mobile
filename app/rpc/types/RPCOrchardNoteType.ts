@@ -4,7 +4,8 @@ export type RPCOrchardNoteType = {
   created_in_txid: string;
   value: string;
   pending: string;
-  is_change: boolean;
+  // deprecated
+  //is_change: boolean;
   address: string;
   spendable: string;
   spent: string;
