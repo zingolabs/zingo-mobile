@@ -119,9 +119,9 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
           </View>
           <View style={{ display: 'flex' }}>
             {!!displayAddress && displayAddress}
-            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ display: 'flex', flexDirection: tx.type === TransactionTypeEnum.Received || tx.type === TransactionTypeEnum.SendToSelf ? 'column' : 'row', alignItems: 'flex-start' }}>
               <FadeText
-                style={{ opacity: 1, fontWeight: 'bold', color: amountColor, fontSize: displayAddress ? 14 : 18 }}>
+                style={{ opacity: 1, fontWeight: 'bold', color: amountColor, fontSize: displayAddress || tx.confirmations === 0 ? 14 : 18 }}>
                 {tx.type === TransactionTypeEnum.Sent && tx.confirmations === 0
                   ? (translate('history.sending') as string)
                   : tx.type === TransactionTypeEnum.Sent && tx.confirmations > 0
@@ -134,10 +134,12 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                   ? (translate('history.sendingtoself') as string)
                   : (translate('history.sendtoself') as string)}
               </FadeText>
-              <FadeText>{tx.time ? moment((tx.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
-              {haveMemo && (
-                <FontAwesomeIcon style={{ marginLeft: 10 }} size={15} icon={faComment} color={colors.primaryDisabled} />
-              )}
+              <View style={{ display: 'flex', flexDirection: 'row'}} >
+                <FadeText>{tx.time ? moment((tx.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
+                {haveMemo && (
+                  <FontAwesomeIcon style={{ marginLeft: 10 }} size={15} icon={faComment} color={colors.primaryDisabled} />
+                )}
+              </View>
             </View>
           </View>
           <ZecAmount
