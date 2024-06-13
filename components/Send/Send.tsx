@@ -100,7 +100,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendPageState,
     navigation,
     zecPrice,
-    //sendAll,
+    sendAll,
     netInfo,
     privacy,
     server,
@@ -196,7 +196,13 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [donation, donationAddress, sendToSelf, totalBalance.spendableOrchard, totalBalance.spendablePrivate]);
 
   const calculateFeeWithPropose = useCallback(
-    async (amount: string, address: string, memo: string, includeUAMemo: boolean): Promise<void> => {
+    async (
+      amount: string,
+      address: string,
+      memo: string,
+      includeUAMemo: boolean,
+      command: CommandEnum.send | CommandEnum.sendall,
+    ): Promise<void> => {
       // if no address -> make no sense to run the propose
       if (!address || validAddress !== 1) {
         defaultValueFee();
@@ -226,7 +232,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
       // fee
       let proposeFee = 0;
-      const runProposeStr = await runSendPropose(JSON.stringify(sendJson), CommandEnum.send);
+      const runProposeStr = await runSendPropose(JSON.stringify(sendJson), command);
       console.log(sendJson);
       if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
@@ -326,6 +332,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       totalBalance.spendableOrchard,
       totalBalance.spendablePrivate,
       validAddress,
+      //sendAllClick,
+      //updateToField,
     ],
   );
 
@@ -443,6 +451,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       sendPageState.toaddr.to,
       sendPageState.toaddr.memo,
       sendPageState.toaddr.includeUAMemo,
+      CommandEnum.send,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -806,7 +815,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         transparent={false}
         visible={confirmModalVisible}
         onRequestClose={() => setConfirmModalVisible(false)}>
-        {/*<Confirm
+        <Confirm
           calculatedFee={fee}
           donationAmount={
             donation && server.chain_name === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress
@@ -825,22 +834,6 @@ const Send: React.FunctionComponent<SendProps> = ({
             Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) ===
               Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
           }
-          calculateFeeWithPropose={calculateFeeWithPropose}
-        />*/}
-        <Confirm
-          calculatedFee={fee}
-          donationAmount={
-            donation && server.chain_name === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress
-              ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
-              : 0
-          }
-          closeModal={() => {
-            setConfirmModalVisible(false);
-          }}
-          openModal={() => {
-            setConfirmModalVisible(true);
-          }}
-          confirmSend={confirmSend}
           calculateFeeWithPropose={calculateFeeWithPropose}
         />
       </Modal>
@@ -1046,22 +1039,23 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}>
                       <FadeText>{`${translate('send.amount')}`}</FadeText>
                     </View>
-                    {/*sendAll && mode !== ModeEnum.basic && (
+                    {sendAll && mode !== ModeEnum.basic && (
                       <TouchableOpacity
                         onPress={() => {
-                          if (fee > 0) {
-                            updateToField(null, Utils.parseNumberFloatToStringLocale(maxAmount, 8), null, null, null);
-                          }
-                          calculateSpendableAndFeeWithPropose(
+                          //if (fee > 0) {
+                          updateToField(null, Utils.parseNumberFloatToStringLocale(maxAmount, 8), null, null, null);
+                          //}
+                          calculateFeeWithPropose(
                             Utils.parseNumberFloatToStringLocale(maxAmount, 8),
                             sendPageState.toaddr.to,
                             sendPageState.toaddr.memo,
                             sendPageState.toaddr.includeUAMemo,
+                            CommandEnum.sendall,
                           );
-                          setSendAllClick(true);
-                          setTimeout(() => {
-                            setSendAllClick(false);
-                          }, 1000);
+                          //setSendAllClick(true);
+                          //setTimeout(() => {
+                          //  setSendAllClick(false);
+                          //}, 1000);
                         }}>
                         <View
                           style={{
@@ -1077,7 +1071,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <RegText color={colors.primary}>{translate('send.sendall') as string}</RegText>
                         </View>
                       </TouchableOpacity>
-                    )*/}
+                    )}
                   </View>
                   {validAmount === -1 && <ErrorText>{translate('send.invalidnumber') as string}</ErrorText>}
                   {validAmount === -2 && <ErrorText>{translate('send.invalidamount') as string}</ErrorText>}
@@ -1141,6 +1135,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               ta.to,
                               ta.memo,
                               ta.includeUAMemo,
+                              CommandEnum.send,
                             );
                           }}
                           editable={true}
@@ -1339,7 +1334,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             onEndEditing={(e: any) => {
                               updateToField(null, null, e.nativeEvent.text.substring(0, 15), null, null);
                               // re-calculate the fee with the zec amount in the other field
-                              calculateFeeWithPropose(ta.amount, ta.to, ta.memo, ta.includeUAMemo);
+                              calculateFeeWithPropose(ta.amount, ta.to, ta.memo, ta.includeUAMemo, CommandEnum.send);
                             }}
                             editable={true}
                             maxLength={15}
@@ -1439,7 +1434,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                               e.nativeEvent.text,
                               null,
                             );
-                            calculateFeeWithPropose(ta.amount, ta.to, e.nativeEvent.text, ta.includeUAMemo);
+                            calculateFeeWithPropose(
+                              ta.amount,
+                              ta.to,
+                              e.nativeEvent.text,
+                              ta.includeUAMemo,
+                              CommandEnum.send,
+                            );
                           }}
                           editable={true}
                           onContentSizeChange={(e: any) => {
@@ -1530,13 +1531,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                 accessibilityLabel={'title ' + translate('send.button')}
                 type={ButtonTypeEnum.Primary}
                 title={
-                  /*validAmount === 1 &&
+                  validAmount === 1 &&
                   sendPageState.toaddr.amount &&
                   mode !== ModeEnum.basic &&
                   Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) ===
                     Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
                     ? (translate('send.button-all') as string)
-                    :*/ translate('send.button') as string
+                    : (translate('send.button') as string)
                 }
                 disabled={!sendButtonEnabled}
                 onPress={() => {
@@ -1550,18 +1551,18 @@ const Send: React.FunctionComponent<SendProps> = ({
                     updateToField(null, Utils.getDefaultDonationAmount(), null, null, false);
                     return;
                   }
-                  //if (
-                  //  validAmount === 1 &&
-                  //  sendPageState.toaddr.amount &&
-                  //  mode !== ModeEnum.basic &&
-                  //  Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) ===
-                  //    Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
-                  //) {
-                  //  addLastSnackbar({ message: `${translate('send.sendall-message') as string}` });
-                  //}
                   if (!netInfo.isConnected) {
                     addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
                     return;
+                  }
+                  if (
+                    validAmount === 1 &&
+                    sendPageState.toaddr.amount &&
+                    mode !== ModeEnum.basic &&
+                    Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) ===
+                      Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
+                  ) {
+                    addLastSnackbar({ message: `${translate('send.sendall-message') as string}` });
                   }
                   // if the address is transparent - clean the memo field Just in Case.
                   if (!memoEnabled) {

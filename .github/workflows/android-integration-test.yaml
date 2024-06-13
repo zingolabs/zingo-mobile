@@ -107,6 +107,9 @@ jobs:
         with:
           upgrade-qemu: true
 
+      - name: checking outcome
+        run: echo "Docker 1 outcome: ${{ steps.dockerTry1.outcome }}"
+
       - name: Setup Docker 2 try
         if: steps.dockerTry1.outcome != 'success'
         uses: douglascamata/setup-docker-macos-action@v1-alpha
@@ -114,6 +117,9 @@ jobs:
         continue-on-error: true
         with:
           upgrade-qemu: true
+
+      - name: checking outcome
+        run: echo "Docker 2 outcome: ${{ steps.dockerTry2.outcome }}"
 
       - name: Setup Docker Manually
         if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'

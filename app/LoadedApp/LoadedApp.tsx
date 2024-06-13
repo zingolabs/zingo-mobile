@@ -1555,26 +1555,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   <Text>{translate('loading') as string}</Text>
                 </View>
               }>
-              {/*<Settings
-                closeModal={() => this.setState({ settingsModalVisible: false })}
-                set_wallet_option={this.set_wallet_option}
-                set_server_option={this.set_server_option}
-                set_currency_option={this.set_currency_option}
-                set_language_option={this.set_language_option}
-                set_sendAll_option={this.set_sendAll_option}
-                set_donation_option={this.set_donation_option}
-                set_privacy_option={this.set_privacy_option}
-                set_mode_option={this.set_mode_option}
-                set_security_option={this.set_security_option}
-                set_selectServer_option={this.set_selectServer_option}
-                set_rescanMenuOption_option={this.set_rescanMenuOption_option}
-              />*/}
               <Settings
                 closeModal={() => this.setState({ settingsModalVisible: false })}
                 set_wallet_option={this.set_wallet_option}
                 set_server_option={this.set_server_option}
                 set_currency_option={this.set_currency_option}
                 set_language_option={this.set_language_option}
+                set_sendAll_option={this.set_sendAll_option}
                 set_donation_option={this.set_donation_option}
                 set_privacy_option={this.set_privacy_option}
                 set_mode_option={this.set_mode_option}
