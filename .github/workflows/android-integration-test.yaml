@@ -115,10 +115,12 @@ jobs:
         with:
           upgrade-qemu: true
 
-      - name: Setup Docker Default
+      - name: Setup Docker Manually
         if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
-        uses: docker-practice/actions-setup-docker@1.0.12
-        timeout-minutes: 30
+        run: |
+          brew install colima
+          brew install --formula docker
+          colima start
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
