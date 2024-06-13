@@ -100,10 +100,25 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Install Docker (MacOs X)
+      - name: Setup Docker 1 try
         uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry1
+        continue-on-error: true
         with:
           upgrade-qemu: true
+
+      - name: Setup Docker 2 try
+        if: steps.dockerTry1.outcome != 'success'
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry2
+        continue-on-error: true
+        with:
+          upgrade-qemu: true
+
+      - name: Setup Docker Default
+        if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
+        uses: docker-practice/actions-setup-docker@1.0.12
+        timeout-minutes: 30
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
