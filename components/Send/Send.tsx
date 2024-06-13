@@ -1152,7 +1152,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     <View style={{ display: 'flex', flexDirection: 'column' }}>
                       <TouchableOpacity
                         onPress={() => {
-                          if (spendableBalanceLastError) {
+                          if (spendableBalanceLastError && mode === ModeEnum.advanced) {
                             Alert.alert(translate('send.spendable') as string, spendableBalanceLastError);
                           }
                         }}>
@@ -1164,10 +1164,22 @@ const Send: React.FunctionComponent<SendProps> = ({
                             alignItems: 'center',
                             marginTop: 5,
                           }}>
-                          <RegText style={{ fontSize: 14 }}>{translate('send.spendable') as string}</RegText>
+                          <RegText
+                            style={{
+                              fontSize: 14,
+                              color: spendableBalanceLastError && mode === ModeEnum.advanced ? 'red' : colors.money,
+                            }}>
+                            {translate('send.spendable') as string}
+                          </RegText>
                           <ZecAmount
                             currencyName={info.currencyName}
-                            color={stillConfirming || negativeMaxAmount ? 'red' : colors.money}
+                            color={
+                              stillConfirming ||
+                              negativeMaxAmount ||
+                              (spendableBalanceLastError && mode === ModeEnum.advanced)
+                                ? 'red'
+                                : colors.money
+                            }
                             size={15}
                             amtZec={maxAmount}
                             privacy={privacy}
@@ -1202,11 +1214,14 @@ const Send: React.FunctionComponent<SendProps> = ({
                           {validAddress !== 0 && validAmount !== 0 && (
                             <TouchableOpacity
                               onPress={() => {
-                                if (proposeSendLastError) {
+                                if (proposeSendLastError && mode === ModeEnum.advanced) {
                                   Alert.alert(translate('send.fee') as string, proposeSendLastError);
                                 }
                               }}>
-                              <FadeText style={{ color: fee > 0 ? colors.text : 'red' }}>
+                              <FadeText
+                                style={{
+                                  color: proposeSendLastError && mode === ModeEnum.advanced ? 'red' : colors.money,
+                                }}>
                                 {(translate('send.fee') as string) +
                                   ': ' +
                                   Utils.parseNumberFloatToStringLocale(fee, 8) +
