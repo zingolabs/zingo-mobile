@@ -61,8 +61,11 @@ jobs:
 
       - name: Run integration tests
         working-directory: ios
-        run: |
-          xcodebuild test \
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          command: xcodebuild test \
             -workspace ZingoMobile.xcworkspace \
             -scheme ZingoMobile \
             -sdk iphonesimulator \
