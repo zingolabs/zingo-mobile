@@ -87,19 +87,24 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       ),
     );
 
+    const totalSpendable: number = Utils.parseStringLocaleToNumberFloat(
+      Utils.parseNumberFloatToStringLocale(totalBalance.spendableOrchard + totalBalance.spendablePrivate, 8),
+    );
+
+    console.log('total', totalAmount);
+    console.log('orchard', totalBalance.spendableOrchard);
+    console.log('sapling', totalBalance.spendablePrivate);
+
     // amount + fee
     if (totalAmount <= totalBalance.spendableOrchard) {
       from = PrivacyLevelFromEnum.orchardPrivacyLevel;
-    } else if (
-      totalBalance.spendableOrchard > 0 &&
-      totalAmount <= totalBalance.spendableOrchard + totalBalance.spendablePrivate
-    ) {
+    } else if (totalBalance.spendableOrchard > 0 && totalAmount <= totalSpendable) {
       from = PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel;
     } else if (totalAmount <= totalBalance.spendablePrivate) {
       from = PrivacyLevelFromEnum.saplingPrivacyLevel;
     }
 
-    //console.log(from);
+    console.log(from);
 
     if (from === PrivacyLevelFromEnum.nonePrivacyLevel) {
       return '-';
