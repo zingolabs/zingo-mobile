@@ -107,8 +107,8 @@ jobs:
         with:
           upgrade-qemu: true
 
-      - name: checking outcome
-        run: echo "Docker 1 outcome: ${{ steps.dockerTry1.outcome }}"
+      - name: checking outcome 1
+        run: echo ${{ steps.dockerTry1.outcome }}
 
       - name: Setup Docker 2 try
         if: steps.dockerTry1.outcome != 'success'
@@ -118,8 +118,8 @@ jobs:
         with:
           upgrade-qemu: true
 
-      - name: checking outcome
-        run: echo "Docker 2 outcome: ${{ steps.dockerTry2.outcome }}"
+      - name: checking outcome 2
+        run: echo ${{ steps.dockerTry2.outcome }}
 
       - name: Setup Docker Manually
         if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
