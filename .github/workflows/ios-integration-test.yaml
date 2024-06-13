@@ -64,7 +64,7 @@ jobs:
         with:
           timeout_minutes: 60
           max_attempts: 3
-          command: ./ios/xcodebuild test \
+          command: ios/xcodebuild test \
             -workspace ZingoMobile.xcworkspace \
             -scheme ZingoMobile \
             -sdk iphonesimulator \
