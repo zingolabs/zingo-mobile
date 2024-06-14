@@ -104,6 +104,9 @@ jobs:
         uses: douglascamata/setup-docker-macos-action@v1-alpha
         id: dockerTry1
         continue-on-error: true
+        with:
+          lima: v0.18.0
+          colima: v0.5.6
 
       - name: checking outcome 1
         run: echo ${{ steps.dockerTry1.outcome }}
@@ -113,6 +116,9 @@ jobs:
         uses: douglascamata/setup-docker-macos-action@v1-alpha
         id: dockerTry2
         continue-on-error: true
+        with:
+          lima: v0.18.0
+          colima: v0.5.6
 
       - name: checking outcome 2
         run: echo ${{ steps.dockerTry2.outcome }}
@@ -120,7 +126,9 @@ jobs:
       - name: Setup Docker Manually
         if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
         run: |
-          brew install colima
+          brew uninstall colima
+          brew tap colima/releases
+          brew install colima@0.5.6
           brew install --formula docker
           colima start
 
