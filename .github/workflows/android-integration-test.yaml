@@ -104,8 +104,6 @@ jobs:
         uses: douglascamata/setup-docker-macos-action@v1-alpha
         id: dockerTry1
         continue-on-error: true
-        with:
-          upgrade-qemu: true
 
       - name: checking outcome 1
         run: echo ${{ steps.dockerTry1.outcome }}
@@ -115,8 +113,6 @@ jobs:
         uses: douglascamata/setup-docker-macos-action@v1-alpha
         id: dockerTry2
         continue-on-error: true
-        with:
-          upgrade-qemu: true
 
       - name: checking outcome 2
         run: echo ${{ steps.dockerTry2.outcome }}
