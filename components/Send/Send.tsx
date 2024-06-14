@@ -60,6 +60,7 @@ import { RPCAdressKindEnum } from '../../app/rpc/enums/RPCAddressKindEnum';
 import { Buffer } from 'buffer';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
 import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
+import { RPCSendallProposeType } from '../../app/rpc/types/RPCSendallProposeType';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -241,16 +242,34 @@ const Send: React.FunctionComponent<SendProps> = ({
         //Alert.alert('Calculating the FEE', runProposeStr);
       } else {
         try {
-          const runProposeJson: RPCSendProposeType = JSON.parse(runProposeStr);
+          let runProposeJson: RPCSendProposeType & RPCSendallProposeType;
+          if (command === CommandEnum.send) {
+            runProposeJson = JSON.parse(runProposeStr);
+          } else {
+            runProposeJson = JSON.parse(runProposeStr);
+          }
           if (runProposeJson.error) {
             // snack with error
             console.log(runProposeJson.error);
             setProposeSendLastError(runProposeJson.error);
             //Alert.alert('Calculating the FEE', runProposeJson.error);
-          } else if (runProposeJson.fee) {
-            console.log(runProposeJson.fee);
-            proposeFee = runProposeJson.fee / 10 ** 8;
-            setProposeSendLastError('');
+          } else {
+            if (runProposeJson.fee) {
+              console.log(runProposeJson.fee);
+              proposeFee = runProposeJson.fee / 10 ** 8;
+              setProposeSendLastError('');
+            }
+            if (runProposeJson.amount) {
+              console.log(runProposeJson.amount);
+              updateToField(
+                null,
+                Utils.parseNumberFloatToStringLocale(runProposeJson.amount / 10 ** 8, 8),
+                null,
+                null,
+                null,
+              );
+              setProposeSendLastError('');
+            }
           }
         } catch (e) {
           // snack with error
@@ -261,6 +280,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
       setFee(proposeFee);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [addresses, donation, server, translate, uaAddress, validAddress, validAmount, validMemo],
   );
 
