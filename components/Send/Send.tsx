@@ -1065,12 +1065,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                           //if (fee > 0) {
                           updateToField(null, Utils.parseNumberFloatToStringLocale(maxAmount, 8), null, null, null);
                           //}
+                          // the command sendall make only sense if you are using only one receiver -> Without donation in each transaction
                           calculateFeeWithPropose(
                             Utils.parseNumberFloatToStringLocale(maxAmount, 8),
                             sendPageState.toaddr.to,
                             sendPageState.toaddr.memo,
                             sendPageState.toaddr.includeUAMemo,
-                            CommandEnum.sendall,
+                            donation ? CommandEnum.send : CommandEnum.sendall,
                           );
                           //setSendAllClick(true);
                           //setTimeout(() => {
