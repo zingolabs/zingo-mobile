@@ -135,7 +135,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [fee, setFee] = useState<number>(0);
   const [stillConfirming, setStillConfirming] = useState<boolean>(false);
   const [showShieldInfo, setShowShieldInfo] = useState<boolean>(false);
-  const [showUpgradeInfo, setShowUpgradeInfo] = useState<boolean>(false);
   const [updatingToField, setUpdatingToField] = useState<boolean>(false);
   const [sendToSelf, setSendToSelf] = useState<boolean>(false);
   const [donationAddress, setDonationAddress] = useState<boolean>(false);
@@ -454,8 +453,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     //  (somePending ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
     setStillConfirming(stillConf);
     setShowShieldInfo(showShield);
-    //setShowUpgradeInfo(showUpgrade);
-    setShowUpgradeInfo(false);
   }, [
     shieldingAmount,
     somePending,
@@ -1269,7 +1266,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           </View>
                         </TouchableOpacity>
                       )}
-                      {(showShieldInfo || showUpgradeInfo) && (
+                      {showShieldInfo && mode === ModeEnum.advanced && (
                         <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
                           <View
                             style={{
@@ -1286,11 +1283,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               color={colors.primary}
                               style={{ marginRight: 5 }}
                             />
-                            {showShieldInfo || mode === ModeEnum.basic ? (
-                              <FadeText>{translate('send.needtoshield') as string}</FadeText>
-                            ) : showUpgradeInfo ? (
-                              <FadeText>{translate('send.needtoupgrade') as string}</FadeText>
-                            ) : null}
+                            <FadeText>{translate('send.needtoshield') as string}</FadeText>
                           </View>
                         </TouchableOpacity>
                       )}
