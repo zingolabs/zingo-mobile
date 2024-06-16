@@ -167,12 +167,12 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
               {translate('loadedapp.loadwalletfromseed-basic') as string}
             </RegText>
           )}
-          {mode === ModeEnum.basic && (
+          {mode === ModeEnum.basic && !readOnly && (
             <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.TipZingoLabs)} style={item}>
               {translate('loadedapp.tipzingolabs-basic') as string}
             </RegText>
           )}
-          {mode !== ModeEnum.basic && (
+          {mode !== ModeEnum.basic && !readOnly && (
             <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.VoteForNym)} style={item}>
               {translate('loadedapp.votefornym') as string}
             </RegText>

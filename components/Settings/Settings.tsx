@@ -545,19 +545,23 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
         {modeContext !== ModeEnum.basic && (
           <>
-            <View style={{ display: 'flex', margin: 10 }}>
-              <BoldText>{translate('settings.donation-title') as string}</BoldText>
-            </View>
+            {!readOnly && (
+              <>
+                <View style={{ display: 'flex', margin: 10 }}>
+                  <BoldText>{translate('settings.donation-title') as string}</BoldText>
+                </View>
 
-            <View style={{ display: 'flex', marginLeft: 25 }}>
-              {optionsRadio(
-                DONATIONS,
-                setDonation as React.Dispatch<React.SetStateAction<string | boolean>>,
-                Boolean,
-                donation,
-                'donation',
-              )}
-            </View>
+                <View style={{ display: 'flex', marginLeft: 25 }}>
+                  {optionsRadio(
+                    DONATIONS,
+                    setDonation as React.Dispatch<React.SetStateAction<string | boolean>>,
+                    Boolean,
+                    donation,
+                    'donation',
+                  )}
+                </View>
+              </>
+            )}
 
             <View style={{ display: 'flex', margin: 10 }}>
               <BoldText>{translate('settings.privacy-title') as string}</BoldText>
@@ -573,19 +577,23 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               )}
             </View>
 
-            <View style={{ display: 'flex', margin: 10 }}>
-              <BoldText>{translate('settings.sendall-title') as string}</BoldText>
-            </View>
+            {!readOnly && (
+              <>
+                <View style={{ display: 'flex', margin: 10 }}>
+                  <BoldText>{translate('settings.sendall-title') as string}</BoldText>
+                </View>
 
-            <View style={{ display: 'flex', marginLeft: 25 }}>
-              {optionsRadio(
-                SENDALLS,
-                setSendAll as React.Dispatch<React.SetStateAction<string | boolean>>,
-                Boolean,
-                sendAll,
-                'sendall',
-              )}
-            </View>
+                <View style={{ display: 'flex', marginLeft: 25 }}>
+                  {optionsRadio(
+                    SENDALLS,
+                    setSendAll as React.Dispatch<React.SetStateAction<string | boolean>>,
+                    Boolean,
+                    sendAll,
+                    'sendall',
+                  )}
+                </View>
+              </>
+            )}
 
             <View style={{ display: 'flex', margin: 10 }}>
               <BoldText>{translate('settings.rescanmenuoption-title') as string}</BoldText>
