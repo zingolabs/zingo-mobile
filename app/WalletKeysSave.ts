@@ -10,8 +10,8 @@ export const saveWalletKeys = async (keys: WalletType, translate: (key: string) 
   try {
     await Keychain.setGenericPassword(translate('zingo') as string, JSON.stringify(keys));
     console.log('keys saved correctly');
-    console.log('key:', translate('zingo') as string);
-    console.log('value:', keys);
+    //console.log('key:', translate('zingo') as string);
+    //console.log('value:', keys);
   } catch (error) {
     console.log('Error saving keys', error);
   }
@@ -22,8 +22,8 @@ export const getWalletKeys = async (translate: (key: string) => TranslateType): 
     const credentials = await Keychain.getGenericPassword();
     if (credentials) {
       console.log('keys read correctly');
-      console.log('key:', credentials.username);
-      console.log('value:', credentials.password);
+      //console.log('key:', credentials.username);
+      //console.log('value:', credentials.password);
       if (credentials.username === (translate('zingo') as string)) {
         return JSON.parse(credentials.password) as WalletType;
       } else {
