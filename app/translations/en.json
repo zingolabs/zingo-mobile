@@ -89,7 +89,8 @@
     "serversecondtry": "It doesn't seem to be a problem with the server. Someting else is happening.",
     "alert-donation-title": "TIP ZINGOLABS",
     "alert-donation-body": "Do you want to help ZingoLabs make Zcash more useful? Opt in to tip one Zenny (0.01 ZEC) to ZingoLabs with each transaction! If so, press confirm, otherwise press Cancel.",
-    "recoverseed": "Recover last Seed Phrase used in this device"
+    "recoverseed": "Recover last Seed Phrase used in this device",
+    "recoverseedinstall": "Recovered the last Seed Phrase used in this device:"
   },
   "loadedapp": {
     "about": "About Zingo",

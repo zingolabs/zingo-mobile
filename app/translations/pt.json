@@ -89,7 +89,8 @@
     "serversecondtry": "Não parece haver nenhum problema com o servidor. Algo mais está acontecendo.",
     "alert-donation-title": "APOIAR A ZINGOLABS",
     "alert-donation-body": "Você quer ajudar o ZingoLabs a tornar o Zcash mais útil? Opte por dar uma gorjeta de um Zenny (0.01 ZEC) para ZingoLabs em cada transação! Se sim, pressione confirmar, caso contrário, pressione Cancelar.",
-    "recoverseed": "Recuperar a última Frases de Recuperação usada neste dispositivo"
+    "recoverseed": "Recuperar a última Frases de Recuperação usada neste dispositivo",
+    "recoverseedinstall": "Recuperou a última Frases de Recuperação usada neste dispositivo:"
   },
   "loadedapp": {
     "about": "Sobre a Zingo",
