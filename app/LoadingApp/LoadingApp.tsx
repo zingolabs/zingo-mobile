@@ -405,7 +405,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       donationAlert: props.donationAlert,
       firstLaunchingMessage: props.firstLaunchingMessage,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
-      hasRecoveryWalletInfoSaved: false,
     };
 
     this.dim = {} as EmitterSubscription;
