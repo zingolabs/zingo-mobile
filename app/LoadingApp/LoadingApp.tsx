@@ -566,11 +566,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
         // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
         if (this.state.mode === ModeEnum.basic) {
-          // but first we need to check if exists some seed stored in the device from a prior installation
-          // of Zingo.
+          // but first we need to check if exists some seed stored in the device from a previous installation
           if (this.state.hasRecoveryWalletInfoSaved) {
             this.recoverRecoveryWalletInfo(false);
-            await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
+            await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, false);
             this.setState({
               screen: 1,
               walletExists: false,
@@ -580,7 +579,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             // setting the prop basicFirstViewSeed to false.
             // this means when the user have funds, the seed screen will show up.
             await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, false);
-            this.createNewWallet();
+            // do not go to seed screen
+            this.createNewWallet(false);
             this.setState({ actionButtonsDisabled: false });
             this.navigateToLoadedApp();
             //console.log('navigate to LoadedApp');
@@ -895,7 +895,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     });
   };
 
-  createNewWallet = () => {
+  createNewWallet = (goSeedScreen: boolean = true) => {
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
       let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chainName);
@@ -928,7 +928,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         // basic mode -> same screen.
         this.setState(state => ({
           wallet,
-          screen: state.mode === ModeEnum.basic ? state.screen : 2,
+          screen: goSeedScreen ? 2 : state.screen,
           actionButtonsDisabled: false,
           walletExists: true,
         }));
@@ -1028,6 +1028,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 await createUpdateRecoveryWalletInfo(wallet, this.props.translate);
               }
             }
+            // when restore a wallet never the user needs that the seed screen shows up with the first funds received.
+            await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
             this.setState({
               actionButtonsDisabled: false,
               readOnly: type === RestoreFromTypeEnum.seedRestoreFrom ? false : true,
