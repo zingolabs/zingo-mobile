@@ -560,11 +560,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           if (this.state.hasWalletKeysStored) {
             this.recoverWalletKeys(false);
             await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
-            this.setState(state => ({
+            this.setState({
               screen: 1,
               walletExists: false,
               actionButtonsDisabled: false,
-            }));
+            });
           } else {
             // setting the prop basicFirstViewSeed to false.
             // this means when the user have funds, the seed screen will show up.
