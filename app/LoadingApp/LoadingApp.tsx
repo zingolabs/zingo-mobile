@@ -554,19 +554,26 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       } else {
         //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
         // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
-        // but first we need to check if exists some seed stored in the device from a prior installation
-        // of Zingo.
         if (this.state.mode === ModeEnum.basic) {
-          // setting the prop basicFirstViewSeed to false.
-          // this means when the user have funds, the seed screen will show up.
+          // but first we need to check if exists some seed stored in the device from a prior installation
+          // of Zingo.
           if (this.state.hasWalletKeysStored) {
             this.recoverWalletKeys(false);
+            await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
+            this.setState(state => ({
+              screen: 1,
+              walletExists: false,
+              actionButtonsDisabled: false,
+            }));
+          } else {
+            // setting the prop basicFirstViewSeed to false.
+            // this means when the user have funds, the seed screen will show up.
+            await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, false);
+            this.createNewWallet();
+            this.setState({ actionButtonsDisabled: false });
+            this.navigateToLoadedApp();
+            //console.log('navigate to LoadedApp');
           }
-          await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, false);
-          this.createNewWallet();
-          this.setState({ actionButtonsDisabled: false });
-          this.navigateToLoadedApp();
-          //console.log('navigate to LoadedApp');
         } else {
           // for advanced mode
           await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
