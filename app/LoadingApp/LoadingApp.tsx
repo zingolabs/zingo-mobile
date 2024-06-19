@@ -1095,7 +1095,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       const txt = wallet.seed + '\n\n' + wallet.birthday;
       Alert.alert(
         this.props.translate('loadedapp.walletseed-basic') as string,
-        txt,
+        (security ? '' : ((this.props.translate('loadingapp.recoverseedinstall') + '\n\n') as string)) + txt,
         [
           {
             text: this.props.translate('copy') as string,

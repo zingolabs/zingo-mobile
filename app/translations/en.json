@@ -97,6 +97,7 @@
     "alert-donation-title": "TIP ZINGOLABS",
     "alert-donation-body": "Do you want to help ZingoLabs make Zcash more useful? Opt in to tip one Zenny (0.01 ZEC) to ZingoLabs with each transaction! If so, press confirm, otherwise press Cancel.",
     "recoverseed": "Recover last Seed Phrase used in this device",
+    "recoverseedinstall": "Recovered the last Seed Phrase used in this device:",
     "noservers": "None of the servers on the list are available, it is probably a connection error."
   },
   "loadedapp": {
