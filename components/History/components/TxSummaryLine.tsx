@@ -118,7 +118,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             />
           </View>
           <View style={{ display: 'flex' }}>
-            {!!displayAddress && displayAddress}
+            <View>{!!displayAddress && displayAddress}</View>
             <View
               style={{
                 display: 'flex',
@@ -126,7 +126,10 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                   tx.type === TransactionTypeEnum.Received || tx.type === TransactionTypeEnum.SendToSelf
                     ? 'column'
                     : 'row',
-                alignItems: 'flex-start',
+                alignItems:
+                  tx.type === TransactionTypeEnum.Received || tx.type === TransactionTypeEnum.SendToSelf
+                    ? 'flex-start'
+                    : 'center',
               }}>
               <FadeText
                 style={{
@@ -147,7 +150,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                   ? (translate('history.sendingtoself') as string)
                   : (translate('history.sendtoself') as string)}
               </FadeText>
-              <View style={{ display: 'flex', flexDirection: 'row' }}>
+              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 <FadeText>{tx.time ? moment((tx.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
                 {haveMemo && (
                   <FontAwesomeIcon
