@@ -94,7 +94,7 @@ type LoadingAppProps = {
 
 const SERVER_DEFAULT_0: ServerType = {
   uri: serverUris(() => {})[0].uri,
-  chain_name: serverUris(() => {})[0].chain_name,
+  chainName: serverUris(() => {})[0].chainName,
 } as ServerType;
 
 export default function LoadingApp(props: LoadingAppProps) {
@@ -446,7 +446,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         this.setState({ walletExists: true });
         const networkState = await NetInfo.fetch();
         if (networkState.isConnected) {
-          let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chain_name);
+          let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chainName);
 
           // for testing
           //await delay(5000);
@@ -459,7 +459,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
               const resultJson: RPCSeedType = await JSON.parse(result);
               if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
                 // Load the wallet and navigate to the transactions screen
-                const walletKindStr: string = await RPCModule.execute(CommandEnum.wallet_kind, '');
+                const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
                 //console.log(walletKindStr);
                 try {
                   const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
@@ -625,7 +625,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
         .filter((s: ServerUrisType) => s.latency !== null && s.uri !== (aDifferentOne ? this.state.server.uri : ''))
         .sort((a, b) => (a.latency ? a.latency : Infinity) - (b.latency ? b.latency : Infinity))
         .map((s: ServerUrisType) => {
-          return { uri: s.uri, chain_name: s.chain_name };
+          return { uri: s.uri, chainName: s.chainName };
         });
       if (serversSorted.length > 0) {
         fasterServer = serversSorted[0];
@@ -723,13 +723,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     }
     this.setState({ actionButtonsDisabled: true });
     const uri: string = parseServerURI(this.state.customServerUri, this.props.translate);
-    const chain_name = this.state.customServerChainName;
+    const chainName = this.state.customServerChainName;
     if (uri.toLowerCase().startsWith(GlobalConst.error)) {
       this.addLastSnackbar({ message: this.props.translate('settings.isuri') as string });
     } else {
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, { uri, chain_name });
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, { uri, chainName });
       this.setState({
-        server: { uri, chain_name },
+        server: { uri, chainName },
         customServerShow: false,
         customServerUri: '',
         customServerChainName: ChainNameEnum.mainChainName,
@@ -749,7 +749,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   createNewWallet = () => {
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
-      let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chain_name);
+      let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chainName);
 
       if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
         let wallet = {} as WalletType;
@@ -766,7 +766,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           return;
         }
         // default values for wallet options
-        this.setWalletOption(WalletOptionEnum.download_memos, DownloadMemosEnum.walletMemos);
+        this.setWalletOption(WalletOptionEnum.downloadMemos, DownloadMemosEnum.walletMemos);
         // basic mode -> same screen.
         this.setState(state => ({
           wallet,
@@ -796,9 +796,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     }
     if (
       (seedUfvk.toLowerCase().startsWith(GlobalConst.uview) &&
-        this.state.server.chain_name !== ChainNameEnum.mainChainName) ||
+        this.state.server.chainName !== ChainNameEnum.mainChainName) ||
       (seedUfvk.toLowerCase().startsWith(GlobalConst.utestview) &&
-        this.state.server.chain_name === ChainNameEnum.mainChainName)
+        this.state.server.chainName === ChainNameEnum.mainChainName)
     ) {
       createAlert(
         this.setBackgroundError,
@@ -834,14 +834,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           seedUfvk.toLowerCase(),
           walletBirthday || '0',
           this.state.server.uri,
-          this.state.server.chain_name,
+          this.state.server.chainName,
         );
       } else {
         result = await RPCModule.restoreWalletFromUfvk(
           seedUfvk.toLowerCase(),
           walletBirthday || '0',
           this.state.server.uri,
-          this.state.server.chain_name,
+          this.state.server.chainName,
         );
       }
 
@@ -1033,7 +1033,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                     <>
                       <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
                         {`${translate('loadingapp.actualserver') as string} [${
-                          translate(`settings.value-chain_name-${server.chain_name}`) as string
+                          translate(`settings.value-chainname-${server.chainName}`) as string
                         }]`}
                       </BoldText>
                       <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server.uri}</BoldText>

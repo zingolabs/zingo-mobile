@@ -84,7 +84,7 @@ describe('Component Send - test', () => {
       confirmations: 22,
       txid: 'sent-txid-1234567890',
       time: Date.now(),
-      zec_price: 33.33,
+      zecPrice: 33.33,
       txDetails: [
         {
           address: 'sent-address-1-12345678901234567890',
@@ -104,7 +104,7 @@ describe('Component Send - test', () => {
       confirmations: 12,
       txid: 'sendtoself-txid-1234567890',
       time: Date.now(),
-      zec_price: 33.33,
+      zecPrice: 33.33,
       txDetails: [
         {
           address: '',
@@ -118,18 +118,18 @@ describe('Component Send - test', () => {
       confirmations: 133,
       txid: 'receive-txid-1234567890',
       time: Date.now(),
-      zec_price: 66.66,
+      zecPrice: 66.66,
       txDetails: [
         {
           address: '',
           amount: 0.77654321,
-          pool_type: PoolEnum.OrchardPool,
+          poolType: PoolEnum.OrchardPool,
           memos: ['hola', '  & ', 'hello'],
         },
         {
           address: '',
           amount: 0.1,
-          pool_type: PoolEnum.SaplingPool,
+          poolType: PoolEnum.SaplingPool,
           memos: ['hello', '  & ', 'hola'],
         },
       ],

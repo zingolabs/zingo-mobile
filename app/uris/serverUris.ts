@@ -6,7 +6,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://zec.rocks:443', // this will be the default server.
       region: translate('settings.usa') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: true,
       latency: null,
       obsolete: false,
@@ -14,7 +14,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://lwd1.zcash-infra.com:9067',
       region: translate('settings.usa') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: true,
       latency: null,
       obsolete: false,
@@ -23,7 +23,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://na.zec.rocks:443',
       region: translate('settings.na') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: false,
@@ -31,7 +31,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://sa.zec.rocks:443',
       region: translate('settings.sa') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: false,
@@ -39,7 +39,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://eu.zec.rocks:443',
       region: translate('settings.ea') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: false,
@@ -47,7 +47,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://ap.zec.rocks:443',
       region: translate('settings.ao') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: false,
@@ -55,7 +55,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://lwd2.zcash-infra.com:9067',
       region: translate('settings.hk') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: false,
@@ -63,7 +63,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://lwd3.zcash-infra.com:9067',
       region: translate('settings.usa') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: false,
@@ -71,7 +71,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://lwd4.zcash-infra.com:9067',
       region: translate('settings.canada') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: false,
@@ -79,7 +79,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://lwd5.zcash-infra.com:9067',
       region: translate('settings.france') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: false,
@@ -87,7 +87,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://lwd6.zcash-infra.com:9067',
       region: translate('settings.usa') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: false,
@@ -95,7 +95,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://lwd7.zcash-infra.com:9067',
       region: translate('settings.netherlands') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: false,
@@ -103,7 +103,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://lwd8.zcash-infra.com:9067',
       region: translate('settings.uk') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: false,
@@ -112,7 +112,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://mainnet.lightwalletd.com:9067',
       region: translate('settings.na') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: true,
       latency: null,
       obsolete: true,
@@ -120,7 +120,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://na.lightwalletd.com:443',
       region: translate('settings.na') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: true,
@@ -128,7 +128,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://sa.lightwalletd.com:443',
       region: translate('settings.sa') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: true,
@@ -136,7 +136,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://eu.lightwalletd.com:443',
       region: translate('settings.ea') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: true,
@@ -144,7 +144,7 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
     {
       uri: 'https://ai.lightwalletd.com:443',
       region: translate('settings.ao') as string,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       default: false,
       latency: null,
       obsolete: true,

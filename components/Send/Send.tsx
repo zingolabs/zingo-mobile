@@ -492,7 +492,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
         return false;
       }
-      const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
+      const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
       //console.log(result);
       if (result) {
         if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
@@ -513,7 +513,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       return (
         resultJSON.status === RPCParseStatusEnum.successParse &&
         resultJSON.address_kind !== RPCAdressKindEnum.transparentAddressKind &&
-        resultJSON.chain_name === server.chain_name
+        resultJSON.chain_name === server.chainName
       );
     };
 
@@ -531,7 +531,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       updateToField(null, null, null, '', false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [server.chain_name, netInfo.isConnected, sendPageState.toaddr.to, translate, addLastSnackbar]);
+  }, [server.chainName, netInfo.isConnected, sendPageState.toaddr.to, translate, addLastSnackbar]);
 
   useEffect(() => {
     const parseAdressJSON = async (address: string): Promise<boolean> => {
@@ -539,7 +539,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
         return false;
       }
-      const result: string = await RPCModule.execute(CommandEnum.parse_address, address);
+      const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
       //console.log(result);
       if (result) {
         if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
@@ -557,7 +557,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       //console.log('parse-address', address, resultJSON, resultJSON.status === RPCParseStatusEnum.successParse);
 
-      return resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chain_name;
+      return resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chainName;
     };
 
     var to = sendPageState.toaddr;
@@ -618,7 +618,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendToSelf,
     donationAddress,
     decimalSeparator,
-    server.chain_name,
+    server.chainName,
     netInfo.isConnected,
     sendPageState.toaddr,
     sendPageState.toaddr.to,
@@ -704,7 +704,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         const myAddress: AddressClass[] = addresses.filter((a: AddressClass) => a.address === address);
         const sendToS = myAddress.length >= 1;
 
-        const donationA = address === (await Utils.getDonationAddress(server.chain_name));
+        const donationA = address === (await Utils.getDonationAddress(server.chainName));
         setSendToSelf(sendToS);
         setDonationAddress(donationA);
       })();
@@ -712,7 +712,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setSendToSelf(false);
       setDonationAddress(false);
     }
-  }, [addresses, sendPageState.toaddr.to, server.chain_name]);
+  }, [addresses, sendPageState.toaddr.to, server.chainName]);
 
   const confirmSend = async () => {
     if (!netInfo.isConnected) {
@@ -835,7 +835,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         <Confirm
           calculatedFee={fee}
           donationAmount={
-            donation && server.chain_name === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress
+            donation && server.chainName === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress
               ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
               : 0
           }
@@ -1599,7 +1599,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 }}
               />
             </View>
-            {server.chain_name === ChainNameEnum.mainChainName && (
+            {server.chainName === ChainNameEnum.mainChainName && (
               <>
                 {donation ? (
                   <View
@@ -1621,7 +1621,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       let update = false;
                       if (
                         sendPageState.toaddr.to &&
-                        sendPageState.toaddr.to !== (await Utils.getDonationAddress(server.chain_name))
+                        sendPageState.toaddr.to !== (await Utils.getDonationAddress(server.chainName))
                       ) {
                         await ShowAddressAlertAsync(translate)
                           .then(async () => {
@@ -1635,7 +1635,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }
                       if (update) {
                         updateToField(
-                          await Utils.getDonationAddress(server.chain_name),
+                          await Utils.getDonationAddress(server.chainName),
                           Utils.getDefaultDonationAmount(),
                           null,
                           Utils.getDefaultDonationMemo(translate),

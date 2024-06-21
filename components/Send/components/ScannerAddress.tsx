@@ -33,7 +33,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
       return;
     }
 
-    const result: string = await RPCModule.execute(CommandEnum.parse_address, scannedAddress);
+    const result: string = await RPCModule.execute(CommandEnum.parseAddress, scannedAddress);
     if (result) {
       if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
         addLastSnackbar({ message: translate('scanner.nozcash-error') as string });
@@ -53,7 +53,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
 
     //console.log('parse-1', scannedAddress, resultJSON);
 
-    const valid = resultJSON.status === RPCParseStatusEnum.successParse && server.chain_name === resultJSON.chain_name;
+    const valid = resultJSON.status === RPCParseStatusEnum.successParse && server.chainName === resultJSON.chain_name;
 
     if (valid) {
       setAddress(scannedAddress);

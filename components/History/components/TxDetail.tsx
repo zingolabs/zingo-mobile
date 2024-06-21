@@ -75,7 +75,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
       return;
     }
 
-    const url = Utils.getBlockExplorerTxIDURL(txid, server.chain_name);
+    const url = Utils.getBlockExplorerTxIDURL(txid, server.chainName);
     Linking.canOpenURL(url).then(supported => {
       if (supported) {
         Linking.openURL(url);
@@ -147,9 +147,9 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
             privacy={privacy}
             smallPrefix={true}
           />
-          {!!tx.zec_price && (
+          {!!tx.zecPrice && (
             <CurrencyAmount
-              price={tx.zec_price}
+              price={tx.zecPrice}
               amtZec={tx.txDetails.reduce((s, d) => s + d.amount, 0)}
               currency={currency}
               privacy={privacy}
@@ -187,7 +187,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
               {expandTxid && !!tx.txid && (
                 <>
                   <RegText>{tx.txid}</RegText>
-                  {server.chain_name !== ChainNameEnum.regtestChainName && (
+                  {server.chainName !== ChainNameEnum.regtestChainName && (
                     <TouchableOpacity onPress={() => handleTxIDClick(tx.txid)}>
                       <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
                         {translate('history.viewexplorer') as string}
@@ -223,7 +223,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
             }
             return (
               <View
-                key={txd.address + txd.pool_type}
+                key={txd.address + txd.poolType}
                 style={{
                   display: 'flex',
                   marginTop: tx.txDetails.length > 1 ? 10 : 0,
@@ -245,10 +245,10 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                   </View>
                 )}
 
-                {!!txd.pool_type && (
+                {!!txd.poolType && (
                   <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
                     <FadeText>{translate('history.pool') as string}</FadeText>
-                    <RegText>{txd.pool_type}</RegText>
+                    <RegText>{txd.poolType}</RegText>
                   </View>
                 )}
 
@@ -256,8 +256,8 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                   <FadeText>{translate('history.amount') as string}</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                     <ZecAmount amtZec={txd.amount} size={18} currencyName={info.currencyName} privacy={privacy} />
-                    {!!tx.zec_price && (
-                      <CurrencyAmount price={tx.zec_price} amtZec={txd.amount} currency={currency} privacy={privacy} />
+                    {!!tx.zecPrice && (
+                      <CurrencyAmount price={tx.zecPrice} amtZec={txd.amount} currency={currency} privacy={privacy} />
                     )}
                   </View>
                 </View>

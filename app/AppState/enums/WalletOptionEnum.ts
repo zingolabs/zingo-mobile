@@ -1,4 +1,4 @@
 export enum WalletOptionEnum {
-  download_memos = 'download_memos',
-  transaction_filter_threshold = 'transaction_filter_threshold',
+  downloadMemos = 'download_memos',
+  transactionFilterThreshold = 'transaction_filter_threshold',
 }

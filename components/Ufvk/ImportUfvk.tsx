@@ -82,7 +82,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   // the validation of the ufvk will be when we try to `restore from ufvk'...
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const validateKey = async (scannedKey: string): Promise<boolean> => {
-    const result: string = await RPCModule.execute(CommandEnum.parse_viewkey, scannedKey);
+    const result: string = await RPCModule.execute(CommandEnum.parseViewkey, scannedKey);
     //console.log(result);
     if (result) {
       if (result.toLowerCase().startsWith(GlobalConst.error)) {
@@ -103,7 +103,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
 
     //console.log('parse ufvk', scannedKey, resultJSON);
 
-    const valid = resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chain_name;
+    const valid = resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chainName;
 
     if (valid) {
       return true;

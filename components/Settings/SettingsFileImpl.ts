@@ -46,30 +46,30 @@ export default class SettingsFileImpl {
       if (!settings.hasOwnProperty(SettingsNameEnum.server)) {
         settings.server = {
           uri: serverUris(() => {})[0].uri,
-          chain_name: serverUris(() => {})[0].chain_name,
+          chainName: serverUris(() => {})[0].chainName,
         } as ServerType;
       } else {
         if (typeof settings.server === 'string') {
-          const ss: ServerType = { uri: settings.server, chain_name: ChainNameEnum.mainChainName };
+          const ss: ServerType = { uri: settings.server, chainName: ChainNameEnum.mainChainName };
           const standard = serverUris(() => {}).find((s: ServerUrisType) =>
-            isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, ss as ServerType),
+            isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, ss as ServerType),
           );
           if (standard) {
             settings.server = ss as ServerType;
           } else {
             // here probably the user have a cumtom server, but we don't know
-            // what is the chain_name -> we assign the default server.
+            // what is the chainName -> we assign the default server.
             settings.server = {
               uri: serverUris(() => {})[0].uri,
-              chain_name: serverUris(() => {})[0].chain_name,
+              chainName: serverUris(() => {})[0].chainName,
             } as ServerType;
           }
         } else {
-          if (!settings.server.uri || !settings.server.chain_name) {
+          if (!settings.server.uri || !settings.server.chainName) {
             // if one or both field/s don't have valid value -> we assign the default server.
             settings.server = {
               uri: serverUris(() => {})[0].uri,
-              chain_name: serverUris(() => {})[0].chain_name,
+              chainName: serverUris(() => {})[0].chainName,
             } as ServerType;
           }
         }
@@ -111,7 +111,7 @@ export default class SettingsFileImpl {
           serverUris(() => {})
             .filter((s: ServerUrisType) => s.obsolete)
             .find((s: ServerUrisType) =>
-              isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, settings.server as ServerType),
+              isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, settings.server as ServerType),
             )
         ) {
           // obsolete servers -> auto - to make easier and faster UX to the user
@@ -120,14 +120,14 @@ export default class SettingsFileImpl {
           serverUris(() => {})
             .filter((s: ServerUrisType) => s.default)
             .find((s: ServerUrisType) =>
-              isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, settings.server as ServerType),
+              isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, settings.server as ServerType),
             )
         ) {
           // default servers -> auto - to make easier and faster UX to the user
           settings.selectServer = SelectServerEnum.auto;
         } else if (
           serverUris(() => {}).find((s: ServerUrisType) =>
-            isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, settings.server as ServerType),
+            isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, settings.server as ServerType),
           )
         ) {
           // new servers (not default & not obsolete) -> in the list - the user changed the default server in some point
@@ -144,7 +144,7 @@ export default class SettingsFileImpl {
           serverUris(() => {})
             .filter((s: ServerUrisType) => s.obsolete)
             .find((s: ServerUrisType) =>
-              isEqual({ uri: s.uri, chain_name: s.chain_name } as ServerType, settings.server as ServerType),
+              isEqual({ uri: s.uri, chainName: s.chainName } as ServerType, settings.server as ServerType),
             ) &&
           settings.selectServer !== SelectServerEnum.custom
         ) {

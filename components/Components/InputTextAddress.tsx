@@ -46,7 +46,7 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
         return false;
       }
-      const result: string = await RPCModule.execute(CommandEnum.parse_address, addr);
+      const result: string = await RPCModule.execute(CommandEnum.parseAddress, addr);
       if (result) {
         if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
           return false;
@@ -64,7 +64,7 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
 
       //console.log('parse-address', address, resultJSON.status === RPCParseStatusEnum.success);
 
-      return resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chain_name;
+      return resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chainName;
     };
 
     if (address) {
@@ -76,7 +76,7 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
       setValidAddress(0);
       setError('');
     }
-  }, [addLastSnackbar, address, netInfo.isConnected, server.chain_name, setError, translate]);
+  }, [addLastSnackbar, address, netInfo.isConnected, server.chainName, setError, translate]);
 
   //console.log('render input text address');
 

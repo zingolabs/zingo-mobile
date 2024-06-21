@@ -116,7 +116,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       return '-';
     }
 
-    const result: string = await RPCModule.execute(CommandEnum.parse_address, sendPageState.toaddr.to);
+    const result: string = await RPCModule.execute(CommandEnum.parseAddress, sendPageState.toaddr.to);
     if (result) {
       if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
         return '-';
@@ -134,7 +134,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
     //console.log('parse-address', sendPageState.toaddr.to, resultJSON.status === RPCParseStatusEnum.successParse);
 
-    if (resultJSON.status !== RPCParseStatusEnum.successParse || resultJSON.chain_name !== server.chain_name) {
+    if (resultJSON.status !== RPCParseStatusEnum.successParse || resultJSON.chain_name !== server.chainName) {
       return '-';
     }
 
@@ -209,7 +209,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     netInfo.isConnected,
     sendPageState.toaddr.amount,
     sendPageState.toaddr.to,
-    server.chain_name,
+    server.chainName,
     totalBalance.spendableOrchard,
     totalBalance.spendablePrivate,
     translate,

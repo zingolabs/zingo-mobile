@@ -113,7 +113,7 @@ type LoadedAppProps = {
 
 const SERVER_DEFAULT_0: ServerType = {
   uri: serverUris(() => {})[0].uri,
-  chain_name: serverUris(() => {})[0].chain_name,
+  chainName: serverUris(() => {})[0].chainName,
 } as ServerType;
 
 export default function LoadedApp(props: LoadedAppProps) {
@@ -978,7 +978,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       let update = false;
       if (
         this.state.sendPageState.toaddr.to &&
-        this.state.sendPageState.toaddr.to !== (await Utils.getDonationAddress(this.state.server.chain_name))
+        this.state.sendPageState.toaddr.to !== (await Utils.getDonationAddress(this.state.server.chainName))
       ) {
         await ShowAddressAlertAsync(this.props.translate)
           .then(async () => {
@@ -995,7 +995,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         let uriToAddr: ToAddrClass = new ToAddrClass(0);
         const to = new ToAddrClass(Utils.getNextToAddrID());
 
-        to.to = await Utils.getDonationAddress(this.state.server.chain_name);
+        to.to = await Utils.getDonationAddress(this.state.server.chainName);
         to.amount = Utils.getDefaultDonationAmount();
         to.memo = this.props.translate('loadedapp.nymmemo') as string;
         to.includeUAMemo = true;
@@ -1022,13 +1022,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   };
 
   setServerOption = async (value: ServerType, toast: boolean, sameServerChainName: boolean): Promise<void> => {
-    //console.log(value, same_server_chain_name);
     // here I know the server was changed, clean all the tasks before anything.
     await this.rpc.clearTimers();
     this.setSyncingStatus(new SyncingStatusClass());
     this.rpc.setInRefresh(false);
     this.keepAwake(false);
-    // First we need to check the `chain_name` between servers, if this is different
+    // First we need to check the `chainName` between servers, if this is different
     // we cannot try to open the current wallet, because make not sense.
     let error = false;
     if (!sameServerChainName) {
@@ -1039,7 +1038,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       //   The App have to go to the initial screen
       // - the seed exists and the App can open the wallet in the new server.
       //   But I have to restart the sync if needed.
-      let result: string = await RPCModule.loadExistingWallet(value.uri, value.chain_name);
+      let result: string = await RPCModule.loadExistingWallet(value.uri, value.chainName);
       //console.log(result);
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
@@ -1077,7 +1076,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
     }
 
-    // if the chain_name id different between server or we cannot open the wallet...
+    // if the chainName id different between server or we cannot open the wallet...
     if (error) {
       // I need to open the modal ASAP.
       if (this.state.readOnly) {
@@ -1230,7 +1229,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     // if the App is working with a test server
     // no need to do backups of the wallets.
     let resultStr = '';
-    if (server.chain_name === ChainNameEnum.mainChainName) {
+    if (server.chainName === ChainNameEnum.mainChainName) {
       resultStr = (await this.rpc.changeWallet()) as string;
     } else {
       resultStr = (await this.rpc.changeWalletNoBackup()) as string;
@@ -1299,7 +1298,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
       let resultStr2 = '';
       // if the server was testnet or regtest -> no need backup the wallet.
-      if (beforeServer.chain_name === ChainNameEnum.mainChainName) {
+      if (beforeServer.chainName === ChainNameEnum.mainChainName) {
         // backup
         resultStr2 = (await this.rpc.changeWallet()) as string;
       } else {

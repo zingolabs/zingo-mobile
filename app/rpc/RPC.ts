@@ -123,17 +123,17 @@ export default class RPC {
 
   static async rpcSetInterruptSyncAfterBatch(value: string): Promise<void> {
     try {
-      const resultStr: string = await RPCModule.execute(CommandEnum.interrupt_sync_after_batch, value);
+      const resultStr: string = await RPCModule.execute(CommandEnum.interruptSyncAfterBatch, value);
 
       if (resultStr) {
         if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error setting interrupt_sync_after_batch ${resultStr}`);
+          console.log(`Error setting interruptSyncAfterBatch ${resultStr}`);
         }
       } else {
-        console.log('Internal Error setting interrupt_sync_after_batch');
+        console.log('Internal Error setting interruptSyncAfterBatch');
       }
     } catch (error) {
-      console.log(`Critical Error setting interrupt_sync_after_batch ${error}`);
+      console.log(`Critical Error setting interruptSyncAfterBatch ${error}`);
     }
   }
 
@@ -420,11 +420,11 @@ export default class RPC {
     // First, group by pool.
     const m = new Map<PoolEnum, TxDetailType[]>();
     txdetails
-      .filter(i => i.pool_type !== undefined)
+      .filter(i => i.poolType !== undefined)
       .forEach(i => {
-        const coll = m.get(i.pool_type as PoolEnum);
+        const coll = m.get(i.poolType as PoolEnum);
         if (!coll) {
-          m.set(i.pool_type as PoolEnum, [i]);
+          m.set(i.poolType as PoolEnum, [i]);
         } else {
           coll.push(i);
         }
@@ -456,7 +456,7 @@ export default class RPC {
         address: '',
         amount: totalAmount,
         memos: memos && memos.length > 0 ? [memos.join('')] : undefined,
-        pool_type: pool_type,
+        poolType: pool_type,
       };
 
       reducedDetailedTxns.push(detail);
@@ -836,21 +836,21 @@ export default class RPC {
         console.log(
           'synced',
           ss.synced_blocks,
-          'trial_decryptions',
+          'trialDecryptions',
           ss.trial_decryptions_blocks,
-          'txn_scan',
+          'txnScan',
           ss.txn_scan_blocks,
           'witnesses',
           ss.witnesses_updated,
           'TOTAL',
           ss.total_blocks,
-          'batch_num',
+          'batchNum',
           ss.batch_num,
-          'batch_total',
+          'batchTotal',
           ss.batch_total,
-          'end_block',
+          'endBlock',
           ss.end_block,
-          'start_block',
+          'startBlock',
           ss.start_block,
         );
         //console.log('--------------------------------------');
@@ -862,7 +862,7 @@ export default class RPC {
 
         this.syncId = ss.sync_id;
 
-        // if the sync_id change then reset the %
+        // if the syncId change then reset the %
         if (this.prevSyncId !== this.syncId) {
           if (this.prevSyncId !== -1) {
             // And fetch the rest of the data.
@@ -875,7 +875,7 @@ export default class RPC {
             await RPCModule.doSave();
 
             //console.log('sync status', ss);
-            //console.log(`new sync process id: ${this.sync_id}. Save the wallet.`);
+            //console.log(`new sync process id: ${this.syncId}. Save the wallet.`);
             this.prevBatchNum = -1;
             this.secondsBatch = 0;
             this.secondsBlock = 0;
@@ -925,7 +925,7 @@ export default class RPC {
         let processEndBlock: number = 0;
         // when the App is syncing the new blocks and sync finished really fast
         // the synstatus have almost all of the fields undefined.
-        // if we have latest_block means that the sync process finished in that block
+        // if we have latestBlock means that the sync process finished in that block
         if (endBlock === 0 && batchNum === 0) {
           processEndBlock = this.latestBlock !== -1 ? this.latestBlock : this.lastServerBlockHeight;
         } else {
@@ -1077,7 +1077,7 @@ export default class RPC {
 
   async fetchWalletSettings(): Promise<void> {
     try {
-      const downloadMemosStr: string = await RPCModule.execute(CommandEnum.getoption, WalletOptionEnum.download_memos);
+      const downloadMemosStr: string = await RPCModule.execute(CommandEnum.getoption, WalletOptionEnum.downloadMemos);
       if (downloadMemosStr) {
         if (downloadMemosStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error download memos ${downloadMemosStr}`);
@@ -1091,7 +1091,7 @@ export default class RPC {
 
       const transactionFilterThresholdStr: string = await RPCModule.execute(
         CommandEnum.getoption,
-        WalletOptionEnum.transaction_filter_threshold,
+        WalletOptionEnum.transactionFilterThreshold,
       );
       if (transactionFilterThresholdStr) {
         if (transactionFilterThresholdStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1105,8 +1105,8 @@ export default class RPC {
       const transactionFilterThresholdJson: RPCGetOptionType = await JSON.parse(transactionFilterThresholdStr);
 
       const walletSettings = new WalletSettingsClass();
-      walletSettings.download_memos = downloadMemosJson.download_memos || '';
-      walletSettings.transaction_filter_threshold = transactionFilterThresholdJson.transaction_filter_threshold || '';
+      walletSettings.downloadMemos = downloadMemosJson.download_memos || '';
+      walletSettings.transactionFilterThreshold = transactionFilterThresholdJson.transaction_filter_threshold || '';
 
       this.fnSetWalletSettings(walletSettings);
     } catch (error) {
@@ -1324,8 +1324,8 @@ export default class RPC {
           if (!currentTxList[0].time && !!tx.datetime) {
             currentTxList[0].time = tx.datetime;
           }
-          if (!currentTxList[0].zec_price && !!tx.price && tx.price !== 'None') {
-            currentTxList[0].zec_price = tx.price;
+          if (!currentTxList[0].zecPrice && !!tx.price && tx.price !== 'None') {
+            currentTxList[0].zecPrice = tx.price;
           }
 
           if (tx.txid.startsWith('4779ccbe')) {
@@ -1347,7 +1347,7 @@ export default class RPC {
             currenttxdetails.address = !tx.to_address || tx.to_address === 'None' ? '' : tx.to_address;
             currenttxdetails.amount = tx.amount / 10 ** 8;
             currenttxdetails.memos = !tx.memos ? undefined : tx.memos;
-            currenttxdetails.pool_type = !tx.pool_type || tx.pool_type === 'None' ? undefined : tx.pool_type;
+            currenttxdetails.poolType = !tx.pool_type || tx.pool_type === 'None' ? undefined : tx.pool_type;
             currentTxList[0].txDetails.push(currenttxdetails);
           }
           //console.log(currentTxList[0]);

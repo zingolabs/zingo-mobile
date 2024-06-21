@@ -124,7 +124,7 @@ describe('Component LoadingApp - test', () => {
     const currency = CurrencyEnum.noCurrency;
     const server: ServerType = {
       uri: 'https://mainnet.lightwalletd.com:9067',
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
     };
     const sendAll = false;
     const rescanMenu = false;

@@ -136,14 +136,14 @@ describe('Component Settings - test', () => {
   };
   state.info.currencyName = CurrencyNameEnum.ZEC;
   state.totalBalance.total = 1.12345678;
-  state.server = { uri: 'https://zcash.es', chain_name: ChainNameEnum.mainChainName };
+  state.server = { uri: 'https://zcash.es', chainName: ChainNameEnum.mainChainName };
   state.currency = CurrencyEnum.USDCurrency;
   state.language = LanguageEnum.en;
   state.sendAll = false;
   state.rescanMenu = false;
   state.donation = false;
-  state.walletSettings.download_memos = DownloadMemosEnum.walletMemos;
-  state.walletSettings.transaction_filter_threshold = '500';
+  state.walletSettings.downloadMemos = DownloadMemosEnum.walletMemos;
+  state.walletSettings.transactionFilterThreshold = '500';
   const onClose = jest.fn();
   const onSetOption = jest.fn();
   test('Settings - snapshot', () => {

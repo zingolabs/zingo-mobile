@@ -28,7 +28,7 @@ const parseZcashURI = async (
   //console.log(address);
 
   if (address) {
-    const resultParse: string = await RPCModule.execute(CommandEnum.parse_address, address);
+    const resultParse: string = await RPCModule.execute(CommandEnum.parseAddress, address);
     if (resultParse) {
       if (resultParse.toLowerCase().startsWith(GlobalConst.error) || resultParse.toLowerCase() === 'null') {
         return translate('uris.parseerror') as string;
@@ -45,7 +45,7 @@ const parseZcashURI = async (
     }
 
     const validParse =
-      resultParseJSON.status === RPCParseStatusEnum.successParse && server.chain_name === resultParseJSON.chain_name;
+      resultParseJSON.status === RPCParseStatusEnum.successParse && server.chainName === resultParseJSON.chain_name;
 
     if (address && !validParse) {
       return `"${address || ''}" ${translate('uris.notvalid')}`;
@@ -88,7 +88,7 @@ const parseZcashURI = async (
         if (typeof target.address !== 'undefined') {
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
-        const result: string = await RPCModule.execute(CommandEnum.parse_address, value);
+        const result: string = await RPCModule.execute(CommandEnum.parseAddress, value);
         if (result) {
           if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
             return translate('uris.notvalid') as string;
@@ -104,7 +104,7 @@ const parseZcashURI = async (
         }
 
         const valid =
-          resultJSON.status === RPCParseStatusEnum.successParse && server.chain_name === resultJSON.chain_name;
+          resultJSON.status === RPCParseStatusEnum.successParse && server.chainName === resultJSON.chain_name;
 
         if (!valid) {
           return `"${value}" ${translate('uris.notvalid')}`;

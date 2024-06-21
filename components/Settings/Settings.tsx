@@ -143,8 +143,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(languageContext);
 
-  const [memos, setMemos] = useState<string>(walletSettings.download_memos);
-  const [filter, setFilter] = useState<string>(walletSettings.transaction_filter_threshold);
+  const [memos, setMemos] = useState<string>(walletSettings.downloadMemos);
+  const [filter, setFilter] = useState<string>(walletSettings.transactionFilterThreshold);
   const [autoServerUri, setAutoServerUri] = useState<string>('');
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
   const [listServerUri, setListServerUri] = useState<string>('');
@@ -184,23 +184,23 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (selectServerContext === SelectServerEnum.auto) {
       setAutoIcon(faDotCircle);
       setAutoServerUri(serverContext.uri);
-      setAutoServerChainName(serverContext.chain_name);
+      setAutoServerChainName(serverContext.chainName);
     } else if (selectServerContext === SelectServerEnum.list) {
       setListIcon(faDotCircle);
       setListServerUri(serverContext.uri);
-      setListServerChainName(serverContext.chain_name);
+      setListServerChainName(serverContext.chainName);
       // I have to update them in auto as well
       // with the same server
       setAutoServerUri(serverContext.uri);
-      setAutoServerChainName(serverContext.chain_name);
+      setAutoServerChainName(serverContext.chainName);
     } else if (selectServerContext === SelectServerEnum.custom) {
       setCustomIcon(faDotCircle);
       setCustomServerUri(serverContext.uri);
-      setCustomServerChainName(serverContext.chain_name);
+      setCustomServerChainName(serverContext.chainName);
       // I have to update them in auto as well
       // with the first of the list
       setAutoServerUri(serverUris(translate)[0].uri);
-      setAutoServerChainName(serverUris(translate)[0].chain_name);
+      setAutoServerChainName(serverUris(translate)[0].chainName);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // only the first time
@@ -257,12 +257,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       chainNameParsed = customServerChainName;
     }
     let sameServerChainName = true;
-    const chainName = serverContext.chain_name;
+    const chainName = serverContext.chainName;
     if (
-      walletSettings.download_memos === memos &&
-      walletSettings.transaction_filter_threshold === filter &&
+      walletSettings.downloadMemos === memos &&
+      walletSettings.transactionFilterThreshold === filter &&
       serverContext.uri === serverUriParsed &&
-      serverContext.chain_name === chainNameParsed &&
+      serverContext.chainName === chainNameParsed &&
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
@@ -322,7 +322,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
-    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== chainNameParsed) {
+    if (serverContext.uri !== serverUriParsed || serverContext.chainName !== chainNameParsed) {
       setDisabled(true);
       addLastSnackbar({ message: translate('loadedapp.tryingnewserver') as string });
       const { result, timeout, newChainName } = await checkServerURI(serverUriParsed, serverContext.uri);
@@ -341,7 +341,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         setDisabled(false);
         return;
       } else {
-        //console.log('new', new_chain_name, 'old', chain_name);
         if (newChainName && newChainName !== chainName) {
           sameServerChainName = false;
           addLastSnackbar({ message: translate('loadedapp.differentchain-error') as string });
@@ -349,11 +348,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       }
     }
 
-    if (walletSettings.download_memos !== memos) {
-      await setWalletOption(WalletOptionEnum.download_memos, memos);
+    if (walletSettings.downloadMemos !== memos) {
+      await setWalletOption(WalletOptionEnum.downloadMemos, memos);
     }
-    if (walletSettings.transaction_filter_threshold !== filter) {
-      await setWalletOption(WalletOptionEnum.transaction_filter_threshold, filter);
+    if (walletSettings.transactionFilterThreshold !== filter) {
+      await setWalletOption(WalletOptionEnum.transactionFilterThreshold, filter);
     }
     if (currencyContext !== currency) {
       await setCurrencyOption(currency);
@@ -382,11 +381,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
-    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== chainNameParsed) {
+    if (serverContext.uri !== serverUriParsed || serverContext.chainName !== chainNameParsed) {
       if (languageContext !== language) {
         await setLanguageOption(language, false);
       }
-      setServerOption({ uri: serverUriParsed, chain_name: chainNameParsed } as ServerType, true, sameServerChainName);
+      setServerOption({ uri: serverUriParsed, chainName: chainNameParsed } as ServerType, true, sameServerChainName);
       ms = 1500;
     } else {
       if (languageContext !== language) {
@@ -657,7 +656,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           (s: ServerUrisType) => s.uri === itemValue && !s.obsolete,
                         );
                         if (cnItem) {
-                          setListServerChainName(cnItem.chain_name);
+                          setListServerChainName(cnItem.chainName);
                         } else {
                           console.log('chain name not found');
                         }
