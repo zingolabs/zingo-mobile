@@ -664,7 +664,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     (async () => {
       if (mode === ModeEnum.basic) {
-        const price = await RPC.rpc_getZecPrice();
+        const price = await RPC.rpcGetZecPrice();
         // values:
         // 0   - initial/default value
         // -1  - error in Gemini/zingolib.
@@ -690,9 +690,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     (async () => {
       if (isFocused) {
-        await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
+        await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
       } else {
-        await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
+        await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
       }
     })();
   }, [isFocused]);
@@ -721,7 +721,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       return;
     }
     // first interrupt syncing Just in case...
-    await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
+    await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
     // First, close the confirm modal and show the "computing" modal
     setConfirmModalVisible(false);
     setComputingModalVisible(true);

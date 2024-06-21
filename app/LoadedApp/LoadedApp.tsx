@@ -402,7 +402,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         if (this.state.appState === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.background) {
           //console.log('App LOADED IOS is gone to the background!');
           // re-activate the interruption sync flag
-          await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
+          await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
           //console.log('background yes in storage');
@@ -456,7 +456,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       ) {
         console.log('App LOADED is gone to the background!');
         // re-activate the interruption sync flag
-        await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
+        await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
         //console.log('background yes in storage');
@@ -885,7 +885,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   };
 
   fetchWallet = async () => {
-    const wallet = await RPC.rpc_fetchWallet(this.state.readOnly);
+    const wallet = await RPC.rpcFetchWallet(this.state.readOnly);
     //console.log(wallet, this.state.readOnly);
     if (!isEqual(this.state.wallet, wallet)) {
       //console.log('fetch wallet seed or Viewing Key & birthday');
@@ -1015,7 +1015,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   };
 
   setWalletOption = async (walletOption: string, value: string): Promise<void> => {
-    await RPC.rpc_setWalletSettingOption(walletOption, value);
+    await RPC.rpcSetWalletSettingOption(walletOption, value);
 
     // Refetch the settings updated
     this.rpc.fetchWalletSettings();

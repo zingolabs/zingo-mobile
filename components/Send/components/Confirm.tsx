@@ -244,7 +244,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
   // the App is about to send - activate the interrupt syncing flag
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true))();
+    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true))();
   }, []);
 
   useEffect(() => {

@@ -298,12 +298,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // We need to activate this flag because if the App is syncing
     // while shielding, then it going to finish the current batch
     // and after that it run the shield process.
-    await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
+    await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
     // because I don't what the user is doing, I need to the re-run the shield
     // command right before the confirmation
     const proposeStr: string = await RPCModule.execute(CommandEnum.shield, '');
     console.log(proposeStr);
-    const shieldStr = await RPC.rpc_shieldFunds();
+    const shieldStr = await RPC.rpcShieldFunds();
 
     if (shieldStr) {
       if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -346,7 +346,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         }
       }
       setComputingModalVisible(false);
-      await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
+      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
     }
   };
 

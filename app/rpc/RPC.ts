@@ -121,7 +121,7 @@ export default class RPC {
     this.readOnly = readOnly;
   }
 
-  static async rpc_setInterruptSyncAfterBatch(value: string): Promise<void> {
+  static async rpcSetInterruptSyncAfterBatch(value: string): Promise<void> {
     try {
       const resultStr: string = await RPCModule.execute(CommandEnum.interrupt_sync_after_batch, value);
 
@@ -137,7 +137,7 @@ export default class RPC {
     }
   }
 
-  static async rpc_getZecPrice(): Promise<number> {
+  static async rpcGetZecPrice(): Promise<number> {
     try {
       // values:
       // 0   - initial/default value
@@ -164,7 +164,7 @@ export default class RPC {
     }
   }
 
-  static async rpc_setWalletSettingOption(name: string, value: string): Promise<string> {
+  static async rpcSetWalletSettingOption(name: string, value: string): Promise<string> {
     try {
       const resultStr: string = await RPCModule.execute(CommandEnum.setoption, `${name}=${value}`);
 
@@ -186,7 +186,7 @@ export default class RPC {
   }
 
   // Special method to get the Info object. This is used both internally and by the Loading screen
-  static async rpc_getInfoObject(): Promise<InfoType> {
+  static async rpcGetInfoObject(): Promise<InfoType> {
     try {
       const infoStr: string = await RPCModule.execute(CommandEnum.info, '');
       if (infoStr) {
@@ -231,8 +231,8 @@ export default class RPC {
     }
   }
 
-  static async rpc_fetchServerHeight(): Promise<number> {
-    const info = await RPC.rpc_getInfoObject();
+  static async rpcFetchServerHeight(): Promise<number> {
+    const info = await RPC.rpcGetInfoObject();
 
     if (info) {
       return info.latestBlock;
@@ -241,7 +241,7 @@ export default class RPC {
     return 0;
   }
 
-  static async rpc_fetchWalletHeight(): Promise<number> {
+  static async rpcFetchWalletHeight(): Promise<number> {
     try {
       const heightStr: string = await RPCModule.execute(CommandEnum.height, '');
       if (heightStr) {
@@ -262,7 +262,7 @@ export default class RPC {
     }
   }
 
-  static async rpc_shieldFunds(): Promise<string> {
+  static async rpcShieldFunds(): Promise<string> {
     try {
       const shieldStr: string = await RPCModule.execute(CommandEnum.confirm, '');
       console.log(shieldStr);
@@ -283,7 +283,7 @@ export default class RPC {
     }
   }
 
-  static async rpc_fetchWallet(readOnly: boolean): Promise<WalletType> {
+  static async rpcFetchWallet(readOnly: boolean): Promise<WalletType> {
     if (readOnly) {
       // only viewing key & birthday
       try {
@@ -365,7 +365,7 @@ export default class RPC {
   // We combine detailed transactions if they are sent to the same outgoing address in the same txid. This
   // is usually done to split long memos.
   // Remember to add up both amounts and combine memos
-  static rpc_combineTxDetailsByAddress(txdetails: TxDetailType[]): TxDetailType[] {
+  static rpcCombineTxDetailsByAddress(txdetails: TxDetailType[]): TxDetailType[] {
     // First, group by outgoing address.
     const m = new Map<string, TxDetailType[]>();
     txdetails
@@ -416,7 +416,7 @@ export default class RPC {
   // We combine detailed transactions if they are received to the same pool in the same txid. This
   // is usually done to split long memos.
   // Remember to add up both amounts and combine memos
-  static rpc_combineTxDetailsByPool(txdetails: TxDetailType[]): TxDetailType[] {
+  static rpcCombineTxDetailsByPool(txdetails: TxDetailType[]): TxDetailType[] {
     // First, group by pool.
     const m = new Map<PoolEnum, TxDetailType[]>();
     txdetails
@@ -539,7 +539,7 @@ export default class RPC {
 
     while (ss.in_progress) {
       // interrupting sync process
-      await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
+      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
 
       // sleep for half second
       await this.sleep(500);
@@ -552,7 +552,7 @@ export default class RPC {
     console.log('stop sync process. STOPPED');
 
     // NOT interrupting sync process
-    await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
+    await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
   }
 
   async clearTimers(): Promise<void> {
@@ -922,14 +922,14 @@ export default class RPC {
         const end_block: number = ss.end_block || 0; // lower
 
         // I want to know what was the first block of the current sync process
-        let process_end_block: number = 0;
+        let processEndBlock: number = 0;
         // when the App is syncing the new blocks and sync finished really fast
         // the synstatus have almost all of the fields undefined.
         // if we have latest_block means that the sync process finished in that block
         if (end_block === 0 && batch_num === 0) {
-          process_end_block = this.latest_block !== -1 ? this.latest_block : this.lastServerBlockHeight;
+          processEndBlock = this.latest_block !== -1 ? this.latest_block : this.lastServerBlockHeight;
         } else {
-          process_end_block = end_block - batch_num * this.blocksPerBatch;
+          processEndBlock = end_block - batch_num * this.blocksPerBatch;
         }
 
         //const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
@@ -984,7 +984,7 @@ export default class RPC {
           lastError: ss.last_error,
           blocksPerBatch: this.blocksPerBatch,
           secondsPerBatch: this.seconds_batch,
-          process_end_block: process_end_block,
+          processEndBlock: processEndBlock,
           lastBlockServer: this.lastServerBlockHeight,
           syncProcessStalled: syncProcessStalled,
         } as SyncingStatusClass);
@@ -1020,7 +1020,7 @@ export default class RPC {
             lastError: ss.last_error,
             blocksPerBatch: this.blocksPerBatch,
             secondsPerBatch: 0,
-            process_end_block: process_end_block,
+            processEndBlock: processEndBlock,
             lastBlockServer: this.lastServerBlockHeight,
             syncProcessStalled: false,
           } as SyncingStatusClass);
@@ -1069,7 +1069,7 @@ export default class RPC {
         lastError: '',
         blocksPerBatch: this.blocksPerBatch,
         secondsPerBatch: 0,
-        process_end_block: this.lastServerBlockHeight,
+        processEndBlock: this.lastServerBlockHeight,
         lastBlockServer: this.lastServerBlockHeight,
         syncProcessStalled: false,
       } as SyncingStatusClass);
@@ -1121,7 +1121,7 @@ export default class RPC {
   }
 
   async fetchInfoAndServerHeight(): Promise<void> {
-    const info = await RPC.rpc_getInfoObject();
+    const info = await RPC.rpcGetInfoObject();
 
     if (info) {
       this.fnSetInfo(info);
@@ -1275,7 +1275,7 @@ export default class RPC {
   }
 
   async fetchWalletBirthday(): Promise<void> {
-    const wallet = await RPC.rpc_fetchWallet(this.readOnly);
+    const wallet = await RPC.rpcFetchWallet(this.readOnly);
 
     if (wallet) {
       this.walletBirthday = wallet.birthday;
@@ -1367,10 +1367,10 @@ export default class RPC {
         const combinedTx = txns;
         if (txns.type === TransactionTypeEnum.Sent || txns.type === TransactionTypeEnum.SendToSelf) {
           // using address for `Sent` & `SendToSelf`
-          combinedTx.txDetails = RPC.rpc_combineTxDetailsByAddress(txns.txDetails);
+          combinedTx.txDetails = RPC.rpcCombineTxDetailsByAddress(txns.txDetails);
         } else {
           // using pool for `Received`
-          combinedTx.txDetails = RPC.rpc_combineTxDetailsByPool(txns.txDetails);
+          combinedTx.txDetails = RPC.rpcCombineTxDetailsByPool(txns.txDetails);
         }
         //console.log(combinedTx);
         combinedTxList.push(combinedTx);
@@ -1468,7 +1468,7 @@ export default class RPC {
         // because I don't know what the user are doing, I force every 2 seconds
         // the interrupt flag to true if the sync_interrupt is false
         if (!progress.sync_interrupt) {
-          await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
+          await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
         }
 
         const updatedProgress = new SendProgressClass(0, 0, 0);
@@ -1529,7 +1529,7 @@ export default class RPC {
           this.refresh(true);
           // send process is about to finish - reactivate the syncing flag
           if (progress.sync_interrupt) {
-            await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
+            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
           }
           resolve(progress.txid);
         }
@@ -1537,7 +1537,7 @@ export default class RPC {
         if (progress.error) {
           // send process is about to finish - reactivate the syncing flag
           if (progress.sync_interrupt) {
-            await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
+            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
           }
           reject(progress.error);
         }
@@ -1547,7 +1547,7 @@ export default class RPC {
           this.refresh(true);
           // send process is about to finish - reactivate the syncing flag
           if (progress.sync_interrupt) {
-            await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
+            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
           }
           resolve(sendTxid);
         }
@@ -1555,7 +1555,7 @@ export default class RPC {
         if (sendError) {
           // send process is about to finish - reactivate the syncing flag
           if (progress.sync_interrupt) {
-            await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
+            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
           }
           reject(sendError);
         }

@@ -40,7 +40,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   const [server_1_percent, setServer_1_percent] = useState<number>(0);
   const [server_2_percent, setServer_2_percent] = useState<number>(0);
   const [server_3_percent, setServer_3_percent] = useState<number>(0);
-  const [process_end_block_fixed, setProcess_end_block_fixed] = useState<number>(0);
+  const [processEndBlock_fixed, setProcess_end_block_fixed] = useState<number>(0);
   const [wallet_old_synced_percent, setWallet_old_synced_percent] = useState<number>(0);
   const [wallet_new_synced_percent, setWallet_new_synced_percent] = useState<number>(0);
   const [wallet_for_synced_percent, setWallet_for_synced_percent] = useState<number>(0);
@@ -92,7 +92,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
+    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
     setTimeout(() => setShowBackgroundLegend(false), 10000); // 10 seconds only
   }, []);
 
@@ -101,15 +101,15 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     // I have to subtract 1 here, almost always.
     // when end block process & last block wallet are equal, don't subtract anything.
     // when end block process & wallet birthday are equal, don't subtract anything.
-    let process_end_block_fi = 0;
+    let processEndBlock_fi = 0;
     if (
-      syncingStatus.process_end_block &&
-      syncingStatus.process_end_block !== wallet.birthday &&
-      syncingStatus.process_end_block < syncingStatus.lastBlockWallet
+      syncingStatus.processEndBlock &&
+      syncingStatus.processEndBlock !== wallet.birthday &&
+      syncingStatus.processEndBlock < syncingStatus.lastBlockWallet
     ) {
-      process_end_block_fi = syncingStatus.process_end_block - 1;
+      processEndBlock_fi = syncingStatus.processEndBlock - 1;
     } else {
-      process_end_block_fi = syncingStatus.process_end_block;
+      processEndBlock_fi = syncingStatus.processEndBlock;
     }
 
     /*
@@ -152,13 +152,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     */
 
     let wall_1: number =
-      process_end_block_fi && wallet.birthday
-        ? process_end_block_fi >= wallet.birthday
-          ? process_end_block_fi - wallet.birthday
-          : process_end_block_fi
+      processEndBlock_fi && wallet.birthday
+        ? processEndBlock_fi >= wallet.birthday
+          ? processEndBlock_fi - wallet.birthday
+          : processEndBlock_fi
         : 0;
     let wall_2: number =
-      syncingStatus.currentBlock && process_end_block_fi ? syncingStatus.currentBlock - process_end_block_fi : 0;
+      syncingStatus.currentBlock && processEndBlock_fi ? syncingStatus.currentBlock - processEndBlock_fi : 0;
 
     // It is really weird, but don't want any negative values in the UI.
     if (wall_1 < 0) {
@@ -170,9 +170,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
 
     const wall_3: number =
       syncingStatus.lastBlockServer && wallet.birthday
-        ? process_end_block_fi >= wallet.birthday
+        ? processEndBlock_fi >= wallet.birthday
           ? syncingStatus.lastBlockServer - wallet.birthday - wall_1 - wall_2
-          : syncingStatus.lastBlockServer - process_end_block_fi - wall_1 - wall_2
+          : syncingStatus.lastBlockServer - processEndBlock_fi - wall_1 - wall_2
         : 0;
 
     let wallet_old_synced_per: number = (wall_1 * 100) / serv_wallet;
@@ -196,7 +196,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     setServer_1_percent(serv_1_percent);
     setServer_2_percent(serv_2_percent);
     setServer_3_percent(serv_3_percent);
-    setProcess_end_block_fixed(process_end_block_fi);
+    setProcess_end_block_fixed(processEndBlock_fi);
     setWallet_old_synced_percent(wallet_old_synced_per);
     setWallet_new_synced_percent(wallet_new_synced_per);
     setWallet_for_synced_percent(wallet_for_synced_per);
@@ -208,7 +208,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     syncingStatus.currentBlock,
     syncingStatus.lastBlockServer,
     syncingStatus.lastBlockWallet,
-    syncingStatus.process_end_block,
+    syncingStatus.processEndBlock,
     wallet.birthday,
   ]);
 
@@ -216,9 +216,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
   //  'birthday',
   //  wallet.birthday,
   //  'end',
-  //  syncingStatus.process_end_block,
+  //  syncingStatus.processEndBlock,
   //  'end fixed',
-  //  process_end_block_fixed,
+  //  processEndBlock_fixed,
   //  'last wallet',
   //  syncingStatus.lastBlockWallet,
   //  'last server',
@@ -487,7 +487,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                     }}>
                     <>
                       <Text style={{ color: colors.primary }}>
-                        {process_end_block_fixed >= wallet.birthday ? wallet.birthday : process_end_block_fixed}
+                        {processEndBlock_fixed >= wallet.birthday ? wallet.birthday : processEndBlock_fixed}
                       </Text>
                       <Text style={{ color: colors.primary }}>{syncingStatus.lastBlockServer}</Text>
                     </>

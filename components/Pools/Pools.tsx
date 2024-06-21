@@ -33,7 +33,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOpti
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
+    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
   }, []);
 
   //console.log(totalBalance);

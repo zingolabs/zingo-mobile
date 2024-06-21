@@ -875,7 +875,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
   };
 
   setWalletOption = async (walletOption: string, value: string) => {
-    await RPC.rpc_setWalletSettingOption(walletOption, value);
+    await RPC.rpcSetWalletSettingOption(walletOption, value);
   };
 
   setPrivacyOption = async (value: boolean): Promise<void> => {

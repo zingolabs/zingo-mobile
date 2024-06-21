@@ -210,7 +210,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   // because this screen is fired from more places than the menu.
   useEffect(() => {
     if (action !== SeedActionEnum.new && action !== SeedActionEnum.restore) {
-      (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
+      (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
     }
   }, [action]);
 
