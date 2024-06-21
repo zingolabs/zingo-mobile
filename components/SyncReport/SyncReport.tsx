@@ -140,7 +140,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     /*
       WALLET points:
       - wallet0 : birthday of the wallet
-      - wallet1 : first block of the sync process (end_block)
+      - wallet1 : first block of the sync process (endBlock)
       - wallet2 : current block of the sync process
       - wallet3 : empty part of the wallet bar
 

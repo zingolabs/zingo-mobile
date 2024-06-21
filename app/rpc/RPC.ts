@@ -960,7 +960,6 @@ export default class RPC {
         // if current block is lower than the previous current block
         // The user need to see something not confusing.
         if (currentBlock > 0 && this.prevCurrentBlock !== -1 && currentBlock < this.prevCurrentBlock) {
-          //console.log('blocks down', current_block - this.prev_current_block);
           // I decided to add only one fake block because otherwise could seems stalled
           // the user expect every 5 seconds the blocks change...
           currentBlock = this.prevCurrentBlock + 1;
@@ -970,7 +969,7 @@ export default class RPC {
 
         this.secondsBatch += 5;
 
-        //console.log('interval sync/rescan, secs', this.seconds_batch, 'timer', this.syncStatusTimerID);
+        //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
 
         // store SyncStatus object for a new screen
         this.fnSetSyncingStatus({
@@ -1025,9 +1024,9 @@ export default class RPC {
           } as SyncingStatusClass);
 
           //console.log('sync status', ss);
-          //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${this.sync_id}`);
+          //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${this.syncId}`);
         } else {
-          // If we're doing a long sync, every time the batch_num changes, save the wallet
+          // If we're doing a long sync, every time the batchNum changes, save the wallet
           if (this.prevBatchNum !== batchNum) {
             // if finished batches really fast, the App have to save the wallet delayed.
             if (this.prevBatchNum !== -1 && this.batches >= 1) {
@@ -1043,7 +1042,7 @@ export default class RPC {
 
               //console.log('sync status', ss);
               //console.log(
-              //  `@@@@@@@@@@@ Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
+              //  `@@@@@@@@@@@ Saving because batch num changed ${this.prevBatchNum} - ${batchNum}. seconds: ${this.secondsBatch}`,
               //);
             }
             this.batches += batchNum - this.prevBatchNum;
