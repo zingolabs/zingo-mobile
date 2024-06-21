@@ -55,7 +55,7 @@ describe('Component Info - test', () => {
       verificationProgress: 0,
       currencyName: CurrencyNameEnum.ZEC,
       solps: 0,
-      chain_name: ChainNameEnum.mainChainName,
+      chainName: ChainNameEnum.mainChainName,
       zingolib: 'mob-release...',
     };
     state.zecPrice.zecPrice = 33.33;

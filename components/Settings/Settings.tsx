@@ -41,7 +41,7 @@ import RNPickerSelect from 'react-native-picker-select';
 type SettingsProps = {
   closeModal: () => void;
   setWalletOption: (walletOption: string, value: string) => Promise<void>;
-  setServerOption: (value: ServerType, toast: boolean, same_server_chain_name: boolean) => Promise<void>;
+  setServerOption: (value: ServerType, toast: boolean, sameServerChainName: boolean) => Promise<void>;
   setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
   setLanguageOption: (value: LanguageEnum, reset: boolean) => Promise<void>;
   setSendAllOption: (value: boolean) => Promise<void>;
@@ -245,24 +245,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const saveSettings = async () => {
     let serverUriParsed = '';
-    let chain_nameParsed = '';
+    let chainNameParsed = '';
     if (selectServer === SelectServerEnum.auto) {
       serverUriParsed = autoServerUri;
-      chain_nameParsed = autoServerChainName;
+      chainNameParsed = autoServerChainName;
     } else if (selectServer === SelectServerEnum.list) {
       serverUriParsed = listServerUri;
-      chain_nameParsed = listServerChainName;
+      chainNameParsed = listServerChainName;
     } else if (selectServer === SelectServerEnum.custom) {
       serverUriParsed = customServerUri;
-      chain_nameParsed = customServerChainName;
+      chainNameParsed = customServerChainName;
     }
-    let same_server_chain_name = true;
-    const chain_name = serverContext.chain_name;
+    let sameServerChainName = true;
+    const chainName = serverContext.chain_name;
     if (
       walletSettings.download_memos === memos &&
       walletSettings.transaction_filter_threshold === filter &&
       serverContext.uri === serverUriParsed &&
-      serverContext.chain_name === chain_nameParsed &&
+      serverContext.chain_name === chainNameParsed &&
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
@@ -284,7 +284,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       addLastSnackbar({ message: translate('settings.isthreshold') as string });
       return;
     }
-    if (!serverUriParsed || !chain_nameParsed) {
+    if (!serverUriParsed || !chainNameParsed) {
       addLastSnackbar({ message: translate('settings.isserver') as string });
       return;
     }
@@ -322,10 +322,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
-    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== chain_nameParsed) {
+    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== chainNameParsed) {
       setDisabled(true);
       addLastSnackbar({ message: translate('loadedapp.tryingnewserver') as string });
-      const { result, timeout, new_chain_name } = await checkServerURI(serverUriParsed, serverContext.uri);
+      const { result, timeout, newChainName } = await checkServerURI(serverUriParsed, serverContext.uri);
       if (!result) {
         // if the server checking takes more then 30 seconds.
         if (timeout === true) {
@@ -337,13 +337,13 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         }
         // in this point the sync process is blocked, who knows why.
         // if I save the actual server before the customization... is going to work.
-        setServerOption(serverContext, false, same_server_chain_name);
+        setServerOption(serverContext, false, sameServerChainName);
         setDisabled(false);
         return;
       } else {
         //console.log('new', new_chain_name, 'old', chain_name);
-        if (new_chain_name && new_chain_name !== chain_name) {
-          same_server_chain_name = false;
+        if (newChainName && newChainName !== chainName) {
+          sameServerChainName = false;
           addLastSnackbar({ message: translate('loadedapp.differentchain-error') as string });
         }
       }
@@ -382,15 +382,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
-    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== chain_nameParsed) {
+    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== chainNameParsed) {
       if (languageContext !== language) {
         await setLanguageOption(language, false);
       }
-      setServerOption(
-        { uri: serverUriParsed, chain_name: chain_nameParsed } as ServerType,
-        true,
-        same_server_chain_name,
-      );
+      setServerOption({ uri: serverUriParsed, chain_name: chainNameParsed } as ServerType, true, sameServerChainName);
       ms = 1500;
     } else {
       if (languageContext !== language) {

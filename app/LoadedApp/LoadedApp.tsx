@@ -1021,7 +1021,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  setServerOption = async (value: ServerType, toast: boolean, same_server_chain_name: boolean): Promise<void> => {
+  setServerOption = async (value: ServerType, toast: boolean, sameServerChainName: boolean): Promise<void> => {
     //console.log(value, same_server_chain_name);
     // here I know the server was changed, clean all the tasks before anything.
     await this.rpc.clearTimers();
@@ -1031,7 +1031,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     // First we need to check the `chain_name` between servers, if this is different
     // we cannot try to open the current wallet, because make not sense.
     let error = false;
-    if (!same_server_chain_name) {
+    if (!sameServerChainName) {
       error = true;
     } else {
       // when I try to open the wallet in the new server:
@@ -1097,14 +1097,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
 
       // we need to restore the old server because the new doesn't have the seed of the current wallet.
-      const old_settings = await SettingsFileImpl.readSettings();
-      await RPCModule.execute(CommandEnum.changeserver, old_settings.server.uri);
+      const oldSettings = await SettingsFileImpl.readSettings();
+      await RPCModule.execute(CommandEnum.changeserver, oldSettings.server.uri);
 
       // go to the seed screen for changing the wallet for another in the new server or cancel this action.
       this.fetchWallet();
       this.setState({
         newServer: value as ServerType,
-        server: old_settings.server,
+        server: oldSettings.server,
       });
     }
   };

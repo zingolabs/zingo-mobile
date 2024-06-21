@@ -63,14 +63,14 @@ export default class RPC {
   inSend: boolean;
   blocksPerBatch: number;
 
-  prev_batch_num: number;
-  prev_sync_id: number;
-  prev_current_block: number;
-  seconds_batch: number;
-  seconds_block: number;
+  prevBatchNum: number;
+  prevSyncId: number;
+  prevCurrentBlock: number;
+  secondsBatch: number;
+  secondsBlock: number;
   batches: number;
-  latest_block: number;
-  sync_id: number;
+  latestBlock: number;
+  syncId: number;
 
   timers: NodeJS.Timeout[];
 
@@ -107,14 +107,14 @@ export default class RPC {
     this.inSend = false;
     this.blocksPerBatch = GlobalConst.blocksPerBatch;
 
-    this.prev_batch_num = -1;
-    this.prev_sync_id = -1;
-    this.prev_current_block = -1;
-    this.seconds_batch = 0;
-    this.seconds_block = 0;
+    this.prevBatchNum = -1;
+    this.prevSyncId = -1;
+    this.prevCurrentBlock = -1;
+    this.secondsBatch = 0;
+    this.secondsBlock = 0;
     this.batches = 0;
-    this.latest_block = -1;
-    this.sync_id = -1;
+    this.latestBlock = -1;
+    this.syncId = -1;
 
     this.timers = [];
 
@@ -213,7 +213,7 @@ export default class RPC {
       //const zingolibJSON = await JSON.parse(zingolibStr);
 
       const info: InfoType = {
-        chain_name: infoJSON.chain_name,
+        chainName: infoJSON.chain_name,
         latestBlock: infoJSON.latest_block_height,
         serverUri: infoJSON.server_uri || '<none>',
         connections: 1,
@@ -773,13 +773,13 @@ export default class RPC {
       this.setInRefresh(true);
       this.keepAwake(true);
 
-      this.prev_batch_num = -1;
-      this.prev_sync_id = -1;
-      this.seconds_batch = 0;
-      this.seconds_block = 0;
+      this.prevBatchNum = -1;
+      this.prevSyncId = -1;
+      this.secondsBatch = 0;
+      this.secondsBlock = 0;
       this.batches = 0;
-      this.latest_block = -1;
-      this.prev_current_block = -1;
+      this.latestBlock = -1;
+      this.prevCurrentBlock = -1;
 
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
@@ -799,7 +799,7 @@ export default class RPC {
             if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
               const resultJSON: RPCSyncRescan = JSON.parse(result);
               if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
-                this.latest_block = resultJSON.latest_block;
+                this.latestBlock = resultJSON.latest_block;
               }
             }
           })
@@ -811,7 +811,7 @@ export default class RPC {
             if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
               const resultJSON: RPCSyncRescan = JSON.parse(result);
               if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
-                this.latest_block = resultJSON.latest_block;
+                this.latestBlock = resultJSON.latest_block;
               }
             }
           })
@@ -860,11 +860,11 @@ export default class RPC {
           this.setInRefresh(ss.in_progress);
         }
 
-        this.sync_id = ss.sync_id;
+        this.syncId = ss.sync_id;
 
         // if the sync_id change then reset the %
-        if (this.prev_sync_id !== this.sync_id) {
-          if (this.prev_sync_id !== -1) {
+        if (this.prevSyncId !== this.syncId) {
+          if (this.prevSyncId !== -1) {
             // And fetch the rest of the data.
             await this.loadWalletData();
 
@@ -876,114 +876,113 @@ export default class RPC {
 
             //console.log('sync status', ss);
             //console.log(`new sync process id: ${this.sync_id}. Save the wallet.`);
-            this.prev_batch_num = -1;
-            this.seconds_batch = 0;
-            this.seconds_block = 0;
+            this.prevBatchNum = -1;
+            this.secondsBatch = 0;
+            this.secondsBlock = 0;
             this.batches = 0;
           }
-          this.prev_sync_id = this.sync_id;
+          this.prevSyncId = this.syncId;
         }
 
         // Post sync updates
-        let synced_blocks: number = ss.synced_blocks || 0;
-        let trial_decryptions_blocks: number = ss.trial_decryptions_blocks || 0;
-        let txn_scan_blocks: number = ss.txn_scan_blocks || 0;
-        let witnesses_updated: number = ss.witnesses_updated || 0;
+        let syncedBlocks: number = ss.synced_blocks || 0;
+        let trialDecryptionsBlocks: number = ss.trial_decryptions_blocks || 0;
+        let txnScanBlocks: number = ss.txn_scan_blocks || 0;
+        let witnessesUpdated: number = ss.witnesses_updated || 0;
 
         // just in case
-        if (synced_blocks < 0) {
-          synced_blocks = 0;
+        if (syncedBlocks < 0) {
+          syncedBlocks = 0;
         }
-        if (synced_blocks > this.blocksPerBatch) {
-          synced_blocks = this.blocksPerBatch;
+        if (syncedBlocks > this.blocksPerBatch) {
+          syncedBlocks = this.blocksPerBatch;
         }
-        if (trial_decryptions_blocks < 0) {
-          trial_decryptions_blocks = 0;
+        if (trialDecryptionsBlocks < 0) {
+          trialDecryptionsBlocks = 0;
         }
-        if (trial_decryptions_blocks > this.blocksPerBatch) {
-          trial_decryptions_blocks = this.blocksPerBatch;
+        if (trialDecryptionsBlocks > this.blocksPerBatch) {
+          trialDecryptionsBlocks = this.blocksPerBatch;
         }
-        if (txn_scan_blocks < 0) {
-          txn_scan_blocks = 0;
+        if (txnScanBlocks < 0) {
+          txnScanBlocks = 0;
         }
-        if (txn_scan_blocks > this.blocksPerBatch) {
-          txn_scan_blocks = this.blocksPerBatch;
+        if (txnScanBlocks > this.blocksPerBatch) {
+          txnScanBlocks = this.blocksPerBatch;
         }
-        if (witnesses_updated < 0) {
-          witnesses_updated = 0;
+        if (witnessesUpdated < 0) {
+          witnessesUpdated = 0;
         }
-        if (witnesses_updated > this.blocksPerBatch) {
-          witnesses_updated = this.blocksPerBatch;
+        if (witnessesUpdated > this.blocksPerBatch) {
+          witnessesUpdated = this.blocksPerBatch;
         }
 
-        const batch_total: number = ss.batch_total || 0;
-        const batch_num: number = ss.batch_num || 0;
+        const batchTotal: number = ss.batch_total || 0;
+        const batchNum: number = ss.batch_num || 0;
 
-        const end_block: number = ss.end_block || 0; // lower
+        const endBlock: number = ss.end_block || 0; // lower
 
         // I want to know what was the first block of the current sync process
         let processEndBlock: number = 0;
         // when the App is syncing the new blocks and sync finished really fast
         // the synstatus have almost all of the fields undefined.
         // if we have latest_block means that the sync process finished in that block
-        if (end_block === 0 && batch_num === 0) {
-          processEndBlock = this.latest_block !== -1 ? this.latest_block : this.lastServerBlockHeight;
+        if (endBlock === 0 && batchNum === 0) {
+          processEndBlock = this.latestBlock !== -1 ? this.latestBlock : this.lastServerBlockHeight;
         } else {
-          processEndBlock = end_block - batch_num * this.blocksPerBatch;
+          processEndBlock = endBlock - batchNum * this.blocksPerBatch;
         }
 
-        //const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + txn_scan_blocks) / 3;
-        const progress_blocks: number = (synced_blocks + trial_decryptions_blocks + witnesses_updated) / 3;
+        const progressBlocks: number = (syncedBlocks + trialDecryptionsBlocks + witnessesUpdated) / 3;
 
-        let current_block = end_block + progress_blocks;
-        if (current_block > this.lastServerBlockHeight) {
-          current_block = this.lastServerBlockHeight;
+        let currentBlock = endBlock + progressBlocks;
+        if (currentBlock > this.lastServerBlockHeight) {
+          currentBlock = this.lastServerBlockHeight;
         }
-        current_block = Number(current_block.toFixed(0));
+        currentBlock = Number(currentBlock.toFixed(0));
 
         // if the current block is stalled I need to restart the App
         let syncProcessStalled = false;
-        if (this.prev_current_block !== -1) {
-          if (current_block > 0 && this.prev_current_block === current_block) {
-            this.seconds_block += 5;
+        if (this.prevCurrentBlock !== -1) {
+          if (currentBlock > 0 && this.prevCurrentBlock === currentBlock) {
+            this.secondsBlock += 5;
             // 5 minutes
-            if (this.seconds_block >= 300) {
-              this.seconds_block = 0;
+            if (this.secondsBlock >= 300) {
+              this.secondsBlock = 0;
               syncProcessStalled = true;
             }
           }
-          if (current_block > 0 && this.prev_current_block !== current_block) {
-            this.seconds_block = 0;
+          if (currentBlock > 0 && this.prevCurrentBlock !== currentBlock) {
+            this.secondsBlock = 0;
             syncProcessStalled = false;
           }
         }
 
         // if current block is lower than the previous current block
         // The user need to see something not confusing.
-        if (current_block > 0 && this.prev_current_block !== -1 && current_block < this.prev_current_block) {
+        if (currentBlock > 0 && this.prevCurrentBlock !== -1 && currentBlock < this.prevCurrentBlock) {
           //console.log('blocks down', current_block - this.prev_current_block);
           // I decided to add only one fake block because otherwise could seems stalled
           // the user expect every 5 seconds the blocks change...
-          current_block = this.prev_current_block + 1;
+          currentBlock = this.prevCurrentBlock + 1;
         }
 
-        this.prev_current_block = current_block;
+        this.prevCurrentBlock = currentBlock;
 
-        this.seconds_batch += 5;
+        this.secondsBatch += 5;
 
         //console.log('interval sync/rescan, secs', this.seconds_batch, 'timer', this.syncStatusTimerID);
 
         // store SyncStatus object for a new screen
         this.fnSetSyncingStatus({
-          syncID: this.sync_id,
-          totalBatches: batch_total,
-          currentBatch: ss.in_progress ? batch_num + 1 : 0,
+          syncID: this.syncId,
+          totalBatches: batchTotal,
+          currentBatch: ss.in_progress ? batchNum + 1 : 0,
           lastBlockWallet: this.lastWalletBlockHeight,
-          currentBlock: current_block,
+          currentBlock: currentBlock,
           inProgress: ss.in_progress,
           lastError: ss.last_error,
           blocksPerBatch: this.blocksPerBatch,
-          secondsPerBatch: this.seconds_batch,
+          secondsPerBatch: this.secondsBatch,
           processEndBlock: processEndBlock,
           lastBlockServer: this.lastServerBlockHeight,
           syncProcessStalled: syncProcessStalled,
@@ -1011,11 +1010,11 @@ export default class RPC {
 
           // store SyncStatus object for a new screen
           this.fnSetSyncingStatus({
-            syncID: this.sync_id,
+            syncID: this.syncId,
             totalBatches: 0,
             currentBatch: 0,
             lastBlockWallet: this.lastWalletBlockHeight,
-            currentBlock: current_block,
+            currentBlock: currentBlock,
             inProgress: false,
             lastError: ss.last_error,
             blocksPerBatch: this.blocksPerBatch,
@@ -1029,9 +1028,9 @@ export default class RPC {
           //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${this.sync_id}`);
         } else {
           // If we're doing a long sync, every time the batch_num changes, save the wallet
-          if (this.prev_batch_num !== batch_num) {
+          if (this.prevBatchNum !== batchNum) {
             // if finished batches really fast, the App have to save the wallet delayed.
-            if (this.prev_batch_num !== -1 && this.batches >= 1) {
+            if (this.prevBatchNum !== -1 && this.batches >= 1) {
               // And fetch the rest of the data.
               await this.loadWalletData();
 
@@ -1047,9 +1046,9 @@ export default class RPC {
               //  `@@@@@@@@@@@ Saving because batch num changed ${this.prevBatchNum} - ${batch_num}. seconds: ${this.seconds_batch}`,
               //);
             }
-            this.batches += batch_num - this.prev_batch_num;
-            this.prev_batch_num = batch_num;
-            this.seconds_batch = 0;
+            this.batches += batchNum - this.prevBatchNum;
+            this.prevBatchNum = batchNum;
+            this.secondsBatch = 0;
           }
         }
       }, 5000);
@@ -1060,7 +1059,7 @@ export default class RPC {
       //console.log('Already have latest block, waiting for next refresh');
       // Here I know the sync process is over, I need to inform to the UI.
       this.fnSetSyncingStatus({
-        syncID: this.sync_id,
+        syncID: this.syncId,
         totalBatches: 0,
         currentBatch: 0,
         lastBlockWallet: this.lastWalletBlockHeight,
@@ -1078,40 +1077,36 @@ export default class RPC {
 
   async fetchWalletSettings(): Promise<void> {
     try {
-      const download_memos_str: string = await RPCModule.execute(
-        CommandEnum.getoption,
-        WalletOptionEnum.download_memos,
-      );
-      if (download_memos_str) {
-        if (download_memos_str.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error download memos ${download_memos_str}`);
+      const downloadMemosStr: string = await RPCModule.execute(CommandEnum.getoption, WalletOptionEnum.download_memos);
+      if (downloadMemosStr) {
+        if (downloadMemosStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error download memos ${downloadMemosStr}`);
           return;
         }
       } else {
         console.log('Internal Error download memos');
         return;
       }
-      const download_memos_json: RPCGetOptionType = await JSON.parse(download_memos_str);
+      const downloadMemosJson: RPCGetOptionType = await JSON.parse(downloadMemosStr);
 
-      const transaction_filter_threshold_str: string = await RPCModule.execute(
+      const transactionFilterThresholdStr: string = await RPCModule.execute(
         CommandEnum.getoption,
         WalletOptionEnum.transaction_filter_threshold,
       );
-      if (transaction_filter_threshold_str) {
-        if (transaction_filter_threshold_str.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error transaction filter threshold ${transaction_filter_threshold_str}`);
+      if (transactionFilterThresholdStr) {
+        if (transactionFilterThresholdStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error transaction filter threshold ${transactionFilterThresholdStr}`);
           return;
         }
       } else {
         console.log('Internal Error transaction filter threshold');
         return;
       }
-      const transaction_filter_threshold_json: RPCGetOptionType = await JSON.parse(transaction_filter_threshold_str);
+      const transactionFilterThresholdJson: RPCGetOptionType = await JSON.parse(transactionFilterThresholdStr);
 
       const walletSettings = new WalletSettingsClass();
-      walletSettings.download_memos = download_memos_json.download_memos || '';
-      walletSettings.transaction_filter_threshold =
-        transaction_filter_threshold_json.transaction_filter_threshold || '';
+      walletSettings.download_memos = downloadMemosJson.download_memos || '';
+      walletSettings.transaction_filter_threshold = transactionFilterThresholdJson.transaction_filter_threshold || '';
 
       this.fnSetWalletSettings(walletSettings);
     } catch (error) {

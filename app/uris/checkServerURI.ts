@@ -5,11 +5,11 @@ import { RPCInfoType } from '../rpc/types/RPCInfoType';
 type checkServerURIReturn = {
   result: boolean;
   timeout: boolean;
-  new_chain_name?: ChainNameEnum;
+  newChainName?: ChainNameEnum;
 };
 
 const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerURIReturn> => {
-  let new_chain_name: ChainNameEnum | undefined;
+  let newChainName: ChainNameEnum | undefined;
 
   try {
     const resultStrServerPromise = RPCModule.execute(CommandEnum.changeserver, uri);
@@ -26,7 +26,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
       //console.log('changeserver', resultStrServer);
       await RPCModule.execute(CommandEnum.changeserver, oldUri);
       // error, no timeout
-      return { result: false, timeout: false, new_chain_name };
+      return { result: false, timeout: false, newChainName };
     } else {
       // the server is changed
       const infoStrPromise = RPCModule.execute(CommandEnum.info, '');
@@ -43,17 +43,17 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
         // I have to restore the old server again.
         await RPCModule.execute(CommandEnum.changeserver, oldUri);
         // error, no timeout
-        return { result: false, timeout: false, new_chain_name };
+        return { result: false, timeout: false, newChainName };
       } else {
         try {
           const infoJSON: RPCInfoType = await JSON.parse(infoStr);
-          new_chain_name = infoJSON.chain_name;
+          newChainName = infoJSON.chain_name;
         } catch (e) {
           console.log(infoStr);
           // I have to restore the old server again.
           await RPCModule.execute(CommandEnum.changeserver, oldUri);
           // error, no timeout
-          return { result: false, timeout: false, new_chain_name };
+          return { result: false, timeout: false, newChainName };
         }
       }
     }
@@ -62,11 +62,11 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
     // I have to restore the old server again. Just in case.
     await RPCModule.execute(CommandEnum.changeserver, oldUri);
     // error, YES timeout
-    return { result: false, timeout: true, new_chain_name };
+    return { result: false, timeout: true, newChainName };
   }
 
   // NO error, no timeout
-  return { result: true, timeout: false, new_chain_name };
+  return { result: true, timeout: false, newChainName };
 };
 
 export default checkServerURI;

@@ -784,8 +784,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.setState({ wallet: {} as WalletType, screen: 3 });
   };
 
-  doRestore = async (seed_ufvk: string, birthday: number) => {
-    if (!seed_ufvk) {
+  doRestore = async (seedUfvk: string, birthday: number) => {
+    if (!seedUfvk) {
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
@@ -795,9 +795,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       return;
     }
     if (
-      (seed_ufvk.toLowerCase().startsWith(GlobalConst.uview) &&
+      (seedUfvk.toLowerCase().startsWith(GlobalConst.uview) &&
         this.state.server.chain_name !== ChainNameEnum.mainChainName) ||
-      (seed_ufvk.toLowerCase().startsWith(GlobalConst.utestview) &&
+      (seedUfvk.toLowerCase().startsWith(GlobalConst.utestview) &&
         this.state.server.chain_name === ChainNameEnum.mainChainName)
     ) {
       createAlert(
@@ -821,8 +821,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
 
       let type: RestoreFromTypeEnum = RestoreFromTypeEnum.seedRestoreFrom;
       if (
-        seed_ufvk.toLowerCase().startsWith(GlobalConst.uview) ||
-        seed_ufvk.toLowerCase().startsWith(GlobalConst.utestview)
+        seedUfvk.toLowerCase().startsWith(GlobalConst.uview) ||
+        seedUfvk.toLowerCase().startsWith(GlobalConst.utestview)
       ) {
         // this is a UFVK
         type = RestoreFromTypeEnum.ufvkRestoreFrom;
@@ -831,21 +831,21 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       let result: string;
       if (type === RestoreFromTypeEnum.seedRestoreFrom) {
         result = await RPCModule.restoreWalletFromSeed(
-          seed_ufvk.toLowerCase(),
+          seedUfvk.toLowerCase(),
           walletBirthday || '0',
           this.state.server.uri,
           this.state.server.chain_name,
         );
       } else {
         result = await RPCModule.restoreWalletFromUfvk(
-          seed_ufvk.toLowerCase(),
+          seedUfvk.toLowerCase(),
           walletBirthday || '0',
           this.state.server.uri,
           this.state.server.chain_name,
         );
       }
 
-      //console.log(seed_ufvk);
+      //console.log(seedUfvk);
       //console.log(result);
       let error = false;
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
