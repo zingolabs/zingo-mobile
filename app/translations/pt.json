@@ -232,7 +232,7 @@
         "text": "Modo Avançado, para usuários mais avançados."
       }
     ],
-    "rescanmenuoptions": [
+    "rescanmenus": [
       {
         "value": true,
         "text": "Ativar/Mostrar a opção de menu para reescanear a carteira."
@@ -271,7 +271,7 @@
     "donation-title": "Dica ZingoLabs",
     "privacy-title": "Alterar entre Privacidade Alta ou Normal",
     "mode-title": "Alterar entre o modo Básico ou Avançado",
-    "rescanmenuoption-title": "A OPÇÃO DE MENU RESCAN",
+    "rescanmenu-title": "A OPÇÃO DE MENU RESCAN",
     "value-currency-": "Sem Saldo",
     "value-currency-USD": "US Dólares",
     "value-language-en": "Inglês",
@@ -290,8 +290,8 @@
     "value-chain_name-main": "Mainnet",
     "value-chain_name-test": "Testnet",
     "value-chain_name-regtest": "Regtest",
-    "value-rescanmenuoption-true": "Habilitar",
-    "value-rescanmenuoption-false": "Desabilitar",
+    "value-rescanmenu-true": "Habilitar",
+    "value-rescanmenu-false": "Desabilitar",
     "security-title": "APLICAR SEGURANÇA DO DISPOSITIVO PARA AS TELAS/OPÇÕES",
     "security-startapp": "Quando o App inicia",
     "security-foregroundapp": "Quando o aplicativo vai para o primeiro plano",

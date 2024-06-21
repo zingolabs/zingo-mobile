@@ -29,9 +29,9 @@ type ShowUfvkProps = {
   onClickOK: () => void;
   onClickCancel: () => void;
   action: UfvkActionEnum;
-  set_privacy_option: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
 };
-const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
+const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, wallet, server, netInfo, mode, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -96,7 +96,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
-        set_privacy_option={set_privacy_option}
+        setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
       />
 

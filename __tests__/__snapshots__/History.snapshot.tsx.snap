@@ -866,10 +866,11 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 }
               }
             >
+              <View />
               <View
                 style={
                   {
-                    "alignItems": "flex-start",
+                    "alignItems": "center",
                     "display": "flex",
                     "flexDirection": "row",
                   }
@@ -890,6 +891,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 <View
                   style={
                     {
+                      "alignItems": "center",
                       "display": "flex",
                       "flexDirection": "row",
                     }
@@ -1151,6 +1153,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 }
               }
             >
+              <View />
               <View
                 style={
                   {
@@ -1175,6 +1178,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 <View
                   style={
                     {
+                      "alignItems": "center",
                       "display": "flex",
                       "flexDirection": "row",
                     }
@@ -1436,6 +1440,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 }
               }
             >
+              <View />
               <View
                 style={
                   {
@@ -1460,6 +1465,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 <View
                   style={
                     {
+                      "alignItems": "center",
                       "display": "flex",
                       "flexDirection": "row",
                     }
@@ -2153,10 +2159,11 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 }
               }
             >
+              <View />
               <View
                 style={
                   {
-                    "alignItems": "flex-start",
+                    "alignItems": "center",
                     "display": "flex",
                     "flexDirection": "row",
                   }
@@ -2177,6 +2184,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 <View
                   style={
                     {
+                      "alignItems": "center",
                       "display": "flex",
                       "flexDirection": "row",
                     }
@@ -2453,6 +2461,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 }
               }
             >
+              <View />
               <View
                 style={
                   {
@@ -2477,6 +2486,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 <View
                   style={
                     {
+                      "alignItems": "center",
                       "display": "flex",
                       "flexDirection": "row",
                     }
@@ -2739,6 +2749,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 }
               }
             >
+              <View />
               <View
                 style={
                   {
@@ -2763,6 +2774,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 <View
                   style={
                     {
+                      "alignItems": "center",
                       "display": "flex",
                       "flexDirection": "row",
                     }

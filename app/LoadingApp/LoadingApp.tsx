@@ -121,7 +121,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   });
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
   const [donationAlert, setDonationAlert] = useState<boolean>(false);
-  const [rescanMenuOption, setRescanMenuOption] = useState<boolean>(false);
+  const [rescanMenu, setRescanMenu] = useState<boolean>(false);
   const file = useMemo(
     () => ({
       en: en,
@@ -243,10 +243,10 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, selectServer);
       }
-      if (settings.rescanMenuOption === true || settings.rescanMenuOption === false) {
-        setRescanMenuOption(settings.rescanMenuOption);
+      if (settings.rescanMenu === true || settings.rescanMenu === false) {
+        setRescanMenu(settings.rescanMenu);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenuOption, rescanMenuOption);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenu, rescanMenu);
       }
 
       // for testing
@@ -295,7 +295,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         security={security}
         selectServer={selectServer}
         donationAlert={donationAlert}
-        rescanMenuOption={rescanMenuOption}
+        rescanMenu={rescanMenu}
       />
     );
   }
@@ -319,7 +319,7 @@ type LoadingAppClassProps = {
   security: SecurityType;
   selectServer: SelectServerEnum;
   donationAlert: boolean;
-  rescanMenuOption: boolean;
+  rescanMenu: boolean;
 };
 
 export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoading> {
@@ -373,7 +373,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       selectServer: props.selectServer,
       // serverErrorTries -> 0 (context).
       donationAlert: props.donationAlert,
-      rescanMenuOption: props.rescanMenuOption,
+      rescanMenu: props.rescanMenu,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -766,7 +766,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
           return;
         }
         // default values for wallet options
-        this.set_wallet_option(WalletOptionEnum.download_memos, DownloadMemosEnum.walletMemos);
+        this.setWalletOption(WalletOptionEnum.download_memos, DownloadMemosEnum.walletMemos);
         // basic mode -> same screen.
         this.setState(state => ({
           wallet,
@@ -874,11 +874,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     });
   };
 
-  set_wallet_option = async (walletOption: string, value: string) => {
+  setWalletOption = async (walletOption: string, value: string) => {
     await RPC.rpc_setWalletSettingOption(walletOption, value);
   };
 
-  set_privacy_option = async (value: boolean): Promise<void> => {
+  setPrivacyOption = async (value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, value);
     this.setState({
       privacy: value as boolean,
@@ -1274,7 +1274,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
                   onClickOK={() => this.navigateToLoadedApp()}
                   onClickCancel={() => this.navigateToLoadedApp()}
                   action={SeedActionEnum.new}
-                  set_privacy_option={this.set_privacy_option}
+                  setPrivacyOption={this.setPrivacyOption}
                 />
               </Suspense>
             </Modal>

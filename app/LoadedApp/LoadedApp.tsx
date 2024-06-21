@@ -139,7 +139,7 @@ export default function LoadedApp(props: LoadedAppProps) {
     restoreWalletBackupScreen: true,
   });
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
-  const [rescanMenuOption, setRescanMenuOption] = useState<boolean>(false);
+  const [rescanMenu, setRescanMenu] = useState<boolean>(false);
   const file = useMemo(
     () => ({
       en: en,
@@ -246,10 +246,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, selectServer);
       }
-      if (settings.rescanMenuOption === true || settings.rescanMenuOption === false) {
-        setRescanMenuOption(settings.rescanMenuOption);
+      if (settings.rescanMenu === true || settings.rescanMenu === false) {
+        setRescanMenu(settings.rescanMenu);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenuOption, rescanMenuOption);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenu, rescanMenu);
       }
 
       // reading background task info
@@ -301,7 +301,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         addressBook={addressBook}
         security={security}
         selectServer={selectServer}
-        rescanMenuOption={rescanMenuOption}
+        rescanMenu={rescanMenu}
       />
     );
   }
@@ -325,7 +325,7 @@ type LoadedAppClassProps = {
   addressBook: AddressBookFileClass[];
   security: SecurityType;
   selectServer: SelectServerEnum;
-  rescanMenuOption: boolean;
+  rescanMenu: boolean;
 };
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
@@ -360,7 +360,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       launchAddressBook: this.launchAddressBook,
       security: props.security,
       selectServer: props.selectServer,
-      rescanMenuOption: props.rescanMenuOption,
+      rescanMenu: props.rescanMenu,
     };
 
     this.rpc = new RPC(
@@ -958,11 +958,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         [
           {
             text: translate('confirm') as string,
-            onPress: async () => await this.set_donation_option(true),
+            onPress: async () => await this.setDonationOption(true),
           },
           {
             text: translate('cancel') as string,
-            onPress: async () => await this.set_donation_option(false),
+            onPress: async () => await this.setDonationOption(false),
             style: 'cancel',
           },
         ],
@@ -1014,14 +1014,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  set_wallet_option = async (walletOption: string, value: string): Promise<void> => {
+  setWalletOption = async (walletOption: string, value: string): Promise<void> => {
     await RPC.rpc_setWalletSettingOption(walletOption, value);
 
     // Refetch the settings updated
     this.rpc.fetchWalletSettings();
   };
 
-  set_server_option = async (value: ServerType, toast: boolean, same_server_chain_name: boolean): Promise<void> => {
+  setServerOption = async (value: ServerType, toast: boolean, same_server_chain_name: boolean): Promise<void> => {
     //console.log(value, same_server_chain_name);
     // here I know the server was changed, clean all the tasks before anything.
     await this.rpc.clearTimers();
@@ -1109,7 +1109,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  set_currency_option = async (value: CurrencyEnum): Promise<void> => {
+  setCurrencyOption = async (value: CurrencyEnum): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, value);
     this.setState({
       currency: value as CurrencyEnum,
@@ -1119,7 +1119,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_language_option = async (value: string, reset: boolean): Promise<void> => {
+  setLanguageOption = async (value: string, reset: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.language, value);
     this.setState({
       language: value as LanguageEnum,
@@ -1132,7 +1132,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  set_sendAll_option = async (value: boolean): Promise<void> => {
+  setSendAllOption = async (value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.sendAll, value);
     this.setState({
       sendAll: value as boolean,
@@ -1142,7 +1142,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_donation_option = async (value: boolean): Promise<void> => {
+  setDonationOption = async (value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.donation, value);
     this.setState({
       donation: value as boolean,
@@ -1152,7 +1152,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_privacy_option = async (value: boolean): Promise<void> => {
+  setPrivacyOption = async (value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, value);
     this.setState({
       privacy: value as boolean,
@@ -1162,7 +1162,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_mode_option = async (value: string): Promise<void> => {
+  setModeOption = async (value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, value);
     this.setState({
       mode: value as ModeEnum,
@@ -1176,7 +1176,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_security_option = async (value: SecurityType): Promise<void> => {
+  setSecurityOption = async (value: SecurityType): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.security, value);
     this.setState({
       security: value as SecurityType,
@@ -1186,7 +1186,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_selectServer_option = async (value: string): Promise<void> => {
+  setSelectServerOption = async (value: string): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, value);
     this.setState({
       selectServer: value as SelectServerEnum,
@@ -1196,10 +1196,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_rescanMenuOption_option = async (value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenuOption, value);
+  setRescanMenuOption = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenu, value);
     this.setState({
-      rescanMenuOption: value as boolean,
+      rescanMenu: value as boolean,
     });
 
     // Refetch the settings to update
@@ -1211,7 +1211,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
-      await this.set_mode_option(ModeEnum.advanced);
+      await this.setModeOption(ModeEnum.advanced);
     }
     navigation.reset({
       index: 0,
@@ -1504,7 +1504,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               }>
               <Pools
                 closeModal={() => this.setState({ poolsModalVisible: false })}
-                set_privacy_option={this.set_privacy_option}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1523,7 +1523,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               <Insight
                 closeModal={() => this.setState({ insightModalVisible: false })}
                 openModal={() => this.setState({ insightModalVisible: true })}
-                set_privacy_option={this.set_privacy_option}
+                setPrivacyOption={this.setPrivacyOption}
                 setSendPageState={this.setSendPageState}
               />
             </Suspense>
@@ -1557,17 +1557,17 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               }>
               <Settings
                 closeModal={() => this.setState({ settingsModalVisible: false })}
-                set_wallet_option={this.set_wallet_option}
-                set_server_option={this.set_server_option}
-                set_currency_option={this.set_currency_option}
-                set_language_option={this.set_language_option}
-                set_sendAll_option={this.set_sendAll_option}
-                set_donation_option={this.set_donation_option}
-                set_privacy_option={this.set_privacy_option}
-                set_mode_option={this.set_mode_option}
-                set_security_option={this.set_security_option}
-                set_selectServer_option={this.set_selectServer_option}
-                set_rescanMenuOption_option={this.set_rescanMenuOption_option}
+                setWalletOption={this.setWalletOption}
+                setServerOption={this.setServerOption}
+                setCurrencyOption={this.setCurrencyOption}
+                setLanguageOption={this.setLanguageOption}
+                setSendAllOption={this.setSendAllOption}
+                setDonationOption={this.setDonationOption}
+                setPrivacyOption={this.setPrivacyOption}
+                setModeOption={this.setModeOption}
+                setSecurityOption={this.setSecurityOption}
+                setSelectServerOption={this.setSelectServerOption}
+                setRescanMenuOption={this.setRescanMenuOption}
               />
             </Suspense>
           </Modal>
@@ -1587,7 +1587,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 onClickOK={() => this.setState({ seedViewModalVisible: false })}
                 onClickCancel={() => this.setState({ seedViewModalVisible: false })}
                 action={SeedActionEnum.view}
-                set_privacy_option={this.set_privacy_option}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1607,7 +1607,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
                 action={SeedActionEnum.change}
-                set_privacy_option={this.set_privacy_option}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1627,7 +1627,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
                 action={SeedActionEnum.backup}
-                set_privacy_option={this.set_privacy_option}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1651,7 +1651,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   this.setState({ seedServerModalVisible: false });
                 }}
                 action={SeedActionEnum.server}
-                set_privacy_option={this.set_privacy_option}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1671,7 +1671,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 onClickOK={() => this.setState({ ufvkViewModalVisible: false })}
                 onClickCancel={() => this.setState({ ufvkViewModalVisible: false })}
                 action={UfvkActionEnum.view}
-                set_privacy_option={this.set_privacy_option}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1691,7 +1691,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ ufvkChangeModalVisible: false })}
                 action={UfvkActionEnum.change}
-                set_privacy_option={this.set_privacy_option}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1711,7 +1711,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                 onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ ufvkBackupModalVisible: false })}
                 action={UfvkActionEnum.backup}
-                set_privacy_option={this.set_privacy_option}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1735,7 +1735,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   this.setState({ ufvkServerModalVisible: false });
                 }}
                 action={UfvkActionEnum.server}
-                set_privacy_option={this.set_privacy_option}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1825,7 +1825,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                         poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                         setZecPrice={this.setZecPrice}
                         setComputingModalVisible={this.setComputingModalVisible}
-                        set_privacy_option={this.set_privacy_option}
+                        setPrivacyOption={this.setPrivacyOption}
                         setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
                         setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
@@ -1838,7 +1838,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                         poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                         setZecPrice={this.setZecPrice}
                         setComputingModalVisible={this.setComputingModalVisible}
-                        set_privacy_option={this.set_privacy_option}
+                        setPrivacyOption={this.setPrivacyOption}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                         setSendPageState={this.setSendPageState}
                         setShieldingAmount={this.setShieldingAmount}
@@ -1868,7 +1868,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                             poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                             setZecPrice={this.setZecPrice}
                             setComputingModalVisible={this.setComputingModalVisible}
-                            set_privacy_option={this.set_privacy_option}
+                            setPrivacyOption={this.setPrivacyOption}
                             setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
                             setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
                           />*/}
@@ -1882,7 +1882,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                             poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                             setZecPrice={this.setZecPrice}
                             setComputingModalVisible={this.setComputingModalVisible}
-                            set_privacy_option={this.set_privacy_option}
+                            setPrivacyOption={this.setPrivacyOption}
                             setShieldingAmount={this.setShieldingAmount}
                           />
                         </Suspense>
@@ -1903,7 +1903,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                         setUaAddress={this.setUaAddress}
                         toggleMenuDrawer={this.toggleMenuDrawer}
                         syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        set_privacy_option={this.set_privacy_option}
+                        setPrivacyOption={this.setPrivacyOption}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                       />
                     </Suspense>
@@ -1935,7 +1935,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                         setUaAddress={this.setUaAddress}
                         toggleMenuDrawer={this.toggleMenuDrawer}
                         syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        set_privacy_option={this.set_privacy_option}
+                        setPrivacyOption={this.setPrivacyOption}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                       />
                     </Suspense>

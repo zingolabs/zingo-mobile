@@ -58,7 +58,7 @@ describe('Component Pools - test', () => {
   test('Pools - snapshot', () => {
     const pools = render(
       <ContextAppLoadedProvider value={state}>
-        <Pools closeModal={onClose} set_privacy_option={onClose} />
+        <Pools closeModal={onClose} setPrivacyOption={onClose} />
       </ContextAppLoadedProvider>,
     );
     expect(pools.toJSON()).toMatchSnapshot();

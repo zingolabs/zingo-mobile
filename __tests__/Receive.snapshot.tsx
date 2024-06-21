@@ -85,7 +85,7 @@ describe('Component Receive - test', () => {
         <Receive
           setUaAddress={onFunction}
           toggleMenuDrawer={onFunction}
-          set_privacy_option={onFunction}
+          setPrivacyOption={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
         />
       </ContextAppLoadedProvider>,

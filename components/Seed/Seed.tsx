@@ -53,9 +53,9 @@ type SeedProps = {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
   action: SeedActionEnum;
-  set_privacy_option: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
 };
-const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
+const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, setPrivacyOption }) => {
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
   let wallet: WalletType,
@@ -273,7 +273,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             noBalance={true}
             noSyncingStatus={true}
             noDrawMenu={true}
-            set_privacy_option={set_privacy_option}
+            setPrivacyOption={setPrivacyOption}
             translate={translate}
             netInfo={netInfo}
             mode={mode}

@@ -136,7 +136,7 @@ export default interface AppStateLoaded {
   addressBookOpenPriorModal: () => void;
   security: SecurityType;
   selectServer: SelectServerEnum;
-  rescanMenuOption: boolean;
+  rescanMenu: boolean;
 
   shieldingAmount: number;
 

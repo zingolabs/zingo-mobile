@@ -40,17 +40,17 @@ import RNPickerSelect from 'react-native-picker-select';
 
 type SettingsProps = {
   closeModal: () => void;
-  set_wallet_option: (walletOption: string, value: string) => Promise<void>;
-  set_server_option: (value: ServerType, toast: boolean, same_server_chain_name: boolean) => Promise<void>;
-  set_currency_option: (value: CurrencyEnum) => Promise<void>;
-  set_language_option: (value: LanguageEnum, reset: boolean) => Promise<void>;
-  set_sendAll_option: (value: boolean) => Promise<void>;
-  set_donation_option: (value: boolean) => Promise<void>;
-  set_privacy_option: (value: boolean) => Promise<void>;
-  set_mode_option: (value: string) => Promise<void>;
-  set_security_option: (value: SecurityType) => Promise<void>;
-  set_selectServer_option: (value: string) => Promise<void>;
-  set_rescanMenuOption_option: (value: boolean) => Promise<void>;
+  setWalletOption: (walletOption: string, value: string) => Promise<void>;
+  setServerOption: (value: ServerType, toast: boolean, same_server_chain_name: boolean) => Promise<void>;
+  setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
+  setLanguageOption: (value: LanguageEnum, reset: boolean) => Promise<void>;
+  setSendAllOption: (value: boolean) => Promise<void>;
+  setDonationOption: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
+  setModeOption: (value: string) => Promise<void>;
+  setSecurityOption: (value: SecurityType) => Promise<void>;
+  setSelectServerOption: (value: string) => Promise<void>;
+  setRescanMenuOption: (value: boolean) => Promise<void>;
 };
 
 type Options = {
@@ -59,17 +59,17 @@ type Options = {
 };
 
 const Settings: React.FunctionComponent<SettingsProps> = ({
-  set_wallet_option,
-  set_server_option,
-  set_currency_option,
-  set_language_option,
-  set_sendAll_option,
-  set_donation_option,
-  set_privacy_option,
-  set_mode_option,
-  set_security_option,
-  set_selectServer_option,
-  set_rescanMenuOption_option,
+  setWalletOption,
+  setServerOption,
+  setCurrencyOption,
+  setLanguageOption,
+  setSendAllOption,
+  setDonationOption,
+  setPrivacyOption,
+  setModeOption,
+  setSecurityOption,
+  setSelectServerOption,
+  setRescanMenuOption,
   closeModal,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -87,7 +87,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     addLastSnackbar,
     security: securityContext,
     selectServer: selectServerContext,
-    rescanMenuOption: rescanMenuOptionContext,
+    rescanMenu: rescanMenuContext,
     readOnly,
   } = context;
 
@@ -134,10 +134,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     MODES = modesArray as Options[];
   }
 
-  const rescanMenuOptionsArray = translate('settings.rescanmenuoptions');
-  let RESCANMENUOPTION: Options[] = [];
-  if (typeof rescanMenuOptionsArray === 'object') {
-    RESCANMENUOPTION = rescanMenuOptionsArray as Options[];
+  const rescanMenusArray = translate('settings.rescanmenus');
+  let RESCANMENU: Options[] = [];
+  if (typeof rescanMenusArray === 'object') {
+    RESCANMENU = rescanMenusArray as Options[];
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -170,7 +170,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     securityContext.restoreWalletBackupScreen,
   );
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(selectServerContext);
-  const [rescanMenuOption, setRescanMenuOption] = useState<boolean>(rescanMenuOptionContext);
+  const [rescanMenu, setRescanMenu] = useState<boolean>(rescanMenuContext);
 
   const [customIcon, setCustomIcon] = useState<IconDefinition>(farCircle);
   const [autoIcon, setAutoIcon] = useState<IconDefinition>(farCircle);
@@ -271,7 +271,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       modeContext === mode &&
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer &&
-      rescanMenuOptionContext === rescanMenuOption
+      rescanMenuContext === rescanMenu
     ) {
       addLastSnackbar({ message: translate('settings.nochanges') as string });
       return;
@@ -337,7 +337,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         }
         // in this point the sync process is blocked, who knows why.
         // if I save the actual server before the customization... is going to work.
-        set_server_option(serverContext, false, same_server_chain_name);
+        setServerOption(serverContext, false, same_server_chain_name);
         setDisabled(false);
         return;
       } else {
@@ -350,43 +350,43 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
 
     if (walletSettings.download_memos !== memos) {
-      await set_wallet_option(WalletOptionEnum.download_memos, memos);
+      await setWalletOption(WalletOptionEnum.download_memos, memos);
     }
     if (walletSettings.transaction_filter_threshold !== filter) {
-      await set_wallet_option(WalletOptionEnum.transaction_filter_threshold, filter);
+      await setWalletOption(WalletOptionEnum.transaction_filter_threshold, filter);
     }
     if (currencyContext !== currency) {
-      await set_currency_option(currency);
+      await setCurrencyOption(currency);
     }
     if (sendAllContext !== sendAll) {
-      await set_sendAll_option(sendAll);
+      await setSendAllOption(sendAll);
     }
     if (donationContext !== donation) {
-      await set_donation_option(donation);
+      await setDonationOption(donation);
     }
     if (privacyContext !== privacy) {
-      await set_privacy_option(privacy);
+      await setPrivacyOption(privacy);
     }
     if (modeContext !== mode) {
-      await set_mode_option(mode);
+      await setModeOption(mode);
     }
     if (!isEqual(securityContext, securityObject())) {
-      await set_security_option(securityObject());
+      await setSecurityOption(securityObject());
     }
     if (selectServerContext !== selectServer) {
-      await set_selectServer_option(selectServer);
+      await setSelectServerOption(selectServer);
     }
-    if (rescanMenuOptionContext !== rescanMenuOption) {
-      await set_rescanMenuOption_option(rescanMenuOption);
+    if (rescanMenuContext !== rescanMenu) {
+      await setRescanMenuOption(rescanMenu);
     }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
     if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== chain_nameParsed) {
       if (languageContext !== language) {
-        await set_language_option(language, false);
+        await setLanguageOption(language, false);
       }
-      set_server_option(
+      setServerOption(
         { uri: serverUriParsed, chain_name: chain_nameParsed } as ServerType,
         true,
         same_server_chain_name,
@@ -394,7 +394,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       ms = 1500;
     } else {
       if (languageContext !== language) {
-        await set_language_option(language, true);
+        await setLanguageOption(language, true);
       }
     }
 
@@ -596,16 +596,16 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             )}
 
             <View style={{ display: 'flex', margin: 10 }}>
-              <BoldText>{translate('settings.rescanmenuoption-title') as string}</BoldText>
+              <BoldText>{translate('settings.rescanmenu-title') as string}</BoldText>
             </View>
 
             <View style={{ display: 'flex', marginLeft: 25 }}>
               {optionsRadio(
-                RESCANMENUOPTION,
-                setRescanMenuOption as React.Dispatch<React.SetStateAction<string | boolean>>,
+                RESCANMENU,
+                setRescanMenu as React.Dispatch<React.SetStateAction<string | boolean>>,
                 Boolean,
-                rescanMenuOption,
-                'rescanmenuoption',
+                rescanMenu,
+                'rescanmenu',
               )}
             </View>
 

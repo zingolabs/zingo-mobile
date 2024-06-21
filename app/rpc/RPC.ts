@@ -1333,7 +1333,7 @@ export default class RPC {
             currentTxList[0].zec_price = tx.price;
           }
 
-          if (tx.txid.startsWith('b3962e572c359b453f27921d9371fcd4e1b1f95b7879117439d0f931fc50600f')) {
+          if (tx.txid.startsWith('4779ccbe')) {
             console.log('tran: ', tx);
             console.log('--------------------------------------------------');
           }

@@ -72,7 +72,7 @@ type SendProps = {
   syncingStatusMoreInfoOnClick: () => void;
   poolsMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
-  set_privacy_option: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
   setShieldingAmount: (value: number) => void;
   //setPoolsToShieldSelectSapling: (v: boolean) => void;
   //setPoolsToShieldSelectTransparent: (v: boolean) => void;
@@ -88,7 +88,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   syncingStatusMoreInfoOnClick,
   poolsMoreInfoOnClick,
   setZecPrice,
-  set_privacy_option,
+  setPrivacyOption,
   setShieldingAmount,
   //setPoolsToShieldSelectSapling,
   //setPoolsToShieldSelectTransparent,
@@ -882,7 +882,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             title={translate('send.title') as string}
             setComputingModalVisible={setComputingModalVisible}
             setBackgroundError={setBackgroundError}
-            set_privacy_option={set_privacy_option}
+            setPrivacyOption={setPrivacyOption}
             //setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
             //setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
             addLastSnackbar={addLastSnackbar}

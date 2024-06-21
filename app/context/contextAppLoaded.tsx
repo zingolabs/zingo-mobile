@@ -105,7 +105,7 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   addressBookOpenPriorModal: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
-  rescanMenuOption: false,
+  rescanMenu: false,
   shieldingAmount: 0,
 };
 

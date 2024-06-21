@@ -24,7 +24,7 @@ type HistoryProps = {
   syncingStatusMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
-  set_privacy_option: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
   //setPoolsToShieldSelectSapling: (v: boolean) => void;
   //setPoolsToShieldSelectTransparent: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
@@ -39,7 +39,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   syncingStatusMoreInfoOnClick,
   setZecPrice,
   setComputingModalVisible,
-  set_privacy_option,
+  setPrivacyOption,
   //setPoolsToShieldSelectSapling,
   //setPoolsToShieldSelectTransparent,
   setUfvkViewModalVisible,
@@ -93,7 +93,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           tx={txDetail}
           closeModal={() => setTxDetailModalShowing(false)}
           openModal={() => setTxDetailModalShowing(true)}
-          set_privacy_option={set_privacy_option}
+          setPrivacyOption={setPrivacyOption}
           setSendPageState={setSendPageState}
         />
       </Modal>
@@ -107,7 +107,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         title={translate('history.title') as string}
         setComputingModalVisible={setComputingModalVisible}
         setBackgroundError={setBackgroundError}
-        set_privacy_option={set_privacy_option}
+        setPrivacyOption={setPrivacyOption}
         //setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
         //setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
         setUfvkViewModalVisible={setUfvkViewModalVisible}

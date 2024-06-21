@@ -41,14 +41,14 @@ type TxDetailProps = {
   tx: TransactionType;
   closeModal: () => void;
   openModal: () => void;
-  set_privacy_option: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
   setSendPageState: (s: SendPageStateClass) => void;
 };
 
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({
   tx,
   closeModal,
-  set_privacy_option,
+  setPrivacyOption,
   openModal,
   setSendPageState,
 }) => {
@@ -111,7 +111,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
-        set_privacy_option={set_privacy_option}
+        setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
       />
       <ScrollView

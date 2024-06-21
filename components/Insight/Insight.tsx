@@ -82,13 +82,13 @@ const getPercent = (percent: number) => {
 type InsightProps = {
   closeModal: () => void;
   openModal: () => void;
-  set_privacy_option: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
   setSendPageState: (s: SendPageStateClass) => void;
 };
 
 const Insight: React.FunctionComponent<InsightProps> = ({
   closeModal,
-  set_privacy_option,
+  setPrivacyOption,
   openModal,
   setSendPageState,
 }) => {
@@ -286,7 +286,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
-        set_privacy_option={set_privacy_option}
+        setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
       />
 

@@ -232,7 +232,7 @@
         "text": "Расширенный режим для продвинутых пользователей."
       }
     ],
-    "rescanmenuoptions": [
+    "rescanmenus": [
       {
         "value": true,
         "text": "Включить/Показать пункт меню для повторного сканирования кошелька."
@@ -271,7 +271,7 @@
     "donation-title": "Поддержать ZingoLabs",
     "privacy-title": "Переключение между высоким или обычным режимом конфиденциальности",
     "mode-title": "Переключение между основным или расширенным режимом",
-    "rescanmenuoption-title": "ОТПРАВЛЕНИЕ РЕШЕНУ",
+    "rescanmenu-title": "ОТПРАВЛЕНИЕ РЕШЕНУ",
     "value-currency-": "Без указания валюты",
     "value-currency-USD": "Доллар США",
     "value-language-en": "Английский",
@@ -290,8 +290,8 @@
     "value-chain_name-main": "Основная сеть",
     "value-chain_name-test": "Тестовая сеть",
     "value-chain_name-regtest": "Регтест",
-    "value-rescanmenuoption-true": "Включить",
-    "value-rescanmenuoption-false": "Отключить",
+    "value-rescanmenu-true": "Включить",
+    "value-rescanmenu-false": "Отключить",
     "security-title": "ПРИМЕНИТЬ ЗАЩИТУ ДЛЯ ЭКРАНОВ И ОПЦИЙ УСТРОЙСТВА",
     "security-startapp": "При запуске приложения",
     "security-foregroundapp": "Когда приложение переходит в активный режим",

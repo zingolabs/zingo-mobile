@@ -1300,7 +1300,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "opacity": 1,
               }
             }
-            testID="settings.rescanmenuoption-true"
+            testID="settings.rescanmenu-true"
           >
             <View
               style={
@@ -1407,7 +1407,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 "opacity": 1,
               }
             }
-            testID="settings.rescanmenuoption-false"
+            testID="settings.rescanmenu-false"
           >
             <View
               style={

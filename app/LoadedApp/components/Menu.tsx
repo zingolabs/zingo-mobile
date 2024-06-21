@@ -22,7 +22,7 @@ type MenuProps = {
 
 const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuState }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly, mode, transactions, addLastSnackbar, security, language, rescanMenuOption } = context;
+  const { translate, readOnly, mode, transactions, addLastSnackbar, security, language, rescanMenu } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -118,7 +118,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
             </RegText>
           )}
 
-          {mode !== ModeEnum.basic && rescanMenuOption && (
+          {mode !== ModeEnum.basic && rescanMenu && (
             <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.Rescan)} style={item}>
               {translate('loadedapp.rescanwallet') as string}
             </RegText>

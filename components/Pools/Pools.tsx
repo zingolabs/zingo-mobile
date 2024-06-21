@@ -22,10 +22,10 @@ import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
 
 type PoolsProps = {
   closeModal: () => void;
-  set_privacy_option: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
 };
 
-const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_option }) => {
+const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
   const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -52,7 +52,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
-        set_privacy_option={set_privacy_option}
+        setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
       />
 

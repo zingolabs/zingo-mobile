@@ -76,7 +76,7 @@ describe('Component Seed - test', () => {
   test('Seed View - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.view} set_privacy_option={jest.fn()} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.view} setPrivacyOption={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -84,7 +84,7 @@ describe('Component Seed - test', () => {
   test('Seed Change - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.change} set_privacy_option={jest.fn()} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.change} setPrivacyOption={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -92,7 +92,7 @@ describe('Component Seed - test', () => {
   test('Seed Server - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.server} set_privacy_option={jest.fn()} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.server} setPrivacyOption={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -100,7 +100,7 @@ describe('Component Seed - test', () => {
   test('Seed Backup - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.backup} set_privacy_option={jest.fn()} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.backup} setPrivacyOption={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -129,7 +129,7 @@ describe('Component Seed - test', () => {
   test('Seed New - snapshot', () => {
     const seed = render(
       <ContextAppLoadingProvider value={stateLoading}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.new} set_privacy_option={jest.fn()} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.new} setPrivacyOption={jest.fn()} />
       </ContextAppLoadingProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -137,12 +137,7 @@ describe('Component Seed - test', () => {
   test('Seed Restore - snapshot', () => {
     const seed = render(
       <ContextAppLoadingProvider value={stateLoading}>
-        <Seed
-          onClickOK={onOk}
-          onClickCancel={onCancel}
-          action={SeedActionEnum.restore}
-          set_privacy_option={jest.fn()}
-        />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.restore} setPrivacyOption={jest.fn()} />
       </ContextAppLoadingProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();

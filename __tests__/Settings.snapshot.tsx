@@ -120,7 +120,7 @@ describe('Component Settings - test', () => {
         },
       ];
     }
-    if (p === 'settings.rescanmenuoptions') {
+    if (p === 'settings.rescanmenus') {
       return [
         {
           value: true,
@@ -140,7 +140,7 @@ describe('Component Settings - test', () => {
   state.currency = CurrencyEnum.USDCurrency;
   state.language = LanguageEnum.en;
   state.sendAll = false;
-  state.rescanMenuOption = false;
+  state.rescanMenu = false;
   state.donation = false;
   state.walletSettings.download_memos = DownloadMemosEnum.walletMemos;
   state.walletSettings.transaction_filter_threshold = '500';
@@ -151,17 +151,17 @@ describe('Component Settings - test', () => {
       <ContextAppLoadedProvider value={state}>
         <Settings
           closeModal={onClose}
-          set_wallet_option={onSetOption}
-          set_server_option={onSetOption}
-          set_currency_option={onSetOption}
-          set_language_option={onSetOption}
-          set_sendAll_option={onSetOption}
-          set_donation_option={onSetOption}
-          set_privacy_option={onSetOption}
-          set_mode_option={onSetOption}
-          set_security_option={onSetOption}
-          set_selectServer_option={onSetOption}
-          set_rescanMenuOption_option={onSetOption}
+          setWalletOption={onSetOption}
+          setServerOption={onSetOption}
+          setCurrencyOption={onSetOption}
+          setLanguageOption={onSetOption}
+          setSendAllOption={onSetOption}
+          setDonationOption={onSetOption}
+          setPrivacyOption={onSetOption}
+          setModeOption={onSetOption}
+          setSecurityOption={onSetOption}
+          setSelectServerOption={onSetOption}
+          setRescanMenuOption={onSetOption}
         />
       </ContextAppLoadedProvider>,
     );

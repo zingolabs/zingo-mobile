@@ -117,7 +117,7 @@ describe('Component History TxDetail - test', () => {
           tx={tx}
           closeModal={onClose}
           openModal={onClose}
-          set_privacy_option={onSetOption}
+          setPrivacyOption={onSetOption}
           setSendPageState={onClose}
         />
       </ContextAppLoadedProvider>,
@@ -156,7 +156,7 @@ describe('Component History TxDetail - test', () => {
           tx={txSelfSend}
           closeModal={onClose}
           openModal={onClose}
-          set_privacy_option={onSetOption}
+          setPrivacyOption={onSetOption}
           setSendPageState={onClose}
         />
       </ContextAppLoadedProvider>,
@@ -197,7 +197,7 @@ describe('Component History TxDetail - test', () => {
           tx={txSelfSend}
           closeModal={onClose}
           openModal={onClose}
-          set_privacy_option={onSetOption}
+          setPrivacyOption={onSetOption}
           setSendPageState={onClose}
         />
       </ContextAppLoadedProvider>,

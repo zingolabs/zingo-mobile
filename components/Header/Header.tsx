@@ -66,7 +66,7 @@ type HeaderProps = {
   setComputingModalVisible?: (visible: boolean) => void;
   setBackgroundError?: (title: string, error: string) => void;
   noPrivacy?: boolean;
-  set_privacy_option?: (value: boolean) => Promise<void>;
+  setPrivacyOption?: (value: boolean) => Promise<void>;
   //setPoolsToShieldSelectSapling?: (v: boolean) => void;
   //setPoolsToShieldSelectTransparent?: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
@@ -91,7 +91,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setComputingModalVisible,
   setBackgroundError,
   noPrivacy,
-  set_privacy_option,
+  setPrivacyOption,
   //setPoolsToShieldSelectSapling,
   //setPoolsToShieldSelectTransparent,
   setUfvkViewModalVisible,
@@ -609,7 +609,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             )}
           </>
         )}
-        {mode !== ModeEnum.basic && !noPrivacy && set_privacy_option && addLastSnackbar && (
+        {mode !== ModeEnum.basic && !noPrivacy && setPrivacyOption && addLastSnackbar && (
           <TouchableOpacity
             style={{ marginHorizontal: 5 }}
             onPress={() => {
@@ -621,7 +621,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         translate('change-privacy-legend')) as string)
                 }`,
               });
-              set_privacy_option(!privacy);
+              setPrivacyOption(!privacy);
             }}>
             <View
               style={{
