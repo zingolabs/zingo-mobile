@@ -352,7 +352,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       mode: props.mode,
       background: props.background,
       readOnly: props.readOnly,
-      appState: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
+      appStateStatus: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
       setBackgroundError: this.setBackgroundError,
       addLastSnackbar: this.addLastSnackbar,
       restartApp: this.navigateToLoadingApp,
@@ -392,14 +392,17 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       //console.log('LOADED', 'prior', this.state.appState, 'next', nextAppState);
       if (Platform.OS === GlobalConst.platformOSios) {
         if (
-          (this.state.appState === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.active) ||
-          (this.state.appState === AppStateStatusEnum.active && nextAppState === AppStateStatusEnum.inactive)
+          (this.state.appStateStatus === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.active) ||
+          (this.state.appStateStatus === AppStateStatusEnum.active && nextAppState === AppStateStatusEnum.inactive)
         ) {
           //console.log('LOADED SAVED IOS do nothing', nextAppState);
-          this.setState({ appState: nextAppState });
+          this.setState({ appStateStatus: nextAppState });
           return;
         }
-        if (this.state.appState === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.background) {
+        if (
+          this.state.appStateStatus === AppStateStatusEnum.inactive &&
+          nextAppState === AppStateStatusEnum.background
+        ) {
           //console.log('App LOADED IOS is gone to the background!');
           // re-activate the interruption sync flag
           await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
@@ -412,19 +415,19 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           this.setSyncingStatus(new SyncingStatusClass());
           //console.log('clear sync status state');
           //console.log('LOADED SAVED IOS background', nextAppState);
-          this.setState({ appState: nextAppState });
+          this.setState({ appStateStatus: nextAppState });
           return;
         }
       }
       if (
-        (this.state.appState === AppStateStatusEnum.inactive ||
-          this.state.appState === AppStateStatusEnum.background) &&
+        (this.state.appStateStatus === AppStateStatusEnum.inactive ||
+          this.state.appStateStatus === AppStateStatusEnum.background) &&
         nextAppState === AppStateStatusEnum.active
       ) {
         console.log('App LOADED Android & IOS has come to the foreground!');
         if (Platform.OS === GlobalConst.platformOSios) {
           //console.log('LOADED SAVED IOS foreground', nextAppState);
-          this.setState({ appState: nextAppState });
+          this.setState({ appStateStatus: nextAppState });
         }
         // (PIN or TouchID or FaceID)
         const resultBio = this.state.security.foregroundApp
@@ -451,7 +454,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           }
         }
       } else if (
-        this.state.appState === AppStateStatusEnum.active &&
+        this.state.appStateStatus === AppStateStatusEnum.active &&
         (nextAppState === AppStateStatusEnum.inactive || nextAppState === AppStateStatusEnum.background)
       ) {
         console.log('App LOADED is gone to the background!');
@@ -467,20 +470,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         //console.log('clear sync status state');
         if (Platform.OS === GlobalConst.platformOSios) {
           //console.log('LOADED SAVED IOS background', nextAppState);
-          this.setState({ appState: nextAppState });
+          this.setState({ appStateStatus: nextAppState });
         }
       } else {
         if (Platform.OS === GlobalConst.platformOSios) {
-          if (this.state.appState !== nextAppState) {
+          if (this.state.appStateStatus !== nextAppState) {
             //console.log('LOADED SAVED IOS', nextAppState);
-            this.setState({ appState: nextAppState });
+            this.setState({ appStateStatus: nextAppState });
           }
         }
       }
       if (Platform.OS === GlobalConst.platformOSandroid) {
-        if (this.state.appState !== nextAppState) {
+        if (this.state.appStateStatus !== nextAppState) {
           //console.log('LOADED SAVED Android', nextAppState);
-          this.setState({ appState: nextAppState });
+          this.setState({ appStateStatus: nextAppState });
         }
       }
     });

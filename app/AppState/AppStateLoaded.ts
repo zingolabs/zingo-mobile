@@ -32,7 +32,7 @@ import { AppStateStatus } from 'react-native';
 export default interface AppStateLoaded {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  appState: AppStateStatus;
+  appStateStatus: AppStateStatus;
   netInfo: NetInfoType;
 
   // The total confirmed and pending balance in this wallet

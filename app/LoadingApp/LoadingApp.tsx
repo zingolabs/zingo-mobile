@@ -354,7 +354,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       privacy: props.privacy,
       mode: props.mode,
       background: props.background,
-      appState: AppState.currentState,
+      appStateStatus: AppState.currentState,
       setBackgroundError: this.setBackgroundError,
       netInfo: netInfo,
       actionButtonsDisabled: !netInfo.isConnected ? true : false,
@@ -527,8 +527,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
     this.appstate = AppState.addEventListener(EventListenerEnum.change, async nextAppState => {
       //console.log('LOADING', 'next', nextAppState, 'prior', this.state.appState);
       if (
-        (this.state.appState === AppStateStatusEnum.inactive ||
-          this.state.appState === AppStateStatusEnum.background) &&
+        (this.state.appStateStatus === AppStateStatusEnum.inactive ||
+          this.state.appStateStatus === AppStateStatusEnum.background) &&
         nextAppState === AppStateStatusEnum.active
       ) {
         console.log('App LOADING has come to the foreground!');
@@ -543,13 +543,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, AppStateLoa
       }
       if (
         (nextAppState === AppStateStatusEnum.inactive || nextAppState === AppStateStatusEnum.background) &&
-        this.state.appState === AppStateStatusEnum.active
+        this.state.appStateStatus === AppStateStatusEnum.active
       ) {
         console.log('App LOADING is gone to the background!');
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
       }
-      this.setState({ appState: nextAppState });
+      this.setState({ appStateStatus: nextAppState });
     });
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(state => {

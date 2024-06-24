@@ -24,7 +24,7 @@ import {
 export const defaultAppStateLoading: AppStateLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
   route: {} as StackScreenProps<any>['route'],
-  appState: AppStateStatusEnum.unknown,
+  appStateStatus: AppStateStatusEnum.unknown,
   netInfo: {} as NetInfoType,
 
   screen: 0,
