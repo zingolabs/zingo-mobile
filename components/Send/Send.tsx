@@ -1068,7 +1068,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             sendPageState.toaddr.to,
                             sendPageState.toaddr.memo,
                             sendPageState.toaddr.includeUAMemo,
-                            donation ? CommandEnum.send : CommandEnum.sendall,
+                            CommandEnum.sendall,
                           );
                           //setSendAllClick(true);
                           //setTimeout(() => {

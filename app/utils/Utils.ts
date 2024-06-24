@@ -171,9 +171,9 @@ export default class Utils {
 
   static getBlockExplorerTxIDURL(txid: string, chainName: ChainNameEnum): string {
     if (chainName === ChainNameEnum.testChainName) {
-      return `https://blockexplorer.one/zcash/testnet/tx/${txid}`;
+      return `https://testnet.zcashexplorer.app/transactions/${txid}`;
     } else {
-      return `https://3xpl.com/zcash/transaction/${txid}`;
+      return `https://mainnet.zcashexplorer.app/transactions/${txid}`;
     }
   }
 
