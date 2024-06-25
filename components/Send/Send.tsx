@@ -216,24 +216,45 @@ const Send: React.FunctionComponent<SendProps> = ({
         defaultValueFee();
         return;
       }
-      const sendPageStateCalculateFee = new SendPageStateClass(new ToAddrClass(0));
-      sendPageStateCalculateFee.toaddr.to = address;
-      sendPageStateCalculateFee.toaddr.memo = memo;
-      sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemo;
-      sendPageStateCalculateFee.toaddr.amount = amount;
 
-      const sendJson = await Utils.getSendManyJSON(
-        sendPageStateCalculateFee,
-        uaAddress,
-        addresses,
-        server,
-        donation,
-        translate,
-      );
+      let sendJson;
+
+      if (command === CommandEnum.send) {
+        const sendPageStateCalculateFee = new SendPageStateClass(new ToAddrClass(0));
+        sendPageStateCalculateFee.toaddr.to = address;
+        sendPageStateCalculateFee.toaddr.memo = memo;
+        sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemo;
+        sendPageStateCalculateFee.toaddr.amount = amount;
+
+        sendJson = await Utils.getSendManyJSON(
+          sendPageStateCalculateFee,
+          uaAddress,
+          addresses,
+          server,
+          donation,
+          translate,
+        );
+        console.log('SEND', sendJson);
+      }
+
+      let sendallJson;
+
+      if (command === CommandEnum.sendall) {
+        let zenniesForZingo = sendToSelf || donationAddress ? false : donation;
+        if (memo) {
+          sendallJson = { address, memo, zennies_for_zingo: zenniesForZingo };
+        } else {
+          sendallJson = { address, zennies_for_zingo: zenniesForZingo };
+        }
+        console.log('SENDALL', sendallJson);
+      }
+
       // fee
       let proposeFee = 0;
-      const runProposeStr = await runSendPropose(JSON.stringify(sendJson), command);
-      console.log(sendJson);
+      const runProposeStr = await runSendPropose(
+        JSON.stringify(command === CommandEnum.send ? sendJson : sendallJson),
+        command,
+      );
       if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
         console.log(runProposeStr);
@@ -254,19 +275,18 @@ const Send: React.FunctionComponent<SendProps> = ({
             //Alert.alert('Calculating the FEE', runProposeJson.error);
           } else {
             if (runProposeJson.fee) {
-              console.log(runProposeJson.fee);
+              console.log('FEE', runProposeJson.fee);
               proposeFee = runProposeJson.fee / 10 ** 8;
               setProposeSendLastError('');
             }
             if (runProposeJson.amount) {
-              console.log(runProposeJson.amount);
-              updateToField(
-                null,
-                Utils.parseNumberFloatToStringLocale(runProposeJson.amount / 10 ** 8, 8),
-                null,
-                null,
-                null,
-              );
+              const newAmount =
+                runProposeJson.amount / 10 ** 8 -
+                (donation && !sendToSelf && !donationAddress
+                  ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+                  : 0);
+              console.log('AMOUNT', newAmount);
+              updateToField(null, Utils.parseNumberFloatToStringLocale(newAmount, 8), null, null, null);
               setProposeSendLastError('');
             }
           }
@@ -292,7 +312,13 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
       // spendable
       let spendableBalance = totalBalance.spendableOrchard + totalBalance.spendablePrivate;
-      const runSpendableBalanceStr = await RPCModule.execute(CommandEnum.spendablebalance, address);
+      let zenniesForZingo = sendToSelf || donationAddress ? false : donation;
+      const spendableBalanceJSON = { address, zennies_for_zingo: zenniesForZingo };
+      console.log('SPENDABLEBALANCE', spendableBalanceJSON);
+      const runSpendableBalanceStr = await RPCModule.execute(
+        CommandEnum.spendablebalance,
+        JSON.stringify(spendableBalanceJSON),
+      );
       console.log(runSpendableBalanceStr);
       if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
@@ -308,7 +334,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             setSpendableBalanceLastError(runSpendableBalanceJson.error);
             //Alert.alert('Calculating the FEE', runProposeJson.error);
           } else if (runSpendableBalanceJson.balance) {
-            console.log(runSpendableBalanceJson.balance);
+            console.log('BALANCE', runSpendableBalanceJson.balance);
             spendableBalance = runSpendableBalanceJson.balance / 10 ** 8;
             setSpendableBalanceLastError('');
           }
@@ -321,11 +347,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
       setSpendable(spendableBalance);
       // max amount
-      const max =
-        spendableBalance -
-        (donation && !sendToSelf && !donationAddress
-          ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
-          : 0);
+      // don't need to substract the donation here.
+      const max = spendableBalance;
       if (max >= 0) {
         // if max is 0 then the user can send a memo with amount 0.
         setMaxAmount(max);
@@ -1062,7 +1085,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                           //if (fee > 0) {
                           updateToField(null, Utils.parseNumberFloatToStringLocale(maxAmount, 8), null, null, null);
                           //}
-                          // the command sendall make only sense if you are using only one receiver -> Without donation in each transaction
                           calculateFeeWithPropose(
                             Utils.parseNumberFloatToStringLocale(maxAmount, 8),
                             sendPageState.toaddr.to,
