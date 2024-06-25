@@ -709,7 +709,8 @@ export default class RPC {
 
   async loadWalletData() {
     await this.fetchTotalBalance();
-    await this.fetchTandZandOTransactionsSummaries();
+    //await this.fetchTandZandOTransactionsSummaries();
+    await this.fetchTandZandOTransactionsValueTransfers();
     await this.fetchWalletSettings();
     await this.fetchInfoAndServerHeight();
   }
@@ -1281,8 +1282,11 @@ export default class RPC {
   // Fetch all T and Z and O transactions
   async fetchTandZandOTransactionsSummaries() {
     try {
+      const valueTransfersStr: string = await RPCModule.getValueTransfersList();
+      console.log('value transfers', valueTransfersStr);
       const summariesStr: string = await RPCModule.execute(CommandEnum.summaries, '');
-      //console.log(summariesStr);
+      console.log('++++++++', summariesStr);
+      console.log('======');
       if (summariesStr) {
         if (summariesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error txs summaries ${summariesStr}`);
@@ -1377,6 +1381,109 @@ export default class RPC {
       this.fnSetTransactionsList(combinedTxList);
     } catch (error) {
       console.log(`Critical Error txs list ${error}`);
+      return;
+    }
+  }
+
+  // Fetch all T and Z and O transactions
+  async fetchTandZandOTransactionsValueTransfers() {
+    try {
+      const valueTransfersStr: string = await RPCModule.getValueTransfersList();
+      console.log(valueTransfersStr);
+      if (valueTransfersStr) {
+        if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error txs value transfers ${valueTransfersStr}`);
+          return;
+        }
+      } else {
+        console.log('Internal Error txs value transfers');
+        return;
+      }
+      const summariesJSON: RPCSummariesType[] = await JSON.parse(valueTransfersStr);
+
+      await this.fetchInfoAndServerHeight();
+
+      let txList: TransactionType[] = [];
+
+      summariesJSON
+        //.filter(tx => tx.kind !== TransactionTypeEnum.Fee)
+        .forEach((tx: RPCSummariesType) => {
+          let currentTxList: TransactionType[] = txList.filter(t => t.txid === tx.txid);
+          if (currentTxList.length === 0) {
+            currentTxList = [{} as TransactionType];
+            currentTxList[0].txDetails = [];
+          }
+          let restTxList: TransactionType[] = txList.filter(t => t.txid !== tx.txid);
+
+          const type = tx.kind === TransactionTypeEnum.Fee ? TransactionTypeEnum.Sent : tx.kind;
+          if (!currentTxList[0].type && !!type) {
+            currentTxList[0].type = type;
+          }
+          if (tx.pending) {
+            currentTxList[0].confirmations = 0;
+          } else if (!currentTxList[0].confirmations) {
+            currentTxList[0].confirmations = this.lastServerBlockHeight
+              ? this.lastServerBlockHeight - tx.block_height + 1
+              : this.lastWalletBlockHeight - tx.block_height + 1;
+          }
+          if (!currentTxList[0].txid && !!tx.txid) {
+            currentTxList[0].txid = tx.txid;
+          }
+          if (!currentTxList[0].time && !!tx.datetime) {
+            currentTxList[0].time = tx.datetime;
+          }
+          if (!currentTxList[0].zecPrice && !!tx.price && tx.price !== 'None') {
+            currentTxList[0].zecPrice = tx.price;
+          }
+
+          if (tx.txid.startsWith('xxxxxxxx')) {
+            console.log('tran: ', tx);
+            console.log('--------------------------------------------------');
+          }
+
+          let currenttxdetails: TxDetailType = {} as TxDetailType;
+          if (tx.kind === TransactionTypeEnum.Fee) {
+            currentTxList[0].fee = (currentTxList[0].fee ? currentTxList[0].fee : 0) + tx.amount / 10 ** 8;
+            if (currentTxList[0].txDetails.length === 0) {
+              // when only have 1 item with `Fee`, we assume this tx is `SendToSelf`.
+              currentTxList[0].type = TransactionTypeEnum.SendToSelf;
+              currenttxdetails.address = '';
+              currenttxdetails.amount = 0;
+              currentTxList[0].txDetails.push(currenttxdetails);
+            }
+          } else {
+            currenttxdetails.address = !tx.to_address || tx.to_address === 'None' ? '' : tx.to_address;
+            currenttxdetails.amount = tx.amount / 10 ** 8;
+            currenttxdetails.memos = !tx.memos ? undefined : tx.memos;
+            currenttxdetails.poolType = !tx.pool_type || tx.pool_type === 'None' ? undefined : tx.pool_type;
+            currentTxList[0].txDetails.push(currenttxdetails);
+          }
+          //console.log(currentTxList[0]);
+          txList = [...currentTxList, ...restTxList];
+        });
+
+      //console.log(txlist);
+
+      // Now, combine the amounts and memos
+      const combinedTxList: TransactionType[] = [];
+      txList.forEach((txns: TransactionType) => {
+        const combinedTx = txns;
+        if (txns.type === TransactionTypeEnum.Sent || txns.type === TransactionTypeEnum.SendToSelf) {
+          // using address for `Sent` & `SendToSelf`
+          combinedTx.txDetails = RPC.rpcCombineTxDetailsByAddress(txns.txDetails);
+        } else {
+          // using pool for `Received`
+          combinedTx.txDetails = RPC.rpcCombineTxDetailsByPool(txns.txDetails);
+        }
+        //console.log(combinedTx);
+        combinedTxList.push(combinedTx);
+      });
+
+      //console.log(combinedTxList);
+
+      this.fnSetTransactionsList(combinedTxList);
+    } catch (error) {
+      console.log(`Critical Error txs list value transfers ${error}`);
       return;
     }
   }

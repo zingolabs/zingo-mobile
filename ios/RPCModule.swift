@@ -410,6 +410,24 @@ class RPCModule: NSObject {
       }
   }
 
+  @objc(getValueTransfersList:reject:)
+  func getValueTransfersList(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      self.getValueTransfersListAsync(dict)
+  }
+
+  func getValueTransfersListAsync(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getValueTransfers()
+          let respStr = String(resp)
+          resolve(respStr)
+      } else {
+          NSLog("Error getting latest block server")
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+              resolve("Error: [Native] Getting developer donation address. Command arguments problem.")
+          }
+      }
+  }
 
 
 }
