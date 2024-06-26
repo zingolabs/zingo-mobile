@@ -26,18 +26,15 @@ export const defaultAppStateLoading: AppStateLoading = {
   route: {} as StackScreenProps<any>['route'],
   appStateStatus: AppStateStatusEnum.unknown,
   netInfo: {} as NetInfoType,
-
   screen: 0,
   actionButtonsDisabled: false,
   walletExists: false,
   wallet: {} as WalletType,
   totalBalance: new TotalBalanceClass(),
   info: {} as InfoType,
-
   server: {} as ServerType,
   currency: CurrencyEnum.noCurrency,
   language: LanguageEnum.en,
-
   zecPrice: {
     zecPrice: 0,
     date: 0,
@@ -50,7 +47,6 @@ export const defaultAppStateLoading: AppStateLoading = {
     date: 0,
     dateEnd: 0,
   } as BackgroundType,
-
   translate: () => '',
   backgroundError: {} as BackgroundErrorType,
   setBackgroundError: () => {},

@@ -21,49 +21,46 @@ import { ChainNameEnum } from './enums/ChainNameEnum';
 import { AppStateStatus } from 'react-native';
 
 export default interface AppStateLoading {
-  navigation: StackScreenProps<any>['navigation'];
+  // state
   route: StackScreenProps<any>['route'];
   appStateStatus: AppStateStatus;
-  netInfo: NetInfoType;
-
   screen: number;
   actionButtonsDisabled: boolean;
   walletExists: boolean;
-  wallet: WalletType;
-  totalBalance: TotalBalanceClass;
-  info: InfoType;
-
-  server: ServerType;
-  currency: CurrencyEnum;
-  language: LanguageEnum;
-
-  zecPrice: ZecPriceType;
-  sendAll: boolean;
-  donation: boolean;
-  background: BackgroundType;
-
-  translate: (key: string) => TranslateType;
-  backgroundError: BackgroundErrorType;
-  setBackgroundError: (title: string, error: string) => void;
-
-  privacy: boolean;
-  readOnly: boolean;
-
   customServerShow: boolean;
   customServerUri: string;
   customServerChainName: ChainNameEnum;
+  biometricsFailed: boolean;
+  startingApp: boolean;
+  serverErrorTries: number;
+  donationAlert: boolean;
+  firstLaunchingMessage: boolean;
 
-  mode: ModeEnum;
+  // context
+  navigation: StackScreenProps<any>['navigation'];
+  netInfo: NetInfoType;
+  wallet: WalletType;
+  totalBalance: TotalBalanceClass;
+  info: InfoType;
+  zecPrice: ZecPriceType;
+  background: BackgroundType;
+  translate: (key: string) => TranslateType;
+  backgroundError: BackgroundErrorType;
+  setBackgroundError: (title: string, error: string) => void;
+  readOnly: boolean;
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
 
-  firstLaunchingMessage: boolean;
-  biometricsFailed: boolean;
-  startingApp: boolean;
+  // settings
+  server: ServerType;
+  currency: CurrencyEnum;
+  language: LanguageEnum;
+  sendAll: boolean;
+  donation: boolean;
+  privacy: boolean;
+  mode: ModeEnum;
   security: SecurityType;
   selectServer: SelectServerEnum;
-  serverErrorTries: number;
-  donationAlert: boolean;
   rescanMenu: boolean;
 
   // eslint-disable-next-line semi

@@ -1,4 +1,5 @@
 export enum SettingsNameEnum {
+  // screen
   server = 'server',
   currency = 'currency',
   language = 'language',
@@ -6,11 +7,13 @@ export enum SettingsNameEnum {
   donation = 'donation',
   privacy = 'privacy',
   mode = 'mode',
+  security = 'security',
+  selectServer = 'selectServer',
+  rescanMenu = 'rescanMenu',
+
+  // internal management
   firstInstall = 'firstInstall',
   basicFirstViewSeed = 'basicFirstViewSeed',
   version = 'version',
-  security = 'security',
-  selectServer = 'selectServer',
   firstUpdateWithDonation = 'firstUpdateWithDonation',
-  rescanMenu = 'rescanMenu',
 }

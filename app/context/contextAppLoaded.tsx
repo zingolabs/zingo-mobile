@@ -35,10 +35,8 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   route: {} as StackScreenProps<any>['route'],
   appStateStatus: AppStateStatusEnum.unknown,
   netInfo: {} as NetInfoType,
-
   syncingStatus: new SyncingStatusClass(),
   totalBalance: new TotalBalanceClass(),
-  addressPrivateKeys: new Map(),
   addresses: [] as AddressClass[],
   transactions: [] as TransactionType[],
   sendPageState: new SendPageStateClass(new ToAddrClass(0)),
@@ -69,11 +67,9 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   addressBookModalVisible: false,
   newServer: {} as ServerType,
   uaAddress: '',
-
   server: {} as ServerType,
   currency: CurrencyEnum.noCurrency,
   language: LanguageEnum.en,
-
   zecPrice: {
     zecPrice: 0,
     date: 0,
@@ -86,7 +82,6 @@ export const defaultAppStateLoaded: AppStateLoaded = {
     date: 0,
     dateEnd: 0,
   } as BackgroundType,
-
   translate: () => '',
   backgroundError: {} as BackgroundErrorType,
   setBackgroundError: () => {},

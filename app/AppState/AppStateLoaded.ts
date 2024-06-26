@@ -38,10 +38,6 @@ export default interface AppStateLoaded {
   // The total confirmed and pending balance in this wallet
   totalBalance: TotalBalanceClass;
 
-  // A map type that contains address -> privatekey mapping, for display on the receive page
-  // This mapping is ephemeral, and will disappear when the user navigates away.
-  addressPrivateKeys: Map<string, string>;
-
   // List of all addresses in the wallet, including change addresses and addresses
   // that don't have any balance or are unused
   addresses: AddressClass[];
@@ -58,11 +54,10 @@ export default interface AppStateLoaded {
   // getinfo and getblockchaininfo result
   info: InfoType;
 
-  // Callbacks for the password dialog box
-  //passwordState: PasswordState;
-
+  // internal wallet settings from blockchain
   walletSettings: WalletSettingsClass;
 
+  // syncing Info about the status of the process
   syncingStatus: SyncingStatusClass;
 
   // Data for any error or info modal
@@ -71,73 +66,88 @@ export default interface AppStateLoaded {
   // Build progress from Tx
   sendProgress: SendProgressClass;
 
+  // wallet recovery info
   wallet: WalletType;
 
+  // menu drawer
   isMenuDrawerOpen: boolean;
-
   selectedMenuDrawerItem: MenuItemEnum | null;
 
+  // modals
   aboutModalVisible: boolean;
-
   computingModalVisible: boolean;
-
   settingsModalVisible: boolean;
-
   infoModalVisible: boolean;
-
   rescanModalVisible: boolean;
-
   seedViewModalVisible: boolean;
   seedChangeModalVisible: boolean;
   seedBackupModalVisible: boolean;
   seedServerModalVisible: boolean;
-
   ufvkViewModalVisible: boolean;
   ufvkChangeModalVisible: boolean;
   ufvkBackupModalVisible: boolean;
   ufvkServerModalVisible: boolean;
-
   syncReportModalVisible: boolean;
   poolsModalVisible: boolean;
   insightModalVisible: boolean;
   addressBookModalVisible: boolean;
 
+  // change server helper
   newServer: ServerType;
 
+  // active UA in the wallet
   uaAddress: string;
 
-  server: ServerType;
-  language: LanguageEnum;
-  currency: CurrencyEnum;
-
+  // zec price in USD from internet
   zecPrice: ZecPriceType;
-  sendAll: boolean;
-  donation: boolean;
+
+  // info about background syncing
   background: BackgroundType;
 
+  // helper to get text tranalated to the active language
   translate: (key: string) => TranslateType;
+
+  // Error from the App when is in background
   backgroundError: BackgroundErrorType;
   setBackgroundError: (title: string, error: string) => void;
 
-  privacy: boolean;
+  // this wallet is watch-only (Readonly)
   readOnly: boolean;
-  //poolsToShieldSelectSapling: boolean;
-  //poolsToShieldSelectTransparent: boolean;
 
+  // settings
+  server: ServerType;
+  currency: CurrencyEnum;
+  language: LanguageEnum;
+  sendAll: boolean;
+  donation: boolean;
+  privacy: boolean;
   mode: ModeEnum;
-  snackbars: SnackbarType[];
-  addLastSnackbar: (snackbar: SnackbarType) => void;
-  restartApp: (s: any) => void;
-  somePending: boolean;
-
-  addressBook: AddressBookFileClass[];
-  launchAddressBook: (add: string, close: () => void, open: () => void) => void;
-  addressBookCurrentAddress: string;
-  addressBookOpenPriorModal: () => void;
   security: SecurityType;
   selectServer: SelectServerEnum;
   rescanMenu: boolean;
 
+  //poolsToShieldSelectSapling: boolean;
+  //poolsToShieldSelectTransparent: boolean;
+
+  // snackbard queue
+  snackbars: SnackbarType[];
+  addLastSnackbar: (snackbar: SnackbarType) => void;
+
+  // if the App is stalled - restart is fired
+  restartApp: (s: any) => void;
+
+  // some transaction is pending?
+  somePending: boolean;
+
+  // List of our contacts - Address book
+  addressBook: AddressBookFileClass[];
+
+  // helpers to open the address book modal from different places in the App
+  launchAddressBook: (add: string, close: () => void, open: () => void) => void;
+  addressBookCurrentAddress: string;
+  addressBookOpenPriorModal: () => void;
+
+  // is calculated in the header & needed in the send screen
   shieldingAmount: number;
 
   // eslint-disable-next-line semi
