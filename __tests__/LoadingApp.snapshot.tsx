@@ -22,6 +22,7 @@ import {
   ServerType,
   CurrencyEnum,
 } from '../app/AppState';
+import { serverUris } from '../app/uris';
 
 // Crea un mock para el constructor de I18n
 jest.mock('i18n-js', () => ({
@@ -66,10 +67,20 @@ jest.mock('react-native', () => {
 
   RN.NativeModules.RPCModule = {
     execute: jest.fn(() => '{}'),
+    getLatestBlock: jest.fn(() => '{}'),
+    walletExists: jest.fn(() => 'false'),
   };
 
   return RN;
 });
+jest.mock('react-native-simple-biometrics', () => ({
+  requestBioAuth: jest.fn(() => Promise.resolve(true)),
+}));
+jest.mock('react-native-fs', () => ({
+  readFile: jest.fn(() => Promise.resolve('{}')), // o Promise.reject(new Error('File not found'))
+  writeFile: jest.fn(() => Promise.resolve()), // o Promise.reject(new Error('Write failed'))
+  // Agrega más funciones mockeadas según sea necesario
+}));
 
 // test suite
 describe('Component LoadingApp - test', () => {
@@ -123,7 +134,7 @@ describe('Component LoadingApp - test', () => {
     const language = LanguageEnum.en;
     const currency = CurrencyEnum.noCurrency;
     const server: ServerType = {
-      uri: 'https://mainnet.lightwalletd.com:9067',
+      uri: serverUris(() => '')[0].uri,
       chainName: ChainNameEnum.mainChainName,
     };
     const sendAll = false;

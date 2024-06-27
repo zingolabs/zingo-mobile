@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Pools from '../components/Pools';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
 import { CurrencyNameEnum } from '../app/AppState';
 
 jest.useFakeTimers();
@@ -45,7 +45,7 @@ jest.mock('react-native', () => {
 // test suite
 describe('Component Pools - test', () => {
   //snapshot test
-  const state = defaultAppStateLoaded;
+  const state = defaultAppContextLoaded;
   state.translate = () => 'translated text';
   state.info.currencyName = CurrencyNameEnum.ZEC;
   state.totalBalance.total = 1.12345678;

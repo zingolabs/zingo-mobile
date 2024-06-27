@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Header from '../components/Header';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
 import { CurrencyNameEnum } from '../app/AppState';
 
 jest.useFakeTimers();
@@ -32,12 +32,21 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 
 // test suite
 describe('Component Header - test', () => {
   //snapshot test
   test('Header Simple - snapshot', () => {
-    const state = defaultAppStateLoaded;
+    const state = defaultAppContextLoaded;
     state.translate = () => 'text translated';
     const about = render(
       <ContextAppLoadedProvider value={state}>
@@ -47,7 +56,7 @@ describe('Component Header - test', () => {
     expect(about.toJSON()).toMatchSnapshot();
   });
   test('Header Complex - snapshot', () => {
-    const state = defaultAppStateLoaded;
+    const state = defaultAppContextLoaded;
     state.translate = () => 'text translated';
     state.info.currencyName = CurrencyNameEnum.ZEC;
     state.totalBalance.total = 1.12345678;

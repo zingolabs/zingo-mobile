@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Receive from '../components/Receive';
-import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../app/context';
+import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
 import { AddressKindEnum, CurrencyNameEnum, ReceiverEnum } from '../app/AppState';
 
 jest.useFakeTimers();
@@ -51,7 +51,7 @@ jest.mock('react-native', () => {
 describe('Component Receive - test', () => {
   //snapshot test
   test('Receive - snapshot', () => {
-    const state = defaultAppStateLoaded;
+    const state = defaultAppContextLoaded;
     state.uaAddress = 'UA-12345678901234567890';
     state.addresses = [
       {

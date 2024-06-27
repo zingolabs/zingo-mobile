@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render, screen } from '@testing-library/react-native';
 import TxDetail from '../components/History/components/TxDetail';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
 import { CurrencyNameEnum, PoolEnum, TransactionType, TransactionTypeEnum } from '../app/AppState';
 
 jest.useFakeTimers();
@@ -83,7 +83,7 @@ jest.mock('react-native', () => {
 // test suite
 describe('Component History TxDetail - test', () => {
   //unit test
-  const state = defaultAppStateLoaded;
+  const state = defaultAppContextLoaded;
   state.translate = () => 'translated text';
   const onClose = jest.fn();
   const onSetOption = jest.fn();

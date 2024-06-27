@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render, screen } from '@testing-library/react-native';
 import Info from '../components/Info';
-import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../app/context';
+import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
 import { CurrencyEnum, ChainNameEnum, CurrencyNameEnum } from '../app/AppState';
 
 jest.useFakeTimers();
@@ -46,7 +46,7 @@ jest.mock('react-native', () => {
 describe('Component Info - test', () => {
   //unit test
   test('Info - price with es (,) decimal point', () => {
-    const state = defaultAppStateLoaded;
+    const state = defaultAppContextLoaded;
     state.info = {
       serverUri: 'https://zcash.es',
       latestBlock: 2000100,

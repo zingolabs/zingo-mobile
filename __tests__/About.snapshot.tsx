@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import About from '../components/About';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
 import { CurrencyNameEnum } from '../app/AppState';
 
 jest.useFakeTimers();
@@ -46,7 +46,7 @@ jest.mock('react-native', () => {
 describe('Component About - test', () => {
   //snapshot test
   test('About - snapshot', () => {
-    const state = defaultAppStateLoaded;
+    const state = defaultAppContextLoaded;
     state.translate = (p: string) => {
       if (p === 'about.copyright') {
         return String([

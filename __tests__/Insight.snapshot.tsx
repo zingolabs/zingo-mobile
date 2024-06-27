@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Insight from '../components/Insight';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
 import { CurrencyNameEnum } from '../app/AppState';
 
 jest.useFakeTimers();
@@ -39,7 +39,7 @@ jest.mock('react-native', () => {
 describe('Component Insight - test', () => {
   //snapshot test
   test('Insight - snapshot', () => {
-    const state = defaultAppStateLoaded;
+    const state = defaultAppContextLoaded;
     state.translate = () => {
       return 'text translated';
     };

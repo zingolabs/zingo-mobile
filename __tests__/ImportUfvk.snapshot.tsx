@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import { ImportUfvk } from '../components/Ufvk';
-import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../app/context';
+import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
 import { CurrencyNameEnum } from '../app/AppState';
 
 jest.useFakeTimers();
@@ -47,7 +47,7 @@ jest.mock('react-native', () => {
 describe('Component ImportUfvk - test', () => {
   //snapshot test
   test('ImportUfvk - snapshot', () => {
-    const state = defaultAppStateLoaded;
+    const state = defaultAppContextLoaded;
     state.translate = () => 'text translated';
     state.info.currencyName = CurrencyNameEnum.ZEC;
     state.totalBalance.total = 1.12345678;

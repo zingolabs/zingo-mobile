@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Send from '../components/Send';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
 import { ThemeType } from '../app/types';
 import {
   ModeEnum,
@@ -76,7 +76,7 @@ jest.mock('react-native-picker-select', () => 'RNPickerSelect');
 // test suite
 describe('Component Send - test', () => {
   //snapshot test
-  const state = defaultAppStateLoaded;
+  const state = defaultAppContextLoaded;
   state.transactions = [
     {
       type: TransactionTypeEnum.Sent,

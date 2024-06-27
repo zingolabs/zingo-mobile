@@ -186,17 +186,14 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
     <View />
     <MockedBottomTabNavigator
       initialRouteName="text traslated"
-      screenOptions={
-        {
-          "headerShown": false,
-          "tabBarStyle": {
-            "borderTopColor": "#011401",
-            "borderTopWidth": 0,
-            "height": 0,
-          },
-        }
-      }
+      screenOptions={[Function]}
     >
+      <MockedScreen
+        name="text traslated"
+      />
+      <MockedScreen
+        name="text traslated"
+      />
       <MockedScreen
         name="text traslated"
       />

@@ -2,7 +2,6 @@ import React, { ReactNode } from 'react';
 import { StackScreenProps } from '@react-navigation/stack';
 
 import {
-  AppStateLoaded,
   SyncingStatusClass,
   TotalBalanceClass,
   ReceivePageStateClass,
@@ -27,13 +26,11 @@ import {
   CurrencyEnum,
   SelectServerEnum,
   SnackbarType,
-  AppStateStatusEnum,
+  AppContextLoaded,
 } from '../AppState';
 
-export const defaultAppStateLoaded: AppStateLoaded = {
+export const defaultAppContextLoaded: AppContextLoaded = {
   navigation: {} as StackScreenProps<any>['navigation'],
-  route: {} as StackScreenProps<any>['route'],
-  appStateStatus: AppStateStatusEnum.unknown,
   netInfo: {} as NetInfoType,
   syncingStatus: new SyncingStatusClass(),
   totalBalance: new TotalBalanceClass(),
@@ -46,26 +43,6 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   errorModalData: new ErrorModalDataClass('', ''),
   sendProgress: new SendProgressClass(0, 0, 0),
   wallet: {} as WalletType,
-  isMenuDrawerOpen: false,
-  selectedMenuDrawerItem: null,
-  aboutModalVisible: false,
-  computingModalVisible: false,
-  settingsModalVisible: false,
-  infoModalVisible: false,
-  rescanModalVisible: false,
-  seedViewModalVisible: false,
-  seedChangeModalVisible: false,
-  seedBackupModalVisible: false,
-  seedServerModalVisible: false,
-  ufvkViewModalVisible: false,
-  ufvkChangeModalVisible: false,
-  ufvkBackupModalVisible: false,
-  ufvkServerModalVisible: false,
-  syncReportModalVisible: false,
-  poolsModalVisible: false,
-  insightModalVisible: false,
-  addressBookModalVisible: false,
-  newServer: {} as ServerType,
   uaAddress: '',
   server: {} as ServerType,
   currency: CurrencyEnum.noCurrency,
@@ -104,11 +81,11 @@ export const defaultAppStateLoaded: AppStateLoaded = {
   shieldingAmount: 0,
 };
 
-export const ContextAppLoaded = React.createContext(defaultAppStateLoaded);
+export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);
 
 type ContextProviderProps = {
   children: ReactNode;
-  value: AppStateLoaded;
+  value: AppContextLoaded;
 };
 
 export const ContextAppLoadedProvider = ({ children, value }: ContextProviderProps) => {

@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
 import AddressBook from '../components/AddressBook/AddressBook';
 import { ThemeType } from '../app/types';
 
@@ -67,7 +67,7 @@ jest.mock('@react-navigation/native', () => ({
 describe('Component Address Book - test', () => {
   //snapshot test
   test('Address Book - snapshot', () => {
-    const state = defaultAppStateLoaded;
+    const state = defaultAppContextLoaded;
     state.addressBook = [
       {
         label: 'pepe',

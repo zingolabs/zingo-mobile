@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { StackScreenProps } from '@react-navigation/stack';
 
 import {
-  AppStateLoading,
+  AppContextLoading,
   InfoType,
   TotalBalanceClass,
   WalletType,
@@ -16,19 +16,12 @@ import {
   ModeEnum,
   CurrencyEnum,
   SelectServerEnum,
-  ChainNameEnum,
   SnackbarType,
-  AppStateStatusEnum,
 } from '../AppState';
 
-export const defaultAppStateLoading: AppStateLoading = {
+export const defaultAppContextLoading: AppContextLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
-  route: {} as StackScreenProps<any>['route'],
-  appStateStatus: AppStateStatusEnum.unknown,
   netInfo: {} as NetInfoType,
-  screen: 0,
-  actionButtonsDisabled: false,
-  walletExists: false,
   wallet: {} as WalletType,
   totalBalance: new TotalBalanceClass(),
   info: {} as InfoType,
@@ -52,27 +45,19 @@ export const defaultAppStateLoading: AppStateLoading = {
   setBackgroundError: () => {},
   privacy: false,
   readOnly: false,
-  customServerShow: false,
-  customServerUri: '',
-  customServerChainName: ChainNameEnum.mainChainName,
   mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
-  firstLaunchingMessage: false,
-  biometricsFailed: false,
-  startingApp: true,
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
-  serverErrorTries: 0,
-  donationAlert: false,
   rescanMenu: false,
 };
 
-export const ContextAppLoading = React.createContext(defaultAppStateLoading);
+export const ContextAppLoading = React.createContext(defaultAppContextLoading);
 
 type ContextProviderProps = {
   children: ReactNode;
-  value: AppStateLoading;
+  value: AppContextLoading;
 };
 
 export const ContextAppLoadingProvider = ({ children, value }: ContextProviderProps) => {

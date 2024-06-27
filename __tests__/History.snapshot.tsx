@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import History from '../components/History';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
 import {
   AddressKindEnum,
   CurrencyEnum,
@@ -91,7 +91,7 @@ jest.mock('react-native', () => {
 // test suite
 describe('Component History - test', () => {
   //snapshot test
-  const state = defaultAppStateLoaded;
+  const state = defaultAppContextLoaded;
   state.transactions = [
     {
       type: TransactionTypeEnum.Sent,

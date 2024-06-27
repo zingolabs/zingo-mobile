@@ -8,10 +8,10 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Seed from '../components/Seed';
 import {
-  defaultAppStateLoaded,
   ContextAppLoadedProvider,
-  defaultAppStateLoading,
   ContextAppLoadingProvider,
+  defaultAppContextLoaded,
+  defaultAppContextLoading,
 } from '../app/context';
 import { CurrencyNameEnum, SeedActionEnum } from '../app/AppState';
 
@@ -50,7 +50,7 @@ jest.mock('react-native', () => {
 // test suite
 describe('Component Seed - test', () => {
   //snapshot test
-  const stateLoaded = defaultAppStateLoaded;
+  const stateLoaded = defaultAppContextLoaded;
   stateLoaded.translate = (p: string) => {
     if (p === 'seed.buttontexts') {
       return `{
@@ -105,8 +105,8 @@ describe('Component Seed - test', () => {
     );
     expect(seed.toJSON()).toMatchSnapshot();
   });
-  const stateLoading = defaultAppStateLoading;
-  stateLoading.translate = (p: string) => {
+  const contextLoading = defaultAppContextLoading;
+  contextLoading.translate = (p: string) => {
     if (p === 'seed.buttontexts') {
       return `{
         "new": ["new"],
@@ -120,15 +120,15 @@ describe('Component Seed - test', () => {
       return 'text translated';
     }
   };
-  stateLoading.wallet = {
+  contextLoading.wallet = {
     seed: 'pepe lolo titi',
     birthday: 1500100,
   };
-  stateLoading.info.latestBlock = 1900100;
-  stateLoading.totalBalance.total = 1.12345678;
+  contextLoading.info.latestBlock = 1900100;
+  contextLoading.totalBalance.total = 1.12345678;
   test('Seed New - snapshot', () => {
     const seed = render(
-      <ContextAppLoadingProvider value={stateLoading}>
+      <ContextAppLoadingProvider value={contextLoading}>
         <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.new} setPrivacyOption={jest.fn()} />
       </ContextAppLoadingProvider>,
     );
@@ -136,7 +136,7 @@ describe('Component Seed - test', () => {
   });
   test('Seed Restore - snapshot', () => {
     const seed = render(
-      <ContextAppLoadingProvider value={stateLoading}>
+      <ContextAppLoadingProvider value={contextLoading}>
         <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.restore} setPrivacyOption={jest.fn()} />
       </ContextAppLoadingProvider>,
     );

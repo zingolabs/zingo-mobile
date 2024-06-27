@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Settings from '../components/Settings';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
 import { LanguageEnum, CurrencyEnum, ChainNameEnum, DownloadMemosEnum, CurrencyNameEnum } from '../app/AppState';
 
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -46,7 +46,7 @@ jest.useFakeTimers();
 // test suite
 describe('Component Settings - test', () => {
   //snapshot test
-  const state = defaultAppStateLoaded;
+  const state = defaultAppContextLoaded;
   state.translate = (p: string) => {
     if (p === 'settings.memos') {
       return [
