@@ -8,7 +8,9 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import About from '../components/About';
 import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
-import { CurrencyNameEnum } from '../app/AppState';
+import { infoMock } from './dataMock/infoMock';
+import { totalBalanceMock } from './dataMock/totalBalanceMock';
+import { translateMock } from './dataMock/translateMock';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -47,21 +49,9 @@ describe('Component About - test', () => {
   //snapshot test
   test('About - snapshot', () => {
     const state = defaultAppContextLoaded;
-    state.translate = (p: string) => {
-      if (p === 'about.copyright') {
-        return String([
-          '1 text translated line 1',
-          '2 text translated line 2',
-          '3 text translated line 3',
-          '4 text translated line 4',
-          '5 text translated line 5',
-        ]);
-      } else {
-        return 'text translated';
-      }
-    };
-    state.info.currencyName = CurrencyNameEnum.ZEC;
-    state.totalBalance.total = 1.25691111;
+    state.translate = translateMock;
+    state.info = infoMock;
+    state.totalBalance = totalBalanceMock;
     const onClose = jest.fn();
     const about = render(
       <ContextAppLoadedProvider value={state}>

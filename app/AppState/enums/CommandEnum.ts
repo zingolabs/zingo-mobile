@@ -27,7 +27,7 @@ export enum CommandEnum {
   sendsToAddress = 'sends_to_address',
   memobytesToAddress = 'memobytes_to_address',
 
-  // calculate the max soendable amount in the wallet
+  // calculate the max sendable amount in the wallet
   spendablebalance = 'spendablebalance',
   // new commands to create a proposal
   send = 'send',
