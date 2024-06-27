@@ -162,6 +162,7 @@ describe('Component LoadedApp - test', () => {
       <LoadedAppClass
         navigation={navigationMock}
         route={routeMock}
+        toggleTheme={toggleTheme}
         translate={translate}
         theme={theme}
         language={language}
@@ -173,7 +174,6 @@ describe('Component LoadedApp - test', () => {
         mode={mode}
         background={background}
         readOnly={readOnly}
-        toggleTheme={toggleTheme}
         addressBook={addressBook}
         security={security}
         selectServer={selectServer}

@@ -166,6 +166,7 @@ describe('Component LoadingApp - test', () => {
       <LoadingAppClass
         navigation={navigationMock}
         route={routeMock}
+        toggleTheme={toggleTheme}
         translate={translate}
         theme={theme}
         language={language}
@@ -177,7 +178,6 @@ describe('Component LoadingApp - test', () => {
         mode={mode}
         background={background}
         firstLaunchingMessage={firstLaunchingMessage}
-        toggleTheme={toggleTheme}
         security={security}
         selectServer={selectServer}
         donationAlert={donationAlert}

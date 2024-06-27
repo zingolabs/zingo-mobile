@@ -376,8 +376,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       rescanMenu: props.rescanMenu,
 
       // state
-      theme: props.theme,
-      toggleTheme: props.toggleTheme,
       appStateStatus: AppState.currentState,
       screen: !!props.route.params && !!props.route.params.screen ? props.route.params.screen : 0,
       actionButtonsDisabled: !netInfo.isConnected ? true : false,
@@ -943,7 +941,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
   changeMode = async (mode: ModeEnum.basic | ModeEnum.advanced) => {
     this.setState({ mode, screen: 0 });
     await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-    this.state.toggleTheme(mode);
+    this.props.toggleTheme(mode);
     // if the user selects advanced mode & wants to change to another wallet
     // and then the user wants to go to basic mode in the first screen
     // the result will be the same -> create a new wallet.
@@ -966,9 +964,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       firstLaunchingMessage,
       biometricsFailed,
       translate,
-      theme,
     } = this.state;
-    const { colors } = theme;
+    const { colors } = this.props.theme;
 
     //console.log('render loadingAppClass - 3', translate('version'));
 

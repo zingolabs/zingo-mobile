@@ -386,9 +386,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       rescanMenu: props.rescanMenu,
 
       // state
-      route: props.route,
-      theme: props.theme,
-      toggleTheme: props.toggleTheme,
       appStateStatus: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
       isMenuDrawerOpen: false,
       selectedMenuDrawerItem: null,
@@ -1226,7 +1223,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       //poolsToShieldSelectTransparent: true,
     });
     // this function change the Theme in the App component.
-    this.state.toggleTheme(value as ModeEnum);
+    this.props.toggleTheme(value as ModeEnum);
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
@@ -1462,9 +1459,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       readOnly,
       totalBalance,
       translate,
-      theme,
     } = this.state;
-    const { colors } = theme;
+    const { colors } = this.props.theme;
 
     const context = {
       //context
