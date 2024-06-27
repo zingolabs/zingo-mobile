@@ -2,7 +2,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import AddressClass from './classes/AddressClass';
-import ErrorModalDataClass from './classes/ErrorModalDataClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import SendProgressClass from './classes/SendProgressClass';
 import ReceivePageStateClass from './classes/ReceivePageStateClass';
@@ -55,9 +54,6 @@ export default interface AppContextLoaded {
 
   // syncing Info about the status of the process
   syncingStatus: SyncingStatusClass;
-
-  // Data for any error or info modal
-  errorModalData: ErrorModalDataClass;
 
   // Build progress from Tx
   sendProgress: SendProgressClass;

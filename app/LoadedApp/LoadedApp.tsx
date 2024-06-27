@@ -35,7 +35,6 @@ import {
   InfoType,
   TransactionType,
   ToAddrClass,
-  ErrorModalDataClass,
   SyncingStatusClass,
   SendProgressClass,
   WalletSettingsClass,
@@ -352,7 +351,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       transactions: [] as TransactionType[],
       walletSettings: {} as WalletSettingsClass,
       syncingStatus: {} as SyncingStatusClass,
-      errorModalData: {} as ErrorModalDataClass,
       sendProgress: {} as SendProgressClass,
       info: {} as InfoType,
       zecPrice: {} as ZecPriceType,
@@ -692,20 +690,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
   getFullState = (): AppStateLoaded => {
     return this.state;
-  };
-
-  openErrorModal = (title: string, body: string) => {
-    const errorModalData = new ErrorModalDataClass(title, body);
-    errorModalData.modalIsOpen = true;
-
-    this.setState({ errorModalData });
-  };
-
-  closeErrorModal = () => {
-    const errorModalData = new ErrorModalDataClass('', '');
-    errorModalData.modalIsOpen = false;
-
-    this.setState({ errorModalData });
   };
 
   setUfvkViewModalVisible = async (value: boolean) => {
@@ -1472,7 +1456,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       transactions: this.state.transactions,
       walletSettings: this.state.walletSettings,
       syncingStatus: this.state.syncingStatus,
-      errorModalData: this.state.errorModalData,
       sendProgress: this.state.sendProgress,
       info: this.state.info,
       zecPrice: this.state.zecPrice,
