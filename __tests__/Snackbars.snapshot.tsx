@@ -26,10 +26,8 @@ describe('Component Snackbars - test', () => {
   //snapshot test
   test('Snackbars - snapshot', () => {
     const removeFirstSnackbar = jest.fn();
-    const translate = mockTranslate;
-    const snackbars = mockSnackbars;
     const snack = render(
-      <Snackbars snackbars={snackbars} removeFirstSnackbar={removeFirstSnackbar} translate={translate} />,
+      <Snackbars snackbars={mockSnackbars} removeFirstSnackbar={removeFirstSnackbar} translate={mockTranslate} />,
     );
     expect(snack.toJSON()).toMatchSnapshot();
   });

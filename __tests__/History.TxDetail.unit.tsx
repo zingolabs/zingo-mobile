@@ -89,12 +89,12 @@ describe('Component History TxDetail - test', () => {
   //unit test
   const state = defaultAppContextLoaded;
   state.translate = mockTranslate;
+  state.info = mockInfo;
+  state.totalBalance = mockTotalBalance;
   const onClose = jest.fn();
   const onSetOption = jest.fn();
 
   test('History TxDetail - sent transaction with 2 addresses', () => {
-    state.info = mockInfo;
-    state.totalBalance = mockTotalBalance;
     const tx = mockTransactions[0] as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
@@ -118,8 +118,6 @@ describe('Component History TxDetail - test', () => {
   });
 
   test('History TxDetail - self sent transaction', () => {
-    state.info = mockInfo;
-    state.totalBalance = mockTotalBalance;
     const txSelfSend = mockTransactions[1] as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
@@ -139,8 +137,6 @@ describe('Component History TxDetail - test', () => {
   });
 
   test('History TxDetail - received transaction with 2 pools', () => {
-    state.info = mockInfo;
-    state.totalBalance = mockTotalBalance;
     const txSelfSend = mockTransactions[2] as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>

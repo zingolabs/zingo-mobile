@@ -87,7 +87,6 @@ describe('Component LoadedApp - test', () => {
     const mode = ModeEnum.basic;
     const readOnly = false;
     const toggleTheme = jest.fn();
-    const addressBook = mockAddressBook;
     const selectServer = SelectServerEnum.auto;
     const loadedapp = render(
       <LoadedAppClass
@@ -105,7 +104,7 @@ describe('Component LoadedApp - test', () => {
         mode={mode}
         background={mockBackground}
         readOnly={readOnly}
-        addressBook={addressBook}
+        addressBook={mockAddressBook}
         security={mockSecurity}
         selectServer={selectServer}
         rescanMenu={rescanMenu}

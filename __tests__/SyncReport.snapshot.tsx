@@ -13,6 +13,7 @@ import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSyncingStatus from '../__mocks__/dataMocks/mockSyncingStatus';
+import { mockNetInfo } from '../__mocks__/dataMocks/mockNetInfo';
 
 const NetInfoStateType = {
   unknown: 'unknown',
@@ -70,7 +71,7 @@ describe('Component SyncReport - test', () => {
   state.totalBalance = mockTotalBalance;
   state.wallet = mockWallet;
   state.syncingStatus = mockSyncingStatus;
-  state.netInfo.isConnected = true;
+  state.netInfo = mockNetInfo;
   const onClose = jest.fn();
   test('SyncReport - snapshot', () => {
     const sync = render(
