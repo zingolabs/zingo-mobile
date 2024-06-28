@@ -7,23 +7,19 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import { LoadedAppClass } from '../app/LoadedApp';
-import { ThemeType } from '../app/types';
 
 // Importa el módulo I18n
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { I18n } from 'i18n-js';
-import { StackScreenProps } from '@react-navigation/stack';
-import {
-  BackgroundType,
-  AddressBookFileClass,
-  ServerType,
-  LanguageEnum,
-  ModeEnum,
-  SelectServerEnum,
-  ChainNameEnum,
-  CurrencyEnum,
-} from '../app/AppState';
-import { serverUris } from '../app/uris';
+import { LanguageEnum, ModeEnum, SelectServerEnum, CurrencyEnum } from '../app/AppState';
+import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockNavigation } from '../__mocks__/dataMocks/mockNavigation';
+import { mockRoute } from '../__mocks__/dataMocks/mockRoute';
+import { mockServer } from '../__mocks__/dataMocks/mockServer';
+import { mockBackground } from '../__mocks__/dataMocks/mockBackground';
+import { mockSecurity } from '../__mocks__/dataMocks/mockSecurity';
+import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 
 // Crea un mock para el constructor de I18n
 jest.mock('i18n-js', () => ({
@@ -82,100 +78,35 @@ jest.mock('react-native-fs', () => ({
 describe('Component LoadedApp - test', () => {
   //snapshot test
   test('LoadedApp - snapshot', () => {
-    const navigationMock: StackScreenProps<any>['navigation'] = {
-      // Propiedades y métodos necesarios para la navegación
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-      dispatch: jest.fn(),
-      reset: jest.fn(),
-      isFocused: jest.fn(),
-      canGoBack: jest.fn(),
-      getParent: jest.fn(),
-      getId: jest.fn(),
-      getState: jest.fn(),
-      setParams: jest.fn(),
-      setOptions: jest.fn(),
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
-      replace: jest.fn(),
-      push: jest.fn(),
-      pop: jest.fn(),
-      popToTop: jest.fn(),
-      // Agrega cualquier otra propiedad o método necesario para tu caso
-    };
-    // Declara un objeto mock para la ruta
-    const routeMock: StackScreenProps<any>['route'] = {
-      // Propiedades necesarias para la ruta
-      key: '',
-      name: '',
-    };
-    const theme: ThemeType = {
-      dark: true,
-      colors: {
-        background: '#011401', //'#010101',
-        card: '#011401', //'#401717',
-        border: '#ffffff',
-        primary: '#18bd18', //'#df4100',
-        primaryDisabled: '#5a8c5a', //'rgba(90, 140, 90, 1)',
-        secondaryDisabled: '#233623',
-        text: '#c3c3c3',
-        zingo: '#888888',
-        placeholder: '#888888',
-        money: '#ffffff',
-        syncing: '#ebff5a',
-        notification: '',
-      },
-    };
-    const translate = () => 'text traslated';
     const language = LanguageEnum.en;
     const currency = CurrencyEnum.noCurrency;
-    const server: ServerType = {
-      uri: serverUris(() => '')[0].uri,
-      chainName: ChainNameEnum.mainChainName,
-    };
     const sendAll = false;
     const rescanMenu = false;
     const donation = false;
     const privacy = false;
     const mode = ModeEnum.basic;
-    const background: BackgroundType = {
-      batches: 0,
-      message: '',
-      date: 0,
-      dateEnd: 0,
-    };
     const readOnly = false;
     const toggleTheme = jest.fn();
-    const addressBook = [] as AddressBookFileClass[];
-    const security = {
-      startApp: true,
-      foregroundApp: true,
-      sendConfirm: true,
-      seedUfvkScreen: true,
-      rescanScreen: true,
-      settingsScreen: true,
-      changeWalletScreen: true,
-      restoreWalletBackupScreen: true,
-    };
+    const addressBook = mockAddressBook;
     const selectServer = SelectServerEnum.auto;
     const loadedapp = render(
       <LoadedAppClass
-        navigation={navigationMock}
-        route={routeMock}
+        navigation={mockNavigation}
+        route={mockRoute}
         toggleTheme={toggleTheme}
-        translate={translate}
-        theme={theme}
+        translate={mockTranslate}
+        theme={mockTheme}
         language={language}
         currency={currency}
-        server={server}
+        server={mockServer}
         sendAll={sendAll}
         donation={donation}
         privacy={privacy}
         mode={mode}
-        background={background}
+        background={mockBackground}
         readOnly={readOnly}
         addressBook={addressBook}
-        security={security}
+        security={mockSecurity}
         selectServer={selectServer}
         rescanMenu={rescanMenu}
       />,

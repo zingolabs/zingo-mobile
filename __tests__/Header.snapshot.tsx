@@ -8,7 +8,9 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Header from '../components/Header';
 import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
-import { CurrencyNameEnum } from '../app/AppState';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -47,7 +49,7 @@ describe('Component Header - test', () => {
   //snapshot test
   test('Header Simple - snapshot', () => {
     const state = defaultAppContextLoaded;
-    state.translate = () => 'text translated';
+    state.translate = mockTranslate;
     const about = render(
       <ContextAppLoadedProvider value={state}>
         <Header title="title" noBalance={true} noSyncingStatus={true} noDrawMenu={true} noPrivacy={true} />
@@ -57,9 +59,9 @@ describe('Component Header - test', () => {
   });
   test('Header Complex - snapshot', () => {
     const state = defaultAppContextLoaded;
-    state.translate = () => 'text translated';
-    state.info.currencyName = CurrencyNameEnum.ZEC;
-    state.totalBalance.total = 1.12345678;
+    state.translate = mockTranslate;
+    state.info = mockInfo;
+    state.totalBalance = mockTotalBalance;
     const onFunction = jest.fn();
     const header = render(
       <ContextAppLoadedProvider value={state}>

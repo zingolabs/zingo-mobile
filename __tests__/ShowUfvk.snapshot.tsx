@@ -8,7 +8,11 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { ShowUfvk } from '../components/Ufvk';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
-import { CurrencyNameEnum, UfvkActionEnum } from '../app/AppState';
+import { UfvkActionEnum } from '../app/AppState';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -46,11 +50,10 @@ jest.mock('react-native', () => {
 describe('Component ShowUfvk - test', () => {
   //snapshot test
   const state = defaultAppContextLoaded;
-  state.translate = () => 'text translated';
-  state.info.currencyName = CurrencyNameEnum.ZEC;
-  state.totalBalance.total = 1.12345678;
-  state.wallet.ufvk =
-    'uview1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890';
+  state.translate = mockTranslate;
+  state.info = mockInfo;
+  state.totalBalance = mockTotalBalance;
+  state.wallet = mockWallet;
   const onClose = jest.fn();
   const onOK = jest.fn();
   test('ShowUfvk - snapshot', () => {

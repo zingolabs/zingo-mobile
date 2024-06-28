@@ -185,17 +185,17 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
     />
     <View />
     <MockedBottomTabNavigator
-      initialRouteName="text traslated"
+      initialRouteName="text translated"
       screenOptions={[Function]}
     >
       <MockedScreen
-        name="text traslated"
+        name="text translated"
       />
       <MockedScreen
-        name="text traslated"
+        name="text translated"
       />
       <MockedScreen
-        name="text traslated"
+        name="text translated"
       />
     </MockedBottomTabNavigator>
   </View>

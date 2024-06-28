@@ -57,7 +57,7 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
             }
           }
         >
-          text traslated
+          text translated
         </Text>
         <Text
           style={
@@ -67,7 +67,7 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
             }
           }
         >
-          text traslated
+          text translated
         </Text>
       </View>
       <View
@@ -99,7 +99,7 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
             }
           }
         >
-          text traslated
+          text translated
         </Text>
         <Text
           style={
@@ -112,7 +112,7 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
             }
           }
         >
-          text traslated
+          text translated
         </Text>
         <Text
           style={
@@ -126,7 +126,7 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
             }
           }
         >
-          text traslated
+          text translated
         </Text>
       </View>
     </View>

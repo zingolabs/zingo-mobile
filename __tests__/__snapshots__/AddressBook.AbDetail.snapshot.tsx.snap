@@ -25,7 +25,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
       }
     }
   >
-    translated text
+    text translated
   </Text>
   <View
     style={
@@ -55,7 +55,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
       <TextInput
         editable={true}
         onChangeText={[Function]}
-        placeholder="translated text"
+        placeholder="text translated"
         placeholderTextColor="#888888"
         style={
           {
@@ -115,7 +115,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
       <View
@@ -137,7 +137,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
           }
         >
           <View
-            accessibilityLabel="translated text"
+            accessibilityLabel="text translated"
             accessible={true}
             style={
               {
@@ -149,7 +149,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
             <TextInput
               editable={true}
               onChangeText={[Function]}
-              placeholder="translated text"
+              placeholder="text translated"
               placeholderTextColor="#888888"
               style={
                 {
@@ -174,7 +174,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
             }
           >
             <View
-              accessibilityLabel="translated text"
+              accessibilityLabel="text translated"
               accessibilityState={
                 {
                   "busy": undefined,
@@ -320,7 +320,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>
@@ -396,7 +396,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>
@@ -429,7 +429,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
       }
     }
   >
-    translated text
+    text translated
   </Text>
   <View
     style={
@@ -459,7 +459,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
       <TextInput
         editable={false}
         onChangeText={[Function]}
-        placeholder="translated text"
+        placeholder="text translated"
         placeholderTextColor="#888888"
         style={
           {
@@ -520,7 +520,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
       <View
@@ -542,7 +542,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
           }
         >
           <View
-            accessibilityLabel="translated text"
+            accessibilityLabel="text translated"
             accessible={true}
             style={
               {
@@ -554,7 +554,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
             <TextInput
               editable={false}
               onChangeText={[Function]}
-              placeholder="translated text"
+              placeholder="text translated"
               placeholderTextColor="#888888"
               style={
                 {
@@ -647,7 +647,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
               />
             </View>
             <View
-              accessibilityLabel="translated text"
+              accessibilityLabel="text translated"
               accessibilityState={
                 {
                   "busy": undefined,
@@ -793,7 +793,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>
@@ -869,7 +869,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>
@@ -902,7 +902,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
       }
     }
   >
-    translated text
+    text translated
   </Text>
   <View
     style={
@@ -932,7 +932,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
       <TextInput
         editable={true}
         onChangeText={[Function]}
-        placeholder="translated text"
+        placeholder="text translated"
         placeholderTextColor="#888888"
         style={
           {
@@ -993,7 +993,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
       <View
@@ -1015,7 +1015,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
           }
         >
           <View
-            accessibilityLabel="translated text"
+            accessibilityLabel="text translated"
             accessible={true}
             style={
               {
@@ -1027,7 +1027,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
             <TextInput
               editable={true}
               onChangeText={[Function]}
-              placeholder="translated text"
+              placeholder="text translated"
               placeholderTextColor="#888888"
               style={
                 {
@@ -1120,7 +1120,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
               />
             </View>
             <View
-              accessibilityLabel="translated text"
+              accessibilityLabel="text translated"
               accessibilityState={
                 {
                   "busy": undefined,
@@ -1202,7 +1202,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
         }
       }
     >
-      translated text
+      text translated
     </Text>
   </View>
   <View
@@ -1288,7 +1288,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>
@@ -1364,7 +1364,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>

@@ -8,7 +8,9 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import PrivKey from '../components/PrivKey';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
-import { CurrencyNameEnum } from '../app/AppState';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -46,9 +48,9 @@ jest.mock('react-native', () => {
 describe('Component PrivKey - test', () => {
   //snapshot test
   const state = defaultAppContextLoaded;
-  state.translate = () => 'text translated';
-  state.info.currencyName = CurrencyNameEnum.ZEC;
-  state.totalBalance.total = 1.12345678;
+  state.translate = mockTranslate;
+  state.info = mockInfo;
+  state.totalBalance = mockTotalBalance;
   const onClose = jest.fn();
   test('PrivKey Private - snapshot', () => {
     const privKey = render(

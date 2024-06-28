@@ -8,7 +8,9 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Insight from '../components/Insight';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
-import { CurrencyNameEnum } from '../app/AppState';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -40,11 +42,9 @@ describe('Component Insight - test', () => {
   //snapshot test
   test('Insight - snapshot', () => {
     const state = defaultAppContextLoaded;
-    state.translate = () => {
-      return 'text translated';
-    };
-    state.info.currencyName = CurrencyNameEnum.ZEC;
-    state.totalBalance.total = 1.25691111;
+    state.translate = mockTranslate;
+    state.info = mockInfo;
+    state.totalBalance = mockTotalBalance;
     const onClose = jest.fn();
     const insight = render(
       <ContextAppLoadedProvider value={state}>

@@ -30,7 +30,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
   >
     <View>
       <View
-        accessibilityLabel="translated text"
+        accessibilityLabel="text translated"
         accessible={true}
         style={
           {
@@ -172,7 +172,7 @@ memo10"
             }
           }
         >
-          translated text
+          text translated
         </Text>
         <Text
           style={
@@ -270,7 +270,7 @@ memo10"
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>
@@ -346,7 +346,7 @@ memo10"
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>

@@ -1,7 +1,7 @@
 import { ChainNameEnum, CurrencyNameEnum, InfoType } from '../../app/AppState';
 import { serverUris } from '../../app/uris';
 
-export const infoMock: InfoType = {
+export const mockInfo: InfoType = {
   chainName: ChainNameEnum.mainChainName,
   serverUri: serverUris(() => {})[0].uri,
   latestBlock: 2000000,

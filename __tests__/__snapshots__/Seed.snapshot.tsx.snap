@@ -237,7 +237,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
               }
             }
           >
-            1500100
+            1900100
           </Text>
         </View>
       </View>
@@ -652,7 +652,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
               }
             }
           >
-            1500100
+            1900100
           </Text>
         </View>
       </View>
@@ -1067,7 +1067,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
               }
             }
           >
-            1500100
+            1900100
           </Text>
         </View>
       </View>
@@ -1372,7 +1372,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
             }
           }
         >
-          text translated (1, 1900100)
+          text translated (1, 2000000)
         </Text>
         <View
           accessibilityLabel="text translated"
@@ -1408,7 +1408,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
               }
             }
             testID="seed.birthdayinput"
-            value="1500100"
+            value="1900100"
           />
         </View>
       </View>
@@ -1823,7 +1823,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
               }
             }
           >
-            1500100
+            1900100
           </Text>
         </View>
       </View>
@@ -2238,7 +2238,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
               }
             }
           >
-            1500100
+            1900100
           </Text>
         </View>
       </View>

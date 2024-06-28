@@ -8,15 +8,12 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import History from '../components/History';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
-import {
-  AddressKindEnum,
-  CurrencyEnum,
-  CurrencyNameEnum,
-  ModeEnum,
-  PoolEnum,
-  ReceiverEnum,
-  TransactionTypeEnum,
-} from '../app/AppState';
+import { CurrencyEnum, ModeEnum } from '../app/AppState';
+import { mockTransactions } from '../__mocks__/dataMocks/mockTransactions';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -92,91 +89,12 @@ jest.mock('react-native', () => {
 describe('Component History - test', () => {
   //snapshot test
   const state = defaultAppContextLoaded;
-  state.transactions = [
-    {
-      type: TransactionTypeEnum.Sent,
-      fee: 0.0001,
-      confirmations: 22,
-      txid: 'sent-txid-1234567890',
-      time: Date.now(),
-      zecPrice: 33.33,
-      txDetails: [
-        {
-          address: 'sent-address-1-12345678901234567890',
-          amount: 0.12345678,
-          memos: ['hola', '  & ', 'hello'],
-        },
-        {
-          address: 'sent-address-2-09876543210987654321',
-          amount: 0,
-          memos: ['hello', '  & ', 'hola'],
-        },
-      ],
-    },
-    {
-      type: TransactionTypeEnum.SendToSelf,
-      fee: 0.0001,
-      confirmations: 12,
-      txid: 'sendtoself-txid-1234567890',
-      time: Date.now(),
-      zecPrice: 33.33,
-      txDetails: [
-        {
-          address: '',
-          amount: 0,
-          memos: ['orchard memo', 'sapling memo'],
-        },
-      ],
-    },
-    {
-      type: TransactionTypeEnum.Received,
-      confirmations: 133,
-      txid: 'receive-txid-1234567890',
-      time: Date.now(),
-      zecPrice: 66.66,
-      txDetails: [
-        {
-          address: '',
-          amount: 0.77654321,
-          poolType: PoolEnum.OrchardPool,
-          memos: ['hola', '  & ', 'hello'],
-        },
-        {
-          address: '',
-          amount: 0.1,
-          poolType: PoolEnum.SaplingPool,
-          memos: ['hello', '  & ', 'hola'],
-        },
-      ],
-    },
-  ];
-  state.uaAddress = 'UA-12345678901234567890';
-  state.addresses = [
-    {
-      uaAddress: 'UA-12345678901234567890',
-      address: 'UA-12345678901234567890',
-      addressKind: AddressKindEnum.u,
-      containsPending: false,
-      receivers: ReceiverEnum.o + ReceiverEnum.z + ReceiverEnum.t,
-    },
-    {
-      uaAddress: 'UA-12345678901234567890',
-      address: 'sapling-12345678901234567890',
-      addressKind: AddressKindEnum.z,
-      containsPending: false,
-      receivers: ReceiverEnum.z,
-    },
-    {
-      uaAddress: 'UA-12345678901234567890',
-      address: 'transparent-12345678901234567890',
-      addressKind: AddressKindEnum.t,
-      containsPending: false,
-      receivers: ReceiverEnum.t,
-    },
-  ];
-  state.translate = () => 'text translated';
-  state.info.currencyName = CurrencyNameEnum.ZEC;
-  state.totalBalance.total = 1.12345678;
+  state.transactions = mockTransactions;
+  state.uaAddress = mockAddresses[0].uaAddress;
+  state.addresses = mockAddresses;
+  state.translate = mockTranslate;
+  state.info = mockInfo;
+  state.totalBalance = mockTotalBalance;
   const onFunction = jest.fn();
 
   test('History no currency, privacy normal & mode basic - snapshot', () => {

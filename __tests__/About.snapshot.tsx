@@ -8,9 +8,9 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import About from '../components/About';
 import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
-import { infoMock } from './dataMock/infoMock';
-import { totalBalanceMock } from './dataMock/totalBalanceMock';
-import { translateMock } from './dataMock/translateMock';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -49,9 +49,9 @@ describe('Component About - test', () => {
   //snapshot test
   test('About - snapshot', () => {
     const state = defaultAppContextLoaded;
-    state.translate = translateMock;
-    state.info = infoMock;
-    state.totalBalance = totalBalanceMock;
+    state.translate = mockTranslate;
+    state.info = mockInfo;
+    state.totalBalance = mockTotalBalance;
     const onClose = jest.fn();
     const about = render(
       <ContextAppLoadedProvider value={state}>

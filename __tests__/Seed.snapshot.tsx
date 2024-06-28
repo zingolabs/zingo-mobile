@@ -13,7 +13,11 @@ import {
   defaultAppContextLoaded,
   defaultAppContextLoading,
 } from '../app/context';
-import { CurrencyNameEnum, SeedActionEnum } from '../app/AppState';
+import { SeedActionEnum } from '../app/AppState';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -51,26 +55,10 @@ jest.mock('react-native', () => {
 describe('Component Seed - test', () => {
   //snapshot test
   const stateLoaded = defaultAppContextLoaded;
-  stateLoaded.translate = (p: string) => {
-    if (p === 'seed.buttontexts') {
-      return `{
-        "new": ["new"],
-        "change": ["change"],
-        "server": ["server"],
-        "view": ["view"],
-        "restore": ["restore"],
-        "backup": ["backup"]
-      }`;
-    } else {
-      return 'text translated';
-    }
-  };
-  stateLoaded.wallet = {
-    seed: 'pepe lolo titi',
-    birthday: 1500100,
-  };
-  stateLoaded.info.currencyName = CurrencyNameEnum.ZEC;
-  stateLoaded.totalBalance.total = 1.12345678;
+  stateLoaded.translate = mockTranslate;
+  stateLoaded.wallet = mockWallet;
+  stateLoaded.info = mockInfo;
+  stateLoaded.totalBalance = mockTotalBalance;
   const onOk = jest.fn();
   const onCancel = jest.fn();
   test('Seed View - snapshot', () => {
@@ -106,26 +94,10 @@ describe('Component Seed - test', () => {
     expect(seed.toJSON()).toMatchSnapshot();
   });
   const contextLoading = defaultAppContextLoading;
-  contextLoading.translate = (p: string) => {
-    if (p === 'seed.buttontexts') {
-      return `{
-        "new": ["new"],
-        "change": ["change"],
-        "server": ["server"],
-        "view": ["view"],
-        "restore": ["restore"],
-        "backup": ["backup"]
-      }`;
-    } else {
-      return 'text translated';
-    }
-  };
-  contextLoading.wallet = {
-    seed: 'pepe lolo titi',
-    birthday: 1500100,
-  };
-  contextLoading.info.latestBlock = 1900100;
-  contextLoading.totalBalance.total = 1.12345678;
+  contextLoading.translate = mockTranslate;
+  contextLoading.wallet = mockWallet;
+  contextLoading.info = mockInfo;
+  contextLoading.totalBalance = mockTotalBalance;
   test('Seed New - snapshot', () => {
     const seed = render(
       <ContextAppLoadingProvider value={contextLoading}>

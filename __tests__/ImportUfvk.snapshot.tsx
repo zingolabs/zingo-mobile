@@ -8,7 +8,9 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { ImportUfvk } from '../components/Ufvk';
 import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
-import { CurrencyNameEnum } from '../app/AppState';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -48,9 +50,9 @@ describe('Component ImportUfvk - test', () => {
   //snapshot test
   test('ImportUfvk - snapshot', () => {
     const state = defaultAppContextLoaded;
-    state.translate = () => 'text translated';
-    state.info.currencyName = CurrencyNameEnum.ZEC;
-    state.totalBalance.total = 1.12345678;
+    state.translate = mockTranslate;
+    state.info = mockInfo;
+    state.totalBalance = mockTotalBalance;
     const onCancel = jest.fn();
     const onOK = jest.fn();
     const importUfvk = render(

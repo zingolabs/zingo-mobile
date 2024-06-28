@@ -48,7 +48,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>
@@ -136,7 +136,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>
@@ -212,7 +212,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>

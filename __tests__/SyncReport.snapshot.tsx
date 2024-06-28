@@ -8,7 +8,11 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import SyncReport from '../components/SyncReport';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
-import { CurrencyNameEnum } from '../app/AppState';
+import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import mockSyncingStatus from '../__mocks__/dataMocks/mockSyncingStatus';
 
 const NetInfoStateType = {
   unknown: 'unknown',
@@ -61,19 +65,11 @@ jest.mock('react-native', () => {
 describe('Component SyncReport - test', () => {
   //snapshot test
   const state = defaultAppContextLoaded;
-  state.translate = () => 'translated text';
-  state.info.currencyName = CurrencyNameEnum.ZEC;
-  state.totalBalance.total = 1.12345678;
-  state.wallet.birthday = 1500100;
-  state.syncingStatus.syncID = 1;
-  state.syncingStatus.inProgress = true;
-  state.syncingStatus.currentBatch = 5;
-  state.syncingStatus.totalBatches = 50;
-  state.syncingStatus.currentBlock = 1800100;
-  state.syncingStatus.lastBlockWallet = 1800000;
-  state.syncingStatus.lastBlockServer = 1900100;
-  state.syncingStatus.secondsPerBatch = 122;
-  state.syncingStatus.processEndBlock = 1600100;
+  state.translate = mockTranslate;
+  state.info = mockInfo;
+  state.totalBalance = mockTotalBalance;
+  state.wallet = mockWallet;
+  state.syncingStatus = mockSyncingStatus;
   state.netInfo.isConnected = true;
   const onClose = jest.fn();
   test('SyncReport - snapshot', () => {

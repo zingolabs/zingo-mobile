@@ -8,7 +8,12 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Settings from '../components/Settings';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
-import { LanguageEnum, CurrencyEnum, ChainNameEnum, DownloadMemosEnum, CurrencyNameEnum } from '../app/AppState';
+import { LanguageEnum, CurrencyEnum } from '../app/AppState';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { mockServer } from '../__mocks__/dataMocks/mockServer';
+import { mockWalletSettings } from '../__mocks__/dataMocks/mockWalletSettings';
 
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
@@ -47,103 +52,16 @@ jest.useFakeTimers();
 describe('Component Settings - test', () => {
   //snapshot test
   const state = defaultAppContextLoaded;
-  state.translate = (p: string) => {
-    if (p === 'settings.memos') {
-      return [
-        {
-          value: DownloadMemosEnum.noneMemos,
-          text: 'text none',
-        },
-        {
-          value: DownloadMemosEnum.walletMemos,
-          text: 'text wallet',
-        },
-        {
-          value: DownloadMemosEnum.allMemos,
-          text: 'text all',
-        },
-      ];
-    }
-    if (p === 'settings.currencies') {
-      return [
-        {
-          value: '',
-          text: 'text no currency',
-        },
-        {
-          value: CurrencyEnum.USDCurrency,
-          text: 'text USD',
-        },
-      ];
-    }
-    if (p === 'settings.languages') {
-      return [
-        {
-          value: LanguageEnum.en,
-          text: 'text en',
-        },
-        {
-          value: LanguageEnum.es,
-          text: 'text es',
-        },
-        {
-          value: LanguageEnum.pt,
-          text: 'text pt',
-        },
-        {
-          value: LanguageEnum.ru,
-          text: 'text ru',
-        },
-      ];
-    }
-    if (p === 'settings.sendalls') {
-      return [
-        {
-          value: true,
-          text: 'text true',
-        },
-        {
-          value: false,
-          text: 'text false',
-        },
-      ];
-    }
-    if (p === 'settings.donations') {
-      return [
-        {
-          value: true,
-          text: 'text true',
-        },
-        {
-          value: false,
-          text: 'text false',
-        },
-      ];
-    }
-    if (p === 'settings.rescanmenus') {
-      return [
-        {
-          value: true,
-          text: 'text true',
-        },
-        {
-          value: false,
-          text: 'text false',
-        },
-      ];
-    }
-    return 'text translated';
-  };
-  state.info.currencyName = CurrencyNameEnum.ZEC;
-  state.totalBalance.total = 1.12345678;
-  state.server = { uri: 'https://zcash.es', chainName: ChainNameEnum.mainChainName };
+  state.translate = mockTranslate;
+  state.info = mockInfo;
+  state.totalBalance = mockTotalBalance;
+  state.server = mockServer;
   state.currency = CurrencyEnum.USDCurrency;
   state.language = LanguageEnum.en;
   state.sendAll = false;
   state.rescanMenu = false;
   state.donation = false;
-  state.walletSettings.downloadMemos = DownloadMemosEnum.walletMemos;
-  state.walletSettings.transactionFilterThreshold = '500';
+  state.walletSettings = mockWalletSettings;
   const onClose = jest.fn();
   const onSetOption = jest.fn();
   test('Settings - snapshot', () => {
