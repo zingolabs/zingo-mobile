@@ -57,4 +57,19 @@ export const mockTransactions: TransactionType[] = [
       },
     ],
   },
+  {
+    type: TransactionTypeEnum.Shield,
+    fee: 0.0001,
+    confirmations: 12,
+    txid: 'shield-txid-1234567890',
+    time: Date.now(),
+    zecPrice: 33.33,
+    txDetails: [
+      {
+        address: '',
+        poolType: PoolEnum.OrchardPool,
+        amount: 0.0009,
+      },
+    ],
+  },
 ];

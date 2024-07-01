@@ -157,4 +157,22 @@ describe('Component History TxDetail - test', () => {
     const txt = screen.queryByText('hola & hellohello & hola');
     expect(txt).toBe(null);
   });
+
+  test('History TxDetail - shield transaction', () => {
+    const txSelfSend = mockTransactions[3] as TransactionType;
+    render(
+      <ContextAppLoadedProvider value={state}>
+        <TxDetail
+          tx={txSelfSend}
+          closeModal={onClose}
+          openModal={onClose}
+          setPrivacyOption={onSetOption}
+          setSendPageState={onClose}
+        />
+      </ContextAppLoadedProvider>,
+    );
+    const num = screen.getAllByText('0.0009');
+    expect(num.length).toBe(2);
+    screen.getByText('0.0001');
+  });
 });

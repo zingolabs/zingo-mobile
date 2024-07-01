@@ -64,7 +64,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
     const spendCo =
       tx.confirmations === 0
         ? colors.primaryDisabled
-        : tx.type === TransactionTypeEnum.Received
+        : tx.type === TransactionTypeEnum.Received || tx.type === TransactionTypeEnum.Shield
         ? colors.primary
         : colors.text;
     setSpendColor(spendCo);
@@ -138,7 +138,11 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
               ? (translate('history.sent') as string)
               : tx.type === TransactionTypeEnum.Received
               ? (translate('history.received') as string)
-              : (translate('history.sendtoself') as string)}
+              : tx.type === TransactionTypeEnum.SendToSelf
+              ? (translate('history.sendtoself') as string)
+              : tx.type === TransactionTypeEnum.Shield
+              ? (translate('history.shield') as string)
+              : ''}
           </BoldText>
           <ZecAmount
             currencyName={info.currencyName}
