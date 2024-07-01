@@ -37,6 +37,8 @@ import { RPCSyncRescan } from './types/RPCSyncRescanType';
 import { RPCSummariesType } from './types/RPCSummariesType';
 import { RPCUfvkType } from './types/RPCUfvkType';
 import { RPCSendType } from './types/RPCSendType';
+import { RPCValueTransfersType } from './types/RPCValueTransfersType';
+import { RPCValueTransfersKindEnum } from './enums/RPCValueTransfersKindEnum';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -1282,8 +1284,6 @@ export default class RPC {
   // Fetch all T and Z and O transactions
   async fetchTandZandOTransactionsSummaries() {
     try {
-      const valueTransfersStr: string = await RPCModule.getValueTransfersList();
-      console.log('value transfers', valueTransfersStr);
       const summariesStr: string = await RPCModule.execute(CommandEnum.summaries, '');
       console.log('++++++++', summariesStr);
       console.log('======');
@@ -1389,7 +1389,7 @@ export default class RPC {
   async fetchTandZandOTransactionsValueTransfers() {
     try {
       const valueTransfersStr: string = await RPCModule.getValueTransfersList();
-      console.log(valueTransfersStr);
+      //console.log(valueTransfersStr);
       if (valueTransfersStr) {
         if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error txs value transfers ${valueTransfersStr}`);
@@ -1399,89 +1399,66 @@ export default class RPC {
         console.log('Internal Error txs value transfers');
         return;
       }
-      const summariesJSON: RPCSummariesType[] = await JSON.parse(valueTransfersStr);
+      const valueTransfersJSON = await JSON.parse(valueTransfersStr);
+
+      //console.log(valueTransfersJSON);
 
       await this.fetchInfoAndServerHeight();
 
       let txList: TransactionType[] = [];
 
-      summariesJSON
-        //.filter(tx => tx.kind !== TransactionTypeEnum.Fee)
-        .forEach((tx: RPCSummariesType) => {
-          let currentTxList: TransactionType[] = txList.filter(t => t.txid === tx.txid);
-          if (currentTxList.length === 0) {
-            currentTxList = [{} as TransactionType];
-            currentTxList[0].txDetails = [];
-          }
-          let restTxList: TransactionType[] = txList.filter(t => t.txid !== tx.txid);
+      valueTransfersJSON.value_transfers.forEach((tx: RPCValueTransfersType) => {
+        let pushIt: boolean = false;
+        let currentTxList: TransactionType[] = txList.filter(t => t.txid === tx.txid);
+        if (currentTxList.length === 0) {
+          currentTxList = [{} as TransactionType];
+          currentTxList[0].txDetails = [];
+          pushIt = true;
+        }
 
-          const type = tx.kind === TransactionTypeEnum.Fee ? TransactionTypeEnum.Sent : tx.kind;
-          if (!currentTxList[0].type && !!type) {
-            currentTxList[0].type = type;
-          }
-          if (tx.pending) {
-            currentTxList[0].confirmations = 0;
-          } else if (!currentTxList[0].confirmations) {
-            currentTxList[0].confirmations = this.lastServerBlockHeight
-              ? this.lastServerBlockHeight - tx.block_height + 1
-              : this.lastWalletBlockHeight - tx.block_height + 1;
-          }
-          if (!currentTxList[0].txid && !!tx.txid) {
-            currentTxList[0].txid = tx.txid;
-          }
-          if (!currentTxList[0].time && !!tx.datetime) {
-            currentTxList[0].time = tx.datetime;
-          }
-          if (!currentTxList[0].zecPrice && !!tx.price && tx.price !== 'None') {
-            currentTxList[0].zecPrice = tx.price;
-          }
+        currentTxList[0].txid = tx.txid;
+        currentTxList[0].time = tx.datetime;
+        currentTxList[0].type =
+          tx.kind === RPCValueTransfersKindEnum.noteToSelf
+            ? TransactionTypeEnum.SendToSelf
+            : tx.kind === RPCValueTransfersKindEnum.received
+            ? TransactionTypeEnum.Received
+            : tx.kind === RPCValueTransfersKindEnum.sent
+            ? TransactionTypeEnum.Sent
+            : tx.kind === RPCValueTransfersKindEnum.shield
+            ? TransactionTypeEnum.Shield
+            : undefined;
+        currentTxList[0].fee = (tx.transaction_fee ? tx.transaction_fee : 0) / 10 ** 8;
+        currentTxList[0].zecPrice = tx.zec_price;
+        if (tx.status === 'pending') {
+          currentTxList[0].confirmations = 0;
+        } else {
+          currentTxList[0].confirmations = this.lastServerBlockHeight
+            ? this.lastServerBlockHeight - tx.blockheight + 1
+            : this.lastWalletBlockHeight - tx.blockheight + 1;
+        }
 
-          if (tx.txid.startsWith('xxxxxxxx')) {
-            console.log('tran: ', tx);
-            console.log('--------------------------------------------------');
-          }
+        let currenttxdetails = {} as TxDetailType;
+        currenttxdetails.address = !tx.recipient_address ? '' : tx.recipient_address;
+        currenttxdetails.amount = (!tx.value ? 0 : tx.value) / 10 ** 8;
+        currenttxdetails.memos = !tx.memos ? undefined : tx.memos;
+        currenttxdetails.poolType = !tx.pool_received ? undefined : tx.pool_received;
+        currentTxList[0].txDetails.push(currenttxdetails);
 
-          let currenttxdetails: TxDetailType = {} as TxDetailType;
-          if (tx.kind === TransactionTypeEnum.Fee) {
-            currentTxList[0].fee = (currentTxList[0].fee ? currentTxList[0].fee : 0) + tx.amount / 10 ** 8;
-            if (currentTxList[0].txDetails.length === 0) {
-              // when only have 1 item with `Fee`, we assume this tx is `SendToSelf`.
-              currentTxList[0].type = TransactionTypeEnum.SendToSelf;
-              currenttxdetails.address = '';
-              currenttxdetails.amount = 0;
-              currentTxList[0].txDetails.push(currenttxdetails);
-            }
-          } else {
-            currenttxdetails.address = !tx.to_address || tx.to_address === 'None' ? '' : tx.to_address;
-            currenttxdetails.amount = tx.amount / 10 ** 8;
-            currenttxdetails.memos = !tx.memos ? undefined : tx.memos;
-            currenttxdetails.poolType = !tx.pool_type || tx.pool_type === 'None' ? undefined : tx.pool_type;
-            currentTxList[0].txDetails.push(currenttxdetails);
-          }
-          //console.log(currentTxList[0]);
-          txList = [...currentTxList, ...restTxList];
-        });
+        if (tx.txid.startsWith('c238c7492b266fdaaa3d88b6bcc33cc32eb126d54d1fb1e8692f54443e203fc8')) {
+          console.log('tran: ', tx);
+          console.log('--------------------------------------------------');
+        }
+
+        //console.log(currentTxList[0]);
+        if (pushIt) {
+          txList.push(currentTxList[0]);
+        }
+      });
 
       //console.log(txlist);
 
-      // Now, combine the amounts and memos
-      const combinedTxList: TransactionType[] = [];
-      txList.forEach((txns: TransactionType) => {
-        const combinedTx = txns;
-        if (txns.type === TransactionTypeEnum.Sent || txns.type === TransactionTypeEnum.SendToSelf) {
-          // using address for `Sent` & `SendToSelf`
-          combinedTx.txDetails = RPC.rpcCombineTxDetailsByAddress(txns.txDetails);
-        } else {
-          // using pool for `Received`
-          combinedTx.txDetails = RPC.rpcCombineTxDetailsByPool(txns.txDetails);
-        }
-        //console.log(combinedTx);
-        combinedTxList.push(combinedTx);
-      });
-
-      //console.log(combinedTxList);
-
-      this.fnSetTransactionsList(combinedTxList);
+      this.fnSetTransactionsList(txList);
     } catch (error) {
       console.log(`Critical Error txs list value transfers ${error}`);
       return;

@@ -2,7 +2,7 @@ import { TransactionTypeEnum } from '../enums/TransactionTypeEnum';
 import TxDetailType from './TxDetailType';
 
 export default interface TransactionType {
-  type: TransactionTypeEnum.Sent | TransactionTypeEnum.Received | TransactionTypeEnum.SendToSelf; // like kind
+  type?: TransactionTypeEnum; // like kind
   fee?: number;
   confirmations: number;
   txid: string;
