@@ -1445,7 +1445,7 @@ export default class RPC {
         currenttxdetails.poolType = !tx.pool_received ? undefined : tx.pool_received;
         currentTxList[0].txDetails.push(currenttxdetails);
 
-        if (tx.txid.startsWith('c238c7492b266fdaaa3d88b6bcc33cc32eb126d54d1fb1e8692f54443e203fc8')) {
+        if (tx.txid.startsWith('xxxxxxxxx')) {
           console.log('tran: ', tx);
           console.log('--------------------------------------------------');
         }
