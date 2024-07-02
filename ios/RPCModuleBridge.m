@@ -66,5 +66,8 @@ RCT_EXTERN_METHOD(getLatestBlock:
 RCT_EXTERN_METHOD(getDonationAddress:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getValueTransfersList:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end
