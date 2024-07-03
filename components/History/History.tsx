@@ -60,7 +60,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   var lastMonth = '';
 
   const fetchTransactionsSorted = useMemo(() => {
-    return transactions.slice(0, numTx).sort((a, b) => b.time - a.time);
+    return transactions.sort((a, b) => b.time - a.time).slice(0, numTx);
   }, [transactions, numTx]);
 
   useEffect(() => {
