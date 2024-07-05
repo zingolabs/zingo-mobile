@@ -120,7 +120,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
         setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
       />
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', marginRight: 30 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginRight: 30 }}>
         <TouchableOpacity onPress={() => moveTxDetail(tx.txid, -1)} style={{ marginRight: 25 }} disabled={index === 0}>
           <FontAwesomeIcon icon={faChevronUp} color={index === 0 ? colors.primaryDisabled : colors.primary} size={30} />
         </TouchableOpacity>
