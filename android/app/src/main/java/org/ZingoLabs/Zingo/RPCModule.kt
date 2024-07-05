@@ -490,4 +490,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         promise.resolve(resp)
     }
 
+    @ReactMethod
+    fun getTransactionSummariesList(promise: Promise) {
+        // Log.i("MAIN", "Initialize Light Client")
+
+        uniffi.zingo.initLogging()
+
+        // Initialize Light Client
+        val resp = uniffi.zingo.getTransactionSummaries()
+
+        promise.resolve(resp)
+    }
+
 }

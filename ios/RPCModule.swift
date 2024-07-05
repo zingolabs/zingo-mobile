@@ -403,7 +403,7 @@ class RPCModule: NSObject {
           let respStr = String(resp)
           resolve(respStr)
       } else {
-          NSLog("Error getting latest block server")
+          NSLog("Error getting developer donation address")
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
               resolve("Error: [Native] Getting developer donation address. Command arguments problem.")
           }
@@ -422,9 +422,28 @@ class RPCModule: NSObject {
           let respStr = String(resp)
           resolve(respStr)
       } else {
-          NSLog("Error getting latest block server")
+          NSLog("Error getting value transfers list")
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-              resolve("Error: [Native] Getting developer donation address. Command arguments problem.")
+              resolve("Error: [Native] Getting value transfers list. Command arguments problem.")
+          }
+      }
+  }
+
+  @objc(getTransactionSummariesList:reject:)
+  func getTransactionSummariesList(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      self.getTransactionSummariesListAsync(dict)
+  }
+
+  func getTransactionSummariesListAsync(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getTransactionSummaries()
+          let respStr = String(resp)
+          resolve(respStr)
+      } else {
+          NSLog("Error getting transaction summaries list")
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+              resolve("Error: [Native] Getting transaction summaries list. Command arguments problem.")
           }
       }
   }
