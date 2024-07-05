@@ -72,6 +72,17 @@ const History: React.FunctionComponent<HistoryProps> = ({
     setNumTx(numTx + 50);
   }, [numTx]);
 
+  const moveTxDetail = (txid: string, type: number) => {
+    // -1 -> Prevoius transaction
+    //  1 -> Next transaction
+    const index = transactionsSorted.findIndex((tx: TransactionType) => tx.txid === txid);
+    console.log(index);
+    if ((index > 0 && type === -1) || (index < transactionsSorted.length - 1 && type === 1)) {
+      console.log(transactionsSorted[index + type].txid);
+      setTxDetail(transactionsSorted[index + type]);
+    }
+  };
+
   //console.log('render History - 4');
 
   return (
@@ -90,11 +101,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
         visible={isTxDetailModalShowing}
         onRequestClose={() => setTxDetailModalShowing(false)}>
         <TxDetail
+          index={transactionsSorted.findIndex((tx: TransactionType) => tx.txid === txDetail.txid)}
+          length={transactionsSorted.length}
           tx={txDetail}
           closeModal={() => setTxDetailModalShowing(false)}
           openModal={() => setTxDetailModalShowing(true)}
           setPrivacyOption={setPrivacyOption}
           setSendPageState={setSendPageState}
+          moveTxDetail={moveTxDetail}
         />
       </Modal>
 

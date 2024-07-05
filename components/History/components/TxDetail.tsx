@@ -33,24 +33,30 @@ import CurrencyAmount from '../../Components/CurrencyAmount';
 import AddressItem from '../../Components/AddressItem';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 // this is for http. (red)
-import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { faTriangleExclamation, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 // this is for https. (primary)
 //import { faLock } from '@fortawesome/free-solid-svg-icons';
 
 type TxDetailProps = {
+  index: number;
+  length: number;
   tx: TransactionType;
   closeModal: () => void;
   openModal: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setSendPageState: (s: SendPageStateClass) => void;
+  moveTxDetail: (txid: string, t: number) => void;
 };
 
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({
+  index,
+  length,
   tx,
   closeModal,
   setPrivacyOption,
   openModal,
   setSendPageState,
+  moveTxDetail,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, language, privacy, addLastSnackbar, server, currency, addressBook, addresses } = context;
@@ -114,6 +120,22 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
         setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
       />
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', marginRight: 30 }}>
+        <TouchableOpacity onPress={() => moveTxDetail(tx.txid, -1)} style={{ marginRight: 25 }} disabled={index === 0}>
+          <FontAwesomeIcon icon={faChevronUp} color={index === 0 ? colors.primaryDisabled : colors.primary} size={30} />
+        </TouchableOpacity>
+        <FadeText>{(index + 1).toString()}</FadeText>
+        <TouchableOpacity
+          onPress={() => moveTxDetail(tx.txid, 1)}
+          style={{ marginLeft: 25 }}
+          disabled={index === length - 1}>
+          <FontAwesomeIcon
+            icon={faChevronDown}
+            color={index === length - 1 ? colors.primaryDisabled : colors.primary}
+            size={30}
+          />
+        </TouchableOpacity>
+      </View>
       <ScrollView
         showsVerticalScrollIndicator={true}
         persistentScrollbar={true}

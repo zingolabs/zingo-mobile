@@ -93,17 +93,21 @@ describe('Component History TxDetail - test', () => {
   state.totalBalance = mockTotalBalance;
   const onClose = jest.fn();
   const onSetOption = jest.fn();
+  const onMove = jest.fn();
 
   test('History TxDetail - sent transaction with 2 addresses', () => {
     const tx = mockTransactions[0] as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail
+          index={0}
+          length={mockTransactions.length}
           tx={tx}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
           setSendPageState={onClose}
+          moveTxDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     ).toJSON();
@@ -118,15 +122,18 @@ describe('Component History TxDetail - test', () => {
   });
 
   test('History TxDetail - self sent transaction', () => {
-    const txSelfSend = mockTransactions[1] as TransactionType;
+    const tx = mockTransactions[1] as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail
-          tx={txSelfSend}
+          index={1}
+          length={mockTransactions.length}
+          tx={tx}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
           setSendPageState={onClose}
+          moveTxDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
@@ -137,15 +144,18 @@ describe('Component History TxDetail - test', () => {
   });
 
   test('History TxDetail - received transaction with 2 pools', () => {
-    const txSelfSend = mockTransactions[2] as TransactionType;
+    const tx = mockTransactions[2] as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail
-          tx={txSelfSend}
+          index={2}
+          length={mockTransactions.length}
+          tx={tx}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
           setSendPageState={onClose}
+          moveTxDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
@@ -159,15 +169,18 @@ describe('Component History TxDetail - test', () => {
   });
 
   test('History TxDetail - shield transaction', () => {
-    const txSelfSend = mockTransactions[3] as TransactionType;
+    const tx = mockTransactions[3] as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail
-          tx={txSelfSend}
+          index={3}
+          length={mockTransactions.length}
+          tx={tx}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
           setSendPageState={onClose}
+          moveTxDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
