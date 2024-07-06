@@ -496,7 +496,7 @@
     "back": " Back",
     "sent": "Sent ",
     "received": "Received ",
-    "sendtoself": "Send-to-Self ",
+    "notetoself": "Note-to-Self ",
     "shield": "Shield",
     "sending": "...Sending... ",
     "receiving": "...Receiving... ",

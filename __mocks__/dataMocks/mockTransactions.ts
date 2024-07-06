@@ -22,10 +22,10 @@ export const mockTransactions: TransactionType[] = [
     ],
   },
   {
-    type: TransactionTypeEnum.SendToSelf,
+    type: TransactionTypeEnum.NoteToSelf,
     fee: 0.0001,
     confirmations: 12,
-    txid: 'sendtoself-txid-1234567890',
+    txid: 'notetooself-txid-1234567890',
     time: Date.now(),
     zecPrice: 33.33,
     txDetails: [

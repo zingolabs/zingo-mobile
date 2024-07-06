@@ -128,13 +128,13 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                 display: 'flex',
                 flexDirection:
                   tx.type === TransactionTypeEnum.Received ||
-                  tx.type === TransactionTypeEnum.SendToSelf ||
+                  tx.type === TransactionTypeEnum.NoteToSelf ||
                   tx.type === TransactionTypeEnum.Shield
                     ? 'column'
                     : 'row',
                 alignItems:
                   tx.type === TransactionTypeEnum.Received ||
-                  tx.type === TransactionTypeEnum.SendToSelf ||
+                  tx.type === TransactionTypeEnum.NoteToSelf ||
                   tx.type === TransactionTypeEnum.Shield
                     ? 'flex-start'
                     : 'center',
@@ -154,10 +154,10 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
                   ? (translate('history.receiving') as string)
                   : tx.type === TransactionTypeEnum.Received && tx.confirmations > 0
                   ? (translate('history.received') as string)
-                  : tx.type === TransactionTypeEnum.SendToSelf && tx.confirmations === 0
+                  : tx.type === TransactionTypeEnum.NoteToSelf && tx.confirmations === 0
                   ? (translate('history.sendingtoself') as string)
-                  : tx.type === TransactionTypeEnum.SendToSelf && tx.confirmations > 0
-                  ? (translate('history.sendtoself') as string)
+                  : tx.type === TransactionTypeEnum.NoteToSelf && tx.confirmations > 0
+                  ? (translate('history.notetoself') as string)
                   : tx.type === TransactionTypeEnum.Shield && tx.confirmations === 0
                   ? (translate('history.shielding') as string)
                   : tx.type === TransactionTypeEnum.Shield && tx.confirmations > 0

@@ -1,5 +1,5 @@
 import { PoolEnum } from '../../AppState';
-import { RPCValueTransfersStatusEnum } from '../enums/RCPValueTransfersStatusEnum';
+import { RPCValueTransfersStatusEnum } from '../enums/RPCValueTransfersStatusEnum';
 import { RPCValueTransfersKindEnum } from '../enums/RPCValueTransfersKindEnum';
 
 export type RPCValueTransfersType = {

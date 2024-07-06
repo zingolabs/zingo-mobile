@@ -773,10 +773,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate('loadedapp.uas-menu') as string;
-              } else if (txNew[0].type === TransactionTypeEnum.SendToSelf) {
+              } else if (txNew[0].type === TransactionTypeEnum.NoteToSelf) {
                 message =
                   (this.state.translate('loadedapp.transaction-confirmed') as string) +
-                  (this.state.translate('history.sendtoself') as string) +
+                  (this.state.translate('history.notetoself') as string) +
                   (txNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
                       ' ' +

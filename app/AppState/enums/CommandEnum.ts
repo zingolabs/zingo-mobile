@@ -5,7 +5,6 @@ export enum CommandEnum {
   interruptSyncAfterBatch = 'interrupt_sync_after_batch',
   updatecurrentprice = 'updatecurrentprice',
   notes = 'notes',
-  summaries = 'summaries',
   height = 'height',
   setoption = 'setoption',
   getoption = 'getoption',
