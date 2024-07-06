@@ -88,7 +88,7 @@ data class Send (
     val memo : String?
 )
 
-data class ValueTransfers (
+data class ValueTransfer (
     val txid : String,
     val datetime : Long,
     val status: String,
@@ -100,6 +100,10 @@ data class ValueTransfers (
     val recipient_address : String?,
     val pool_received : String?,
     val memos : List<String>?,
+)
+
+data class ValueTransfers (
+    val value_transfers : List<ValueTransfer>,
 )
 
 @Category(OfflineTest::class)
@@ -339,25 +343,25 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
         println("\nValue Transfers:")
         println(valueTranfersJson)
-        val valueTranfers: List<ValueTransfers> = mapper.readValue(valueTranfersJson)
+        val valueTranfers: ValueTransfers = mapper.readValue(valueTranfersJson)
         // the value transfers have 3 items for 3 different txs
         // 1. Received - 1_000_000 - orchard (1 item)
         // 2. Sent - 110_000 - uregtest1zkuzfv5m3... (1 item)
         // 3. NoteToSelf - 10_000 (1 item)
-        assertThat(valueTranfers.size).isEqualTo(3)
+        assertThat(valueTranfers.value_transfers.size).isEqualTo(3)
         // first item have to be a `Received`
-        assertThat(valueTranfers[0].kind).isEqualTo("received")
-        assertThat(valueTranfers[0].pool_received).isEqualTo("Orchard")
-        assertThat(valueTranfers[0].value).isEqualTo(1000000)
+        assertThat(valueTranfers.value_transfers[0].kind).isEqualTo("received")
+        assertThat(valueTranfers.value_transfers[0].pool_received).isEqualTo("Orchard")
+        assertThat(valueTranfers.value_transfers[0].value).isEqualTo(1000000)
         // second item have to be a `Sent`
-        assertThat(valueTranfers[1].kind).isEqualTo("sent")
-        assertThat(valueTranfers[1].recipient_address).isEqualTo("uregtest1zkuzfv5m3yhv2j4fmvq5rjurkxenxyq8r7h4daun2zkznrjaa8ra8asgdm8wwgwjvlwwrxx7347r8w0ee6dqyw4rufw4wg9djwcr6frzkezmdw6dud3wsm99eany5r8wgsctlxquu009nzd6hsme2tcsk0v3sgjvxa70er7h27z5epr67p5q767s2z5gt88paru56mxpm6pwz0cu35m")
-        assertThat(valueTranfers[1].value).isEqualTo(100000)
-        assertThat(valueTranfers[1].transaction_fee).isEqualTo(10000)
+        assertThat(valueTranfers.value_transfers[1].kind).isEqualTo("sent")
+        assertThat(valueTranfers.value_transfers[1].recipient_address).isEqualTo("uregtest1zkuzfv5m3yhv2j4fmvq5rjurkxenxyq8r7h4daun2zkznrjaa8ra8asgdm8wwgwjvlwwrxx7347r8w0ee6dqyw4rufw4wg9djwcr6frzkezmdw6dud3wsm99eany5r8wgsctlxquu009nzd6hsme2tcsk0v3sgjvxa70er7h27z5epr67p5q767s2z5gt88paru56mxpm6pwz0cu35m")
+        assertThat(valueTranfers.value_transfers[1].value).isEqualTo(100000)
+        assertThat(valueTranfers.value_transfers[1].transaction_fee).isEqualTo(10000)
         // third item have to be a `fee` from the last `Sent` with the same txid
-        assertThat(valueTranfers[2].kind).isEqualTo("note-to-self")
-        assertThat(valueTranfers[2].value).isEqualTo(10000)
-        assertThat(valueTranfers[2].transaction_fee).isEqualTo(10000)
+        assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("note-to-self")
+        assertThat(valueTranfers.value_transfers[2].value).isEqualTo(10000)
+        assertThat(valueTranfers.value_transfers[2].transaction_fee).isEqualTo(10000)
         
     }
 }
