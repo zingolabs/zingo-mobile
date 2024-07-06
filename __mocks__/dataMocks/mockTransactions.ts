@@ -6,7 +6,7 @@ export const mockTransactions: TransactionType[] = [
     fee: 0.0001,
     confirmations: 22,
     txid: 'sent-txid-1234567890',
-    time: Date.now(),
+    time: Date.now() - 1000,
     zecPrice: 33.33,
     txDetails: [
       {
@@ -26,7 +26,7 @@ export const mockTransactions: TransactionType[] = [
     fee: 0.0001,
     confirmations: 12,
     txid: 'notetooself-txid-1234567890',
-    time: Date.now(),
+    time: Date.now() - 100,
     zecPrice: 33.33,
     txDetails: [
       {
@@ -40,7 +40,7 @@ export const mockTransactions: TransactionType[] = [
     type: TransactionTypeEnum.Received,
     confirmations: 133,
     txid: 'receive-txid-1234567890',
-    time: Date.now(),
+    time: Date.now() - 10,
     zecPrice: 66.66,
     txDetails: [
       {

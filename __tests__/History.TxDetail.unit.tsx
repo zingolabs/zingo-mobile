@@ -8,7 +8,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import TxDetail from '../components/History/components/TxDetail';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
-import { TransactionType } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
@@ -91,18 +90,18 @@ describe('Component History TxDetail - test', () => {
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
+  state.transactions = mockTransactions;
   const onClose = jest.fn();
   const onSetOption = jest.fn();
   const onMove = jest.fn();
 
   test('History TxDetail - sent transaction with 2 addresses', () => {
-    const tx = mockTransactions[0] as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail
           index={0}
           length={mockTransactions.length}
-          tx={tx}
+          tx={mockTransactions[0]}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
@@ -122,13 +121,12 @@ describe('Component History TxDetail - test', () => {
   });
 
   test('History TxDetail - self sent transaction', () => {
-    const tx = mockTransactions[1] as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail
           index={1}
           length={mockTransactions.length}
-          tx={tx}
+          tx={mockTransactions[1]}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
@@ -144,13 +142,12 @@ describe('Component History TxDetail - test', () => {
   });
 
   test('History TxDetail - received transaction with 2 pools', () => {
-    const tx = mockTransactions[2] as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail
           index={2}
           length={mockTransactions.length}
-          tx={tx}
+          tx={mockTransactions[2]}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
@@ -169,13 +166,12 @@ describe('Component History TxDetail - test', () => {
   });
 
   test('History TxDetail - shield transaction', () => {
-    const tx = mockTransactions[3] as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail
           index={3}
           length={mockTransactions.length}
-          tx={tx}
+          tx={mockTransactions[3]}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
