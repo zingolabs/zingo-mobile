@@ -336,7 +336,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         println("\nSync:")
         println(syncJson)
 
-        val valueTranfersJson: String = uniffi.zingo.getValueTransfersList()
+        val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
         println("\nValue Transfers:")
         println(valueTranfersJson)
         val valueTranfers: List<ValueTransfers> = mapper.readValue(valueTranfersJson)
@@ -344,7 +344,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         // 1. Received - 1_000_000 - orchard (1 item)
         // 2. Sent - 110_000 - uregtest1zkuzfv5m3... (1 item)
         // 3. NoteToSelf - 10_000 (1 item)
-        assertThat(valueTranfers.size).isIn(3)
+        assertThat(valueTranfers.size).isEqualTo(3)
         // first item have to be a `Received`
         assertThat(valueTranfers[0].kind).isEqualTo("received")
         assertThat(valueTranfers[0].pool_received).isEqualTo("Orchard")
@@ -356,7 +356,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         assertThat(valueTranfers[1].transaction_fee).isEqualTo(10000)
         // third item have to be a `fee` from the last `Sent` with the same txid
         assertThat(valueTranfers[2].kind).isEqualTo("note-to-self")
-        assertThat(valueTranfers[2].amount).isEqualTo(10000)
+        assertThat(valueTranfers[2].value).isEqualTo(10000)
         assertThat(valueTranfers[2].transaction_fee).isEqualTo(10000)
         
     }
@@ -385,7 +385,7 @@ class ExecuteSaplingBalanceFromSeed {
         println("\nSync:")
         println(syncJson)
         
-        val valueTranfersJson: String = uniffi.zingo.getValueTransfersList()
+        val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
         println("\nValue Transfers:")
         println(valueTranfersJson)
 
