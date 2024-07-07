@@ -73,12 +73,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
   }, [numTx]);
 
   const moveTxDetail = (txid: string, type: number) => {
-    // -1 -> Prevoius transaction
+    // -1 -> Previous transaction
     //  1 -> Next transaction
     const index = transactionsSorted.findIndex((tx: TransactionType) => tx.txid === txid);
-    console.log(index);
     if ((index > 0 && type === -1) || (index < transactionsSorted.length - 1 && type === 1)) {
-      console.log(transactionsSorted[index + type].txid);
       setTxDetail(transactionsSorted[index + type]);
     }
   };
