@@ -347,7 +347,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         // 1. Received - 1_000_000 - orchard (1 item)
         // 2. Sent - 110_000 - uregtest1zkuzfv5m3... (1 item)
         // 3. NoteToSelf - 10_000 (1 item) -> in valueTransfers doesn't exists (Why?)
-        assertThat(valueTranfers.value_transfers.size).isEqualTo(2)
+        assertThat(valueTranfers.value_transfers.size).isEqualTo(3)
         // first item have to be a `Received`
         assertThat(valueTranfers.value_transfers[0].kind).isEqualTo("received")
         assertThat(valueTranfers.value_transfers[0].pool_received).isEqualTo("Orchard")
