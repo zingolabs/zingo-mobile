@@ -13,7 +13,6 @@ import {
   CommandEnum,
   ChainNameEnum,
   TransactionTypeEnum,
-  PoolEnum,
   WalletOptionEnum,
   CurrencyNameEnum,
   AddressKindEnum,
@@ -34,7 +33,6 @@ import { RPCSyncStatusType } from './types/RPCSyncStatusType';
 import { RPCGetOptionType } from './types/RPCGetOptionType';
 import { RPCSendProgressType } from './types/RPCSendProgressType';
 import { RPCSyncRescan } from './types/RPCSyncRescanType';
-import { RPCSummariesType } from './types/RPCSummariesType';
 import { RPCUfvkType } from './types/RPCUfvkType';
 import { RPCSendType } from './types/RPCSendType';
 import { RPCValueTransfersType } from './types/RPCValueTransfersType';
@@ -366,109 +364,6 @@ export default class RPC {
     }
   }
 
-  // We combine detailed transactions if they are sent to the same outgoing address in the same txid. This
-  // is usually done to split long memos.
-  // Remember to add up both amounts and combine memos
-  static rpcCombineTxDetailsByAddress(txdetails: TxDetailType[]): TxDetailType[] {
-    // First, group by outgoing address.
-    const m = new Map<string, TxDetailType[]>();
-    txdetails
-      .filter(i => i.address !== undefined)
-      .forEach(i => {
-        const coll = m.get(i.address as string);
-        if (!coll) {
-          m.set(i.address as string, [i]);
-        } else {
-          coll.push(i);
-        }
-      });
-
-    // Reduce the groups to a single TxDetail, combining memos and summing amounts
-    const reducedDetailedTxns: TxDetailType[] = [];
-    m.forEach((txns, toaddr) => {
-      const totalAmount = txns.reduce((sum, i) => sum + i.amount, 0);
-
-      const memos = txns
-        .filter(i => i.memos && i.memos.length > 0)
-        .map(a => a.memos)
-        .flat()
-        .map(memo => {
-          const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
-          const tags = memo?.match(rex);
-          if (tags && tags.length >= 4) {
-            return { num: parseInt(tags[1], 10), memo: tags[3] };
-          }
-
-          // Just return as is
-          return { num: 0, memo };
-        })
-        .sort((a, b) => a.num - b.num)
-        .map(a => a.memo);
-
-      const detail: TxDetailType = {
-        address: toaddr,
-        amount: totalAmount,
-        memos: memos && memos.length > 0 ? [memos.join('')] : undefined,
-      };
-
-      reducedDetailedTxns.push(detail);
-    });
-
-    return reducedDetailedTxns;
-  }
-
-  // We combine detailed transactions if they are received to the same pool in the same txid. This
-  // is usually done to split long memos.
-  // Remember to add up both amounts and combine memos
-  static rpcCombineTxDetailsByPool(txdetails: TxDetailType[]): TxDetailType[] {
-    // First, group by pool.
-    const m = new Map<PoolEnum, TxDetailType[]>();
-    txdetails
-      .filter(i => i.poolType !== undefined)
-      .forEach(i => {
-        const coll = m.get(i.poolType as PoolEnum);
-        if (!coll) {
-          m.set(i.poolType as PoolEnum, [i]);
-        } else {
-          coll.push(i);
-        }
-      });
-
-    // Reduce the groups to a single TxDetail, combining memos and summing amounts
-    const reducedDetailedTxns: TxDetailType[] = [];
-    m.forEach((txns, pool_type) => {
-      const totalAmount = txns.reduce((sum, i) => sum + i.amount, 0);
-
-      const memos = txns
-        .filter(i => i.memos && i.memos.length > 0)
-        .map(a => a.memos)
-        .flat()
-        .map(memo => {
-          const rex = /\((\d+)\/(\d+)\)((.|[\r\n])*)/;
-          const tags = memo?.match(rex);
-          if (tags && tags.length >= 4) {
-            return { num: parseInt(tags[1], 10), memo: tags[3] };
-          }
-
-          // Just return as is
-          return { num: 0, memo };
-        })
-        .sort((a, b) => a.num - b.num)
-        .map(a => a.memo);
-
-      const detail: TxDetailType = {
-        address: '',
-        amount: totalAmount,
-        memos: memos && memos.length > 0 ? [memos.join('')] : undefined,
-        poolType: pool_type,
-      };
-
-      reducedDetailedTxns.push(detail);
-    });
-
-    return reducedDetailedTxns;
-  }
-
   // this is only for the first time when the App is booting, but
   // there are more cases:
   // - LoadedApp mounting component.
@@ -711,7 +606,6 @@ export default class RPC {
 
   async loadWalletData() {
     await this.fetchTotalBalance();
-    //await this.fetchTandZandOTransactionsSummaries();
     await this.fetchTandZandOTransactionsValueTransfers();
     await this.fetchWalletSettings();
     await this.fetchInfoAndServerHeight();
@@ -1278,109 +1172,6 @@ export default class RPC {
 
     if (wallet) {
       this.walletBirthday = wallet.birthday;
-    }
-  }
-
-  // Fetch all T and Z and O transactions
-  // deprecated
-  async fetchTandZandOTransactionsSummaries() {
-    try {
-      const summariesStr: string = await RPCModule.getTransactionSummariesList();
-      console.log('++++++++', summariesStr);
-      console.log('======');
-      if (summariesStr) {
-        if (summariesStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error txs summaries ${summariesStr}`);
-          return;
-        }
-      } else {
-        console.log('Internal Error txs summaries');
-        return;
-      }
-      const summariesJSON = await JSON.parse(summariesStr);
-
-      await this.fetchInfoAndServerHeight();
-
-      let txList: TransactionType[] = [];
-
-      summariesJSON.transaction_summaries.forEach((tx: RPCSummariesType) => {
-        let currentTxList: TransactionType[] = txList.filter(t => t.txid === tx.txid);
-        if (currentTxList.length === 0) {
-          currentTxList = [{} as TransactionType];
-          currentTxList[0].txDetails = [];
-        }
-        let restTxList: TransactionType[] = txList.filter(t => t.txid !== tx.txid);
-
-        const type = tx.kind === TransactionTypeEnum.Fee ? TransactionTypeEnum.Sent : tx.kind;
-        if (!currentTxList[0].type && !!type) {
-          currentTxList[0].type = type;
-        }
-        if (tx.pending) {
-          currentTxList[0].confirmations = 0;
-        } else if (!currentTxList[0].confirmations) {
-          currentTxList[0].confirmations = this.lastServerBlockHeight
-            ? this.lastServerBlockHeight - tx.block_height + 1
-            : this.lastWalletBlockHeight - tx.block_height + 1;
-        }
-        if (!currentTxList[0].txid && !!tx.txid) {
-          currentTxList[0].txid = tx.txid;
-        }
-        if (!currentTxList[0].time && !!tx.datetime) {
-          currentTxList[0].time = tx.datetime;
-        }
-        if (!currentTxList[0].zecPrice && !!tx.price && tx.price !== 'None') {
-          currentTxList[0].zecPrice = tx.price;
-        }
-
-        if (tx.txid.startsWith('xxxxxxxx')) {
-          console.log('tran: ', tx);
-          console.log('--------------------------------------------------');
-        }
-
-        let currenttxdetails: TxDetailType = {} as TxDetailType;
-        if (tx.kind === TransactionTypeEnum.Fee) {
-          currentTxList[0].fee = (currentTxList[0].fee ? currentTxList[0].fee : 0) + tx.amount / 10 ** 8;
-          if (currentTxList[0].txDetails.length === 0) {
-            // when only have 1 item with `Fee`, we assume this tx is `MemoToSelf`.
-            currentTxList[0].type = TransactionTypeEnum.MemoToSelf;
-            currenttxdetails.address = '';
-            currenttxdetails.amount = 0;
-            currentTxList[0].txDetails.push(currenttxdetails);
-          }
-        } else {
-          currenttxdetails.address = !tx.to_address || tx.to_address === 'None' ? '' : tx.to_address;
-          currenttxdetails.amount = tx.amount / 10 ** 8;
-          currenttxdetails.memos = !tx.memos ? undefined : tx.memos;
-          currenttxdetails.poolType = !tx.pool_type || tx.pool_type === 'None' ? undefined : tx.pool_type;
-          currentTxList[0].txDetails.push(currenttxdetails);
-        }
-        //console.log(currentTxList[0]);
-        txList = [...currentTxList, ...restTxList];
-      });
-
-      //console.log(txlist);
-
-      // Now, combine the amounts and memos
-      const combinedTxList: TransactionType[] = [];
-      txList.forEach((txns: TransactionType) => {
-        const combinedTx = txns;
-        if (txns.type === TransactionTypeEnum.Sent || txns.type === TransactionTypeEnum.MemoToSelf) {
-          // using address for `Sent` & `MemoToSelf`
-          combinedTx.txDetails = RPC.rpcCombineTxDetailsByAddress(txns.txDetails);
-        } else {
-          // using pool for `Received`
-          combinedTx.txDetails = RPC.rpcCombineTxDetailsByPool(txns.txDetails);
-        }
-        //console.log(combinedTx);
-        combinedTxList.push(combinedTx);
-      });
-
-      //console.log(combinedTxList);
-
-      this.fnSetTransactionsList(combinedTxList);
-    } catch (error) {
-      console.log(`Critical Error txs list ${error}`);
-      return;
     }
   }
 

@@ -4,7 +4,4 @@ export enum TransactionTypeEnum {
   MemoToSelf = 'MemoToSelf',
   SendToSelf = 'SendToSelf',
   Shield = 'Shield',
-
-  // obsolete
-  Fee = 'Fee',
 }
