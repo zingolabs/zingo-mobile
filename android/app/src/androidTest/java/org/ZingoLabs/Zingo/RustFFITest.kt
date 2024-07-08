@@ -346,7 +346,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         // the value transfers have 3 items for 3 different txs
         // 1. Received - 1_000_000 - orchard (1 item)
         // 2. Sent - 110_000 - uregtest1zkuzfv5m3... (1 item)
-        // 3. NoteToSelf - 10_000 (1 item) -> in valueTransfers doesn't exists (Why?)
+        // 3. memoToSelf - 10_000 (1 item) -> in valueTransfers doesn't exists (Why?)
         assertThat(valueTranfers.value_transfers.size).isEqualTo(3)
         // first item have to be a `Received`
         assertThat(valueTranfers.value_transfers[0].kind).isEqualTo("received")
@@ -360,7 +360,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         assertThat(valueTranfers.value_transfers[1].value).isEqualTo(100000)
         assertThat(valueTranfers.value_transfers[1].transaction_fee).isEqualTo(10000)
         // third item have to be a `fee` from the last `Sent` with the same txid
-        assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("note-to-self")
+        assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("memo-to-self")
         assertThat(valueTranfers.value_transfers[2].status).isEqualTo("confirmed")
         assertThat(valueTranfers.value_transfers[2].value).isEqualTo(100000)
         assertThat(valueTranfers.value_transfers[2].transaction_fee).isEqualTo(10000)
@@ -399,9 +399,9 @@ class ExecuteSaplingBalanceFromSeed {
         // 2. Received in sapling pool =     +250_000
         // 3. Received in transparent pool = +250_000
         // 4. Send - 100_000 + 10_000fee =   -110_000
-        // 5. NoteToSelf orchard pool =       -10_000 (one item: Fee)
-        // 6. NoteToSelf sapling pool =       -10_000 (one item: Fee)
-        // 7. NoteToSelf transparent pool =   -10_000 (two items: NoteToSelf & Fee)
+        // 5. MemoToSelf orchard pool =       -10_000 (one item: Fee)
+        // 6. MemoToSelf sapling pool =       -10_000 (one item: Fee)
+        // 7. MemoToSelf transparent pool =   -10_000 (two items: MemoToSelf & Fee)
         // 8. Shielding transparent pool =    -10_000 (one item: Fee)
         // 9. Upgrading sapling pool =        -10_000 (one item: Fee)
         //

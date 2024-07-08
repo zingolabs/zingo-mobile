@@ -1,7 +1,8 @@
 export enum TransactionTypeEnum {
   Sent = 'Sent',
   Received = 'Received',
-  NoteToSelf = 'NoteToSelf',
+  MemoToSelf = 'MemoToSelf',
+  SendToSelf = 'SendToSelf',
   Shield = 'Shield',
 
   // obsolete

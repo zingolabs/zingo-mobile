@@ -1,6 +1,7 @@
 export enum RPCValueTransfersKindEnum {
   sent = 'sent',
-  noteToSelf = 'note-to-self',
+  memoToSelf = 'memo-to-self',
+  sendToSelf = 'send-to-self',
   shield = 'shield',
   received = 'received',
 }

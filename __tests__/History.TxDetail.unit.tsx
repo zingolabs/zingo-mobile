@@ -120,7 +120,7 @@ describe('Component History TxDetail - test', () => {
     expect(txt).toBe(null);
   });
 
-  test('History TxDetail - self sent transaction', () => {
+  test('History TxDetail - memo self sent transaction', () => {
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail
@@ -141,13 +141,33 @@ describe('Component History TxDetail - test', () => {
     screen.getByText('orchard memosapling memo');
   });
 
-  test('History TxDetail - received transaction with 2 pools', () => {
+  test('History TxDetail - self sent transaction', () => {
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail
           index={2}
           length={mockTransactions.length}
           tx={mockTransactions[2]}
+          closeModal={onClose}
+          openModal={onClose}
+          setPrivacyOption={onSetOption}
+          setSendPageState={onClose}
+          moveTxDetail={onMove}
+        />
+      </ContextAppLoadedProvider>,
+    );
+    const num = screen.getAllByText('0.0000');
+    expect(num.length).toBe(2);
+    screen.getByText('0.0001');
+  });
+
+  test('History TxDetail - received transaction with 2 pools', () => {
+    render(
+      <ContextAppLoadedProvider value={state}>
+        <TxDetail
+          index={3}
+          length={mockTransactions.length}
+          tx={mockTransactions[3]}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
@@ -169,9 +189,9 @@ describe('Component History TxDetail - test', () => {
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail
-          index={3}
+          index={4}
           length={mockTransactions.length}
-          tx={mockTransactions[3]}
+          tx={mockTransactions[4]}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}

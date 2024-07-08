@@ -773,10 +773,22 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate('loadedapp.uas-menu') as string;
-              } else if (txNew[0].type === TransactionTypeEnum.NoteToSelf) {
+              } else if (txNew[0].type === TransactionTypeEnum.MemoToSelf) {
                 message =
                   (this.state.translate('loadedapp.transaction-confirmed') as string) +
-                  (this.state.translate('history.notetoself') as string) +
+                  (this.state.translate('history.memotoself') as string) +
+                  (txNew[0].fee
+                    ? ((' ' + this.state.translate('send.fee')) as string) +
+                      ' ' +
+                      Utils.parseNumberFloatToStringLocale(txNew[0].fee, 8) +
+                      ' ' +
+                      this.state.info.currencyName
+                    : '');
+                title = this.state.translate('loadedapp.send-menu') as string;
+              } else if (txNew[0].type === TransactionTypeEnum.SendToSelf) {
+                message =
+                  (this.state.translate('loadedapp.transaction-confirmed') as string) +
+                  (this.state.translate('history.sendtoself') as string) +
                   (txNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
                       ' ' +

@@ -22,10 +22,10 @@ export const mockTransactions: TransactionType[] = [
     ],
   },
   {
-    type: TransactionTypeEnum.NoteToSelf,
+    type: TransactionTypeEnum.MemoToSelf,
     fee: 0.0001,
     confirmations: 12,
-    txid: 'notetooself-txid-1234567890',
+    txid: 'memotooself-txid-1234567890',
     time: Date.now() - 100,
     zecPrice: 33.33,
     txDetails: [
@@ -33,6 +33,20 @@ export const mockTransactions: TransactionType[] = [
         address: '',
         amount: 0,
         memos: ['orchard memo', 'sapling memo'],
+      },
+    ],
+  },
+  {
+    type: TransactionTypeEnum.SendToSelf,
+    fee: 0.0001,
+    confirmations: 12,
+    txid: 'sendtooself-txid-1234567890',
+    time: Date.now() - 100,
+    zecPrice: 33.33,
+    txDetails: [
+      {
+        address: '',
+        amount: 0,
       },
     ],
   },

@@ -168,8 +168,10 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
               ? (translate('history.sent') as string)
               : tx.type === TransactionTypeEnum.Received
               ? (translate('history.received') as string)
-              : tx.type === TransactionTypeEnum.NoteToSelf
-              ? (translate('history.notetoself') as string)
+              : tx.type === TransactionTypeEnum.MemoToSelf
+              ? (translate('history.memotoself') as string)
+              : tx.type === TransactionTypeEnum.SendToSelf
+              ? (translate('history.sendtoself') as string)
               : tx.type === TransactionTypeEnum.Shield
               ? (translate('history.shield') as string)
               : ''}

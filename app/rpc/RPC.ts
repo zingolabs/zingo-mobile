@@ -1341,8 +1341,8 @@ export default class RPC {
         if (tx.kind === TransactionTypeEnum.Fee) {
           currentTxList[0].fee = (currentTxList[0].fee ? currentTxList[0].fee : 0) + tx.amount / 10 ** 8;
           if (currentTxList[0].txDetails.length === 0) {
-            // when only have 1 item with `Fee`, we assume this tx is `NoteToSelf`.
-            currentTxList[0].type = TransactionTypeEnum.NoteToSelf;
+            // when only have 1 item with `Fee`, we assume this tx is `MemoToSelf`.
+            currentTxList[0].type = TransactionTypeEnum.MemoToSelf;
             currenttxdetails.address = '';
             currenttxdetails.amount = 0;
             currentTxList[0].txDetails.push(currenttxdetails);
@@ -1364,8 +1364,8 @@ export default class RPC {
       const combinedTxList: TransactionType[] = [];
       txList.forEach((txns: TransactionType) => {
         const combinedTx = txns;
-        if (txns.type === TransactionTypeEnum.Sent || txns.type === TransactionTypeEnum.NoteToSelf) {
-          // using address for `Sent` & `NoteToSelf`
+        if (txns.type === TransactionTypeEnum.Sent || txns.type === TransactionTypeEnum.MemoToSelf) {
+          // using address for `Sent` & `MemoToSelf`
           combinedTx.txDetails = RPC.rpcCombineTxDetailsByAddress(txns.txDetails);
         } else {
           // using pool for `Received`
@@ -1418,8 +1418,10 @@ export default class RPC {
         currentTxList[0].txid = tx.txid;
         currentTxList[0].time = tx.datetime;
         currentTxList[0].type =
-          tx.kind === RPCValueTransfersKindEnum.noteToSelf
-            ? TransactionTypeEnum.NoteToSelf
+          tx.kind === RPCValueTransfersKindEnum.memoToSelf
+            ? TransactionTypeEnum.MemoToSelf
+            : tx.kind === RPCValueTransfersKindEnum.sendToSelf
+            ? TransactionTypeEnum.SendToSelf
             : tx.kind === RPCValueTransfersKindEnum.received
             ? TransactionTypeEnum.Received
             : tx.kind === RPCValueTransfersKindEnum.sent
