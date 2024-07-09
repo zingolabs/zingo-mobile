@@ -37,6 +37,7 @@ import { RPCUfvkType } from './types/RPCUfvkType';
 import { RPCSendType } from './types/RPCSendType';
 import { RPCValueTransfersType } from './types/RPCValueTransfersType';
 import { RPCValueTransfersKindEnum } from './enums/RPCValueTransfersKindEnum';
+import { RPCValueTransferType } from './types/RPCValueTransferType';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -1189,7 +1190,7 @@ export default class RPC {
         console.log('Internal Error txs value transfers');
         return;
       }
-      const valueTransfersJSON = await JSON.parse(valueTransfersStr);
+      const valueTransfersJSON: RPCValueTransfersType = await JSON.parse(valueTransfersStr);
 
       //console.log(valueTransfersJSON);
 
@@ -1197,7 +1198,7 @@ export default class RPC {
 
       let txList: TransactionType[] = [];
 
-      valueTransfersJSON.value_transfers.forEach((tx: RPCValueTransfersType) => {
+      valueTransfersJSON.value_transfers.forEach((tx: RPCValueTransferType) => {
         let pushIt: boolean = false;
         let currentTxList: TransactionType[] = txList.filter(t => t.txid === tx.txid);
         if (currentTxList.length === 0) {
