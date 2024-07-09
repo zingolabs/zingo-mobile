@@ -40,6 +40,7 @@ jest.mock('react-native', () => {
 
   RN.NativeModules.RPCModule = {
     execute: jest.fn(() => '{}'),
+    getValueTransfersList: jest.fn(() => '{ "value_transfers": [] }'),
   };
 
   return RN;
