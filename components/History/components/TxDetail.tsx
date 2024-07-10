@@ -288,12 +288,66 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                   </View>
                 )}
 
+                {!!txd.type && txd.type !== tx.type && (
+                  <View style={{ display: 'flex', marginTop: 10 }}>
+                    <FadeText>{translate('history.type') as string}</FadeText>
+                    <BoldText style={{ textTransform: 'capitalize', color: spendColor }}>
+                      {txd.type === TransactionTypeEnum.Sent
+                        ? (translate('history.sent') as string)
+                        : txd.type === TransactionTypeEnum.Received
+                        ? (translate('history.received') as string)
+                        : txd.type === TransactionTypeEnum.MemoToSelf
+                        ? (translate('history.memotoself') as string)
+                        : txd.type === TransactionTypeEnum.SendToSelf
+                        ? (translate('history.sendtoself') as string)
+                        : txd.type === TransactionTypeEnum.Shield
+                        ? (translate('history.shield') as string)
+                        : ''}
+                    </BoldText>
+                  </View>
+                )}
+
+                {((!!txd.time && txd.time > 0 && txd.time !== tx.time) ||
+                  (!!txd.confirmations && txd.confirmations > 0 && txd.confirmations !== tx.confirmations)) && (
+                  <View
+                    style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                    {!!txd.time && txd.time > 0 && txd.time !== tx.time && (
+                      <View style={{ display: 'flex' }}>
+                        <FadeText>{translate('history.time') as string}</FadeText>
+                        <RegText>
+                          {txd.time ? moment((txd.time || 0) * 1000).format('YYYY MMM D h:mm a') : '--'}
+                        </RegText>
+                      </View>
+                    )}
+                    {!!txd.confirmations && txd.confirmations > 0 && txd.confirmations !== tx.confirmations && (
+                      <View style={{ display: 'flex', alignItems: 'flex-end' }}>
+                        <FadeText>{translate('history.confirmations') as string}</FadeText>
+                        <RegText>{txd.confirmations.toString()}</RegText>
+                      </View>
+                    )}
+                  </View>
+                )}
+
+                {!!txd.fee && txd.fee > 0 && txd.fee !== tx.fee && (
+                  <View style={{ display: 'flex', marginTop: 10 }}>
+                    <FadeText>{translate('history.txfee') as string}</FadeText>
+                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <ZecAmount amtZec={txd.fee} size={18} currencyName={info.currencyName} privacy={privacy} />
+                    </View>
+                  </View>
+                )}
+
                 <View style={{ marginTop: 10 }}>
                   <FadeText>{translate('history.amount') as string}</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                     <ZecAmount amtZec={txd.amount} size={18} currencyName={info.currencyName} privacy={privacy} />
-                    {!!tx.zecPrice && (
-                      <CurrencyAmount price={tx.zecPrice} amtZec={txd.amount} currency={currency} privacy={privacy} />
+                    {(!!txd.zecPrice || !!tx.zecPrice) && (
+                      <CurrencyAmount
+                        price={txd.zecPrice || tx.zecPrice}
+                        amtZec={txd.amount}
+                        currency={currency}
+                        privacy={privacy}
+                      />
                     )}
                   </View>
                 </View>

@@ -524,7 +524,8 @@
     "pool": "Pool",
     "contactcopied": "Contacto copiado al portapapeles",
     "address-http": "¡Zingo no tiene idea de quién te envió esta dirección! Depende totalmente de ti autenticar al remitente.",
-    "address-https": "Dirección autenticada por Zingo"
+    "address-https": "Dirección autenticada por Zingo",
+    "type": "Tipo"
   },
   "report": {
     "title": "Informe de Sincronización",

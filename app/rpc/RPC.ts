@@ -1202,14 +1202,62 @@ export default class RPC {
         let pushIt: boolean = false;
         let currentTxList: TransactionType[] = txList.filter(t => t.txid === tx.txid);
         if (currentTxList.length === 0) {
+          // this txid does not exists
           currentTxList = [{} as TransactionType];
           currentTxList[0].txDetails = [];
+
+          currentTxList[0].txid = tx.txid;
+          currentTxList[0].time = tx.datetime;
+          currentTxList[0].type =
+            tx.kind === RPCValueTransfersKindEnum.memoToSelf
+              ? TransactionTypeEnum.MemoToSelf
+              : tx.kind === RPCValueTransfersKindEnum.sendToSelf
+              ? TransactionTypeEnum.SendToSelf
+              : tx.kind === RPCValueTransfersKindEnum.received
+              ? TransactionTypeEnum.Received
+              : tx.kind === RPCValueTransfersKindEnum.sent
+              ? TransactionTypeEnum.Sent
+              : tx.kind === RPCValueTransfersKindEnum.shield
+              ? TransactionTypeEnum.Shield
+              : undefined;
+          currentTxList[0].fee = (tx.transaction_fee ? tx.transaction_fee : 0) / 10 ** 8;
+          currentTxList[0].zecPrice = tx.zec_price;
+          if (tx.status === 'pending') {
+            currentTxList[0].confirmations = 0;
+          } else {
+            currentTxList[0].confirmations = this.lastServerBlockHeight
+              ? this.lastServerBlockHeight - tx.blockheight + 1
+              : this.lastWalletBlockHeight - tx.blockheight + 1;
+          }
           pushIt = true;
+        } else {
+          // this txid exists
+          // we need to compare with the previous values in case
+          // this txid have more than one item
+
+          // select the older time
+          if (tx.datetime && tx.datetime < currentTxList[0].time) {
+            currentTxList[0].time = tx.datetime;
+          }
+          // the most important kind is `sent`
+          if (tx.kind && tx.kind === RPCValueTransfersKindEnum.sent) {
+            currentTxList[0].type = TransactionTypeEnum.Sent;
+          }
+          // select the bigger fee
+          if ((tx.transaction_fee || 0) / 10 ** 8 > (currentTxList[0].fee || 0)) {
+            currentTxList[0].fee = tx.transaction_fee;
+          }
+          // confirmations from the first item with the same txid is OK.
+          // select the lower zec price
+          if ((tx.zec_price || 0) / 10 ** 8 < (currentTxList[0].zecPrice || 0)) {
+            currentTxList[0].zecPrice = tx.zec_price;
+          }
         }
 
-        currentTxList[0].txid = tx.txid;
-        currentTxList[0].time = tx.datetime;
-        currentTxList[0].type =
+        let currenttxdetails = {} as TxDetailType;
+        // can be different with the same txid (send types).
+        currenttxdetails.time = tx.datetime;
+        currenttxdetails.type =
           tx.kind === RPCValueTransfersKindEnum.memoToSelf
             ? TransactionTypeEnum.MemoToSelf
             : tx.kind === RPCValueTransfersKindEnum.sendToSelf
@@ -1221,17 +1269,16 @@ export default class RPC {
             : tx.kind === RPCValueTransfersKindEnum.shield
             ? TransactionTypeEnum.Shield
             : undefined;
-        currentTxList[0].fee = (tx.transaction_fee ? tx.transaction_fee : 0) / 10 ** 8;
-        currentTxList[0].zecPrice = tx.zec_price;
+        currenttxdetails.fee = (tx.transaction_fee ? tx.transaction_fee : 0) / 10 ** 8;
+        currenttxdetails.zecPrice = tx.zec_price;
         if (tx.status === 'pending') {
-          currentTxList[0].confirmations = 0;
+          currenttxdetails.confirmations = 0;
         } else {
-          currentTxList[0].confirmations = this.lastServerBlockHeight
+          currenttxdetails.confirmations = this.lastServerBlockHeight
             ? this.lastServerBlockHeight - tx.blockheight + 1
             : this.lastWalletBlockHeight - tx.blockheight + 1;
         }
-
-        let currenttxdetails = {} as TxDetailType;
+        // real detail data
         currenttxdetails.address = !tx.recipient_address ? '' : tx.recipient_address;
         currenttxdetails.amount = (!tx.value ? 0 : tx.value) / 10 ** 8;
         currenttxdetails.memos = !tx.memos ? undefined : tx.memos;

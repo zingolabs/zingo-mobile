@@ -524,7 +524,8 @@
     "pool": "Pool",
     "contactcopied": "Contato copiado para a Área de Transparência",
     "address-http": "Zingo não tem ideia de quem lhe enviou este Endereço! Você deve autenticar o Remetente.",
-    "address-https": "Endereço Zingo-Authenticated"
+    "address-https": "Endereço Zingo-Authenticated",
+    "type": "Tipo"
   },
   "report": {
     "title": "Relatório de Sincronização / Rescan",
