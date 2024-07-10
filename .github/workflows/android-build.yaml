@@ -18,7 +18,7 @@ env:
 jobs:
   android-check-build-cache:
     name: Check build cache
-    runs-on: macos-12
+    runs-on: macos-13
     outputs:
       android-cache-found: ${{ steps.android-set-cache-found.outputs.android-cache-found }}
     steps:     
@@ -49,7 +49,7 @@ jobs:
     if: ${{ needs.android-check-build-cache.outputs.android-cache-found != 'true' }}
     runs-on: ubuntu-22.04
     container:
-      image: zingodevops/android_builder:008
+      image: zingodevops/android_builder:009
     env:
       RUSTUP_HOME: /root/.rustup
     steps:
@@ -119,7 +119,7 @@ jobs:
           LD: ld
           RANLIB: llvm-ranlib
           CC: ${{ env.CC }}24-clang
-          OPENSSL_DIR: /opt/openssl-3.1.3/${{ env.OPENSSL_PATH }}
+          OPENSSL_DIR: /opt/openssl-3.3.1/${{ env.OPENSSL_PATH }}
           CARGO_FEATURE_STD: true
       
       - name: LLVM Strip
@@ -139,7 +139,7 @@ jobs:
   cache-native-android-uniffi:
     name: Cache native rust
     needs: android-build
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}

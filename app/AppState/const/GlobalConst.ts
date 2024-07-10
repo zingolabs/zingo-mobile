@@ -12,8 +12,11 @@ export const GlobalConst = {
   success: 'success',
   true: 'true',
   false: 'false',
-  memoMaxLength: 512,
+  memoMaxLength: 511,
   platformOSios: 'ios',
   platformOSandroid: 'android',
   blocksPerBatch: 100,
+  yes: 'yes',
+  no: 'no',
+  background: '@background',
 };

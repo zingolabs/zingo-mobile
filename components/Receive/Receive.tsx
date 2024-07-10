@@ -21,7 +21,7 @@ type ReceiveProps = {
   setUaAddress: (uaAddress: string) => void;
   toggleMenuDrawer: () => void;
   syncingStatusMoreInfoOnClick: () => void;
-  set_privacy_option: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
   setUfvkViewModalVisible?: (v: boolean) => void;
 };
 
@@ -29,7 +29,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   setUaAddress,
   toggleMenuDrawer,
   syncingStatusMoreInfoOnClick,
-  set_privacy_option,
+  setPrivacyOption,
   setUfvkViewModalVisible,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -255,7 +255,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
           title={translate('receive.title') as string}
           noBalance={true}
-          set_privacy_option={set_privacy_option}
+          setPrivacyOption={setPrivacyOption}
           setUfvkViewModalVisible={setUfvkViewModalVisible}
           addLastSnackbar={addLastSnackbar}
         />

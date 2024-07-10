@@ -2,7 +2,7 @@ import { RPCOutgoingMetadataType } from './RPCOutgoingMetadataType';
 
 export type RPCTransactionType = {
   block_height: number;
-  unconfirmed: boolean;
+  pending: boolean;
   datetime: number;
   txid: string;
   zec_price: number;

@@ -1,11 +1,10 @@
 export enum CommandEnum {
   sendprogress = 'sendprogress',
   changeserver = 'changeserver',
-  wallet_kind = 'wallet_kind',
-  interrupt_sync_after_batch = 'interrupt_sync_after_batch',
+  walletKind = 'wallet_kind',
+  interruptSyncAfterBatch = 'interrupt_sync_after_batch',
   updatecurrentprice = 'updatecurrentprice',
   notes = 'notes',
-  summaries = 'summaries',
   height = 'height',
   setoption = 'setoption',
   getoption = 'getoption',
@@ -18,22 +17,21 @@ export enum CommandEnum {
   sync = 'sync',
   syncstatus = 'syncstatus',
   addresses = 'addresses',
-  parse_address = 'parse_address',
-  parse_viewkey = 'parse_viewkey',
+  parseAddress = 'parse_address',
+  parseViewkey = 'parse_viewkey',
   balance = 'balance',
   seed = 'seed',
   rescan = 'rescan',
-  value_to_address = 'value_to_address',
-  sends_to_address = 'sends_to_address',
-  memobytes_to_address = 'memobytes_to_address',
+  valueToAddress = 'value_to_address',
+  sendsToAddress = 'sends_to_address',
+  memobytesToAddress = 'memobytes_to_address',
 
-  // new commands, some are comming...
-  send_proposed = 'send_proposed',
-  shield_proposed = 'shield_proposed',
-
-  quicksend = 'quicksend',
-  quickshield = 'quickshield',
-
-  propose_send = 'propose_send',
-  propose_shield = 'propose_shield',
+  // calculate the max sendable amount in the wallet
+  spendablebalance = 'spendablebalance',
+  // new commands to create a proposal
+  send = 'send',
+  sendall = 'sendall',
+  shield = 'shield',
+  // this works for all: send, sendall & shield
+  confirm = 'confirm',
 }

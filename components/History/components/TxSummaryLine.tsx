@@ -37,7 +37,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [amountColor, setAmountColor] = useState<string>('');
+  const [amountColor, setAmountColor] = useState<string>(colors.primaryDisabled);
   const [txIcon, setTxIcon] = useState<IconDefinition>(faRefresh);
   const [displayAddress, setDisplayAddress] = useState<React.JSX.Element | null>(null);
   const [haveMemo, setHaveMemo] = useState<boolean>(false);
@@ -46,7 +46,7 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
     const amountCo =
       tx.confirmations === 0
         ? colors.primaryDisabled
-        : tx.type === TransactionTypeEnum.Received
+        : tx.type === TransactionTypeEnum.Received || tx.type === TransactionTypeEnum.Shield
         ? colors.primary
         : colors.text;
 
@@ -55,7 +55,11 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
 
   useEffect(() => {
     const txIc =
-      tx.confirmations === 0 ? faRefresh : tx.type === TransactionTypeEnum.Received ? faArrowDown : faArrowUp;
+      tx.confirmations === 0
+        ? faRefresh
+        : tx.type === TransactionTypeEnum.Received || tx.type === TransactionTypeEnum.Shield
+        ? faArrowDown
+        : faArrowUp;
     setTxIcon(txIc);
   }, [tx.confirmations, tx.type]);
 
@@ -118,20 +122,53 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             />
           </View>
           <View style={{ display: 'flex' }}>
-            {!!displayAddress && displayAddress}
-            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <View>{!!displayAddress && displayAddress}</View>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: tx.type === TransactionTypeEnum.Sent ? 'row' : 'column',
+                alignItems: tx.type === TransactionTypeEnum.Sent ? 'center' : 'flex-start',
+              }}>
               <FadeText
-                style={{ opacity: 1, fontWeight: 'bold', color: amountColor, fontSize: displayAddress ? 14 : 18 }}>
-                {tx.type === TransactionTypeEnum.Sent
+                style={{
+                  opacity: 1,
+                  fontWeight: 'bold',
+                  color: amountColor,
+                  fontSize: displayAddress || tx.confirmations === 0 ? 14 : 18,
+                }}>
+                {tx.type === TransactionTypeEnum.Sent && tx.confirmations === 0
+                  ? (translate('history.sending') as string)
+                  : tx.type === TransactionTypeEnum.Sent && tx.confirmations > 0
                   ? (translate('history.sent') as string)
-                  : tx.type === TransactionTypeEnum.Received
+                  : tx.type === TransactionTypeEnum.Received && tx.confirmations === 0
+                  ? (translate('history.receiving') as string)
+                  : tx.type === TransactionTypeEnum.Received && tx.confirmations > 0
                   ? (translate('history.received') as string)
-                  : (translate('history.sendtoself') as string)}
+                  : tx.type === TransactionTypeEnum.MemoToSelf && tx.confirmations === 0
+                  ? (translate('history.sendingtoself') as string)
+                  : tx.type === TransactionTypeEnum.MemoToSelf && tx.confirmations > 0
+                  ? (translate('history.memotoself') as string)
+                  : tx.type === TransactionTypeEnum.SendToSelf && tx.confirmations === 0
+                  ? (translate('history.sendingtoself') as string)
+                  : tx.type === TransactionTypeEnum.SendToSelf && tx.confirmations > 0
+                  ? (translate('history.sendtoself') as string)
+                  : tx.type === TransactionTypeEnum.Shield && tx.confirmations === 0
+                  ? (translate('history.shielding') as string)
+                  : tx.type === TransactionTypeEnum.Shield && tx.confirmations > 0
+                  ? (translate('history.shield') as string)
+                  : ''}
               </FadeText>
-              <FadeText>{tx.time ? moment((tx.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
-              {haveMemo && (
-                <FontAwesomeIcon style={{ marginLeft: 10 }} size={15} icon={faComment} color={colors.primaryDisabled} />
-              )}
+              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                <FadeText>{tx.time ? moment((tx.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
+                {haveMemo && (
+                  <FontAwesomeIcon
+                    style={{ marginLeft: 10 }}
+                    size={15}
+                    icon={faComment}
+                    color={colors.primaryDisabled}
+                  />
+                )}
+              </View>
             </View>
           </View>
           <ZecAmount
@@ -139,7 +176,10 @@ const TxSummaryLine: React.FunctionComponent<TxSummaryLineProps> = ({
             size={18}
             currencyName={info.currencyName}
             color={amountColor}
-            amtZec={tx.txDetails.reduce((s, d) => s + d.amount, 0) + (tx.fee ? tx.fee : 0)}
+            amtZec={
+              tx.txDetails.reduce((s, d) => s + d.amount, 0) +
+              (tx.fee && tx.type !== TransactionTypeEnum.Shield ? tx.fee : 0)
+            }
             privacy={privacy}
           />
         </View>

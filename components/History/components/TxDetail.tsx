@@ -33,38 +33,44 @@ import CurrencyAmount from '../../Components/CurrencyAmount';
 import AddressItem from '../../Components/AddressItem';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 // this is for http. (red)
-import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { faTriangleExclamation, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 // this is for https. (primary)
 //import { faLock } from '@fortawesome/free-solid-svg-icons';
 
 type TxDetailProps = {
+  index: number;
+  length: number;
   tx: TransactionType;
   closeModal: () => void;
   openModal: () => void;
-  set_privacy_option: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
   setSendPageState: (s: SendPageStateClass) => void;
+  moveTxDetail: (txid: string, t: number) => void;
 };
 
 const TxDetail: React.FunctionComponent<TxDetailProps> = ({
+  index,
+  length,
   tx,
   closeModal,
-  set_privacy_option,
+  setPrivacyOption,
   openModal,
   setSendPageState,
+  moveTxDetail,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, language, privacy, addLastSnackbar, server, currency, addressBook, addresses } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [spendColor, setSpendColor] = useState<string>('');
+  const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
 
   useEffect(() => {
     const spendCo =
       tx.confirmations === 0
         ? colors.primaryDisabled
-        : tx.type === TransactionTypeEnum.Received
+        : tx.type === TransactionTypeEnum.Received || tx.type === TransactionTypeEnum.Shield
         ? colors.primary
         : colors.text;
     setSpendColor(spendCo);
@@ -75,7 +81,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
       return;
     }
 
-    const url = Utils.getBlockExplorerTxIDURL(txid, server.chain_name);
+    const url = Utils.getBlockExplorerTxIDURL(txid, server.chainName);
     Linking.canOpenURL(url).then(supported => {
       if (supported) {
         Linking.openURL(url);
@@ -111,9 +117,32 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
-        set_privacy_option={set_privacy_option}
+        setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
       />
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          marginRight: 30,
+          marginTop: 5,
+        }}>
+        <TouchableOpacity onPress={() => moveTxDetail(tx.txid, -1)} style={{ marginRight: 25 }} disabled={index === 0}>
+          <FontAwesomeIcon icon={faChevronUp} color={index === 0 ? colors.primaryDisabled : colors.primary} size={30} />
+        </TouchableOpacity>
+        <FadeText>{(index + 1).toString()}</FadeText>
+        <TouchableOpacity
+          onPress={() => moveTxDetail(tx.txid, 1)}
+          style={{ marginLeft: 25 }}
+          disabled={index === length - 1}>
+          <FontAwesomeIcon
+            icon={faChevronDown}
+            color={index === length - 1 ? colors.primaryDisabled : colors.primary}
+            size={30}
+          />
+        </TouchableOpacity>
+      </View>
       <ScrollView
         showsVerticalScrollIndicator={true}
         persistentScrollbar={true}
@@ -128,6 +157,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
             display: 'flex',
             alignItems: 'center',
             margin: 25,
+            marginTop: 5,
             padding: 10,
             borderWidth: 1,
             borderRadius: 10,
@@ -138,7 +168,13 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
               ? (translate('history.sent') as string)
               : tx.type === TransactionTypeEnum.Received
               ? (translate('history.received') as string)
-              : (translate('history.sendtoself') as string)}
+              : tx.type === TransactionTypeEnum.MemoToSelf
+              ? (translate('history.memotoself') as string)
+              : tx.type === TransactionTypeEnum.SendToSelf
+              ? (translate('history.sendtoself') as string)
+              : tx.type === TransactionTypeEnum.Shield
+              ? (translate('history.shield') as string)
+              : ''}
           </BoldText>
           <ZecAmount
             currencyName={info.currencyName}
@@ -147,9 +183,9 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
             privacy={privacy}
             smallPrefix={true}
           />
-          {!!tx.zec_price && (
+          {!!tx.zecPrice && (
             <CurrencyAmount
-              price={tx.zec_price}
+              price={tx.zecPrice}
               amtZec={tx.txDetails.reduce((s, d) => s + d.amount, 0)}
               currency={currency}
               privacy={privacy}
@@ -187,7 +223,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
               {expandTxid && !!tx.txid && (
                 <>
                   <RegText>{tx.txid}</RegText>
-                  {server.chain_name !== ChainNameEnum.regtestChainName && (
+                  {server.chainName !== ChainNameEnum.regtestChainName && (
                     <TouchableOpacity onPress={() => handleTxIDClick(tx.txid)}>
                       <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
                         {translate('history.viewexplorer') as string}
@@ -223,7 +259,7 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
             }
             return (
               <View
-                key={txd.address + txd.pool}
+                key={txd.address + txd.poolType}
                 style={{
                   display: 'flex',
                   marginTop: tx.txDetails.length > 1 ? 10 : 0,
@@ -245,10 +281,10 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                   </View>
                 )}
 
-                {!!txd.pool && (
+                {!!txd.poolType && (
                   <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
                     <FadeText>{translate('history.pool') as string}</FadeText>
-                    <RegText>{txd.pool}</RegText>
+                    <RegText>{txd.poolType}</RegText>
                   </View>
                 )}
 
@@ -256,8 +292,8 @@ const TxDetail: React.FunctionComponent<TxDetailProps> = ({
                   <FadeText>{translate('history.amount') as string}</FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                     <ZecAmount amtZec={txd.amount} size={18} currencyName={info.currencyName} privacy={privacy} />
-                    {!!tx.zec_price && (
-                      <CurrencyAmount price={tx.zec_price} amtZec={txd.amount} currency={currency} privacy={privacy} />
+                    {!!tx.zecPrice && (
+                      <CurrencyAmount price={tx.zecPrice} amtZec={txd.amount} currency={currency} privacy={privacy} />
                     )}
                   </View>
                 </View>

@@ -107,9 +107,9 @@ export default class Utils {
     return Utils.nextToAddrID++;
   }
 
-  static async getDonationAddress(chain_name: ChainNameEnum): Promise<string> {
+  static async getDonationAddress(chainName: ChainNameEnum): Promise<string> {
     // donations only for mainnet.
-    if (chain_name === ChainNameEnum.mainChainName) {
+    if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
       const ua: string = await RPCModule.getDonationAddress();
       return ua;
@@ -169,14 +169,12 @@ export default class Utils {
     return stringValue.replace(new RegExp('\\.'), `${decimalSeparator}`);
   }
 
-  static getBlockExplorerTxIDURL(txid: string, chain_name: ChainNameEnum): string {
-    if (chain_name === ChainNameEnum.testChainName) {
-      return `https://testnet.zcashblockexplorer.com/transactions/${txid}`;
+  static getBlockExplorerTxIDURL(txid: string, chainName: ChainNameEnum): string {
+    if (chainName === ChainNameEnum.testChainName) {
+      return `https://testnet.zcashexplorer.app/transactions/${txid}`;
     } else {
-      return `https://zcashblockexplorer.com/transactions/${txid}`;
+      return `https://mainnet.zcashexplorer.app/transactions/${txid}`;
     }
-    // updated a new server
-    //return `https://blockchair.com/zcash/transaction/${txid}`;
   }
 
   static generateColorList(numColors: number): string[] {
@@ -212,18 +210,18 @@ export default class Utils {
         const myAddress: AddressClass[] = addresses.filter((a: AddressClass) => a.address === to.to);
         sendToSelf = myAddress.length >= 1;
 
-        donationAddress = to.to === (await Utils.getDonationAddress(server.chain_name));
+        donationAddress = to.to === (await Utils.getDonationAddress(server.chainName));
 
         if (memo === '') {
           return [{ address: to.to, amount } as SendJsonToTypeType];
         } else if (Buffer.byteLength(memo, 'utf8') <= GlobalConst.memoMaxLength) {
           return [{ address: to.to, amount, memo } as SendJsonToTypeType];
         } else {
-          // If the memo is more than 512 bytes, then we split it into multiple transactions.
-          // Each memo will be `(xx/yy)memo_part`. The prefix "(xx/yy)" is 7 bytes long, so
-          // we'll split the memo into 512-7 = 505 bytes length
+          // If the memo is more than 511 bytes, then we split it into multiple transactions.
+          // Each memo will be `(xx/yy)memo part`. The prefix "(xx/yy)" is 7 bytes long, so
+          // we'll split the memo into 511-7 = 505 bytes length
           // this make sense if we make long memos... in the future.
-          const splits = Utils.utf16Split(memo, 512 - 7);
+          const splits = Utils.utf16Split(memo, 511 - 7);
           const tos = [];
 
           // The first one contains all the tx value
@@ -248,9 +246,9 @@ export default class Utils {
     // we need to exclude 2 use cases:
     // 1. send to self (make no sense to do a donation here)
     // 2. send to donation UA (make no sense to do a double donation)
-    if (donation && server.chain_name === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress) {
+    if (donation && server.chainName === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress) {
       donationTransaction.push({
-        address: await Utils.getDonationAddress(server.chain_name),
+        address: await Utils.getDonationAddress(server.chainName),
         amount: parseInt(
           (Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) * 10 ** 8).toFixed(0),
           10,

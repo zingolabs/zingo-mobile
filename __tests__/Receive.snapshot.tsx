@@ -7,8 +7,11 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Receive from '../components/Receive';
-import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../app/context';
-import { AddressKindEnum, CurrencyNameEnum, ReceiverEnum } from '../app/AppState';
+import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
+import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -51,41 +54,19 @@ jest.mock('react-native', () => {
 describe('Component Receive - test', () => {
   //snapshot test
   test('Receive - snapshot', () => {
-    const state = defaultAppStateLoaded;
-    state.uaAddress = 'UA-12345678901234567890';
-    state.addresses = [
-      {
-        uaAddress: 'UA-12345678901234567890',
-        address: 'UA-12345678901234567890',
-        addressKind: AddressKindEnum.u,
-        containsPending: false,
-        receivers: ReceiverEnum.o + ReceiverEnum.z + ReceiverEnum.t,
-      },
-      {
-        uaAddress: 'UA-12345678901234567890',
-        address: 'sapling-12345678901234567890',
-        addressKind: AddressKindEnum.z,
-        containsPending: false,
-        receivers: ReceiverEnum.z,
-      },
-      {
-        uaAddress: 'UA-12345678901234567890',
-        address: 'transparent-12345678901234567890',
-        addressKind: AddressKindEnum.t,
-        containsPending: false,
-        receivers: ReceiverEnum.t,
-      },
-    ];
-    state.translate = () => 'text translated';
-    state.info.currencyName = CurrencyNameEnum.ZEC;
-    state.totalBalance.total = 1.12345678;
+    const state = defaultAppContextLoaded;
+    state.uaAddress = mockAddresses[0].uaAddress;
+    state.addresses = mockAddresses;
+    state.translate = mockTranslate;
+    state.info = mockInfo;
+    state.totalBalance = mockTotalBalance;
     const onFunction = jest.fn();
     const receive = render(
       <ContextAppLoadedProvider value={state}>
         <Receive
           setUaAddress={onFunction}
           toggleMenuDrawer={onFunction}
-          set_privacy_option={onFunction}
+          setPrivacyOption={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
         />
       </ContextAppLoadedProvider>,

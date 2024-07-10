@@ -25,7 +25,7 @@ export default class SyncingStatusClass {
 
   secondsPerBatch: number;
 
-  process_end_block: number;
+  processEndBlock: number;
 
   lastBlockServer: number;
 
@@ -41,7 +41,7 @@ export default class SyncingStatusClass {
     this.inProgress = false;
     this.lastError = '';
     this.secondsPerBatch = 0;
-    this.process_end_block = 0;
+    this.processEndBlock = 0;
     this.lastBlockServer = 0;
     this.syncProcessStalled = false;
   }

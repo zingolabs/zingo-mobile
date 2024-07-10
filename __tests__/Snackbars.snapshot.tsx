@@ -7,7 +7,8 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Snackbars from '../components/Components/Snackbars';
-import SnackbarType from '../app/AppState/types/SnackbarType';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockSnackbars } from '../__mocks__/dataMocks/mockSnackbars';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -25,10 +26,8 @@ describe('Component Snackbars - test', () => {
   //snapshot test
   test('Snackbars - snapshot', () => {
     const removeFirstSnackbar = jest.fn();
-    const translate = () => 'text translated';
-    const snackbars: SnackbarType[] = [{ message: 'snackbar' }];
     const snack = render(
-      <Snackbars snackbars={snackbars} removeFirstSnackbar={removeFirstSnackbar} translate={translate} />,
+      <Snackbars snackbars={mockSnackbars} removeFirstSnackbar={removeFirstSnackbar} translate={mockTranslate} />,
     );
     expect(snack.toJSON()).toMatchSnapshot();
   });

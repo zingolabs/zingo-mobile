@@ -51,7 +51,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
                 color: colors.border,
                 marginRight: 5,
               }}>
-              {translate('settings.value-chain_name-main') as string}
+              {translate('settings.value-chainname-main') as string}
             </Text>
             {customServerChainName === ChainNameEnum.mainChainName && (
               <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
@@ -87,7 +87,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
                 color: colors.border,
                 marginRight: 5,
               }}>
-              {translate('settings.value-chain_name-test') as string}
+              {translate('settings.value-chainname-test') as string}
             </Text>
             {customServerChainName === ChainNameEnum.testChainName && (
               <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />
@@ -123,7 +123,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
                 color: colors.border,
                 marginRight: 5,
               }}>
-              {translate('settings.value-chain_name-regtest') as string}
+              {translate('settings.value-chainname-regtest') as string}
             </Text>
             {customServerChainName === ChainNameEnum.regtestChainName && (
               <FontAwesomeIcon icon={faCashRegister} size={14} color={colors.primary} />

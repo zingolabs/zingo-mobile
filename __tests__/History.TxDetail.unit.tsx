@@ -7,8 +7,11 @@ import React from 'react';
 
 import { render, screen } from '@testing-library/react-native';
 import TxDetail from '../components/History/components/TxDetail';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
-import { CurrencyNameEnum, PoolEnum, TransactionType, TransactionTypeEnum } from '../app/AppState';
+import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { mockTransactions } from '../__mocks__/dataMocks/mockTransactions';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -83,42 +86,27 @@ jest.mock('react-native', () => {
 // test suite
 describe('Component History TxDetail - test', () => {
   //unit test
-  const state = defaultAppStateLoaded;
-  state.translate = () => 'translated text';
+  const state = defaultAppContextLoaded;
+  state.translate = mockTranslate;
+  state.info = mockInfo;
+  state.totalBalance = mockTotalBalance;
+  state.transactions = mockTransactions;
   const onClose = jest.fn();
   const onSetOption = jest.fn();
+  const onMove = jest.fn();
 
   test('History TxDetail - sent transaction with 2 addresses', () => {
-    state.info.currencyName = CurrencyNameEnum.ZEC;
-    state.totalBalance.total = 1.12345678;
-    const tx = {
-      type: TransactionTypeEnum.Sent,
-      fee: 0.0001,
-      confirmations: 22,
-      txid: 'sent-txid-1234567890',
-      time: Date.now(),
-      zec_price: 33.33,
-      txDetails: [
-        {
-          address: 'sent-address-1-12345678901234567890',
-          amount: 0.12345678,
-          memos: ['hola', '  & ', 'hello'],
-        },
-        {
-          address: 'sent-address-2-09876543210987654321',
-          amount: 0.1,
-          memos: ['hello', '  & ', 'hola'],
-        },
-      ],
-    } as TransactionType;
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail
-          tx={tx}
+          index={0}
+          length={mockTransactions.length}
+          tx={mockTransactions[0]}
           closeModal={onClose}
           openModal={onClose}
-          set_privacy_option={onSetOption}
+          setPrivacyOption={onSetOption}
           setSendPageState={onClose}
+          moveTxDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     ).toJSON();
@@ -132,32 +120,18 @@ describe('Component History TxDetail - test', () => {
     expect(txt).toBe(null);
   });
 
-  test('History TxDetail - self sent transaction', () => {
-    state.info.currencyName = CurrencyNameEnum.ZEC;
-    state.totalBalance.total = 1.12345678;
-    const txSelfSend = {
-      type: TransactionTypeEnum.SendToSelf,
-      fee: 0.0001,
-      confirmations: 12,
-      txid: 'sendtoself-txid-1234567890',
-      time: Date.now(),
-      zec_price: 33.33,
-      txDetails: [
-        {
-          address: '',
-          amount: 0,
-          memos: ['orchard memo', 'sapling memo'],
-        },
-      ],
-    } as TransactionType;
+  test('History TxDetail - memo self sent transaction', () => {
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail
-          tx={txSelfSend}
+          index={1}
+          length={mockTransactions.length}
+          tx={mockTransactions[1]}
           closeModal={onClose}
           openModal={onClose}
-          set_privacy_option={onSetOption}
+          setPrivacyOption={onSetOption}
           setSendPageState={onClose}
+          moveTxDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
@@ -167,38 +141,38 @@ describe('Component History TxDetail - test', () => {
     screen.getByText('orchard memosapling memo');
   });
 
-  test('History TxDetail - received transaction with 2 pools', () => {
-    state.info.currencyName = CurrencyNameEnum.ZEC;
-    state.totalBalance.total = 1.12345678;
-    const txSelfSend = {
-      type: TransactionTypeEnum.Received,
-      confirmations: 133,
-      txid: 'receive-txid-1234567890',
-      time: Date.now(),
-      zec_price: 66.66,
-      txDetails: [
-        {
-          address: '',
-          amount: 0.77654321,
-          pool: PoolEnum.OrchardPool,
-          memos: ['hola', '  & ', 'hello'],
-        },
-        {
-          address: '',
-          amount: 0.1,
-          pool: PoolEnum.SaplingPool,
-          memos: ['hello', '  & ', 'hola'],
-        },
-      ],
-    } as TransactionType;
+  test('History TxDetail - self sent transaction', () => {
     render(
       <ContextAppLoadedProvider value={state}>
         <TxDetail
-          tx={txSelfSend}
+          index={2}
+          length={mockTransactions.length}
+          tx={mockTransactions[2]}
           closeModal={onClose}
           openModal={onClose}
-          set_privacy_option={onSetOption}
+          setPrivacyOption={onSetOption}
           setSendPageState={onClose}
+          moveTxDetail={onMove}
+        />
+      </ContextAppLoadedProvider>,
+    );
+    const num = screen.getAllByText('0.0000');
+    expect(num.length).toBe(2);
+    screen.getByText('0.0001');
+  });
+
+  test('History TxDetail - received transaction with 2 pools', () => {
+    render(
+      <ContextAppLoadedProvider value={state}>
+        <TxDetail
+          index={3}
+          length={mockTransactions.length}
+          tx={mockTransactions[3]}
+          closeModal={onClose}
+          openModal={onClose}
+          setPrivacyOption={onSetOption}
+          setSendPageState={onClose}
+          moveTxDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
@@ -209,5 +183,25 @@ describe('Component History TxDetail - test', () => {
     screen.getByText('hello & hola');
     const txt = screen.queryByText('hola & hellohello & hola');
     expect(txt).toBe(null);
+  });
+
+  test('History TxDetail - shield transaction', () => {
+    render(
+      <ContextAppLoadedProvider value={state}>
+        <TxDetail
+          index={4}
+          length={mockTransactions.length}
+          tx={mockTransactions[4]}
+          closeModal={onClose}
+          openModal={onClose}
+          setPrivacyOption={onSetOption}
+          setSendPageState={onClose}
+          moveTxDetail={onMove}
+        />
+      </ContextAppLoadedProvider>,
+    );
+    const num = screen.getAllByText('0.0009');
+    expect(num.length).toBe(2);
+    screen.getByText('0.0001');
   });
 });

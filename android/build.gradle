@@ -2,7 +2,7 @@
 
 buildscript {
     ext {
-        buildToolsVersion = "31.0.0"
+        buildToolsVersion = "34.0.0"
         minSdkVersion = 24
         compileSdkVersion = 33
         targetSdkVersion = 33
@@ -11,43 +11,36 @@ buildscript {
     }
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath('com.android.tools.build:gradle:7.4.2')
+        classpath('com.android.tools.build:gradle:8.0.0')
+        classpath("com.facebook.react:react-native-gradle-plugin")
 	    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath("de.undercouch:gradle-download-task:4.1.2")
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
     }
 }
-
-def REACT_NATIVE_VERSION = new File(['node', '--print',"JSON.parse(require('fs').readFileSync(require.resolve('react-native/package.json'), 'utf-8')).version"].execute(null, rootDir).text.trim())
 
 allprojects {
-    configurations.all {
-            resolutionStrategy {
-                force 'com.facebook.react:react-native:' + REACT_NATIVE_VERSION
-            }
-        }
-    repositories {
-        mavenLocal()
-        google()
-        mavenCentral()
-        maven {
-            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url("$rootDir/../node_modules/react-native/android")
-        }
-        maven {
-            // Android JSC is installed from npm
-            url("$rootDir/../node_modules/jsc-android/dist")
-        }
-        maven {
-            url("$rootDir/../node_modules/detox/Detox-android")
-        }
-        maven {
-            url 'https://www.jitpack.io'
-        }
-    }
-}
+   repositories {
+     google()
+     maven {
+       url("$rootDir/../node_modules/detox/Detox-android")
+     }
+     maven { url 'https://www.jitpack.io' }
+   }
+ }
+
+// this is not the best solution, but while the libraries have no namespace...
+// https://discuss.gradle.org/t/namespace-not-specified-for-agp-8-0-0/45850/5
+
+//subprojects {
+//   afterEvaluate { project ->
+//       if (project.hasProperty('android')) {
+//           project.android {
+//               if (namespace == null) {
+//                   namespace project.group
+//               }
+//           }
+//       }
+//   }
+//}

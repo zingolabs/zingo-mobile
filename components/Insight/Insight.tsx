@@ -82,13 +82,13 @@ const getPercent = (percent: number) => {
 type InsightProps = {
   closeModal: () => void;
   openModal: () => void;
-  set_privacy_option: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
   setSendPageState: (s: SendPageStateClass) => void;
 };
 
 const Insight: React.FunctionComponent<InsightProps> = ({
   closeModal,
-  set_privacy_option,
+  setPrivacyOption,
   openModal,
   setSendPageState,
 }) => {
@@ -112,15 +112,15 @@ const Insight: React.FunctionComponent<InsightProps> = ({
       let resultStr: string = '';
       switch (tab) {
         case 'sent':
-          resultStr = await RPCModule.execute(CommandEnum.value_to_address, '');
+          resultStr = await RPCModule.execute(CommandEnum.valueToAddress, '');
           //console.log('################# value', resultStr);
           break;
         case 'sends':
-          resultStr = await RPCModule.execute(CommandEnum.sends_to_address, '');
+          resultStr = await RPCModule.execute(CommandEnum.sendsToAddress, '');
           //console.log('################# sends', resultStr);
           break;
         case 'memobytes':
-          resultStr = await RPCModule.execute(CommandEnum.memobytes_to_address, '');
+          resultStr = await RPCModule.execute(CommandEnum.memobytesToAddress, '');
           //console.log('################# memobytes', resultStr);
           break;
         default:
@@ -286,7 +286,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
-        set_privacy_option={set_privacy_option}
+        setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
       />
 

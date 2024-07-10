@@ -39,6 +39,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    fun walletBackup_exists(): Boolean {
+        // Check if a wallet already exists
+        val file = getFile(walletBackupFileName)
+        return if (file.exists()) {
+            Log.i("SCHEDULED_TASK_RUN", "Wallet backup exists")
+            true
+        } else {
+            Log.i("SCHEDULED_TASK_RUN", "Wallet backup DOES NOT exist")
+            false
+        }
+    }
+
     @ReactMethod
     fun walletExists(promise: Promise) {
         // Check if a wallet already exists
@@ -381,9 +393,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun deleteExistingWallet(promise: Promise) {
-        val file = MainApplication.getAppContext()?.getFileStreamPath(walletFileName)
-        if (file!!.delete()) {
-            promise.resolve(true)
+        // check first if the file exists
+        if (wallet_exists()) {
+            val file = MainApplication.getAppContext()?.getFileStreamPath(walletFileName)
+            if (file!!.delete()) {
+                promise.resolve(true)
+            } else {
+                promise.resolve(false)
+            }
         } else {
             promise.resolve(false)
         }
@@ -391,9 +408,14 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun deleteExistingWalletBackup(promise: Promise) {
-        val file = MainApplication.getAppContext()?.getFileStreamPath(walletBackupFileName)
-        if (file!!.delete()) {
-            promise.resolve(true)
+        // check first if the file exists
+        if (walletBackup_exists()) {
+            val file = MainApplication.getAppContext()?.getFileStreamPath(walletBackupFileName)
+            if (file!!.delete()) {
+                promise.resolve(true)
+            } else {
+                promise.resolve(false)
+            }
         } else {
             promise.resolve(false)
         }
@@ -452,6 +474,30 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         // Initialize Light Client
         val resp = uniffi.zingo.getDeveloperDonationAddress()
+
+        promise.resolve(resp)
+    }
+
+    @ReactMethod
+    fun getValueTransfersList(promise: Promise) {
+        // Log.i("MAIN", "Initialize Light Client")
+
+        uniffi.zingo.initLogging()
+
+        // Initialize Light Client
+        val resp = uniffi.zingo.getValueTransfers()
+
+        promise.resolve(resp)
+    }
+
+    @ReactMethod
+    fun getTransactionSummariesList(promise: Promise) {
+        // Log.i("MAIN", "Initialize Light Client")
+
+        uniffi.zingo.initLogging()
+
+        // Initialize Light Client
+        val resp = uniffi.zingo.getTransactionSummaries()
 
         promise.resolve(resp)
     }

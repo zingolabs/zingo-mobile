@@ -210,9 +210,11 @@ if [ ! -d "./android/app" ]; then
     exit 1
 fi
 
-echo -e "\nRunning yarn install..."
-yarn global add node-gyp
-yarn install
+echo -e "\nRemoving node_modules before yarn..."
+rm -rf ./node_modules
+
+echo -e "\nRunning yarn..."
+yarn
 
 cd android
 
@@ -259,6 +261,9 @@ else
     else
         echo "AVD found: ${avd_name}"
     fi
+
+    echo -e "\nCleaning before Building APKs..."
+    ./gradlew clean
 
     echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug assembleAndroidTest -PsplitApk=true

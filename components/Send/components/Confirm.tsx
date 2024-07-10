@@ -35,15 +35,21 @@ type ConfirmProps = {
   closeModal: () => void;
   openModal: () => void;
   confirmSend: () => void;
-  //sendAllAmount: boolean;
-  calculateFeeWithPropose: (amount: string, address: string, memo: string, includeUAMemo: boolean) => Promise<void>;
+  sendAllAmount: boolean;
+  calculateFeeWithPropose: (
+    amount: string,
+    address: string,
+    memo: string,
+    includeUAMemo: boolean,
+    command: CommandEnum.send | CommandEnum.sendall,
+  ) => Promise<void>;
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
   closeModal,
   confirmSend,
   calculatedFee,
   donationAmount,
-  //sendAllAmount,
+  sendAllAmount,
   openModal,
   calculateFeeWithPropose,
 }) => {
@@ -80,30 +86,37 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     }
 
     let from: PrivacyLevelFromEnum = PrivacyLevelFromEnum.nonePrivacyLevel;
+    const totalAmount: number = Utils.parseStringLocaleToNumberFloat(
+      Utils.parseNumberFloatToStringLocale(
+        Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee,
+        8,
+      ),
+    );
+
+    const totalSpendable: number = Utils.parseStringLocaleToNumberFloat(
+      Utils.parseNumberFloatToStringLocale(totalBalance.spendableOrchard + totalBalance.spendablePrivate, 8),
+    );
+
+    console.log('total', totalAmount);
+    console.log('orchard', totalBalance.spendableOrchard);
+    console.log('sapling', totalBalance.spendablePrivate);
+
     // amount + fee
-    if (
-      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
-      totalBalance.spendableOrchard
-    ) {
+    if (totalAmount <= totalBalance.spendableOrchard) {
       from = PrivacyLevelFromEnum.orchardPrivacyLevel;
-    } else if (
-      totalBalance.spendableOrchard > 0 &&
-      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
-        totalBalance.spendableOrchard + totalBalance.spendablePrivate
-    ) {
+    } else if (totalBalance.spendableOrchard > 0 && totalAmount <= totalSpendable) {
       from = PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel;
-    } else if (
-      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee <=
-      totalBalance.spendablePrivate
-    ) {
+    } else if (totalAmount <= totalBalance.spendablePrivate) {
       from = PrivacyLevelFromEnum.saplingPrivacyLevel;
     }
+
+    console.log(from);
 
     if (from === PrivacyLevelFromEnum.nonePrivacyLevel) {
       return '-';
     }
 
-    const result: string = await RPCModule.execute(CommandEnum.parse_address, sendPageState.toaddr.to);
+    const result: string = await RPCModule.execute(CommandEnum.parseAddress, sendPageState.toaddr.to);
     if (result) {
       if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
         return '-';
@@ -115,12 +128,13 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     try {
       resultJSON = await JSON.parse(result);
     } catch (e) {
+      //console.log(e);
       return '-';
     }
 
-    //console.log('parse-address', address, resultJSON.status === RPCParseStatusEnum.success);
+    //console.log('parse-address', sendPageState.toaddr.to, resultJSON.status === RPCParseStatusEnum.successParse);
 
-    if (resultJSON.status !== RPCParseStatusEnum.successParse || resultJSON.chain_name !== server.chain_name) {
+    if (resultJSON.status !== RPCParseStatusEnum.successParse || resultJSON.chain_name !== server.chainName) {
       return '-';
     }
 
@@ -195,7 +209,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     netInfo.isConnected,
     sendPageState.toaddr.amount,
     sendPageState.toaddr.to,
-    server.chain_name,
+    server.chainName,
     totalBalance.spendableOrchard,
     totalBalance.spendablePrivate,
     translate,
@@ -230,7 +244,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
   // the App is about to send - activate the interrupt syncing flag
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true))();
+    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true))();
   }, []);
 
   useEffect(() => {
@@ -239,6 +253,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       sendPageState.toaddr.to,
       sendPageState.toaddr.memo,
       sendPageState.toaddr.includeUAMemo,
+      CommandEnum.send,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -387,9 +402,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <Button
             type={ButtonTypeEnum.Primary}
-            title={
-              /*sendAllAmount ? (translate('send.confirm-button-all') as string) :*/ translate('confirm') as string
-            }
+            title={sendAllAmount ? (translate('send.confirm-button-all') as string) : (translate('confirm') as string)}
             onPress={() => confirmSendBiometrics()}
           />
           <Button

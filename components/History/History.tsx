@@ -24,11 +24,12 @@ type HistoryProps = {
   syncingStatusMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
-  set_privacy_option: (value: boolean) => Promise<void>;
-  setPoolsToShieldSelectSapling: (v: boolean) => void;
-  setPoolsToShieldSelectTransparent: (v: boolean) => void;
+  setPrivacyOption: (value: boolean) => Promise<void>;
+  //setPoolsToShieldSelectSapling: (v: boolean) => void;
+  //setPoolsToShieldSelectTransparent: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
   setSendPageState: (s: SendPageStateClass) => void;
+  setShieldingAmount: (value: number) => void;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -38,11 +39,12 @@ const History: React.FunctionComponent<HistoryProps> = ({
   syncingStatusMoreInfoOnClick,
   setZecPrice,
   setComputingModalVisible,
-  set_privacy_option,
-  setPoolsToShieldSelectSapling,
-  setPoolsToShieldSelectTransparent,
+  setPrivacyOption,
+  //setPoolsToShieldSelectSapling,
+  //setPoolsToShieldSelectTransparent,
   setUfvkViewModalVisible,
   setSendPageState,
+  setShieldingAmount,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, transactions, language, setBackgroundError, addLastSnackbar } = context;
@@ -58,7 +60,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   var lastMonth = '';
 
   const fetchTransactionsSorted = useMemo(() => {
-    return transactions.slice(0, numTx).sort((a, b) => b.time - a.time);
+    return transactions.sort((a, b) => b.time - a.time).slice(0, numTx);
   }, [transactions, numTx]);
 
   useEffect(() => {
@@ -69,6 +71,15 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const loadMoreClicked = useCallback(() => {
     setNumTx(numTx + 50);
   }, [numTx]);
+
+  const moveTxDetail = (txid: string, type: number) => {
+    // -1 -> Previous transaction
+    //  1 -> Next transaction
+    const index = transactionsSorted.findIndex((tx: TransactionType) => tx.txid === txid);
+    if ((index > 0 && type === -1) || (index < transactionsSorted.length - 1 && type === 1)) {
+      setTxDetail(transactionsSorted[index + type]);
+    }
+  };
 
   //console.log('render History - 4');
 
@@ -88,11 +99,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
         visible={isTxDetailModalShowing}
         onRequestClose={() => setTxDetailModalShowing(false)}>
         <TxDetail
+          index={transactionsSorted.findIndex((tx: TransactionType) => tx.txid === txDetail.txid)}
+          length={transactionsSorted.length}
           tx={txDetail}
           closeModal={() => setTxDetailModalShowing(false)}
           openModal={() => setTxDetailModalShowing(true)}
-          set_privacy_option={set_privacy_option}
+          setPrivacyOption={setPrivacyOption}
           setSendPageState={setSendPageState}
+          moveTxDetail={moveTxDetail}
         />
       </Modal>
 
@@ -105,11 +119,12 @@ const History: React.FunctionComponent<HistoryProps> = ({
         title={translate('history.title') as string}
         setComputingModalVisible={setComputingModalVisible}
         setBackgroundError={setBackgroundError}
-        set_privacy_option={set_privacy_option}
-        setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
-        setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
+        setPrivacyOption={setPrivacyOption}
+        //setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
+        //setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
         setUfvkViewModalVisible={setUfvkViewModalVisible}
         addLastSnackbar={addLastSnackbar}
+        setShieldingAmount={setShieldingAmount}
       />
 
       <ScrollView

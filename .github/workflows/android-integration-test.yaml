@@ -23,7 +23,7 @@ env:
 jobs:
   android-build-test-artifacts:
     name: Android Build test artifacts
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -61,7 +61,7 @@ jobs:
 
   android-integration-test:
     name: Android Integration test
-    runs-on: macos-12
+    runs-on: macos-13
     needs: android-build-test-artifacts
     strategy:
       matrix:
@@ -100,9 +100,36 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Install docker
+      - name: Setup Docker 1 try
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry1
+        continue-on-error: true
+        with:
+          lima: v0.18.0
+          colima: v0.5.6
+
+      - name: checking outcome 1
+        run: echo ${{ steps.dockerTry1.outcome }}
+
+      - name: Setup Docker 2 try
+        if: steps.dockerTry1.outcome != 'success'
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry2
+        continue-on-error: true
+        with:
+          lima: v0.18.0
+          colima: v0.5.6
+
+      - name: checking outcome 2
+        run: echo ${{ steps.dockerTry2.outcome }}
+
+      - name: Setup Docker Manually
+        if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
         run: |
-          brew install docker
+          brew uninstall colima
+          brew tap colima/releases
+          brew install colima@0.5.6
+          brew install --formula docker
           colima start
 
       - name: Pull regchest docker image
@@ -142,7 +169,7 @@ jobs:
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: 7.5
+          gradle-version: 8.0.1
           build-root-directory: ./android
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
       
@@ -157,7 +184,7 @@ jobs:
           
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 60
           max_attempts: 3

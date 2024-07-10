@@ -52,7 +52,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
   const onPressFetch = async () => {
     if (setZecPrice) {
       setLoading(true);
-      const price = await RPC.rpc_getZecPrice();
+      const price = await RPC.rpcGetZecPrice();
       // values:
       // 0   - initial/default value
       // -1  - error in Gemini/zingolib.

@@ -22,18 +22,18 @@ import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
 
 type PoolsProps = {
   closeModal: () => void;
-  set_privacy_option: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
 };
 
-const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_option }) => {
+const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate, privacy, addLastSnackbar, someUnconfirmed, language } = context;
+  const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
+    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
   }, []);
 
   //console.log(totalBalance);
@@ -52,7 +52,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
-        set_privacy_option={set_privacy_option}
+        setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
       />
 
@@ -151,7 +151,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
             </DetailLine>
           </View>
 
-          {someUnconfirmed && (
+          {somePending && (
             <View
               style={{
                 display: 'flex',

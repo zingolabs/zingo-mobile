@@ -53,9 +53,9 @@ type SeedProps = {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
   action: SeedActionEnum;
-  set_privacy_option: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
 };
-const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
+const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, setPrivacyOption }) => {
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
   let wallet: WalletType,
@@ -210,7 +210,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   // because this screen is fired from more places than the menu.
   useEffect(() => {
     if (action !== SeedActionEnum.new && action !== SeedActionEnum.restore) {
-      (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
+      (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
     }
   }, [action]);
 
@@ -224,7 +224,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         : action === SeedActionEnum.server
         ? (translate('seed.server-warning') as string)
         : '') +
-        (server.chain_name !== ChainNameEnum.mainChainName &&
+        (server.chainName !== ChainNameEnum.mainChainName &&
         (action === SeedActionEnum.change || action === SeedActionEnum.server)
           ? '\n' + (translate('seed.mainnet-warning') as string)
           : ''),
@@ -273,7 +273,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             noBalance={true}
             noSyncingStatus={true}
             noDrawMenu={true}
-            set_privacy_option={set_privacy_option}
+            setPrivacyOption={setPrivacyOption}
             translate={translate}
             netInfo={netInfo}
             mode={mode}

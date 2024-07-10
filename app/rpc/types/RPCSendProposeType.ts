@@ -1,4 +1,4 @@
-export type RPCProposeType = {
+export type RPCSendProposeType = {
   fee?: number;
   error?: string;
 };

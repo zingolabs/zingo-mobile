@@ -1,6 +1,5 @@
 import AddressClass from './classes/AddressClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
-import ErrorModalDataClass from './classes/ErrorModalDataClass';
 import ReceivePageStateClass from './classes/ReceivePageStateClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import SendProgressClass from './classes/SendProgressClass';
@@ -50,18 +49,23 @@ import { ButtonTypeEnum } from './enums/ButtonTypeEnum';
 import { AddressKindEnum } from './enums/AddressKindEnum';
 import { ReceiverEnum } from './enums/ReceiverEnum';
 import { PrivacyLevelFromEnum } from './enums/PrivacyLevelFromEnum';
+import { SecurityTypeEnum } from './enums/SecurityTypeEnum';
+import { EventListenerEnum } from './enums/EventListenerEnum';
 
 import { GlobalConst } from './const/GlobalConst';
 
 import AppStateLoaded from './AppStateLoaded';
 import AppStateLoading from './AppStateLoading';
+import AppContextLoading from './AppContextLoading';
+import AppContextLoaded from './AppContextLoaded';
 
 export {
   AppStateLoaded,
   AppStateLoading,
+  AppContextLoading,
+  AppContextLoaded,
   AddressClass,
   AddressBookFileClass,
-  ErrorModalDataClass,
   ReceivePageStateClass,
   SendPageStateClass,
   SendProgressClass,
@@ -109,5 +113,7 @@ export {
   AddressKindEnum,
   ReceiverEnum,
   PrivacyLevelFromEnum,
+  SecurityTypeEnum,
+  EventListenerEnum,
   GlobalConst,
 };

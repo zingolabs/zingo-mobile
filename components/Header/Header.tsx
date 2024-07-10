@@ -9,7 +9,7 @@ import {
   faLockOpen,
   faLock,
   faSnowflake,
-  faXmark,
+  //faXmark,
   faWifi,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -47,7 +47,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import Utils from '../../app/utils';
-import { RPCProposeType } from '../../app/rpc/types/RPCProposeType';
+import { RPCShieldProposeType } from '../../app/rpc/types/RPCShieldProposeType';
 import RPCModule from '../../app/RPCModule';
 
 type HeaderProps = {
@@ -66,12 +66,13 @@ type HeaderProps = {
   setComputingModalVisible?: (visible: boolean) => void;
   setBackgroundError?: (title: string, error: string) => void;
   noPrivacy?: boolean;
-  set_privacy_option?: (value: boolean) => Promise<void>;
-  setPoolsToShieldSelectSapling?: (v: boolean) => void;
-  setPoolsToShieldSelectTransparent?: (v: boolean) => void;
+  setPrivacyOption?: (value: boolean) => Promise<void>;
+  //setPoolsToShieldSelectSapling?: (v: boolean) => void;
+  //setPoolsToShieldSelectTransparent?: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
   addLastSnackbar?: (snackbar: SnackbarType) => void;
   receivedLegend?: boolean;
+  setShieldingAmount?: (value: number) => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -90,12 +91,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setComputingModalVisible,
   setBackgroundError,
   noPrivacy,
-  set_privacy_option,
-  setPoolsToShieldSelectSapling,
-  setPoolsToShieldSelectTransparent,
+  setPrivacyOption,
+  //setPoolsToShieldSelectSapling,
+  //setPoolsToShieldSelectTransparent,
   setUfvkViewModalVisible,
   addLastSnackbar,
   receivedLegend,
+  setShieldingAmount,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -106,14 +108,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     zecPrice,
     privacy,
     readOnly,
-    poolsToShieldSelectSapling,
-    poolsToShieldSelectTransparent,
+    //poolsToShieldSelectSapling,
+    //poolsToShieldSelectTransparent,
     transactions,
     wallet,
     restartApp,
-    someUnconfirmed,
+    somePending,
     security,
     language,
+    shieldingAmount,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum.basic | ModeEnum.advanced;
@@ -138,7 +141,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
   const opacityValue = useRef(new Animated.Value(1)).current;
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
-  const [poolsToShield, setPoolsToShield] = useState<PoolToShieldEnum>(PoolToShieldEnum.noPoolToShield);
+  //const [poolsToShield, setPoolsToShield] = useState<PoolToShieldEnum>(PoolToShieldEnum.noPoolToShield);
   const [blocksRemaining, setBlocksRemaining] = useState<number>(0);
   const [shieldingFee, setShieldingFee] = useState<number>(0);
 
@@ -175,7 +178,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   useEffect(() => {
     const runShieldPropose = async (): Promise<string> => {
       try {
-        const proposeStr: string = await RPCModule.execute(CommandEnum.propose_shield, '');
+        const proposeStr: string = await RPCModule.execute(CommandEnum.shield, '');
         if (proposeStr) {
           if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error propose ${proposeStr}`);
@@ -193,9 +196,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       }
     };
 
-    if (!readOnly) {
+    if (!readOnly && setShieldingAmount) {
       (async () => {
         let proposeFee = 0;
+        let proposeAmount = 0;
         const runProposeStr = await runShieldPropose();
         if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
           // snack with error
@@ -203,15 +207,19 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           //Alert.alert('Calculating the FEE', runProposeStr);
         } else {
           try {
-            const runProposeJson: RPCProposeType = JSON.parse(runProposeStr);
+            const runProposeJson: RPCShieldProposeType = JSON.parse(runProposeStr);
             if (runProposeJson.error) {
               // snack with error
               console.log(runProposeJson.error);
               //Alert.alert('Calculating the FEE', runProposeJson.error);
             } else {
               if (runProposeJson.fee) {
-                console.log(runProposeJson.fee);
+                console.log('fee', runProposeJson.fee);
                 proposeFee = runProposeJson.fee / 10 ** 8;
+              }
+              if (runProposeJson.value_to_shield) {
+                console.log('value to shield', runProposeJson.fee);
+                proposeAmount = runProposeJson.value_to_shield / 10 ** 8;
               }
             }
           } catch (e) {
@@ -222,43 +230,27 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         }
 
         setShieldingFee(proposeFee);
-        console.log(proposeFee);
+        setShieldingAmount(proposeAmount);
+        console.log(proposeFee, proposeAmount);
       })();
     }
-  }, [
-    readOnly,
-    totalBalance.transparentBal,
-    totalBalance.spendablePrivate,
-    poolsToShield,
-    poolsToShieldSelectSapling,
-    poolsToShieldSelectTransparent,
-  ]);
+  }, [readOnly, setShieldingAmount, totalBalance.transparentBal, somePending]);
 
   useEffect(() => {
-    setShowShieldButton(
-      !readOnly &&
-        totalBalance &&
-        (someUnconfirmed ? 0 : totalBalance.transparentBal) + totalBalance.spendablePrivate > shieldingFee,
-    );
+    setShowShieldButton(!readOnly && (somePending ? 0 : shieldingAmount) > 0);
 
-    if ((someUnconfirmed ? 0 : totalBalance.transparentBal) > 0 && totalBalance.spendablePrivate > 0) {
-      setPoolsToShield(PoolToShieldEnum.allPoolToShield);
-    } else if ((someUnconfirmed ? 0 : totalBalance.transparentBal) > 0) {
-      setPoolsToShield(PoolToShieldEnum.transparentPoolToShield);
-    } else if (totalBalance.spendablePrivate > 0) {
-      setPoolsToShield(PoolToShieldEnum.saplingPoolToShield);
-    } else {
-      setPoolsToShield(PoolToShieldEnum.noPoolToShield);
-    }
-  }, [
-    readOnly,
-    someUnconfirmed,
-    totalBalance,
-    totalBalance.transparentBal,
-    totalBalance.spendablePrivate,
-    shieldingFee,
-  ]);
+    //if ((somePending ? 0 : totalBalance.transparentBal) > 0 && totalBalance.spendablePrivate > 0) {
+    //  setPoolsToShield(PoolToShieldEnum.allPoolToShield);
+    //} else if ((somePending ? 0 : totalBalance.transparentBal) > 0) {
+    //  setPoolsToShield(PoolToShieldEnum.transparentPoolToShield);
+    //} else if (totalBalance.spendablePrivate > 0) {
+    //  setPoolsToShield(PoolToShieldEnum.saplingPoolToShield);
+    //} else {
+    //  setPoolsToShield(PoolToShieldEnum.noPoolToShield);
+    //}
+  }, [readOnly, shieldingAmount, somePending]);
 
+  /*
   useEffect(() => {
     // for basic mode always have to be 'all', It's easier for the user.
     if (
@@ -275,37 +267,43 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       }
     }
   }, [mode, poolsToShield, setPoolsToShieldSelectSapling, setPoolsToShieldSelectTransparent]);
+  */
 
   const shieldFunds = async () => {
     if (!setComputingModalVisible || !setBackgroundError || !addLastSnackbar) {
       return;
     }
-    if (poolsToShield === '') {
-      return;
-    }
+    //if (poolsToShield === '') {
+    //  return;
+    //}
 
-    let pools: PoolToShieldEnum = poolsToShield;
+    // now zingolib only can shield `transparent`.
+    let pools: PoolToShieldEnum = PoolToShieldEnum.transparentPoolToShield;
 
-    if (pools === PoolToShieldEnum.allPoolToShield) {
-      if (!poolsToShieldSelectSapling && !poolsToShieldSelectTransparent) {
-        pools = PoolToShieldEnum.noPoolToShield;
-      } else if (poolsToShieldSelectSapling && !poolsToShieldSelectTransparent) {
-        pools = PoolToShieldEnum.saplingPoolToShield;
-      } else if (!poolsToShieldSelectSapling && poolsToShieldSelectTransparent) {
-        pools = PoolToShieldEnum.transparentPoolToShield;
-      }
-    }
+    //if (pools === PoolToShieldEnum.allPoolToShield) {
+    //  if (!poolsToShieldSelectSapling && !poolsToShieldSelectTransparent) {
+    //    pools = PoolToShieldEnum.noPoolToShield;
+    //  } else if (poolsToShieldSelectSapling && !poolsToShieldSelectTransparent) {
+    //    pools = PoolToShieldEnum.saplingPoolToShield;
+    //  } else if (!poolsToShieldSelectSapling && poolsToShieldSelectTransparent) {
+    //    pools = PoolToShieldEnum.transparentPoolToShield;
+    //  }
+    //}
 
-    if (pools === '') {
-      return;
-    }
+    //if (pools === '') {
+    //  return;
+    //}
 
     setComputingModalVisible(true);
     // We need to activate this flag because if the App is syncing
     // while shielding, then it going to finish the current batch
     // and after that it run the shield process.
-    await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.true);
-    const shieldStr = await RPC.rpc_shieldFunds();
+    await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
+    // because I don't what the user is doing, I need to the re-run the shield
+    // command right before the confirmation
+    const proposeStr: string = await RPCModule.execute(CommandEnum.shield, '');
+    console.log(proposeStr);
+    const shieldStr = await RPC.rpcShieldFunds();
 
     if (shieldStr) {
       if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -348,7 +346,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         }
       }
       setComputingModalVisible(false);
-      await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false);
+      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
     }
   };
 
@@ -385,52 +383,55 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }, [syncingStatus.inProgress, noSyncingStatus]);
 
   const calculateAmountToShield = (): string => {
-    return poolsToShield === PoolToShieldEnum.saplingPoolToShield && totalBalance.spendablePrivate > shieldingFee
-      ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - shieldingFee, 8)
-      : poolsToShield === PoolToShieldEnum.transparentPoolToShield &&
-        (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
-      ? Utils.parseNumberFloatToStringLocale((someUnconfirmed ? 0 : totalBalance.transparentBal) - shieldingFee, 8)
-      : poolsToShieldSelectSapling &&
-        poolsToShieldSelectTransparent &&
-        totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
-      ? Utils.parseNumberFloatToStringLocale(
-          totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) - shieldingFee,
-          8,
-        )
-      : poolsToShieldSelectSapling && totalBalance.spendablePrivate > shieldingFee
-      ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - shieldingFee, 8)
-      : poolsToShieldSelectTransparent && (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
-      ? Utils.parseNumberFloatToStringLocale((someUnconfirmed ? 0 : totalBalance.transparentBal) - shieldingFee, 8)
-      : '0';
+    //return poolsToShield === PoolToShieldEnum.saplingPoolToShield && totalBalance.spendablePrivate > shieldingFee
+    //  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - shieldingFee, 8)
+    //  : poolsToShield === PoolToShieldEnum.transparentPoolToShield &&
+    //    (somePending ? 0 : totalBalance.transparentBal) > shieldingFee
+    //  ? Utils.parseNumberFloatToStringLocale((somePending ? 0 : totalBalance.transparentBal) - shieldingFee, 8)
+    //  : poolsToShieldSelectSapling &&
+    //    poolsToShieldSelectTransparent &&
+    //    totalBalance.spendablePrivate + (somePending ? 0 : totalBalance.transparentBal) > shieldingFee
+    //  ? Utils.parseNumberFloatToStringLocale(
+    //      totalBalance.spendablePrivate + (somePending ? 0 : totalBalance.transparentBal) - shieldingFee,
+    //      8,
+    //    )
+    //  : poolsToShieldSelectSapling && totalBalance.spendablePrivate > shieldingFee
+    //  ? Utils.parseNumberFloatToStringLocale(totalBalance.spendablePrivate - shieldingFee, 8)
+    //  : poolsToShieldSelectTransparent && (somePending ? 0 : totalBalance.transparentBal) > shieldingFee
+    //  ? Utils.parseNumberFloatToStringLocale((somePending ? 0 : totalBalance.transparentBal) - shieldingFee, 8)
+    //  : '0';
+    return Utils.parseNumberFloatToStringLocale(somePending ? 0 : shieldingAmount, 8);
   };
 
   const calculatePoolsToShield = (): string => {
-    return poolsToShield !== PoolToShieldEnum.allPoolToShield
-      ? poolsToShield
-      : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
-      ? PoolToShieldEnum.allPoolToShield
-      : poolsToShieldSelectSapling
-      ? PoolToShieldEnum.saplingPoolToShield
-      : poolsToShieldSelectTransparent
-      ? PoolToShieldEnum.transparentPoolToShield
-      : PoolToShieldEnum.allPoolToShield;
+    //return poolsToShield !== PoolToShieldEnum.allPoolToShield
+    //  ? poolsToShield
+    //  : poolsToShieldSelectSapling && poolsToShieldSelectTransparent
+    //  ? PoolToShieldEnum.allPoolToShield
+    //  : poolsToShieldSelectSapling
+    //  ? PoolToShieldEnum.saplingPoolToShield
+    //  : poolsToShieldSelectTransparent
+    //  ? PoolToShieldEnum.transparentPoolToShield
+    //  : PoolToShieldEnum.allPoolToShield;
+    return PoolToShieldEnum.transparentPoolToShield;
   };
 
   const calculateDisableButtonToShield = (): boolean => {
-    return poolsToShield === PoolToShieldEnum.saplingPoolToShield && totalBalance.spendablePrivate > shieldingFee
-      ? false
-      : poolsToShield === PoolToShieldEnum.transparentPoolToShield &&
-        (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
-      ? false
-      : poolsToShieldSelectSapling &&
-        poolsToShieldSelectTransparent &&
-        totalBalance.spendablePrivate + (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
-      ? false
-      : poolsToShieldSelectSapling && totalBalance.spendablePrivate > shieldingFee
-      ? false
-      : poolsToShieldSelectTransparent && (someUnconfirmed ? 0 : totalBalance.transparentBal) > shieldingFee
-      ? false
-      : true;
+    //return poolsToShield === PoolToShieldEnum.saplingPoolToShield && totalBalance.spendablePrivate > shieldingFee
+    //  ? false
+    //  : poolsToShield === PoolToShieldEnum.transparentPoolToShield &&
+    //    (somePending ? 0 : totalBalance.transparentBal) > shieldingFee
+    //  ? false
+    //  : poolsToShieldSelectSapling &&
+    //    poolsToShieldSelectTransparent &&
+    //    totalBalance.spendablePrivate + (somePending ? 0 : totalBalance.transparentBal) > shieldingFee
+    //  ? false
+    //  : poolsToShieldSelectSapling && totalBalance.spendablePrivate > shieldingFee
+    //  ? false
+    //  : poolsToShieldSelectTransparent && (somePending ? 0 : totalBalance.transparentBal) > shieldingFee
+    //  ? false
+    //  : true;
+    return (somePending ? 0 : shieldingAmount) <= shieldingFee;
   };
 
   const onPressShieldFunds = () => {
@@ -446,7 +447,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   };
 
   const ufvkShowModal = async () => {
-    const resultBio = security.ufvkScreen ? await simpleBiometrics({ translate: translate }) : true;
+    const resultBio = security.seedUfvkScreen ? await simpleBiometrics({ translate: translate }) : true;
     // can be:
     // - true      -> the user do pass the authentication
     // - false     -> the user do NOT pass the authentication
@@ -608,7 +609,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             )}
           </>
         )}
-        {mode !== ModeEnum.basic && !noPrivacy && set_privacy_option && addLastSnackbar && (
+        {mode !== ModeEnum.basic && !noPrivacy && setPrivacyOption && addLastSnackbar && (
           <TouchableOpacity
             style={{ marginHorizontal: 5 }}
             onPress={() => {
@@ -620,7 +621,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         translate('change-privacy-legend')) as string)
                 }`,
               });
-              set_privacy_option(!privacy);
+              setPrivacyOption(!privacy);
             }}>
             <View
               style={{
@@ -737,105 +738,107 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </View>
       )}
 
-      {showShieldButton && !!poolsToShield && setComputingModalVisible && (
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <FadeText style={{ fontSize: 8 }}>
-            {(translate(`history.shield-legend-${calculatePoolsToShield()}`) as string) +
-              ` ${calculateAmountToShield()} ` +
-              (translate('send.fee') as string) +
-              ': ' +
-              Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
-              ' '}
-          </FadeText>
-          <View style={{ margin: 5, flexDirection: 'row' }}>
-            <Button
-              type={ButtonTypeEnum.Primary}
-              title={translate(`history.shield-${calculatePoolsToShield()}`) as string}
-              onPress={onPressShieldFunds}
-              disabled={calculateDisableButtonToShield()}
-            />
-            {mode !== ModeEnum.basic &&
-              poolsToShield === PoolToShieldEnum.allPoolToShield &&
-              setPoolsToShieldSelectSapling &&
-              setPoolsToShieldSelectTransparent && (
-                <View style={{ alignItems: 'flex-start' }}>
-                  <TouchableOpacity
-                    style={{ marginHorizontal: 10 }}
-                    onPress={() => setPoolsToShieldSelectSapling(!poolsToShieldSelectSapling)}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginBottom: 10,
-                      }}>
+      {showShieldButton /*&& !!poolsToShield*/ &&
+        setComputingModalVisible &&
+        (mode === ModeEnum.advanced || (mode === ModeEnum.basic && !calculateDisableButtonToShield())) && (
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <FadeText style={{ fontSize: 8 }}>
+              {(translate(`history.shield-legend-${calculatePoolsToShield()}`) as string) +
+                ` ${calculateAmountToShield()} ` +
+                (translate('send.fee') as string) +
+                ': ' +
+                Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
+                ' '}
+            </FadeText>
+            <View style={{ margin: 5, flexDirection: 'row' }}>
+              <Button
+                type={ButtonTypeEnum.Primary}
+                title={translate(`history.shield-${calculatePoolsToShield()}`) as string}
+                onPress={onPressShieldFunds}
+                disabled={calculateDisableButtonToShield()}
+              />
+              {/*mode !== ModeEnum.basic &&
+                poolsToShield === PoolToShieldEnum.allPoolToShield &&
+                setPoolsToShieldSelectSapling &&
+                setPoolsToShieldSelectTransparent && (
+                  <View style={{ alignItems: 'flex-start' }}>
+                    <TouchableOpacity
+                      style={{ marginHorizontal: 10 }}
+                      onPress={() => setPoolsToShieldSelectSapling(!poolsToShieldSelectSapling)}>
                       <View
                         style={{
                           flexDirection: 'row',
                           justifyContent: 'center',
                           alignItems: 'center',
-                          borderWidth: poolsToShieldSelectSapling ? 2 : 1,
-                          borderColor: poolsToShieldSelectSapling ? colors.primary : colors.primaryDisabled,
-                          borderRadius: 5,
-                          paddingHorizontal: 5,
+                          marginBottom: 10,
                         }}>
-                        <Text
+                        <View
                           style={{
-                            fontSize: 13,
-                            color: colors.border,
-                            marginRight: 5,
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderWidth: poolsToShieldSelectSapling ? 2 : 1,
+                            borderColor: poolsToShieldSelectSapling ? colors.primary : colors.primaryDisabled,
+                            borderRadius: 5,
+                            paddingHorizontal: 5,
                           }}>
-                          {translate('history.shield-z') as string}
-                        </Text>
-                        {poolsToShieldSelectSapling ? (
-                          <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
-                        ) : (
-                          <FontAwesomeIcon icon={faXmark} size={14} color={'red'} />
-                        )}
+                          <Text
+                            style={{
+                              fontSize: 13,
+                              color: colors.border,
+                              marginRight: 5,
+                            }}>
+                            {translate('history.shield-z') as string}
+                          </Text>
+                          {poolsToShieldSelectSapling ? (
+                            <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
+                          ) : (
+                            <FontAwesomeIcon icon={faXmark} size={14} color={'red'} />
+                          )}
+                        </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={{ marginHorizontal: 10 }}
-                    onPress={() => setPoolsToShieldSelectTransparent(!poolsToShieldSelectTransparent)}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginBottom: 0,
-                      }}>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={{ marginHorizontal: 10 }}
+                      onPress={() => setPoolsToShieldSelectTransparent(!poolsToShieldSelectTransparent)}>
                       <View
                         style={{
                           flexDirection: 'row',
                           justifyContent: 'center',
                           alignItems: 'center',
-                          borderWidth: poolsToShieldSelectTransparent ? 2 : 1,
-                          borderColor: poolsToShieldSelectTransparent ? colors.primary : colors.primaryDisabled,
-                          borderRadius: 5,
-                          paddingHorizontal: 5,
+                          marginBottom: 0,
                         }}>
-                        <Text
+                        <View
                           style={{
-                            fontSize: 13,
-                            color: colors.border,
-                            marginRight: 5,
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderWidth: poolsToShieldSelectTransparent ? 2 : 1,
+                            borderColor: poolsToShieldSelectTransparent ? colors.primary : colors.primaryDisabled,
+                            borderRadius: 5,
+                            paddingHorizontal: 5,
                           }}>
-                          {translate('history.shield-t') as string}
-                        </Text>
-                        {poolsToShieldSelectTransparent ? (
-                          <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
-                        ) : (
-                          <FontAwesomeIcon icon={faXmark} size={14} color={'red'} />
-                        )}
+                          <Text
+                            style={{
+                              fontSize: 13,
+                              color: colors.border,
+                              marginRight: 5,
+                            }}>
+                            {translate('history.shield-t') as string}
+                          </Text>
+                          {poolsToShieldSelectTransparent ? (
+                            <FontAwesomeIcon icon={faCheck} size={14} color={colors.primary} />
+                          ) : (
+                            <FontAwesomeIcon icon={faXmark} size={14} color={'red'} />
+                          )}
+                        </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              )}
+                    </TouchableOpacity>
+                  </View>
+                )*/}
+            </View>
           </View>
-        </View>
-      )}
+        )}
 
       <View
         style={{

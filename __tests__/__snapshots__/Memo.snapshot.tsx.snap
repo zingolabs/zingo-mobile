@@ -30,7 +30,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
   >
     <View>
       <View
-        accessibilityLabel="translated text"
+        accessibilityLabel="text translated"
         accessible={true}
         style={
           {
@@ -47,7 +47,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
       >
         <TextInput
           editable={true}
-          maxLength={512}
+          maxLength={511}
           multiline={true}
           onChangeText={[Function]}
           style={
@@ -76,6 +76,23 @@ memo9
 memo10"
         />
         <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -155,7 +172,7 @@ memo10"
             }
           }
         >
-          translated text
+          text translated
         </Text>
         <Text
           style={
@@ -166,7 +183,7 @@ memo10"
             }
           }
         >
-           512 
+           511 
         </Text>
       </View>
     </View>
@@ -185,7 +202,19 @@ memo10"
     <View
       accessibilityState={
         {
+          "busy": undefined,
+          "checked": undefined,
           "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
         }
       }
       accessible={true}
@@ -241,11 +270,28 @@ memo10"
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -300,7 +346,7 @@ memo10"
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>

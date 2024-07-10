@@ -68,7 +68,21 @@ class RPCModule: NSObject {
       return false
     }
   }
-  
+
+  func walletBackup_exists() -> Bool {
+    do {
+      let fileName = try getFileName(walletBackupFileName)
+      if (fileExists(fileName) == "true") {
+        return true
+      } else {
+        return false
+      }
+    } catch {
+      NSLog("wallet backup exists error: \(error.localizedDescription)")
+      return false
+    }
+  }
+
   @objc(walletExists:reject:)
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
@@ -151,8 +165,12 @@ class RPCModule: NSObject {
   @objc(deleteExistingWallet:reject:)
   func deleteExistingWallet(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      try self.deleteExistingWallet()
-      resolve("true")
+      if wallet_exists() {
+        try self.deleteExistingWallet()
+        resolve("true")
+      } else {
+        resolve("false")
+      }
     } catch {
       NSLog("\(error.localizedDescription)")
       resolve("false")
@@ -171,8 +189,12 @@ class RPCModule: NSObject {
   @objc(deleteExistingWalletBackup:reject:)
   func deleteExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      try self.deleteExistingWalletBackup()
-      resolve("true")
+      if walletBackup_exists() {
+        try self.deleteExistingWalletBackup()
+        resolve("true")
+      } else {
+        resolve("false")
+      }
     } catch {
       NSLog("\(error.localizedDescription)")
       resolve("false")
@@ -381,13 +403,50 @@ class RPCModule: NSObject {
           let respStr = String(resp)
           resolve(respStr)
       } else {
-          NSLog("Error getting latest block server")
+          NSLog("Error getting developer donation address")
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
               resolve("Error: [Native] Getting developer donation address. Command arguments problem.")
           }
       }
   }
 
+  @objc(getValueTransfersList:reject:)
+  func getValueTransfersList(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      self.getValueTransfersListAsync(dict)
+  }
+
+  func getValueTransfersListAsync(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getValueTransfers()
+          let respStr = String(resp)
+          resolve(respStr)
+      } else {
+          NSLog("Error getting value transfers list")
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+              resolve("Error: [Native] Getting value transfers list. Command arguments problem.")
+          }
+      }
+  }
+
+  @objc(getTransactionSummariesList:reject:)
+  func getTransactionSummariesList(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      self.getTransactionSummariesListAsync(dict)
+  }
+
+  func getTransactionSummariesListAsync(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getTransactionSummaries()
+          let respStr = String(resp)
+          resolve(respStr)
+      } else {
+          NSLog("Error getting transaction summaries list")
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+              resolve("Error: [Native] Getting transaction summaries list. Command arguments problem.")
+          }
+      }
+  }
 
 
 }

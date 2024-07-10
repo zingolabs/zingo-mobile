@@ -22,7 +22,7 @@ type MenuProps = {
 
 const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuState }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly, mode, transactions, addLastSnackbar, security, language, rescanMenuOption } = context;
+  const { translate, readOnly, mode, transactions, addLastSnackbar, security, language, rescanMenu } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -39,8 +39,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
 
   const onItemSelectedWrapper = async (value: MenuItemEnum) => {
     if (
-      (value === MenuItemEnum.WalletSeedUfvk && !readOnly && security.seedScreen) ||
-      (value === MenuItemEnum.WalletSeedUfvk && readOnly && security.ufvkScreen) ||
+      (value === MenuItemEnum.WalletSeedUfvk && security.seedUfvkScreen) ||
       (value === MenuItemEnum.Rescan && security.rescanScreen) ||
       (value === MenuItemEnum.Settings && security.settingsScreen) ||
       (value === MenuItemEnum.ChangeWallet && security.changeWalletScreen) ||
@@ -58,13 +57,13 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
         addLastSnackbar({ message: translate('biometrics-error') as string });
       } else {
         // if the user click on a screen in the menu the sync is going to continue
-        (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
+        (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
         onItemSelected(value);
       }
     } else {
       // if the user click on a screen in the menu the sync is going to continue
       // or if the security check of the screen is false in settings
-      (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
+      (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
       onItemSelected(value);
     }
   };
@@ -119,7 +118,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
             </RegText>
           )}
 
-          {mode !== ModeEnum.basic && rescanMenuOption && (
+          {mode !== ModeEnum.basic && rescanMenu && (
             <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.Rescan)} style={item}>
               {translate('loadedapp.rescanwallet') as string}
             </RegText>
@@ -168,12 +167,12 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
               {translate('loadedapp.loadwalletfromseed-basic') as string}
             </RegText>
           )}
-          {mode === ModeEnum.basic && (
+          {mode === ModeEnum.basic && !readOnly && (
             <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.TipZingoLabs)} style={item}>
               {translate('loadedapp.tipzingolabs-basic') as string}
             </RegText>
           )}
-          {mode !== ModeEnum.basic && (
+          {mode !== ModeEnum.basic && !readOnly && (
             <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.VoteForNym)} style={item}>
               {translate('loadedapp.votefornym') as string}
             </RegText>

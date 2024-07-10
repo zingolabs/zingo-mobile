@@ -3,11 +3,12 @@ export type RPCSaplingNoteType = {
   datetime: number;
   created_in_txid: string;
   value: string;
-  unconfirmed: string;
-  is_change: boolean;
+  pending: string;
+  // deprecated
+  //is_change: boolean;
   address: string;
   spendable: string;
   spent: string;
   spent_at_height: number;
-  unconfirmed_spent: string;
+  pending_spent: string;
 };

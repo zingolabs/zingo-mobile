@@ -7,7 +7,9 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Memo from '../components/Memo';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -45,9 +47,9 @@ jest.mock('react-native', () => {
 describe('Component Memo - test', () => {
   //snapshot test
   test('Memo - snapshot', () => {
-    const state = defaultAppStateLoaded;
-    state.translate = () => 'translated text';
-    state.sendPageState.toaddr.memo = 'memo1\nmemo2\nmemo3\nmemo4\nmemo5\nmemo6\nmemo7\nmemo8\nmemo9\nmemo10';
+    const state = defaultAppContextLoaded;
+    state.translate = mockTranslate;
+    state.sendPageState = mockSendPageState;
     const onClose = jest.fn();
     const memo = render(
       <ContextAppLoadedProvider value={state}>

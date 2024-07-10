@@ -48,7 +48,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>
@@ -65,6 +65,23 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
     }
   >
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -119,11 +136,28 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -178,7 +212,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>

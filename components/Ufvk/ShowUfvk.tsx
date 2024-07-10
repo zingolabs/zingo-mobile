@@ -29,9 +29,9 @@ type ShowUfvkProps = {
   onClickOK: () => void;
   onClickCancel: () => void;
   action: UfvkActionEnum;
-  set_privacy_option: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
 };
-const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, set_privacy_option }) => {
+const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, wallet, server, netInfo, mode, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -54,7 +54,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
+    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
   }, []);
 
   const onPressOK = () => {
@@ -67,7 +67,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         : action === UfvkActionEnum.server
         ? (translate('ufvk.server-warning') as string)
         : '') +
-        (server.chain_name !== ChainNameEnum.mainChainName &&
+        (server.chainName !== ChainNameEnum.mainChainName &&
         (action === UfvkActionEnum.change || action === UfvkActionEnum.server)
           ? '\n' + (translate('ufvk.mainnet-warning') as string)
           : ''),
@@ -96,7 +96,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
-        set_privacy_option={set_privacy_option}
+        setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
       />
 

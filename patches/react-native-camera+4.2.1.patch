@@ -1,3 +1,390 @@
+diff --git a/node_modules/react-native-camera/android/build.gradle b/node_modules/react-native-camera/android/build.gradle
+index 4aed495..b4c0204 100644
+--- a/node_modules/react-native-camera/android/build.gradle
++++ b/node_modules/react-native-camera/android/build.gradle
+@@ -23,6 +23,7 @@ buildscript {
+ apply plugin: 'com.android.library'
+ 
+ android {
++  namespace "org.reactnative.camera"
+   compileSdkVersion safeExtGet('compileSdkVersion', 29)
+   buildToolsVersion safeExtGet('buildToolsVersion', '29.0.2')
+ 
+diff --git a/node_modules/react-native-camera/android/build/generated/source/buildConfig/general/debug/Zingo/BuildConfig.java b/node_modules/react-native-camera/android/build/generated/source/buildConfig/general/debug/Zingo/BuildConfig.java
+new file mode 100644
+index 0000000..e9b262e
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/generated/source/buildConfig/general/debug/Zingo/BuildConfig.java
+@@ -0,0 +1,11 @@
++/**
++ * Automatically generated file. DO NOT MODIFY
++ */
++package Zingo;
++
++public final class BuildConfig {
++  public static final boolean DEBUG = Boolean.parseBoolean("true");
++  public static final String LIBRARY_PACKAGE_NAME = "Zingo";
++  public static final String BUILD_TYPE = "debug";
++  public static final String FLAVOR = "general";
++}
+diff --git a/node_modules/react-native-camera/android/build/intermediates/aar_metadata/generalDebug/aar-metadata.properties b/node_modules/react-native-camera/android/build/intermediates/aar_metadata/generalDebug/aar-metadata.properties
+new file mode 100644
+index 0000000..776557e
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/intermediates/aar_metadata/generalDebug/aar-metadata.properties
+@@ -0,0 +1,5 @@
++aarFormatVersion=1.0
++aarMetadataVersion=1.0
++minCompileSdk=1
++minCompileSdkExtension=0
++minAndroidGradlePluginVersion=1.0.0
+diff --git a/node_modules/react-native-camera/android/build/intermediates/annotation_processor_list/generalDebug/annotationProcessors.json b/node_modules/react-native-camera/android/build/intermediates/annotation_processor_list/generalDebug/annotationProcessors.json
+new file mode 100644
+index 0000000..9e26dfe
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/intermediates/annotation_processor_list/generalDebug/annotationProcessors.json
+@@ -0,0 +1 @@
++{}
+\ No newline at end of file
+diff --git a/node_modules/react-native-camera/android/build/intermediates/compiled_local_resources/generalDebug/out/layout-v14_texture_view.xml.flat b/node_modules/react-native-camera/android/build/intermediates/compiled_local_resources/generalDebug/out/layout-v14_texture_view.xml.flat
+new file mode 100644
+index 0000000..7c1bb7f
+Binary files /dev/null and b/node_modules/react-native-camera/android/build/intermediates/compiled_local_resources/generalDebug/out/layout-v14_texture_view.xml.flat differ
+diff --git a/node_modules/react-native-camera/android/build/intermediates/compiled_local_resources/generalDebug/out/layout_surface_view.xml.flat b/node_modules/react-native-camera/android/build/intermediates/compiled_local_resources/generalDebug/out/layout_surface_view.xml.flat
+new file mode 100644
+index 0000000..4766fa0
+Binary files /dev/null and b/node_modules/react-native-camera/android/build/intermediates/compiled_local_resources/generalDebug/out/layout_surface_view.xml.flat differ
+diff --git a/node_modules/react-native-camera/android/build/intermediates/incremental/generalDebug/packageGeneralDebugResources/compile-file-map.properties b/node_modules/react-native-camera/android/build/intermediates/incremental/generalDebug/packageGeneralDebugResources/compile-file-map.properties
+new file mode 100644
+index 0000000..59f1829
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/intermediates/incremental/generalDebug/packageGeneralDebugResources/compile-file-map.properties
+@@ -0,0 +1,3 @@
++#Mon May 27 11:26:53 MDT 2024
++Zingo.react-native-camera-main-8\:/layout-v14/texture_view.xml=C\:\\Users\\juank\\github\\zingo-mobile-juanky\\node_modules\\react-native-camera\\android\\build\\intermediates\\packaged_res\\generalDebug\\layout-v14\\texture_view.xml
++Zingo.react-native-camera-main-8\:/layout/surface_view.xml=C\:\\Users\\juank\\github\\zingo-mobile-juanky\\node_modules\\react-native-camera\\android\\build\\intermediates\\packaged_res\\generalDebug\\layout\\surface_view.xml
+diff --git a/node_modules/react-native-camera/android/build/intermediates/incremental/generalDebug/packageGeneralDebugResources/merged.dir/values/values.xml b/node_modules/react-native-camera/android/build/intermediates/incremental/generalDebug/packageGeneralDebugResources/merged.dir/values/values.xml
+new file mode 100644
+index 0000000..ee605cf
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/intermediates/incremental/generalDebug/packageGeneralDebugResources/merged.dir/values/values.xml
+@@ -0,0 +1,50 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++    <style name="Widget.CameraView" parent="android:Widget">
++        <item name="android:adjustViewBounds">false</item>
++        <item name="facing">back</item>
++        <item name="aspectRatio">4:3</item>
++        <item name="autoFocus">true</item>
++        <item name="flash">auto</item>
++    </style>
++    <declare-styleable name="CameraView">
++        
++        <attr name="android:adjustViewBounds"/>
++        
++        <attr format="enum" name="facing">
++            <!-- The camera device faces the opposite direction as the device's screen. -->
++            <enum name="back" value="0"/>
++            <!-- The camera device faces the same direction as the device's screen. -->
++            <enum name="front" value="1"/>
++        </attr>
++        
++        <attr format="string" name="aspectRatio"/>
++        
++        <attr format="boolean" name="autoFocus"/>
++        
++        <attr format="enum" name="flash">
++            <!-- Flash will not be fired. -->
++            <enum name="off" value="0"/>
++            <!--
++              Flash will always be fired during snapshot.
++              The flash may also be fired during preview or auto-focus depending on the driver.
++            -->
++            <enum name="on" value="1"/>
++            <!--
++              Constant emission of light during preview, auto-focus and snapshot.
++              This can also be used for video recording.
++            -->
++            <enum name="torch" value="2"/>
++            <!--
++              Flash will be fired automatically when required.
++              The flash may be fired during preview, auto-focus, or snapshot depending on the
++              driver.
++            -->
++            <enum name="auto" value="3"/>
++            <!--
++              Flash will be fired in red-eye reduction mode.
++            -->
++            <enum name="redEye" value="4"/>
++        </attr>
++    </declare-styleable>
++</resources>
+\ No newline at end of file
+diff --git a/node_modules/react-native-camera/android/build/intermediates/incremental/generalDebug/packageGeneralDebugResources/merger.xml b/node_modules/react-native-camera/android/build/intermediates/incremental/generalDebug/packageGeneralDebugResources/merger.xml
+new file mode 100644
+index 0000000..11e2463
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/intermediates/incremental/generalDebug/packageGeneralDebugResources/merger.xml
+@@ -0,0 +1,62 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\main\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\main\res"><file name="surface_view" path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\main\res\layout\surface_view.xml" qualifiers="" type="layout"/><file name="texture_view" path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\main\res\layout-v14\texture_view.xml" qualifiers="v14" type="layout"/><file path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\main\res\values\attrs.xml" qualifiers=""><declare-styleable name="CameraView">
++        
++        <attr name="android:adjustViewBounds"/>
++        
++        <attr format="enum" name="facing">
++            
++            <enum name="back" value="0"/>
++            
++            <enum name="front" value="1"/>
++        </attr>
++        
++        <attr format="string" name="aspectRatio"/>
++        
++        <attr format="boolean" name="autoFocus"/>
++        
++        <attr format="enum" name="flash">
++            
++            <enum name="off" value="0"/>
++            
++            <enum name="on" value="1"/>
++            
++            <enum name="torch" value="2"/>
++            
++            <enum name="auto" value="3"/>
++            
++            <enum name="redEye" value="4"/>
++        </attr>
++    </declare-styleable></file><file path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\main\res\values\public.xml" qualifiers=""><public name="facing" type="attr"/><public name="aspectRatio" type="attr"/><public name="autoFocus" type="attr"/><public name="flash" type="attr"/><public name="Widget.CameraView" type="style"/></file><file path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\main\res\values\styles.xml" qualifiers=""><style name="Widget.CameraView" parent="android:Widget">
++        <item name="android:adjustViewBounds">false</item>
++        <item name="facing">back</item>
++        <item name="aspectRatio">4:3</item>
++        <item name="autoFocus">true</item>
++        <item name="flash">auto</item>
++    </style></file></source></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="general$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\general\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="general" generated-set="general$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\general\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\debug\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\debug\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\build\generated\res\resValues\general\debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\build\generated\res\resValues\general\debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="variant$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\generalDebug\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="variant" generated-set="variant$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\generalDebug\res"/></dataSet><mergedItems><configuration qualifiers=""><declare-styleable name="CameraView">
++        
++        <attr name="android:adjustViewBounds"/>
++        
++        <attr format="enum" name="facing">
++            
++            <enum name="back" value="0"/>
++            
++            <enum name="front" value="1"/>
++        </attr>
++        
++        <attr format="string" name="aspectRatio"/>
++        
++        <attr format="boolean" name="autoFocus"/>
++        
++        <attr format="enum" name="flash">
++            
++            <enum name="off" value="0"/>
++            
++            <enum name="on" value="1"/>
++            
++            <enum name="torch" value="2"/>
++            
++            <enum name="auto" value="3"/>
++            
++            <enum name="redEye" value="4"/>
++        </attr>
++    </declare-styleable></configuration></mergedItems></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-camera/android/build/intermediates/incremental/mergeGeneralDebugJniLibFolders/merger.xml b/node_modules/react-native-camera/android/build/intermediates/incremental/mergeGeneralDebugJniLibFolders/merger.xml
+new file mode 100644
+index 0000000..77c6bfa
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/intermediates/incremental/mergeGeneralDebugJniLibFolders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\main\jniLibs"/></dataSet><dataSet config="general" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\general\jniLibs"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\debug\jniLibs"/></dataSet><dataSet config="variant" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\generalDebug\jniLibs"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-camera/android/build/intermediates/incremental/mergeGeneralDebugShaders/merger.xml b/node_modules/react-native-camera/android/build/intermediates/incremental/mergeGeneralDebugShaders/merger.xml
+new file mode 100644
+index 0000000..98d0ef6
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/intermediates/incremental/mergeGeneralDebugShaders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\main\shaders"/></dataSet><dataSet config="general" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\general\shaders"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\debug\shaders"/></dataSet><dataSet config="variant" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\generalDebug\shaders"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-camera/android/build/intermediates/incremental/packageGeneralDebugAssets/merger.xml b/node_modules/react-native-camera/android/build/intermediates/incremental/packageGeneralDebugAssets/merger.xml
+new file mode 100644
+index 0000000..dc5b4e2
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/intermediates/incremental/packageGeneralDebugAssets/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\main\assets"/></dataSet><dataSet config="general" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\general\assets"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\debug\assets"/></dataSet><dataSet config="variant" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\src\generalDebug\assets"/></dataSet><dataSet config="generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="C:\Users\juank\github\zingo-mobile-juanky\node_modules\react-native-camera\android\build\intermediates\shader_assets\generalDebug\out"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-camera/android/build/intermediates/local_only_symbol_list/generalDebug/R-def.txt b/node_modules/react-native-camera/android/build/intermediates/local_only_symbol_list/generalDebug/R-def.txt
+new file mode 100644
+index 0000000..8a7d807
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/intermediates/local_only_symbol_list/generalDebug/R-def.txt
+@@ -0,0 +1,19 @@
++R_DEF: Internal format may change without notice
++local
++attr? aspectRatio
++attr? autoFocus
++attr? facing
++attr? flash
++id auto
++id back
++id front
++id off
++id on
++id redEye
++id surface_view
++id texture_view
++id torch
++layout surface_view
++layout texture_view
++style Widget.CameraView
++styleable CameraView android:adjustViewBounds facing aspectRatio autoFocus flash
+diff --git a/node_modules/react-native-camera/android/build/intermediates/navigation_json/generalDebug/navigation.json b/node_modules/react-native-camera/android/build/intermediates/navigation_json/generalDebug/navigation.json
+new file mode 100644
+index 0000000..0637a08
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/intermediates/navigation_json/generalDebug/navigation.json
+@@ -0,0 +1 @@
++[]
+\ No newline at end of file
+diff --git a/node_modules/react-native-camera/android/build/intermediates/packaged_res/generalDebug/layout-v14/texture_view.xml b/node_modules/react-native-camera/android/build/intermediates/packaged_res/generalDebug/layout-v14/texture_view.xml
+new file mode 100644
+index 0000000..91953b7
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/intermediates/packaged_res/generalDebug/layout-v14/texture_view.xml
+@@ -0,0 +1,23 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++    Copyright (C) 2016 The Android Open Source Project
++    Licensed under the Apache License, Version 2.0 (the "License");
++    you may not use this file except in compliance with the License.
++    You may obtain a copy of the License at
++         http://www.apache.org/licenses/LICENSE-2.0
++    Unless required by applicable law or agreed to in writing, software
++    distributed under the License is distributed on an "AS IS" BASIS,
++    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++    See the License for the specific language governing permissions and
++    limitations under the License.
++-->
++<merge xmlns:android="http://schemas.android.com/apk/res/android">
++
++    <TextureView
++        android:id="@+id/texture_view"
++        android:layout_width="match_parent"
++        android:layout_height="match_parent"
++        android:gravity="center"
++        />
++
++</merge>
+diff --git a/node_modules/react-native-camera/android/build/intermediates/packaged_res/generalDebug/layout/surface_view.xml b/node_modules/react-native-camera/android/build/intermediates/packaged_res/generalDebug/layout/surface_view.xml
+new file mode 100644
+index 0000000..4029bb9
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/intermediates/packaged_res/generalDebug/layout/surface_view.xml
+@@ -0,0 +1,23 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++    Copyright (C) 2016 The Android Open Source Project
++    Licensed under the Apache License, Version 2.0 (the "License");
++    you may not use this file except in compliance with the License.
++    You may obtain a copy of the License at
++         http://www.apache.org/licenses/LICENSE-2.0
++    Unless required by applicable law or agreed to in writing, software
++    distributed under the License is distributed on an "AS IS" BASIS,
++    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++    See the License for the specific language governing permissions and
++    limitations under the License.
++-->
++<merge xmlns:android="http://schemas.android.com/apk/res/android">
++
++    <SurfaceView
++        android:id="@+id/surface_view"
++        android:layout_width="match_parent"
++        android:layout_height="match_parent"
++        android:gravity="center"
++        />
++
++</merge>
+diff --git a/node_modules/react-native-camera/android/build/intermediates/packaged_res/generalDebug/values/values.xml b/node_modules/react-native-camera/android/build/intermediates/packaged_res/generalDebug/values/values.xml
+new file mode 100644
+index 0000000..ee605cf
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/intermediates/packaged_res/generalDebug/values/values.xml
+@@ -0,0 +1,50 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++    <style name="Widget.CameraView" parent="android:Widget">
++        <item name="android:adjustViewBounds">false</item>
++        <item name="facing">back</item>
++        <item name="aspectRatio">4:3</item>
++        <item name="autoFocus">true</item>
++        <item name="flash">auto</item>
++    </style>
++    <declare-styleable name="CameraView">
++        
++        <attr name="android:adjustViewBounds"/>
++        
++        <attr format="enum" name="facing">
++            <!-- The camera device faces the opposite direction as the device's screen. -->
++            <enum name="back" value="0"/>
++            <!-- The camera device faces the same direction as the device's screen. -->
++            <enum name="front" value="1"/>
++        </attr>
++        
++        <attr format="string" name="aspectRatio"/>
++        
++        <attr format="boolean" name="autoFocus"/>
++        
++        <attr format="enum" name="flash">
++            <!-- Flash will not be fired. -->
++            <enum name="off" value="0"/>
++            <!--
++              Flash will always be fired during snapshot.
++              The flash may also be fired during preview or auto-focus depending on the driver.
++            -->
++            <enum name="on" value="1"/>
++            <!--
++              Constant emission of light during preview, auto-focus and snapshot.
++              This can also be used for video recording.
++            -->
++            <enum name="torch" value="2"/>
++            <!--
++              Flash will be fired automatically when required.
++              The flash may be fired during preview, auto-focus, or snapshot depending on the
++              driver.
++            -->
++            <enum name="auto" value="3"/>
++            <!--
++              Flash will be fired in red-eye reduction mode.
++            -->
++            <enum name="redEye" value="4"/>
++        </attr>
++    </declare-styleable>
++</resources>
+\ No newline at end of file
+diff --git a/node_modules/react-native-camera/android/build/intermediates/public_res/generalDebug/public.txt b/node_modules/react-native-camera/android/build/intermediates/public_res/generalDebug/public.txt
+new file mode 100644
+index 0000000..4742c36
+--- /dev/null
++++ b/node_modules/react-native-camera/android/build/intermediates/public_res/generalDebug/public.txt
+@@ -0,0 +1,5 @@
++style Widget_CameraView
++attr aspectRatio
++attr autoFocus
++attr facing
++attr flash
+diff --git a/node_modules/react-native-camera/android/src/main/AndroidManifest.xml b/node_modules/react-native-camera/android/src/main/AndroidManifest.xml
+index fe6303a..29818d4 100644
+--- a/node_modules/react-native-camera/android/src/main/AndroidManifest.xml
++++ b/node_modules/react-native-camera/android/src/main/AndroidManifest.xml
+@@ -1,4 +1,4 @@
+-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.reactnative.camera">
++<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+   <uses-permission android:name="android.permission.CAMERA" />
+ 
+   <uses-feature android:name="android.hardware.camera" android:required="false" />
 diff --git a/node_modules/react-native-camera/src/RNCamera.js b/node_modules/react-native-camera/src/RNCamera.js
 index b7a271a..326caf2 100644
 --- a/node_modules/react-native-camera/src/RNCamera.js

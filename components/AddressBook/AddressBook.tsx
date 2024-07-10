@@ -67,7 +67,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch(GlobalConst.false))();
+    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
   }, []);
 
   useEffect(() => {

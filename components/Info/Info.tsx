@@ -68,15 +68,15 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
           <DetailLine
             label={translate('info.network') as string}
             value={
-              !info.chain_name
+              !info.chainName
                 ? (translate('loading') as string)
-                : info.chain_name === ChainNameEnum.mainChainName
+                : info.chainName === ChainNameEnum.mainChainName
                 ? 'Mainnet'
-                : info.chain_name === ChainNameEnum.testChainName
+                : info.chainName === ChainNameEnum.testChainName
                 ? 'Testnet'
-                : info.chain_name === ChainNameEnum.regtestChainName
+                : info.chainName === ChainNameEnum.regtestChainName
                 ? 'Regtest'
-                : (translate('info.unknown') as string) + ' (' + info.chain_name + ')'
+                : (translate('info.unknown') as string) + ' (' + info.chainName + ')'
             }
           />
           <DetailLine

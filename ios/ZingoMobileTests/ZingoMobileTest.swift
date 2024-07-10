@@ -12,7 +12,7 @@ import React
 import XCTest
 
 let TIMEOUT_SECONDS = 60
-let TEXT_TO_LOOK_FOR = "Zingo!"
+let TEXT_TO_LOOK_FOR = "Zingo"
 
 class ZingoMobileTests: XCTestCase {
   

@@ -34,7 +34,6 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
   </View>
   <View
     collapsable={false}
-    forwardedRef={[Function]}
     onMoveShouldSetResponder={[Function]}
     onMoveShouldSetResponderCapture={[Function]}
     onResponderEnd={[Function]}
@@ -186,20 +185,17 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
     />
     <View />
     <MockedBottomTabNavigator
-      initialRouteName="text traslated"
-      screenOptions={
-        {
-          "headerShown": false,
-          "tabBarStyle": {
-            "borderTopColor": "#011401",
-            "borderTopWidth": 0,
-            "height": 0,
-          },
-        }
-      }
+      initialRouteName="text translated"
+      screenOptions={[Function]}
     >
       <MockedScreen
-        name="text traslated"
+        name="text translated"
+      />
+      <MockedScreen
+        name="text translated"
+      />
+      <MockedScreen
+        name="text translated"
       />
     </MockedBottomTabNavigator>
   </View>

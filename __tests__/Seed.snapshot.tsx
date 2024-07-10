@@ -8,12 +8,16 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Seed from '../components/Seed';
 import {
-  defaultAppStateLoaded,
   ContextAppLoadedProvider,
-  defaultAppStateLoading,
   ContextAppLoadingProvider,
+  defaultAppContextLoaded,
+  defaultAppContextLoading,
 } from '../app/context';
-import { CurrencyNameEnum, SeedActionEnum } from '../app/AppState';
+import { SeedActionEnum } from '../app/AppState';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -50,33 +54,17 @@ jest.mock('react-native', () => {
 // test suite
 describe('Component Seed - test', () => {
   //snapshot test
-  const stateLoaded = defaultAppStateLoaded;
-  stateLoaded.translate = (p: string) => {
-    if (p === 'seed.buttontexts') {
-      return `{
-        "new": ["new"],
-        "change": ["change"],
-        "server": ["server"],
-        "view": ["view"],
-        "restore": ["restore"],
-        "backup": ["backup"]
-      }`;
-    } else {
-      return 'text translated';
-    }
-  };
-  stateLoaded.wallet = {
-    seed: 'pepe lolo titi',
-    birthday: 1500100,
-  };
-  stateLoaded.info.currencyName = CurrencyNameEnum.ZEC;
-  stateLoaded.totalBalance.total = 1.12345678;
+  const stateLoaded = defaultAppContextLoaded;
+  stateLoaded.translate = mockTranslate;
+  stateLoaded.wallet = mockWallet;
+  stateLoaded.info = mockInfo;
+  stateLoaded.totalBalance = mockTotalBalance;
   const onOk = jest.fn();
   const onCancel = jest.fn();
   test('Seed View - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.view} set_privacy_option={jest.fn()} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.view} setPrivacyOption={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -84,7 +72,7 @@ describe('Component Seed - test', () => {
   test('Seed Change - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.change} set_privacy_option={jest.fn()} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.change} setPrivacyOption={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -92,7 +80,7 @@ describe('Component Seed - test', () => {
   test('Seed Server - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.server} set_privacy_option={jest.fn()} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.server} setPrivacyOption={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
@@ -100,49 +88,28 @@ describe('Component Seed - test', () => {
   test('Seed Backup - snapshot', () => {
     const seed = render(
       <ContextAppLoadedProvider value={stateLoaded}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.backup} set_privacy_option={jest.fn()} />
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.backup} setPrivacyOption={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
   });
-  const stateLoading = defaultAppStateLoading;
-  stateLoading.translate = (p: string) => {
-    if (p === 'seed.buttontexts') {
-      return `{
-        "new": ["new"],
-        "change": ["change"],
-        "server": ["server"],
-        "view": ["view"],
-        "restore": ["restore"],
-        "backup": ["backup"]
-      }`;
-    } else {
-      return 'text translated';
-    }
-  };
-  stateLoading.wallet = {
-    seed: 'pepe lolo titi',
-    birthday: 1500100,
-  };
-  stateLoading.info.latestBlock = 1900100;
-  stateLoading.totalBalance.total = 1.12345678;
+  const contextLoading = defaultAppContextLoading;
+  contextLoading.translate = mockTranslate;
+  contextLoading.wallet = mockWallet;
+  contextLoading.info = mockInfo;
+  contextLoading.totalBalance = mockTotalBalance;
   test('Seed New - snapshot', () => {
     const seed = render(
-      <ContextAppLoadingProvider value={stateLoading}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.new} set_privacy_option={jest.fn()} />
+      <ContextAppLoadingProvider value={contextLoading}>
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.new} setPrivacyOption={jest.fn()} />
       </ContextAppLoadingProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();
   });
   test('Seed Restore - snapshot', () => {
     const seed = render(
-      <ContextAppLoadingProvider value={stateLoading}>
-        <Seed
-          onClickOK={onOk}
-          onClickCancel={onCancel}
-          action={SeedActionEnum.restore}
-          set_privacy_option={jest.fn()}
-        />
+      <ContextAppLoadingProvider value={contextLoading}>
+        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.restore} setPrivacyOption={jest.fn()} />
       </ContextAppLoadingProvider>,
     );
     expect(seed.toJSON()).toMatchSnapshot();

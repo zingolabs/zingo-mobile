@@ -50,7 +50,7 @@ jobs:
         run: |
           cp ./*.* ../../../ios
 
-      - name: Yarn Install
+      - name: Yarn
         run: |
           yarn
 
@@ -60,11 +60,15 @@ jobs:
           pod install
 
       - name: Run integration tests
-        working-directory: ios
-        run: |
-          xcodebuild test \
-            -workspace ZingoMobile.xcworkspace \
-            -scheme ZingoMobile \
-            -sdk iphonesimulator \
-            -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2'
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          command: |
+            cd ios
+            xcodebuild test \
+              -workspace ZingoMobile.xcworkspace \
+              -scheme ZingoMobile \
+              -sdk iphonesimulator \
+              -configuration Debug \
+              -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2'

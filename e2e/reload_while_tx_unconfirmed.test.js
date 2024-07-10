@@ -6,7 +6,7 @@ import { loadRecipientWallet } from "./e2e-utils/loadRecipientWallet.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-describe('Maintains correct information while tx unconfirmed', () => {
+describe('Maintains correct information while tx pending', () => {
   it('should send from orchard to sapling pool', async () => {
     await loadRecipientWallet();
     await sleep(10000);

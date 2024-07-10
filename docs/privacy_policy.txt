@@ -1,4 +1,4 @@
-Zingo! A Zcash Application
+Zingo A Zcash Application
 
 Use zero knowledge cryptography to transact, and to manage your transaction history, in a private and mindful way.
 

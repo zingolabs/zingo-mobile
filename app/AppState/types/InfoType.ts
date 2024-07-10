@@ -2,7 +2,7 @@ import { ChainNameEnum } from '../enums/ChainNameEnum';
 import { CurrencyNameEnum } from '../enums/CurrencyNameEnum';
 
 export default interface InfoType {
-  chain_name: ChainNameEnum;
+  chainName: ChainNameEnum;
   serverUri: string;
   latestBlock: number;
   connections: number;

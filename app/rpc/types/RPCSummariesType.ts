@@ -9,6 +9,6 @@ export type RPCSummariesType = {
   to_address?: string;
   memos?: string[];
   kind: TransactionTypeEnum;
-  pool?: PoolEnum | 'None';
-  unconfirmed: boolean;
+  pool_type?: PoolEnum | 'None';
+  pending: boolean;
 };

@@ -67,13 +67,13 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
   ]);
 
   useEffect(() => {
-    if (snackbars.length > 0) {
+    if (snackbars.length > 0 && snacking) {
       const timer = setTimeout(() => {
         handleSnackbarClose();
       }, duration);
       return () => clearTimeout(timer);
     }
-  }, [duration, handleSnackbarClose, snackbars, snackbars.length]);
+  }, [duration, handleSnackbarClose, snackbars, snackbars.length, snacking]);
 
   useEffect(() => {
     return () => {
