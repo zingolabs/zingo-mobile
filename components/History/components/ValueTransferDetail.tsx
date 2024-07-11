@@ -65,7 +65,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
 
-  const memoTotal = vt.memos ? vt.memos.join('') : '';
+  const memoTotal = vt.memos ? vt.memos.join('\n') : '';
   let memo = '';
   let memoUA = '';
   if (memoTotal.includes('\nReply to: \n')) {

@@ -114,7 +114,7 @@ describe('Component History ValueTransferDetail - test', () => {
     expect(num.length).toBe(2);
     screen.getByText('0.0001');
     screen.getByText('hola & hello');
-    const txt = screen.queryByText('hola & hellohello & hola');
+    const txt = screen.queryByText('hola & hello\nhello & hola');
     expect(txt).toBe(null);
   });
 
@@ -136,7 +136,7 @@ describe('Component History ValueTransferDetail - test', () => {
     const num = screen.getAllByText('0.0000');
     expect(num.length).toBe(2);
     screen.getByText('0.0001');
-    screen.getByText('orchard memosapling memo');
+    screen.getByText('orchard memo\nsapling memo');
   });
 
   test('History ValueTransferDetail - self sent ValueTransfer', () => {
@@ -177,7 +177,7 @@ describe('Component History ValueTransferDetail - test', () => {
     const num = screen.getAllByText('0.7765');
     expect(num.length).toBe(2);
     screen.getByText('hola & hello');
-    const txt = screen.queryByText('hola & hellohello & hola');
+    const txt = screen.queryByText('hola & hello\nhello & hola');
     expect(txt).toBe(null);
   });
 
