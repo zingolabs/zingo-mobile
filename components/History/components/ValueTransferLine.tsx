@@ -105,6 +105,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             paddingBottom: 10,
             borderBottomWidth: nextLineWithSameTxid ? 0.5 : 1.5,
             borderBottomColor: nextLineWithSameTxid ? colors.primaryDisabled : colors.border,
+            borderStyle: nextLineWithSameTxid ? 'dashed' : 'solid',
           }}>
           <View style={{ display: 'flex' }}>
             <FontAwesomeIcon
