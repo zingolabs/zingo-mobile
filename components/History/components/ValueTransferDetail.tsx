@@ -65,7 +65,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
 
-  const memoTotal = vt.memos ? vt.memos.join('\n') : '';
+  const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
   let memo = '';
   let memoUA = '';
   if (memoTotal.includes('\nReply to: \n')) {
@@ -197,7 +197,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             privacy={privacy}
             smallPrefix={true}
           />
-          {!!vt.zecPrice && (
+          {!!vt.zecPrice && vt.zecPrice > 0 && (
             <CurrencyAmount price={vt.zecPrice} amtZec={vt.amount} currency={currency} privacy={privacy} />
           )}
         </View>
@@ -278,7 +278,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             <FadeText>{translate('history.amount') as string}</FadeText>
             <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
               <ZecAmount amtZec={vt.amount} size={18} currencyName={info.currencyName} privacy={privacy} />
-              {!!vt.zecPrice && (
+              {!!vt.zecPrice && vt.zecPrice > 0 && (
                 <CurrencyAmount price={vt.zecPrice} amtZec={vt.amount} currency={currency} privacy={privacy} />
               )}
             </View>

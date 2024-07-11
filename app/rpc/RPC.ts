@@ -37,6 +37,7 @@ import { RPCValueTransfersType } from './types/RPCValueTransfersType';
 import { RPCValueTransfersKindEnum } from './enums/RPCValueTransfersKindEnum';
 import { RPCValueTransferType } from './types/RPCValueTransferType';
 import { ValueTransferKindEnum } from '../AppState/enums/ValueTransferKindEnum';
+import { RPCValueTransfersStatusEnum } from './enums/RPCValueTransfersStatusEnum';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -1216,19 +1217,22 @@ export default class RPC {
             : vt.kind === RPCValueTransfersKindEnum.shield
             ? ValueTransferKindEnum.Shield
             : undefined;
-        currentValueTransferList.fee = (vt.transaction_fee ? vt.transaction_fee : 0) / 10 ** 8;
-        currentValueTransferList.zecPrice = vt.zec_price;
-        if (vt.status === 'pending') {
+        currentValueTransferList.fee = (!vt.transaction_fee ? 0 : vt.transaction_fee) / 10 ** 8;
+        currentValueTransferList.zecPrice = !vt.zec_price ? 0 : vt.zec_price;
+        if (vt.status === RPCValueTransfersStatusEnum.pending) {
           currentValueTransferList.confirmations = 0;
-        } else {
+        } else if (vt.status === RPCValueTransfersStatusEnum.confirmed) {
           currentValueTransferList.confirmations = this.lastServerBlockHeight
             ? this.lastServerBlockHeight - vt.blockheight + 1
             : this.lastWalletBlockHeight - vt.blockheight + 1;
+        } else {
+          // impossible case... I guess.
+          currentValueTransferList.confirmations = 0;
         }
 
         currentValueTransferList.address = !vt.recipient_address ? '' : vt.recipient_address;
         currentValueTransferList.amount = (!vt.value ? 0 : vt.value) / 10 ** 8;
-        currentValueTransferList.memos = !vt.memos ? undefined : vt.memos;
+        currentValueTransferList.memos = !vt.memos || vt.memos.length === 0 ? undefined : vt.memos;
         currentValueTransferList.poolType = !vt.pool_received ? undefined : vt.pool_received;
 
         if (vt.txid.startsWith('xxxxxxxxx')) {
