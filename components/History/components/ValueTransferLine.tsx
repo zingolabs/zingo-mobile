@@ -25,6 +25,7 @@ type ValueTransferLineProps = {
   setValueTransferDetail: (t: ValueTransferType) => void;
   setValueTransferDetailIndex: (i: number) => void;
   setValueTransferDetailModalShowing: (b: boolean) => void;
+  nextLineWithSameTxid: boolean;
 };
 const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   index,
@@ -33,6 +34,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   setValueTransferDetail,
   setValueTransferDetailIndex,
   setValueTransferDetailModalShowing,
+  nextLineWithSameTxid,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, privacy, info } = context;
@@ -70,7 +72,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     setHaveMemo(memos.length > 0);
   }, [vt.memos]);
 
-  //console.log('render ValueTransferLine - 5', index);
+  //console.log('render ValueTransferLine - 5', index, nextLineWithSameTxid);
 
   return (
     <View testID={`valueTransferList.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
@@ -101,8 +103,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             alignItems: 'center',
             marginTop: 15,
             paddingBottom: 10,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.border,
+            borderBottomWidth: nextLineWithSameTxid ? 0.5 : 1.5,
+            borderBottomColor: nextLineWithSameTxid ? colors.primaryDisabled : colors.border,
           }}>
           <View style={{ display: 'flex' }}>
             <FontAwesomeIcon

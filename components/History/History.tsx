@@ -192,6 +192,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
               setValueTransferDetail={(ttt: ValueTransferType) => setValueTransferDetail(ttt)}
               setValueTransferDetailIndex={(iii: number) => setValueTransferDetailIndex(iii)}
               setValueTransferDetailModalShowing={(bbb: boolean) => setValueTransferDetailModalShowing(bbb)}
+              nextLineWithSameTxid={
+                index >= valueTransfersSorted.length - 1 ? false : valueTransfersSorted[index + 1].txid === vt.txid
+              }
             />
           );
         })}
