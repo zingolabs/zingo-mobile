@@ -889,7 +889,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               {
                 "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "borderBottomWidth": 1.5,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
@@ -1151,7 +1151,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               {
                 "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "borderBottomWidth": 1.5,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
@@ -1437,7 +1437,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               {
                 "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "borderBottomWidth": 1.5,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
@@ -1723,7 +1723,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               {
                 "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "borderBottomWidth": 1.5,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
@@ -1985,7 +1985,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               {
                 "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "borderBottomWidth": 1.5,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
@@ -2783,7 +2783,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               {
                 "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "borderBottomWidth": 1.5,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
@@ -3046,7 +3046,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               {
                 "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "borderBottomWidth": 1.5,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
@@ -3347,7 +3347,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               {
                 "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "borderBottomWidth": 1.5,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
@@ -3634,7 +3634,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               {
                 "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "borderBottomWidth": 1.5,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
@@ -3897,7 +3897,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               {
                 "alignItems": "center",
                 "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "borderBottomWidth": 1.5,
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
