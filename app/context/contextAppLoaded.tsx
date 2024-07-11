@@ -7,7 +7,6 @@ import {
   ReceivePageStateClass,
   SendProgressClass,
   WalletSettingsClass,
-  TransactionType,
   InfoType,
   WalletType,
   AddressClass,
@@ -26,6 +25,7 @@ import {
   SelectServerEnum,
   SnackbarType,
   AppContextLoaded,
+  ValueTransferType,
 } from '../AppState';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
@@ -34,7 +34,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   syncingStatus: new SyncingStatusClass(),
   totalBalance: new TotalBalanceClass(),
   addresses: [] as AddressClass[],
-  transactions: [] as TransactionType[],
+  valueTransfers: [] as ValueTransferType[],
   sendPageState: new SendPageStateClass(new ToAddrClass(0)),
   receivePageState: new ReceivePageStateClass(''),
   info: {} as InfoType,

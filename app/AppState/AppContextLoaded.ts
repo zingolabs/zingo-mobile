@@ -9,7 +9,6 @@ import WalletSettingsClass from './classes/WalletSettingsClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
 import SyncingStatusClass from './classes/SyncingStatusClass';
 
-import TransactionType from './types/TransactionType';
 import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
 import ZecPriceType from './types/ZecPriceType';
@@ -25,6 +24,7 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
+import ValueTransferType from './types/ValueTransferType';
 
 export default interface AppContextLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -37,10 +37,10 @@ export default interface AppContextLoaded {
   // that don't have any balance or are unused
   addresses: AddressClass[];
 
-  // List of all T and Z and O transactions
-  transactions: TransactionType[];
+  // List of all T and Z and O value transfers
+  valueTransfers: ValueTransferType[];
 
-  // The state of the send page, as the user constructs a transaction
+  // The state of the send page
   sendPageState: SendPageStateClass;
 
   // Any state for the receive page
@@ -99,7 +99,7 @@ export default interface AppContextLoaded {
   // if the App is stalled - restart is fired
   restartApp: (s: any) => void;
 
-  // some transaction is pending?
+  // some ValueTransfer is pending?
   somePending: boolean;
 
   // List of our contacts - Address book

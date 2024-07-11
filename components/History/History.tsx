@@ -8,12 +8,12 @@ import 'moment/locale/ru';
 
 import { useTheme } from '@react-navigation/native';
 
-import { ButtonTypeEnum, SendPageStateClass, TransactionType } from '../../app/AppState';
+import { ButtonTypeEnum, SendPageStateClass, ValueTransferType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
-import TxDetail from './components/TxDetail';
-import TxSummaryLine from './components/TxSummaryLine';
+import ValueTransferDetail from './components/ValueTransferDetail';
+import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 
@@ -47,37 +47,72 @@ const History: React.FunctionComponent<HistoryProps> = ({
   setShieldingAmount,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, transactions, language, setBackgroundError, addLastSnackbar } = context;
+  const { translate, valueTransfers, language, setBackgroundError, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [isTxDetailModalShowing, setTxDetailModalShowing] = useState<boolean>(false);
-  const [txDetail, setTxDetail] = useState<TransactionType>({} as TransactionType);
-  const [numTx, setNumTx] = useState<number>(50);
-  const [loadMoreButton, setLoadMoreButton] = useState<boolean>(numTx < (transactions.length || 0));
-  const [transactionsSorted, setTransactionsSorted] = useState<TransactionType[]>([]);
+  const [isValueTransferDetailModalShowing, setValueTransferDetailModalShowing] = useState<boolean>(false);
+  const [valueTransferDetail, setValueTransferDetail] = useState<ValueTransferType>({} as ValueTransferType);
+  const [valueTransferDetailIndex, setValueTransferDetailIndex] = useState<number>(-1);
+  const [numVt, setNumVt] = useState<number>(50);
+  const [loadMoreButton, setLoadMoreButton] = useState<boolean>(numVt < (valueTransfers.length || 0));
+  const [valueTransfersSorted, setValueTransfersSorted] = useState<ValueTransferType[]>([]);
 
   var lastMonth = '';
 
-  const fetchTransactionsSorted = useMemo(() => {
-    return transactions.sort((a, b) => b.time - a.time).slice(0, numTx);
-  }, [transactions, numTx]);
+  const fetchValueTransfersSorted = useMemo(() => {
+    // we need to sort the array properly.
+    // by:
+    // - time
+    // - txid
+    // - address
+    // - pool
+    return valueTransfers
+      .sort((a, b) => {
+        const timeComparison = b.time - a.time;
+        if (timeComparison === 0) {
+          // same time
+          const txidComparison = a.txid.localeCompare(b.txid);
+          if (txidComparison === 0) {
+            // same txid
+            const addressComparison = a.address.localeCompare(b.address);
+            if (addressComparison === 0) {
+              // same address
+              const aPoolType = a.poolType?.toString() || '';
+              const bPoolType = b.poolType?.toString() || '';
+              // last one sort criteria - poolType.
+              return aPoolType.localeCompare(bPoolType);
+            } else {
+              // different address
+              return addressComparison;
+            }
+          } else {
+            // different txid
+            return txidComparison;
+          }
+        } else {
+          // different time
+          return timeComparison;
+        }
+      })
+      .slice(0, numVt);
+  }, [valueTransfers, numVt]);
 
   useEffect(() => {
-    setLoadMoreButton(numTx < (transactions.length || 0));
-    setTransactionsSorted(fetchTransactionsSorted);
-  }, [fetchTransactionsSorted, numTx, transactions]);
+    setLoadMoreButton(numVt < (valueTransfers.length || 0));
+    setValueTransfersSorted(fetchValueTransfersSorted);
+  }, [fetchValueTransfersSorted, numVt, valueTransfers]);
 
   const loadMoreClicked = useCallback(() => {
-    setNumTx(numTx + 50);
-  }, [numTx]);
+    setNumVt(numVt + 50);
+  }, [numVt]);
 
-  const moveTxDetail = (txid: string, type: number) => {
-    // -1 -> Previous transaction
-    //  1 -> Next transaction
-    const index = transactionsSorted.findIndex((tx: TransactionType) => tx.txid === txid);
-    if ((index > 0 && type === -1) || (index < transactionsSorted.length - 1 && type === 1)) {
-      setTxDetail(transactionsSorted[index + type]);
+  const moveValueTransferDetail = (index: number, type: number) => {
+    // -1 -> Previous ValueTransfer
+    //  1 -> Next ValueTransfer
+    if ((index > 0 && type === -1) || (index < valueTransfersSorted.length - 1 && type === 1)) {
+      setValueTransferDetail(valueTransfersSorted[index + type]);
+      setValueTransferDetailIndex(index + type);
     }
   };
 
@@ -96,22 +131,22 @@ const History: React.FunctionComponent<HistoryProps> = ({
       <Modal
         animationType="slide"
         transparent={false}
-        visible={isTxDetailModalShowing}
-        onRequestClose={() => setTxDetailModalShowing(false)}>
-        <TxDetail
-          index={transactionsSorted.findIndex((tx: TransactionType) => tx.txid === txDetail.txid)}
-          length={transactionsSorted.length}
-          tx={txDetail}
-          closeModal={() => setTxDetailModalShowing(false)}
-          openModal={() => setTxDetailModalShowing(true)}
+        visible={isValueTransferDetailModalShowing}
+        onRequestClose={() => setValueTransferDetailModalShowing(false)}>
+        <ValueTransferDetail
+          index={valueTransferDetailIndex}
+          length={valueTransfersSorted.length}
+          vt={valueTransferDetail}
+          closeModal={() => setValueTransferDetailModalShowing(false)}
+          openModal={() => setValueTransferDetailModalShowing(true)}
           setPrivacyOption={setPrivacyOption}
           setSendPageState={setSendPageState}
-          moveTxDetail={moveTxDetail}
+          moveValueTransferDetail={moveValueTransferDetail}
         />
       </Modal>
 
       <Header
-        testID="transaction text"
+        testID="ValueTransfer text"
         poolsMoreInfoOnClick={poolsMoreInfoOnClick}
         syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
         toggleMenuDrawer={toggleMenuDrawer}
@@ -139,8 +174,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
           />
         }
         style={{ flexGrow: 1, marginTop: 10, width: '100%' }}>
-        {transactionsSorted.flatMap((t, index) => {
-          let txmonth = t.time ? moment(t.time * 1000).format('MMM YYYY') : '--- ----';
+        {valueTransfersSorted.flatMap((vt, index) => {
+          let txmonth = vt.time ? moment(vt.time * 1000).format('MMM YYYY') : '--- ----';
 
           var month = '';
           if (txmonth !== lastMonth) {
@@ -149,13 +184,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
           }
 
           return (
-            <TxSummaryLine
+            <ValueTransferLine
               index={index}
-              key={`${t.txid}-${t.type}`}
-              tx={t}
+              key={`${index}-${vt.txid}-${vt.kind}`}
+              vt={vt}
               month={month}
-              setTxDetail={(ttt: TransactionType) => setTxDetail(ttt)}
-              setTxDetailModalShowing={(bbb: boolean) => setTxDetailModalShowing(bbb)}
+              setValueTransferDetail={(ttt: ValueTransferType) => setValueTransferDetail(ttt)}
+              setValueTransferDetailIndex={(iii: number) => setValueTransferDetailIndex(iii)}
+              setValueTransferDetailModalShowing={(bbb: boolean) => setValueTransferDetailModalShowing(bbb)}
             />
           );
         })}
@@ -176,7 +212,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           </View>
         ) : (
           <>
-            {!!transactions && !!transactions.length && (
+            {!!valueTransfers && !!valueTransfers.length && (
               <View
                 style={{
                   display: 'flex',

@@ -134,9 +134,9 @@
     "selectingserverbest": "En este momento este es el servidor más optimizado:",
     "nymmemo": "Necesito seguridad de red Nym",
     "incoming-funds": "Fondos entrantes\n",
-    "transaction-confirmed": "Transacción confirmada\n",
+    "valuetransfer-confirmed": "Transacción confirmada\n",
     "payment-made": "Pago realizado\n",
-    "transaction-reverted": "La transacción fue revertida por el servidor, vuelva a intentarlo."
+    "valuetransfer-reverted": "La transacción fue revertida por el servidor, vuelva a intentarlo."
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",
@@ -415,7 +415,7 @@
     "confirm-title": "Confirmar Transacción",
     "sending-title": "Procesando",
     "confirm-amount": "Cantidad",
-    "fee": "Comisión",
+    "fee": "Comisión transacción",
     "confirm-button-all": "Confirmar Enviar Todo",
     "amount": "   Cantidad",
     "to": "A",

@@ -134,9 +134,9 @@
     "selectingserverbest": "In this moment this is the most optimized server:",
     "nymmemo": "I need Nym network security",
     "incoming-funds": "Incoming funds\n",
-    "transaction-confirmed": "Transaction confirmed\n",
+    "valuetransfer-confirmed": "Transaction confirmed\n",
     "payment-made": "Payment made\n",
-    "transaction-reverted": "The transaction was reverted by the server, try again."
+    "valuetransfer-reverted": "The transaction was reverted by the server, try again."
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",
@@ -415,7 +415,7 @@
     "confirm-title": "Confirm Transaction",
     "sending-title": "Processing",
     "confirm-amount": "Amount",
-    "fee": "Fee",
+    "fee": "Transaction fee",
     "confirm-button-all": "Confirm Send All",
     "amount": "   Amount",
     "to": "To",

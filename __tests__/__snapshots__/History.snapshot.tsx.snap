@@ -695,7 +695,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "paddingHorizontal": 5,
           }
         }
-        testID="transaction text"
+        testID="ValueTransfer text"
       >
         text translated
       </Text>
@@ -855,7 +855,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "flexDirection": "column",
           }
         }
-        testID="transactionList.1"
+        testID="valueTransferList.1"
       >
         <View
           style={
@@ -938,7 +938,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 }
               }
             >
-              <View />
               <View
                 style={
                   {
@@ -1142,7 +1141,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "flexDirection": "column",
           }
         }
-        testID="transactionList.2"
+        testID="valueTransferList.2"
       >
         <View
           onPress={[Function]}
@@ -1201,7 +1200,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 }
               }
             >
-              <View />
               <View
                 style={
                   {
@@ -1429,7 +1427,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "flexDirection": "column",
           }
         }
-        testID="transactionList.3"
+        testID="valueTransferList.3"
       >
         <View
           onPress={[Function]}
@@ -1488,7 +1486,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 }
               }
             >
-              <View />
               <View
                 style={
                   {
@@ -1716,7 +1713,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "flexDirection": "column",
           }
         }
-        testID="transactionList.4"
+        testID="valueTransferList.4"
       >
         <View
           onPress={[Function]}
@@ -1775,7 +1772,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 }
               }
             >
-              <View />
               <View
                 style={
                   {
@@ -1979,7 +1975,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "flexDirection": "column",
           }
         }
-        testID="transactionList.5"
+        testID="valueTransferList.5"
       >
         <View
           onPress={[Function]}
@@ -2038,7 +2034,86 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 }
               }
             >
-              <View />
+              <View>
+                <View
+                  style={
+                    {
+                      "alignItems": "flex-start",
+                      "display": "flex",
+                      "flexDirection": "row",
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "flex-start",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "marginRight": 10,
+                      }
+                    }
+                  >
+                    <View
+                      accessibilityState={
+                        {
+                          "busy": undefined,
+                          "checked": undefined,
+                          "disabled": undefined,
+                          "expanded": undefined,
+                          "selected": undefined,
+                        }
+                      }
+                      accessibilityValue={
+                        {
+                          "max": undefined,
+                          "min": undefined,
+                          "now": undefined,
+                          "text": undefined,
+                        }
+                      }
+                      accessible={true}
+                      collapsable={false}
+                      focusable={true}
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                      style={
+                        {
+                          "opacity": 1,
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "flex",
+                            "flexDirection": "column",
+                            "flexWrap": "wrap",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "rgb(28, 28, 30)",
+                              "fontSize": 18,
+                              "fontWeight": "600",
+                              "opacity": 1,
+                            }
+                          }
+                        >
+                          sent-ad...4567890
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
               <View
                 style={
                   {
@@ -2528,7 +2603,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "paddingHorizontal": 5,
           }
         }
-        testID="transaction text"
+        testID="ValueTransfer text"
       >
         text translated
       </Text>
@@ -2674,7 +2749,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "flexDirection": "column",
           }
         }
-        testID="transactionList.1"
+        testID="valueTransferList.1"
       >
         <View
           style={
@@ -2757,7 +2832,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 }
               }
             >
-              <View />
               <View
                 style={
                   {
@@ -2962,7 +3036,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "flexDirection": "column",
           }
         }
-        testID="transactionList.2"
+        testID="valueTransferList.2"
       >
         <View
           onPress={[Function]}
@@ -3021,7 +3095,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 }
               }
             >
-              <View />
               <View
                 style={
                   {
@@ -3235,7 +3308,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     }
                     testID="undefined.big-part"
                   >
-                     0.8765
+                     0.7765
                   </Text>
                   <Text
                     style={
@@ -3264,7 +3337,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "flexDirection": "column",
           }
         }
-        testID="transactionList.3"
+        testID="valueTransferList.3"
       >
         <View
           onPress={[Function]}
@@ -3323,7 +3396,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 }
               }
             >
-              <View />
               <View
                 style={
                   {
@@ -3552,7 +3624,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "flexDirection": "column",
           }
         }
-        testID="transactionList.4"
+        testID="valueTransferList.4"
       >
         <View
           onPress={[Function]}
@@ -3611,7 +3683,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 }
               }
             >
-              <View />
               <View
                 style={
                   {
@@ -3816,7 +3887,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "flexDirection": "column",
           }
         }
-        testID="transactionList.5"
+        testID="valueTransferList.5"
       >
         <View
           onPress={[Function]}
@@ -3875,7 +3946,86 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 }
               }
             >
-              <View />
+              <View>
+                <View
+                  style={
+                    {
+                      "alignItems": "flex-start",
+                      "display": "flex",
+                      "flexDirection": "row",
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "flex-start",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "marginRight": 10,
+                      }
+                    }
+                  >
+                    <View
+                      accessibilityState={
+                        {
+                          "busy": undefined,
+                          "checked": undefined,
+                          "disabled": undefined,
+                          "expanded": undefined,
+                          "selected": undefined,
+                        }
+                      }
+                      accessibilityValue={
+                        {
+                          "max": undefined,
+                          "min": undefined,
+                          "now": undefined,
+                          "text": undefined,
+                        }
+                      }
+                      accessible={true}
+                      collapsable={false}
+                      focusable={true}
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                      style={
+                        {
+                          "opacity": 1,
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "flex",
+                            "flexDirection": "column",
+                            "flexWrap": "wrap",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "rgb(28, 28, 30)",
+                              "fontSize": 18,
+                              "fontWeight": "600",
+                              "opacity": 1,
+                            }
+                          }
+                        >
+                          sent-ad...4567890
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
               <View
                 style={
                   {
@@ -4089,7 +4239,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     }
                     testID="undefined.big-part"
                   >
-                     0.2235
+                     0.1235
                   </Text>
                   <Text
                     style={

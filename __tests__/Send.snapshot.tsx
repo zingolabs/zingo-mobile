@@ -10,7 +10,7 @@ import Send from '../components/Send';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
 import { ModeEnum, CurrencyEnum } from '../app/AppState';
 import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
-import { mockTransactions } from '../__mocks__/dataMocks/mockTransactions';
+import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
@@ -59,7 +59,7 @@ jest.mock('react-native-picker-select', () => 'RNPickerSelect');
 describe('Component Send - test', () => {
   //snapshot test
   const state = defaultAppContextLoaded;
-  state.transactions = mockTransactions;
+  state.valueTransfers = mockValueTransfers;
   state.uaAddress = mockAddresses[0].uaAddress;
   state.addresses = mockAddresses;
   state.translate = mockTranslate;

@@ -1,8 +1,6 @@
 import {
   TotalBalanceClass,
   AddressClass,
-  TransactionType,
-  TxDetailType,
   InfoType,
   SendJsonToTypeType,
   WalletType,
@@ -12,12 +10,12 @@ import {
   SyncingStatusClass,
   CommandEnum,
   ChainNameEnum,
-  TransactionTypeEnum,
   WalletOptionEnum,
   CurrencyNameEnum,
   AddressKindEnum,
   ReceiverEnum,
   GlobalConst,
+  ValueTransferType,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCAddressType } from './types/RPCAddressType';
@@ -38,11 +36,12 @@ import { RPCSendType } from './types/RPCSendType';
 import { RPCValueTransfersType } from './types/RPCValueTransfersType';
 import { RPCValueTransfersKindEnum } from './enums/RPCValueTransfersKindEnum';
 import { RPCValueTransferType } from './types/RPCValueTransferType';
+import { ValueTransferKindEnum } from '../AppState/enums/ValueTransferKindEnum';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
-  fnSetTransactionsList: (txList: TransactionType[]) => void;
+  fnSetValueTransfersList: (vtList: ValueTransferType[]) => void;
   fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
   fnSetSyncingStatus: (syncingStatus: SyncingStatusClass) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
@@ -79,7 +78,7 @@ export default class RPC {
 
   constructor(
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
-    fnSetTransactionsList: (txlist: TransactionType[]) => void,
+    fnSetValueTransfersList: (txlist: ValueTransferType[]) => void,
     fnSetAllAddresses: (addresses: AddressClass[]) => void,
     fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
@@ -89,7 +88,7 @@ export default class RPC {
     readOnly: boolean,
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
-    this.fnSetTransactionsList = fnSetTransactionsList;
+    this.fnSetValueTransfersList = fnSetValueTransfersList;
     this.fnSetAllAddresses = fnSetAllAddresses;
     this.fnSetWalletSettings = fnSetWalletSettings;
     this.fnSetInfo = fnSetInfo;
@@ -607,7 +606,7 @@ export default class RPC {
 
   async loadWalletData() {
     await this.fetchTotalBalance();
-    await this.fetchTandZandOTransactionsValueTransfers();
+    await this.fetchTandZandOValueTransfers();
     await this.fetchWalletSettings();
     await this.fetchInfoAndServerHeight();
   }
@@ -683,8 +682,8 @@ export default class RPC {
 
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
-        // clean the transaction list before.
-        this.fnSetTransactionsList([]);
+        // clean the ValueTransfer list before.
+        this.fnSetValueTransfersList([]);
         this.fnSetTotalBalance({
           orchardBal: 0,
           privateBal: 0,
@@ -1176,18 +1175,18 @@ export default class RPC {
     }
   }
 
-  // Fetch all T and Z and O transactions
-  async fetchTandZandOTransactionsValueTransfers() {
+  // Fetch all T and Z and O ValueTransfers
+  async fetchTandZandOValueTransfers() {
     try {
       const valueTransfersStr: string = await RPCModule.getValueTransfersList();
       //console.log(valueTransfersStr);
       if (valueTransfersStr) {
         if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error txs value transfers ${valueTransfersStr}`);
+          console.log(`Error value transfers ${valueTransfersStr}`);
           return;
         }
       } else {
-        console.log('Internal Error txs value transfers');
+        console.log('Internal Error value transfers');
         return;
       }
       const valueTransfersJSON: RPCValueTransfersType = await JSON.parse(valueTransfersStr);
@@ -1196,109 +1195,54 @@ export default class RPC {
 
       await this.fetchInfoAndServerHeight();
 
-      let txList: TransactionType[] = [];
+      let vtList: ValueTransferType[] = [];
 
-      valueTransfersJSON.value_transfers.forEach((tx: RPCValueTransferType) => {
-        let pushIt: boolean = false;
-        let currentTxList: TransactionType[] = txList.filter(t => t.txid === tx.txid);
-        if (currentTxList.length === 0) {
-          // this txid does not exists
-          currentTxList = [{} as TransactionType];
-          currentTxList[0].txDetails = [];
+      // oscar idea and I think it is the correct way to build the history of
+      // value transfers.
+      valueTransfersJSON.value_transfers.forEach((vt: RPCValueTransferType) => {
+        const currentValueTransferList: ValueTransferType = {} as ValueTransferType;
 
-          currentTxList[0].txid = tx.txid;
-          currentTxList[0].time = tx.datetime;
-          currentTxList[0].type =
-            tx.kind === RPCValueTransfersKindEnum.memoToSelf
-              ? TransactionTypeEnum.MemoToSelf
-              : tx.kind === RPCValueTransfersKindEnum.sendToSelf
-              ? TransactionTypeEnum.SendToSelf
-              : tx.kind === RPCValueTransfersKindEnum.received
-              ? TransactionTypeEnum.Received
-              : tx.kind === RPCValueTransfersKindEnum.sent
-              ? TransactionTypeEnum.Sent
-              : tx.kind === RPCValueTransfersKindEnum.shield
-              ? TransactionTypeEnum.Shield
-              : undefined;
-          currentTxList[0].fee = (tx.transaction_fee ? tx.transaction_fee : 0) / 10 ** 8;
-          currentTxList[0].zecPrice = tx.zec_price;
-          if (tx.status === 'pending') {
-            currentTxList[0].confirmations = 0;
-          } else {
-            currentTxList[0].confirmations = this.lastServerBlockHeight
-              ? this.lastServerBlockHeight - tx.blockheight + 1
-              : this.lastWalletBlockHeight - tx.blockheight + 1;
-          }
-          pushIt = true;
-        } else {
-          // this txid exists
-          // we need to compare with the previous values in case
-          // this txid have more than one item
-
-          // select the older time
-          if (tx.datetime && tx.datetime < currentTxList[0].time) {
-            currentTxList[0].time = tx.datetime;
-          }
-          // the most important kind is `sent`
-          if (tx.kind && tx.kind === RPCValueTransfersKindEnum.sent) {
-            currentTxList[0].type = TransactionTypeEnum.Sent;
-          }
-          // select the bigger fee
-          if ((tx.transaction_fee || 0) / 10 ** 8 > (currentTxList[0].fee || 0)) {
-            currentTxList[0].fee = tx.transaction_fee;
-          }
-          // confirmations from the first item with the same txid is OK.
-          // select the lower zec price
-          if ((tx.zec_price || 0) / 10 ** 8 < (currentTxList[0].zecPrice || 0)) {
-            currentTxList[0].zecPrice = tx.zec_price;
-          }
-        }
-
-        let currenttxdetails = {} as TxDetailType;
-        // can be different with the same txid (send types).
-        currenttxdetails.time = tx.datetime;
-        currenttxdetails.type =
-          tx.kind === RPCValueTransfersKindEnum.memoToSelf
-            ? TransactionTypeEnum.MemoToSelf
-            : tx.kind === RPCValueTransfersKindEnum.sendToSelf
-            ? TransactionTypeEnum.SendToSelf
-            : tx.kind === RPCValueTransfersKindEnum.received
-            ? TransactionTypeEnum.Received
-            : tx.kind === RPCValueTransfersKindEnum.sent
-            ? TransactionTypeEnum.Sent
-            : tx.kind === RPCValueTransfersKindEnum.shield
-            ? TransactionTypeEnum.Shield
+        currentValueTransferList.txid = vt.txid;
+        currentValueTransferList.time = vt.datetime;
+        currentValueTransferList.kind =
+          vt.kind === RPCValueTransfersKindEnum.memoToSelf
+            ? ValueTransferKindEnum.MemoToSelf
+            : vt.kind === RPCValueTransfersKindEnum.sendToSelf
+            ? ValueTransferKindEnum.SendToSelf
+            : vt.kind === RPCValueTransfersKindEnum.received
+            ? ValueTransferKindEnum.Received
+            : vt.kind === RPCValueTransfersKindEnum.sent
+            ? ValueTransferKindEnum.Sent
+            : vt.kind === RPCValueTransfersKindEnum.shield
+            ? ValueTransferKindEnum.Shield
             : undefined;
-        currenttxdetails.fee = (tx.transaction_fee ? tx.transaction_fee : 0) / 10 ** 8;
-        currenttxdetails.zecPrice = tx.zec_price;
-        if (tx.status === 'pending') {
-          currenttxdetails.confirmations = 0;
+        currentValueTransferList.fee = (vt.transaction_fee ? vt.transaction_fee : 0) / 10 ** 8;
+        currentValueTransferList.zecPrice = vt.zec_price;
+        if (vt.status === 'pending') {
+          currentValueTransferList.confirmations = 0;
         } else {
-          currenttxdetails.confirmations = this.lastServerBlockHeight
-            ? this.lastServerBlockHeight - tx.blockheight + 1
-            : this.lastWalletBlockHeight - tx.blockheight + 1;
+          currentValueTransferList.confirmations = this.lastServerBlockHeight
+            ? this.lastServerBlockHeight - vt.blockheight + 1
+            : this.lastWalletBlockHeight - vt.blockheight + 1;
         }
-        // real detail data
-        currenttxdetails.address = !tx.recipient_address ? '' : tx.recipient_address;
-        currenttxdetails.amount = (!tx.value ? 0 : tx.value) / 10 ** 8;
-        currenttxdetails.memos = !tx.memos ? undefined : tx.memos;
-        currenttxdetails.poolType = !tx.pool_received ? undefined : tx.pool_received;
-        currentTxList[0].txDetails.push(currenttxdetails);
 
-        if (tx.txid.startsWith('xxxxxxxxx')) {
-          console.log('tran: ', tx);
+        currentValueTransferList.address = !vt.recipient_address ? '' : vt.recipient_address;
+        currentValueTransferList.amount = (!vt.value ? 0 : vt.value) / 10 ** 8;
+        currentValueTransferList.memos = !vt.memos ? undefined : vt.memos;
+        currentValueTransferList.poolType = !vt.pool_received ? undefined : vt.pool_received;
+
+        if (vt.txid.startsWith('xxxxxxxxx')) {
+          console.log('valuetranfer: ', vt);
           console.log('--------------------------------------------------');
         }
 
-        //console.log(currentTxList[0]);
-        if (pushIt) {
-          txList.push(currentTxList[0]);
-        }
+        //console.log(currentValueTransferList);
+        vtList.push(currentValueTransferList);
       });
 
       //console.log(txlist);
 
-      this.fnSetTransactionsList(txList);
+      this.fnSetValueTransfersList(vtList);
     } catch (error) {
       console.log(`Critical Error txs list value transfers ${error}`);
       return;

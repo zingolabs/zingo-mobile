@@ -134,9 +134,9 @@
     "selectingserverbest": "В этот момент его самый оптимизированный сервер:",
     "nymmemo": "Мне нужна сетевая безопасность Nym",
     "incoming-funds": "Входящие средства\n",
-    "transaction-confirmed": "Транзакция подтверждена\n",
+    "valuetransfer-confirmed": "Транзакция подтверждена\n",
     "payment-made": "Платеж произведен\n",
-    "transaction-reverted": "Транзакция была отменена сервером, попробуйте еще раз."
+    "valuetransfer-reverted": "Транзакция была отменена сервером, попробуйте еще раз."
   },
   "rpc": {
     "parsebirthday-error": "Ошибка: Невозможно распознать как число:",
@@ -415,7 +415,7 @@
     "confirm-title": "Подтвердить транзакцию",
     "sending-title": "В процессе",
     "confirm-amount": "Сумма",
-    "fee": "Комиссия",
+    "fee": "комиссия перевод",
     "confirm-button-all": "Отправить весь баланс?",
     "amount": "   Сумма",
     "to": "На",

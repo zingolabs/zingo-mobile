@@ -38,7 +38,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [numTx, setNumTx] = useState<number>(50);
+  const [numAb, setNumAb] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   const [addressBookSorted, setAddressBookSorted] = useState<AddressBookFileClass[]>([]);
 
@@ -52,18 +52,20 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   useScrollToTop(scrollViewRef);
 
   const fetchAddressBookSorted = useMemo(async () => {
-    return addressBook.slice(0, numTx).sort((a, b) => {
-      const nA = a.label.toUpperCase();
-      const nB = b.label.toUpperCase();
-      if (nA < nB) {
-        return -1;
-      } else if (nA > nB) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
-  }, [addressBook, numTx]);
+    return addressBook
+      .sort((a, b) => {
+        const nA = a.label.toUpperCase();
+        const nB = b.label.toUpperCase();
+        if (nA < nB) {
+          return -1;
+        } else if (nA > nB) {
+          return 1;
+        } else {
+          return 0;
+        }
+      })
+      .slice(0, numAb);
+  }, [addressBook, numAb]);
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
@@ -73,7 +75,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   useEffect(() => {
     (async () => {
       const abs = await fetchAddressBookSorted;
-      setLoadMoreButton(numTx < (abs.length || 0));
+      setLoadMoreButton(numAb < (abs.length || 0));
       setAddressBookSorted(abs);
       // find the current address
       if (addressBookCurrentAddress) {
@@ -86,7 +88,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
         setCurrentItem(index);
       }
     })();
-  }, [addressBookCurrentAddress, fetchAddressBookSorted, numTx]);
+  }, [addressBookCurrentAddress, fetchAddressBookSorted, numAb]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -103,8 +105,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   }, [slideAnim, titleViewHeight]);
 
   const loadMoreClicked = useCallback(() => {
-    setNumTx(numTx + 50);
-  }, [numTx]);
+    setNumAb(numAb + 50);
+  }, [numAb]);
 
   const newAddressBookItem = () => {
     setCurrentItem(-1);

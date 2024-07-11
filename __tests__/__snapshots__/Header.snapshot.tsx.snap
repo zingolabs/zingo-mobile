@@ -521,7 +521,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           "paddingHorizontal": 5,
         }
       }
-      testID="transaction text"
+      testID="ValueTransfer text"
     >
       title
     </Text>

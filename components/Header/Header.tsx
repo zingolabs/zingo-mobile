@@ -110,7 +110,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     readOnly,
     //poolsToShieldSelectSapling,
     //poolsToShieldSelectTransparent,
-    transactions,
+    valueTransfers,
     wallet,
     restartApp,
     somePending,
@@ -874,7 +874,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           {readOnly && (
             <>
               {setUfvkViewModalVisible &&
-              !(mode === ModeEnum.basic && transactions.length <= 0) &&
+              !(mode === ModeEnum.basic && valueTransfers.length <= 0) &&
               !(mode === ModeEnum.basic && totalBalance.total <= 0) ? (
                 <TouchableOpacity onPress={() => ufvkShowModal()}>
                   <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />

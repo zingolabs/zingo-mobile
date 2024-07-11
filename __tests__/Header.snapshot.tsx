@@ -66,7 +66,7 @@ describe('Component Header - test', () => {
     const header = render(
       <ContextAppLoadedProvider value={state}>
         <Header
-          testID="transaction text"
+          testID="ValueTransfer text"
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
           toggleMenuDrawer={onFunction}
