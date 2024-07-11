@@ -1230,7 +1230,7 @@ export default class RPC {
           currentValueTransferList.confirmations = 0;
         }
 
-        currentValueTransferList.address = !vt.recipient_address ? '' : vt.recipient_address;
+        currentValueTransferList.address = !vt.recipient_address ? undefined : vt.recipient_address;
         currentValueTransferList.amount = (!vt.value ? 0 : vt.value) / 10 ** 8;
         currentValueTransferList.memos = !vt.memos || vt.memos.length === 0 ? undefined : vt.memos;
         currentValueTransferList.poolType = !vt.pool_received ? undefined : vt.pool_received;

@@ -8,7 +8,7 @@ export default interface ValueTransferType {
   confirmations: number;
   time: number;
   zecPrice?: number;
-  address: string;
+  address?: string;
   amount: number;
   memos?: string[];
   poolType?: PoolEnum;

@@ -68,14 +68,16 @@ const History: React.FunctionComponent<HistoryProps> = ({
     // - address
     // - pool
     return valueTransfers
-      .sort((a, b) => {
+      .sort((a: ValueTransferType, b: ValueTransferType) => {
         const timeComparison = b.time - a.time;
         if (timeComparison === 0) {
           // same time
           const txidComparison = a.txid.localeCompare(b.txid);
           if (txidComparison === 0) {
             // same txid
-            const addressComparison = a.address.localeCompare(b.address);
+            const aAddress = a.address?.toString() || '';
+            const bAddress = b.address?.toString() || '';
+            const addressComparison = aAddress.localeCompare(bAddress);
             if (addressComparison === 0) {
               // same address
               const aPoolType = a.poolType?.toString() || '';
