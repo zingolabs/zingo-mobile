@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, SafeAreaView, Linking, Text } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import moment from 'moment';
@@ -39,6 +39,7 @@ import { faTriangleExclamation, faChevronDown, faChevronUp } from '@fortawesome/
 type ValueTransferDetailProps = {
   index: number;
   length: number;
+  totalLength: number;
   vt: ValueTransferType;
   closeModal: () => void;
   openModal: () => void;
@@ -50,6 +51,7 @@ type ValueTransferDetailProps = {
 const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = ({
   index,
   length,
+  totalLength,
   vt,
   closeModal,
   setPrivacyOption,
@@ -64,6 +66,8 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
 
   const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
+  const [showNavigator, setShowNavigator] = useState<boolean>(true);
+  const isTheFirstMount = useRef(true);
 
   const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
   let memo = '';
@@ -102,6 +106,20 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     });
   };
 
+  // if the App is syncing, the VT list will change (new items).
+  // Hide the navigator is the solution because the current index
+  // will be associated to other item.
+  useEffect(() => {
+    if (isTheFirstMount.current) {
+      isTheFirstMount.current = false;
+      return;
+    }
+    if (showNavigator) {
+      setShowNavigator(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalLength]);
+
   const contactFound: (add: string) => boolean = (add: string) => {
     const contact: AddressBookFileClass[] = addressBook.filter((ab: AddressBookFileClass) => ab.address === add);
     return contact.length >= 1;
@@ -112,7 +130,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     return address.length >= 1;
   };
 
-  //console.log('tx', vt.valueTransferDetails);
+  console.log('vt', index, totalLength, isTheFirstMount);
 
   return (
     <SafeAreaView
@@ -131,32 +149,38 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
         setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
       />
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          marginRight: 30,
-          marginTop: 5,
-        }}>
-        <TouchableOpacity
-          onPress={() => moveValueTransferDetail(index, -1)}
-          style={{ marginRight: 25 }}
-          disabled={index === 0}>
-          <FontAwesomeIcon icon={faChevronUp} color={index === 0 ? colors.primaryDisabled : colors.primary} size={30} />
-        </TouchableOpacity>
-        <FadeText>{(index + 1).toString()}</FadeText>
-        <TouchableOpacity
-          onPress={() => moveValueTransferDetail(index, 1)}
-          style={{ marginLeft: 25 }}
-          disabled={index === length - 1}>
-          <FontAwesomeIcon
-            icon={faChevronDown}
-            color={index === length - 1 ? colors.primaryDisabled : colors.primary}
-            size={30}
-          />
-        </TouchableOpacity>
-      </View>
+      {showNavigator && (
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            marginRight: 30,
+            marginTop: 5,
+          }}>
+          <TouchableOpacity
+            onPress={() => moveValueTransferDetail(index, -1)}
+            style={{ marginRight: 25 }}
+            disabled={index === 0}>
+            <FontAwesomeIcon
+              icon={faChevronUp}
+              color={index === 0 ? colors.primaryDisabled : colors.primary}
+              size={30}
+            />
+          </TouchableOpacity>
+          <FadeText>{(index + 1).toString()}</FadeText>
+          <TouchableOpacity
+            onPress={() => moveValueTransferDetail(index, 1)}
+            style={{ marginLeft: 25 }}
+            disabled={index === length - 1}>
+            <FontAwesomeIcon
+              icon={faChevronDown}
+              color={index === length - 1 ? colors.primaryDisabled : colors.primary}
+              size={30}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
       <ScrollView
         showsVerticalScrollIndicator={true}
         persistentScrollbar={true}
@@ -171,7 +195,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             display: 'flex',
             alignItems: 'center',
             margin: 25,
-            marginTop: 5,
+            marginTop: showNavigator ? 5 : 25,
             padding: 10,
             borderWidth: 1,
             borderRadius: 10,

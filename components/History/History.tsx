@@ -138,6 +138,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         <ValueTransferDetail
           index={valueTransferDetailIndex}
           length={valueTransfersSorted.length}
+          totalLength={valueTransfers.length}
           vt={valueTransferDetail}
           closeModal={() => setValueTransferDetailModalShowing(false)}
           openModal={() => setValueTransferDetailModalShowing(true)}
