@@ -274,7 +274,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         )}
       </ScrollView>
       {!isAtTop && (
-        <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 150 }}>
+        <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 10 }}>
           <FontAwesomeIcon
             style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
             size={50}

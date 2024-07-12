@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { IconDefinition, faArrowDown, faArrowUp, faRefresh, faComment } from '@fortawesome/free-solid-svg-icons';
@@ -8,7 +8,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
-import { ValueTransferType, ValueTransferKindEnum } from '../../../app/AppState';
+import { ValueTransferType, ValueTransferKindEnum, GlobalConst } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -103,9 +103,9 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             alignItems: 'center',
             marginTop: 15,
             paddingBottom: 10,
-            borderBottomWidth: nextLineWithSameTxid ? 1 : 1.5,
+            borderBottomWidth: nextLineWithSameTxid ? Platform.OS === GlobalConst.platformOSandroid ? 1 : 0.5 : 1.5,
             borderBottomColor: nextLineWithSameTxid ? colors.primaryDisabled : colors.border,
-            borderStyle: nextLineWithSameTxid ? 'dotted' : 'solid',
+            borderStyle: nextLineWithSameTxid ? Platform.OS === GlobalConst.platformOSandroid ? 'dotted' : 'solid' : 'solid',
           }}>
           <View style={{ display: 'flex' }}>
             <FontAwesomeIcon
