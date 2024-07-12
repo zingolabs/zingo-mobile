@@ -101,6 +101,7 @@ describe('Component History ValueTransferDetail - test', () => {
         <ValueTransferDetail
           index={0}
           length={mockValueTransfers.length}
+          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[0]}
           closeModal={onClose}
           openModal={onClose}
@@ -124,6 +125,7 @@ describe('Component History ValueTransferDetail - test', () => {
         <ValueTransferDetail
           index={1}
           length={mockValueTransfers.length}
+          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[1]}
           closeModal={onClose}
           openModal={onClose}
@@ -145,6 +147,7 @@ describe('Component History ValueTransferDetail - test', () => {
         <ValueTransferDetail
           index={2}
           length={mockValueTransfers.length}
+          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[2]}
           closeModal={onClose}
           openModal={onClose}
@@ -165,6 +168,7 @@ describe('Component History ValueTransferDetail - test', () => {
         <ValueTransferDetail
           index={3}
           length={mockValueTransfers.length}
+          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[3]}
           closeModal={onClose}
           openModal={onClose}
@@ -187,6 +191,7 @@ describe('Component History ValueTransferDetail - test', () => {
         <ValueTransferDetail
           index={4}
           length={mockValueTransfers.length}
+          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[4]}
           closeModal={onClose}
           openModal={onClose}
