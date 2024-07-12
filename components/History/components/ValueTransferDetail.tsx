@@ -130,7 +130,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     return address.length >= 1;
   };
 
-  console.log('vt', index, totalLength, isTheFirstMount);
+  //console.log('vt', index, totalLength, isTheFirstMount);
 
   return (
     <SafeAreaView
