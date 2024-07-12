@@ -1,12 +1,22 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { View, ScrollView, Modal, RefreshControl } from 'react-native';
+import {
+  View,
+  ScrollView,
+  Modal,
+  RefreshControl,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  TouchableOpacity,
+} from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
 import { useScrollToTop, useTheme } from '@react-navigation/native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 
 import { ButtonTypeEnum, SendPageStateClass, ValueTransferType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
@@ -61,6 +71,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [numVt, setNumVt] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(numVt < (valueTransfers.length || 0));
   const [valueTransfersSorted, setValueTransfersSorted] = useState<ValueTransferType[]>([]);
+  const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const scrollViewRef = useRef<ScrollView>(null);
 
   useScrollToTop(scrollViewRef);
@@ -138,6 +149,12 @@ const History: React.FunctionComponent<HistoryProps> = ({
     }
   };
 
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset } = event.nativeEvent;
+    const isTop = contentOffset.y === 0;
+    setIsAtTop(isTop);
+  };
+
   //console.log('render History - 4');
 
   return (
@@ -188,6 +205,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
       <ScrollView
         ref={scrollViewRef}
+        onScroll={handleScroll}
         accessible={true}
         accessibilityLabel={translate('history.list-acc') as string}
         refreshControl={
@@ -255,6 +273,16 @@ const History: React.FunctionComponent<HistoryProps> = ({
           </>
         )}
       </ScrollView>
+      {!isAtTop && (
+        <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 150 }}>
+          <FontAwesomeIcon
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+            size={50}
+            icon={faAnglesUp}
+            color={colors.zingo}
+          />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
