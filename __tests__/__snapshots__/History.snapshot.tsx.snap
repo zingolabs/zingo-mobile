@@ -24,7 +24,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "rgb(255, 255, 255)",
+        "backgroundColor": "#011401",
         "display": "flex",
         "paddingBottom": 0,
         "paddingTop": 10,
@@ -51,7 +51,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         style={
           {
             "alignItems": "center",
-            "borderColor": undefined,
+            "borderColor": "#5a8c5a",
             "borderRadius": 10,
             "borderWidth": 1,
             "justifyContent": "center",
@@ -108,6 +108,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             }
           >
             <
+              color="#5a8c5a"
               icon={
                 {
                   "icon": [
@@ -233,7 +234,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             style={
               {
                 "alignItems": "center",
-                "borderColor": "rgb(0, 122, 255)",
+                "borderColor": "#18bd18",
                 "borderRadius": 5,
                 "borderWidth": 2,
                 "flexDirection": "row",
@@ -245,7 +246,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             <Text
               style={
                 {
-                  "color": "rgb(216, 216, 216)",
+                  "color": "#ffffff",
                   "fontSize": 13,
                   "marginRight": 5,
                 }
@@ -254,7 +255,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               text translated
             </Text>
             <
-              color="rgb(0, 122, 255)"
+              color="#18bd18"
               icon={
                 {
                   "icon": [
@@ -343,7 +344,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               align="xMidYMid"
               bbHeight="25.2"
               bbWidth="50.4"
-              fill="rgb(28, 28, 30)"
+              fill="#c3c3c3"
               focusable={false}
               height={25.2}
               meetOrSlice={0}
@@ -378,7 +379,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               <RNSVGGroup
                 fill={
                   {
-                    "payload": 4280032286,
+                    "payload": 4291019715,
                     "type": 0,
                   }
                 }
@@ -420,7 +421,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 36,
                   "fontWeight": "700",
                   "margin": 0,
@@ -471,7 +472,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "rgb(255, 255, 255)",
+              "backgroundColor": "#011401",
               "borderRadius": 10,
               "display": "flex",
               "flexDirection": "row",
@@ -485,7 +486,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           }
         >
           <
-            color="rgb(0, 122, 255)"
+            color="#18bd18"
             icon={
               {
                 "icon": [
@@ -567,7 +568,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             <Text
               style={
                 {
-                  "color": undefined,
+                  "color": "#ffffff",
                   "fontSize": 20,
                   "marginBottom": 5,
                   "marginTop": 0,
@@ -579,7 +580,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             <Text
               style={
                 {
-                  "color": undefined,
+                  "color": "#ffffff",
                   "fontSize": 20,
                   "fontWeight": "700",
                   "marginBottom": 5,
@@ -637,7 +638,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             style={
               {
                 "alignItems": "center",
-                "backgroundColor": "rgb(255, 255, 255)",
+                "backgroundColor": "#011401",
                 "borderRadius": 10,
                 "flexDirection": "row",
                 "justifyContent": "center",
@@ -649,7 +650,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             }
           >
             <
-              color="rgb(0, 122, 255)"
+              color="#18bd18"
               icon={
                 {
                   "icon": [
@@ -687,7 +688,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "marginBottom": 3,
@@ -756,7 +757,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           testID="header.drawmenu"
         >
           <
-            color="rgb(216, 216, 216)"
+            color="#ffffff"
             icon={
               {
                 "icon": [
@@ -806,7 +807,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
@@ -834,7 +835,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           }
         }
         refreshing={false}
-        tintColor="rgb(28, 28, 30)"
+        tintColor="#c3c3c3"
         title="text translated"
       />
     }
@@ -860,9 +861,9 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         <View
           style={
             {
-              "backgroundColor": "rgb(242, 242, 242)",
+              "backgroundColor": "#011401",
               "borderBottomWidth": 1,
-              "borderColor": "rgb(255, 255, 255)",
+              "borderColor": "#011401",
               "borderTopWidth": 1,
               "paddingBottom": 5,
               "paddingLeft": 15,
@@ -873,7 +874,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -888,7 +889,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             style={
               {
                 "alignItems": "center",
-                "borderBottomColor": "rgb(216, 216, 216)",
+                "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
                 "display": "flex",
@@ -906,7 +907,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               }
             >
               <
-                color="rgb(0, 122, 255)"
+                color="#18bd18"
                 icon={
                   {
                     "icon": [
@@ -951,7 +952,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 <Text
                   style={
                     {
-                      "color": "rgb(0, 122, 255)",
+                      "color": "#18bd18",
                       "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
@@ -972,7 +973,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "opacity": 0.65,
                       }
                     }
@@ -1042,7 +1043,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(0, 122, 255)"
+                    fill="#18bd18"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -1077,7 +1078,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4278221567,
+                          "payload": 4279811352,
                           "type": 0,
                         }
                       }
@@ -1119,7 +1120,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   <Text
                     style={
                       {
-                        "color": "rgb(0, 122, 255)",
+                        "color": "#18bd18",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -1151,7 +1152,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             style={
               {
                 "alignItems": "center",
-                "borderBottomColor": "rgb(216, 216, 216)",
+                "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
                 "display": "flex",
@@ -1169,7 +1170,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               }
             >
               <
-                color="rgb(0, 122, 255)"
+                color="#18bd18"
                 icon={
                   {
                     "icon": [
@@ -1214,7 +1215,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 <Text
                   style={
                     {
-                      "color": "rgb(0, 122, 255)",
+                      "color": "#18bd18",
                       "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
@@ -1235,7 +1236,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "opacity": 0.65,
                       }
                     }
@@ -1243,6 +1244,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     Dec 13, 8:00 am
                   </Text>
                   <
+                    color="#5a8c5a"
                     icon={
                       {
                         "icon": [
@@ -1329,7 +1331,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(0, 122, 255)"
+                    fill="#18bd18"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -1364,7 +1366,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4278221567,
+                          "payload": 4279811352,
                           "type": 0,
                         }
                       }
@@ -1406,7 +1408,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   <Text
                     style={
                       {
-                        "color": "rgb(0, 122, 255)",
+                        "color": "#18bd18",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -1438,7 +1440,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             style={
               {
                 "alignItems": "center",
-                "borderBottomColor": "rgb(216, 216, 216)",
+                "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
                 "display": "flex",
@@ -1456,7 +1458,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               }
             >
               <
-                color="rgb(28, 28, 30)"
+                color="#c3c3c3"
                 icon={
                   {
                     "icon": [
@@ -1501,7 +1503,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 <Text
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
+                      "color": "#c3c3c3",
                       "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
@@ -1522,7 +1524,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "opacity": 0.65,
                       }
                     }
@@ -1530,6 +1532,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     Dec 13, 8:00 am
                   </Text>
                   <
+                    color="#5a8c5a"
                     icon={
                       {
                         "icon": [
@@ -1616,7 +1619,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(28, 28, 30)"
+                    fill="#c3c3c3"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -1651,7 +1654,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4280032286,
+                          "payload": 4291019715,
                           "type": 0,
                         }
                       }
@@ -1693,7 +1696,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -1725,7 +1728,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             style={
               {
                 "alignItems": "center",
-                "borderBottomColor": "rgb(216, 216, 216)",
+                "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
                 "display": "flex",
@@ -1743,7 +1746,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               }
             >
               <
-                color="rgb(28, 28, 30)"
+                color="#c3c3c3"
                 icon={
                   {
                     "icon": [
@@ -1788,7 +1791,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 <Text
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
+                      "color": "#c3c3c3",
                       "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
@@ -1809,7 +1812,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "opacity": 0.65,
                       }
                     }
@@ -1879,7 +1882,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(28, 28, 30)"
+                    fill="#c3c3c3"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -1914,7 +1917,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4280032286,
+                          "payload": 4291019715,
                           "type": 0,
                         }
                       }
@@ -1956,7 +1959,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -1988,7 +1991,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             style={
               {
                 "alignItems": "center",
-                "borderBottomColor": "rgb(216, 216, 216)",
+                "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
                 "display": "flex",
@@ -2006,7 +2009,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               }
             >
               <
-                color="rgb(28, 28, 30)"
+                color="#c3c3c3"
                 icon={
                   {
                     "icon": [
@@ -2105,7 +2108,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                         <Text
                           style={
                             {
-                              "color": "rgb(28, 28, 30)",
+                              "color": "#c3c3c3",
                               "fontSize": 18,
                               "fontWeight": "600",
                               "opacity": 1,
@@ -2131,7 +2134,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 <Text
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
+                      "color": "#c3c3c3",
                       "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
@@ -2152,7 +2155,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "opacity": 0.65,
                       }
                     }
@@ -2160,6 +2163,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     Dec 13, 8:00 am
                   </Text>
                   <
+                    color="#5a8c5a"
                     icon={
                       {
                         "icon": [
@@ -2246,7 +2250,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(28, 28, 30)"
+                    fill="#c3c3c3"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -2281,7 +2285,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4280032286,
+                          "payload": 4291019715,
                           "type": 0,
                         }
                       }
@@ -2323,7 +2327,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -2353,7 +2357,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "#18bd18",
               "opacity": 0.65,
             }
           }
@@ -2390,7 +2394,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "rgb(255, 255, 255)",
+        "backgroundColor": "#011401",
         "display": "flex",
         "paddingBottom": 0,
         "paddingTop": 10,
@@ -2480,7 +2484,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               align="xMidYMid"
               bbHeight="25.2"
               bbWidth="50.4"
-              fill="rgb(28, 28, 30)"
+              fill="#c3c3c3"
               focusable={false}
               height={25.2}
               meetOrSlice={0}
@@ -2515,7 +2519,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               <RNSVGGroup
                 fill={
                   {
-                    "payload": 4280032286,
+                    "payload": 4291019715,
                     "type": 0,
                   }
                 }
@@ -2557,7 +2561,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 36,
                   "fontWeight": "700",
                   "margin": 0,
@@ -2571,7 +2575,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 25.2,
                   "margin": 0,
                   "marginBottom": 2.4,
@@ -2600,7 +2604,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "marginBottom": 3,
@@ -2669,7 +2673,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           testID="header.drawmenu"
         >
           <
-            color="rgb(216, 216, 216)"
+            color="#ffffff"
             icon={
               {
                 "icon": [
@@ -2719,7 +2723,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
@@ -2733,7 +2737,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
       <RefreshControlMock
         onRefresh={[MockFunction]}
         refreshing={false}
-        tintColor="rgb(28, 28, 30)"
+        tintColor="#c3c3c3"
         title="text translated"
       />
     }
@@ -2759,9 +2763,9 @@ exports[`Component History - test History no currency, privacy normal & mode bas
         <View
           style={
             {
-              "backgroundColor": "rgb(242, 242, 242)",
+              "backgroundColor": "#011401",
               "borderBottomWidth": 1,
-              "borderColor": "rgb(255, 255, 255)",
+              "borderColor": "#011401",
               "borderTopWidth": 1,
               "paddingBottom": 5,
               "paddingLeft": 15,
@@ -2772,7 +2776,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -2787,7 +2791,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             style={
               {
                 "alignItems": "center",
-                "borderBottomColor": "rgb(216, 216, 216)",
+                "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
                 "display": "flex",
@@ -2805,7 +2809,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               }
             >
               <
-                color="rgb(0, 122, 255)"
+                color="#18bd18"
                 icon={
                   {
                     "icon": [
@@ -2850,7 +2854,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 <Text
                   style={
                     {
-                      "color": "rgb(0, 122, 255)",
+                      "color": "#18bd18",
                       "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
@@ -2871,7 +2875,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "opacity": 0.65,
                       }
                     }
@@ -2941,7 +2945,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(0, 122, 255)"
+                    fill="#18bd18"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -2976,7 +2980,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4278221567,
+                          "payload": 4279811352,
                           "type": 0,
                         }
                       }
@@ -3018,7 +3022,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   <Text
                     style={
                       {
-                        "color": "rgb(0, 122, 255)",
+                        "color": "#18bd18",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -3051,7 +3055,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             style={
               {
                 "alignItems": "center",
-                "borderBottomColor": "rgb(216, 216, 216)",
+                "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
                 "display": "flex",
@@ -3069,7 +3073,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               }
             >
               <
-                color="rgb(0, 122, 255)"
+                color="#18bd18"
                 icon={
                   {
                     "icon": [
@@ -3114,7 +3118,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 <Text
                   style={
                     {
-                      "color": "rgb(0, 122, 255)",
+                      "color": "#18bd18",
                       "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
@@ -3135,7 +3139,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "opacity": 0.65,
                       }
                     }
@@ -3143,6 +3147,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     Dec 13, 8:00 am
                   </Text>
                   <
+                    color="#5a8c5a"
                     icon={
                       {
                         "icon": [
@@ -3229,7 +3234,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(0, 122, 255)"
+                    fill="#18bd18"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -3264,7 +3269,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4278221567,
+                          "payload": 4279811352,
                           "type": 0,
                         }
                       }
@@ -3306,7 +3311,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   <Text
                     style={
                       {
-                        "color": "rgb(0, 122, 255)",
+                        "color": "#18bd18",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -3320,7 +3325,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   <Text
                     style={
                       {
-                        "color": "rgb(0, 122, 255)",
+                        "color": "#18bd18",
                         "fontSize": 12.6,
                         "margin": 0,
                         "marginBottom": 1.2,
@@ -3353,7 +3358,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             style={
               {
                 "alignItems": "center",
-                "borderBottomColor": "rgb(216, 216, 216)",
+                "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
                 "display": "flex",
@@ -3371,7 +3376,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               }
             >
               <
-                color="rgb(28, 28, 30)"
+                color="#c3c3c3"
                 icon={
                   {
                     "icon": [
@@ -3416,7 +3421,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 <Text
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
+                      "color": "#c3c3c3",
                       "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
@@ -3437,7 +3442,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "opacity": 0.65,
                       }
                     }
@@ -3445,6 +3450,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     Dec 13, 8:00 am
                   </Text>
                   <
+                    color="#5a8c5a"
                     icon={
                       {
                         "icon": [
@@ -3531,7 +3537,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(28, 28, 30)"
+                    fill="#c3c3c3"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -3566,7 +3572,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4280032286,
+                          "payload": 4291019715,
                           "type": 0,
                         }
                       }
@@ -3608,7 +3614,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -3641,7 +3647,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             style={
               {
                 "alignItems": "center",
-                "borderBottomColor": "rgb(216, 216, 216)",
+                "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
                 "display": "flex",
@@ -3659,7 +3665,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               }
             >
               <
-                color="rgb(28, 28, 30)"
+                color="#c3c3c3"
                 icon={
                   {
                     "icon": [
@@ -3704,7 +3710,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 <Text
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
+                      "color": "#c3c3c3",
                       "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
@@ -3725,7 +3731,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "opacity": 0.65,
                       }
                     }
@@ -3795,7 +3801,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(28, 28, 30)"
+                    fill="#c3c3c3"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -3830,7 +3836,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4280032286,
+                          "payload": 4291019715,
                           "type": 0,
                         }
                       }
@@ -3872,7 +3878,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -3905,7 +3911,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             style={
               {
                 "alignItems": "center",
-                "borderBottomColor": "rgb(216, 216, 216)",
+                "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
                 "display": "flex",
@@ -3923,7 +3929,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               }
             >
               <
-                color="rgb(28, 28, 30)"
+                color="#c3c3c3"
                 icon={
                   {
                     "icon": [
@@ -4022,7 +4028,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                         <Text
                           style={
                             {
-                              "color": "rgb(28, 28, 30)",
+                              "color": "#c3c3c3",
                               "fontSize": 18,
                               "fontWeight": "600",
                               "opacity": 1,
@@ -4048,7 +4054,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 <Text
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
+                      "color": "#c3c3c3",
                       "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
@@ -4069,7 +4075,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "opacity": 0.65,
                       }
                     }
@@ -4077,6 +4083,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     Dec 13, 8:00 am
                   </Text>
                   <
+                    color="#5a8c5a"
                     icon={
                       {
                         "icon": [
@@ -4163,7 +4170,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(28, 28, 30)"
+                    fill="#c3c3c3"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -4198,7 +4205,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4280032286,
+                          "payload": 4291019715,
                           "type": 0,
                         }
                       }
@@ -4240,7 +4247,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -4254,7 +4261,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#c3c3c3",
                         "fontSize": 12.6,
                         "margin": 0,
                         "marginBottom": 1.2,
@@ -4285,7 +4292,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "#18bd18",
               "opacity": 0.65,
             }
           }

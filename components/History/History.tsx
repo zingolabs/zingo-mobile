@@ -1,12 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { View, ScrollView, Modal, RefreshControl } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import { useTheme } from '@react-navigation/native';
+import { useScrollToTop, useTheme } from '@react-navigation/native';
 
 import { ButtonTypeEnum, SendPageStateClass, ValueTransferType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
@@ -30,6 +30,8 @@ type HistoryProps = {
   setUfvkViewModalVisible?: (v: boolean) => void;
   setSendPageState: (s: SendPageStateClass) => void;
   setShieldingAmount: (value: number) => void;
+  setScrollToTop: (value: boolean) => void;
+  scrollToTop: boolean;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -45,6 +47,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
   setUfvkViewModalVisible,
   setSendPageState,
   setShieldingAmount,
+  setScrollToTop,
+  scrollToTop,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, valueTransfers, language, setBackgroundError, addLastSnackbar } = context;
@@ -57,6 +61,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [numVt, setNumVt] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(numVt < (valueTransfers.length || 0));
   const [valueTransfersSorted, setValueTransfersSorted] = useState<ValueTransferType[]>([]);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  useScrollToTop(scrollViewRef);
 
   var lastMonth = '';
 
@@ -105,6 +112,13 @@ const History: React.FunctionComponent<HistoryProps> = ({
     setValueTransfersSorted(fetchValueTransfersSorted);
   }, [fetchValueTransfersSorted, numVt, valueTransfers]);
 
+  useEffect(() => {
+    if (scrollToTop) {
+      handleScrollToTop();
+      setScrollToTop(false);
+    }
+  }, [scrollToTop, setScrollToTop]);
+
   const loadMoreClicked = useCallback(() => {
     setNumVt(numVt + 50);
   }, [numVt]);
@@ -115,6 +129,12 @@ const History: React.FunctionComponent<HistoryProps> = ({
     if ((index > 0 && type === -1) || (index < valueTransfersSorted.length - 1 && type === 1)) {
       setValueTransferDetail(valueTransfersSorted[index + type]);
       setValueTransferDetailIndex(index + type);
+    }
+  };
+
+  const handleScrollToTop = () => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ y: 0, animated: true });
     }
   };
 
@@ -163,9 +183,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
         setUfvkViewModalVisible={setUfvkViewModalVisible}
         addLastSnackbar={addLastSnackbar}
         setShieldingAmount={setShieldingAmount}
+        setScrollToTop={setScrollToTop}
       />
 
       <ScrollView
+        ref={scrollViewRef}
         accessible={true}
         accessibilityLabel={translate('history.list-acc') as string}
         refreshControl={

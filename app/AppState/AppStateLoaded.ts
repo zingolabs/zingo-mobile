@@ -32,5 +32,8 @@ export default interface AppStateLoaded {
   // change server helper
   newServer: ServerType;
 
+  // to do scroll to top in history
+  scrollToTop: boolean;
+
   // eslint-disable-next-line semi
 }

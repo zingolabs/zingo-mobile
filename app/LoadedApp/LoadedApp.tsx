@@ -406,6 +406,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       addressBookModalVisible: false,
       newServer: {} as ServerType,
       somePending: false,
+      scrollToTop: false,
     };
 
     this.rpc = new RPC(
@@ -1435,6 +1436,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     );
   };
 
+  setScrollToTop = (value: boolean) => {
+    this.setState({
+      scrollToTop: value,
+    });
+  };
+
   render() {
     const {
       aboutModalVisible,
@@ -1461,6 +1468,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       readOnly,
       totalBalance,
       translate,
+      scrollToTop,
     } = this.state;
     const { colors } = this.props.theme;
 
@@ -1941,6 +1949,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                         setSendPageState={this.setSendPageState}
                         setShieldingAmount={this.setShieldingAmount}
+                        setScrollToTop={this.setScrollToTop}
+                        scrollToTop={scrollToTop}
                       />
                     </Suspense>
                   </>
@@ -1983,6 +1993,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                             setComputingModalVisible={this.setComputingModalVisible}
                             setPrivacyOption={this.setPrivacyOption}
                             setShieldingAmount={this.setShieldingAmount}
+                            setScrollToTop={this.setScrollToTop}
                           />
                         </Suspense>
                       </>

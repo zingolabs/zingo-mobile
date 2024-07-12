@@ -76,6 +76,7 @@ type SendProps = {
   setShieldingAmount: (value: number) => void;
   //setPoolsToShieldSelectSapling: (v: boolean) => void;
   //setPoolsToShieldSelectTransparent: (v: boolean) => void;
+  setScrollToTop: (value: boolean) => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -92,6 +93,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setShieldingAmount,
   //setPoolsToShieldSelectSapling,
   //setPoolsToShieldSelectTransparent,
+  setScrollToTop,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -755,7 +757,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     setTimeout(async () => {
       try {
         const txid = await sendTransaction(setLocalSendProgress);
-        setComputingModalVisible(false);
 
         // Clear the fields
         clearToAddr();
@@ -764,6 +765,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           navigation.navigate(translate('loadedapp.wallet-menu') as string);
         }
 
+        // scroll to top in history, just in case.
+        setScrollToTop(true);
+
         createAlert(
           setBackgroundError,
           addLastSnackbar,
@@ -771,8 +775,8 @@ const Send: React.FunctionComponent<SendProps> = ({
           `${translate('send.Broadcast')} ${txid}`,
           true,
         );
-      } catch (err) {
         setComputingModalVisible(false);
+      } catch (err) {
         const error = err as string;
 
         let customError = '';
@@ -799,6 +803,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             `${customError ? customError : error}`,
           );
         }, 1000);
+        setComputingModalVisible(false);
       }
     });
   };
@@ -904,6 +909,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             //setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
             addLastSnackbar={addLastSnackbar}
             setShieldingAmount={setShieldingAmount}
+            setScrollToTop={setScrollToTop}
           />
         </View>
       </Animated.View>

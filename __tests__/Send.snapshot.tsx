@@ -50,6 +50,7 @@ jest.mock('@react-native-community/netinfo', () => {
   return RN;
 });
 jest.mock('@react-navigation/native', () => ({
+  useScrollToTop: jest.fn(),
   useIsFocused: jest.fn(),
   useTheme: () => mockTheme,
 }));
@@ -92,6 +93,7 @@ describe('Component Send - test', () => {
           //setPoolsToShieldSelectSapling={onFunction}
           //setPoolsToShieldSelectTransparent={onFunction}
           setShieldingAmount={onFunction}
+          setScrollToTop={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
@@ -121,6 +123,7 @@ describe('Component Send - test', () => {
           //setPoolsToShieldSelectSapling={onFunction}
           //setPoolsToShieldSelectTransparent={onFunction}
           setShieldingAmount={onFunction}
+          setScrollToTop={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

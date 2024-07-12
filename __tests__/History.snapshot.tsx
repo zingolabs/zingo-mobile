@@ -14,6 +14,7 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
+import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -84,6 +85,10 @@ jest.mock('react-native', () => {
 
   return RN;
 });
+jest.mock('@react-navigation/native', () => ({
+  useScrollToTop: jest.fn(),
+  useTheme: () => mockTheme,
+}));
 
 // test suite
 describe('Component History - test', () => {
@@ -118,6 +123,8 @@ describe('Component History - test', () => {
           //setPoolsToShieldSelectTransparent={onFunction}
           setSendPageState={onFunction}
           setShieldingAmount={onFunction}
+          setScrollToTop={onFunction}
+          scrollToTop={false}
         />
       </ContextAppLoadedProvider>,
     );
@@ -145,6 +152,8 @@ describe('Component History - test', () => {
           //setPoolsToShieldSelectTransparent={onFunction}
           setSendPageState={onFunction}
           setShieldingAmount={onFunction}
+          setScrollToTop={onFunction}
+          scrollToTop={false}
         />
       </ContextAppLoadedProvider>,
     );
