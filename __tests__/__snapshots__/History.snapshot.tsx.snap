@@ -817,6 +817,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
   <RCTScrollView
     accessibilityLabel="text translated"
     accessible={true}
+    onScroll={[Function]}
     refreshControl={
       <RefreshControlMock
         onRefresh={
@@ -2733,6 +2734,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
   <RCTScrollView
     accessibilityLabel="text translated"
     accessible={true}
+    onScroll={[Function]}
     refreshControl={
       <RefreshControlMock
         onRefresh={[MockFunction]}
