@@ -292,9 +292,13 @@ class ExecuteSendFromOrchard {
 
         val send = Send(addresses[0].receivers.transparent, 100000, null)
 
-        val txidJson: String = uniffi.zingo.executeCommand("send", mapper.writeValueAsString(listOf(send)))
-        println("\nTXID:")
-        println(txidJson)
+        val proposeJson: String = uniffi.zingo.executeCommand("send", mapper.writeValueAsString(listOf(send)))
+        println("\nPropose:")
+        println(proposeJson)
+
+        val confirmJson: String = uniffi.zingo.executeCommand("confirm", mapper.writeValueAsString(listOf(send)))
+        println("\nConfirm Txid:")
+        println(confirmJson)
 
         val sendProgressJson: String = uniffi.zingo.executeCommand("sendprogress", "")
         println("\nSend progress:")
