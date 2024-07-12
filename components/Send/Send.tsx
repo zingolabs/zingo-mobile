@@ -617,12 +617,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           setValidAmount(-1); // invalid number
         } else {
           if (
-            Utils.parseStringLocaleToNumberFloat(spendable.toFixed(8)) >=
-              // avoiding to use the fee in calculations, for now.
-              //Utils.parseStringLocaleToNumberFloat(fee.toFixed(8)) +
-              (donation && !sendToSelf && !donationAddress
-                ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
-                : 0) &&
             Utils.parseStringLocaleToNumberFloat(to.amount) >= 0 &&
             Utils.parseStringLocaleToNumberFloat(to.amount) <=
               Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
