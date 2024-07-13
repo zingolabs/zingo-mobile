@@ -103,9 +103,13 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             alignItems: 'center',
             marginTop: 15,
             paddingBottom: 10,
-            borderBottomWidth: nextLineWithSameTxid ? Platform.OS === GlobalConst.platformOSandroid ? 1 : 0.5 : 1.5,
+            borderBottomWidth: nextLineWithSameTxid ? (Platform.OS === GlobalConst.platformOSandroid ? 1 : 0.5) : 1.5,
             borderBottomColor: nextLineWithSameTxid ? colors.primaryDisabled : colors.border,
-            borderStyle: nextLineWithSameTxid ? Platform.OS === GlobalConst.platformOSandroid ? 'dotted' : 'solid' : 'solid',
+            borderStyle: nextLineWithSameTxid
+              ? Platform.OS === GlobalConst.platformOSandroid
+                ? 'dotted'
+                : 'solid'
+              : 'solid',
           }}>
           <View style={{ display: 'flex' }}>
             <FontAwesomeIcon
