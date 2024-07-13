@@ -296,13 +296,13 @@ class ExecuteSendFromOrchard {
         println("\nPropose:")
         println(proposeJson)
 
-        val confirmJson: String = uniffi.zingo.executeCommand("confirm", mapper.writeValueAsString(listOf(send)))
-        println("\nConfirm Txid:")
-        println(confirmJson)
-
         val sendProgressJson: String = uniffi.zingo.executeCommand("sendprogress", "")
         println("\nSend progress:")
         println(sendProgressJson)
+
+        val confirmJson: String = uniffi.zingo.executeCommand("confirm", "")
+        println("\nConfirm Txid:")
+        println(confirmJson)
 
         syncJson = uniffi.zingo.executeCommand("sync", "")
         println("\nSync:")
