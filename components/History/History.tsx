@@ -206,6 +206,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
       <ScrollView
         ref={scrollViewRef}
         onScroll={handleScroll}
+        scrollEventThrottle={100}
         accessible={true}
         accessibilityLabel={translate('history.list-acc') as string}
         refreshControl={

@@ -195,6 +195,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
       <ScrollView
         ref={scrollViewRef}
         onScroll={handleScroll}
+        scrollEventThrottle={100}
         testID="addressbook.scrollView"
         keyboardShouldPersistTaps="handled"
         style={{ maxHeight: '85%' }}
