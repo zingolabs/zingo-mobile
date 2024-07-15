@@ -200,15 +200,11 @@ export default class Utils {
     donation: boolean,
     translate: (key: string) => TranslateType,
   ): Promise<SendJsonToTypeType[]> {
-    let sendToSelf: boolean = false;
     let donationAddress: boolean = false;
     const json: Promise<SendJsonToTypeType[][]> = Promise.all(
       [sendPageState.toaddr].flatMap(async (to: ToAddrClass) => {
         const memo = `${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`;
         const amount = parseInt((Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(0), 10);
-
-        const myAddress: AddressClass[] = addresses.filter((a: AddressClass) => a.address === to.to);
-        sendToSelf = myAddress.length >= 1;
 
         donationAddress = to.to === (await Utils.getDonationAddress(server.chainName));
 
@@ -246,7 +242,7 @@ export default class Utils {
     // we need to exclude 2 use cases:
     // 1. send to self (make no sense to do a donation here)
     // 2. send to donation UA (make no sense to do a double donation)
-    if (donation && server.chainName === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress) {
+    if (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress) {
       donationTransaction.push({
         address: await Utils.getDonationAddress(server.chainName),
         amount: parseInt(
