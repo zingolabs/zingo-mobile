@@ -178,7 +178,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             size={18}
             currencyName={info.currencyName}
             color={amountColor}
-            amtZec={vt.amount + (vt.fee && vt.kind !== ValueTransferKindEnum.Shield ? vt.fee : 0)}
+            amtZec={vt.amount}
             privacy={privacy}
           />
         </View>

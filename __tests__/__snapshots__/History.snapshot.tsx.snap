@@ -3627,7 +3627,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     }
                     testID="undefined.big-part"
                   >
-                     0.0001
+                     0.0000
                   </Text>
                 </View>
               </View>
@@ -3891,7 +3891,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     }
                     testID="undefined.big-part"
                   >
-                     0.0001
+                     0.0000
                   </Text>
                 </View>
               </View>
@@ -4260,7 +4260,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     }
                     testID="undefined.big-part"
                   >
-                     0.1235
+                     0.1234
                   </Text>
                   <Text
                     style={
