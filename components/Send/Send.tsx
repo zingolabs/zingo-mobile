@@ -1221,7 +1221,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           />
                         </View>
                       </TouchableOpacity>
-                      {((donation && !sendToSelf && !donationAddress) || (validAddress !== 0 && validAmount !== 0)) && (
+                      {donation && !sendToSelf && !donationAddress && (
                         <View
                           style={{
                             display: 'flex',
@@ -1238,32 +1238,48 @@ const Send: React.FunctionComponent<SendProps> = ({
                             style={{ marginRight: 5 }}
                           />
                           <FadeText>{'( '}</FadeText>
-                          {donation && !sendToSelf && !donationAddress && (
-                            <FadeText>
-                              {(translate('send.confirm-donation') as string) +
+                          <FadeText>
+                            {(translate('send.confirm-donation') as string) +
+                              ': ' +
+                              Utils.getDefaultDonationAmount() +
+                              ' '}
+                          </FadeText>
+                          <FadeText>{')'}</FadeText>
+                        </View>
+                      )}
+                      {validAddress !== 0 && validAmount !== 0 && (
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            marginTop: 5,
+                            backgroundColor: colors.card,
+                            padding: 5,
+                            borderRadius: 10,
+                          }}>
+                          <FontAwesomeIcon
+                            icon={faInfoCircle}
+                            size={20}
+                            color={colors.primary}
+                            style={{ marginRight: 5 }}
+                          />
+                          <FadeText>{'( '}</FadeText>
+                          <TouchableOpacity
+                            onPress={() => {
+                              if (proposeSendLastError && mode === ModeEnum.advanced) {
+                                Alert.alert(translate('send.fee') as string, proposeSendLastError);
+                              }
+                            }}>
+                            <FadeText
+                              style={{
+                                color: proposeSendLastError && mode === ModeEnum.advanced ? 'red' : colors.money,
+                              }}>
+                              {(translate('send.fee') as string) +
                                 ': ' +
-                                Utils.getDefaultDonationAmount() +
+                                Utils.parseNumberFloatToStringLocale(fee, 8) +
                                 ' '}
                             </FadeText>
-                          )}
-                          {validAddress !== 0 && validAmount !== 0 && (
-                            <TouchableOpacity
-                              onPress={() => {
-                                if (proposeSendLastError && mode === ModeEnum.advanced) {
-                                  Alert.alert(translate('send.fee') as string, proposeSendLastError);
-                                }
-                              }}>
-                              <FadeText
-                                style={{
-                                  color: proposeSendLastError && mode === ModeEnum.advanced ? 'red' : colors.money,
-                                }}>
-                                {(translate('send.fee') as string) +
-                                  ': ' +
-                                  Utils.parseNumberFloatToStringLocale(fee, 8) +
-                                  ' '}
-                              </FadeText>
-                            </TouchableOpacity>
-                          )}
+                          </TouchableOpacity>
                           <FadeText>{')'}</FadeText>
                         </View>
                       )}
