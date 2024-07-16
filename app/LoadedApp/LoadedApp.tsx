@@ -353,7 +353,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       syncingStatus: {} as SyncingStatusClass,
       sendProgress: {} as SendProgressClass,
       info: {} as InfoType,
-      zecPrice: {} as ZecPriceType,
+      zecPrice: {
+        zecPrice: 0,
+        date: 0,
+      } as ZecPriceType,
       uaAddress: '',
       sendPageState: new SendPageStateClass(new ToAddrClass(Utils.getNextToAddrID())),
       receivePageState: {} as ReceivePageStateClass,
