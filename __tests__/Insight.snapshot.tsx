@@ -7,7 +7,10 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Insight from '../components/Insight';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -38,16 +41,14 @@ jest.mock('react-native', () => {
 describe('Component Insight - test', () => {
   //snapshot test
   test('Insight - snapshot', () => {
-    const state = defaultAppStateLoaded;
-    state.translate = () => {
-      return 'text translated';
-    };
-    state.info.currencyName = 'ZEC';
-    state.totalBalance.total = 1.25691111;
+    const state = defaultAppContextLoaded;
+    state.translate = mockTranslate;
+    state.info = mockInfo;
+    state.totalBalance = mockTotalBalance;
     const onClose = jest.fn();
     const insight = render(
       <ContextAppLoadedProvider value={state}>
-        <Insight closeModal={onClose} openModal={onClose} set_privacy_option={onClose} setSendPageState={onClose} />
+        <Insight closeModal={onClose} openModal={onClose} setPrivacyOption={onClose} setSendPageState={onClose} />
       </ContextAppLoadedProvider>,
     );
     expect(insight.toJSON()).toMatchSnapshot();

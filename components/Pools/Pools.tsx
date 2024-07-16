@@ -17,21 +17,23 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
 
 type PoolsProps = {
   closeModal: () => void;
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
 };
 
-const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_option }) => {
+const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate, privacy, addLastSnackbar, someUnconfirmed, language } = context;
+  const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
   }, []);
 
   //console.log(totalBalance);
@@ -50,7 +52,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}
-        set_privacy_option={set_privacy_option}
+        setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
       />
 
@@ -70,7 +72,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
                 testID="orchard-total-balance"
                 amtZec={totalBalance.orchardBal}
                 size={18}
-                currencyName={info.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName}
                 style={{
                   opacity:
                     totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
@@ -85,7 +87,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
                 testID="orchard-spendable-balance"
                 amtZec={totalBalance.spendableOrchard}
                 size={18}
-                currencyName={info.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName}
                 color={
                   totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
                     ? colors.primary
@@ -106,7 +108,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
                 testID="sapling-total-balance"
                 amtZec={totalBalance.privateBal}
                 size={18}
-                currencyName={info.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName}
                 style={{
                   opacity:
                     totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
@@ -121,7 +123,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
                 testID="sapling-spendable-balance"
                 amtZec={totalBalance.spendablePrivate}
                 size={18}
-                currencyName={info.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName}
                 color={
                   totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
                     ? colors.syncing
@@ -142,14 +144,14 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
                 testID="transparent-balance"
                 amtZec={totalBalance.transparentBal}
                 size={18}
-                currencyName={info.currencyName ? info.currencyName : ''}
+                currencyName={info.currencyName}
                 color={'red'}
                 privacy={privacy}
               />
             </DetailLine>
           </View>
 
-          {someUnconfirmed && (
+          {somePending && (
             <View
               style={{
                 display: 'flex',
@@ -176,7 +178,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, set_privacy_op
         }}>
         <Button
           testID="fund-pools.button.close"
-          type="Secondary"
+          type={ButtonTypeEnum.Secondary}
           title={translate('close') as string}
           onPress={closeModal}
         />

@@ -4,7 +4,19 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
 <View
   accessibilityState={
     {
+      "busy": undefined,
+      "checked": undefined,
       "disabled": false,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
     }
   }
   accessible={true}
@@ -60,7 +72,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
         }
       }
     >
-      Primary
+      Primary button
     </Text>
   </View>
 </View>
@@ -70,7 +82,19 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
 <View
   accessibilityState={
     {
+      "busy": undefined,
+      "checked": undefined,
       "disabled": false,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
     }
   }
   accessible={true}
@@ -126,7 +150,7 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
         }
       }
     >
-      Secondary
+      Secondary button
     </Text>
   </View>
 </View>

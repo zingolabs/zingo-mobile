@@ -7,7 +7,12 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import { ShowUfvk } from '../components/Ufvk';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import { UfvkActionEnum } from '../app/AppState';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -44,18 +49,17 @@ jest.mock('react-native', () => {
 // test suite
 describe('Component ShowUfvk - test', () => {
   //snapshot test
-  const state = defaultAppStateLoaded;
-  state.translate = () => 'text translated';
-  state.info.currencyName = 'ZEC';
-  state.totalBalance.total = 1.12345678;
-  state.wallet.ufvk =
-    'uview1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890';
+  const state = defaultAppContextLoaded;
+  state.translate = mockTranslate;
+  state.info = mockInfo;
+  state.totalBalance = mockTotalBalance;
+  state.wallet = mockWallet;
   const onClose = jest.fn();
   const onOK = jest.fn();
   test('ShowUfvk - snapshot', () => {
     const ufvk = render(
       <ContextAppLoadedProvider value={state}>
-        <ShowUfvk onClickCancel={onClose} onClickOK={onOK} action="view" set_privacy_option={jest.fn()} />
+        <ShowUfvk onClickCancel={onClose} onClickOK={onOK} action={UfvkActionEnum.view} setPrivacyOption={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(ufvk.toJSON()).toMatchSnapshot();

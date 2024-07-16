@@ -7,7 +7,10 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import { ImportUfvk } from '../components/Ufvk';
-import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../app/context';
+import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -36,6 +39,7 @@ jest.mock('react-native', () => {
 
   RN.NativeModules.RPCModule = {
     execute: jest.fn(() => '{}'),
+    getLatestBlock: jest.fn(() => '{}'),
   };
 
   return RN;
@@ -45,10 +49,10 @@ jest.mock('react-native', () => {
 describe('Component ImportUfvk - test', () => {
   //snapshot test
   test('ImportUfvk - snapshot', () => {
-    const state = defaultAppStateLoaded;
-    state.translate = () => 'text translated';
-    state.info.currencyName = 'ZEC';
-    state.totalBalance.total = 1.12345678;
+    const state = defaultAppContextLoaded;
+    state.translate = mockTranslate;
+    state.info = mockInfo;
+    state.totalBalance = mockTotalBalance;
     const onCancel = jest.fn();
     const onOK = jest.fn();
     const importUfvk = render(

@@ -1,5 +1,7 @@
+import { RPCWalletKindEnum } from '../enums/RPCWalletKindEnum';
+
 export type RPCWalletKindType = {
-  kind: 'Seeded' | 'Loaded from key';
+  kind: RPCWalletKindEnum;
   transparent?: string;
   sapling?: string;
   orchard?: string;

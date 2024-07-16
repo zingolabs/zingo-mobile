@@ -1,15 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
-import {
-  View,
-  ScrollView,
-  SafeAreaView,
-  TextInput,
-  Dimensions,
-  Keyboard,
-  Platform,
-  TouchableOpacity,
-} from 'react-native';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { View, ScrollView, SafeAreaView, TextInput, Dimensions, Keyboard, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 
@@ -20,8 +11,13 @@ import Header from '../Header';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
+import FadeText from '../Components/FadeText';
+import { Buffer } from 'buffer';
 
 type MemoProps = {
   closeModal: () => void;
@@ -35,13 +31,14 @@ type MemoProps = {
 };
 const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, sendPageState, language } = context;
+  const { translate, sendPageState, language, uaAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
   const [memo, setMemo] = useState<string>(sendPageState.toaddr.memo);
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
 
+  const includeUAMemo = sendPageState.toaddr.includeUAMemo;
   const slideAnim = useSharedValue(0);
 
   const dimensions = {
@@ -67,6 +64,18 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
       !!keyboardDidHideListener && keyboardDidHideListener.remove();
     };
   }, [slideAnim, titleViewHeight]);
+
+  const memoTotal = useCallback(
+    (memoStr: string, includeUAMemoBoo: boolean) => {
+      return `${memoStr || ''}${includeUAMemoBoo ? '\nReply to: \n' + uaAddress : ''}`;
+    },
+    [uaAddress],
+  );
+
+  const countMemoBytes = (memoStr: string, includeUAMemoBoo: boolean) => {
+    const len = Buffer.byteLength(memoTotal(memoStr, includeUAMemoBoo), 'utf8');
+    return len;
+  };
 
   return (
     <SafeAreaView
@@ -95,8 +104,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
 
       <ScrollView
         style={{
-          maxHeight: Platform.OS === 'android' ? '70%' : '70%',
-          minHeight: Platform.OS === 'android' ? '50%' : '50%',
+          maxHeight: '70%',
+          minHeight: '50%',
         }}
         contentContainerStyle={{
           flexDirection: 'column',
@@ -113,8 +122,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
             borderRadius: 5,
             borderColor: colors.text,
             minWidth: 48,
-            minHeight: dimensions.height * 0.5,
-            maxHeight: dimensions.height * 0.5,
+            minHeight: dimensions.height * 0.3,
+            maxHeight: dimensions.height * 0.4,
             flexDirection: 'row',
           }}>
           <TextInput
@@ -134,6 +143,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
             value={memo}
             onChangeText={(text: string) => setMemo(text)}
             editable={true}
+            maxLength={GlobalConst.memoMaxLength}
           />
           {memo && (
             <TouchableOpacity
@@ -144,6 +154,21 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
             </TouchableOpacity>
           )}
         </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+          }}>
+          <FadeText
+            style={{
+              marginTop: 5,
+              fontWeight: 'bold',
+              color: countMemoBytes(memo, includeUAMemo) > GlobalConst.memoMaxLength ? 'red' : colors.text,
+            }}>{`${countMemoBytes(memo, includeUAMemo)} `}</FadeText>
+          <FadeText style={{ marginTop: 5 }}>{translate('loadedapp.of') as string}</FadeText>
+          <FadeText style={{ marginTop: 5 }}>{' ' + GlobalConst.memoMaxLength.toString() + ' '}</FadeText>
+        </View>
       </ScrollView>
       <View
         style={{
@@ -153,9 +178,14 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, updateToField })
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Primary" title={translate('save') as string} onPress={doSaveAndClose} />
         <Button
-          type="Secondary"
+          type={ButtonTypeEnum.Primary}
+          title={translate('save') as string}
+          onPress={doSaveAndClose}
+          disabled={countMemoBytes(memo, includeUAMemo) > GlobalConst.memoMaxLength}
+        />
+        <Button
+          type={ButtonTypeEnum.Secondary}
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}
           onPress={closeModal}

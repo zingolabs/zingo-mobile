@@ -1,0 +1,37 @@
+export enum CommandEnum {
+  sendprogress = 'sendprogress',
+  changeserver = 'changeserver',
+  walletKind = 'wallet_kind',
+  interruptSyncAfterBatch = 'interrupt_sync_after_batch',
+  updatecurrentprice = 'updatecurrentprice',
+  notes = 'notes',
+  height = 'height',
+  setoption = 'setoption',
+  getoption = 'getoption',
+  info = 'info',
+  version = 'version',
+  export = 'export',
+  new = 'new',
+  import = 'import',
+  exportufvk = 'exportufvk',
+  sync = 'sync',
+  syncstatus = 'syncstatus',
+  addresses = 'addresses',
+  parseAddress = 'parse_address',
+  parseViewkey = 'parse_viewkey',
+  balance = 'balance',
+  seed = 'seed',
+  rescan = 'rescan',
+  valueToAddress = 'value_to_address',
+  sendsToAddress = 'sends_to_address',
+  memobytesToAddress = 'memobytes_to_address',
+
+  // calculate the max sendable amount in the wallet
+  spendablebalance = 'spendablebalance',
+  // new commands to create a proposal
+  send = 'send',
+  sendall = 'sendall',
+  shield = 'shield',
+  // this works for all: send, sendall & shield
+  confirm = 'confirm',
+}

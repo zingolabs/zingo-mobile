@@ -33,10 +33,7 @@ import {
   TotalBalanceClass,
   SendPageStateClass,
   InfoType,
-  TransactionType,
   ToAddrClass,
-  ErrorModalDataClass,
-  SendJsonToTypeType,
   SyncingStatusClass,
   SendProgressClass,
   WalletSettingsClass,
@@ -47,22 +44,44 @@ import {
   ServerType,
   AddressBookFileClass,
   SecurityType,
+  CommandEnum,
+  MenuItemEnum,
+  LanguageEnum,
+  ModeEnum,
+  CurrencyEnum,
+  SelectServerEnum,
+  ChainNameEnum,
+  SeedActionEnum,
+  UfvkActionEnum,
+  SettingsNameEnum,
+  RouteEnums,
+  SnackbarType,
+  AppStateStatusEnum,
+  GlobalConst,
+  EventListenerEnum,
+  AppContextLoaded,
+  NetInfoType,
+  WalletType,
+  BackgroundErrorType,
+  ReceivePageStateClass,
+  ValueTransferType,
+  ValueTransferKindEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
-import { ContextAppLoadedProvider, defaultAppStateLoaded } from '../context';
+import { ContextAppLoadedProvider } from '../context';
 import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import Snackbars from '../../components/Components/Snackbars';
-import SnackbarType from '../AppState/types/SnackbarType';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
 import AddressBook from '../../components/AddressBook/AddressBook';
 import AddressBookFileImpl from '../../components/AddressBook/AddressBookFileImpl';
 import simpleBiometrics from '../simpleBiometrics';
+import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
 
 const History = React.lazy(() => import('../../components/History'));
 const Send = React.lazy(() => import('../../components/Send'));
@@ -83,6 +102,7 @@ const ComputingTxContent = React.lazy(() => import('./components/ComputingTxCont
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
 const pt = require('../translations/pt.json');
+const ru = require('../translations/ru.json');
 
 const Tab = createBottomTabNavigator();
 
@@ -92,22 +112,23 @@ const Tab = createBottomTabNavigator();
 type LoadedAppProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
-  toggleTheme: (mode: 'basic' | 'advanced') => void;
+  toggleTheme: (mode: ModeEnum) => void;
 };
 
 const SERVER_DEFAULT_0: ServerType = {
   uri: serverUris(() => {})[0].uri,
-  chain_name: serverUris(() => {})[0].chain_name,
+  chainName: serverUris(() => {})[0].chainName,
 } as ServerType;
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as unknown as ThemeType;
-  const [language, setLanguage] = useState<'en' | 'es' | 'pt'>('en');
-  const [currency, setCurrency] = useState<'USD' | ''>('');
+  const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
+  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency);
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
+  const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<'basic' | 'advanced'>('advanced'); // by default advanced
+  const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -115,19 +136,20 @@ export default function LoadedApp(props: LoadedAppProps) {
     startApp: true,
     foregroundApp: true,
     sendConfirm: true,
-    seedScreen: true,
-    ufvkScreen: true,
+    seedUfvkScreen: true,
     rescanScreen: true,
     settingsScreen: true,
     changeWalletScreen: true,
     restoreWalletBackupScreen: true,
   });
-  const [selectServer, setSelectServer] = useState<'auto' | 'list' | 'custom'>('auto');
+  const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
+  const [rescanMenu, setRescanMenu] = useState<boolean>(false);
   const file = useMemo(
     () => ({
       en: en,
       es: es,
       pt: pt,
+      ru: ru,
     }),
     [],
   );
@@ -139,21 +161,20 @@ export default function LoadedApp(props: LoadedAppProps) {
   useEffect(() => {
     (async () => {
       // fallback if no available language fits
-      const fallback = { languageTag: 'en', isRTL: false };
+      const fallback = { languageTag: LanguageEnum.en, isRTL: false };
 
-      //console.log(RNLocalize.findBestAvailableLanguage(Object.keys(file)));
-      //console.log(RNLocalize.getLocales());
-
-      const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(file)) || fallback;
+      const { languageTag, isRTL } = RNLocalize.findBestLanguageTag(Object.keys(file)) || fallback;
 
       // update layout direction
       I18nManager.forceRTL(isRTL);
 
-      // If the App is mounting this component, I know I have to reset the firstInstall prop in settings.
-      await SettingsFileImpl.writeSettings('firstInstall', false);
+      // If the App is mounting this component,
+      // I know I have to reset the firstInstall & firstUpdateWithDonation prop in settings.
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.firstInstall, false);
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.firstUpdateWithDonation, false);
 
       // If the App is mounting this component, I know I have to update the version prop in settings.
-      await SettingsFileImpl.writeSettings('version', translate('version') as string);
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.version, translate('version') as string);
 
       //I have to check what language is in the settings
       const settings = await SettingsFileImpl.readSettings();
@@ -161,61 +182,82 @@ export default function LoadedApp(props: LoadedAppProps) {
       // for testing
       //await delay(5000);
 
-      if (settings.language === 'en' || settings.language === 'es' || settings.language === 'pt') {
+      if (
+        settings.language === LanguageEnum.en ||
+        settings.language === LanguageEnum.es ||
+        settings.language === LanguageEnum.pt ||
+        settings.language === LanguageEnum.ru
+      ) {
         setLanguage(settings.language);
         i18n.locale = settings.language;
         //console.log('apploaded settings', settings.language, settings.currency);
       } else {
         const lang =
-          languageTag === 'en' || languageTag === 'es' || languageTag === 'pt'
-            ? (languageTag as 'en' | 'es' | 'pt')
-            : (fallback.languageTag as 'en' | 'es' | 'pt');
+          languageTag === LanguageEnum.en ||
+          languageTag === LanguageEnum.es ||
+          languageTag === LanguageEnum.pt ||
+          languageTag === LanguageEnum.ru
+            ? (languageTag as LanguageEnum)
+            : (fallback.languageTag as LanguageEnum);
         setLanguage(lang);
         i18n.locale = lang;
-        await SettingsFileImpl.writeSettings('language', lang);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
         //console.log('apploaded NO settings', languageTag);
       }
-      if (settings.currency === '' || settings.currency === 'USD') {
+      if (settings.currency === CurrencyEnum.noCurrency || settings.currency === CurrencyEnum.USDCurrency) {
         setCurrency(settings.currency);
       } else {
-        await SettingsFileImpl.writeSettings('currency', currency);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, currency);
       }
       if (settings.server) {
         setServer(settings.server);
       } else {
-        await SettingsFileImpl.writeSettings('server', server);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
       }
       if (settings.sendAll === true || settings.sendAll === false) {
         setSendAll(settings.sendAll);
       } else {
-        await SettingsFileImpl.writeSettings('sendAll', sendAll);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.sendAll, sendAll);
+      }
+      if (settings.donation === true || settings.donation === false) {
+        setDonation(settings.donation);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.donation, donation);
       }
       if (settings.privacy === true || settings.privacy === false) {
         setPrivacy(settings.privacy);
       } else {
-        await SettingsFileImpl.writeSettings('privacy', privacy);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
       }
-      if (settings.mode === 'basic' || settings.mode === 'advanced') {
+      if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
         setMode(settings.mode);
         props.toggleTheme(settings.mode);
       } else {
-        await SettingsFileImpl.writeSettings('mode', mode);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
         props.toggleTheme(mode);
       }
       if (settings.security) {
         setSecurity(settings.security);
       } else {
-        await SettingsFileImpl.writeSettings('security', security);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.security, security);
       }
-      if (settings.selectServer) {
+      if (
+        settings.selectServer === SelectServerEnum.auto ||
+        settings.selectServer === SelectServerEnum.custom ||
+        settings.selectServer === SelectServerEnum.list
+      ) {
         setSelectServer(settings.selectServer);
       } else {
-        await SettingsFileImpl.writeSettings('selectServer', selectServer);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, selectServer);
+      }
+      if (settings.rescanMenu === true || settings.rescanMenu === false) {
+        setRescanMenu(settings.rescanMenu);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenu, rescanMenu);
       }
 
       // reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
-      //console.log('background', backgroundJson);
       if (backgroundJson) {
         setBackground(backgroundJson);
       }
@@ -253,14 +295,15 @@ export default function LoadedApp(props: LoadedAppProps) {
         currency={currency}
         server={server}
         sendAll={sendAll}
+        donation={donation}
         privacy={privacy}
         mode={mode}
         background={background}
         readOnly={readOnly}
-        toggleTheme={props.toggleTheme}
         addressBook={addressBook}
         security={security}
         selectServer={selectServer}
+        rescanMenu={rescanMenu}
       />
     );
   }
@@ -269,23 +312,27 @@ export default function LoadedApp(props: LoadedAppProps) {
 type LoadedAppClassProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
+  toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
   theme: ThemeType;
-  language: 'en' | 'es' | 'pt';
-  currency: 'USD' | '';
+  language: LanguageEnum;
+  currency: CurrencyEnum;
   server: ServerType;
   sendAll: boolean;
+  donation: boolean;
   privacy: boolean;
-  mode: 'basic' | 'advanced';
+  mode: ModeEnum;
   background: BackgroundType;
   readOnly: boolean;
-  toggleTheme: (mode: 'basic' | 'advanced') => void;
   addressBook: AddressBookFileClass[];
   security: SecurityType;
-  selectServer: 'auto' | 'list' | 'custom';
+  selectServer: SelectServerEnum;
+  rescanMenu: boolean;
 };
 
-export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoaded> {
+type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
+
+export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClassState> {
   rpc: RPC;
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
@@ -295,32 +342,76 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     super(props);
 
     this.state = {
-      ...defaultAppStateLoaded,
+      //context
       navigation: props.navigation,
-      route: props.route,
+      netInfo: {} as NetInfoType,
+      wallet: {} as WalletType,
+      totalBalance: {} as TotalBalanceClass,
+      addresses: [] as AddressClass[],
+      valueTransfers: [] as ValueTransferType[],
+      walletSettings: {} as WalletSettingsClass,
+      syncingStatus: {} as SyncingStatusClass,
+      sendProgress: {} as SendProgressClass,
+      info: {} as InfoType,
+      zecPrice: {} as ZecPriceType,
+      uaAddress: '',
       sendPageState: new SendPageStateClass(new ToAddrClass(Utils.getNextToAddrID())),
-      translate: props.translate,
-      server: props.server,
-      language: props.language,
-      currency: props.currency,
-      sendAll: props.sendAll,
-      privacy: props.privacy,
-      mode: props.mode,
+      receivePageState: {} as ReceivePageStateClass,
       background: props.background,
-      readOnly: props.readOnly,
-      appState: Platform.OS === 'ios' ? 'active' : AppState.currentState,
+      translate: props.translate,
+      backgroundError: {} as BackgroundErrorType,
       setBackgroundError: this.setBackgroundError,
+      readOnly: props.readOnly,
+      snackbars: [] as SnackbarType[],
       addLastSnackbar: this.addLastSnackbar,
-      restartApp: this.navigateToLoadingApp,
       addressBook: props.addressBook,
       launchAddressBook: this.launchAddressBook,
+      addressBookCurrentAddress: '',
+      addressBookOpenPriorModal: () => {},
+      shieldingAmount: 0,
+      restartApp: this.navigateToLoadingApp,
+
+      // context settings
+      server: props.server,
+      currency: props.currency,
+      language: props.language,
+      sendAll: props.sendAll,
+      donation: props.donation,
+      privacy: props.privacy,
+      mode: props.mode,
       security: props.security,
       selectServer: props.selectServer,
+      rescanMenu: props.rescanMenu,
+
+      // state
+      appStateStatus: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
+      isMenuDrawerOpen: false,
+      selectedMenuDrawerItem: null,
+      aboutModalVisible: false,
+      computingModalVisible: false,
+      settingsModalVisible: false,
+      infoModalVisible: false,
+      rescanModalVisible: false,
+      seedViewModalVisible: false,
+      seedChangeModalVisible: false,
+      seedBackupModalVisible: false,
+      seedServerModalVisible: false,
+      ufvkViewModalVisible: false,
+      ufvkChangeModalVisible: false,
+      ufvkBackupModalVisible: false,
+      ufvkServerModalVisible: false,
+      syncReportModalVisible: false,
+      poolsModalVisible: false,
+      insightModalVisible: false,
+      addressBookModalVisible: false,
+      newServer: {} as ServerType,
+      somePending: false,
+      scrollToTop: false,
     };
 
     this.rpc = new RPC(
       this.setTotalBalance,
-      this.setTransactionList,
+      this.setValueTransfersList,
       this.setAllAddresses,
       this.setWalletSettings,
       this.setInfo,
@@ -341,45 +432,48 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     (async () => {
       // Configure the RPC to start doing refreshes
       await this.rpc.configure();
-
-      //console.log(await SettingsFileImpl.readSettings());
     })();
 
-    this.appstate = AppState.addEventListener('change', async nextAppState => {
-      console.log('LOADED', 'prior', this.state.appState, 'next', nextAppState);
-      if (Platform.OS === 'ios') {
+    this.appstate = AppState.addEventListener(EventListenerEnum.change, async nextAppState => {
+      //console.log('LOADED', 'prior', this.state.appState, 'next', nextAppState);
+      if (Platform.OS === GlobalConst.platformOSios) {
         if (
-          (this.state.appState === 'inactive' && nextAppState === 'active') ||
-          (this.state.appState === 'active' && nextAppState === 'inactive')
+          (this.state.appStateStatus === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.active) ||
+          (this.state.appStateStatus === AppStateStatusEnum.active && nextAppState === AppStateStatusEnum.inactive)
         ) {
-          console.log('LOADED SAVED IOS do nothing', nextAppState);
-          this.setState({ appState: nextAppState });
+          //console.log('LOADED SAVED IOS do nothing', nextAppState);
+          this.setState({ appStateStatus: nextAppState });
           return;
         }
-        if (this.state.appState === 'inactive' && nextAppState === 'background') {
-          console.log('App LOADED IOS is gone to the background!');
+        if (
+          this.state.appStateStatus === AppStateStatusEnum.inactive &&
+          nextAppState === AppStateStatusEnum.background
+        ) {
+          //console.log('App LOADED IOS is gone to the background!');
           // re-activate the interruption sync flag
-          await RPC.rpc_setInterruptSyncAfterBatch('true');
+          await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
           // setting value for background task Android
-          await AsyncStorage.setItem('@background', 'yes');
+          await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
           //console.log('background yes in storage');
           this.rpc.setInRefresh(false);
           await this.rpc.clearTimers();
-          console.log('clear timers IOS');
+          //console.log('clear timers IOS');
           this.setSyncingStatus(new SyncingStatusClass());
           //console.log('clear sync status state');
-          console.log('LOADED SAVED IOS background', nextAppState);
-          this.setState({ appState: nextAppState });
+          //console.log('LOADED SAVED IOS background', nextAppState);
+          this.setState({ appStateStatus: nextAppState });
           return;
         }
       }
-      if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+      if (
+        (this.state.appStateStatus === AppStateStatusEnum.inactive ||
+          this.state.appStateStatus === AppStateStatusEnum.background) &&
+        nextAppState === AppStateStatusEnum.active
+      ) {
         console.log('App LOADED Android & IOS has come to the foreground!');
-        if (Platform.OS === 'ios') {
-          if (this.state.appState !== nextAppState) {
-            console.log('LOADED SAVED IOS foreground', nextAppState);
-            this.setState({ appState: nextAppState });
-          }
+        if (Platform.OS === GlobalConst.platformOSios) {
+          //console.log('LOADED SAVED IOS foreground', nextAppState);
+          this.setState({ appStateStatus: nextAppState });
         }
         // (PIN or TouchID or FaceID)
         const resultBio = this.state.security.foregroundApp
@@ -388,53 +482,54 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         // can be:
         // - true      -> the user do pass the authentication
         // - false     -> the user do NOT pass the authentication
-        // - undefined -> no biometric authentication available -> Passcode.
-        console.log('BIOMETRIC FOREGROUND --------> ', resultBio);
+        // - undefined -> no biometric authentication available -> Passcode -> Nothing.
+        //console.log('BIOMETRIC FOREGROUND --------> ', resultBio);
         if (resultBio === false) {
           this.navigateToLoadingApp({ startingApp: true, biometricsFailed: true });
         } else {
           // reading background task info
           await this.fetchBackgroundSyncing();
           // setting value for background task Android
-          await AsyncStorage.setItem('@background', 'no');
+          await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
           //console.log('background no in storage');
           await this.rpc.configure();
-          console.log('configure start timers Android & IOS');
+          //console.log('configure start timers Android & IOS');
           if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
             Alert.alert(this.state.backgroundError.title, this.state.backgroundError.error);
             this.setBackgroundError('', '');
           }
         }
-      } else if (this.state.appState === 'active' && nextAppState.match(/inactive|background/)) {
+      } else if (
+        this.state.appStateStatus === AppStateStatusEnum.active &&
+        (nextAppState === AppStateStatusEnum.inactive || nextAppState === AppStateStatusEnum.background)
+      ) {
         console.log('App LOADED is gone to the background!');
         // re-activate the interruption sync flag
-        await RPC.rpc_setInterruptSyncAfterBatch('true');
+        await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
         // setting value for background task Android
-        await AsyncStorage.setItem('@background', 'yes');
+        await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
         //console.log('background yes in storage');
         this.rpc.setInRefresh(false);
         await this.rpc.clearTimers();
-        console.log('clear timers');
+        //console.log('clear timers');
         this.setSyncingStatus(new SyncingStatusClass());
         //console.log('clear sync status state');
-        if (Platform.OS === 'ios') {
-          if (this.state.appState !== nextAppState) {
-            console.log('LOADED SAVED IOS background', nextAppState);
-            this.setState({ appState: nextAppState });
-          }
+        if (Platform.OS === GlobalConst.platformOSios) {
+          //console.log('LOADED SAVED IOS background', nextAppState);
+          this.setState({ appStateStatus: nextAppState });
         }
       } else {
-        if (Platform.OS === 'ios') {
-          if (this.state.appState !== nextAppState) {
-            console.log('LOADED SAVED IOS', nextAppState);
-            this.setState({ appState: nextAppState });
+        if (Platform.OS === GlobalConst.platformOSios) {
+          if (this.state.appStateStatus !== nextAppState) {
+            //console.log('LOADED SAVED IOS', nextAppState);
+            this.setState({ appStateStatus: nextAppState });
           }
         }
       }
-      if (Platform.OS === 'android') {
-        if (this.state.appState !== nextAppState) {
-          console.log('LOADED SAVED Android', nextAppState);
-          this.setState({ appState: nextAppState });
+      if (Platform.OS === GlobalConst.platformOSandroid) {
+        if (this.state.appStateStatus !== nextAppState) {
+          //console.log('LOADED SAVED Android', nextAppState);
+          this.setState({ appStateStatus: nextAppState });
         }
       }
     });
@@ -446,19 +541,17 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
     })();
 
-    this.linking = Linking.addEventListener('url', async ({ url }) => {
+    this.linking = Linking.addEventListener(EventListenerEnum.url, async ({ url }) => {
       //console.log(url);
-      const { to } = this.state.sendPageState.toaddr;
-      if (url !== null && to === '') {
+      if (url !== null) {
         this.readUrl(url);
-      } else {
-        this.closeAllModals();
-        this.state.navigation.navigate('LoadedApp', {
-          screen: this.state.translate('loadedapp.send-menu'),
-          initial: false,
-        });
-        this.addLastSnackbar({ message: this.state.translate('loadedapp.zcash-url') as string, type: 'Primary' });
       }
+
+      this.closeAllModals();
+      this.state.navigation.navigate(RouteEnums.LoadedApp, {
+        screen: this.state.translate('loadedapp.send-menu'),
+        initial: false,
+      });
     });
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(async state => {
@@ -482,8 +575,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
             await this.rpc.clearTimers();
             this.setSyncingStatus(new SyncingStatusClass());
             this.addLastSnackbar({
-              message: this.props.translate('loadedapp.connection-error') as string,
-              type: 'Primary',
+              message: this.state.translate('loadedapp.connection-error') as string,
             });
           } else {
             //console.log('EVENT Loaded: YES internet connection.');
@@ -519,37 +611,48 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     //console.log(url);
     // Attempt to parse as URI if it starts with zcash
     // only if it is a spendable wallet
-    if (url.startsWith('zcash:') && !this.state.readOnly) {
+    if (url && url.startsWith(GlobalConst.zcash) && !this.state.readOnly) {
       const target: string | ZcashURITargetClass = await parseZcashURI(url, this.state.translate, this.state.server);
       //console.log(targets);
 
       if (typeof target !== 'string') {
-        // redo the to addresses
-        const newSendPageState = new SendPageStateClass(new ToAddrClass(0));
-        let uriToAddr: ToAddrClass = new ToAddrClass(0);
-        [target].forEach(tgt => {
-          const to = new ToAddrClass(Utils.getNextToAddrID());
+        let update = false;
+        if (
+          this.state.sendPageState.toaddr.to &&
+          target.address &&
+          this.state.sendPageState.toaddr.to !== target.address
+        ) {
+          await ShowAddressAlertAsync(this.state.translate)
+            .then(async () => {
+              // fill the fields in the screen with the donation data
+              update = true;
+            })
+            .catch(() => {});
+        } else if (target.address) {
+          // fill the fields in the screen with the donation data
+          update = true;
+        }
+        if (update) {
+          // redo the to addresses
+          const newSendPageState = new SendPageStateClass(new ToAddrClass(0));
+          let uriToAddr: ToAddrClass = new ToAddrClass(0);
+          [target].forEach(tgt => {
+            const to = new ToAddrClass(Utils.getNextToAddrID());
 
-          to.to = tgt.address || '';
-          to.amount = Utils.maxPrecisionTrimmed(tgt.amount || 0);
-          to.memo = tgt.memoString || '';
+            to.to = tgt.address || '';
+            to.amount = Utils.parseNumberFloatToStringLocale(tgt.amount || 0, 8);
+            to.memo = tgt.memoString || '';
 
-          uriToAddr = to;
-        });
+            uriToAddr = to;
+          });
 
-        newSendPageState.toaddr = uriToAddr;
+          newSendPageState.toaddr = uriToAddr;
 
-        this.setSendPageState(newSendPageState);
-        this.closeAllModals();
-        this.state.navigation.navigate('LoadedApp', {
-          screen: this.state.translate('loadedapp.send-menu'),
-          initial: false,
-        });
-        return;
+          this.setSendPageState(newSendPageState);
+        }
       } else {
         // Show the error message as a toast
-        this.addLastSnackbar({ message: target, type: 'Primary' });
-        return;
+        this.addLastSnackbar({ message: target });
       }
     }
   };
@@ -590,32 +693,22 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     return this.state;
   };
 
-  openErrorModal = (title: string, body: string) => {
-    const errorModalData = new ErrorModalDataClass(title, body);
-    errorModalData.modalIsOpen = true;
-
-    this.setState({ errorModalData });
-  };
-
-  closeErrorModal = () => {
-    const errorModalData = new ErrorModalDataClass('', '');
-    errorModalData.modalIsOpen = false;
-
-    this.setState({ errorModalData });
-  };
-
   setUfvkViewModalVisible = async (value: boolean) => {
     await this.fetchWallet();
     this.setState({ ufvkViewModalVisible: value });
   };
 
-  setPoolsToShieldSelectSapling = (value: boolean) => {
-    this.setState({ poolsToShieldSelectSapling: value });
+  setShieldingAmount = (value: number) => {
+    this.setState({ shieldingAmount: value });
   };
 
-  setPoolsToShieldSelectTransparent = (value: boolean) => {
-    this.setState({ poolsToShieldSelectTransparent: value });
-  };
+  //setPoolsToShieldSelectSapling = (value: boolean) => {
+  //  this.setState({ poolsToShieldSelectSapling: value });
+  //};
+
+  //setPoolsToShieldSelectTransparent = (value: boolean) => {
+  //  this.setState({ poolsToShieldSelectTransparent: value });
+  //};
 
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
@@ -631,16 +724,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  setTransactionList = async (transactions: TransactionType[]) => {
+  setValueTransfersList = async (valueTransfers: ValueTransferType[]) => {
     const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
     // only for basic mode
-    if (this.state.mode === 'basic') {
+    if (this.state.mode === ModeEnum.basic) {
       // only if the user doesn't see the seed the first time
       if (!basicFirstViewSeed) {
         // only if the App are in foreground
-        const background = await AsyncStorage.getItem('@background');
-        // only if the wallet have some transactions
-        if (background === 'no' && transactions.length > 0) {
+        const background = await AsyncStorage.getItem(GlobalConst.background);
+        // only if the wallet have some ValueTransfers
+        if (background === GlobalConst.no && valueTransfers.length > 0) {
           // I need to check this out in the seed screen.
           await this.fetchWallet();
           this.setState({ seedViewModalVisible: true });
@@ -649,15 +742,95 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     } else {
       // for advanced mode
       if (!basicFirstViewSeed) {
-        await SettingsFileImpl.writeSettings('basicFirstViewSeed', true);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
       }
     }
-    if (deepDiff(this.state.transactions, transactions)) {
-      //console.log('fetch transactions');
-      // set someUnconfirmed as well here when I know there is something new in transactions
-      const unconfirmed: number =
-        transactions.length > 0 ? transactions.filter((tx: TransactionType) => tx.confirmations === 0).length : 0;
-      this.setState({ transactions, someUnconfirmed: unconfirmed > 0 });
+    if (deepDiff(this.state.valueTransfers, valueTransfers)) {
+      //console.log('fetch ValueTransfers');
+      // set somePending as well here when I know there is something new in ValueTransfers
+      const pending: number =
+        valueTransfers.length > 0 ? valueTransfers.filter((vt: ValueTransferType) => vt.confirmations === 0).length : 0;
+      // if a ValueTransfer go from 0 confirmations to > 0 -> Show a message about a ValueTransfer is confirmed
+      this.state.valueTransfers.length > 0 &&
+        this.state.valueTransfers
+          .filter((vtOld: ValueTransferType) => !vtOld.confirmations || vtOld.confirmations === 0)
+          .forEach((vtOld: ValueTransferType) => {
+            const vtNew = valueTransfers.filter(
+              (vt: ValueTransferType) =>
+                vt.txid === vtOld.txid && vt.address === vtOld.address && vt.poolType === vtOld.poolType,
+            );
+            console.log('old', vtOld);
+            console.log('new', vtNew);
+            // the ValueTransfer is confirmed
+            if (vtNew.length > 0 && vtNew[0].confirmations > 0) {
+              let message: string = '';
+              let title: string = '';
+              if (vtNew[0].kind === ValueTransferKindEnum.Received) {
+                message =
+                  (this.state.translate('loadedapp.incoming-funds') as string) +
+                  (this.state.translate('history.received') as string) +
+                  ' ' +
+                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
+                  ' ' +
+                  this.state.info.currencyName;
+                title = this.state.translate('loadedapp.uas-menu') as string;
+              } else if (vtNew[0].kind === ValueTransferKindEnum.MemoToSelf) {
+                message =
+                  (this.state.translate('loadedapp.valuetransfer-confirmed') as string) +
+                  (this.state.translate('history.memotoself') as string) +
+                  (vtNew[0].fee
+                    ? ((' ' + this.state.translate('send.fee')) as string) +
+                      ' ' +
+                      Utils.parseNumberFloatToStringLocale(vtNew[0].fee, 8) +
+                      ' ' +
+                      this.state.info.currencyName
+                    : '');
+                title = this.state.translate('loadedapp.send-menu') as string;
+              } else if (vtNew[0].kind === ValueTransferKindEnum.SendToSelf) {
+                message =
+                  (this.state.translate('loadedapp.valuetransfer-confirmed') as string) +
+                  (this.state.translate('history.sendtoself') as string) +
+                  (vtNew[0].fee
+                    ? ((' ' + this.state.translate('send.fee')) as string) +
+                      ' ' +
+                      Utils.parseNumberFloatToStringLocale(vtNew[0].fee, 8) +
+                      ' ' +
+                      this.state.info.currencyName
+                    : '');
+                title = this.state.translate('loadedapp.send-menu') as string;
+              } else if (vtNew[0].kind === ValueTransferKindEnum.Shield) {
+                message =
+                  (this.state.translate('loadedapp.incoming-funds') as string) +
+                  (this.state.translate('history.shield') as string) +
+                  ' ' +
+                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
+                  ' ' +
+                  this.state.info.currencyName;
+                title = this.state.translate('loadedapp.uas-menu') as string;
+              } else {
+                message =
+                  (this.state.translate('loadedapp.payment-made') as string) +
+                  (this.state.translate('history.sent') as string) +
+                  ' ' +
+                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
+                  ' ' +
+                  this.state.info.currencyName;
+                title = this.state.translate('loadedapp.send-menu') as string;
+              }
+              createAlert(this.setBackgroundError, this.addLastSnackbar, title, message, true);
+            }
+            // the ValueTransfer is gone -> Likely Reverted by the server
+            if (vtNew.length === 0) {
+              createAlert(
+                this.setBackgroundError,
+                this.addLastSnackbar,
+                this.state.translate('loadedapp.send-menu') as string,
+                this.state.translate('loadedapp.valuetransfer-reverted') as string,
+                true,
+              );
+            }
+          });
+      this.setState({ valueTransfers, somePending: pending > 0 });
     }
   };
 
@@ -666,8 +839,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       //console.log('fetch addresses');
       this.setState({ addresses });
     }
-    if (this.state.uaAddress !== addresses[0].uaAddress) {
-      this.setState({ uaAddress: addresses[0].uaAddress });
+    if (addresses.length > 0) {
+      if (this.state.uaAddress !== addresses[0].uaAddress) {
+        this.setState({ uaAddress: addresses[0].uaAddress });
+      }
+    } else {
+      this.setState({ uaAddress: '' });
     }
   };
 
@@ -731,48 +908,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  getSendManyJSON = (): Array<SendJsonToTypeType> => {
-    const { sendPageState, uaAddress } = this.state;
-    const json: Array<SendJsonToTypeType> = [sendPageState.toaddr].flatMap((to: ToAddrClass) => {
-      const memo = `${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`;
-      const amount = parseInt((Number(to.amount) * 10 ** 8).toFixed(0), 10);
-
-      if (memo === '') {
-        return [{ address: to.to, amount } as SendJsonToTypeType];
-      } else if (memo.length <= 512) {
-        return [{ address: to.to, amount, memo } as SendJsonToTypeType];
-      } else {
-        // If the memo is more than 512 bytes, then we split it into multiple transactions.
-        // Each memo will be `(xx/yy)memo_part`. The prefix "(xx/yy)" is 7 bytes long, so
-        // we'll split the memo into 512-7 = 505 bytes length
-        const splits = Utils.utf16Split(memo, 505);
-        const tos = [];
-
-        // The first one contains all the tx value
-        tos.push({ address: to.to, amount, memo: `(1/${splits.length})${splits[0]}` } as SendJsonToTypeType);
-
-        for (let i = 1; i < splits.length; i++) {
-          tos.push({
-            address: to.to,
-            amount: 0,
-            memo: `(${i + 1}/${splits.length})${splits[i]}`,
-          } as SendJsonToTypeType);
-        }
-
-        return tos;
-      }
-    });
-
-    //console.log('Sending:');
-    //console.log(json);
-
-    return json;
-  };
-
   sendTransaction = async (setSendProgress: (arg0: SendProgressClass) => void): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
-      const sendJson = this.getSendManyJSON();
+      const { sendPageState, uaAddress, addresses, server, donation, translate } = this.state;
+      const sendJson = await Utils.getSendManyJSON(sendPageState, uaAddress, addresses, server, donation, translate);
       const txid = await this.rpc.sendTransaction(sendJson, setSendProgress);
 
       return txid;
@@ -781,44 +921,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       throw err;
     }
   };
-  /*
-  // Get a single private key for this address, and return it as a string.
-  getPrivKeyAsString = async (address: string): Promise<string> => {
-    const pk = await RPC.rpc_getPrivKeyAsString(address);
-    if (pk) {
-      return pk;
-    }
-    return '';
-  };
 
-  // Getter methods, which are called by the components to update the state
-  fetchAndSetSinglePrivKey = async (address: string) => {
-    const key = await RPC.rpc_getPrivKeyAsString(address);
-    const addressPrivateKeys = new Map<string, string>();
-    if (key) {
-      addressPrivateKeys.set(address, key);
-      this.setState({ addressPrivateKeys });
-    }
-  };
-
-  createNewAddress = async (addressType: 'tzo') => {
-    // Create a new address
-    const newaddress = await RPC.rpc_createNewAddress(addressType);
-    //console.log(`Created new Address ${newaddress}`);
-
-    // And then fetch the list of addresses again to refresh (totalBalance gets all addresses)
-    this.fetchTotalBalance();
-
-    const { receivePageState } = this.state;
-    const newRerenderKey = receivePageState.rerenderKey + 1;
-
-    if (newaddress) {
-      const newReceivePageState = new ReceivePageStateClass(newaddress);
-      newReceivePageState.rerenderKey = newRerenderKey;
-      this.setState({ receivePageState: newReceivePageState });
-    }
-  };
-  */
   doRefresh = async () => {
     await this.rpc.refresh(false);
   };
@@ -827,10 +930,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await this.rpc.stopSyncProcess();
     this.rpc.refresh(false, true);
   };
-
-  //fetchTotalBalance = async () => {
-  //  await this.rpc.fetchTotalBalance();
-  //};
 
   toggleMenuDrawer = () => {
     this.setState({
@@ -843,7 +942,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   };
 
   fetchWallet = async () => {
-    const wallet = await RPC.rpc_fetchWallet(this.state.readOnly);
+    const wallet = await RPC.rpcFetchWallet(this.state.readOnly);
     //console.log(wallet, this.state.readOnly);
     if (!isEqual(this.state.wallet, wallet)) {
       //console.log('fetch wallet seed or Viewing Key & birthday');
@@ -851,7 +950,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  onMenuItemSelected = async (item: string) => {
+  onMenuItemSelected = async (item: MenuItemEnum) => {
     this.setState({
       isMenuDrawerOpen: false,
       selectedMenuDrawerItem: item,
@@ -860,39 +959,39 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     await this.fetchWallet();
 
     // Depending on the menu item, open the appropriate modal
-    if (item === 'About') {
+    if (item === MenuItemEnum.About) {
       this.setState({ aboutModalVisible: true });
-    } else if (item === 'Rescan') {
+    } else if (item === MenuItemEnum.Rescan) {
       this.setState({ rescanModalVisible: true });
-    } else if (item === 'Settings') {
+    } else if (item === MenuItemEnum.Settings) {
       this.setState({ settingsModalVisible: true });
-    } else if (item === 'Info') {
+    } else if (item === MenuItemEnum.Info) {
       this.setState({ infoModalVisible: true });
-    } else if (item === 'Sync Report') {
+    } else if (item === MenuItemEnum.SyncReport) {
       this.setState({ syncReportModalVisible: true });
-    } else if (item === 'Fund Pools') {
+    } else if (item === MenuItemEnum.FundPools) {
       this.setState({ poolsModalVisible: true });
-    } else if (item === 'Insight') {
+    } else if (item === MenuItemEnum.Insight) {
       this.setState({ insightModalVisible: true });
-    } else if (item === 'Wallet') {
+    } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
         this.setState({ ufvkViewModalVisible: true });
       } else {
         this.setState({ seedViewModalVisible: true });
       }
-    } else if (item === 'Change Wallet') {
+    } else if (item === MenuItemEnum.ChangeWallet) {
       if (this.state.readOnly) {
         this.setState({ ufvkChangeModalVisible: true });
       } else {
         this.setState({ seedChangeModalVisible: true });
       }
-    } else if (item === 'Restore Wallet Backup') {
+    } else if (item === MenuItemEnum.RestoreWalletBackup) {
       if (this.state.readOnly) {
         this.setState({ ufvkBackupModalVisible: true });
       } else {
         this.setState({ seedBackupModalVisible: true });
       }
-    } else if (item === 'Load Wallet From Seed') {
+    } else if (item === MenuItemEnum.LoadWalletFromSeed) {
       // change to the screen 3 directly.
       const { translate } = this.state;
       Alert.alert(
@@ -907,38 +1006,88 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
         ],
         { cancelable: false, userInterfaceStyle: 'light' },
       );
-    } else if (item === 'Address Book') {
+    } else if (item === MenuItemEnum.TipZingoLabs) {
+      // change to the screen 3 directly.
+      const { translate } = this.state;
+      Alert.alert(
+        translate('loadingapp.alert-donation-title') as string,
+        translate('loadingapp.alert-donation-body') as string,
+        [
+          {
+            text: translate('confirm') as string,
+            onPress: async () => await this.setDonationOption(true),
+          },
+          {
+            text: translate('cancel') as string,
+            onPress: async () => await this.setDonationOption(false),
+            style: 'cancel',
+          },
+        ],
+        { cancelable: false, userInterfaceStyle: 'light' },
+      );
+    } else if (item === MenuItemEnum.AddressBook) {
       this.setState({
         addressBookModalVisible: true,
         addressBookCurrentAddress: '',
         addressBookOpenPriorModal: () => {},
       });
+    } else if (item === MenuItemEnum.VoteForNym) {
+      let update = false;
+      if (
+        this.state.sendPageState.toaddr.to &&
+        this.state.sendPageState.toaddr.to !== (await Utils.getDonationAddress(this.state.server.chainName))
+      ) {
+        await ShowAddressAlertAsync(this.state.translate)
+          .then(async () => {
+            // fill the fields in the screen with the donation data
+            update = true;
+          })
+          .catch(() => {});
+      } else {
+        // fill the fields in the screen with the donation data
+        update = true;
+      }
+      if (update) {
+        const newSendPageState = new SendPageStateClass(new ToAddrClass(0));
+        let uriToAddr: ToAddrClass = new ToAddrClass(0);
+        const to = new ToAddrClass(Utils.getNextToAddrID());
+
+        to.to = await Utils.getDonationAddress(this.state.server.chainName);
+        to.amount = Utils.getDefaultDonationAmount();
+        to.memo = this.state.translate('loadedapp.nymmemo') as string;
+        to.includeUAMemo = true;
+
+        uriToAddr = to;
+
+        newSendPageState.toaddr = uriToAddr;
+
+        this.setSendPageState(newSendPageState);
+      }
+      this.closeAllModals();
+      this.state.navigation.navigate(RouteEnums.LoadedApp, {
+        screen: this.state.translate('loadedapp.send-menu'),
+        initial: false,
+      });
     }
   };
 
-  set_wallet_option = async (name: string, value: string): Promise<void> => {
-    await RPC.rpc_setWalletSettingOption(name, value);
+  setWalletOption = async (walletOption: string, value: string): Promise<void> => {
+    await RPC.rpcSetWalletSettingOption(walletOption, value);
 
     // Refetch the settings updated
     this.rpc.fetchWalletSettings();
   };
 
-  set_server_option = async (
-    name: 'server',
-    value: ServerType,
-    toast: boolean,
-    same_server_chain_name: boolean,
-  ): Promise<void> => {
-    //console.log(value, same_server_chain_name);
+  setServerOption = async (value: ServerType, toast: boolean, sameServerChainName: boolean): Promise<void> => {
     // here I know the server was changed, clean all the tasks before anything.
     await this.rpc.clearTimers();
     this.setSyncingStatus(new SyncingStatusClass());
     this.rpc.setInRefresh(false);
     this.keepAwake(false);
-    // First we need to check the `chain_name` between servers, if this is different
+    // First we need to check the `chainName` between servers, if this is different
     // we cannot try to open the current wallet, because make not sense.
     let error = false;
-    if (!same_server_chain_name) {
+    if (!sameServerChainName) {
       error = true;
     } else {
       // when I try to open the wallet in the new server:
@@ -946,33 +1095,37 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       //   The App have to go to the initial screen
       // - the seed exists and the App can open the wallet in the new server.
       //   But I have to restart the sync if needed.
-      let result: string = await RPCModule.loadExistingWallet(value.uri, value.chain_name);
+      let result: string = await RPCModule.loadExistingWallet(value.uri, value.chainName);
       //console.log(result);
-      if (result && !result.toLowerCase().startsWith('error')) {
-        // here result can have an `error` field for watch-only which is actually OK.
-        const resultJson: RPCSeedType = await JSON.parse(result);
-        if (
-          !resultJson.error ||
-          (resultJson.error && resultJson.error.startsWith('This wallet is watch-only') && this.state.readOnly)
-        ) {
-          // Load the wallet and navigate to the transactions screen
-          //console.log(`wallet loaded ok ${value.uri}`);
-          if (toast) {
-            this.addLastSnackbar({
-              message: `${this.props.translate('loadedapp.readingwallet')} ${value.uri}`,
-              type: 'Primary',
+      if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
+        try {
+          // here result can have an `error` field for watch-only which is actually OK.
+          const resultJson: RPCSeedType = await JSON.parse(result);
+          if (
+            !resultJson.error ||
+            (resultJson.error && resultJson.error.startsWith('This wallet is watch-only') && this.state.readOnly)
+          ) {
+            // Load the wallet and navigate to the ValueTransfers screen
+            //console.log(`wallet loaded ok ${value.uri}`);
+            if (toast) {
+              this.addLastSnackbar({
+                message: `${this.state.translate('loadedapp.readingwallet')} ${value.uri}`,
+              });
+            }
+            await SettingsFileImpl.writeSettings(SettingsNameEnum.server, value);
+            this.setState({
+              server: value,
             });
+            // the server is changed, the App needs to restart the timeout tasks from the beginning
+            await this.rpc.configure();
+            // Refetch the settings to update
+            await this.rpc.fetchWalletSettings();
+            return;
+          } else {
+            error = true;
           }
-          await SettingsFileImpl.writeSettings(name, value);
-          this.setState({
-            server: value,
-          });
-          // the server is changed, the App needs to restart the timeout tasks from the beginning
-          await this.rpc.configure();
-          // Refetch the settings to update
-          await this.rpc.fetchWalletSettings();
-          return;
-        } else {
+        } catch (e) {
+          console.log(result);
           error = true;
         }
       } else {
@@ -980,7 +1133,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
     }
 
-    // if the chain_name id different between server or we cannot open the wallet...
+    // if the chainName id different between server or we cannot open the wallet...
     if (error) {
       // I need to open the modal ASAP.
       if (this.state.readOnly) {
@@ -995,38 +1148,37 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       //console.log(`Error Reading Wallet ${value} - ${error}`);
       if (toast) {
         this.addLastSnackbar({
-          message: `${this.props.translate('loadedapp.readingwallet-error')} ${value.uri}`,
-          type: 'Primary',
+          message: `${this.state.translate('loadedapp.readingwallet-error')} ${value.uri}`,
         });
       }
 
       // we need to restore the old server because the new doesn't have the seed of the current wallet.
-      const old_settings = await SettingsFileImpl.readSettings();
-      await RPCModule.execute('changeserver', old_settings.server.uri);
+      const oldSettings = await SettingsFileImpl.readSettings();
+      await RPCModule.execute(CommandEnum.changeserver, oldSettings.server.uri);
 
       // go to the seed screen for changing the wallet for another in the new server or cancel this action.
       this.fetchWallet();
       this.setState({
         newServer: value as ServerType,
-        server: old_settings.server,
+        server: oldSettings.server,
       });
     }
   };
 
-  set_currency_option = async (name: 'currency', value: string): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  setCurrencyOption = async (value: CurrencyEnum): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, value);
     this.setState({
-      currency: value as 'USD' | '',
+      currency: value as CurrencyEnum,
     });
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
   };
 
-  set_language_option = async (name: 'language', value: string, reset: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  setLanguageOption = async (value: string, reset: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.language, value);
     this.setState({
-      language: value as 'en' | 'es' | 'pt',
+      language: value as LanguageEnum,
     });
 
     // Refetch the settings to update
@@ -1036,8 +1188,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     }
   };
 
-  set_sendAll_option = async (name: 'sendAll', value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  setSendAllOption = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.sendAll, value);
     this.setState({
       sendAll: value as boolean,
     });
@@ -1046,8 +1198,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_privacy_option = async (name: 'privacy', value: boolean): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  setDonationOption = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.donation, value);
+    this.setState({
+      donation: value as boolean,
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
+  setPrivacyOption = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, value);
     this.setState({
       privacy: value as boolean,
     });
@@ -1056,22 +1218,22 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_mode_option = async (name: 'mode', value: string): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  setModeOption = async (value: string): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, value);
     this.setState({
-      mode: value as 'basic' | 'advanced',
-      poolsToShieldSelectSapling: true,
-      poolsToShieldSelectTransparent: true,
+      mode: value as ModeEnum,
+      //poolsToShieldSelectSapling: true,
+      //poolsToShieldSelectTransparent: true,
     });
     // this function change the Theme in the App component.
-    this.props.toggleTheme(value as 'basic' | 'advanced');
+    this.props.toggleTheme(value as ModeEnum);
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
   };
 
-  set_security_option = async (name: 'security', value: SecurityType): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  setSecurityOption = async (value: SecurityType): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.security, value);
     this.setState({
       security: value as SecurityType,
     });
@@ -1080,10 +1242,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     this.rpc.fetchWalletSettings();
   };
 
-  set_selectServer_option = async (name: 'selectServer', value: string): Promise<void> => {
-    await SettingsFileImpl.writeSettings(name, value);
+  setSelectServerOption = async (value: string): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, value);
     this.setState({
-      selectServer: value as 'auto' | 'list' | 'custom',
+      selectServer: value as SelectServerEnum,
+    });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
+  setRescanMenuOption = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenu, value);
+    this.setState({
+      rescanMenu: value as boolean,
     });
 
     // Refetch the settings to update
@@ -1091,17 +1263,17 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   };
 
   navigateToLoadingApp = async (state: any) => {
-    const { navigation } = this.props;
+    const { navigation } = this.state;
 
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
-      await this.set_mode_option('mode', 'advanced');
+      await this.setModeOption(ModeEnum.advanced);
     }
     navigation.reset({
       index: 0,
       routes: [
         {
-          name: 'LoadingApp',
+          name: RouteEnums.LoadingApp,
           params: state,
         },
       ],
@@ -1114,19 +1286,19 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     // if the App is working with a test server
     // no need to do backups of the wallets.
     let resultStr = '';
-    if (server.chain_name === 'main') {
+    if (server.chainName === ChainNameEnum.mainChainName) {
       resultStr = (await this.rpc.changeWallet()) as string;
     } else {
       resultStr = (await this.rpc.changeWalletNoBackup()) as string;
     }
 
     //console.log("jc change", resultStr);
-    if (resultStr.toLowerCase().startsWith('error')) {
+    if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
       //console.log(`Error change wallet. ${resultStr}`);
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
-        this.props.translate('loadedapp.changingwallet-label') as string,
+        this.state.translate('loadedapp.changingwallet-label') as string,
         resultStr,
       );
       return;
@@ -1142,12 +1314,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     const resultStr = (await this.rpc.restoreBackup()) as string;
 
     //console.log("jc restore", resultStr);
-    if (resultStr.toLowerCase().startsWith('error')) {
+    if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
       //console.log(`Error restore backup wallet. ${resultStr}`);
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
-        this.props.translate('loadedapp.restoringwallet-label') as string,
+        this.state.translate('loadedapp.restoringwallet-label') as string,
         resultStr,
       );
       return;
@@ -1162,19 +1334,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
   onClickOKServerWallet = async () => {
     if (this.state.newServer) {
       const beforeServer = this.state.server;
-      const resultStr: string = await RPCModule.execute('changeserver', this.state.newServer.uri);
-      if (resultStr.toLowerCase().startsWith('error')) {
+      const resultStr: string = await RPCModule.execute(CommandEnum.changeserver, this.state.newServer.uri);
+      if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
         //console.log(`Error change server ${value} - ${resultStr}`);
         this.addLastSnackbar({
-          message: `${this.props.translate('loadedapp.changeservernew-error')} ${resultStr}`,
-          type: 'Primary',
+          message: `${this.state.translate('loadedapp.changeservernew-error')} ${resultStr}`,
         });
         return;
       } else {
         //console.log(`change server ok ${value}`);
       }
 
-      await SettingsFileImpl.writeSettings('server', this.state.newServer);
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, this.state.newServer);
       this.setState({
         server: this.state.newServer,
         newServer: {} as ServerType,
@@ -1184,7 +1355,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
       let resultStr2 = '';
       // if the server was testnet or regtest -> no need backup the wallet.
-      if (beforeServer.chain_name === 'main') {
+      if (beforeServer.chainName === ChainNameEnum.mainChainName) {
         // backup
         resultStr2 = (await this.rpc.changeWallet()) as string;
       } else {
@@ -1193,12 +1364,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       }
 
       //console.log("jc change", resultStr);
-      if (resultStr2.toLowerCase().startsWith('error')) {
+      if (resultStr2.toLowerCase().startsWith(GlobalConst.error)) {
         //console.log(`Error change wallet. ${resultStr}`);
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
-          this.props.translate('loadedapp.changingwallet-label') as string,
+          this.state.translate('loadedapp.changingwallet-label') as string,
           resultStr2,
         );
         //return;
@@ -1261,8 +1432,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
           addressBookOpenPriorModal: openModal,
         });
       },
-      Platform.OS === 'ios' ? 100 : 1,
+      Platform.OS === GlobalConst.platformOSios ? 100 : 1,
     );
+  };
+
+  setScrollToTop = (value: boolean) => {
+    this.setState({
+      scrollToTop: value,
+    });
   };
 
   render() {
@@ -1285,9 +1462,59 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
       ufvkServerModalVisible,
       addressBookModalVisible,
       snackbars,
+      isMenuDrawerOpen,
+      mode,
+      valueTransfers,
+      readOnly,
+      totalBalance,
+      translate,
+      scrollToTop,
     } = this.state;
-    const { translate } = this.props;
     const { colors } = this.props.theme;
+
+    const context = {
+      //context
+      navigation: this.state.navigation,
+      netInfo: this.state.netInfo,
+      wallet: this.state.wallet,
+      totalBalance: this.state.totalBalance,
+      addresses: this.state.addresses,
+      valueTransfers: this.state.valueTransfers,
+      walletSettings: this.state.walletSettings,
+      syncingStatus: this.state.syncingStatus,
+      sendProgress: this.state.sendProgress,
+      info: this.state.info,
+      zecPrice: this.state.zecPrice,
+      uaAddress: this.state.uaAddress,
+      sendPageState: this.state.sendPageState,
+      receivePageState: this.state.receivePageState,
+      background: this.state.background,
+      translate: this.state.translate,
+      backgroundError: this.state.backgroundError,
+      setBackgroundError: this.state.setBackgroundError,
+      readOnly: this.state.readOnly,
+      snackbars: this.state.snackbars,
+      addLastSnackbar: this.state.addLastSnackbar,
+      addressBook: this.state.addressBook,
+      launchAddressBook: this.state.launchAddressBook,
+      addressBookCurrentAddress: this.state.addressBookCurrentAddress,
+      addressBookOpenPriorModal: this.state.addressBookOpenPriorModal,
+      shieldingAmount: this.state.shieldingAmount,
+      restartApp: this.state.restartApp,
+      somePending: this.state.somePending,
+
+      // context settings
+      server: this.state.server,
+      currency: this.state.currency,
+      language: this.state.language,
+      sendAll: this.state.sendAll,
+      donation: this.state.donation,
+      privacy: this.state.privacy,
+      mode: this.state.mode,
+      security: this.state.security,
+      selectServer: this.state.selectServer,
+      rescanMenu: this.state.rescanMenu,
+    };
 
     const menu = (
       <Suspense
@@ -1324,11 +1551,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
     //console.log('render LoadedAppClass - 3', translate('version'));
 
     return (
-      <ContextAppLoadedProvider value={this.state}>
-        <SideMenu
-          menu={menu}
-          isOpen={this.state.isMenuDrawerOpen}
-          onChange={(isOpen: boolean) => this.updateMenuState(isOpen)}>
+      <ContextAppLoadedProvider value={context}>
+        <SideMenu menu={menu} isOpen={isMenuDrawerOpen} onChange={(isOpen: boolean) => this.updateMenuState(isOpen)}>
           <Modal
             animationType="slide"
             transparent={false}
@@ -1387,7 +1611,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               }>
               <Pools
                 closeModal={() => this.setState({ poolsModalVisible: false })}
-                set_privacy_option={this.set_privacy_option}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1406,7 +1630,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               <Insight
                 closeModal={() => this.setState({ insightModalVisible: false })}
                 openModal={() => this.setState({ insightModalVisible: true })}
-                set_privacy_option={this.set_privacy_option}
+                setPrivacyOption={this.setPrivacyOption}
                 setSendPageState={this.setSendPageState}
               />
             </Suspense>
@@ -1440,15 +1664,17 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               }>
               <Settings
                 closeModal={() => this.setState({ settingsModalVisible: false })}
-                set_wallet_option={this.set_wallet_option}
-                set_server_option={this.set_server_option}
-                set_currency_option={this.set_currency_option}
-                set_language_option={this.set_language_option}
-                set_sendAll_option={this.set_sendAll_option}
-                set_privacy_option={this.set_privacy_option}
-                set_mode_option={this.set_mode_option}
-                set_security_option={this.set_security_option}
-                set_selectServer_option={this.set_selectServer_option}
+                setWalletOption={this.setWalletOption}
+                setServerOption={this.setServerOption}
+                setCurrencyOption={this.setCurrencyOption}
+                setLanguageOption={this.setLanguageOption}
+                setSendAllOption={this.setSendAllOption}
+                setDonationOption={this.setDonationOption}
+                setPrivacyOption={this.setPrivacyOption}
+                setModeOption={this.setModeOption}
+                setSecurityOption={this.setSecurityOption}
+                setSelectServerOption={this.setSelectServerOption}
+                setRescanMenuOption={this.setRescanMenuOption}
               />
             </Suspense>
           </Modal>
@@ -1467,8 +1693,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               <Seed
                 onClickOK={() => this.setState({ seedViewModalVisible: false })}
                 onClickCancel={() => this.setState({ seedViewModalVisible: false })}
-                action={'view'}
-                set_privacy_option={this.set_privacy_option}
+                action={SeedActionEnum.view}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1487,8 +1713,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               <Seed
                 onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
-                action={'change'}
-                set_privacy_option={this.set_privacy_option}
+                action={SeedActionEnum.change}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1507,8 +1733,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               <Seed
                 onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
-                action={'backup'}
-                set_privacy_option={this.set_privacy_option}
+                action={SeedActionEnum.backup}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1531,8 +1757,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   await this.rpc.configure();
                   this.setState({ seedServerModalVisible: false });
                 }}
-                action={'server'}
-                set_privacy_option={this.set_privacy_option}
+                action={SeedActionEnum.server}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1551,8 +1777,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               <ShowUfvk
                 onClickOK={() => this.setState({ ufvkViewModalVisible: false })}
                 onClickCancel={() => this.setState({ ufvkViewModalVisible: false })}
-                action={'view'}
-                set_privacy_option={this.set_privacy_option}
+                action={UfvkActionEnum.view}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1571,8 +1797,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               <ShowUfvk
                 onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ ufvkChangeModalVisible: false })}
-                action={'change'}
-                set_privacy_option={this.set_privacy_option}
+                action={UfvkActionEnum.change}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1591,8 +1817,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
               <ShowUfvk
                 onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ ufvkBackupModalVisible: false })}
-                action={'backup'}
-                set_privacy_option={this.set_privacy_option}
+                action={UfvkActionEnum.backup}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1615,8 +1841,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                   await this.rpc.configure();
                   this.setState({ ufvkServerModalVisible: false });
                 }}
-                action={'server'}
-                set_privacy_option={this.set_privacy_option}
+                action={UfvkActionEnum.server}
+                setPrivacyOption={this.setPrivacyOption}
               />
             </Suspense>
           </Modal>
@@ -1669,14 +1895,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
 
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
-          {this.state.mode !== 'basic' ||
-          (this.state.mode === 'basic' &&
-            (!(this.state.mode === 'basic' && this.state.transactions.length <= 0) ||
-              (!this.state.readOnly &&
-                !(
-                  this.state.mode === 'basic' &&
-                  this.state.totalBalance.spendableOrchard + this.state.totalBalance.spendablePrivate <= 0
-                )))) ? (
+          {mode !== ModeEnum.basic ||
+          (mode === ModeEnum.basic &&
+            (!(mode === ModeEnum.basic && valueTransfers.length <= 0) ||
+              (!readOnly &&
+                !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0)))) ? (
             <Tab.Navigator
               initialRouteName={translate('loadedapp.wallet-menu') as string}
               screenOptions={({ route }) => ({
@@ -1702,6 +1925,19 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                           <Text>{translate('loading') as string}</Text>
                         </View>
                       }>
+                      {/*<History
+                        doRefresh={this.doRefresh}
+                        toggleMenuDrawer={this.toggleMenuDrawer}
+                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                        setZecPrice={this.setZecPrice}
+                        setComputingModalVisible={this.setComputingModalVisible}
+                        setPrivacyOption={this.setPrivacyOption}
+                        setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                        setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                        setSendPageState={this.setSendPageState}
+                      />*/}
                       <History
                         doRefresh={this.doRefresh}
                         toggleMenuDrawer={this.toggleMenuDrawer}
@@ -1709,21 +1945,19 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                         poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                         setZecPrice={this.setZecPrice}
                         setComputingModalVisible={this.setComputingModalVisible}
-                        set_privacy_option={this.set_privacy_option}
-                        setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                        setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                        setPrivacyOption={this.setPrivacyOption}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                         setSendPageState={this.setSendPageState}
+                        setShieldingAmount={this.setShieldingAmount}
+                        setScrollToTop={this.setScrollToTop}
+                        scrollToTop={scrollToTop}
                       />
                     </Suspense>
                   </>
                 )}
               </Tab.Screen>
-              {!this.state.readOnly &&
-                !(
-                  this.state.mode === 'basic' &&
-                  this.state.totalBalance.spendableOrchard + this.state.totalBalance.spendablePrivate <= 0
-                ) && (
+              {!readOnly &&
+                !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
                   <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                     {() => (
                       <>
@@ -1733,6 +1967,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                               <Text>{translate('loading') as string}</Text>
                             </View>
                           }>
+                          {/*<Send
+                            setSendPageState={this.setSendPageState}
+                            sendTransaction={this.sendTransaction}
+                            clearToAddr={this.clearToAddr}
+                            setSendProgress={this.setSendProgress}
+                            toggleMenuDrawer={this.toggleMenuDrawer}
+                            syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                            poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                            setZecPrice={this.setZecPrice}
+                            setComputingModalVisible={this.setComputingModalVisible}
+                            setPrivacyOption={this.setPrivacyOption}
+                            setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                            setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                          />*/}
                           <Send
                             setSendPageState={this.setSendPageState}
                             sendTransaction={this.sendTransaction}
@@ -1743,9 +1991,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                             poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
                             setZecPrice={this.setZecPrice}
                             setComputingModalVisible={this.setComputingModalVisible}
-                            set_privacy_option={this.set_privacy_option}
-                            setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                            setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                            setPrivacyOption={this.setPrivacyOption}
+                            setShieldingAmount={this.setShieldingAmount}
+                            setScrollToTop={this.setScrollToTop}
                           />
                         </Suspense>
                       </>
@@ -1765,7 +2013,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                         setUaAddress={this.setUaAddress}
                         toggleMenuDrawer={this.toggleMenuDrawer}
                         syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        set_privacy_option={this.set_privacy_option}
+                        setPrivacyOption={this.setPrivacyOption}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                       />
                     </Suspense>
@@ -1797,7 +2045,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, AppStateLoade
                         setUaAddress={this.setUaAddress}
                         toggleMenuDrawer={this.toggleMenuDrawer}
                         syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        set_privacy_option={this.set_privacy_option}
+                        setPrivacyOption={this.setPrivacyOption}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                       />
                     </Suspense>

@@ -1,0 +1,74 @@
+name: IOS Integration test
+
+on:
+  workflow_call:
+    inputs:
+      timestamp:
+        required: true
+        type: string
+      cache-key:
+        required: true
+        type: string
+    
+env:
+  CACHE-KEY: ${{ inputs.cache-key }}
+  TIMESTAMP: ${{ inputs.timestamp }}
+  REPO-OWNER: ${{ github.repository_owner }}
+
+jobs:
+  ios-integration-test:
+    name: IOS Integration test
+    runs-on: macos-13
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+            
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+
+      - name: Install nvm with node 20.9.0
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+          nvm install 20.9.0
+          nvm use 20.9.0
+
+      - name: Native rust cache
+        uses: actions/cache/restore@v4
+        with:
+          path: rust/lib/Generated
+          key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Copy libs to ios folder
+        working-directory: rust/lib/Generated
+        run: |
+          cp ./*.* ../../../ios
+
+      - name: Yarn
+        run: |
+          yarn
+
+      - name: Pod Install
+        working-directory: ios
+        run: |
+          pod install
+
+      - name: Run integration tests
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          command: |
+            cd ios
+            xcodebuild test \
+              -workspace ZingoMobile.xcworkspace \
+              -scheme ZingoMobile \
+              -sdk iphonesimulator \
+              -configuration Debug \
+              -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2'

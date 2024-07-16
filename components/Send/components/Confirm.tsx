@@ -18,22 +18,40 @@ import simpleBiometrics from '../../../app/simpleBiometrics';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+
 import { ThemeType } from '../../../app/types';
 import RPC from '../../../app/rpc';
+import Utils from '../../../app/utils';
+import { ButtonTypeEnum, CommandEnum, PrivacyLevelFromEnum, GlobalConst } from '../../../app/AppState';
+import { CurrencyEnum } from '../../../app/AppState';
+import { RPCAdressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
+import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
+import { RPCParseStatusEnum } from '../../../app/rpc/enums/RPCParseStatusEnum';
 
 type ConfirmProps = {
-  defaultFee: number;
+  calculatedFee: number;
+  donationAmount: number;
   closeModal: () => void;
   openModal: () => void;
   confirmSend: () => void;
   sendAllAmount: boolean;
+  calculateFeeWithPropose: (
+    amount: string,
+    address: string,
+    memo: string,
+    includeUAMemo: boolean,
+    command: CommandEnum.send | CommandEnum.sendall,
+  ) => Promise<void>;
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
   closeModal,
   confirmSend,
-  defaultFee,
+  calculatedFee,
+  donationAmount,
   sendAllAmount,
   openModal,
+  calculateFeeWithPropose,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -57,32 +75,50 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const [privacyLevel, setPrivacyLevel] = useState<string>('-');
   const [sendingTotal, setSendingTotal] = useState<number>(0);
 
+  const memoTotal: string = `${sendPageState.toaddr.memo || ''}${
+    sendPageState.toaddr.includeUAMemo ? '\nReply to: \n' + uaAddress : ''
+  }`;
+
   const getPrivacyLevel = useCallback(async () => {
     if (!netInfo.isConnected) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return '-';
     }
 
-    let from: 'orchard' | 'orchard+sapling' | 'sapling' | '' = '';
+    let from: PrivacyLevelFromEnum = PrivacyLevelFromEnum.nonePrivacyLevel;
+    const totalAmount: number = Utils.parseStringLocaleToNumberFloat(
+      Utils.parseNumberFloatToStringLocale(
+        Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee,
+        8,
+      ),
+    );
+
+    const totalSpendable: number = Utils.parseStringLocaleToNumberFloat(
+      Utils.parseNumberFloatToStringLocale(totalBalance.spendableOrchard + totalBalance.spendablePrivate, 8),
+    );
+
+    console.log('total', totalAmount);
+    console.log('orchard', totalBalance.spendableOrchard);
+    console.log('sapling', totalBalance.spendablePrivate);
+
     // amount + fee
-    if (Number(sendPageState.toaddr.amount) + defaultFee <= totalBalance.spendableOrchard) {
-      from = 'orchard';
-    } else if (
-      totalBalance.spendableOrchard > 0 &&
-      Number(sendPageState.toaddr.amount) + defaultFee <= totalBalance.spendableOrchard + totalBalance.spendablePrivate
-    ) {
-      from = 'orchard+sapling';
-    } else if (Number(sendPageState.toaddr.amount) + defaultFee <= totalBalance.spendablePrivate) {
-      from = 'sapling';
+    if (totalAmount <= totalBalance.spendableOrchard) {
+      from = PrivacyLevelFromEnum.orchardPrivacyLevel;
+    } else if (totalBalance.spendableOrchard > 0 && totalAmount <= totalSpendable) {
+      from = PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel;
+    } else if (totalAmount <= totalBalance.spendablePrivate) {
+      from = PrivacyLevelFromEnum.saplingPrivacyLevel;
     }
 
-    if (from === '') {
+    console.log(from);
+
+    if (from === PrivacyLevelFromEnum.nonePrivacyLevel) {
       return '-';
     }
 
-    const result: string = await RPCModule.execute('parse_address', sendPageState.toaddr.to);
+    const result: string = await RPCModule.execute(CommandEnum.parseAddress, sendPageState.toaddr.to);
     if (result) {
-      if (result.toLowerCase().startsWith('error') || result.toLowerCase() === 'null') {
+      if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
         return '-';
       }
     } else {
@@ -92,12 +128,13 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     try {
       resultJSON = await JSON.parse(result);
     } catch (e) {
+      //console.log(e);
       return '-';
     }
 
-    //console.log('parse-address', address, resultJSON.status === 'success');
+    //console.log('parse-address', sendPageState.toaddr.to, resultJSON.status === RPCParseStatusEnum.successParse);
 
-    if (resultJSON.status !== 'success' || resultJSON.chain_name !== server.chain_name) {
+    if (resultJSON.status !== RPCParseStatusEnum.successParse || resultJSON.chain_name !== server.chainName) {
       return '-';
     }
 
@@ -105,38 +142,39 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
     // Private -> orchard to orchard (UA with orchard receiver)
     if (
-      from === 'orchard' &&
-      resultJSON.address_kind === 'unified' &&
-      resultJSON.receivers_available?.includes('orchard')
+      from === PrivacyLevelFromEnum.orchardPrivacyLevel &&
+      resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)
     ) {
       return translate('send.private') as string;
     }
 
     // Private -> sapling to sapling (ZA or UA with sapling receiver and NO orchard receiver)
     if (
-      from === 'sapling' &&
-      (resultJSON.address_kind === 'sapling' ||
-        (resultJSON.address_kind === 'unified' &&
-          resultJSON.receivers_available?.includes('sapling') &&
-          !resultJSON.receivers_available?.includes('orchard')))
+      from === PrivacyLevelFromEnum.saplingPrivacyLevel &&
+      (resultJSON.address_kind === RPCAdressKindEnum.saplingAddressKind ||
+        (resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+          resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver) &&
+          !resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)))
     ) {
       return translate('send.private') as string;
     }
 
     // Amount Revealed -> orchard to sapling (ZA or UA with sapling receiver)
     if (
-      from === 'orchard' &&
-      (resultJSON.address_kind === 'sapling' ||
-        (resultJSON.address_kind === 'unified' && resultJSON.receivers_available?.includes('sapling')))
+      from === PrivacyLevelFromEnum.orchardPrivacyLevel &&
+      (resultJSON.address_kind === RPCAdressKindEnum.saplingAddressKind ||
+        (resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+          resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver)))
     ) {
       return translate('send.amountrevealed') as string;
     }
 
     // Amount Revealed -> sapling to orchard (UA with orchard receiver)
     if (
-      from === 'sapling' &&
-      resultJSON.address_kind === 'unified' &&
-      resultJSON.receivers_available?.includes('orchard')
+      from === PrivacyLevelFromEnum.saplingPrivacyLevel &&
+      resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)
     ) {
       return translate('send.amountrevealed') as string;
     }
@@ -144,18 +182,21 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Amount Revealed -> sapling+orchard to orchard or sapling (UA with orchard receiver or ZA or
     // UA with sapling receiver)
     if (
-      from === 'orchard+sapling' &&
-      (resultJSON.address_kind === 'sapling' ||
-        (resultJSON.address_kind === 'unified' &&
-          (resultJSON.receivers_available?.includes('orchard') || resultJSON.receivers_available?.includes('sapling'))))
+      from === PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel &&
+      (resultJSON.address_kind === RPCAdressKindEnum.saplingAddressKind ||
+        (resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+          (resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver) ||
+            resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver))))
     ) {
       return translate('send.amountrevealed') as string;
     }
 
     // Deshielded -> orchard or sapling or orchard+sapling to transparent
     if (
-      (from === 'orchard' || from === 'sapling' || from === 'orchard+sapling') &&
-      resultJSON.address_kind === 'transparent'
+      (from === PrivacyLevelFromEnum.orchardPrivacyLevel ||
+        from === PrivacyLevelFromEnum.saplingPrivacyLevel ||
+        from === PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel) &&
+      resultJSON.address_kind === RPCAdressKindEnum.transparentAddressKind
     ) {
       return translate('send.deshielded') as string;
     }
@@ -164,11 +205,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     return '-';
   }, [
     addLastSnackbar,
-    defaultFee,
+    calculatedFee,
     netInfo.isConnected,
     sendPageState.toaddr.amount,
     sendPageState.toaddr.to,
-    server.chain_name,
+    server.chainName,
     totalBalance.spendableOrchard,
     totalBalance.spendablePrivate,
     translate,
@@ -180,19 +221,20 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // - true      -> the user do pass the authentication
     // - false     -> the user do NOT pass the authentication
     // - undefined -> no biometric authentication available -> Passcode.
-    console.log('BIOMETRIC --------> ', resultBio);
+    //console.log('BIOMETRIC --------> ', resultBio);
     if (resultBio === false) {
       // snack with Error
-      addLastSnackbar({ message: translate('biometrics-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('biometrics-error') as string });
     } else {
       confirmSend();
     }
   };
 
   useEffect(() => {
-    const sendingTot = Number(sendPageState.toaddr.amount) + defaultFee;
+    const sendingTot =
+      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee + donationAmount;
     setSendingTotal(sendingTot);
-  }, [defaultFee, sendPageState.toaddr.amount]);
+  }, [calculatedFee, donationAmount, sendPageState.toaddr.amount]);
 
   useEffect(() => {
     (async () => {
@@ -202,10 +244,21 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
   // the App is about to send - activate the interrupt syncing flag
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch('true'))();
+    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true))();
   }, []);
 
-  //console.log(sendPageState, price, defaultFee);
+  useEffect(() => {
+    calculateFeeWithPropose(
+      sendPageState.toaddr.amount,
+      sendPageState.toaddr.to,
+      sendPageState.toaddr.memo,
+      sendPageState.toaddr.includeUAMemo,
+      CommandEnum.send,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  //console.log(sendPageState, calculatedFee, Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount));
 
   return (
     <SafeAreaView
@@ -248,13 +301,13 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           </BoldText>
 
           <ZecAmount
-            currencyName={info.currencyName ? info.currencyName : ''}
+            currencyName={info.currencyName}
             amtZec={sendingTotal}
-            privacy={privacy}
+            privacy={false}
             size={36}
             smallPrefix={true}
           />
-          <CurrencyAmount amtZec={sendingTotal} price={zecPrice.zecPrice} currency={currency} privacy={privacy} />
+          <CurrencyAmount amtZec={sendingTotal} price={zecPrice.zecPrice} currency={currency} privacy={false} />
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <View style={{ marginHorizontal: 10 }}>
@@ -263,19 +316,14 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           </View>
           <View style={{ margin: 10 }}>
             <FadeText>{translate('send.fee') as string}</FadeText>
-            <ZecAmount
-              currencyName={info.currencyName ? info.currencyName : ''}
-              size={18}
-              amtZec={defaultFee}
-              privacy={privacy}
-            />
+            <ZecAmount currencyName={info.currencyName} size={18} amtZec={calculatedFee} privacy={privacy} />
           </View>
-          {!!currency && (
+          {currency === CurrencyEnum.USDCurrency && (
             <View style={{ margin: 10, alignItems: 'flex-end' }}>
               <FadeText style={{ opacity: 0 }}>{translate('send.fee') as string}</FadeText>
               <CurrencyAmount
                 style={{ fontSize: 18 }}
-                amtZec={defaultFee}
+                amtZec={calculatedFee}
                 price={zecPrice.zecPrice}
                 currency={currency}
                 privacy={privacy}
@@ -290,6 +338,27 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               <FadeText>{translate('send.to') as string}</FadeText>
               <AddressItem address={to.to} withIcon={true} closeModal={closeModal} openModal={openModal} />
 
+              {donationAmount > 0 && (
+                <>
+                  <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-donation') as string}</FadeText>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}>
+                    <ZecAmount currencyName={info.currencyName} size={18} amtZec={donationAmount} privacy={privacy} />
+                    <CurrencyAmount
+                      style={{ fontSize: 18 }}
+                      amtZec={donationAmount}
+                      price={zecPrice.zecPrice}
+                      currency={currency}
+                      privacy={privacy}
+                    />
+                  </View>
+                </>
+              )}
+
               <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-amount') as string}</FadeText>
               <View
                 style={{
@@ -298,14 +367,14 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   justifyContent: 'space-between',
                 }}>
                 <ZecAmount
-                  currencyName={info.currencyName ? info.currencyName : ''}
+                  currencyName={info.currencyName}
                   size={18}
-                  amtZec={Number(to.amount)}
+                  amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                   privacy={privacy}
                 />
                 <CurrencyAmount
                   style={{ fontSize: 18 }}
-                  amtZec={Number(to.amount)}
+                  amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
                   price={zecPrice.zecPrice}
                   currency={currency}
                   privacy={privacy}
@@ -314,9 +383,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               {!!to.memo && (
                 <>
                   <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo') as string}</FadeText>
-                  <RegText testID="send.confirm-memo">
-                    {`${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`}
-                  </RegText>
+                  <RegText testID="send.confirm-memo">{memoTotal}</RegText>
                 </>
               )}
             </View>
@@ -334,12 +401,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         }}>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <Button
-            type="Primary"
+            type={ButtonTypeEnum.Primary}
             title={sendAllAmount ? (translate('send.confirm-button-all') as string) : (translate('confirm') as string)}
             onPress={() => confirmSendBiometrics()}
           />
           <Button
-            type="Secondary"
+            type={ButtonTypeEnum.Secondary}
             style={{ marginLeft: 20 }}
             title={translate('cancel') as string}
             onPress={closeModal}

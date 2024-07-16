@@ -29,9 +29,9 @@ export default class BackgroundFileImpl {
 
     try {
       const rStr = (await RNFS.readFile(fileName, 'utf8')).toString();
-      console.log('background string', rStr);
+      //console.log('background string', rStr);
       const r = JSON.parse(rStr) as BackgroundType;
-      console.log('background json', r);
+      //console.log('background json', r);
       return r;
     } catch (err) {
       // File probably doesn't exist, so return nothing

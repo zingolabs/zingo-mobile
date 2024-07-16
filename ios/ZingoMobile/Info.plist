@@ -12,7 +12,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Zingo!</string>
+	<string>Zingo</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -63,8 +63,6 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Zingo needs access to the camera to scan address QRCodes</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -92,6 +90,6 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Allow Zingo! to use FaceID to improve the security and privacy?</string>
+	<string>Allow Zingo to use FaceID to improve the security and privacy?</string>
 </dict>
 </plist>

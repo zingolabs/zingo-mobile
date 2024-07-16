@@ -55,6 +55,23 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
         }
       >
         <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -94,6 +111,23 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
       </View>
     </View>
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -133,6 +167,23 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
       />
     </View>
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -225,7 +276,19 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
       <View
         accessibilityState={
           {
+            "busy": undefined,
+            "checked": undefined,
             "disabled": true,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
           }
         }
         accessible={true}
@@ -363,6 +426,78 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
         </View>
       </View>
     </View>
+    <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "opacity": 1,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "rgb(255, 255, 255)",
+            "borderRadius": 10,
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "marginLeft": 5,
+            "minHeight": 25,
+            "minWidth": 25,
+            "padding": 0,
+          }
+        }
+      >
+        <
+          color="rgb(0, 122, 255)"
+          icon={
+            {
+              "icon": [
+                512,
+                512,
+                [
+                  "info-circle",
+                ],
+                "f05a",
+                "M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z",
+              ],
+              "iconName": "circle-info",
+              "prefix": "fas",
+            }
+          }
+          size={25}
+        />
+      </View>
+    </View>
   </View>
   <View
     style={
@@ -386,7 +521,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           "paddingHorizontal": 5,
         }
       }
-      testID="transaction text"
+      testID="ValueTransfer text"
     >
       title
     </Text>
@@ -411,6 +546,23 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
     >
       <View
         accessibilityLabel="text translated"
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
         accessible={true}
         collapsable={false}
         focusable={true}

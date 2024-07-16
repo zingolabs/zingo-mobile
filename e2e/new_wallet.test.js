@@ -9,7 +9,7 @@ describe('New Wallet', () => {
     // For some reason, the element that says 'ZEC', according to react,
     // has text of ' ---'
     // let zecText = element(by.text(" ---")).atIndex(1);
-    let text = element(by.id('transaction text'));
+    let text = element(by.id('ValueTransfer text'));
     let attributes = await text.getAttributes();
     log.info(attributes);
     log.info('Value:', attributes.value);

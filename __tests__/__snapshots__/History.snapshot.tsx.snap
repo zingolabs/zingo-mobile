@@ -24,7 +24,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "rgb(255, 255, 255)",
+        "backgroundColor": "#011401",
         "display": "flex",
         "paddingBottom": 0,
         "paddingTop": 10,
@@ -51,7 +51,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         style={
           {
             "alignItems": "center",
-            "borderColor": undefined,
+            "borderColor": "#5a8c5a",
             "borderRadius": 10,
             "borderWidth": 1,
             "justifyContent": "center",
@@ -74,6 +74,23 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           }
         >
           <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -91,6 +108,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             }
           >
             <
+              color="#5a8c5a"
               icon={
                 {
                   "icon": [
@@ -113,6 +131,23 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         </View>
       </View>
       <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
         accessible={true}
         collapsable={false}
         focusable={true}
@@ -152,6 +187,23 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         />
       </View>
       <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
         accessible={true}
         collapsable={false}
         focusable={true}
@@ -182,7 +234,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             style={
               {
                 "alignItems": "center",
-                "borderColor": "rgb(0, 122, 255)",
+                "borderColor": "#18bd18",
                 "borderRadius": 5,
                 "borderWidth": 2,
                 "flexDirection": "row",
@@ -194,7 +246,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             <Text
               style={
                 {
-                  "color": "rgb(216, 216, 216)",
+                  "color": "#ffffff",
                   "fontSize": 13,
                   "marginRight": 5,
                 }
@@ -203,7 +255,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               text translated
             </Text>
             <
-              color="rgb(0, 122, 255)"
+              color="#18bd18"
               icon={
                 {
                   "icon": [
@@ -247,7 +299,19 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         <View
           accessibilityState={
             {
+              "busy": undefined,
+              "checked": undefined,
               "disabled": false,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
             }
           }
           accessible={true}
@@ -280,7 +344,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               align="xMidYMid"
               bbHeight="25.2"
               bbWidth="50.4"
-              fill="rgb(28, 28, 30)"
+              fill="#c3c3c3"
               focusable={false}
               height={25.2}
               meetOrSlice={0}
@@ -315,7 +379,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               <RNSVGGroup
                 fill={
                   {
-                    "payload": 4280032286,
+                    "payload": 4291019715,
                     "type": 0,
                   }
                 }
@@ -357,7 +421,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 36,
                   "fontWeight": "700",
                   "margin": 0,
@@ -368,6 +432,78 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                -.----
             </Text>
           </View>
+        </View>
+      </View>
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "backgroundColor": "#011401",
+              "borderRadius": 10,
+              "display": "flex",
+              "flexDirection": "row",
+              "justifyContent": "center",
+              "margin": 0,
+              "marginLeft": 5,
+              "minHeight": 25,
+              "minWidth": 25,
+              "padding": 0,
+            }
+          }
+        >
+          <
+            color="#18bd18"
+            icon={
+              {
+                "icon": [
+                  512,
+                  512,
+                  [
+                    "info-circle",
+                  ],
+                  "f05a",
+                  "M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z",
+                ],
+                "iconName": "circle-info",
+                "prefix": "fas",
+              }
+            }
+            size={25}
+          />
         </View>
       </View>
     </View>
@@ -390,7 +526,19 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         <View
           accessibilityState={
             {
+              "busy": undefined,
+              "checked": undefined,
               "disabled": false,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
             }
           }
           accessible={true}
@@ -420,7 +568,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             <Text
               style={
                 {
-                  "color": undefined,
+                  "color": "#ffffff",
                   "fontSize": 20,
                   "marginBottom": 5,
                   "marginTop": 0,
@@ -432,7 +580,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             <Text
               style={
                 {
-                  "color": undefined,
+                  "color": "#ffffff",
                   "fontSize": 20,
                   "fontWeight": "700",
                   "marginBottom": 5,
@@ -455,7 +603,19 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         <View
           accessibilityState={
             {
+              "busy": undefined,
+              "checked": undefined,
               "disabled": false,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
             }
           }
           accessible={true}
@@ -478,7 +638,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             style={
               {
                 "alignItems": "center",
-                "backgroundColor": "rgb(255, 255, 255)",
+                "backgroundColor": "#011401",
                 "borderRadius": 10,
                 "flexDirection": "row",
                 "justifyContent": "center",
@@ -490,7 +650,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             }
           >
             <
-              color="rgb(0, 122, 255)"
+              color="#18bd18"
               icon={
                 {
                   "icon": [
@@ -528,7 +688,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "marginBottom": 3,
@@ -536,7 +696,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "paddingHorizontal": 5,
           }
         }
-        testID="transaction text"
+        testID="ValueTransfer text"
       >
         text translated
       </Text>
@@ -561,6 +721,23 @@ exports[`Component History - test History currency USD, privacy high & mode adva
       >
         <View
           accessibilityLabel="text translated"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -580,7 +757,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           testID="header.drawmenu"
         >
           <
-            color="rgb(216, 216, 216)"
+            color="#ffffff"
             icon={
               {
                 "icon": [
@@ -630,7 +807,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
@@ -640,14 +817,30 @@ exports[`Component History - test History currency USD, privacy high & mode adva
   <RCTScrollView
     accessibilityLabel="text translated"
     accessible={true}
+    onScroll={[Function]}
     refreshControl={
       <RefreshControlMock
-        onRefresh={[MockFunction]}
+        onRefresh={
+          [MockFunction] {
+            "calls": [
+              [
+                0,
+              ],
+            ],
+            "results": [
+              {
+                "type": "return",
+                "value": undefined,
+              },
+            ],
+          }
+        }
         refreshing={false}
-        tintColor="rgb(28, 28, 30)"
+        tintColor="#c3c3c3"
         title="text translated"
       />
     }
+    scrollEventThrottle={100}
     style={
       {
         "flexGrow": 1,
@@ -665,14 +858,14 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "flexDirection": "column",
           }
         }
-        testID="transactionList.1"
+        testID="valueTransferList.1"
       >
         <View
           style={
             {
-              "backgroundColor": "rgb(242, 242, 242)",
+              "backgroundColor": "#011401",
               "borderBottomWidth": 1,
-              "borderColor": "rgb(255, 255, 255)",
+              "borderColor": "#011401",
               "borderTopWidth": 1,
               "paddingBottom": 5,
               "paddingLeft": 15,
@@ -683,7 +876,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -697,41 +890,17 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           <View
             style={
               {
-                "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "alignItems": "center",
+                "borderBottomColor": "#ffffff",
+                "borderBottomWidth": 1.5,
+                "borderStyle": "solid",
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
-                "paddingBottom": 15,
+                "paddingBottom": 10,
               }
             }
           >
-            <
-              color="rgb(28, 28, 30)"
-              icon={
-                {
-                  "icon": [
-                    384,
-                    512,
-                    [
-                      8593,
-                    ],
-                    "f062",
-                    "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
-                  ],
-                  "iconName": "arrow-up",
-                  "prefix": "fas",
-                }
-              }
-              size={24}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 5,
-                  "marginTop": 5,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -739,29 +908,54 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 }
               }
             >
-              <Text
-                style={
+              <
+                color="#18bd18"
+                icon={
                   {
-                    "color": "rgb(28, 28, 30)",
-                    "fontSize": 18,
-                    "opacity": 0.65,
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8595,
+                      ],
+                      "f063",
+                      "M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z",
+                    ],
+                    "iconName": "arrow-down",
+                    "prefix": "fas",
                   }
                 }
-              >
-                sent-tx...4567890
-              </Text>
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
               <View
                 style={
                   {
+                    "alignItems": "flex-start",
                     "display": "flex",
-                    "flexDirection": "row",
+                    "flexDirection": "column",
                   }
                 }
               >
                 <Text
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
+                      "color": "#18bd18",
+                      "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
                     }
@@ -769,22 +963,32 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 >
                   text translated
                 </Text>
-                <Text
+                <View
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
-                      "opacity": 0.65,
+                      "alignItems": "center",
+                      "display": "flex",
+                      "flexDirection": "row",
                     }
                   }
                 >
-                  Dec 13, 8:00 am
-                </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "opacity": 0.65,
+                      }
+                    }
+                  >
+                    Dec 13, 8:00 am
+                  </Text>
+                </View>
               </View>
             </View>
             <View
               style={
                 {
-                  "alignSelf": "baseline",
+                  "alignSelf": "auto",
                   "flexDirection": "row",
                   "flexGrow": 1,
                   "justifyContent": "flex-end",
@@ -796,7 +1000,19 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               <View
                 accessibilityState={
                   {
+                    "busy": undefined,
+                    "checked": undefined,
                     "disabled": false,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
                   }
                 }
                 accessible={true}
@@ -829,7 +1045,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(28, 28, 30)"
+                    fill="#18bd18"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -864,7 +1080,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4280032286,
+                          "payload": 4279811352,
                           "type": 0,
                         }
                       }
@@ -906,7 +1122,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#18bd18",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -929,7 +1145,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "flexDirection": "column",
           }
         }
-        testID="transactionList.2"
+        testID="valueTransferList.2"
       >
         <View
           onPress={[Function]}
@@ -937,41 +1153,17 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           <View
             style={
               {
-                "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "alignItems": "center",
+                "borderBottomColor": "#ffffff",
+                "borderBottomWidth": 1.5,
+                "borderStyle": "solid",
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
-                "paddingBottom": 15,
+                "paddingBottom": 10,
               }
             }
           >
-            <
-              color="rgb(28, 28, 30)"
-              icon={
-                {
-                  "icon": [
-                    384,
-                    512,
-                    [
-                      8593,
-                    ],
-                    "f062",
-                    "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
-                  ],
-                  "iconName": "arrow-up",
-                  "prefix": "fas",
-                }
-              }
-              size={24}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 5,
-                  "marginTop": 5,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -979,29 +1171,54 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 }
               }
             >
-              <Text
-                style={
+              <
+                color="#18bd18"
+                icon={
                   {
-                    "color": "rgb(28, 28, 30)",
-                    "fontSize": 18,
-                    "opacity": 0.65,
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8595,
+                      ],
+                      "f063",
+                      "M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z",
+                    ],
+                    "iconName": "arrow-down",
+                    "prefix": "fas",
                   }
                 }
-              >
-                sendtos...4567890
-              </Text>
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
               <View
                 style={
                   {
+                    "alignItems": "flex-start",
                     "display": "flex",
-                    "flexDirection": "row",
+                    "flexDirection": "column",
                   }
                 }
               >
                 <Text
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
+                      "color": "#18bd18",
+                      "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
                     }
@@ -1009,22 +1226,57 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 >
                   text translated
                 </Text>
-                <Text
+                <View
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
-                      "opacity": 0.65,
+                      "alignItems": "center",
+                      "display": "flex",
+                      "flexDirection": "row",
                     }
                   }
                 >
-                  Dec 13, 8:00 am
-                </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "opacity": 0.65,
+                      }
+                    }
+                  >
+                    Dec 13, 8:00 am
+                  </Text>
+                  <
+                    color="#5a8c5a"
+                    icon={
+                      {
+                        "icon": [
+                          512,
+                          512,
+                          [
+                            128489,
+                            61669,
+                          ],
+                          "f075",
+                          "M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z",
+                        ],
+                        "iconName": "comment",
+                        "prefix": "fas",
+                      }
+                    }
+                    size={15}
+                    style={
+                      {
+                        "marginLeft": 10,
+                      }
+                    }
+                  />
+                </View>
               </View>
             </View>
             <View
               style={
                 {
-                  "alignSelf": "baseline",
+                  "alignSelf": "auto",
                   "flexDirection": "row",
                   "flexGrow": 1,
                   "justifyContent": "flex-end",
@@ -1036,7 +1288,19 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               <View
                 accessibilityState={
                   {
+                    "busy": undefined,
+                    "checked": undefined,
                     "disabled": false,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
                   }
                 }
                 accessible={true}
@@ -1069,7 +1333,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(28, 28, 30)"
+                    fill="#18bd18"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -1104,7 +1368,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4280032286,
+                          "payload": 4279811352,
                           "type": 0,
                         }
                       }
@@ -1146,7 +1410,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#18bd18",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -1169,7 +1433,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "flexDirection": "column",
           }
         }
-        testID="transactionList.3"
+        testID="valueTransferList.3"
       >
         <View
           onPress={[Function]}
@@ -1177,41 +1441,17 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           <View
             style={
               {
-                "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "alignItems": "center",
+                "borderBottomColor": "#ffffff",
+                "borderBottomWidth": 1.5,
+                "borderStyle": "solid",
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
-                "paddingBottom": 15,
+                "paddingBottom": 10,
               }
             }
           >
-            <
-              color="rgb(0, 122, 255)"
-              icon={
-                {
-                  "icon": [
-                    384,
-                    512,
-                    [
-                      8595,
-                    ],
-                    "f063",
-                    "M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z",
-                  ],
-                  "iconName": "arrow-down",
-                  "prefix": "fas",
-                }
-              }
-              size={24}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 5,
-                  "marginTop": 5,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -1219,29 +1459,54 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 }
               }
             >
-              <Text
-                style={
+              <
+                color="#c3c3c3"
+                icon={
                   {
-                    "color": "rgb(28, 28, 30)",
-                    "fontSize": 18,
-                    "opacity": 0.65,
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8593,
+                      ],
+                      "f062",
+                      "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
+                    ],
+                    "iconName": "arrow-up",
+                    "prefix": "fas",
                   }
                 }
-              >
-                receive...4567890
-              </Text>
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
               <View
                 style={
                   {
+                    "alignItems": "flex-start",
                     "display": "flex",
-                    "flexDirection": "row",
+                    "flexDirection": "column",
                   }
                 }
               >
                 <Text
                   style={
                     {
-                      "color": "rgb(0, 122, 255)",
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
                     }
@@ -1249,22 +1514,57 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 >
                   text translated
                 </Text>
-                <Text
+                <View
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
-                      "opacity": 0.65,
+                      "alignItems": "center",
+                      "display": "flex",
+                      "flexDirection": "row",
                     }
                   }
                 >
-                  Dec 13, 8:00 am
-                </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "opacity": 0.65,
+                      }
+                    }
+                  >
+                    Dec 13, 8:00 am
+                  </Text>
+                  <
+                    color="#5a8c5a"
+                    icon={
+                      {
+                        "icon": [
+                          512,
+                          512,
+                          [
+                            128489,
+                            61669,
+                          ],
+                          "f075",
+                          "M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z",
+                        ],
+                        "iconName": "comment",
+                        "prefix": "fas",
+                      }
+                    }
+                    size={15}
+                    style={
+                      {
+                        "marginLeft": 10,
+                      }
+                    }
+                  />
+                </View>
               </View>
             </View>
             <View
               style={
                 {
-                  "alignSelf": "baseline",
+                  "alignSelf": "auto",
                   "flexDirection": "row",
                   "flexGrow": 1,
                   "justifyContent": "flex-end",
@@ -1276,7 +1576,19 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               <View
                 accessibilityState={
                   {
+                    "busy": undefined,
+                    "checked": undefined,
                     "disabled": false,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
                   }
                 }
                 accessible={true}
@@ -1309,7 +1621,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(0, 122, 255)"
+                    fill="#c3c3c3"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -1344,7 +1656,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4278221567,
+                          "payload": 4291019715,
                           "type": 0,
                         }
                       }
@@ -1386,7 +1698,638 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   <Text
                     style={
                       {
-                        "color": "rgb(0, 122, 255)",
+                        "color": "#c3c3c3",
+                        "fontSize": 18,
+                        "fontWeight": "700",
+                        "margin": 0,
+                        "padding": 0,
+                      }
+                    }
+                  >
+                     -.----
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "display": "flex",
+            "flexDirection": "column",
+          }
+        }
+        testID="valueTransferList.4"
+      >
+        <View
+          onPress={[Function]}
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#ffffff",
+                "borderBottomWidth": 1.5,
+                "borderStyle": "solid",
+                "display": "flex",
+                "flexDirection": "row",
+                "marginTop": 15,
+                "paddingBottom": 10,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
+              <
+                color="#c3c3c3"
+                icon={
+                  {
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8593,
+                      ],
+                      "f062",
+                      "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
+                    ],
+                    "iconName": "arrow-up",
+                    "prefix": "fas",
+                  }
+                }
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "flex-start",
+                    "display": "flex",
+                    "flexDirection": "column",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "bold",
+                      "opacity": 1,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "display": "flex",
+                      "flexDirection": "row",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "opacity": 0.65,
+                      }
+                    }
+                  >
+                    Dec 13, 8:00 am
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "alignSelf": "auto",
+                  "flexDirection": "row",
+                  "flexGrow": 1,
+                  "justifyContent": "flex-end",
+                  "margin": 5,
+                  "paddingRight": 5,
+                }
+              }
+            >
+              <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": false,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "opacity": 1,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "flex-end",
+                      "flexDirection": "row",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  <RNSVGSvgView
+                    align="xMidYMid"
+                    bbHeight="18"
+                    bbWidth="36"
+                    fill="#c3c3c3"
+                    focusable={false}
+                    height={18}
+                    meetOrSlice={0}
+                    minX={0}
+                    minY={0}
+                    style={
+                      [
+                        {
+                          "backgroundColor": "transparent",
+                          "borderWidth": 0,
+                        },
+                        {
+                          "marginBottom": 0.9,
+                        },
+                        {
+                          "flex": 0,
+                          "height": 18,
+                          "width": 36,
+                        },
+                      ]
+                    }
+                    vbHeight={147.85}
+                    vbWidth={282.84}
+                    width={36}
+                    xml="<?xml version="1.0" encoding="UTF-8"?>
+  <svg viewBox="0 0 282.84 147.85">
+    <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
+    <polygon points="180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03"/>
+    <path d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"/>
+  </svg>"
+                  >
+                    <RNSVGGroup
+                      fill={
+                        {
+                          "payload": 4291019715,
+                          "type": 0,
+                        }
+                      }
+                      propList={
+                        [
+                          "fill",
+                        ]
+                      }
+                    >
+                      <RNSVGPath
+                        d="M34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                      <RNSVGPath
+                        d="M180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                      <RNSVGPath
+                        d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                    </RNSVGGroup>
+                  </RNSVGSvgView>
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "fontSize": 18,
+                        "fontWeight": "700",
+                        "margin": 0,
+                        "padding": 0,
+                      }
+                    }
+                  >
+                     -.----
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "display": "flex",
+            "flexDirection": "column",
+          }
+        }
+        testID="valueTransferList.5"
+      >
+        <View
+          onPress={[Function]}
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#ffffff",
+                "borderBottomWidth": 1.5,
+                "borderStyle": "solid",
+                "display": "flex",
+                "flexDirection": "row",
+                "marginTop": 15,
+                "paddingBottom": 10,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
+              <
+                color="#c3c3c3"
+                icon={
+                  {
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8593,
+                      ],
+                      "f062",
+                      "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
+                    ],
+                    "iconName": "arrow-up",
+                    "prefix": "fas",
+                  }
+                }
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
+              <View>
+                <View
+                  style={
+                    {
+                      "alignItems": "flex-start",
+                      "display": "flex",
+                      "flexDirection": "row",
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "flex-start",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "marginRight": 10,
+                      }
+                    }
+                  >
+                    <View
+                      accessibilityState={
+                        {
+                          "busy": undefined,
+                          "checked": undefined,
+                          "disabled": undefined,
+                          "expanded": undefined,
+                          "selected": undefined,
+                        }
+                      }
+                      accessibilityValue={
+                        {
+                          "max": undefined,
+                          "min": undefined,
+                          "now": undefined,
+                          "text": undefined,
+                        }
+                      }
+                      accessible={true}
+                      collapsable={false}
+                      focusable={true}
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                      style={
+                        {
+                          "opacity": 1,
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "flex",
+                            "flexDirection": "column",
+                            "flexWrap": "wrap",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#c3c3c3",
+                              "fontSize": 18,
+                              "fontWeight": "600",
+                              "opacity": 1,
+                            }
+                          }
+                        >
+                          sent-ad...4567890
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "display": "flex",
+                    "flexDirection": "row",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "bold",
+                      "opacity": 1,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "display": "flex",
+                      "flexDirection": "row",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "opacity": 0.65,
+                      }
+                    }
+                  >
+                    Dec 13, 8:00 am
+                  </Text>
+                  <
+                    color="#5a8c5a"
+                    icon={
+                      {
+                        "icon": [
+                          512,
+                          512,
+                          [
+                            128489,
+                            61669,
+                          ],
+                          "f075",
+                          "M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z",
+                        ],
+                        "iconName": "comment",
+                        "prefix": "fas",
+                      }
+                    }
+                    size={15}
+                    style={
+                      {
+                        "marginLeft": 10,
+                      }
+                    }
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "alignSelf": "auto",
+                  "flexDirection": "row",
+                  "flexGrow": 1,
+                  "justifyContent": "flex-end",
+                  "margin": 5,
+                  "paddingRight": 5,
+                }
+              }
+            >
+              <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": false,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "opacity": 1,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "flex-end",
+                      "flexDirection": "row",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  <RNSVGSvgView
+                    align="xMidYMid"
+                    bbHeight="18"
+                    bbWidth="36"
+                    fill="#c3c3c3"
+                    focusable={false}
+                    height={18}
+                    meetOrSlice={0}
+                    minX={0}
+                    minY={0}
+                    style={
+                      [
+                        {
+                          "backgroundColor": "transparent",
+                          "borderWidth": 0,
+                        },
+                        {
+                          "marginBottom": 0.9,
+                        },
+                        {
+                          "flex": 0,
+                          "height": 18,
+                          "width": 36,
+                        },
+                      ]
+                    }
+                    vbHeight={147.85}
+                    vbWidth={282.84}
+                    width={36}
+                    xml="<?xml version="1.0" encoding="UTF-8"?>
+  <svg viewBox="0 0 282.84 147.85">
+    <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
+    <polygon points="180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03"/>
+    <path d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"/>
+  </svg>"
+                  >
+                    <RNSVGGroup
+                      fill={
+                        {
+                          "payload": 4291019715,
+                          "type": 0,
+                        }
+                      }
+                      propList={
+                        [
+                          "fill",
+                        ]
+                      }
+                    >
+                      <RNSVGPath
+                        d="M34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                      <RNSVGPath
+                        d="M180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                      <RNSVGPath
+                        d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                    </RNSVGGroup>
+                  </RNSVGSvgView>
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -1416,7 +2359,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "#18bd18",
               "opacity": 0.65,
             }
           }
@@ -1453,7 +2396,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "rgb(255, 255, 255)",
+        "backgroundColor": "#011401",
         "display": "flex",
         "paddingBottom": 0,
         "paddingTop": 10,
@@ -1498,7 +2441,19 @@ exports[`Component History - test History no currency, privacy normal & mode bas
         <View
           accessibilityState={
             {
+              "busy": undefined,
+              "checked": undefined,
               "disabled": true,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
             }
           }
           accessible={true}
@@ -1531,7 +2486,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               align="xMidYMid"
               bbHeight="25.2"
               bbWidth="50.4"
-              fill="rgb(28, 28, 30)"
+              fill="#c3c3c3"
               focusable={false}
               height={25.2}
               meetOrSlice={0}
@@ -1566,7 +2521,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               <RNSVGGroup
                 fill={
                   {
-                    "payload": 4280032286,
+                    "payload": 4291019715,
                     "type": 0,
                   }
                 }
@@ -1608,7 +2563,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 36,
                   "fontWeight": "700",
                   "margin": 0,
@@ -1622,7 +2577,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 25.2,
                   "margin": 0,
                   "marginBottom": 2.4,
@@ -1651,7 +2606,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "marginBottom": 3,
@@ -1659,7 +2614,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "paddingHorizontal": 5,
           }
         }
-        testID="transaction text"
+        testID="ValueTransfer text"
       >
         text translated
       </Text>
@@ -1684,6 +2639,23 @@ exports[`Component History - test History no currency, privacy normal & mode bas
       >
         <View
           accessibilityLabel="text translated"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -1703,7 +2675,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           testID="header.drawmenu"
         >
           <
-            color="rgb(216, 216, 216)"
+            color="#ffffff"
             icon={
               {
                 "icon": [
@@ -1753,7 +2725,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
@@ -1763,14 +2735,16 @@ exports[`Component History - test History no currency, privacy normal & mode bas
   <RCTScrollView
     accessibilityLabel="text translated"
     accessible={true}
+    onScroll={[Function]}
     refreshControl={
       <RefreshControlMock
         onRefresh={[MockFunction]}
         refreshing={false}
-        tintColor="rgb(28, 28, 30)"
+        tintColor="#c3c3c3"
         title="text translated"
       />
     }
+    scrollEventThrottle={100}
     style={
       {
         "flexGrow": 1,
@@ -1788,14 +2762,14 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "flexDirection": "column",
           }
         }
-        testID="transactionList.1"
+        testID="valueTransferList.1"
       >
         <View
           style={
             {
-              "backgroundColor": "rgb(242, 242, 242)",
+              "backgroundColor": "#011401",
               "borderBottomWidth": 1,
-              "borderColor": "rgb(255, 255, 255)",
+              "borderColor": "#011401",
               "borderTopWidth": 1,
               "paddingBottom": 5,
               "paddingLeft": 15,
@@ -1806,7 +2780,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -1820,41 +2794,17 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           <View
             style={
               {
-                "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "alignItems": "center",
+                "borderBottomColor": "#ffffff",
+                "borderBottomWidth": 1.5,
+                "borderStyle": "solid",
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
-                "paddingBottom": 15,
+                "paddingBottom": 10,
               }
             }
           >
-            <
-              color="rgb(28, 28, 30)"
-              icon={
-                {
-                  "icon": [
-                    384,
-                    512,
-                    [
-                      8593,
-                    ],
-                    "f062",
-                    "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
-                  ],
-                  "iconName": "arrow-up",
-                  "prefix": "fas",
-                }
-              }
-              size={24}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 5,
-                  "marginTop": 5,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -1862,29 +2812,54 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 }
               }
             >
-              <Text
-                style={
+              <
+                color="#18bd18"
+                icon={
                   {
-                    "color": "rgb(28, 28, 30)",
-                    "fontSize": 18,
-                    "opacity": 0.65,
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8595,
+                      ],
+                      "f063",
+                      "M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z",
+                    ],
+                    "iconName": "arrow-down",
+                    "prefix": "fas",
                   }
                 }
-              >
-                sent-tx...4567890
-              </Text>
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
               <View
                 style={
                   {
+                    "alignItems": "flex-start",
                     "display": "flex",
-                    "flexDirection": "row",
+                    "flexDirection": "column",
                   }
                 }
               >
                 <Text
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
+                      "color": "#18bd18",
+                      "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
                     }
@@ -1892,22 +2867,32 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 >
                   text translated
                 </Text>
-                <Text
+                <View
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
-                      "opacity": 0.65,
+                      "alignItems": "center",
+                      "display": "flex",
+                      "flexDirection": "row",
                     }
                   }
                 >
-                  Dec 13, 8:00 am
-                </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "opacity": 0.65,
+                      }
+                    }
+                  >
+                    Dec 13, 8:00 am
+                  </Text>
+                </View>
               </View>
             </View>
             <View
               style={
                 {
-                  "alignSelf": "baseline",
+                  "alignSelf": "auto",
                   "flexDirection": "row",
                   "flexGrow": 1,
                   "justifyContent": "flex-end",
@@ -1919,7 +2904,19 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               <View
                 accessibilityState={
                   {
+                    "busy": undefined,
+                    "checked": undefined,
                     "disabled": true,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
                   }
                 }
                 accessible={true}
@@ -1952,7 +2949,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(28, 28, 30)"
+                    fill="#18bd18"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -1987,7 +2984,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4280032286,
+                          "payload": 4279811352,
                           "type": 0,
                         }
                       }
@@ -2029,7 +3026,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
+                        "color": "#18bd18",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -2038,21 +3035,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     }
                     testID="undefined.big-part"
                   >
-                     0.1235
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "rgb(28, 28, 30)",
-                        "fontSize": 12.6,
-                        "margin": 0,
-                        "marginBottom": 1.2,
-                        "padding": 0,
-                      }
-                    }
-                    testID="undefined.small-part"
-                  >
-                    5678
+                     0.0009
                   </Text>
                 </View>
               </View>
@@ -2067,7 +3050,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "flexDirection": "column",
           }
         }
-        testID="transactionList.2"
+        testID="valueTransferList.2"
       >
         <View
           onPress={[Function]}
@@ -2075,41 +3058,17 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           <View
             style={
               {
-                "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
+                "alignItems": "center",
+                "borderBottomColor": "#ffffff",
+                "borderBottomWidth": 1.5,
+                "borderStyle": "solid",
                 "display": "flex",
                 "flexDirection": "row",
                 "marginTop": 15,
-                "paddingBottom": 15,
+                "paddingBottom": 10,
               }
             }
           >
-            <
-              color="rgb(28, 28, 30)"
-              icon={
-                {
-                  "icon": [
-                    384,
-                    512,
-                    [
-                      8593,
-                    ],
-                    "f062",
-                    "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
-                  ],
-                  "iconName": "arrow-up",
-                  "prefix": "fas",
-                }
-              }
-              size={24}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 5,
-                  "marginTop": 5,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -2117,29 +3076,54 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 }
               }
             >
-              <Text
-                style={
+              <
+                color="#18bd18"
+                icon={
                   {
-                    "color": "rgb(28, 28, 30)",
-                    "fontSize": 18,
-                    "opacity": 0.65,
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8595,
+                      ],
+                      "f063",
+                      "M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z",
+                    ],
+                    "iconName": "arrow-down",
+                    "prefix": "fas",
                   }
                 }
-              >
-                sendtos...4567890
-              </Text>
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
               <View
                 style={
                   {
+                    "alignItems": "flex-start",
                     "display": "flex",
-                    "flexDirection": "row",
+                    "flexDirection": "column",
                   }
                 }
               >
                 <Text
                   style={
                     {
-                      "color": "rgb(28, 28, 30)",
+                      "color": "#18bd18",
+                      "fontSize": 18,
                       "fontWeight": "bold",
                       "opacity": 1,
                     }
@@ -2147,263 +3131,57 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 >
                   text translated
                 </Text>
-                <Text
-                  style={
-                    {
-                      "color": "rgb(28, 28, 30)",
-                      "opacity": 0.65,
-                    }
-                  }
-                >
-                  Dec 13, 8:00 am
-                </Text>
-              </View>
-            </View>
-            <View
-              style={
-                {
-                  "alignSelf": "baseline",
-                  "flexDirection": "row",
-                  "flexGrow": 1,
-                  "justifyContent": "flex-end",
-                  "margin": 5,
-                  "paddingRight": 5,
-                }
-              }
-            >
-              <View
-                accessibilityState={
-                  {
-                    "disabled": true,
-                  }
-                }
-                accessible={true}
-                collapsable={false}
-                focusable={true}
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
-                style={
-                  {
-                    "opacity": 1,
-                  }
-                }
-              >
                 <View
                   style={
                     {
-                      "alignItems": "flex-end",
+                      "alignItems": "center",
+                      "display": "flex",
                       "flexDirection": "row",
-                      "margin": 0,
-                      "padding": 0,
                     }
                   }
                 >
-                  <RNSVGSvgView
-                    align="xMidYMid"
-                    bbHeight="18"
-                    bbWidth="36"
-                    fill="rgb(28, 28, 30)"
-                    focusable={false}
-                    height={18}
-                    meetOrSlice={0}
-                    minX={0}
-                    minY={0}
-                    style={
-                      [
-                        {
-                          "backgroundColor": "transparent",
-                          "borderWidth": 0,
-                        },
-                        {
-                          "marginBottom": 0.9,
-                        },
-                        {
-                          "flex": 0,
-                          "height": 18,
-                          "width": 36,
-                        },
-                      ]
-                    }
-                    vbHeight={147.85}
-                    vbWidth={282.84}
-                    width={36}
-                    xml="<?xml version="1.0" encoding="UTF-8"?>
-  <svg viewBox="0 0 282.84 147.85">
-    <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
-    <polygon points="180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03"/>
-    <path d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"/>
-  </svg>"
-                  >
-                    <RNSVGGroup
-                      fill={
-                        {
-                          "payload": 4280032286,
-                          "type": 0,
-                        }
-                      }
-                      propList={
-                        [
-                          "fill",
-                        ]
-                      }
-                    >
-                      <RNSVGPath
-                        d="M34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62z"
-                        fill={
-                          {
-                            "payload": 4278190080,
-                            "type": 0,
-                          }
-                        }
-                      />
-                      <RNSVGPath
-                        d="M180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03z"
-                        fill={
-                          {
-                            "payload": 4278190080,
-                            "type": 0,
-                          }
-                        }
-                      />
-                      <RNSVGPath
-                        d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"
-                        fill={
-                          {
-                            "payload": 4278190080,
-                            "type": 0,
-                          }
-                        }
-                      />
-                    </RNSVGGroup>
-                  </RNSVGSvgView>
                   <Text
                     style={
                       {
-                        "color": "rgb(28, 28, 30)",
-                        "fontSize": 18,
-                        "fontWeight": "700",
-                        "margin": 0,
-                        "padding": 0,
+                        "color": "#c3c3c3",
+                        "opacity": 0.65,
                       }
                     }
-                    testID="undefined.big-part"
                   >
-                     0.0001
+                    Dec 13, 8:00 am
                   </Text>
+                  <
+                    color="#5a8c5a"
+                    icon={
+                      {
+                        "icon": [
+                          512,
+                          512,
+                          [
+                            128489,
+                            61669,
+                          ],
+                          "f075",
+                          "M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z",
+                        ],
+                        "iconName": "comment",
+                        "prefix": "fas",
+                      }
+                    }
+                    size={15}
+                    style={
+                      {
+                        "marginLeft": 10,
+                      }
+                    }
+                  />
                 </View>
               </View>
             </View>
-          </View>
-        </View>
-      </View>
-      <View
-        style={
-          {
-            "display": "flex",
-            "flexDirection": "column",
-          }
-        }
-        testID="transactionList.3"
-      >
-        <View
-          onPress={[Function]}
-        >
-          <View
-            style={
-              {
-                "borderBottomColor": "rgb(216, 216, 216)",
-                "borderBottomWidth": 1,
-                "display": "flex",
-                "flexDirection": "row",
-                "marginTop": 15,
-                "paddingBottom": 15,
-              }
-            }
-          >
-            <
-              color="rgb(0, 122, 255)"
-              icon={
-                {
-                  "icon": [
-                    384,
-                    512,
-                    [
-                      8595,
-                    ],
-                    "f063",
-                    "M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z",
-                  ],
-                  "iconName": "arrow-down",
-                  "prefix": "fas",
-                }
-              }
-              size={24}
-              style={
-                {
-                  "marginLeft": 5,
-                  "marginRight": 5,
-                  "marginTop": 5,
-                }
-              }
-            />
             <View
               style={
                 {
-                  "display": "flex",
-                }
-              }
-            >
-              <Text
-                style={
-                  {
-                    "color": "rgb(28, 28, 30)",
-                    "fontSize": 18,
-                    "opacity": 0.65,
-                  }
-                }
-              >
-                receive...4567890
-              </Text>
-              <View
-                style={
-                  {
-                    "display": "flex",
-                    "flexDirection": "row",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    {
-                      "color": "rgb(0, 122, 255)",
-                      "fontWeight": "bold",
-                      "opacity": 1,
-                    }
-                  }
-                >
-                  text translated
-                </Text>
-                <Text
-                  style={
-                    {
-                      "color": "rgb(28, 28, 30)",
-                      "opacity": 0.65,
-                    }
-                  }
-                >
-                  Dec 13, 8:00 am
-                </Text>
-              </View>
-            </View>
-            <View
-              style={
-                {
-                  "alignSelf": "baseline",
+                  "alignSelf": "auto",
                   "flexDirection": "row",
                   "flexGrow": 1,
                   "justifyContent": "flex-end",
@@ -2415,7 +3193,19 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               <View
                 accessibilityState={
                   {
+                    "busy": undefined,
+                    "checked": undefined,
                     "disabled": true,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
                   }
                 }
                 accessible={true}
@@ -2448,7 +3238,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     align="xMidYMid"
                     bbHeight="18"
                     bbWidth="36"
-                    fill="rgb(0, 122, 255)"
+                    fill="#18bd18"
                     focusable={false}
                     height={18}
                     meetOrSlice={0}
@@ -2483,7 +3273,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     <RNSVGGroup
                       fill={
                         {
-                          "payload": 4278221567,
+                          "payload": 4279811352,
                           "type": 0,
                         }
                       }
@@ -2525,7 +3315,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   <Text
                     style={
                       {
-                        "color": "rgb(0, 122, 255)",
+                        "color": "#18bd18",
                         "fontSize": 18,
                         "fontWeight": "700",
                         "margin": 0,
@@ -2534,12 +3324,12 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     }
                     testID="undefined.big-part"
                   >
-                     0.8765
+                     0.7765
                   </Text>
                   <Text
                     style={
                       {
-                        "color": "rgb(0, 122, 255)",
+                        "color": "#18bd18",
                         "fontSize": 12.6,
                         "margin": 0,
                         "marginBottom": 1.2,
@@ -2549,6 +3339,942 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                     testID="undefined.small-part"
                   >
                     4321
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "display": "flex",
+            "flexDirection": "column",
+          }
+        }
+        testID="valueTransferList.3"
+      >
+        <View
+          onPress={[Function]}
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#ffffff",
+                "borderBottomWidth": 1.5,
+                "borderStyle": "solid",
+                "display": "flex",
+                "flexDirection": "row",
+                "marginTop": 15,
+                "paddingBottom": 10,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
+              <
+                color="#c3c3c3"
+                icon={
+                  {
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8593,
+                      ],
+                      "f062",
+                      "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
+                    ],
+                    "iconName": "arrow-up",
+                    "prefix": "fas",
+                  }
+                }
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "flex-start",
+                    "display": "flex",
+                    "flexDirection": "column",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "bold",
+                      "opacity": 1,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "display": "flex",
+                      "flexDirection": "row",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "opacity": 0.65,
+                      }
+                    }
+                  >
+                    Dec 13, 8:00 am
+                  </Text>
+                  <
+                    color="#5a8c5a"
+                    icon={
+                      {
+                        "icon": [
+                          512,
+                          512,
+                          [
+                            128489,
+                            61669,
+                          ],
+                          "f075",
+                          "M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z",
+                        ],
+                        "iconName": "comment",
+                        "prefix": "fas",
+                      }
+                    }
+                    size={15}
+                    style={
+                      {
+                        "marginLeft": 10,
+                      }
+                    }
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "alignSelf": "auto",
+                  "flexDirection": "row",
+                  "flexGrow": 1,
+                  "justifyContent": "flex-end",
+                  "margin": 5,
+                  "paddingRight": 5,
+                }
+              }
+            >
+              <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": true,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "opacity": 1,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "flex-end",
+                      "flexDirection": "row",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  <RNSVGSvgView
+                    align="xMidYMid"
+                    bbHeight="18"
+                    bbWidth="36"
+                    fill="#c3c3c3"
+                    focusable={false}
+                    height={18}
+                    meetOrSlice={0}
+                    minX={0}
+                    minY={0}
+                    style={
+                      [
+                        {
+                          "backgroundColor": "transparent",
+                          "borderWidth": 0,
+                        },
+                        {
+                          "marginBottom": 0.9,
+                        },
+                        {
+                          "flex": 0,
+                          "height": 18,
+                          "width": 36,
+                        },
+                      ]
+                    }
+                    vbHeight={147.85}
+                    vbWidth={282.84}
+                    width={36}
+                    xml="<?xml version="1.0" encoding="UTF-8"?>
+  <svg viewBox="0 0 282.84 147.85">
+    <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
+    <polygon points="180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03"/>
+    <path d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"/>
+  </svg>"
+                  >
+                    <RNSVGGroup
+                      fill={
+                        {
+                          "payload": 4291019715,
+                          "type": 0,
+                        }
+                      }
+                      propList={
+                        [
+                          "fill",
+                        ]
+                      }
+                    >
+                      <RNSVGPath
+                        d="M34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                      <RNSVGPath
+                        d="M180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                      <RNSVGPath
+                        d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                    </RNSVGGroup>
+                  </RNSVGSvgView>
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "fontSize": 18,
+                        "fontWeight": "700",
+                        "margin": 0,
+                        "padding": 0,
+                      }
+                    }
+                    testID="undefined.big-part"
+                  >
+                     0.0000
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "display": "flex",
+            "flexDirection": "column",
+          }
+        }
+        testID="valueTransferList.4"
+      >
+        <View
+          onPress={[Function]}
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#ffffff",
+                "borderBottomWidth": 1.5,
+                "borderStyle": "solid",
+                "display": "flex",
+                "flexDirection": "row",
+                "marginTop": 15,
+                "paddingBottom": 10,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
+              <
+                color="#c3c3c3"
+                icon={
+                  {
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8593,
+                      ],
+                      "f062",
+                      "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
+                    ],
+                    "iconName": "arrow-up",
+                    "prefix": "fas",
+                  }
+                }
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "flex-start",
+                    "display": "flex",
+                    "flexDirection": "column",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "bold",
+                      "opacity": 1,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "display": "flex",
+                      "flexDirection": "row",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "opacity": 0.65,
+                      }
+                    }
+                  >
+                    Dec 13, 8:00 am
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "alignSelf": "auto",
+                  "flexDirection": "row",
+                  "flexGrow": 1,
+                  "justifyContent": "flex-end",
+                  "margin": 5,
+                  "paddingRight": 5,
+                }
+              }
+            >
+              <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": true,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "opacity": 1,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "flex-end",
+                      "flexDirection": "row",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  <RNSVGSvgView
+                    align="xMidYMid"
+                    bbHeight="18"
+                    bbWidth="36"
+                    fill="#c3c3c3"
+                    focusable={false}
+                    height={18}
+                    meetOrSlice={0}
+                    minX={0}
+                    minY={0}
+                    style={
+                      [
+                        {
+                          "backgroundColor": "transparent",
+                          "borderWidth": 0,
+                        },
+                        {
+                          "marginBottom": 0.9,
+                        },
+                        {
+                          "flex": 0,
+                          "height": 18,
+                          "width": 36,
+                        },
+                      ]
+                    }
+                    vbHeight={147.85}
+                    vbWidth={282.84}
+                    width={36}
+                    xml="<?xml version="1.0" encoding="UTF-8"?>
+  <svg viewBox="0 0 282.84 147.85">
+    <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
+    <polygon points="180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03"/>
+    <path d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"/>
+  </svg>"
+                  >
+                    <RNSVGGroup
+                      fill={
+                        {
+                          "payload": 4291019715,
+                          "type": 0,
+                        }
+                      }
+                      propList={
+                        [
+                          "fill",
+                        ]
+                      }
+                    >
+                      <RNSVGPath
+                        d="M34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                      <RNSVGPath
+                        d="M180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                      <RNSVGPath
+                        d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                    </RNSVGGroup>
+                  </RNSVGSvgView>
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "fontSize": 18,
+                        "fontWeight": "700",
+                        "margin": 0,
+                        "padding": 0,
+                      }
+                    }
+                    testID="undefined.big-part"
+                  >
+                     0.0000
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "display": "flex",
+            "flexDirection": "column",
+          }
+        }
+        testID="valueTransferList.5"
+      >
+        <View
+          onPress={[Function]}
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#ffffff",
+                "borderBottomWidth": 1.5,
+                "borderStyle": "solid",
+                "display": "flex",
+                "flexDirection": "row",
+                "marginTop": 15,
+                "paddingBottom": 10,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
+              <
+                color="#c3c3c3"
+                icon={
+                  {
+                    "icon": [
+                      384,
+                      512,
+                      [
+                        8593,
+                      ],
+                      "f062",
+                      "M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
+                    ],
+                    "iconName": "arrow-up",
+                    "prefix": "fas",
+                  }
+                }
+                size={30}
+                style={
+                  {
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": 0,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                }
+              }
+            >
+              <View>
+                <View
+                  style={
+                    {
+                      "alignItems": "flex-start",
+                      "display": "flex",
+                      "flexDirection": "row",
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "flex-start",
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "marginRight": 10,
+                      }
+                    }
+                  >
+                    <View
+                      accessibilityState={
+                        {
+                          "busy": undefined,
+                          "checked": undefined,
+                          "disabled": undefined,
+                          "expanded": undefined,
+                          "selected": undefined,
+                        }
+                      }
+                      accessibilityValue={
+                        {
+                          "max": undefined,
+                          "min": undefined,
+                          "now": undefined,
+                          "text": undefined,
+                        }
+                      }
+                      accessible={true}
+                      collapsable={false}
+                      focusable={true}
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                      style={
+                        {
+                          "opacity": 1,
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "flex",
+                            "flexDirection": "column",
+                            "flexWrap": "wrap",
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#c3c3c3",
+                              "fontSize": 18,
+                              "fontWeight": "600",
+                              "opacity": 1,
+                            }
+                          }
+                        >
+                          sent-ad...4567890
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "display": "flex",
+                    "flexDirection": "row",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "bold",
+                      "opacity": 1,
+                    }
+                  }
+                >
+                  text translated
+                </Text>
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "display": "flex",
+                      "flexDirection": "row",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "opacity": 0.65,
+                      }
+                    }
+                  >
+                    Dec 13, 8:00 am
+                  </Text>
+                  <
+                    color="#5a8c5a"
+                    icon={
+                      {
+                        "icon": [
+                          512,
+                          512,
+                          [
+                            128489,
+                            61669,
+                          ],
+                          "f075",
+                          "M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z",
+                        ],
+                        "iconName": "comment",
+                        "prefix": "fas",
+                      }
+                    }
+                    size={15}
+                    style={
+                      {
+                        "marginLeft": 10,
+                      }
+                    }
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "alignSelf": "auto",
+                  "flexDirection": "row",
+                  "flexGrow": 1,
+                  "justifyContent": "flex-end",
+                  "margin": 5,
+                  "paddingRight": 5,
+                }
+              }
+            >
+              <View
+                accessibilityState={
+                  {
+                    "busy": undefined,
+                    "checked": undefined,
+                    "disabled": true,
+                    "expanded": undefined,
+                    "selected": undefined,
+                  }
+                }
+                accessibilityValue={
+                  {
+                    "max": undefined,
+                    "min": undefined,
+                    "now": undefined,
+                    "text": undefined,
+                  }
+                }
+                accessible={true}
+                collapsable={false}
+                focusable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  {
+                    "opacity": 1,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "flex-end",
+                      "flexDirection": "row",
+                      "margin": 0,
+                      "padding": 0,
+                    }
+                  }
+                >
+                  <RNSVGSvgView
+                    align="xMidYMid"
+                    bbHeight="18"
+                    bbWidth="36"
+                    fill="#c3c3c3"
+                    focusable={false}
+                    height={18}
+                    meetOrSlice={0}
+                    minX={0}
+                    minY={0}
+                    style={
+                      [
+                        {
+                          "backgroundColor": "transparent",
+                          "borderWidth": 0,
+                        },
+                        {
+                          "marginBottom": 0.9,
+                        },
+                        {
+                          "flex": 0,
+                          "height": 18,
+                          "width": 36,
+                        },
+                      ]
+                    }
+                    vbHeight={147.85}
+                    vbWidth={282.84}
+                    width={36}
+                    xml="<?xml version="1.0" encoding="UTF-8"?>
+  <svg viewBox="0 0 282.84 147.85">
+    <polygon points="34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62"/>
+    <polygon points="180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03"/>
+    <path d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"/>
+  </svg>"
+                  >
+                    <RNSVGGroup
+                      fill={
+                        {
+                          "payload": 4291019715,
+                          "type": 0,
+                        }
+                      }
+                      propList={
+                        [
+                          "fill",
+                        ]
+                      }
+                    >
+                      <RNSVGPath
+                        d="M34.44 107.62 34.44 106.98 87.19 34.17 87.19 20.12 56.09 20.12 56.09 0 35.98 0 35.98 20.12 5.04 20.12 5.04 40.24 53.93 40.24 53.93 40.88 0 114.64 0 127.73 35.98 127.73 35.98 147.85 56.09 147.85 56.09 127.73 88.03 127.73 88.03 107.62 34.44 107.62z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                      <RNSVGPath
+                        d="M180.89 39.03 180.89 19.35 124.56 19.35 110.48 19.35 102.52 19.35 102.52 127.75 110.48 127.75 124.56 127.75 180.89 127.75 180.89 108.07 124.56 108.07 124.56 83.77 172.04 83.77 172.04 64.09 124.56 64.09 124.56 39.03 180.89 39.03z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                      <RNSVGPath
+                        d="m240.92,128.87c-8.96,0-16.59-1.58-22.89-4.73-6.3-3.16-11.12-7.75-14.44-13.79-3.33-6.04-4.99-13.33-4.99-21.88v-29.75c0-8.6,1.66-15.9,4.99-21.92,3.33-6.01,8.14-10.61,14.44-13.79,6.3-3.18,13.93-4.77,22.89-4.77,7.4,0,13.99,1.47,19.75,4.4,5.77,2.93,10.54,7.18,14.32,12.75,3.78,5.57,6.4,12.33,7.85,20.28h-22.85c-.86-3.63-2.19-6.7-3.98-9.21-1.8-2.51-3.97-4.44-6.52-5.78-2.55-1.34-5.41-2.01-8.57-2.01-6.17,0-10.96,1.75-14.36,5.26-3.41,3.5-5.11,8.44-5.11,14.8v29.75c0,6.36,1.7,11.28,5.11,14.76,3.41,3.48,8.19,5.22,14.36,5.22,4.83,0,8.9-1.48,12.23-4.44,3.33-2.96,5.61-7.14,6.84-12.56h22.85c-1.5,7.9-4.14,14.65-7.93,20.24-3.78,5.59-8.54,9.85-14.28,12.79-5.74,2.93-12.31,4.4-19.71,4.4Z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                      />
+                    </RNSVGGroup>
+                  </RNSVGSvgView>
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "fontSize": 18,
+                        "fontWeight": "700",
+                        "margin": 0,
+                        "padding": 0,
+                      }
+                    }
+                    testID="undefined.big-part"
+                  >
+                     0.1234
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "fontSize": 12.6,
+                        "margin": 0,
+                        "marginBottom": 1.2,
+                        "padding": 0,
+                      }
+                    }
+                    testID="undefined.small-part"
+                  >
+                    5678
                   </Text>
                 </View>
               </View>
@@ -2570,7 +4296,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "#18bd18",
               "opacity": 0.65,
             }
           }

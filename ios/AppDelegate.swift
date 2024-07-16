@@ -20,13 +20,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   private var bridge: RCTBridge!
   private var bgTask: BGProcessingTask? = nil
   private var timeStampStrStart: String? = nil
+  private let errorPrefix = "error"
 
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     let jsCodeLocation: URL
 
     jsCodeLocation = RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index", fallbackExtension: nil)
-    let rootView = RCTRootView(bundleURL: jsCodeLocation, moduleName: "Zingo!", initialProperties: nil, launchOptions: launchOptions)
+    let rootView = RCTRootView(bundleURL: jsCodeLocation, moduleName: "Zingo", initialProperties: nil, launchOptions: launchOptions)
     let rootViewController = UIViewController()
     rootViewController.view = rootView
 
@@ -246,7 +247,7 @@ extension AppDelegate {
     func stopSyncingProcess() {
         NSLog("BGTask stopSyncingProcess")
         let statusStr = executeCommand(cmd: "syncstatus", args: "")
-        if statusStr.lowercased().hasPrefix("error") {
+        if statusStr.lowercased().hasPrefix(errorPrefix) {
             NSLog("BGTask stopSyncingProcess - no lightwalled likely")
             return
         }
@@ -266,7 +267,7 @@ extension AppDelegate {
             Thread.sleep(forTimeInterval: 0.5)
 
             let newStatusStr = executeCommand(cmd: "syncstatus", args: "")
-            if newStatusStr.lowercased().hasPrefix("error") {
+            if newStatusStr.lowercased().hasPrefix(errorPrefix) {
                 NSLog("BGTask stopSyncingProcess - error getting new status")
                 return
             }
@@ -300,14 +301,14 @@ extension AppDelegate {
         }
 
         NSLog("BGTask syncingProcessBackgroundTask")
-        let exists = self.wallet__exists()
+        let exists = rpcmodule.wallet_exists()
 
         if exists {
             // chaeck the server
             let balance = executeCommand(cmd: "balance", args: "")
             let balanceStr = String(balance)
             NSLog("BGTask syncingProcessBackgroundTask - testing if server is active \(balanceStr)")
-            if balanceStr.hasPrefix("Error") {
+            if balanceStr.lowercased().hasPrefix(errorPrefix) {
                 // this task is running with the App closed.
                 self.loadWalletFile()
             } else {
@@ -405,17 +406,6 @@ extension AppDelegate {
         } catch {
           NSLog("Error: Unable to load the wallet. error: \(error.localizedDescription)")
         }
-    }
-
-    func wallet__exists() -> Bool {
-      let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-      guard let documentsDirectory = paths.first else {
-        return false
-      }
-
-      // to check if the wallet file exists.
-      let fileName = "\(documentsDirectory)/wallet.dat.txt"
-      return FileManager.default.fileExists(atPath: fileName)
     }
 
 }

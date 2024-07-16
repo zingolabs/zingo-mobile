@@ -17,8 +17,22 @@ import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+
 import Header from '../Header';
-import { SecurityType, ServerType, ServerUrisType } from '../../app/AppState';
+import {
+  LanguageEnum,
+  SecurityType,
+  ServerType,
+  ServerUrisType,
+  ModeEnum,
+  CurrencyEnum,
+  SelectServerEnum,
+  ChainNameEnum,
+  WalletOptionEnum,
+  ButtonTypeEnum,
+  GlobalConst,
+} from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import CheckBox from '@react-native-community/checkbox';
@@ -26,20 +40,17 @@ import RNPickerSelect from 'react-native-picker-select';
 
 type SettingsProps = {
   closeModal: () => void;
-  set_wallet_option: (name: string, value: string) => Promise<void>;
-  set_server_option: (
-    name: 'server',
-    value: ServerType,
-    toast: boolean,
-    same_server_chain_name: boolean,
-  ) => Promise<void>;
-  set_currency_option: (name: 'currency', value: string) => Promise<void>;
-  set_language_option: (name: 'language', value: string, reset: boolean) => Promise<void>;
-  set_sendAll_option: (name: 'sendAll', value: boolean) => Promise<void>;
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
-  set_mode_option: (name: 'mode', value: string) => Promise<void>;
-  set_security_option: (name: 'security', value: SecurityType) => Promise<void>;
-  set_selectServer_option: (name: 'selectServer', value: string) => Promise<void>;
+  setWalletOption: (walletOption: string, value: string) => Promise<void>;
+  setServerOption: (value: ServerType, toast: boolean, sameServerChainName: boolean) => Promise<void>;
+  setCurrencyOption: (value: CurrencyEnum) => Promise<void>;
+  setLanguageOption: (value: LanguageEnum, reset: boolean) => Promise<void>;
+  setSendAllOption: (value: boolean) => Promise<void>;
+  setDonationOption: (value: boolean) => Promise<void>;
+  setPrivacyOption: (value: boolean) => Promise<void>;
+  setModeOption: (value: string) => Promise<void>;
+  setSecurityOption: (value: SecurityType) => Promise<void>;
+  setSelectServerOption: (value: string) => Promise<void>;
+  setRescanMenuOption: (value: boolean) => Promise<void>;
 };
 
 type Options = {
@@ -48,15 +59,17 @@ type Options = {
 };
 
 const Settings: React.FunctionComponent<SettingsProps> = ({
-  set_wallet_option,
-  set_server_option,
-  set_currency_option,
-  set_language_option,
-  set_sendAll_option,
-  set_privacy_option,
-  set_mode_option,
-  set_security_option,
-  set_selectServer_option,
+  setWalletOption,
+  setServerOption,
+  setCurrencyOption,
+  setLanguageOption,
+  setSendAllOption,
+  setDonationOption,
+  setPrivacyOption,
+  setModeOption,
+  setSecurityOption,
+  setSelectServerOption,
+  setRescanMenuOption,
   closeModal,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -67,12 +80,15 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     currency: currencyContext,
     language: languageContext,
     sendAll: sendAllContext,
+    donation: donationContext,
     privacy: privacyContext,
     mode: modeContext,
     netInfo,
     addLastSnackbar,
     security: securityContext,
     selectServer: selectServerContext,
+    rescanMenu: rescanMenuContext,
+    readOnly,
   } = context;
 
   const memosArray = translate('settings.memos');
@@ -100,6 +116,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     SENDALLS = sendAllsArray as Options[];
   }
 
+  const donationsArray = translate('settings.donations');
+  let DONATIONS: Options[] = [];
+  if (typeof donationsArray === 'object') {
+    DONATIONS = donationsArray as Options[];
+  }
+
   const privacysArray = translate('settings.privacys');
   let PRIVACYS: Options[] = [];
   if (typeof privacysArray === 'object') {
@@ -112,11 +134,17 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     MODES = modesArray as Options[];
   }
 
+  const rescanMenusArray = translate('settings.rescanmenus');
+  let RESCANMENU: Options[] = [];
+  if (typeof rescanMenusArray === 'object') {
+    RESCANMENU = rescanMenusArray as Options[];
+  }
+
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(languageContext);
 
-  const [memos, setMemos] = useState<string>(walletSettings.download_memos);
-  const [filter, setFilter] = useState<string>(walletSettings.transaction_filter_threshold);
+  const [memos, setMemos] = useState<string>(walletSettings.downloadMemos);
+  const [filter, setFilter] = useState<string>(walletSettings.transactionFilterThreshold);
   const [autoServerUri, setAutoServerUri] = useState<string>('');
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
   const [listServerUri, setListServerUri] = useState<string>('');
@@ -124,24 +152,25 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [itemsPicker, setItemsPicker] = useState<{ label: string; value: string }[]>([]);
   const [customServerUri, setCustomServerUri] = useState<string>('');
   const [customServerChainName, setCustomServerChainName] = useState<string>('');
-  const [currency, setCurrency] = useState<string>(currencyContext);
-  const [language, setLanguage] = useState<string>(languageContext);
+  const [currency, setCurrency] = useState<CurrencyEnum>(currencyContext);
+  const [language, setLanguage] = useState<LanguageEnum>(languageContext);
   const [sendAll, setSendAll] = useState<boolean>(sendAllContext);
+  const [donation, setDonation] = useState<boolean>(donationContext);
   const [privacy, setPrivacy] = useState<boolean>(privacyContext);
   const [mode, setMode] = useState<string>(modeContext);
   // security checks box.
   const [startApp, setStartApp] = useState<boolean>(securityContext.startApp);
   const [foregroundApp, setForegroundApp] = useState<boolean>(securityContext.foregroundApp);
   const [sendConfirm, setSendConfirm] = useState<boolean>(securityContext.sendConfirm);
-  const [seedScreen, setSeedScreen] = useState<boolean>(securityContext.seedScreen);
-  const [ufvkScreen, setUfvkScreen] = useState<boolean>(securityContext.ufvkScreen);
+  const [seedUfvkScreen, setSeedUfvkScreen] = useState<boolean>(securityContext.seedUfvkScreen);
   const [rescanScreen, setRescanScreen] = useState<boolean>(securityContext.rescanScreen);
   const [settingsScreen, setSettingsScreen] = useState<boolean>(securityContext.settingsScreen);
   const [changeWalletScreen, setChangeWalletScreen] = useState<boolean>(securityContext.changeWalletScreen);
   const [restoreWalletBackupScreen, setRestoreWalletBackupScreen] = useState<boolean>(
     securityContext.restoreWalletBackupScreen,
   );
-  const [selectServer, setSelectServer] = useState<'auto' | 'list' | 'custom'>(selectServerContext);
+  const [selectServer, setSelectServer] = useState<SelectServerEnum>(selectServerContext);
+  const [rescanMenu, setRescanMenu] = useState<boolean>(rescanMenuContext);
 
   const [customIcon, setCustomIcon] = useState<IconDefinition>(farCircle);
   const [autoIcon, setAutoIcon] = useState<IconDefinition>(farCircle);
@@ -152,35 +181,38 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const slideAnim = useSharedValue(0);
 
   useEffect(() => {
-    if (selectServerContext === 'auto') {
+    if (selectServerContext === SelectServerEnum.auto) {
       setAutoIcon(faDotCircle);
       setAutoServerUri(serverContext.uri);
-      setAutoServerChainName(serverContext.chain_name);
-    } else if (selectServerContext === 'list') {
+      setAutoServerChainName(serverContext.chainName);
+    } else if (selectServerContext === SelectServerEnum.list) {
       setListIcon(faDotCircle);
       setListServerUri(serverContext.uri);
-      setListServerChainName(serverContext.chain_name);
+      setListServerChainName(serverContext.chainName);
       // I have to update them in auto as well
       // with the same server
       setAutoServerUri(serverContext.uri);
-      setAutoServerChainName(serverContext.chain_name);
-    } else if (selectServerContext === 'custom') {
+      setAutoServerChainName(serverContext.chainName);
+    } else if (selectServerContext === SelectServerEnum.custom) {
       setCustomIcon(faDotCircle);
       setCustomServerUri(serverContext.uri);
-      setCustomServerChainName(serverContext.chain_name);
+      setCustomServerChainName(serverContext.chainName);
       // I have to update them in auto as well
       // with the first of the list
       setAutoServerUri(serverUris(translate)[0].uri);
-      setAutoServerChainName(serverUris(translate)[0].chain_name);
+      setAutoServerChainName(serverUris(translate)[0].chainName);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // only the first time
 
   useEffect(() => {
-    const items = serverUris(translate).map((item: ServerUrisType) => ({
-      label: (item.region ? item.region + ' ' : '') + item.uri,
-      value: item.uri,
-    }));
+    // avoiding obsolete ones
+    const items = serverUris(translate)
+      .filter((s: ServerUrisType) => !s.obsolete)
+      .map((item: ServerUrisType) => ({
+        label: (item.region ? item.region + ' ' : '') + item.uri,
+        value: item.uri,
+      }));
     setItemsPicker(items);
   }, [translate]);
 
@@ -203,8 +235,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       startApp,
       foregroundApp,
       sendConfirm,
-      seedScreen,
-      ufvkScreen,
+      seedUfvkScreen,
       rescanScreen,
       settingsScreen,
       changeWalletScreen,
@@ -214,56 +245,58 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const saveSettings = async () => {
     let serverUriParsed = '';
-    let chain_nameParsed = '';
-    if (selectServer === 'auto') {
+    let chainNameParsed = '';
+    if (selectServer === SelectServerEnum.auto) {
       serverUriParsed = autoServerUri;
-      chain_nameParsed = autoServerChainName;
-    } else if (selectServer === 'list') {
+      chainNameParsed = autoServerChainName;
+    } else if (selectServer === SelectServerEnum.list) {
       serverUriParsed = listServerUri;
-      chain_nameParsed = listServerChainName;
-    } else if (selectServer === 'custom') {
+      chainNameParsed = listServerChainName;
+    } else if (selectServer === SelectServerEnum.custom) {
       serverUriParsed = customServerUri;
-      chain_nameParsed = customServerChainName;
+      chainNameParsed = customServerChainName;
     }
-    let same_server_chain_name = true;
-    const chain_name = serverContext.chain_name;
+    let sameServerChainName = true;
+    const chainName = serverContext.chainName;
     if (
-      walletSettings.download_memos === memos &&
-      walletSettings.transaction_filter_threshold === filter &&
+      walletSettings.downloadMemos === memos &&
+      walletSettings.transactionFilterThreshold === filter &&
       serverContext.uri === serverUriParsed &&
-      serverContext.chain_name === chain_nameParsed &&
+      serverContext.chainName === chainNameParsed &&
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
+      donationContext === donation &&
       privacyContext === privacy &&
       modeContext === mode &&
       isEqual(securityContext, securityObject()) &&
-      selectServerContext === selectServer
+      selectServerContext === selectServer &&
+      rescanMenuContext === rescanMenu
     ) {
-      addLastSnackbar({ message: translate('settings.nochanges') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('settings.nochanges') as string });
       return;
     }
     if (!memos) {
-      addLastSnackbar({ message: translate('settings.ismemo') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('settings.ismemo') as string });
       return;
     }
     if (!filter) {
-      addLastSnackbar({ message: translate('settings.isthreshold') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('settings.isthreshold') as string });
       return;
     }
-    if (!serverUriParsed || !chain_nameParsed) {
-      addLastSnackbar({ message: translate('settings.isserver') as string, type: 'Primary' });
+    if (!serverUriParsed || !chainNameParsed) {
+      addLastSnackbar({ message: translate('settings.isserver') as string });
       return;
     }
     if (!language) {
-      addLastSnackbar({ message: translate('settings.islanguage') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('settings.islanguage') as string });
       return;
     }
 
     if (serverContext.uri !== serverUriParsed) {
       const resultUri = parseServerURI(serverUriParsed, translate);
-      if (resultUri.toLowerCase().startsWith('error')) {
-        addLastSnackbar({ message: translate('settings.isuri') as string, type: 'Primary' });
+      if (resultUri.toLowerCase().startsWith(GlobalConst.error)) {
+        addLastSnackbar({ message: translate('settings.isuri') as string });
         return;
       } else {
         // url-parse sometimes is too wise, and if you put:
@@ -273,11 +306,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         // and I save it in the state ASAP.
         if (serverUriParsed !== resultUri) {
           serverUriParsed = resultUri;
-          if (selectServer === 'auto') {
+          if (selectServer === SelectServerEnum.auto) {
             setAutoServerUri(serverUriParsed);
-          } else if (selectServer === 'list') {
+          } else if (selectServer === SelectServerEnum.list) {
             setListServerUri(serverUriParsed);
-          } else if (selectServer === 'custom') {
+          } else if (selectServer === SelectServerEnum.custom) {
             setCustomServerUri(serverUriParsed);
           }
         }
@@ -285,79 +318,78 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
 
     if (!netInfo.isConnected) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
 
-    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== chain_nameParsed) {
+    if (serverContext.uri !== serverUriParsed || serverContext.chainName !== chainNameParsed) {
       setDisabled(true);
-      addLastSnackbar({ message: translate('loadedapp.tryingnewserver') as string, type: 'Primary' });
-      const { result, timeout, new_chain_name } = await checkServerURI(serverUriParsed, serverContext.uri);
+      addLastSnackbar({ message: translate('loadedapp.tryingnewserver') as string });
+      const { result, timeout, newChainName } = await checkServerURI(serverUriParsed, serverContext.uri);
       if (!result) {
         // if the server checking takes more then 30 seconds.
         if (timeout === true) {
-          addLastSnackbar({ message: translate('loadedapp.tryingnewserver-error') as string, type: 'Primary' });
+          addLastSnackbar({ message: translate('loadedapp.tryingnewserver-error') as string });
         } else {
           addLastSnackbar({
             message: (translate('loadedapp.changeservernew-error') as string) + serverUriParsed,
-            type: 'Primary',
           });
         }
         // in this point the sync process is blocked, who knows why.
         // if I save the actual server before the customization... is going to work.
-        set_server_option('server', serverContext, false, same_server_chain_name);
+        setServerOption(serverContext, false, sameServerChainName);
         setDisabled(false);
         return;
       } else {
-        //console.log('new', new_chain_name, 'old', chain_name);
-        if (new_chain_name && new_chain_name !== chain_name) {
-          same_server_chain_name = false;
-          addLastSnackbar({ message: translate('loadedapp.differentchain-error') as string, type: 'Primary' });
+        if (newChainName && newChainName !== chainName) {
+          sameServerChainName = false;
+          addLastSnackbar({ message: translate('loadedapp.differentchain-error') as string });
         }
       }
     }
 
-    if (walletSettings.download_memos !== memos) {
-      await set_wallet_option('download_memos', memos);
+    if (walletSettings.downloadMemos !== memos) {
+      await setWalletOption(WalletOptionEnum.downloadMemos, memos);
     }
-    if (walletSettings.transaction_filter_threshold !== filter) {
-      await set_wallet_option('transaction_filter_threshold', filter);
+    if (walletSettings.transactionFilterThreshold !== filter) {
+      await setWalletOption(WalletOptionEnum.transactionFilterThreshold, filter);
     }
     if (currencyContext !== currency) {
-      await set_currency_option('currency', currency);
+      await setCurrencyOption(currency);
     }
     if (sendAllContext !== sendAll) {
-      await set_sendAll_option('sendAll', sendAll);
+      await setSendAllOption(sendAll);
+    }
+    if (donationContext !== donation) {
+      await setDonationOption(donation);
     }
     if (privacyContext !== privacy) {
-      await set_privacy_option('privacy', privacy);
+      await setPrivacyOption(privacy);
     }
     if (modeContext !== mode) {
-      await set_mode_option('mode', mode);
+      await setModeOption(mode);
     }
     if (!isEqual(securityContext, securityObject())) {
-      await set_security_option('security', securityObject());
+      await setSecurityOption(securityObject());
     }
     if (selectServerContext !== selectServer) {
-      await set_selectServer_option('selectServer', selectServer);
+      await setSelectServerOption(selectServer);
+    }
+    if (rescanMenuContext !== rescanMenu) {
+      await setRescanMenuOption(rescanMenu);
     }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
-    if (serverContext.uri !== serverUriParsed || serverContext.chain_name !== chain_nameParsed) {
+    if (serverContext.uri !== serverUriParsed || serverContext.chainName !== chainNameParsed) {
       if (languageContext !== language) {
-        await set_language_option('language', language, false);
+        await setLanguageOption(language, false);
       }
-      set_server_option(
-        'server',
-        { uri: serverUriParsed, chain_name: chain_nameParsed } as ServerType,
-        true,
-        same_server_chain_name,
-      );
+      setServerOption({ uri: serverUriParsed, chainName: chainNameParsed } as ServerType, true, sameServerChainName);
       ms = 1500;
     } else {
       if (languageContext !== language) {
-        await set_language_option('language', language, true);
+        await setLanguageOption(language, true);
       }
     }
 
@@ -371,7 +403,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setOption: React.Dispatch<React.SetStateAction<string | boolean>>,
     typeOption: StringConstructor | BooleanConstructor,
     valueOption: string | boolean,
-    label: string,
+    label: string, // in lowercase to match with the translation json files.
   ) => {
     return DATA.map(item => (
       <View key={'view-' + item.value}>
@@ -396,7 +428,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     ));
   };
 
-  const onPressServerChainName = (chain: 'main' | 'test' | 'regtest') => {
+  const onPressServerChainName = (chain: ChainNameEnum) => {
     setCustomServerChainName(chain);
   };
 
@@ -426,9 +458,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           onTintColor={colors.primary}
           boxType="square"
           animationDuration={0.1}
-          style={{ marginRight: 10, transform: Platform.OS === 'ios' ? [{ scaleX: 0.7 }, { scaleY: 0.7 }] : [] }}
+          style={{
+            marginRight: 10,
+            transform: Platform.OS === GlobalConst.platformOSios ? [{ scaleX: 0.7 }, { scaleY: 0.7 }] : [],
+          }}
         />
-        <RegText style={{ marginTop: Platform.OS === 'ios' ? 5 : 3 }}>{label}</RegText>
+        <RegText style={{ marginTop: Platform.OS === GlobalConst.platformOSios ? 5 : 3 }}>{label}</RegText>
       </View>
     );
   };
@@ -503,8 +538,26 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           )}
         </View>
 
-        {modeContext !== 'basic' && (
+        {modeContext !== ModeEnum.basic && (
           <>
+            {!readOnly && (
+              <>
+                <View style={{ display: 'flex', margin: 10 }}>
+                  <BoldText>{translate('settings.donation-title') as string}</BoldText>
+                </View>
+
+                <View style={{ display: 'flex', marginLeft: 25 }}>
+                  {optionsRadio(
+                    DONATIONS,
+                    setDonation as React.Dispatch<React.SetStateAction<string | boolean>>,
+                    Boolean,
+                    donation,
+                    'donation',
+                  )}
+                </View>
+              </>
+            )}
+
             <View style={{ display: 'flex', margin: 10 }}>
               <BoldText>{translate('settings.privacy-title') as string}</BoldText>
             </View>
@@ -519,17 +572,35 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               )}
             </View>
 
+            {!readOnly && (
+              <>
+                <View style={{ display: 'flex', margin: 10 }}>
+                  <BoldText>{translate('settings.sendall-title') as string}</BoldText>
+                </View>
+
+                <View style={{ display: 'flex', marginLeft: 25 }}>
+                  {optionsRadio(
+                    SENDALLS,
+                    setSendAll as React.Dispatch<React.SetStateAction<string | boolean>>,
+                    Boolean,
+                    sendAll,
+                    'sendall',
+                  )}
+                </View>
+              </>
+            )}
+
             <View style={{ display: 'flex', margin: 10 }}>
-              <BoldText>{translate('settings.sendall-title') as string}</BoldText>
+              <BoldText>{translate('settings.rescanmenu-title') as string}</BoldText>
             </View>
 
             <View style={{ display: 'flex', marginLeft: 25 }}>
               {optionsRadio(
-                SENDALLS,
-                setSendAll as React.Dispatch<React.SetStateAction<string | boolean>>,
+                RESCANMENU,
+                setRescanMenu as React.Dispatch<React.SetStateAction<string | boolean>>,
                 Boolean,
-                sendAll,
-                'sendall',
+                rescanMenu,
+                'rescanmenu',
               )}
             </View>
 
@@ -547,7 +618,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     setAutoIcon(faDotCircle);
                     setListIcon(farCircle);
                     setCustomIcon(farCircle);
-                    setSelectServer('auto');
+                    setSelectServer(SelectServerEnum.auto);
                   }}>
                   <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                     {autoIcon && <FontAwesomeIcon icon={autoIcon} size={20} color={colors.border} />}
@@ -572,17 +643,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       color: colors.primary,
                     }}
                     useNativeAndroidPickerStyle={false}
-                    onValueChange={(item: string) => {
-                      console.log(JSON.stringify(item));
-                      if (item) {
+                    onValueChange={(itemValue: string) => {
+                      //console.log(JSON.stringify(item));
+                      if (itemValue) {
                         setAutoIcon(farCircle);
                         setListIcon(faDotCircle);
                         setCustomIcon(farCircle);
-                        setSelectServer('list');
-                        setListServerUri(item);
-                        const cnItem = serverUris(translate).find((s: ServerUrisType) => s.uri === item);
+                        setSelectServer(SelectServerEnum.list);
+                        setListServerUri(itemValue);
+                        // avoiding obsolete ones
+                        const cnItem = serverUris(translate).find(
+                          (s: ServerUrisType) => s.uri === itemValue && !s.obsolete,
+                        );
                         if (cnItem) {
-                          setListServerChainName(cnItem.chain_name);
+                          setListServerChainName(cnItem.chainName);
                         } else {
                           console.log('chain name not found');
                         }
@@ -633,7 +707,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                     setAutoIcon(farCircle);
                     setListIcon(farCircle);
                     setCustomIcon(faDotCircle);
-                    setSelectServer('custom');
+                    setSelectServer(SelectServerEnum.custom);
                   }}>
                   <View
                     style={{
@@ -668,7 +742,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                       }}>
                       <TextInput
                         testID="settings.custom-server-field"
-                        placeholder={'https://------.---:---'}
+                        placeholder={GlobalConst.serverPlaceHolder}
                         placeholderTextColor={colors.placeholder}
                         style={{
                           color: colors.text,
@@ -737,14 +811,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               translate('settings.security-sendconfirm') as string,
             )}
             {securityCheckBox(
-              seedScreen,
-              setSeedScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
-              translate('settings.security-seedscreen') as string,
-            )}
-            {securityCheckBox(
-              ufvkScreen,
-              setUfvkScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
-              translate('settings.security-ufvkscreen') as string,
+              seedUfvkScreen,
+              setSeedUfvkScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
+              readOnly
+                ? (translate('settings.security-ufvkscreen') as string)
+                : (translate('settings.security-seedscreen') as string),
             )}
             {securityCheckBox(
               rescanScreen,
@@ -833,7 +904,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         <Button
           testID="settings.button.save"
           disabled={disabled}
-          type="Primary"
+          type={ButtonTypeEnum.Primary}
           title={translate('settings.save') as string}
           onPress={() => {
             // waiting while closing the keyboard, just in case.
@@ -844,7 +915,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         />
         <Button
           disabled={disabled}
-          type="Secondary"
+          type={ButtonTypeEnum.Secondary}
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}
           onPress={closeModal}

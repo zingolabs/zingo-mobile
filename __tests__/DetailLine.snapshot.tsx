@@ -13,8 +13,8 @@ import { View } from 'react-native';
 describe('Component DetailLine - test', () => {
   //snapshot test
   test('DetailLine value - snapshot', () => {
-    const about = render(<DetailLine label="label" value="value" />);
-    expect(about.toJSON()).toMatchSnapshot();
+    const detail = render(<DetailLine label="label" value="value" />);
+    expect(detail.toJSON()).toMatchSnapshot();
   });
   test('DetailLine children - snapshot', () => {
     const children = <View />;

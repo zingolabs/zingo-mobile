@@ -1,13 +1,30 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { View, ScrollView, SafeAreaView, Keyboard, Platform } from 'react-native';
+import {
+  View,
+  ScrollView,
+  SafeAreaView,
+  Keyboard,
+  Platform,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  TouchableOpacity,
+} from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { AddressBookFileClass, SendPageStateClass } from '../../app/AppState';
+import {
+  AddressBookActionEnum,
+  AddressBookFileClass,
+  ButtonTypeEnum,
+  GlobalConst,
+  SendPageStateClass,
+} from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -17,6 +34,8 @@ import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import AddressBookFileImpl from './AddressBookFileImpl';
 import RPC from '../../app/rpc';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 
 type AddressBookProps = {
   closeModal: () => void;
@@ -30,13 +49,14 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [numTx, setNumTx] = useState<number>(50);
+  const [numAb, setNumAb] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   const [addressBookSorted, setAddressBookSorted] = useState<AddressBookFileClass[]>([]);
 
   const [currentItem, setCurrentItem] = useState<number | null>(null);
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
-  const [action, setAction] = useState<'Add' | 'Modify' | 'Delete' | null>(null);
+  const [action, setAction] = useState<AddressBookActionEnum | null>(null);
+  const [isAtTop, setIsAtTop] = useState<boolean>(true);
 
   const slideAnim = useSharedValue(0);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -44,41 +64,43 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   useScrollToTop(scrollViewRef);
 
   const fetchAddressBookSorted = useMemo(async () => {
-    return addressBook.slice(0, numTx).sort((a, b) => {
-      const nA = a.label.toUpperCase();
-      const nB = b.label.toUpperCase();
-      if (nA < nB) {
-        return -1;
-      } else if (nA > nB) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
-  }, [addressBook, numTx]);
+    return addressBook
+      .sort((a, b) => {
+        const nA = a.label.toUpperCase();
+        const nB = b.label.toUpperCase();
+        if (nA < nB) {
+          return -1;
+        } else if (nA > nB) {
+          return 1;
+        } else {
+          return 0;
+        }
+      })
+      .slice(0, numAb);
+  }, [addressBook, numAb]);
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpc_setInterruptSyncAfterBatch('false'))();
+    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
   }, []);
 
   useEffect(() => {
     (async () => {
       const abs = await fetchAddressBookSorted;
-      setLoadMoreButton(numTx < (abs.length || 0));
+      setLoadMoreButton(numAb < (abs.length || 0));
       setAddressBookSorted(abs);
       // find the current address
       if (addressBookCurrentAddress) {
         const index: number = abs.findIndex((i: AddressBookFileClass) => i.address === addressBookCurrentAddress);
         if (index === -1) {
-          setAction('Add');
+          setAction(AddressBookActionEnum.Add);
         } else {
-          setAction('Modify');
+          setAction(AddressBookActionEnum.Modify);
         }
         setCurrentItem(index);
       }
     })();
-  }, [addressBookCurrentAddress, fetchAddressBookSorted, numTx]);
+  }, [addressBookCurrentAddress, fetchAddressBookSorted, numAb]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -95,12 +117,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   }, [slideAnim, titleViewHeight]);
 
   const loadMoreClicked = useCallback(() => {
-    setNumTx(numTx + 50);
-  }, [numTx]);
+    setNumAb(numAb + 50);
+  }, [numAb]);
 
   const newAddressBookItem = () => {
     setCurrentItem(-1);
-    setAction('Add');
+    setAction(AddressBookActionEnum.Add);
   };
 
   const cancel = () => {
@@ -112,17 +134,17 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
         () => {
           addressBookOpenPriorModal();
         },
-        Platform.OS === 'ios' ? 100 : 1,
+        Platform.OS === GlobalConst.platformOSios ? 100 : 1,
       );
     }
   };
 
-  const doAction = async (a: 'Add' | 'Modify' | 'Delete', label: string, address: string) => {
+  const doAction = async (a: AddressBookActionEnum, label: string, address: string) => {
     if (!label || !address) {
       return;
     }
     let ab: AddressBookFileClass[] = [];
-    if (a === 'Delete') {
+    if (a === AddressBookActionEnum.Delete) {
       ab = await AddressBookFileImpl.removeAddressBookItem(label, address);
     } else {
       ab = await AddressBookFileImpl.writeAddressBookItem(label, address);
@@ -135,6 +157,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollTo({ y: 0, animated: true });
     }
+  };
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset } = event.nativeEvent;
+    const isTop = contentOffset.y === 0;
+    setIsAtTop(isTop);
   };
 
   //console.log('render Address Book - 4', currentItem, action);
@@ -166,6 +194,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
 
       <ScrollView
         ref={scrollViewRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={100}
         testID="addressbook.scrollView"
         keyboardShouldPersistTaps="handled"
         style={{ maxHeight: '85%' }}
@@ -257,7 +287,11 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
               marginTop: 5,
               marginBottom: 30,
             }}>
-            <Button type="Secondary" title={translate('addressbook.loadmore') as string} onPress={loadMoreClicked} />
+            <Button
+              type={ButtonTypeEnum.Secondary}
+              title={translate('addressbook.loadmore') as string}
+              onPress={loadMoreClicked}
+            />
           </View>
         ) : (
           <>
@@ -277,6 +311,16 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
           </>
         )}
       </ScrollView>
+      {!isAtTop && (
+        <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 70, right: 10 }}>
+          <FontAwesomeIcon
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+            size={50}
+            icon={faAnglesUp}
+            color={colors.zingo}
+          />
+        </TouchableOpacity>
+      )}
       {currentItem === null && (
         <View
           style={{
@@ -288,12 +332,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
           }}>
           <Button
             testID="addressbook.button.new"
-            type="Primary"
+            type={ButtonTypeEnum.Primary}
             title={translate('addressbook.new') as string}
             onPress={() => newAddressBookItem()}
           />
           <Button
-            type="Secondary"
+            type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
             style={{ marginLeft: 10 }}
             onPress={closeModal}

@@ -1,0 +1,16 @@
+export enum MenuItemEnum {
+  WalletSeedUfvk = 'Wallet Seed Ufvk',
+  Rescan = 'Rescan',
+  Settings = 'Settings',
+  ChangeWallet = 'Change Wallet',
+  RestoreWalletBackup = 'Restore Wallet Backup',
+  SyncReport = 'Sync Report',
+  FundPools = 'Fund Pools',
+  Insight = 'Insight',
+  LoadWalletFromSeed = 'Load Wallet From Seed',
+  TipZingoLabs = 'Tip ZingoLabs',
+  AddressBook = 'Address Book',
+  About = 'About',
+  Info = 'Info',
+  VoteForNym = 'Vote For Nym',
+}

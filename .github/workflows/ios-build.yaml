@@ -1,0 +1,115 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      cache-key:
+        required: true
+        type: string
+
+env:
+  CACHE-KEY: ${{ inputs.cache-key }}
+  REPO-OWNER: ${{ github.repository_owner }}
+
+jobs:
+  ios-check-build-cache:
+    name: Check build cache
+    runs-on: macos-13
+    outputs:
+      ios-cache-found: ${{ steps.ios-set-cache-found.outputs.ios-cache-found }}
+    steps:     
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+            
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+        
+      - name: Check if native rust cache exists
+        id: ios-check-build-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: rust/lib/Generated
+          key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
+          lookup-only: true
+  
+      - name: Set cache-found
+        id: ios-set-cache-found
+        run: echo "ios-cache-found=${{ steps.ios-check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+  
+  ios-build:
+    name: Build native rust
+    needs: ios-check-build-cache
+    if: ${{ needs.ios-check-build-cache.outputs.ios-cache-found != 'true' }}
+    runs-on: macos-13
+    env:
+      RUSTUP_HOME: /root/.rustup
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+            
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+        
+      - name: Cargo update for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: |
+          echo "zingolib_ref=$(echo ${GITHUB_REF} | sed 's/\//\\\//g')" >> $GITHUB_ENV
+          sudo sed -i "/^zingolib\|^zingoconfig/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
+          if cat rust/lib/Cargo.toml | grep "^zingolib\|^zingoconfig" | grep -q "branch"; then exit 1; fi
+          cd rust
+          sudo cargo update -p zingolib -p zingoconfig --aggressive
+          sudo rustup default nightly
+
+      - name: Install Cargo Lipo
+        run: |
+          sudo cargo install cargo-lipo
+
+      - name: Install rust Target
+        run: |
+          sudo rustup target add x86_64-apple-ios
+      
+      - name: Build Universal rust lib & uniffi lib and copy to ios folder
+        working-directory: rust/lib
+        run: |
+          sudo cargo run --release --bin uniffi-bindgen generate ./src/zingo.udl --language swift --out-dir ./Generated
+          sudo cargo lipo --release --targets x86_64-apple-ios
+          sudo cp ../target/universal/release/libzingo.a ./Generated/libuniffi_zingo.a
+      
+      - name: Upload native rust
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
+          path: rust/lib/Generated
+      
+  cache-native-ios-uniffi:
+    name: Cache native rust
+    needs: ios-build
+    runs-on: macos-13
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+            
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+            
+      - name: Download native rust
+        uses: actions/download-artifact@v4
+        with: 
+          name: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
+          path: rust/lib/Generated
+      
+      - name: Cache native rust
+        uses: actions/cache/save@v4
+        with:
+          path: rust/lib/Generated
+          key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
+

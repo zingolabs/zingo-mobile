@@ -1,17 +1,29 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { View, ScrollView, Modal, RefreshControl } from 'react-native';
+import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import {
+  View,
+  ScrollView,
+  Modal,
+  RefreshControl,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  TouchableOpacity,
+} from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
-import { useTheme } from '@react-navigation/native';
+import 'moment/locale/ru';
 
-import { SendPageStateClass, TransactionType } from '../../app/AppState';
+import { useScrollToTop, useTheme } from '@react-navigation/native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
+
+import { ButtonTypeEnum, SendPageStateClass, ValueTransferType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
-import TxDetail from './components/TxDetail';
-import TxSummaryLine from './components/TxSummaryLine';
+import ValueTransferDetail from './components/ValueTransferDetail';
+import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 
@@ -22,11 +34,14 @@ type HistoryProps = {
   syncingStatusMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
-  set_privacy_option: (name: 'privacy', value: boolean) => Promise<void>;
-  setPoolsToShieldSelectSapling: (v: boolean) => void;
-  setPoolsToShieldSelectTransparent: (v: boolean) => void;
+  setPrivacyOption: (value: boolean) => Promise<void>;
+  //setPoolsToShieldSelectSapling: (v: boolean) => void;
+  //setPoolsToShieldSelectTransparent: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
   setSendPageState: (s: SendPageStateClass) => void;
+  setShieldingAmount: (value: number) => void;
+  setScrollToTop: (value: boolean) => void;
+  scrollToTop: boolean;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -36,37 +51,109 @@ const History: React.FunctionComponent<HistoryProps> = ({
   syncingStatusMoreInfoOnClick,
   setZecPrice,
   setComputingModalVisible,
-  set_privacy_option,
-  setPoolsToShieldSelectSapling,
-  setPoolsToShieldSelectTransparent,
+  setPrivacyOption,
+  //setPoolsToShieldSelectSapling,
+  //setPoolsToShieldSelectTransparent,
   setUfvkViewModalVisible,
   setSendPageState,
+  setShieldingAmount,
+  setScrollToTop,
+  scrollToTop,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, transactions, language, setBackgroundError, addLastSnackbar } = context;
+  const { translate, valueTransfers, language, setBackgroundError, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [isTxDetailModalShowing, setTxDetailModalShowing] = useState<boolean>(false);
-  const [txDetail, setTxDetail] = useState<TransactionType>({} as TransactionType);
-  const [numTx, setNumTx] = useState<number>(50);
-  const [loadMoreButton, setLoadMoreButton] = useState<boolean>(numTx < (transactions.length || 0));
-  const [transactionsSorted, setTransactionsSorted] = useState<TransactionType[]>([]);
+  const [isValueTransferDetailModalShowing, setValueTransferDetailModalShowing] = useState<boolean>(false);
+  const [valueTransferDetail, setValueTransferDetail] = useState<ValueTransferType>({} as ValueTransferType);
+  const [valueTransferDetailIndex, setValueTransferDetailIndex] = useState<number>(-1);
+  const [numVt, setNumVt] = useState<number>(50);
+  const [loadMoreButton, setLoadMoreButton] = useState<boolean>(numVt < (valueTransfers.length || 0));
+  const [valueTransfersSorted, setValueTransfersSorted] = useState<ValueTransferType[]>([]);
+  const [isAtTop, setIsAtTop] = useState<boolean>(true);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  useScrollToTop(scrollViewRef);
 
   var lastMonth = '';
 
-  const fetchTransactionsSorted = useMemo(() => {
-    return transactions.slice(0, numTx).sort((a, b) => b.time - a.time);
-  }, [transactions, numTx]);
+  const fetchValueTransfersSorted = useMemo(() => {
+    // we need to sort the array properly.
+    // by:
+    // - time
+    // - txid
+    // - address
+    // - pool
+    return valueTransfers
+      .sort((a: ValueTransferType, b: ValueTransferType) => {
+        const timeComparison = b.time - a.time;
+        if (timeComparison === 0) {
+          // same time
+          const txidComparison = a.txid.localeCompare(b.txid);
+          if (txidComparison === 0) {
+            // same txid
+            const aAddress = a.address?.toString() || '';
+            const bAddress = b.address?.toString() || '';
+            const addressComparison = aAddress.localeCompare(bAddress);
+            if (addressComparison === 0) {
+              // same address
+              const aPoolType = a.poolType?.toString() || '';
+              const bPoolType = b.poolType?.toString() || '';
+              // last one sort criteria - poolType.
+              return aPoolType.localeCompare(bPoolType);
+            } else {
+              // different address
+              return addressComparison;
+            }
+          } else {
+            // different txid
+            return txidComparison;
+          }
+        } else {
+          // different time
+          return timeComparison;
+        }
+      })
+      .slice(0, numVt);
+  }, [valueTransfers, numVt]);
 
   useEffect(() => {
-    setLoadMoreButton(numTx < (transactions.length || 0));
-    setTransactionsSorted(fetchTransactionsSorted);
-  }, [fetchTransactionsSorted, numTx, transactions]);
+    setLoadMoreButton(numVt < (valueTransfers.length || 0));
+    setValueTransfersSorted(fetchValueTransfersSorted);
+  }, [fetchValueTransfersSorted, numVt, valueTransfers]);
+
+  useEffect(() => {
+    if (scrollToTop) {
+      handleScrollToTop();
+      setScrollToTop(false);
+    }
+  }, [scrollToTop, setScrollToTop]);
 
   const loadMoreClicked = useCallback(() => {
-    setNumTx(numTx + 50);
-  }, [numTx]);
+    setNumVt(numVt + 50);
+  }, [numVt]);
+
+  const moveValueTransferDetail = (index: number, type: number) => {
+    // -1 -> Previous ValueTransfer
+    //  1 -> Next ValueTransfer
+    if ((index > 0 && type === -1) || (index < valueTransfersSorted.length - 1 && type === 1)) {
+      setValueTransferDetail(valueTransfersSorted[index + type]);
+      setValueTransferDetailIndex(index + type);
+    }
+  };
+
+  const handleScrollToTop = () => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+    }
+  };
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset } = event.nativeEvent;
+    const isTop = contentOffset.y === 0;
+    setIsAtTop(isTop);
+  };
 
   //console.log('render History - 4');
 
@@ -83,19 +170,23 @@ const History: React.FunctionComponent<HistoryProps> = ({
       <Modal
         animationType="slide"
         transparent={false}
-        visible={isTxDetailModalShowing}
-        onRequestClose={() => setTxDetailModalShowing(false)}>
-        <TxDetail
-          tx={txDetail}
-          closeModal={() => setTxDetailModalShowing(false)}
-          openModal={() => setTxDetailModalShowing(true)}
-          set_privacy_option={set_privacy_option}
+        visible={isValueTransferDetailModalShowing}
+        onRequestClose={() => setValueTransferDetailModalShowing(false)}>
+        <ValueTransferDetail
+          index={valueTransferDetailIndex}
+          length={valueTransfersSorted.length}
+          totalLength={valueTransfers.length}
+          vt={valueTransferDetail}
+          closeModal={() => setValueTransferDetailModalShowing(false)}
+          openModal={() => setValueTransferDetailModalShowing(true)}
+          setPrivacyOption={setPrivacyOption}
           setSendPageState={setSendPageState}
+          moveValueTransferDetail={moveValueTransferDetail}
         />
       </Modal>
 
       <Header
-        testID="transaction text"
+        testID="ValueTransfer text"
         poolsMoreInfoOnClick={poolsMoreInfoOnClick}
         syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
         toggleMenuDrawer={toggleMenuDrawer}
@@ -103,14 +194,19 @@ const History: React.FunctionComponent<HistoryProps> = ({
         title={translate('history.title') as string}
         setComputingModalVisible={setComputingModalVisible}
         setBackgroundError={setBackgroundError}
-        set_privacy_option={set_privacy_option}
-        setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
-        setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
+        setPrivacyOption={setPrivacyOption}
+        //setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
+        //setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
         setUfvkViewModalVisible={setUfvkViewModalVisible}
         addLastSnackbar={addLastSnackbar}
+        setShieldingAmount={setShieldingAmount}
+        setScrollToTop={setScrollToTop}
       />
 
       <ScrollView
+        ref={scrollViewRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={100}
         accessible={true}
         accessibilityLabel={translate('history.list-acc') as string}
         refreshControl={
@@ -122,8 +218,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
           />
         }
         style={{ flexGrow: 1, marginTop: 10, width: '100%' }}>
-        {transactionsSorted.flatMap((t, index) => {
-          let txmonth = t.time ? moment(t.time * 1000).format('MMM YYYY') : '--- ----';
+        {valueTransfersSorted.flatMap((vt, index) => {
+          let txmonth = vt.time ? moment(vt.time * 1000).format('MMM YYYY') : '--- ----';
 
           var month = '';
           if (txmonth !== lastMonth) {
@@ -132,13 +228,17 @@ const History: React.FunctionComponent<HistoryProps> = ({
           }
 
           return (
-            <TxSummaryLine
+            <ValueTransferLine
               index={index}
-              key={`${t.txid}-${t.type}`}
-              tx={t}
+              key={`${index}-${vt.txid}-${vt.kind}`}
+              vt={vt}
               month={month}
-              setTxDetail={(ttt: TransactionType) => setTxDetail(ttt)}
-              setTxDetailModalShowing={(bbb: boolean) => setTxDetailModalShowing(bbb)}
+              setValueTransferDetail={(ttt: ValueTransferType) => setValueTransferDetail(ttt)}
+              setValueTransferDetailIndex={(iii: number) => setValueTransferDetailIndex(iii)}
+              setValueTransferDetailModalShowing={(bbb: boolean) => setValueTransferDetailModalShowing(bbb)}
+              nextLineWithSameTxid={
+                index >= valueTransfersSorted.length - 1 ? false : valueTransfersSorted[index + 1].txid === vt.txid
+              }
             />
           );
         })}
@@ -151,11 +251,15 @@ const History: React.FunctionComponent<HistoryProps> = ({
               marginTop: 10,
               marginBottom: 30,
             }}>
-            <Button type="Secondary" title={translate('history.loadmore') as string} onPress={loadMoreClicked} />
+            <Button
+              type={ButtonTypeEnum.Secondary}
+              title={translate('history.loadmore') as string}
+              onPress={loadMoreClicked}
+            />
           </View>
         ) : (
           <>
-            {!!transactions && !!transactions.length && (
+            {!!valueTransfers && !!valueTransfers.length && (
               <View
                 style={{
                   display: 'flex',
@@ -170,6 +274,16 @@ const History: React.FunctionComponent<HistoryProps> = ({
           </>
         )}
       </ScrollView>
+      {!isAtTop && (
+        <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 10 }}>
+          <FontAwesomeIcon
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+            size={50}
+            icon={faAnglesUp}
+            color={colors.zingo}
+          />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

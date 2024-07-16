@@ -7,21 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00E356F31AD99517003FC87E /* ZingoMobileTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* ZingoMobileTests.m */; };
-		067FCC724D9B1655D0C46B53 /* libPods-ZingoMobile-ZingoMobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E762E8D557F84DB0B29FAF1 /* libPods-ZingoMobile-ZingoMobileTests.a */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		1F0893FF2BA4C4380089FD88 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1F0893FE2BA4C4380089FD88 /* PrivacyInfo.xcprivacy */; };
 		1F0894002BA4C4380089FD88 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1F0893FE2BA4C4380089FD88 /* PrivacyInfo.xcprivacy */; };
-		1F2329E72BBEE1740023FB45 /* libuniffi_rustlib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F8118C52BBE4DFF008B5874 /* libuniffi_rustlib.a */; };
-		1F2329E92BBEEE040023FB45 /* rustlib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F2329E82BBEEE040023FB45 /* rustlib.swift */; };
-		1F2329EB2BBEEE140023FB45 /* rustlibFFI.h in Sources */ = {isa = PBXBuildFile; fileRef = 1F2329EA2BBEEE140023FB45 /* rustlibFFI.h */; };
 		1F5569272BBCB4D900F2CD6C /* RPCModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5569262BBCB4D900F2CD6C /* RPCModule.swift */; };
 		1F5569292BBCB98100F2CD6C /* RPCModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F5569282BBCB98100F2CD6C /* RPCModuleBridge.m */; };
 		1F5CEBBB2BBF025700E2551A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5CEBBA2BBF025700E2551A /* AppDelegate.swift */; };
+		1F5E677B2BD30D0A007B17AA /* zingo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5E677A2BD30D0A007B17AA /* zingo.swift */; };
+		1F5E677C2BD30D0A007B17AA /* zingo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5E677A2BD30D0A007B17AA /* zingo.swift */; };
 		1F7D321D2B71D44800D2879C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F7D321C2B71D44800D2879C /* SystemConfiguration.framework */; };
+		1F8815602BD31176006490E1 /* libuniffi_zingo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F5E67792BD30CD1007B17AA /* libuniffi_zingo.a */; };
+		1FA935B02BE4506300117DF5 /* RPCModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5569262BBCB4D900F2CD6C /* RPCModule.swift */; };
+		1FA935B12BE454FA00117DF5 /* RPCModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F5569282BBCB98100F2CD6C /* RPCModuleBridge.m */; };
+		1FA935B22BE4569D00117DF5 /* libuniffi_zingo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F5E67792BD30CD1007B17AA /* libuniffi_zingo.a */; };
+		1FA935B32BE457B100117DF5 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F7D321C2B71D44800D2879C /* SystemConfiguration.framework */; };
+		1FC1E2172BE443270064963B /* ZingoMobileTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC1E2162BE443270064963B /* ZingoMobileTest.swift */; };
 		1FE8E9AC296B85FC004A256B /* BackgroundTasks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FE8E9AB296B85FC004A256B /* BackgroundTasks.framework */; };
-		6B94B1D9F9B5BA49945005D8 /* libPods-ZingoMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C810F76AB736BB690D27EAF4 /* libPods-ZingoMobile.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		D8A3DB482E8FA9E983AC1109 /* libPods-ZingoMobile-ZingoMobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 572DAFF8E902D7DBF542E3A9 /* libPods-ZingoMobile-ZingoMobileTests.a */; };
+		F9AA507264F0795A00076D98 /* libPods-ZingoMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 76C572C9A8064A0E72C81808 /* libPods-ZingoMobile.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,28 +41,29 @@
 /* Begin PBXFileReference section */
 		00E356EE1AD99517003FC87E /* ZingoMobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZingoMobileTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		00E356F21AD99517003FC87E /* ZingoMobileTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZingoMobileTests.m; sourceTree = "<group>"; };
-		063180D6CDF05359894A2D50 /* Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig"; path = "Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* Zingo!.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Zingo!.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* Zingo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Zingo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ZingoMobile/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ZingoMobile/Info.plist; sourceTree = "<group>"; };
 		1F0893FE2BA4C4380089FD88 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		1F2329E82BBEEE040023FB45 /* rustlib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rustlib.swift; sourceTree = "<group>"; };
-		1F2329EA2BBEEE140023FB45 /* rustlibFFI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rustlibFFI.h; sourceTree = "<group>"; };
 		1F5569252BBCB4D900F2CD6C /* RPCModule-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RPCModule-Bridging-Header.h"; sourceTree = "<group>"; };
 		1F5569262BBCB4D900F2CD6C /* RPCModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPCModule.swift; sourceTree = "<group>"; };
 		1F5569282BBCB98100F2CD6C /* RPCModuleBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RPCModuleBridge.m; sourceTree = "<group>"; };
 		1F5CEBBA2BBF025700E2551A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1F5E67792BD30CD1007B17AA /* libuniffi_zingo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libuniffi_zingo.a; sourceTree = "<group>"; };
+		1F5E677A2BD30D0A007B17AA /* zingo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = zingo.swift; sourceTree = "<group>"; };
+		1F5E677D2BD30D1C007B17AA /* zingoFFI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zingoFFI.h; sourceTree = "<group>"; };
 		1F70326429905E6A001D70A2 /* ZingoMobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = ZingoMobile.entitlements; path = ZingoMobile/ZingoMobile.entitlements; sourceTree = "<group>"; };
 		1F7D321C2B71D44800D2879C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		1F8118C52BBE4DFF008B5874 /* libuniffi_rustlib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libuniffi_rustlib.a; sourceTree = "<group>"; };
+		1FA935B62BE474CD00117DF5 /* ZingoMobileTest-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZingoMobileTest-Bridging-Header.h"; sourceTree = "<group>"; };
+		1FC1E2162BE443270064963B /* ZingoMobileTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZingoMobileTest.swift; sourceTree = "<group>"; };
 		1FE8E9AB296B85FC004A256B /* BackgroundTasks.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BackgroundTasks.framework; path = System/Library/Frameworks/BackgroundTasks.framework; sourceTree = SDKROOT; };
-		4CE3348DE1658CE484562C13 /* Pods-ZingoMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZingoMobile.debug.xcconfig"; path = "Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile.debug.xcconfig"; sourceTree = "<group>"; };
-		4E762E8D557F84DB0B29FAF1 /* libPods-ZingoMobile-ZingoMobileTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZingoMobile-ZingoMobileTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		572DAFF8E902D7DBF542E3A9 /* libPods-ZingoMobile-ZingoMobileTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZingoMobile-ZingoMobileTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5AFBDF4BCD399704B08EC0F0 /* Pods-ZingoMobile-ZingoMobileTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZingoMobile-ZingoMobileTests.release.xcconfig"; path = "Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests.release.xcconfig"; sourceTree = "<group>"; };
+		5E6424ABC2D4BDFE8D458774 /* Pods-ZingoMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZingoMobile.debug.xcconfig"; path = "Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile.debug.xcconfig"; sourceTree = "<group>"; };
+		7451F0CE5B571EFC23C9E932 /* Pods-ZingoMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZingoMobile.release.xcconfig"; path = "Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile.release.xcconfig"; sourceTree = "<group>"; };
+		76C572C9A8064A0E72C81808 /* libPods-ZingoMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZingoMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ZingoMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		BDE1D64C4CCB618BC2234554 /* Pods-ZingoMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZingoMobile.release.xcconfig"; path = "Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile.release.xcconfig"; sourceTree = "<group>"; };
-		C43641C800C4542AAF1361BC /* Pods-ZingoMobile-ZingoMobileTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZingoMobile-ZingoMobileTests.release.xcconfig"; path = "Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests.release.xcconfig"; sourceTree = "<group>"; };
-		C810F76AB736BB690D27EAF4 /* libPods-ZingoMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZingoMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D39578ECEA80C3EB53418E41 /* Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig"; path = "Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -67,7 +72,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				067FCC724D9B1655D0C46B53 /* libPods-ZingoMobile-ZingoMobileTests.a in Frameworks */,
+				1FA935B32BE457B100117DF5 /* SystemConfiguration.framework in Frameworks */,
+				1FA935B22BE4569D00117DF5 /* libuniffi_zingo.a in Frameworks */,
+				D8A3DB482E8FA9E983AC1109 /* libPods-ZingoMobile-ZingoMobileTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,10 +82,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F2329E72BBEE1740023FB45 /* libuniffi_rustlib.a in Frameworks */,
 				1FE8E9AC296B85FC004A256B /* BackgroundTasks.framework in Frameworks */,
 				1F7D321D2B71D44800D2879C /* SystemConfiguration.framework in Frameworks */,
-				6B94B1D9F9B5BA49945005D8 /* libPods-ZingoMobile.a in Frameworks */,
+				1F8815602BD31176006490E1 /* libuniffi_zingo.a in Frameworks */,
+				F9AA507264F0795A00076D98 /* libPods-ZingoMobile.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,7 +95,8 @@
 		00E356EF1AD99517003FC87E /* ZingoMobileTests */ = {
 			isa = PBXGroup;
 			children = (
-				00E356F21AD99517003FC87E /* ZingoMobileTests.m */,
+				1FC1E2162BE443270064963B /* ZingoMobileTest.swift */,
+				1FA935B62BE474CD00117DF5 /* ZingoMobileTest-Bridging-Header.h */,
 				00E356F01AD99517003FC87E /* Supporting Files */,
 			);
 			path = ZingoMobileTests;
@@ -120,12 +128,12 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				1F8118C52BBE4DFF008B5874 /* libuniffi_rustlib.a */,
+				1F5E67792BD30CD1007B17AA /* libuniffi_zingo.a */,
 				1F7D321C2B71D44800D2879C /* SystemConfiguration.framework */,
 				1FE8E9AB296B85FC004A256B /* BackgroundTasks.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				C810F76AB736BB690D27EAF4 /* libPods-ZingoMobile.a */,
-				4E762E8D557F84DB0B29FAF1 /* libPods-ZingoMobile-ZingoMobileTests.a */,
+				76C572C9A8064A0E72C81808 /* libPods-ZingoMobile.a */,
+				572DAFF8E902D7DBF542E3A9 /* libPods-ZingoMobile-ZingoMobileTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -140,8 +148,8 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				1F2329EA2BBEEE140023FB45 /* rustlibFFI.h */,
-				1F2329E82BBEEE040023FB45 /* rustlib.swift */,
+				1F5E677D2BD30D1C007B17AA /* zingoFFI.h */,
+				1F5E677A2BD30D0A007B17AA /* zingo.swift */,
 				1F0893FE2BA4C4380089FD88 /* PrivacyInfo.xcprivacy */,
 				13B07FAE1A68108700A75B9A /* ZingoMobile */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -158,7 +166,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* Zingo!.app */,
+				13B07F961A680F5B00A75B9A /* Zingo.app */,
 				00E356EE1AD99517003FC87E /* ZingoMobileTests.xctest */,
 			);
 			name = Products;
@@ -167,10 +175,10 @@
 		8BB7EBE9935B479E64CBB9A8 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				4CE3348DE1658CE484562C13 /* Pods-ZingoMobile.debug.xcconfig */,
-				BDE1D64C4CCB618BC2234554 /* Pods-ZingoMobile.release.xcconfig */,
-				063180D6CDF05359894A2D50 /* Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig */,
-				C43641C800C4542AAF1361BC /* Pods-ZingoMobile-ZingoMobileTests.release.xcconfig */,
+				5E6424ABC2D4BDFE8D458774 /* Pods-ZingoMobile.debug.xcconfig */,
+				7451F0CE5B571EFC23C9E932 /* Pods-ZingoMobile.release.xcconfig */,
+				D39578ECEA80C3EB53418E41 /* Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig */,
+				5AFBDF4BCD399704B08EC0F0 /* Pods-ZingoMobile-ZingoMobileTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -182,12 +190,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ZingoMobileTests" */;
 			buildPhases = (
-				94C458DF3056753ADAC94ED4 /* [CP] Check Pods Manifest.lock */,
+				D57C6672E9DAF046337BF220 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				E221F055FE48F64FF1550792 /* [CP] Embed Pods Frameworks */,
-				F0C06BA03F13D60FDE4A2A7D /* [CP] Copy Pods Resources */,
+				6D42107C6AA72D798D96350C /* [CP] Embed Pods Frameworks */,
+				09D2A61ED04BAEF7F9DBF936 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -203,14 +211,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ZingoMobile" */;
 			buildPhases = (
-				4569B5AD74CC827C890A0FD9 /* [CP] Check Pods Manifest.lock */,
+				05C6B2464D1A149F624BA9D0 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				29951A276A9D61FA18D10251 /* [CP] Embed Pods Frameworks */,
-				085EC0ABCFE6DBFF257A4108 /* [CP] Copy Pods Resources */,
+				F1223373273DF1201340FEA9 /* [CP] Embed Pods Frameworks */,
+				344555CAFDA99171BC8F086A /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -218,7 +226,7 @@
 			);
 			name = ZingoMobile;
 			productName = ZingoMobile;
-			productReference = 13B07F961A680F5B00A75B9A /* Zingo!.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* Zingo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -232,7 +240,7 @@
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
-						TestTargetID = 13B07F861A680F5B00A75B9A;
+						LastSwiftMigration = 1530;
 					};
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1530;
@@ -294,41 +302,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nexport NODE_BINARY=~/.nvm/versions/node/v20.9.0/bin/node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		085EC0ABCFE6DBFF257A4108 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		29951A276A9D61FA18D10251 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		4569B5AD74CC827C890A0FD9 /* [CP] Check Pods Manifest.lock */ = {
+		05C6B2464D1A149F624BA9D0 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -350,7 +324,58 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		94C458DF3056753ADAC94ED4 /* [CP] Check Pods Manifest.lock */ = {
+		09D2A61ED04BAEF7F9DBF936 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		344555CAFDA99171BC8F086A /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6D42107C6AA72D798D96350C /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D57C6672E9DAF046337BF220 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -372,38 +397,21 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E221F055FE48F64FF1550792 /* [CP] Embed Pods Frameworks */ = {
+		F1223373273DF1201340FEA9 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		F0C06BA03F13D60FDE4A2A7D /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -432,7 +440,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00E356F31AD99517003FC87E /* ZingoMobileTests.m in Sources */,
+				1FA935B12BE454FA00117DF5 /* RPCModuleBridge.m in Sources */,
+				1F5E677C2BD30D0A007B17AA /* zingo.swift in Sources */,
+				1FA935B02BE4506300117DF5 /* RPCModule.swift in Sources */,
+				1FC1E2172BE443270064963B /* ZingoMobileTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -441,8 +452,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1F5CEBBB2BBF025700E2551A /* AppDelegate.swift in Sources */,
-				1F2329EB2BBEEE140023FB45 /* rustlibFFI.h in Sources */,
-				1F2329E92BBEEE040023FB45 /* rustlib.swift in Sources */,
+				1F5E677B2BD30D0A007B17AA /* zingo.swift in Sources */,
 				1F5569272BBCB4D900F2CD6C /* RPCModule.swift in Sources */,
 				1F5569292BBCB98100F2CD6C /* RPCModuleBridge.m in Sources */,
 			);
@@ -461,10 +471,10 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 063180D6CDF05359894A2D50 /* Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig */;
+			baseConfigurationReference = D39578ECEA80C3EB53418E41 /* Pods-ZingoMobile-ZingoMobileTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = 788KRST4S8;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -489,16 +499,18 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Zingo.app/Zingo";
+				SWIFT_OBJC_BRIDGING_HEADER = "ZingoMobileTests/ZingoMobileTest-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C43641C800C4542AAF1361BC /* Pods-ZingoMobile-ZingoMobileTests.release.xcconfig */;
+			baseConfigurationReference = 5AFBDF4BCD399704B08EC0F0 /* Pods-ZingoMobile-ZingoMobileTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = 788KRST4S8;
 				INFOPLIST_FILE = ZingoMobileTests/Info.plist;
@@ -520,24 +532,26 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Zingo.app/Zingo";
+				SWIFT_OBJC_BRIDGING_HEADER = "ZingoMobileTests/ZingoMobileTest-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4CE3348DE1658CE484562C13 /* Pods-ZingoMobile.debug.xcconfig */;
+			baseConfigurationReference = 5E6424ABC2D4BDFE8D458774 /* Pods-ZingoMobile.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ZingoMobile/ZingoMobile.entitlements;
-				CURRENT_PROJECT_VERSION = 176;
+				CURRENT_PROJECT_VERSION = 185;
 				DEVELOPMENT_TEAM = 788KRST4S8;
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
 				INFOPLIST_FILE = ZingoMobile/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Zingo!";
+				INFOPLIST_KEY_CFBundleDisplayName = Zingo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"/Library/Developer/Toolchains/swift-5.6.2-RELEASE.xctoolchain/usr/bin/swift",
@@ -549,14 +563,14 @@
 					"$(PROJECT_DIR)",
 					"$(inherited)",
 				);
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.4.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.ZingoLabs.Zingo;
-				PRODUCT_NAME = "Zingo!";
+				PRODUCT_NAME = Zingo;
 				SWIFT_OBJC_BRIDGING_HEADER = "RPCModule-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -567,18 +581,18 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BDE1D64C4CCB618BC2234554 /* Pods-ZingoMobile.release.xcconfig */;
+			baseConfigurationReference = 7451F0CE5B571EFC23C9E932 /* Pods-ZingoMobile.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ZingoMobile/ZingoMobile.entitlements;
-				CURRENT_PROJECT_VERSION = 176;
+				CURRENT_PROJECT_VERSION = 185;
 				DEVELOPMENT_TEAM = 788KRST4S8;
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
 				INFOPLIST_FILE = ZingoMobile/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Zingo!";
+				INFOPLIST_KEY_CFBundleDisplayName = Zingo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"/Library/Developer/Toolchains/swift-5.6.2-RELEASE.xctoolchain/usr/bin/swift",
@@ -590,15 +604,16 @@
 					"$(PROJECT_DIR)",
 					"$(inherited)",
 				);
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.4.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.ZingoLabs.Zingo;
-				PRODUCT_NAME = "Zingo!";
+				PRODUCT_NAME = Zingo;
 				SWIFT_OBJC_BRIDGING_HEADER = "RPCModule-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -647,6 +662,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
+					_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -667,6 +683,12 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 			};
@@ -709,6 +731,10 @@
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION,
+				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -726,6 +752,12 @@
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;

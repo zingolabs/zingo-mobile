@@ -7,6 +7,8 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import ChainTypeToggle from '../components/Components/ChainTypeToggle';
+import { ChainNameEnum } from '../app/AppState';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -18,8 +20,10 @@ describe('Component ChainTypeToggle - test', () => {
   //snapshot test
   test('ChainTypeToggle - snapshot', () => {
     const onPress = jest.fn();
-    const translate = () => 'text translated';
-    const chain = render(<ChainTypeToggle customServerChainName="main" onPress={onPress} translate={translate} />);
+    const translate = mockTranslate;
+    const chain = render(
+      <ChainTypeToggle customServerChainName={ChainNameEnum.mainChainName} onPress={onPress} translate={translate} />,
+    );
     expect(chain.toJSON()).toMatchSnapshot();
   });
 });

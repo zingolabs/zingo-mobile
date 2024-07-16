@@ -41,8 +41,10 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         style={
           {
             "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "900",
             "marginTop": 0,
-            "opacity": 0.65,
+            "opacity": 1,
             "padding": 20,
             "textAlign": "center",
           }
@@ -63,6 +65,23 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         }
       >
         <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -103,6 +122,23 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         >
           <View />
           <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -157,6 +193,23 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           text translated
         </Text>
         <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -184,7 +237,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
               }
             }
           >
-            1500100
+            1900100
           </Text>
         </View>
       </View>
@@ -209,6 +262,23 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
     }
   >
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -266,6 +336,23 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       </View>
     </View>
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -369,8 +456,10 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         style={
           {
             "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "900",
             "marginTop": 0,
-            "opacity": 0.65,
+            "opacity": 1,
             "padding": 20,
             "textAlign": "center",
           }
@@ -391,6 +480,23 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         }
       >
         <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -431,6 +537,23 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         >
           <View />
           <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -485,6 +608,23 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           text translated
         </Text>
         <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -512,7 +652,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
               }
             }
           >
-            1500100
+            1900100
           </Text>
         </View>
       </View>
@@ -537,6 +677,23 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
     }
   >
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -594,6 +751,23 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       </View>
     </View>
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -697,8 +871,10 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         style={
           {
             "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "900",
             "marginTop": 0,
-            "opacity": 0.65,
+            "opacity": 1,
             "padding": 20,
             "textAlign": "center",
           }
@@ -719,6 +895,23 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         }
       >
         <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -759,6 +952,23 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         >
           <View />
           <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -813,6 +1023,23 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
           text translated
         </Text>
         <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -840,7 +1067,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
               }
             }
           >
-            1500100
+            1900100
           </Text>
         </View>
       </View>
@@ -865,6 +1092,23 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
     }
   >
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -966,8 +1210,10 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
         style={
           {
             "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "900",
             "marginTop": 0,
-            "opacity": 0.65,
+            "opacity": 1,
             "padding": 20,
             "textAlign": "center",
           }
@@ -1031,6 +1277,23 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
             />
           </View>
           <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -1109,7 +1372,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
             }
           }
         >
-          text translated (1, 1900100)
+          text translated (1, 2000000)
         </Text>
         <View
           accessibilityLabel="text translated"
@@ -1145,7 +1408,7 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
               }
             }
             testID="seed.birthdayinput"
-            value="1500100"
+            value="1900100"
           />
         </View>
       </View>
@@ -1170,6 +1433,23 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
     }
   >
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -1227,6 +1507,23 @@ exports[`Component Seed - test Seed Restore - snapshot 1`] = `
       </View>
     </View>
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -1330,8 +1627,10 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         style={
           {
             "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "900",
             "marginTop": 0,
-            "opacity": 0.65,
+            "opacity": 1,
             "padding": 20,
             "textAlign": "center",
           }
@@ -1352,6 +1651,23 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         }
       >
         <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -1392,6 +1708,23 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         >
           <View />
           <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -1446,6 +1779,23 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           text translated
         </Text>
         <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -1473,7 +1823,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
               }
             }
           >
-            1500100
+            1900100
           </Text>
         </View>
       </View>
@@ -1498,6 +1848,23 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
     }
   >
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -1555,6 +1922,23 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       </View>
     </View>
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -1658,8 +2042,10 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         style={
           {
             "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "900",
             "marginTop": 0,
-            "opacity": 0.65,
+            "opacity": 1,
             "padding": 20,
             "textAlign": "center",
           }
@@ -1680,6 +2066,23 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         }
       >
         <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -1720,6 +2123,23 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         >
           <View />
           <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -1774,6 +2194,23 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
           text translated
         </Text>
         <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
           accessible={true}
           collapsable={false}
           focusable={true}
@@ -1801,7 +2238,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
               }
             }
           >
-            1500100
+            1900100
           </Text>
         </View>
       </View>
@@ -1826,6 +2263,23 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
     }
   >
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}

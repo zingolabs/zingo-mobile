@@ -10,6 +10,7 @@ import moment from 'moment';
 import RPC from '../../app/rpc';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
+import { ModeEnum } from '../../app/AppState';
 
 type PriceFetcherProps = {
   setZecPrice?: (p: number, d: number) => void;
@@ -51,17 +52,17 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
   const onPressFetch = async () => {
     if (setZecPrice) {
       setLoading(true);
-      const price = await RPC.rpc_getZecPrice();
+      const price = await RPC.rpcGetZecPrice();
       // values:
       // 0   - initial/default value
       // -1  - error in Gemini/zingolib.
       // -2  - error in RPCModule, likely.
       // > 0 - real value
       if (price === -1) {
-        addLastSnackbar({ message: translate('info.errorgemini') as string, type: 'Primary' });
+        addLastSnackbar({ message: translate('info.errorgemini') as string });
       }
       if (price === -2) {
-        addLastSnackbar({ message: translate('info.errorrpcmodule') as string, type: 'Primary' });
+        addLastSnackbar({ message: translate('info.errorrpcmodule') as string });
       }
       if (price <= 0) {
         setZecPrice(price, 0);
@@ -105,7 +106,9 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
         </View>
       )}
       {!loading && (
-        <TouchableOpacity disabled={loading} onPress={() => (mode === 'basic' ? onPressFetch() : onPressFetchAlert())}>
+        <TouchableOpacity
+          disabled={loading}
+          onPress={() => (mode === ModeEnum.basic ? onPressFetch() : onPressFetchAlert())}>
           <View
             style={{
               flexDirection: 'row',

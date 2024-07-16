@@ -8,5 +8,5 @@ cd rust
 ./build.sh
 cd ..
 
-echo -e "\nRunning yarn install..."
-yarn install
+echo -e "\nRunning yarn..."
+yarn

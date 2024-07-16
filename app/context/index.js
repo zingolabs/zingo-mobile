@@ -1,11 +1,11 @@
-import { defaultAppStateLoaded, ContextAppLoaded, ContextAppLoadedProvider } from './contextAppLoaded';
-import { defaultAppStateLoading, ContextAppLoading, ContextAppLoadingProvider } from './contextAppLoading';
+import { defaultAppContextLoaded, ContextAppLoaded, ContextAppLoadedProvider } from './contextAppLoaded';
+import { defaultAppContextLoading, ContextAppLoading, ContextAppLoadingProvider } from './contextAppLoading';
 
 export {
-  defaultAppStateLoaded,
+  defaultAppContextLoaded,
   ContextAppLoaded,
   ContextAppLoadedProvider,
-  defaultAppStateLoading,
+  defaultAppContextLoading,
   ContextAppLoading,
   ContextAppLoadingProvider,
 };

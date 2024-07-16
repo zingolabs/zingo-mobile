@@ -69,7 +69,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           }
         }
       >
-        translated text
+        text translated
       </Text>
     </View>
     <View
@@ -170,6 +170,23 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             Sync ID
           </Text>
           <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -196,7 +213,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
                 }
               }
             >
-              1 - (translated text)
+              1 - (text translated)
             </Text>
           </View>
         </View>
@@ -229,272 +246,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               }
             }
           >
-            0
-          </Text>
-          <Text
-            style={
-              {
-                "color": "rgb(0, 122, 255)",
-              }
-            }
-          >
-            500K
-          </Text>
-          <Text
-            style={
-              {
-                "color": "rgb(0, 122, 255)",
-              }
-            }
-          >
-            1M
-          </Text>
-          <Text
-            style={
-              {
-                "color": "rgb(0, 122, 255)",
-              }
-            }
-          >
-            1.5M
-          </Text>
-          <Text
-            style={
-              {
-                "color": "rgb(0, 122, 255)",
-              }
-            }
-          >
-            2M
-          </Text>
-        </View>
-        <View
-          style={
-            {
-              "display": "flex",
-              "flexDirection": "row",
-              "width": "100%",
-            }
-          }
-        >
-          <View
-            style={
-              {
-                "borderLeftColor": "rgb(0, 122, 255)",
-                "borderLeftWidth": 1,
-                "borderRightColor": "rgb(0, 122, 255)",
-                "borderRightWidth": 1,
-                "height": 10,
-                "width": "25%",
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "borderLeftColor": "rgb(0, 122, 255)",
-                "borderLeftWidth": 1,
-                "borderRightColor": "rgb(0, 122, 255)",
-                "borderRightWidth": 1,
-                "height": 10,
-                "width": "25%",
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "borderLeftColor": "rgb(0, 122, 255)",
-                "borderLeftWidth": 1,
-                "borderRightColor": "rgb(0, 122, 255)",
-                "borderRightWidth": 1,
-                "height": 10,
-                "width": "25%",
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "borderLeftColor": "rgb(0, 122, 255)",
-                "borderLeftWidth": 1,
-                "borderRightColor": "rgb(0, 122, 255)",
-                "borderRightWidth": 1,
-                "height": 10,
-                "width": "25%",
-              }
-            }
-          />
-        </View>
-        <View
-          style={
-            {
-              "borderBottomColor": "rgb(0, 122, 255)",
-              "borderBottomWidth": 2,
-              "display": "flex",
-              "flexDirection": "row",
-              "justifyContent": "flex-start",
-              "marginBottom": 0,
-              "width": "100%",
-            }
-          }
-        >
-          <View
-            style={
-              {
-                "backgroundColor": "blue",
-                "borderLeftColor": "rgb(0, 122, 255)",
-                "borderLeftWidth": 1,
-                "borderRightColor": "blue",
-                "borderRightWidth": 1,
-                "height": 10,
-                "width": "75.005%",
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "backgroundColor": "yellow",
-                "borderBottomColor": "blue",
-                "borderBottomWidth": 5,
-                "borderRightColor": "yellow",
-                "borderRightWidth": 1,
-                "height": 10,
-                "width": "20%",
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "backgroundColor": "#333333",
-                "borderRightColor": "rgb(0, 122, 255)",
-                "borderRightWidth": 1,
-                "height": 10,
-                "width": "4.995%",
-              }
-            }
-          />
-        </View>
-        <View
-          style={
-            {
-              "alignItems": "center",
-              "display": "flex",
-              "flexDirection": "row",
-              "justifyContent": "flex-start",
-              "marginTop": 5,
-              "width": "100%",
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "rgb(0, 122, 255)",
-              }
-            }
-          >
-            translated text
-          </Text>
-          <View
-            style={
-              {
-                "backgroundColor": "blue",
-                "display": "flex",
-                "flexDirection": "row",
-                "height": 10,
-                "justifyContent": "flex-start",
-                "margin": 5,
-                "width": 10,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "rgb(28, 28, 30)",
-              }
-            }
-          >
-            1900100translated text
-          </Text>
-        </View>
-        <View
-          style={
-            {
-              "alignItems": "center",
-              "display": "flex",
-              "flexDirection": "row",
-              "justifyContent": "flex-start",
-              "marginTop": 5,
-              "width": "100%",
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "rgb(0, 122, 255)",
-              }
-            }
-          >
-            translated text
-          </Text>
-          <View
-            style={
-              {
-                "backgroundColor": "yellow",
-                "display": "flex",
-                "flexDirection": "row",
-                "height": 10,
-                "justifyContent": "flex-start",
-                "margin": 5,
-                "width": 10,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "rgb(28, 28, 30)",
-              }
-            }
-          >
-            400000translated text
-          </Text>
-        </View>
-        <View
-          style={
-            {
-              "backgroundColor": "white",
-              "height": 1,
-              "marginBottom": 10,
-              "marginTop": 15,
-              "width": "100%",
-            }
-          }
-        />
-        <View
-          style={
-            {
-              "display": "flex",
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-              "marginTop": 10,
-              "width": "100%",
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "rgb(0, 122, 255)",
-              }
-            }
-          >
-            1500100
+            1600099
           </Text>
           <Text
             style={
@@ -554,10 +306,10 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
                 "backgroundColor": "lightyellow",
                 "borderLeftColor": "rgb(0, 122, 255)",
                 "borderLeftWidth": 1,
-                "borderRightColor": "lightyellow",
+                "borderRightColor": "rgb(0, 122, 255)",
                 "borderRightWidth": 1,
                 "height": 10,
-                "width": "24.99975%",
+                "width": "100%",
               }
             }
           />
@@ -568,18 +320,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
                 "borderRightColor": "orange",
                 "borderRightWidth": 1,
                 "height": 10,
-                "width": "50.00025%",
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "backgroundColor": "#333333",
-                "borderRightColor": "rgb(0, 122, 255)",
-                "borderRightWidth": 1,
-                "height": 10,
-                "width": "24.999999999999993%",
+                "width": "100%",
               }
             }
           />
@@ -603,7 +344,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               }
             }
           >
-            translated text
+            text translated
           </Text>
           <View
             style={
@@ -625,7 +366,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               }
             }
           >
-            99999translated text25.00%
+            1600099text translated100%
           </Text>
         </View>
         <View
@@ -647,7 +388,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               }
             }
           >
-            translated text
+            text translated
           </Text>
           <View
             style={
@@ -670,52 +411,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             }
             testID="syncreport.syncednow"
           >
-            200001translated text50.00%
-          </Text>
-        </View>
-        <View
-          style={
-            {
-              "alignItems": "center",
-              "display": "flex",
-              "flexDirection": "row",
-              "justifyContent": "flex-start",
-              "marginTop": 5,
-              "width": "100%",
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "rgb(0, 122, 255)",
-              }
-            }
-          >
-            translated text
-          </Text>
-          <View
-            style={
-              {
-                "backgroundColor": "#333333",
-                "display": "flex",
-                "flexDirection": "row",
-                "height": 10,
-                "justifyContent": "flex-start",
-                "margin": 5,
-                "width": 10,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "rgb(28, 28, 30)",
-              }
-            }
-            testID="syncreport.notyetsynced"
-          >
-            100000translated text25.00%
+            200001text translated100%
           </Text>
         </View>
         <View
@@ -744,9 +440,26 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               }
             }
           >
-            translated text
+            text translated
           </Text>
           <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -774,7 +487,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               }
               testID="syncreport.currentbatch"
             >
-              translated text5translated text50
+              text translated5text translated50
             </Text>
           </View>
         </View>
@@ -794,9 +507,26 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               }
             }
           >
-            translated text
+            text translated
           </Text>
           <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -852,9 +582,26 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
                 }
               }
             >
-              translated text
+              text translated
             </Text>
             <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
               accessible={true}
               collapsable={false}
               focusable={true}
@@ -916,9 +663,26 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               }
             }
           >
-            translated text
+            text translated
           </Text>
           <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
             accessible={true}
             collapsable={false}
             focusable={true}
@@ -945,7 +709,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
                 }
               }
             >
-              translated text1800100translated text1900100
+              text translated1800100text translated1900100
             </Text>
           </View>
         </View>
@@ -964,6 +728,23 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     }
   >
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
@@ -1017,7 +798,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             }
           }
         >
-          translated text
+          text translated
         </Text>
       </View>
     </View>

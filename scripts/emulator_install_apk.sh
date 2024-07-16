@@ -3,8 +3,9 @@ set -e
 cd $(git rev-parse --show-toplevel)
 source ./scripts/emulator_read_target.sh
 
-echo -e "\nBuilding APKs..."
+echo -e "\nCleaning & Building APKs..."
 cd android
+./gradlew clean
 ./gradlew assembleDebug -PsplitApk=true
 cd ..
 

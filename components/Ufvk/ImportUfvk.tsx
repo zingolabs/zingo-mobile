@@ -18,6 +18,9 @@ import { RPCParseViewKeyType } from '../../app/rpc/types/RPCParseViewKeyType';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+import { ButtonTypeEnum, CommandEnum, GlobalConst } from '../../app/AppState';
+import { RPCParseStatusEnum } from '../../app/rpc/enums/RPCParseStatusEnum';
 
 type ImportUfvkProps = {
   onClickCancel: () => void;
@@ -58,7 +61,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
       (async () => {
         const resp: string = await RPCModule.getLatestBlock(server.uri);
         //console.log(resp);
-        if (resp && !resp.toLowerCase().startsWith('error')) {
+        if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
           setLatestBlock(Number(resp));
         } else {
           //console.log('error latest block', resp);
@@ -69,13 +72,9 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
 
   const okButton = async () => {
     if (!netInfo.isConnected) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, type: 'Primary' });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
-    //const valid = await validateKey(ufvkText);
-    //if (!valid) {
-    //  return;
-    //}
     onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
   };
 
@@ -83,33 +82,33 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   // the validation of the ufvk will be when we try to `restore from ufvk'...
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const validateKey = async (scannedKey: string): Promise<boolean> => {
-    const result: string = await RPCModule.execute('parse_viewkey', scannedKey);
+    const result: string = await RPCModule.execute(CommandEnum.parseViewkey, scannedKey);
     //console.log(result);
     if (result) {
-      if (result.toLowerCase().startsWith('error')) {
-        addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
+      if (result.toLowerCase().startsWith(GlobalConst.error)) {
+        addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
         return false;
       }
     } else {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
+      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
       return false;
     }
     let resultJSON = {} as RPCParseViewKeyType;
     try {
       resultJSON = await JSON.parse(result);
     } catch (e) {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
+      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
       return false;
     }
 
     //console.log('parse ufvk', scannedKey, resultJSON);
 
-    const valid = resultJSON.status === 'success' && resultJSON.chain_name === server.chain_name;
+    const valid = resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chainName;
 
     if (valid) {
       return true;
     } else {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}`, type: 'Primary' });
+      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
       return false;
     }
   };
@@ -275,7 +274,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           marginVertical: 5,
         }}>
         <Button
-          type="Primary"
+          type={ButtonTypeEnum.Primary}
           title={translate('import.button') as string}
           onPress={() => {
             Keyboard.dismiss();
@@ -283,7 +282,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           }}
         />
         <Button
-          type="Secondary"
+          type={ButtonTypeEnum.Secondary}
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}
           onPress={onClickCancel}

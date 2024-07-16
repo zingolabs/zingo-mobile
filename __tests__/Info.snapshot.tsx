@@ -7,7 +7,11 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Info from '../components/Info';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -45,22 +49,11 @@ jest.mock('react-native', () => {
 describe('Component Info - test', () => {
   //snapshot test
   test('Info - snapshot', () => {
-    const state = defaultAppStateLoaded;
-    state.info = {
-      serverUri: 'https://zcash.es',
-      latestBlock: 2000100,
-      connections: 0,
-      version: '3.3.3.0',
-      verificationProgress: 0,
-      currencyName: 'ZEC',
-      solps: 0,
-      defaultFee: 10000,
-      chain_name: 'main',
-      zingolib: 'mob-release...',
-    };
-    state.zecPrice.zecPrice = 33.33;
-    state.translate = () => 'translated text';
-    state.totalBalance.total = 1.12345678;
+    const state = defaultAppContextLoaded;
+    state.info = mockInfo;
+    state.zecPrice = mockZecPrice;
+    state.translate = mockTranslate;
+    state.totalBalance = mockTotalBalance;
     const onClose = jest.fn();
     const onSet = jest.fn();
     const info: any = render(

@@ -7,7 +7,10 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import Pools from '../components/Pools';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -44,20 +47,15 @@ jest.mock('react-native', () => {
 // test suite
 describe('Component Pools - test', () => {
   //snapshot test
-  const state = defaultAppStateLoaded;
-  state.translate = () => 'translated text';
-  state.info.currencyName = 'ZEC';
-  state.totalBalance.total = 1.12345678;
-  state.totalBalance.orchardBal = 0.6;
-  state.totalBalance.spendableOrchard = 0.3;
-  state.totalBalance.privateBal = 0.4;
-  state.totalBalance.spendablePrivate = 0.2;
-  state.totalBalance.transparentBal = 0.12345678;
+  const state = defaultAppContextLoaded;
+  state.translate = mockTranslate;
+  state.info = mockInfo;
+  state.totalBalance = mockTotalBalance;
   const onClose = jest.fn();
   test('Pools - snapshot', () => {
     const pools = render(
       <ContextAppLoadedProvider value={state}>
-        <Pools closeModal={onClose} set_privacy_option={onClose} />
+        <Pools closeModal={onClose} setPrivacyOption={onClose} />
       </ContextAppLoadedProvider>,
     );
     expect(pools.toJSON()).toMatchSnapshot();

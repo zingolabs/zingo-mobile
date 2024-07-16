@@ -12,7 +12,7 @@ mod e2e {
     use super::*;
 
     #[tokio::test]
-    async fn reload_while_tx_unconfirmed() {
+    async fn reload_while_tx_pending() {
         #[cfg(not(feature = "regchest"))]
         let (_regtest_manager, _child_process_handler) =
             scenarios::funded_orchard_mobileclient(1_000_000).await;
@@ -24,7 +24,7 @@ mod e2e {
             };
 
         let (exit_code, output, error) =
-            zingomobile_utils::android_e2e_test("reload_while_tx_unconfirmed");
+            zingomobile_utils::android_e2e_test("reload_while_tx_pending");
 
         #[cfg(feature = "regchest")]
         match regchest_utils::close(&docker).await {

@@ -7,7 +7,10 @@ import React from 'react';
 
 import { render, screen } from '@testing-library/react-native';
 import Info from '../components/Info';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import { CurrencyEnum } from '../app/AppState';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -45,21 +48,10 @@ jest.mock('react-native', () => {
 describe('Component Info - test', () => {
   //unit test
   test('Info - price with us (.) decimal point', () => {
-    const state = defaultAppStateLoaded;
-    state.info = {
-      serverUri: 'https://zcash.es',
-      latestBlock: 2000100,
-      connections: 0,
-      version: '3.3.3.0',
-      verificationProgress: 0,
-      currencyName: 'ZEC',
-      solps: 0,
-      defaultFee: 10000,
-      chain_name: 'main',
-      zingolib: 'mob-release...',
-    };
-    state.zecPrice.zecPrice = 33.33;
-    state.currency = 'USD';
+    const state = defaultAppContextLoaded;
+    state.info = mockInfo;
+    state.zecPrice = mockZecPrice;
+    state.currency = CurrencyEnum.USDCurrency;
     const onClose = jest.fn();
     const onSet = jest.fn();
     render(

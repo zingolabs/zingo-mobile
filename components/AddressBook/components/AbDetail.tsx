@@ -3,7 +3,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { View, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { AddressBookFileClass } from '../../../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, GlobalConst } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
@@ -14,13 +14,14 @@ import FadeText from '../../Components/FadeText';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
 
 type AbDetailProps = {
   index: number;
   item: AddressBookFileClass;
   cancel: () => void;
-  action: 'Add' | 'Modify' | 'Delete';
-  doAction: (action: 'Add' | 'Modify' | 'Delete', label: string, address: string) => void;
+  action: AddressBookActionEnum;
+  doAction: (action: AddressBookActionEnum, label: string, address: string) => void;
   addressBookCurrentAddress?: string;
 };
 const AbDetail: React.FunctionComponent<AbDetailProps> = ({
@@ -38,7 +39,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
 
   const [label, setLabel] = useState<string>(item.label);
   const [address, setAddress] = useState<string>(item.address);
-  const [action, setAction] = useState<'Add' | 'Modify' | 'Delete'>(actionProp);
+  const [action, setAction] = useState<AddressBookActionEnum>(actionProp);
   const [error, setError] = useState<string>('');
   const [errorAddress, setErrorAddress] = useState<string>('');
 
@@ -47,12 +48,12 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
       setAddress(addressBookCurrentAddress);
     }
     if (item.label !== label && item.address !== address) {
-      setAction('Add');
+      setAction(AddressBookActionEnum.Add);
     } else {
       setAction(actionProp);
     }
     setError('');
-    if ((!label || !address) && action === 'Modify') {
+    if ((!label || !address) && action === AddressBookActionEnum.Modify) {
       setError(translate('addressbook.fillboth') as string);
     }
     if (item.label !== label && addressBook.filter((elem: AddressBookFileClass) => elem.label === label).length > 0) {
@@ -71,7 +72,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
       ) {
         setError(translate('addressbook.addressexists') as string);
       } else {
-        if (item.label === label && item.address === address && action === 'Modify') {
+        if (item.label === label && item.address === address && action === AddressBookActionEnum.Modify) {
           setError(translate('addressbook.nochanges') as string);
         }
       }
@@ -96,7 +97,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
     }
     let newAddress: string = addr;
     // Attempt to parse as URI if it starts with zcash
-    if (addr.toLowerCase().startsWith('zcash:')) {
+    if (addr.toLowerCase().startsWith(GlobalConst.zcash)) {
       const target: string | ZcashURITargetClass = await parseZcashURI(addr, translate, server);
       //console.log(targets);
 
@@ -107,7 +108,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         });
       } else {
         // Show the error message as a toast
-        addLastSnackbar({ message: target, type: 'Primary' });
+        addLastSnackbar({ message: target });
         //return;
       }
     } else {
@@ -159,7 +160,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
             placeholderTextColor={colors.placeholder}
             value={label}
             onChangeText={(text: string) => setLabel(text)}
-            editable={action !== 'Delete'}
+            editable={action !== AddressBookActionEnum.Delete}
           />
         </View>
       </View>
@@ -167,7 +168,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         address={address}
         setAddress={updateAddress}
         setError={setErrorAddress}
-        disabled={action === 'Delete'}
+        disabled={action === AddressBookActionEnum.Delete}
       />
       {(!!error || !!errorAddress) && (
         <View
@@ -191,14 +192,19 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         }}>
         <Button
           testID="addressbook.button.action"
-          type="Primary"
+          type={ButtonTypeEnum.Primary}
           title={translate(`addressbook.${action.toLowerCase()}`) as string}
           onPress={() => {
             doAction(action, label, address);
           }}
-          disabled={action === 'Delete' ? false : error || errorAddress ? true : false}
+          disabled={action === AddressBookActionEnum.Delete ? false : error || errorAddress ? true : false}
         />
-        <Button type="Secondary" title={translate('cancel') as string} style={{ marginLeft: 10 }} onPress={cancel} />
+        <Button
+          type={ButtonTypeEnum.Secondary}
+          title={translate('cancel') as string}
+          style={{ marginLeft: 10 }}
+          onPress={cancel}
+        />
       </View>
     </View>
   );

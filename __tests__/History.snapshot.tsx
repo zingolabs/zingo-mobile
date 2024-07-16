@@ -7,7 +7,14 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import History from '../components/History';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
+import { CurrencyEnum, ModeEnum } from '../app/AppState';
+import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
+import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
+import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
+import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -50,6 +57,10 @@ jest.mock('moment/locale/pt', () => () => ({
   defineLocale: jest.fn(),
 }));
 
+jest.mock('moment/locale/ru', () => () => ({
+  defineLocale: jest.fn(),
+}));
+
 jest.mock('react-native-gesture-handler', () => {
   const View = require('react-native').View;
   return {
@@ -74,105 +85,30 @@ jest.mock('react-native', () => {
 
   return RN;
 });
+jest.mock('@react-navigation/native', () => ({
+  useScrollToTop: jest.fn(),
+  useTheme: () => mockTheme,
+}));
 
 // test suite
 describe('Component History - test', () => {
   //snapshot test
-  const state = defaultAppStateLoaded;
-  state.transactions = [
-    {
-      type: 'Sent',
-      fee: 0.0001,
-      confirmations: 22,
-      txid: 'sent-txid-1234567890',
-      time: Date.now(),
-      zec_price: 33.33,
-      txDetails: [
-        {
-          address: 'sent-address-1-12345678901234567890',
-          amount: 0.12345678,
-          memos: ['hola', '  & ', 'hello'],
-        },
-        {
-          address: 'sent-address-2-09876543210987654321',
-          amount: 0,
-          memos: ['hello', '  & ', 'hola'],
-        },
-      ],
-    },
-    {
-      type: 'SendToSelf',
-      fee: 0.0001,
-      confirmations: 12,
-      txid: 'sendtoself-txid-1234567890',
-      time: Date.now(),
-      zec_price: 33.33,
-      txDetails: [
-        {
-          address: '',
-          amount: 0,
-          memos: ['orchard memo', 'sapling memo'],
-        },
-      ],
-    },
-    {
-      type: 'Received',
-      confirmations: 133,
-      txid: 'receive-txid-1234567890',
-      time: Date.now(),
-      zec_price: 66.66,
-      txDetails: [
-        {
-          address: '',
-          amount: 0.77654321,
-          pool: 'Orchard',
-          memos: ['hola', '  & ', 'hello'],
-        },
-        {
-          address: '',
-          amount: 0.1,
-          pool: 'Sapling',
-          memos: ['hello', '  & ', 'hola'],
-        },
-      ],
-    },
-  ];
-  state.uaAddress = 'UA-12345678901234567890';
-  state.addresses = [
-    {
-      uaAddress: 'UA-12345678901234567890',
-      address: 'UA-12345678901234567890',
-      addressKind: 'u',
-      containsPending: false,
-      receivers: 'ozt',
-    },
-    {
-      uaAddress: 'UA-12345678901234567890',
-      address: 'sapling-12345678901234567890',
-      addressKind: 'z',
-      containsPending: false,
-      receivers: 'z',
-    },
-    {
-      uaAddress: 'UA-12345678901234567890',
-      address: 'transparent-12345678901234567890',
-      addressKind: 't',
-      containsPending: false,
-      receivers: 't',
-    },
-  ];
-  state.translate = () => 'text translated';
-  state.info.currencyName = 'ZEC';
-  state.totalBalance.total = 1.12345678;
+  const state = defaultAppContextLoaded;
+  state.valueTransfers = mockValueTransfers;
+  state.uaAddress = mockAddresses[0].uaAddress;
+  state.addresses = mockAddresses;
+  state.translate = mockTranslate;
+  state.info = mockInfo;
+  state.totalBalance = mockTotalBalance;
   const onFunction = jest.fn();
 
   test('History no currency, privacy normal & mode basic - snapshot', () => {
     // no currency
-    state.currency = '';
+    state.currency = CurrencyEnum.noCurrency;
     // privacy normal
     state.privacy = false;
     // mode basic
-    state.mode = 'basic';
+    state.mode = ModeEnum.basic;
     const history = render(
       <ContextAppLoadedProvider value={state}>
         <History
@@ -182,10 +118,13 @@ describe('Component History - test', () => {
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
           setComputingModalVisible={onFunction}
-          set_privacy_option={onFunction}
-          setPoolsToShieldSelectSapling={onFunction}
-          setPoolsToShieldSelectTransparent={onFunction}
+          setPrivacyOption={onFunction}
+          //setPoolsToShieldSelectSapling={onFunction}
+          //setPoolsToShieldSelectTransparent={onFunction}
           setSendPageState={onFunction}
+          setShieldingAmount={onFunction}
+          setScrollToTop={onFunction}
+          scrollToTop={false}
         />
       </ContextAppLoadedProvider>,
     );
@@ -194,11 +133,11 @@ describe('Component History - test', () => {
 
   test('History currency USD, privacy high & mode advanced - snapshot', () => {
     // no currency
-    state.currency = 'USD';
+    state.currency = CurrencyEnum.USDCurrency;
     // privacy normal
     state.privacy = true;
     // mode basic
-    state.mode = 'advanced';
+    state.mode = ModeEnum.advanced;
     const history = render(
       <ContextAppLoadedProvider value={state}>
         <History
@@ -208,10 +147,13 @@ describe('Component History - test', () => {
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
           setComputingModalVisible={onFunction}
-          set_privacy_option={onFunction}
-          setPoolsToShieldSelectSapling={onFunction}
-          setPoolsToShieldSelectTransparent={onFunction}
+          setPrivacyOption={onFunction}
+          //setPoolsToShieldSelectSapling={onFunction}
+          //setPoolsToShieldSelectTransparent={onFunction}
           setSendPageState={onFunction}
+          setShieldingAmount={onFunction}
+          setScrollToTop={onFunction}
+          scrollToTop={false}
         />
       </ContextAppLoadedProvider>,
     );

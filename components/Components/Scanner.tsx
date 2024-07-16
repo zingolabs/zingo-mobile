@@ -8,6 +8,7 @@ import { BarCodeReadEvent } from 'react-native-camera';
 import RegText from './RegText';
 import Button from './Button';
 import { ThemeType } from '../../app/types/ThemeType';
+import { ButtonTypeEnum } from '../../app/AppState';
 
 type ScannerProps = {
   onRead: (e: BarCodeReadEvent) => void;
@@ -44,7 +45,7 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead, doCancel, titl
         bottomContent={
           <View>
             <View style={{ width: '100%' }}>
-              <Button testID="scan.cancel" type="Secondary" title={button} onPress={doCancel} />
+              <Button testID="scan.cancel" type={ButtonTypeEnum.Secondary} title={button} onPress={doCancel} />
             </View>
           </View>
         }

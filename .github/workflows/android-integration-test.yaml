@@ -1,4 +1,4 @@
-name: Integration test
+name: Android Integration test
 
 on:
   workflow_call:
@@ -21,9 +21,9 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
-  build-test-artifacts:
-    name: Build test artifacts
-    runs-on: macos-12
+  android-build-test-artifacts:
+    name: Android Build test artifacts
+    runs-on: macos-13
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -59,10 +59,10 @@ jobs:
           name: nextest-archive-${{ env.ABI }}
           path: ./rust/nextest-archive-${{ env.ABI }}.tar.zst
 
-  integration-test:
-    name: Integration test
-    runs-on: macos-12
-    needs: build-test-artifacts
+  android-integration-test:
+    name: Android Integration test
+    runs-on: macos-13
+    needs: android-build-test-artifacts
     strategy:
       matrix:
         partition: [1, 2, 3, 4, 5]
@@ -100,9 +100,36 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Install docker
+      - name: Setup Docker 1 try
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry1
+        continue-on-error: true
+        with:
+          lima: v0.18.0
+          colima: v0.5.6
+
+      - name: checking outcome 1
+        run: echo ${{ steps.dockerTry1.outcome }}
+
+      - name: Setup Docker 2 try
+        if: steps.dockerTry1.outcome != 'success'
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry2
+        continue-on-error: true
+        with:
+          lima: v0.18.0
+          colima: v0.5.6
+
+      - name: checking outcome 2
+        run: echo ${{ steps.dockerTry2.outcome }}
+
+      - name: Setup Docker Manually
+        if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
         run: |
-          brew install docker
+          brew uninstall colima
+          brew tap colima/releases
+          brew install colima@0.5.6
+          brew install --formula docker
           colima start
 
       - name: Pull regchest docker image
@@ -121,10 +148,10 @@ jobs:
           workspaces: rust
 
       - name: Native rust cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ABI }}
-          key: native-librust-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
       
       - name: Setup Java
@@ -142,7 +169,7 @@ jobs:
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: 7.5
+          gradle-version: 8.0.1
           build-root-directory: ./android
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
       
@@ -157,7 +184,7 @@ jobs:
           
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 60
           max_attempts: 3

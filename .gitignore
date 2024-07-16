@@ -24,11 +24,13 @@ DerivedData
 # Exclude compiled libs
 android/app/src/main/jniLibs
 android/app/release/
-ios/libuniffi_rustlib.a
-ios/rustlib.swift
-ios/rustlibFFI.h
-ios/rustlibFFI.modulemap
-rust/lib/Generated/
+ios/libuniffi_zingo.a
+ios/zingo.swift
+ios/zingoFFI.h
+ios/zingoFFI.modulemap
+rust/lib/Generated/zingo.swift
+rust/lib/Generated/zingoFFI.h
+rust/lib/Generated/zingoFFI.modulemap
 
 # Android/IntelliJ
 #
@@ -80,3 +82,7 @@ buck-out/
 
 # bundle file
 /**/index.android.bundle
+
+# firebase
+/**/google-services.json
+/**/GoogleService-Info.plist

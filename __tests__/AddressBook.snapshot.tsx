@@ -6,9 +6,11 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import { defaultAppStateLoaded, ContextAppLoadedProvider } from '../app/context';
+import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
 import AddressBook from '../components/AddressBook/AddressBook';
-import { ThemeType } from '../app/types';
+import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -41,44 +43,18 @@ jest.mock('react-native', () => {
 
   return RN;
 });
-const Theme: ThemeType = {
-  dark: true,
-  colors: {
-    background: '#011401', //'#010101',
-    card: '#011401', //'#401717',
-    border: '#ffffff',
-    primary: '#18bd18', //'#df4100',
-    primaryDisabled: '#5a8c5a', //'rgba(90, 140, 90, 1)',
-    secondaryDisabled: '#233623',
-    text: '#c3c3c3',
-    zingo: '#888888',
-    placeholder: '#888888',
-    money: '#ffffff',
-    syncing: '#ebff5a',
-    notification: '',
-  },
-};
 jest.mock('@react-navigation/native', () => ({
   useScrollToTop: jest.fn(),
-  useTheme: () => Theme,
+  useTheme: () => mockTheme,
 }));
 
 // test suite
 describe('Component Address Book - test', () => {
   //snapshot test
   test('Address Book - snapshot', () => {
-    const state = defaultAppStateLoaded;
-    state.addressBook = [
-      {
-        label: 'pepe',
-        address: 'u1234567890_____________',
-      },
-      {
-        label: 'lolo',
-        address: 'u0987654321_____________',
-      },
-    ];
-    state.translate = () => 'translated text';
+    const state = defaultAppContextLoaded;
+    state.addressBook = mockAddressBook;
+    state.translate = mockTranslate;
     const onClose = jest.fn();
     const onSet = jest.fn();
     const ab: any = render(

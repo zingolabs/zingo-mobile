@@ -14,6 +14,8 @@ import RegText from '../Components/RegText';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
+import 'moment/locale/ru';
+import { ButtonTypeEnum, ChainNameEnum, CurrencyEnum } from '../../app/AppState';
 
 type InfoProps = {
   closeModal: () => void;
@@ -66,22 +68,22 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
           <DetailLine
             label={translate('info.network') as string}
             value={
-              !info.chain_name
+              !info.chainName
                 ? (translate('loading') as string)
-                : info.chain_name === 'main'
+                : info.chainName === ChainNameEnum.mainChainName
                 ? 'Mainnet'
-                : info.chain_name === 'test'
+                : info.chainName === ChainNameEnum.testChainName
                 ? 'Testnet'
-                : info.chain_name === 'regtest'
+                : info.chainName === ChainNameEnum.regtestChainName
                 ? 'Regtest'
-                : (translate('info.unknown') as string) + ' (' + info.chain_name + ')'
+                : (translate('info.unknown') as string) + ' (' + info.chainName + ')'
             }
           />
           <DetailLine
             label={translate('info.serverblock') as string}
             value={info.latestBlock ? info.latestBlock.toString() : (translate('loading') as string)}
           />
-          {currency === 'USD' && (
+          {currency === CurrencyEnum.USDCurrency && (
             <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
               <DetailLine label={translate('info.zecprice') as string}>
                 {zecPrice.zecPrice === -1 && (
@@ -108,7 +110,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
           alignItems: 'center',
           marginVertical: 5,
         }}>
-        <Button type="Secondary" title={translate('close') as string} onPress={closeModal} />
+        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
       </View>
     </SafeAreaView>
   );
