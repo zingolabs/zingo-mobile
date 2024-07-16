@@ -33,7 +33,6 @@ import {
   TotalBalanceClass,
   SendPageStateClass,
   InfoType,
-  TransactionType,
   ToAddrClass,
   SyncingStatusClass,
   SendProgressClass,
@@ -59,13 +58,14 @@ import {
   SnackbarType,
   AppStateStatusEnum,
   GlobalConst,
-  TransactionTypeEnum,
   EventListenerEnum,
   AppContextLoaded,
   NetInfoType,
   WalletType,
   BackgroundErrorType,
   ReceivePageStateClass,
+  ValueTransferType,
+  ValueTransferKindEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -348,7 +348,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       wallet: {} as WalletType,
       totalBalance: {} as TotalBalanceClass,
       addresses: [] as AddressClass[],
-      transactions: [] as TransactionType[],
+      valueTransfers: [] as ValueTransferType[],
       walletSettings: {} as WalletSettingsClass,
       syncingStatus: {} as SyncingStatusClass,
       sendProgress: {} as SendProgressClass,
@@ -406,11 +406,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       addressBookModalVisible: false,
       newServer: {} as ServerType,
       somePending: false,
+      scrollToTop: false,
     };
 
     this.rpc = new RPC(
       this.setTotalBalance,
-      this.setTransactionList,
+      this.setValueTransfersList,
       this.setAllAddresses,
       this.setWalletSettings,
       this.setInfo,
@@ -723,7 +724,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setTransactionList = async (transactions: TransactionType[]) => {
+  setValueTransfersList = async (valueTransfers: ValueTransferType[]) => {
     const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
     // only for basic mode
     if (this.state.mode === ModeEnum.basic) {
@@ -731,8 +732,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       if (!basicFirstViewSeed) {
         // only if the App are in foreground
         const background = await AsyncStorage.getItem(GlobalConst.background);
-        // only if the wallet have some transactions
-        if (background === GlobalConst.no && transactions.length > 0) {
+        // only if the wallet have some ValueTransfers
+        if (background === GlobalConst.no && valueTransfers.length > 0) {
           // I need to check this out in the seed screen.
           await this.fetchWallet();
           this.setState({ seedViewModalVisible: true });
@@ -744,98 +745,92 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
       }
     }
-    if (deepDiff(this.state.transactions, transactions)) {
-      //console.log('fetch transactions');
-      // set somePending as well here when I know there is something new in transactions
+    if (deepDiff(this.state.valueTransfers, valueTransfers)) {
+      //console.log('fetch ValueTransfers');
+      // set somePending as well here when I know there is something new in ValueTransfers
       const pending: number =
-        transactions.length > 0 ? transactions.filter((tx: TransactionType) => tx.confirmations === 0).length : 0;
-      // if a transaction go from 0 confirmations to > 0 -> Show a message about a transaction is confirmed
-      this.state.transactions.length > 0 &&
-        this.state.transactions
-          .filter((txOld: TransactionType) => !txOld.confirmations || txOld.confirmations === 0)
-          .forEach((txOld: TransactionType) => {
-            const txNew = transactions.filter((tx: TransactionType) => tx.txid === txOld.txid);
-            console.log('old', txOld);
-            console.log('new', txNew);
-            // the transaction is confirmed
-            if (txNew.length > 0 && txNew[0].confirmations > 0) {
+        valueTransfers.length > 0 ? valueTransfers.filter((vt: ValueTransferType) => vt.confirmations === 0).length : 0;
+      // if a ValueTransfer go from 0 confirmations to > 0 -> Show a message about a ValueTransfer is confirmed
+      this.state.valueTransfers.length > 0 &&
+        this.state.valueTransfers
+          .filter((vtOld: ValueTransferType) => !vtOld.confirmations || vtOld.confirmations === 0)
+          .forEach((vtOld: ValueTransferType) => {
+            const vtNew = valueTransfers.filter(
+              (vt: ValueTransferType) =>
+                vt.txid === vtOld.txid && vt.address === vtOld.address && vt.poolType === vtOld.poolType,
+            );
+            console.log('old', vtOld);
+            console.log('new', vtNew);
+            // the ValueTransfer is confirmed
+            if (vtNew.length > 0 && vtNew[0].confirmations > 0) {
               let message: string = '';
               let title: string = '';
-              if (txNew[0].type === TransactionTypeEnum.Received) {
+              if (vtNew[0].kind === ValueTransferKindEnum.Received) {
                 message =
                   (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.received') as string) +
                   ' ' +
-                  Utils.parseNumberFloatToStringLocale(
-                    txNew[0].txDetails.reduce((s, d) => s + d.amount, 0),
-                    8,
-                  ) +
+                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate('loadedapp.uas-menu') as string;
-              } else if (txNew[0].type === TransactionTypeEnum.MemoToSelf) {
+              } else if (vtNew[0].kind === ValueTransferKindEnum.MemoToSelf) {
                 message =
-                  (this.state.translate('loadedapp.transaction-confirmed') as string) +
+                  (this.state.translate('loadedapp.valuetransfer-confirmed') as string) +
                   (this.state.translate('history.memotoself') as string) +
-                  (txNew[0].fee
+                  (vtNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
                       ' ' +
-                      Utils.parseNumberFloatToStringLocale(txNew[0].fee, 8) +
+                      Utils.parseNumberFloatToStringLocale(vtNew[0].fee, 8) +
                       ' ' +
                       this.state.info.currencyName
                     : '');
                 title = this.state.translate('loadedapp.send-menu') as string;
-              } else if (txNew[0].type === TransactionTypeEnum.SendToSelf) {
+              } else if (vtNew[0].kind === ValueTransferKindEnum.SendToSelf) {
                 message =
-                  (this.state.translate('loadedapp.transaction-confirmed') as string) +
+                  (this.state.translate('loadedapp.valuetransfer-confirmed') as string) +
                   (this.state.translate('history.sendtoself') as string) +
-                  (txNew[0].fee
+                  (vtNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
                       ' ' +
-                      Utils.parseNumberFloatToStringLocale(txNew[0].fee, 8) +
+                      Utils.parseNumberFloatToStringLocale(vtNew[0].fee, 8) +
                       ' ' +
                       this.state.info.currencyName
                     : '');
                 title = this.state.translate('loadedapp.send-menu') as string;
-              } else if (txNew[0].type === TransactionTypeEnum.Shield) {
+              } else if (vtNew[0].kind === ValueTransferKindEnum.Shield) {
                 message =
-                  (this.state.translate('loadedapp.transaction-confirmed') as string) +
+                  (this.state.translate('loadedapp.incoming-funds') as string) +
                   (this.state.translate('history.shield') as string) +
-                  (txNew[0].fee
-                    ? ((' ' + this.state.translate('send.fee')) as string) +
-                      ' ' +
-                      Utils.parseNumberFloatToStringLocale(txNew[0].fee, 8) +
-                      ' ' +
-                      this.state.info.currencyName
-                    : '');
-                title = this.state.translate('loadedapp.send-menu') as string;
+                  ' ' +
+                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
+                  ' ' +
+                  this.state.info.currencyName;
+                title = this.state.translate('loadedapp.uas-menu') as string;
               } else {
                 message =
                   (this.state.translate('loadedapp.payment-made') as string) +
                   (this.state.translate('history.sent') as string) +
                   ' ' +
-                  Utils.parseNumberFloatToStringLocale(
-                    txNew[0].txDetails.reduce((s, d) => s + d.amount, 0),
-                    8,
-                  ) +
+                  Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
                   ' ' +
                   this.state.info.currencyName;
                 title = this.state.translate('loadedapp.send-menu') as string;
               }
               createAlert(this.setBackgroundError, this.addLastSnackbar, title, message, true);
             }
-            // the transaction is gone -> Likely Reverted by the server
-            if (txNew.length === 0) {
+            // the ValueTransfer is gone -> Likely Reverted by the server
+            if (vtNew.length === 0) {
               createAlert(
                 this.setBackgroundError,
                 this.addLastSnackbar,
                 this.state.translate('loadedapp.send-menu') as string,
-                this.state.translate('loadedapp.transaction-reverted') as string,
+                this.state.translate('loadedapp.valuetransfer-reverted') as string,
                 true,
               );
             }
           });
-      this.setState({ transactions, somePending: pending > 0 });
+      this.setState({ valueTransfers, somePending: pending > 0 });
     }
   };
 
@@ -1110,7 +1105,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             !resultJson.error ||
             (resultJson.error && resultJson.error.startsWith('This wallet is watch-only') && this.state.readOnly)
           ) {
-            // Load the wallet and navigate to the transactions screen
+            // Load the wallet and navigate to the ValueTransfers screen
             //console.log(`wallet loaded ok ${value.uri}`);
             if (toast) {
               this.addLastSnackbar({
@@ -1441,6 +1436,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     );
   };
 
+  setScrollToTop = (value: boolean) => {
+    this.setState({
+      scrollToTop: value,
+    });
+  };
+
   render() {
     const {
       aboutModalVisible,
@@ -1463,10 +1464,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       snackbars,
       isMenuDrawerOpen,
       mode,
-      transactions,
+      valueTransfers,
       readOnly,
       totalBalance,
       translate,
+      scrollToTop,
     } = this.state;
     const { colors } = this.props.theme;
 
@@ -1477,7 +1479,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       wallet: this.state.wallet,
       totalBalance: this.state.totalBalance,
       addresses: this.state.addresses,
-      transactions: this.state.transactions,
+      valueTransfers: this.state.valueTransfers,
       walletSettings: this.state.walletSettings,
       syncingStatus: this.state.syncingStatus,
       sendProgress: this.state.sendProgress,
@@ -1895,7 +1897,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
           {mode !== ModeEnum.basic ||
           (mode === ModeEnum.basic &&
-            (!(mode === ModeEnum.basic && transactions.length <= 0) ||
+            (!(mode === ModeEnum.basic && valueTransfers.length <= 0) ||
               (!readOnly &&
                 !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0)))) ? (
             <Tab.Navigator
@@ -1947,6 +1949,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                         setSendPageState={this.setSendPageState}
                         setShieldingAmount={this.setShieldingAmount}
+                        setScrollToTop={this.setScrollToTop}
+                        scrollToTop={scrollToTop}
                       />
                     </Suspense>
                   </>
@@ -1989,6 +1993,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                             setComputingModalVisible={this.setComputingModalVisible}
                             setPrivacyOption={this.setPrivacyOption}
                             setShieldingAmount={this.setShieldingAmount}
+                            setScrollToTop={this.setScrollToTop}
                           />
                         </Suspense>
                       </>

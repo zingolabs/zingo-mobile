@@ -479,7 +479,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               // here result can have an `error` field for watch-only which is actually OK.
               const resultJson: RPCSeedType = await JSON.parse(result);
               if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
-                // Load the wallet and navigate to the transactions screen
+                // Load the wallet and navigate to the ValueTransfers screen
                 const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
                 //console.log(walletKindStr);
                 try {

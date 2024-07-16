@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.4.1 (181)",
+  "version": "zingo-1.4.2 (185)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -134,9 +134,9 @@
     "selectingserverbest": "Neste momento ele é o servidor mais otimizado:",
     "nymmemo": "Eu preciso de segurança de rede Nym",
     "incoming-funds": "Fundos recebidos\n",
-    "transaction-confirmed": "Transação confirmada\n",
+    "valuetransfer-confirmed": "Transação confirmada\n",
     "payment-made": "Pagamento efetuado\n",
-    "transaction-reverted": "A transação foi revertida pelo servidor, tente novamente."
+    "valuetransfer-reverted": "A transação foi revertida pelo servidor, tente novamente."
   },
   "rpc": {
     "parsebirthday-error": "Erro: Não foi possível analisar como um número:",
@@ -415,7 +415,7 @@
     "confirm-title": "Confirmar Transação",
     "sending-title": "Processando",
     "confirm-amount": "Quantia",
-    "fee": "Taxa",
+    "fee": "Taxa transação",
     "confirm-button-all": "Confirmar Enviar Tudo",
     "amount": "Quantia",
     "to": "Para",
@@ -524,7 +524,8 @@
     "pool": "Pool",
     "contactcopied": "Contato copiado para a Área de Transparência",
     "address-http": "Zingo não tem ideia de quem lhe enviou este Endereço! Você deve autenticar o Remetente.",
-    "address-https": "Endereço Zingo-Authenticated"
+    "address-https": "Endereço Zingo-Authenticated",
+    "type": "Tipo"
   },
   "report": {
     "title": "Relatório de Sincronização / Rescan",

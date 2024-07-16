@@ -292,13 +292,17 @@ class ExecuteSendFromOrchard {
 
         val send = Send(addresses[0].receivers.transparent, 100000, null)
 
-        val txidJson: String = uniffi.zingo.executeCommand("send", mapper.writeValueAsString(listOf(send)))
-        println("\nTXID:")
-        println(txidJson)
+        val proposeJson: String = uniffi.zingo.executeCommand("send", mapper.writeValueAsString(listOf(send)))
+        println("\nPropose:")
+        println(proposeJson)
 
         val sendProgressJson: String = uniffi.zingo.executeCommand("sendprogress", "")
         println("\nSend progress:")
         println(sendProgressJson)
+
+        val confirmJson: String = uniffi.zingo.executeCommand("confirm", "")
+        println("\nConfirm Txid:")
+        println(confirmJson)
 
         syncJson = uniffi.zingo.executeCommand("sync", "")
         println("\nSync:")
@@ -346,7 +350,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         // the value transfers have 3 items for 3 different txs
         // 1. Received - 1_000_000 - orchard (1 item)
         // 2. Sent - 110_000 - uregtest1zkuzfv5m3... (1 item)
-        // 3. memoToSelf - 10_000 (1 item) -> in valueTransfers doesn't exists (Why?)
+        // 3. sendToSelf - 10_000 (1 item)
         assertThat(valueTranfers.value_transfers.size).isEqualTo(3)
         // first item have to be a `Received`
         assertThat(valueTranfers.value_transfers[0].kind).isEqualTo("received")
@@ -360,9 +364,9 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         assertThat(valueTranfers.value_transfers[1].value).isEqualTo(100000)
         assertThat(valueTranfers.value_transfers[1].transaction_fee).isEqualTo(10000)
         // third item have to be a `fee` from the last `Sent` with the same txid
-        assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("memo-to-self")
+        assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("send-to-self")
         assertThat(valueTranfers.value_transfers[2].status).isEqualTo("confirmed")
-        assertThat(valueTranfers.value_transfers[2].value).isEqualTo(100000)
+        assertThat(valueTranfers.value_transfers[2].value).isEqualTo(0)
         assertThat(valueTranfers.value_transfers[2].transaction_fee).isEqualTo(10000)
     }
 }

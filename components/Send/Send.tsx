@@ -25,7 +25,6 @@ import CurrencyAmount from '../Components/CurrencyAmount';
 import Button from '../Components/Button';
 import {
   AddressBookFileClass,
-  AddressClass,
   CommandEnum,
   SendPageStateClass,
   SendProgressClass,
@@ -76,6 +75,7 @@ type SendProps = {
   setShieldingAmount: (value: number) => void;
   //setPoolsToShieldSelectSapling: (v: boolean) => void;
   //setPoolsToShieldSelectTransparent: (v: boolean) => void;
+  setScrollToTop: (value: boolean) => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -92,6 +92,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setShieldingAmount,
   //setPoolsToShieldSelectSapling,
   //setPoolsToShieldSelectTransparent,
+  setScrollToTop,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -136,7 +137,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [stillConfirming, setStillConfirming] = useState<boolean>(false);
   const [showShieldInfo, setShowShieldInfo] = useState<boolean>(false);
   const [updatingToField, setUpdatingToField] = useState<boolean>(false);
-  const [sendToSelf, setSendToSelf] = useState<boolean>(false);
   const [donationAddress, setDonationAddress] = useState<boolean>(false);
   const [negativeMaxAmount, setNegativeMaxAmount] = useState<boolean>(false);
   //const [sendAllClick, setSendAllClick] = useState<boolean>(false);
@@ -180,9 +180,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     const max =
       totalBalance.spendableOrchard +
       totalBalance.spendablePrivate -
-      (donation && !sendToSelf && !donationAddress
-        ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
-        : 0);
+      (donation && !donationAddress ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) : 0);
     if (max >= 0) {
       // if max is 0 then the user can send a memo with amount 0.
       setMaxAmount(max);
@@ -193,7 +191,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setNegativeMaxAmount(true);
     }
     setSpendableBalanceLastError('');
-  }, [donation, donationAddress, sendToSelf, totalBalance.spendableOrchard, totalBalance.spendablePrivate]);
+  }, [donation, donationAddress, totalBalance.spendableOrchard, totalBalance.spendablePrivate]);
 
   const calculateFeeWithPropose = useCallback(
     async (
@@ -240,7 +238,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       let sendallJson;
 
       if (command === CommandEnum.sendall) {
-        let zenniesForZingo = sendToSelf || donationAddress ? false : donation;
+        let zenniesForZingo = donationAddress ? false : donation;
         if (memo) {
           sendallJson = { address, memo, zennies_for_zingo: zenniesForZingo };
         } else {
@@ -282,7 +280,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             if (runProposeJson.amount) {
               const newAmount =
                 runProposeJson.amount / 10 ** 8 -
-                (donation && !sendToSelf && !donationAddress
+                (donation && !donationAddress
                   ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
                   : 0);
               console.log('AMOUNT', newAmount);
@@ -312,7 +310,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
       // spendable
       let spendableBalance = totalBalance.spendableOrchard + totalBalance.spendablePrivate;
-      let zenniesForZingo = sendToSelf || donationAddress ? false : donation;
+      let zenniesForZingo = donationAddress ? false : donation;
       const spendableBalanceJSON = { address, zennies_for_zingo: zenniesForZingo };
       console.log('SPENDABLEBALANCE', spendableBalanceJSON);
       const runSpendableBalanceStr = await RPCModule.execute(
@@ -370,7 +368,6 @@ const Send: React.FunctionComponent<SendProps> = ({
       defaultValuesSpendableMaxAmount,
       donation,
       donationAddress,
-      sendToSelf,
       totalBalance.spendableOrchard,
       totalBalance.spendablePrivate,
       validAddress,
@@ -617,12 +614,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           setValidAmount(-1); // invalid number
         } else {
           if (
-            Utils.parseStringLocaleToNumberFloat(spendable.toFixed(8)) >=
-              // avoiding to use the fee in calculations, for now.
-              //Utils.parseStringLocaleToNumberFloat(fee.toFixed(8)) +
-              (donation && !sendToSelf && !donationAddress
-                ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
-                : 0) &&
             Utils.parseStringLocaleToNumberFloat(to.amount) >= 0 &&
             Utils.parseStringLocaleToNumberFloat(to.amount) <=
               Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
@@ -638,7 +629,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   }, [
     donation,
-    sendToSelf,
     donationAddress,
     decimalSeparator,
     server.chainName,
@@ -724,15 +714,10 @@ const Send: React.FunctionComponent<SendProps> = ({
     const address = sendPageState.toaddr.to;
     if (address) {
       (async () => {
-        const myAddress: AddressClass[] = addresses.filter((a: AddressClass) => a.address === address);
-        const sendToS = myAddress.length >= 1;
-
         const donationA = address === (await Utils.getDonationAddress(server.chainName));
-        setSendToSelf(sendToS);
         setDonationAddress(donationA);
       })();
     } else {
-      setSendToSelf(false);
       setDonationAddress(false);
     }
   }, [addresses, sendPageState.toaddr.to, server.chainName]);
@@ -761,7 +746,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     setTimeout(async () => {
       try {
         const txid = await sendTransaction(setLocalSendProgress);
-        setComputingModalVisible(false);
 
         // Clear the fields
         clearToAddr();
@@ -770,6 +754,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           navigation.navigate(translate('loadedapp.wallet-menu') as string);
         }
 
+        // scroll to top in history, just in case.
+        setScrollToTop(true);
+
         createAlert(
           setBackgroundError,
           addLastSnackbar,
@@ -777,8 +764,8 @@ const Send: React.FunctionComponent<SendProps> = ({
           `${translate('send.Broadcast')} ${txid}`,
           true,
         );
-      } catch (err) {
         setComputingModalVisible(false);
+      } catch (err) {
         const error = err as string;
 
         let customError = '';
@@ -805,6 +792,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             `${customError ? customError : error}`,
           );
         }, 1000);
+        setComputingModalVisible(false);
       }
     });
   };
@@ -858,7 +846,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         <Confirm
           calculatedFee={fee}
           donationAmount={
-            donation && server.chainName === ChainNameEnum.mainChainName && !sendToSelf && !donationAddress
+            donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
               ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
               : 0
           }
@@ -910,11 +898,12 @@ const Send: React.FunctionComponent<SendProps> = ({
             //setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
             addLastSnackbar={addLastSnackbar}
             setShieldingAmount={setShieldingAmount}
+            setScrollToTop={setScrollToTop}
           />
         </View>
       </Animated.View>
 
-      {validAddress === 1 && !memoEnabled && !sendToSelf && (
+      {validAddress === 1 && !memoEnabled && (
         <FadeText
           style={{
             textAlign: 'center',
@@ -1221,7 +1210,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           />
                         </View>
                       </TouchableOpacity>
-                      {((donation && !sendToSelf && !donationAddress) || (validAddress !== 0 && validAmount !== 0)) && (
+                      {donation && !donationAddress && (
                         <View
                           style={{
                             display: 'flex',
@@ -1238,32 +1227,48 @@ const Send: React.FunctionComponent<SendProps> = ({
                             style={{ marginRight: 5 }}
                           />
                           <FadeText>{'( '}</FadeText>
-                          {donation && !sendToSelf && !donationAddress && (
-                            <FadeText>
-                              {(translate('send.confirm-donation') as string) +
+                          <FadeText>
+                            {(translate('send.confirm-donation') as string) +
+                              ': ' +
+                              Utils.getDefaultDonationAmount() +
+                              ' '}
+                          </FadeText>
+                          <FadeText>{')'}</FadeText>
+                        </View>
+                      )}
+                      {validAddress !== 0 && validAmount !== 0 && (
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            marginTop: 5,
+                            backgroundColor: colors.card,
+                            padding: 5,
+                            borderRadius: 10,
+                          }}>
+                          <FontAwesomeIcon
+                            icon={faInfoCircle}
+                            size={20}
+                            color={colors.primary}
+                            style={{ marginRight: 5 }}
+                          />
+                          <FadeText>{'( '}</FadeText>
+                          <TouchableOpacity
+                            onPress={() => {
+                              if (proposeSendLastError && mode === ModeEnum.advanced) {
+                                Alert.alert(translate('send.fee') as string, proposeSendLastError);
+                              }
+                            }}>
+                            <FadeText
+                              style={{
+                                color: proposeSendLastError && mode === ModeEnum.advanced ? 'red' : colors.money,
+                              }}>
+                              {(translate('send.fee') as string) +
                                 ': ' +
-                                Utils.getDefaultDonationAmount() +
+                                Utils.parseNumberFloatToStringLocale(fee, 8) +
                                 ' '}
                             </FadeText>
-                          )}
-                          {validAddress !== 0 && validAmount !== 0 && (
-                            <TouchableOpacity
-                              onPress={() => {
-                                if (proposeSendLastError && mode === ModeEnum.advanced) {
-                                  Alert.alert(translate('send.fee') as string, proposeSendLastError);
-                                }
-                              }}>
-                              <FadeText
-                                style={{
-                                  color: proposeSendLastError && mode === ModeEnum.advanced ? 'red' : colors.money,
-                                }}>
-                                {(translate('send.fee') as string) +
-                                  ': ' +
-                                  Utils.parseNumberFloatToStringLocale(fee, 8) +
-                                  ' '}
-                              </FadeText>
-                            </TouchableOpacity>
-                          )}
+                          </TouchableOpacity>
                           <FadeText>{')'}</FadeText>
                         </View>
                       )}

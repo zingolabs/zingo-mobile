@@ -11,8 +11,6 @@ import WalletSettingsClass from './classes/WalletSettingsClass';
 
 import InfoType from './types/InfoType';
 import SendJsonToTypeType from './types/SendJsonToTypeType';
-import TransactionType from './types/TransactionType';
-import TxDetailType from './types/TxDetailType';
 import WalletType from './types/WalletType';
 import { TranslateType } from './types/TranslateType';
 import NetInfoType from './types/NetInfoType';
@@ -23,6 +21,7 @@ import SnackbarType from './types/SnackbarType';
 import ZecPriceType from './types/ZecPriceType';
 import SecurityType from './types/SecurityType';
 import ServerUrisType from './types/ServerUrisType';
+import ValueTransferType from './types/ValueTransferType';
 
 import { CommandEnum } from './enums/CommandEnum';
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
@@ -51,6 +50,7 @@ import { ReceiverEnum } from './enums/ReceiverEnum';
 import { PrivacyLevelFromEnum } from './enums/PrivacyLevelFromEnum';
 import { SecurityTypeEnum } from './enums/SecurityTypeEnum';
 import { EventListenerEnum } from './enums/EventListenerEnum';
+import { ValueTransferKindEnum } from './enums/ValueTransferKindEnum';
 
 import { GlobalConst } from './const/GlobalConst';
 
@@ -74,8 +74,6 @@ export {
   ToAddrClass,
   TotalBalanceClass,
   WalletSettingsClass,
-  TransactionType,
-  TxDetailType,
   WalletType,
   SendJsonToTypeType,
   InfoType,
@@ -88,6 +86,7 @@ export {
   SnackbarType,
   SecurityType,
   ServerUrisType,
+  ValueTransferType,
   CommandEnum,
   AddressBookActionEnum,
   MenuItemEnum,
@@ -115,5 +114,6 @@ export {
   PrivacyLevelFromEnum,
   SecurityTypeEnum,
   EventListenerEnum,
+  ValueTransferKindEnum,
   GlobalConst,
 };

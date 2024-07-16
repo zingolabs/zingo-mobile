@@ -73,6 +73,7 @@ type HeaderProps = {
   addLastSnackbar?: (snackbar: SnackbarType) => void;
   receivedLegend?: boolean;
   setShieldingAmount?: (value: number) => void;
+  setScrollToTop?: (value: boolean) => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -98,6 +99,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   addLastSnackbar,
   receivedLegend,
   setShieldingAmount,
+  setScrollToTop,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -110,13 +112,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     readOnly,
     //poolsToShieldSelectSapling,
     //poolsToShieldSelectTransparent,
-    transactions,
+    valueTransfers,
     wallet,
     restartApp,
     somePending,
     security,
     language,
     shieldingAmount,
+    navigation,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum.basic | ModeEnum.advanced;
@@ -270,7 +273,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   */
 
   const shieldFunds = async () => {
-    if (!setComputingModalVisible || !setBackgroundError || !addLastSnackbar) {
+    if (!setComputingModalVisible || !setBackgroundError || !addLastSnackbar || !setScrollToTop) {
       return;
     }
     //if (poolsToShield === '') {
@@ -345,8 +348,14 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           );
         }
       }
-      setComputingModalVisible(false);
       await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
+      // change to the history scrren, just in case.
+      if (navigation) {
+        navigation.navigate(translate('loadedapp.wallet-menu') as string);
+      }
+      // scroll to top in history, just in case.
+      setScrollToTop(true);
+      setComputingModalVisible(false);
     }
   };
 
@@ -874,7 +883,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           {readOnly && (
             <>
               {setUfvkViewModalVisible &&
-              !(mode === ModeEnum.basic && transactions.length <= 0) &&
+              !(mode === ModeEnum.basic && valueTransfers.length <= 0) &&
               !(mode === ModeEnum.basic && totalBalance.total <= 0) ? (
                 <TouchableOpacity onPress={() => ufvkShowModal()}>
                   <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />

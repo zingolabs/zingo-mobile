@@ -6,12 +6,12 @@ import 'react-native';
 import React from 'react';
 
 import { render, screen } from '@testing-library/react-native';
-import TxDetail from '../components/History/components/TxDetail';
+import ValueTransferDetail from '../components/History/components/ValueTransferDetail';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import { mockTransactions } from '../__mocks__/dataMocks/mockTransactions';
+import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -84,75 +84,76 @@ jest.mock('react-native', () => {
 });
 
 // test suite
-describe('Component History TxDetail - test', () => {
+describe('Component History ValueTransferDetail - test', () => {
   //unit test
   const state = defaultAppContextLoaded;
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
-  state.transactions = mockTransactions;
+  state.valueTransfers = mockValueTransfers;
   const onClose = jest.fn();
   const onSetOption = jest.fn();
   const onMove = jest.fn();
 
-  test('History TxDetail - sent transaction with 2 addresses', () => {
+  test('History ValueTransferDetail - sent ValueTransfer with 2 addresses', () => {
     render(
       <ContextAppLoadedProvider value={state}>
-        <TxDetail
+        <ValueTransferDetail
           index={0}
-          length={mockTransactions.length}
-          tx={mockTransactions[0]}
+          length={mockValueTransfers.length}
+          totalLength={mockValueTransfers.length}
+          vt={mockValueTransfers[0]}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
           setSendPageState={onClose}
-          moveTxDetail={onMove}
+          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     ).toJSON();
-    screen.getByText('0.2234');
-    screen.getByText('0.1234');
-    screen.getByText('0.1000');
+    const num = screen.getAllByText('0.1234');
+    expect(num.length).toBe(2);
     screen.getByText('0.0001');
     screen.getByText('hola & hello');
-    screen.getByText('hello & hola');
-    const txt = screen.queryByText('hola & hellohello & hola');
+    const txt = screen.queryByText('hola & hello\nhello & hola');
     expect(txt).toBe(null);
   });
 
-  test('History TxDetail - memo self sent transaction', () => {
+  test('History ValueTransferDetail - memo self sent ValueTransfer', () => {
     render(
       <ContextAppLoadedProvider value={state}>
-        <TxDetail
+        <ValueTransferDetail
           index={1}
-          length={mockTransactions.length}
-          tx={mockTransactions[1]}
+          length={mockValueTransfers.length}
+          totalLength={mockValueTransfers.length}
+          vt={mockValueTransfers[1]}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
           setSendPageState={onClose}
-          moveTxDetail={onMove}
+          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
     const num = screen.getAllByText('0.0000');
     expect(num.length).toBe(2);
     screen.getByText('0.0001');
-    screen.getByText('orchard memosapling memo');
+    screen.getByText('orchard memo\nsapling memo');
   });
 
-  test('History TxDetail - self sent transaction', () => {
+  test('History ValueTransferDetail - self sent ValueTransfer', () => {
     render(
       <ContextAppLoadedProvider value={state}>
-        <TxDetail
+        <ValueTransferDetail
           index={2}
-          length={mockTransactions.length}
-          tx={mockTransactions[2]}
+          length={mockValueTransfers.length}
+          totalLength={mockValueTransfers.length}
+          vt={mockValueTransfers[2]}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
           setSendPageState={onClose}
-          moveTxDetail={onMove}
+          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
@@ -161,42 +162,42 @@ describe('Component History TxDetail - test', () => {
     screen.getByText('0.0001');
   });
 
-  test('History TxDetail - received transaction with 2 pools', () => {
+  test('History ValueTransferDetail - received ValueTransfer with 2 pools', () => {
     render(
       <ContextAppLoadedProvider value={state}>
-        <TxDetail
+        <ValueTransferDetail
           index={3}
-          length={mockTransactions.length}
-          tx={mockTransactions[3]}
+          length={mockValueTransfers.length}
+          totalLength={mockValueTransfers.length}
+          vt={mockValueTransfers[3]}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
           setSendPageState={onClose}
-          moveTxDetail={onMove}
+          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
-    screen.getByText('0.8765');
-    screen.getByText('0.7765');
-    screen.getByText('0.1000');
+    const num = screen.getAllByText('0.7765');
+    expect(num.length).toBe(2);
     screen.getByText('hola & hello');
-    screen.getByText('hello & hola');
-    const txt = screen.queryByText('hola & hellohello & hola');
+    const txt = screen.queryByText('hola & hello\nhello & hola');
     expect(txt).toBe(null);
   });
 
-  test('History TxDetail - shield transaction', () => {
+  test('History ValueTransferDetail - shield ValueTransfer', () => {
     render(
       <ContextAppLoadedProvider value={state}>
-        <TxDetail
+        <ValueTransferDetail
           index={4}
-          length={mockTransactions.length}
-          tx={mockTransactions[4]}
+          length={mockValueTransfers.length}
+          totalLength={mockValueTransfers.length}
+          vt={mockValueTransfers[4]}
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
           setSendPageState={onClose}
-          moveTxDetail={onMove}
+          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );

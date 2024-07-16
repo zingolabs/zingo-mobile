@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.4.1 (181)",
+  "version": "zingo-1.4.2 (185)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -134,9 +134,9 @@
     "selectingserverbest": "En este momento este es el servidor más optimizado:",
     "nymmemo": "Necesito seguridad de red Nym",
     "incoming-funds": "Fondos entrantes\n",
-    "transaction-confirmed": "Transacción confirmada\n",
+    "valuetransfer-confirmed": "Transacción confirmada\n",
     "payment-made": "Pago realizado\n",
-    "transaction-reverted": "La transacción fue revertida por el servidor, vuelva a intentarlo."
+    "valuetransfer-reverted": "La transacción fue revertida por el servidor, vuelva a intentarlo."
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",
@@ -415,7 +415,7 @@
     "confirm-title": "Confirmar Transacción",
     "sending-title": "Procesando",
     "confirm-amount": "Cantidad",
-    "fee": "Comisión",
+    "fee": "Comisión transacción",
     "confirm-button-all": "Confirmar Enviar Todo",
     "amount": "   Cantidad",
     "to": "A",
@@ -524,7 +524,8 @@
     "pool": "Pool",
     "contactcopied": "Contacto copiado al portapapeles",
     "address-http": "¡Zingo no tiene idea de quién te envió esta dirección! Depende totalmente de ti autenticar al remitente.",
-    "address-https": "Dirección autenticada por Zingo"
+    "address-https": "Dirección autenticada por Zingo",
+    "type": "Tipo"
   },
   "report": {
     "title": "Informe de Sincronización",

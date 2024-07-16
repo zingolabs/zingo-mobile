@@ -21,6 +21,8 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
       }
     }
     keyboardShouldPersistTaps="handled"
+    onScroll={[Function]}
+    scrollEventThrottle={100}
     style={
       {
         "maxHeight": "85%",
