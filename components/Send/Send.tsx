@@ -1317,7 +1317,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     </View>
                   </View>
 
-                  {zecPrice.zecPrice <= 0 && (
+                  {(!zecPrice.zecPrice || zecPrice.zecPrice <= 0) && (
                     <View
                       style={{
                         width: '35%',
@@ -1327,7 +1327,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     </View>
                   )}
 
-                  {zecPrice.zecPrice > 0 && (
+                  {!!zecPrice.zecPrice && zecPrice.zecPrice > 0 && (
                     <View
                       style={{
                         display: 'flex',
