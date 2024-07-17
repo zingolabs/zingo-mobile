@@ -1632,9 +1632,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               }>
               <Insight
                 closeModal={() => this.setState({ insightModalVisible: false })}
-                openModal={() => this.setState({ insightModalVisible: true })}
                 setPrivacyOption={this.setPrivacyOption}
-                setSendPageState={this.setSendPageState}
               />
             </Suspense>
           </Modal>
