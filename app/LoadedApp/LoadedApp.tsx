@@ -1038,7 +1038,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       let update = false;
       if (
         this.state.sendPageState.toaddr.to &&
-        this.state.sendPageState.toaddr.to !== (await Utils.getDonationAddress(this.state.server.chainName))
+        this.state.sendPageState.toaddr.to !== (await Utils.getNymDonationAddress(this.state.server.chainName))
       ) {
         await ShowAddressAlertAsync(this.state.translate)
           .then(async () => {
@@ -1055,9 +1055,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         let uriToAddr: ToAddrClass = new ToAddrClass(0);
         const to = new ToAddrClass(Utils.getNextToAddrID());
 
-        to.to = await Utils.getDonationAddress(this.state.server.chainName);
-        to.amount = Utils.getDefaultDonationAmount();
-        to.memo = this.state.translate('loadedapp.nymmemo') as string;
+        to.to = await Utils.getNymDonationAddress(this.state.server.chainName);
+        to.amount = Utils.getNymDonationAmount();
+        to.memo = Utils.getNymDonationMemo(this.state.translate);
         to.includeUAMemo = true;
 
         uriToAddr = to;

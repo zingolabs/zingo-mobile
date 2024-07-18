@@ -183,7 +183,9 @@ const Send: React.FunctionComponent<SendProps> = ({
     const max =
       totalBalance.spendableOrchard +
       totalBalance.spendablePrivate -
-      (donation && !donationAddress ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) : 0);
+      (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+        ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
+        : 0);
     if (max >= 0) {
       // if max is 0 then the user can send a memo with amount 0.
       setMaxAmount(max);
@@ -194,7 +196,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setNegativeMaxAmount(true);
     }
     setSpendableBalanceLastError('');
-  }, [donation, donationAddress, totalBalance.spendableOrchard, totalBalance.spendablePrivate]);
+  }, [donation, donationAddress, server.chainName, totalBalance.spendableOrchard, totalBalance.spendablePrivate]);
 
   const calculateFeeWithPropose = useCallback(
     async (
@@ -283,8 +285,8 @@ const Send: React.FunctionComponent<SendProps> = ({
             if (runProposeJson.amount) {
               const newAmount =
                 runProposeJson.amount / 10 ** 8 -
-                (donation && !donationAddress
-                  ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+                (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+                  ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
                   : 0);
               console.log('AMOUNT', newAmount);
               updateToField(null, Utils.parseNumberFloatToStringLocale(newAmount, 8), null, null, null);
@@ -719,7 +721,10 @@ const Send: React.FunctionComponent<SendProps> = ({
     const address = sendPageState.toaddr.to;
     if (address) {
       (async () => {
-        const donationA = address === (await Utils.getDonationAddress(server.chainName));
+        const donationA =
+          address === (await Utils.getDonationAddress(server.chainName)) ||
+          address === (await Utils.getZenniesDonationAddress(server.chainName)) ||
+          address === (await Utils.getNymDonationAddress(server.chainName));
         setDonationAddress(donationA);
       })();
     } else {
@@ -861,7 +866,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           calculatedFee={fee}
           donationAmount={
             donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
-              ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+              ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
               : 0
           }
           closeModal={() => {
@@ -1226,7 +1231,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           />
                         </View>
                       </TouchableOpacity>
-                      {donation && !donationAddress && (
+                      {donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress && (
                         <View
                           style={{
                             display: 'flex',
@@ -1246,7 +1251,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <FadeText>
                             {(translate('send.confirm-donation') as string) +
                               ': ' +
-                              Utils.getDefaultDonationAmount() +
+                              Utils.getZenniesDonationAmount() +
                               ' '}
                           </FadeText>
                           <FadeText>{')'}</FadeText>
@@ -1616,12 +1621,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                 onPress={() => {
                   // donation - a Zenny is the minimum
                   if (
+                    server.chainName === ChainNameEnum.mainChainName &&
                     donationAddress &&
                     Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) <
-                      Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+                      Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
                   ) {
                     addLastSnackbar({ message: `${translate('send.donation-minimum-message') as string}` });
-                    updateToField(null, Utils.getDefaultDonationAmount(), null, null, false);
+                    updateToField(null, Utils.getZenniesDonationAmount(), null, null, false);
                     return;
                   }
                   if (!netInfo.isConnected) {
@@ -1695,9 +1701,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                       if (update) {
                         updateToField(
                           await Utils.getDonationAddress(server.chainName),
-                          Utils.getDefaultDonationAmount(),
+                          Utils.getDonationAmount(),
                           null,
-                          Utils.getDefaultDonationMemo(translate),
+                          Utils.getDonationMemo(translate),
                           true,
                         );
                       }

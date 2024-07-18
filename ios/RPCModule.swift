@@ -377,6 +377,26 @@ class RPCModule: NSObject {
       self.getDonationAddressAsync(dict)
   }
 
+  func getZenniesDonationAddressAsync(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getZenniesForZingoDonationAddress()
+          let respStr = String(resp)
+          resolve(respStr)
+      } else {
+        let err = "Error: [Native] Getting zennies donation address. Command arguments problem."
+        NSLog(err)
+        if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+              resolve(err)
+          }
+      }
+  }
+  
+  @objc(getZenniesDonationAddress:reject:)
+  func getZenniesDonationAddress(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      self.getZenniesDonationAddressAsync(dict)
+  }
+
   @objc(getValueTransfersList:reject:)
   func getValueTransfersList(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let dict: [String: Any] = ["resolve": resolve]
