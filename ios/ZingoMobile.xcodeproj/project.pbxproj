@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		1F0338192C48782D00A3FC49 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F0338182C48782D00A3FC49 /* Constants.swift */; };
+		1F03381A2C49575900A3FC49 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F0338182C48782D00A3FC49 /* Constants.swift */; };
 		1F0893FF2BA4C4380089FD88 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1F0893FE2BA4C4380089FD88 /* PrivacyInfo.xcprivacy */; };
 		1F0894002BA4C4380089FD88 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1F0893FE2BA4C4380089FD88 /* PrivacyInfo.xcprivacy */; };
 		1F5569272BBCB4D900F2CD6C /* RPCModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5569262BBCB4D900F2CD6C /* RPCModule.swift */; };
@@ -443,6 +444,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F03381A2C49575900A3FC49 /* Constants.swift in Sources */,
 				1FA935B12BE454FA00117DF5 /* RPCModuleBridge.m in Sources */,
 				1F5E677C2BD30D0A007B17AA /* zingo.swift in Sources */,
 				1FA935B02BE4506300117DF5 /* RPCModule.swift in Sources */,

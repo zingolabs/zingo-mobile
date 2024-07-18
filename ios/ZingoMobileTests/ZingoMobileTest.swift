@@ -67,7 +67,7 @@ class ZingoMobileTests: XCTestCase {
     NSLog("Test create New Wallet KO \(newWalletKO)")
     XCTAssertTrue(newWalletKO.lowercased().hasPrefix(errorPrefix), "Create New Wallet NOT fails, and it have to \(newWalletKO)")
 
-    if (rpcmodule.wallet_exists()) {
+    if (try rpcmodule.fileExists(Constants.WalletFileName.rawValue) == "true") {
       // load wallet from file, expecting ERROR.
       let loadWalletKO = try rpcmodule.loadExistingWallet(server: serverKO, chainhint: chainhint)
       NSLog("Test create Load Wallet KO \(loadWalletKO)")
