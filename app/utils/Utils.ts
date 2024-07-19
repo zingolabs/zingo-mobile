@@ -145,10 +145,6 @@ export default class Utils {
     return '0' + decimalSeparator + '01';
   }
 
-  static getZenniesDonationMemo(translate: (key: string) => TranslateType): string {
-    return translate('zennies-donation') as string;
-  }
-
   // NYM
   static async getNymDonationAddress(chainName: ChainNameEnum): Promise<string> {
     // donations only for mainnet.
@@ -241,7 +237,6 @@ export default class Utils {
     addresses: AddressClass[],
     server: ServerType,
     donation: boolean,
-    translate: (key: string) => TranslateType,
   ): Promise<SendJsonToTypeType[]> {
     let donationAddress: boolean = false;
     const json: Promise<SendJsonToTypeType[][]> = Promise.all(
@@ -295,7 +290,7 @@ export default class Utils {
           (Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount()) * 10 ** 8).toFixed(0),
           10,
         ),
-        memo: Utils.getZenniesDonationMemo(translate),
+        memo: '', // zancas decision to not leak info with no reason.
       });
     }
 

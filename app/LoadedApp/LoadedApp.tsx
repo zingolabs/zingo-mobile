@@ -917,8 +917,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   sendTransaction = async (setSendProgress: (arg0: SendProgressClass) => void): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
-      const { sendPageState, uaAddress, addresses, server, donation, translate } = this.state;
-      const sendJson = await Utils.getSendManyJSON(sendPageState, uaAddress, addresses, server, donation, translate);
+      const { sendPageState, uaAddress, addresses, server, donation } = this.state;
+      const sendJson = await Utils.getSendManyJSON(sendPageState, uaAddress, addresses, server, donation);
       const txid = await this.rpc.sendTransaction(sendJson, setSendProgress);
 
       return txid;

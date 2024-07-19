@@ -229,14 +229,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemo;
         sendPageStateCalculateFee.toaddr.amount = amount;
 
-        sendJson = await Utils.getSendManyJSON(
-          sendPageStateCalculateFee,
-          uaAddress,
-          addresses,
-          server,
-          donation,
-          translate,
-        );
+        sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, uaAddress, addresses, server, donation);
         console.log('SEND', sendJson);
       }
 
