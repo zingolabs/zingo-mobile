@@ -229,24 +229,25 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
-        {addressBookProtected.flatMap((aBItem, index) => {
-          return (
-            <View key={`container-${index}-${aBItem.label}`}>
-              <AbSummaryLine
-                index={index}
-                key={`line-${index}-${aBItem.label}`}
-                item={aBItem}
-                setCurrentItem={setCurrentItem}
-                setAction={setAction}
-                setSendPageState={setSendPageState}
-                closeModal={closeModal}
-                handleScrollToTop={handleScrollToTop}
-                doAction={doAction}
-                addressProtected={true}
-              />
-            </View>
-          );
-        })}
+        {!addressBookCurrentAddress &&
+          addressBookProtected.flatMap((aBItem, index) => {
+            return (
+              <View key={`container-${index}-${aBItem.label}`}>
+                <AbSummaryLine
+                  index={index}
+                  key={`line-${index}-${aBItem.label}`}
+                  item={aBItem}
+                  setCurrentItem={setCurrentItem}
+                  setAction={setAction}
+                  setSendPageState={setSendPageState}
+                  closeModal={closeModal}
+                  handleScrollToTop={handleScrollToTop}
+                  doAction={doAction}
+                  addressProtected={true}
+                />
+              </View>
+            );
+          })}
         {currentItem === -1 && action !== null && (
           <AbDetail
             index={-1}
@@ -268,7 +269,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
             doAction={doAction}
           />
         )}
-        {addressBookSorted.length === 0 && currentItem !== -1 && (
+        {!addressBookCurrentAddress && addressBookSorted.length === 0 && currentItem !== -1 && (
           <View
             style={{
               height: 150,
