@@ -262,8 +262,11 @@ export default function LoadedApp(props: LoadedAppProps) {
         setBackground(backgroundJson);
       }
 
-      // reading the address book
-      const ab = await AddressBookFileImpl.readAddressBook();
+      // adding `Zenny Tips` address always.
+      const ab = await AddressBookFileImpl.writeAddressBookItem(
+        translate('zenny-tips-ab') as string,
+        await Utils.getZenniesDonationAddress(server.chainName),
+      );
       setAddressBook(ab);
 
       setLoading(false);
