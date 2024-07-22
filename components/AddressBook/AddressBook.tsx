@@ -71,15 +71,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     return addressBook
       .filter((ab: AddressBookFileClass) => ab.address !== zennyTips)
       .sort((a, b) => {
-        const nA = a.label.toUpperCase();
-        const nB = b.label.toUpperCase();
-        if (nA < nB) {
-          return -1;
-        } else if (nA > nB) {
-          return 1;
-        } else {
-          return 0;
-        }
+        const aLabel = a.label;
+        const bLabel = b.label;
+        return aLabel.localeCompare(bLabel);
       })
       .slice(0, numAb);
   }, [addressBook, numAb, server.chainName]);
@@ -90,15 +84,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     return addressBook
       .filter((ab: AddressBookFileClass) => ab.address === zennyTips)
       .sort((a, b) => {
-        const nA = a.label.toUpperCase();
-        const nB = b.label.toUpperCase();
-        if (nA < nB) {
-          return -1;
-        } else if (nA > nB) {
-          return 1;
-        } else {
-          return 0;
-        }
+        const aLabel = a.label;
+        const bLabel = b.label;
+        return aLabel.localeCompare(bLabel);
       });
   }, [addressBook, server.chainName]);
 
@@ -229,25 +217,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
           alignItems: 'stretch',
           justifyContent: 'flex-start',
         }}>
-        {!addressBookCurrentAddress &&
-          addressBookProtected.flatMap((aBItem, index) => {
-            return (
-              <View key={`container-${index}-${aBItem.label}`}>
-                <AbSummaryLine
-                  index={index}
-                  key={`line-${index}-${aBItem.label}`}
-                  item={aBItem}
-                  setCurrentItem={setCurrentItem}
-                  setAction={setAction}
-                  setSendPageState={setSendPageState}
-                  closeModal={closeModal}
-                  handleScrollToTop={handleScrollToTop}
-                  doAction={doAction}
-                  addressProtected={true}
-                />
-              </View>
-            );
-          })}
         {currentItem === -1 && action !== null && (
           <AbDetail
             index={-1}
@@ -318,6 +287,25 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                     doAction={doAction}
                   />
                 )}
+              </View>
+            );
+          })}
+        {!addressBookCurrentAddress &&
+          addressBookProtected.flatMap((aBItem, index) => {
+            return (
+              <View key={`container-${index}-${aBItem.label}`}>
+                <AbSummaryLine
+                  index={index}
+                  key={`line-${index}-${aBItem.label}`}
+                  item={aBItem}
+                  setCurrentItem={setCurrentItem}
+                  setAction={setAction}
+                  setSendPageState={setSendPageState}
+                  closeModal={closeModal}
+                  handleScrollToTop={handleScrollToTop}
+                  doAction={doAction}
+                  addressProtected={true}
+                />
               </View>
             );
           })}
