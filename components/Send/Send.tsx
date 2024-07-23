@@ -1027,7 +1027,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           {!updatingToField ? (
                             <RNPickerSelect
                               fixAndroidTouchableBug={true}
-                              value={ta.to}
+                              value={pickerTempSelectedAddress && Platform.OS === GlobalConst.platformOSios ? pickerTempSelectedAddress : ta.to}
                               items={itemsPicker}
                               placeholder={{
                                 label: translate('addressbook.select-placeholder') as string,
@@ -1057,6 +1057,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 } else if (ta.to !== pickerTempSelectedAddress) {
                                   updateToField(pickerTempSelectedAddress, null, null, null, null);
                                 }
+                                setPickerTempSelectedAddress('');
                               }}
                               onValueChange={async (itemValue: string) => {
                                 // only for Android
@@ -1693,6 +1694,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   defaultValueFee();
                   defaultValuesSpendableMaxAmount();
                   clearToAddr();
+                  setPickerTempSelectedAddress('');
                 }}
               />
             </View>
