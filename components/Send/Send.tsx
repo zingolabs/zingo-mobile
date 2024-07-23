@@ -1027,7 +1027,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                           {!updatingToField ? (
                             <RNPickerSelect
                               fixAndroidTouchableBug={true}
-                              value={pickerTempSelectedAddress && Platform.OS === GlobalConst.platformOSios ? pickerTempSelectedAddress : ta.to}
+                              value={
+                                pickerTempSelectedAddress && Platform.OS === GlobalConst.platformOSios
+                                  ? pickerTempSelectedAddress
+                                  : ta.to
+                              }
                               items={itemsPicker}
                               placeholder={{
                                 label: translate('addressbook.select-placeholder') as string,
