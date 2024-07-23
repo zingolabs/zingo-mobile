@@ -67,7 +67,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
   const [showNavigator, setShowNavigator] = useState<boolean>(true);
-  const [addressProtected, setAddressProtected] = useState<boolean>(false);
+  const [addressProtected, setAddressProtected] = useState<boolean>(true);
   const isTheFirstMount = useRef(true);
 
   const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
