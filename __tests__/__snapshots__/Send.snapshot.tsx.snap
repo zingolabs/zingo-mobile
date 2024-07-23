@@ -45,7 +45,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
       <View
         style={
           {
-            "marginBottom": 30,
+            "marginBottom": 250,
           }
         }
       >
@@ -1212,7 +1212,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
       <View
         style={
           {
-            "marginBottom": 30,
+            "marginBottom": 250,
           }
         }
       >
