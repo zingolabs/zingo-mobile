@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback, useRef } from 'react';
 import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Text, Alert } from 'react-native';
 import {
   faQrcode,
@@ -142,9 +142,12 @@ const Send: React.FunctionComponent<SendProps> = ({
   //const [sendAllClick, setSendAllClick] = useState<boolean>(false);
   const [proposeSendLastError, setProposeSendLastError] = useState<string>('');
   const [spendableBalanceLastError, setSpendableBalanceLastError] = useState<string>('');
+  const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
+  const [contentHeight, setContentHeight] = useState<number>(0);
   const isFocused = useIsFocused();
 
   const slideAnim = useSharedValue(0);
+  const scrollViewRef = useRef<ScrollView>(null);
   const { decimalSeparator } = getNumberFormatSettings();
 
   const runSendPropose = async (
@@ -663,9 +666,11 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
       slideAnim.value = withTiming(0 - titleViewHeight + 25, { duration: 100, easing: Easing.linear });
+      setKeyboardVisible(true);
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
       slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
+      setKeyboardVisible(false);
     });
 
     return () => {
@@ -802,6 +807,13 @@ const Send: React.FunctionComponent<SendProps> = ({
     return len;
   };
 
+  const scrollToEnd = () => {
+    if (scrollViewRef.current) {
+      //console.log('scrolling to end', keyboardVisible);
+      scrollViewRef.current.scrollTo({ y: contentHeight, animated: true });
+    }
+  };
+
   //console.log('render Send - 4', sendPageState);
   console.log(
     'Render, spendable',
@@ -812,6 +824,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     fee,
     'Amount',
     sendPageState.toaddr.amount,
+    keyboardVisible,
+    contentHeight,
   );
 
   const returnPage = (
@@ -907,21 +921,27 @@ const Send: React.FunctionComponent<SendProps> = ({
         <FadeText
           style={{
             textAlign: 'center',
-            marginHorizontal: 10,
+            marginHorizontal: 5,
             marginTop: 5,
-            color: colors.zingo,
+            color: colors.background,
             opacity: 1,
             fontWeight: '700',
+            backgroundColor: colors.primaryDisabled,
           }}>
           {translate('warning-binance') as string}
         </FadeText>
       )}
 
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{}} testID="send.scroll-view">
+      <ScrollView
+        ref={scrollViewRef}
+        onContentSizeChange={(_, height) => setContentHeight(height)}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{}}
+        testID="send.scroll-view">
         <View style={{ marginBottom: 30 }}>
           {[sendPageState.toaddr].map((ta, i) => {
             return (
-              <View key={i} style={{ display: 'flex', padding: 10, marginTop: 10 }}>
+              <View key={i} style={{ display: 'flex', padding: 10, paddingTop: 5, marginTop: 0 }}>
                 <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                   <View style={{ display: 'flex', flexDirection: 'row' }}>
                     <RegText style={{ marginRight: 10 }}>{translate('send.toaddress') as string}</RegText>
@@ -1053,8 +1073,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                   </View>
                 </View>
 
-                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', minWidth: 48, minHeight: 48 }}>
+                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                     <View
                       style={{
                         alignItems: 'center',
@@ -1063,8 +1083,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                         margin: 0,
                         padding: 0,
                         paddingBottom: 3,
-                        minWidth: 48,
-                        minHeight: 48,
                       }}>
                       <FadeText>{`${translate('send.amount')}`}</FadeText>
                     </View>
@@ -1094,8 +1112,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                             margin: 0,
                             padding: 0,
                             marginLeft: 10,
-                            minWidth: 48,
-                            minHeight: 48,
                           }}>
                           <RegText color={colors.primary}>{translate('send.sendall') as string}</RegText>
                         </View>
@@ -1186,7 +1202,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             flexDirection: 'row',
                             justifyContent: 'flex-start',
                             alignItems: 'center',
-                            marginTop: 5,
+                            marginTop: 0,
                           }}>
                           <RegText
                             style={{
@@ -1215,7 +1231,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
-                            marginTop: 5,
+                            marginTop: 0,
                             backgroundColor: colors.card,
                             padding: 5,
                             borderRadius: 10,
@@ -1241,7 +1257,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
-                            marginTop: 5,
+                            marginTop: 0,
                             backgroundColor: colors.card,
                             padding: 5,
                             borderRadius: 10,
@@ -1278,7 +1294,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             style={{
                               display: 'flex',
                               flexDirection: 'row',
-                              marginTop: 5,
+                              marginTop: 0,
                               backgroundColor: colors.card,
                               padding: 5,
                               borderRadius: 10,
@@ -1289,7 +1305,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               color={colors.primary}
                               style={{ marginRight: 5 }}
                             />
-                            <FadeText>{translate('send.somefunds') as string}</FadeText>
+                            <FadeText style={{ fontSize: 12.5 }}>{translate('send.somefunds') as string}</FadeText>
                           </View>
                         </TouchableOpacity>
                       )}
@@ -1299,7 +1315,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             style={{
                               display: 'flex',
                               flexDirection: 'row',
-                              marginTop: 5,
+                              marginTop: 0,
                               backgroundColor: colors.card,
                               padding: 5,
                               borderRadius: 10,
@@ -1383,20 +1399,21 @@ const Send: React.FunctionComponent<SendProps> = ({
                         </View>
                       </View>
 
-                      <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <RegText style={{ marginTop: 11, fontSize: 12.5 }}>
+                      <View style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                          <RegText style={{ marginTop: 5, fontSize: 12.5 }}>
                             {translate('send.spendable') as string}
                           </RegText>
                           <CurrencyAmount
-                            style={{ marginTop: 11, fontSize: 12.5 }}
+                            style={{ marginTop: 5, fontSize: 12.5 }}
                             price={zecPrice.zecPrice}
                             amtZec={maxAmount}
                             currency={CurrencyEnum.USDCurrency}
                             privacy={privacy}
                           />
                         </View>
-                        <View style={{ marginLeft: 5 }}>
+                        <View style={{ marginLeft: 5, flexDirection: 'row', justifyContent: 'flex-start' }}>
+                          <View style={{ width: '40%' }} />
                           <PriceFetcher setZecPrice={setZecPrice} />
                         </View>
                       </View>
@@ -1412,9 +1429,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         justifyContent: 'space-between',
                         alignItems: 'center',
                       }}>
-                      <FadeText style={{ marginTop: 10, marginBottom: 15 }}>
-                        {translate('send.memo') as string}
-                      </FadeText>
+                      <FadeText style={{ marginTop: 0, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
                       <View style={{ flexDirection: 'row' }}>
                         <FadeText style={{ marginTop: 6 }}>{translate('send.includeua') as string}</FadeText>
                         <CheckBox
@@ -1447,7 +1462,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           borderColor: colors.text,
                           minWidth: 48,
                           minHeight: 48,
-                          maxHeight: 150,
+                          maxHeight: 130,
                         }}>
                         <TextInput
                           testID="send.memo-field"
@@ -1491,6 +1506,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               !memoIcon
                             ) {
                               setMemoIcon(true);
+                              scrollToEnd();
                             }
                             if (
                               e.nativeEvent.contentSize.height <=
@@ -1501,6 +1517,17 @@ const Send: React.FunctionComponent<SendProps> = ({
                             }
                           }}
                           maxLength={GlobalConst.memoMaxLength}
+                          onFocus={() => {
+                            // I need to wait for the keyboard is totally open
+                            // otherwise the scroll to end never happened.
+                            if (keyboardVisible) {
+                              scrollToEnd();
+                            } else {
+                              setTimeout(() => {
+                                scrollToEnd();
+                              }, 1000);
+                            }
+                          }}
                         />
                         {ta.memo && (
                           <TouchableOpacity
@@ -1538,12 +1565,17 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}>
                       <FadeText
                         style={{
-                          marginTop: 5,
+                          marginTop: 0,
                           fontWeight: 'bold',
+                          fontSize: 12.5,
                           color: validMemo === -1 ? 'red' : colors.text,
                         }}>{`${countMemoBytes(ta.memo, ta.includeUAMemo)} `}</FadeText>
-                      <FadeText style={{ marginTop: 5 }}>{translate('loadedapp.of') as string}</FadeText>
-                      <FadeText style={{ marginTop: 5 }}>{' ' + GlobalConst.memoMaxLength.toString() + ' '}</FadeText>
+                      <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
+                        {translate('loadedapp.of') as string}
+                      </FadeText>
+                      <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
+                        {' ' + GlobalConst.memoMaxLength.toString() + ' '}
+                      </FadeText>
                     </View>
                   </>
                 )}
@@ -1556,7 +1588,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
-              marginVertical: 5,
+              marginVertical: 0,
             }}>
             <View
               style={{
