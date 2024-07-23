@@ -697,6 +697,11 @@ const Send: React.FunctionComponent<SendProps> = ({
       const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
       const items = addressBook
         .filter((item: AddressBookFileClass) => item.address !== zennyTips)
+        .sort((a, b) => {
+          const aLabel = a.label;
+          const bLabel = b.label;
+          return aLabel.localeCompare(bLabel);
+        })
         .map((item: AddressBookFileClass) => ({
           label: item.label,
           value: item.address,
