@@ -938,7 +938,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{}}
         testID="send.scroll-view">
-        <View style={{ marginBottom: 30 }}>
+        <View style={{ marginBottom: Platform.OS === GlobalConst.platformOSandroid ? 30 : 250 }}>
           {[sendPageState.toaddr].map((ta, i) => {
             return (
               <View key={i} style={{ display: 'flex', padding: 10, paddingTop: 5, marginTop: 0 }}>
