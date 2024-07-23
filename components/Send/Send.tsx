@@ -144,6 +144,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [spendableBalanceLastError, setSpendableBalanceLastError] = useState<string>('');
   const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
   const [contentHeight, setContentHeight] = useState<number>(0);
+  const [pickerTempSelectedAddress, setPickerTempSelectedAddress] = useState<string>('');
   const isFocused = useIsFocused();
 
   const slideAnim = useSharedValue(0);
@@ -1034,12 +1035,18 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 color: colors.primary,
                               }}
                               useNativeAndroidPickerStyle={false}
-                              onValueChange={async (itemValue: string) => {
-                                if (validAddress === 1 && ta.to && itemValue && ta.to !== itemValue) {
+                              onDonePress={async () => {
+                                // only for IOS
+                                if (
+                                  validAddress === 1 &&
+                                  ta.to &&
+                                  pickerTempSelectedAddress &&
+                                  ta.to !== pickerTempSelectedAddress
+                                ) {
                                   setUpdatingToField(true);
                                   await ShowAddressAlertAsync(translate)
                                     .then(() => {
-                                      updateToField(itemValue, null, null, null, null);
+                                      updateToField(pickerTempSelectedAddress, null, null, null, null);
                                     })
                                     .catch(() => {
                                       updateToField(ta.to, null, null, null, null);
@@ -1047,8 +1054,30 @@ const Send: React.FunctionComponent<SendProps> = ({
                                   setTimeout(() => {
                                     setUpdatingToField(false);
                                   }, 500);
-                                } else if (ta.to !== itemValue) {
-                                  updateToField(itemValue, null, null, null, null);
+                                } else if (ta.to !== pickerTempSelectedAddress) {
+                                  updateToField(pickerTempSelectedAddress, null, null, null, null);
+                                }
+                              }}
+                              onValueChange={async (itemValue: string) => {
+                                // only for Android
+                                if (Platform.OS === GlobalConst.platformOSandroid) {
+                                  if (validAddress === 1 && ta.to && itemValue && ta.to !== itemValue) {
+                                    setUpdatingToField(true);
+                                    await ShowAddressAlertAsync(translate)
+                                      .then(() => {
+                                        updateToField(itemValue, null, null, null, null);
+                                      })
+                                      .catch(() => {
+                                        updateToField(ta.to, null, null, null, null);
+                                      });
+                                    setTimeout(() => {
+                                      setUpdatingToField(false);
+                                    }, 500);
+                                  } else if (ta.to !== itemValue) {
+                                    updateToField(itemValue, null, null, null, null);
+                                  }
+                                } else {
+                                  setPickerTempSelectedAddress(itemValue);
                                 }
                               }}>
                               <FontAwesomeIcon
