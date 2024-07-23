@@ -693,12 +693,17 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [mode, setZecPrice]);
 
   useEffect(() => {
-    const items = addressBook.map((item: AddressBookFileClass) => ({
-      label: item.label,
-      value: item.address,
-    }));
-    setItemsPicker(items);
-  }, [addressBook]);
+    (async () => {
+      const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
+      const items = addressBook
+        .filter((item: AddressBookFileClass) => item.address !== zennyTips)
+        .map((item: AddressBookFileClass) => ({
+          label: item.label,
+          value: item.address,
+        }));
+      setItemsPicker(items);
+    })();
+  }, [addressBook, server.chainName]);
 
   useEffect(() => {
     (async () => {
