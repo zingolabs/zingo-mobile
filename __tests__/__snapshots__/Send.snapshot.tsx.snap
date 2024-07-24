@@ -38,13 +38,14 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
   <RCTScrollView
     contentContainerStyle={{}}
     keyboardShouldPersistTaps="handled"
+    onContentSizeChange={[Function]}
     testID="send.scroll-view"
   >
     <View>
       <View
         style={
           {
-            "marginBottom": 30,
+            "marginBottom": 250,
           }
         }
       >
@@ -52,8 +53,9 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
           style={
             {
               "display": "flex",
-              "marginTop": 10,
+              "marginTop": 0,
               "padding": 10,
+              "paddingTop": 5,
             }
           }
         >
@@ -280,6 +282,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
+                "marginTop": 10,
               }
             }
           >
@@ -288,8 +291,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 {
                   "flexDirection": "row",
                   "justifyContent": "flex-end",
-                  "minHeight": 48,
-                  "minWidth": 48,
                 }
               }
             >
@@ -300,8 +301,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                     "borderRadius": 10,
                     "justifyContent": "flex-end",
                     "margin": 0,
-                    "minHeight": 48,
-                    "minWidth": 48,
                     "padding": 0,
                     "paddingBottom": 3,
                   }
@@ -465,7 +464,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                         "display": "flex",
                         "flexDirection": "row",
                         "justifyContent": "flex-start",
-                        "marginTop": 5,
+                        "marginTop": 0,
                       }
                     }
                   >
@@ -670,7 +669,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                         "borderRadius": 10,
                         "display": "flex",
                         "flexDirection": "row",
-                        "marginTop": 5,
+                        "marginTop": 0,
                         "padding": 5,
                       }
                     }
@@ -703,6 +702,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       style={
                         {
                           "color": "#c3c3c3",
+                          "fontSize": 12.5,
                           "opacity": 0.65,
                         }
                       }
@@ -788,16 +788,16 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               <View
                 style={
                   {
-                    "alignItems": "center",
                     "flexDirection": "column",
+                    "justifyContent": "flex-start",
                   }
                 }
               >
                 <View
                   style={
                     {
-                      "alignItems": "center",
                       "flexDirection": "row",
+                      "justifyContent": "flex-start",
                     }
                   }
                 >
@@ -807,7 +807,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                         "color": "#c3c3c3",
                         "fontSize": 12.5,
                         "fontWeight": "600",
-                        "marginTop": 11,
+                        "marginTop": 5,
                         "opacity": 1,
                       }
                     }
@@ -869,7 +869,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                             {
                               "color": "#ffffff",
                               "fontSize": 12.5,
-                              "marginTop": 11,
+                              "marginTop": 5,
                             }
                           }
                         >
@@ -881,7 +881,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                               "color": "#ffffff",
                               "fontSize": 12.5,
                               "fontWeight": "700",
-                              "marginTop": 11,
+                              "marginTop": 5,
                             }
                           }
                         >
@@ -894,10 +894,19 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 <View
                   style={
                     {
+                      "flexDirection": "row",
+                      "justifyContent": "flex-start",
                       "marginLeft": 5,
                     }
                   }
                 >
+                  <View
+                    style={
+                      {
+                        "width": "40%",
+                      }
+                    }
+                  />
                   <View
                     accessibilityState={
                       {
@@ -982,7 +991,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               "flexDirection": "column",
               "flexGrow": 1,
               "justifyContent": "center",
-              "marginVertical": 5,
+              "marginVertical": 0,
             }
           }
         >
@@ -1196,13 +1205,14 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
   <RCTScrollView
     contentContainerStyle={{}}
     keyboardShouldPersistTaps="handled"
+    onContentSizeChange={[Function]}
     testID="send.scroll-view"
   >
     <View>
       <View
         style={
           {
-            "marginBottom": 30,
+            "marginBottom": 250,
           }
         }
       >
@@ -1210,8 +1220,9 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
           style={
             {
               "display": "flex",
-              "marginTop": 10,
+              "marginTop": 0,
               "padding": 10,
+              "paddingTop": 5,
             }
           }
         >
@@ -1438,6 +1449,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "space-between",
+                "marginTop": 10,
               }
             }
           >
@@ -1446,8 +1458,6 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 {
                   "flexDirection": "row",
                   "justifyContent": "flex-end",
-                  "minHeight": 48,
-                  "minWidth": 48,
                 }
               }
             >
@@ -1458,8 +1468,6 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     "borderRadius": 10,
                     "justifyContent": "flex-end",
                     "margin": 0,
-                    "minHeight": 48,
-                    "minWidth": 48,
                     "padding": 0,
                     "paddingBottom": 3,
                   }
@@ -1623,7 +1631,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                         "display": "flex",
                         "flexDirection": "row",
                         "justifyContent": "flex-start",
-                        "marginTop": 5,
+                        "marginTop": 0,
                       }
                     }
                   >
@@ -1829,7 +1837,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                         "borderRadius": 10,
                         "display": "flex",
                         "flexDirection": "row",
-                        "marginTop": 5,
+                        "marginTop": 0,
                         "padding": 5,
                       }
                     }
@@ -1862,6 +1870,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       style={
                         {
                           "color": "#c3c3c3",
+                          "fontSize": 12.5,
                           "opacity": 0.65,
                         }
                       }
@@ -1947,16 +1956,16 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               <View
                 style={
                   {
-                    "alignItems": "center",
                     "flexDirection": "column",
+                    "justifyContent": "flex-start",
                   }
                 }
               >
                 <View
                   style={
                     {
-                      "alignItems": "center",
                       "flexDirection": "row",
+                      "justifyContent": "flex-start",
                     }
                   }
                 >
@@ -1966,7 +1975,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                         "color": "#c3c3c3",
                         "fontSize": 12.5,
                         "fontWeight": "600",
-                        "marginTop": 11,
+                        "marginTop": 5,
                         "opacity": 1,
                       }
                     }
@@ -2028,7 +2037,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                             {
                               "color": "#ffffff",
                               "fontSize": 12.5,
-                              "marginTop": 11,
+                              "marginTop": 5,
                             }
                           }
                         >
@@ -2040,7 +2049,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                               "color": "#ffffff",
                               "fontSize": 12.5,
                               "fontWeight": "700",
-                              "marginTop": 11,
+                              "marginTop": 5,
                             }
                           }
                         >
@@ -2053,10 +2062,19 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 <View
                   style={
                     {
+                      "flexDirection": "row",
+                      "justifyContent": "flex-start",
                       "marginLeft": 5,
                     }
                   }
                 >
+                  <View
+                    style={
+                      {
+                        "width": "40%",
+                      }
+                    }
+                  />
                   <View
                     accessibilityState={
                       {
@@ -2141,7 +2159,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               "flexDirection": "column",
               "flexGrow": 1,
               "justifyContent": "center",
-              "marginVertical": 5,
+              "marginVertical": 0,
             }
           }
         >
