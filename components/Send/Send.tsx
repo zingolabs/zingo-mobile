@@ -144,6 +144,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [spendableBalanceLastError, setSpendableBalanceLastError] = useState<string>('');
   const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
   const [contentHeight, setContentHeight] = useState<number>(0);
+  const [pickerTempSelectedAddress, setPickerTempSelectedAddress] = useState<string>('');
   const isFocused = useIsFocused();
 
   const slideAnim = useSharedValue(0);
@@ -183,7 +184,9 @@ const Send: React.FunctionComponent<SendProps> = ({
     const max =
       totalBalance.spendableOrchard +
       totalBalance.spendablePrivate -
-      (donation && !donationAddress ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) : 0);
+      (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+        ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
+        : 0);
     if (max >= 0) {
       // if max is 0 then the user can send a memo with amount 0.
       setMaxAmount(max);
@@ -194,7 +197,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setNegativeMaxAmount(true);
     }
     setSpendableBalanceLastError('');
-  }, [donation, donationAddress, totalBalance.spendableOrchard, totalBalance.spendablePrivate]);
+  }, [donation, donationAddress, server.chainName, totalBalance.spendableOrchard, totalBalance.spendablePrivate]);
 
   const calculateFeeWithPropose = useCallback(
     async (
@@ -227,14 +230,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemo;
         sendPageStateCalculateFee.toaddr.amount = amount;
 
-        sendJson = await Utils.getSendManyJSON(
-          sendPageStateCalculateFee,
-          uaAddress,
-          addresses,
-          server,
-          donation,
-          translate,
-        );
+        sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, uaAddress, addresses, server, donation);
         console.log('SEND', sendJson);
       }
 
@@ -283,8 +279,8 @@ const Send: React.FunctionComponent<SendProps> = ({
             if (runProposeJson.amount) {
               const newAmount =
                 runProposeJson.amount / 10 ** 8 -
-                (donation && !donationAddress
-                  ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+                (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+                  ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
                   : 0);
               console.log('AMOUNT', newAmount);
               updateToField(null, Utils.parseNumberFloatToStringLocale(newAmount, 8), null, null, null);
@@ -698,12 +694,22 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [mode, setZecPrice]);
 
   useEffect(() => {
-    const items = addressBook.map((item: AddressBookFileClass) => ({
-      label: item.label,
-      value: item.address,
-    }));
-    setItemsPicker(items);
-  }, [addressBook]);
+    (async () => {
+      const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
+      const items = addressBook
+        .filter((item: AddressBookFileClass) => item.address !== zennyTips)
+        .sort((a, b) => {
+          const aLabel = a.label;
+          const bLabel = b.label;
+          return aLabel.localeCompare(bLabel);
+        })
+        .map((item: AddressBookFileClass) => ({
+          label: item.label,
+          value: item.address,
+        }));
+      setItemsPicker(items);
+    })();
+  }, [addressBook, server.chainName]);
 
   useEffect(() => {
     (async () => {
@@ -719,7 +725,10 @@ const Send: React.FunctionComponent<SendProps> = ({
     const address = sendPageState.toaddr.to;
     if (address) {
       (async () => {
-        const donationA = address === (await Utils.getDonationAddress(server.chainName));
+        const donationA =
+          address === (await Utils.getDonationAddress(server.chainName)) ||
+          address === (await Utils.getZenniesDonationAddress(server.chainName)) ||
+          address === (await Utils.getNymDonationAddress(server.chainName));
         setDonationAddress(donationA);
       })();
     } else {
@@ -861,7 +870,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           calculatedFee={fee}
           donationAmount={
             donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
-              ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+              ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
               : 0
           }
           closeModal={() => {
@@ -1018,7 +1027,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                           {!updatingToField ? (
                             <RNPickerSelect
                               fixAndroidTouchableBug={true}
-                              value={ta.to}
+                              value={
+                                pickerTempSelectedAddress && Platform.OS === GlobalConst.platformOSios
+                                  ? pickerTempSelectedAddress
+                                  : ta.to
+                              }
                               items={itemsPicker}
                               placeholder={{
                                 label: translate('addressbook.select-placeholder') as string,
@@ -1026,12 +1039,18 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 color: colors.primary,
                               }}
                               useNativeAndroidPickerStyle={false}
-                              onValueChange={async (itemValue: string) => {
-                                if (validAddress === 1 && ta.to && itemValue && ta.to !== itemValue) {
+                              onDonePress={async () => {
+                                // only for IOS
+                                if (
+                                  validAddress === 1 &&
+                                  ta.to &&
+                                  pickerTempSelectedAddress &&
+                                  ta.to !== pickerTempSelectedAddress
+                                ) {
                                   setUpdatingToField(true);
                                   await ShowAddressAlertAsync(translate)
                                     .then(() => {
-                                      updateToField(itemValue, null, null, null, null);
+                                      updateToField(pickerTempSelectedAddress, null, null, null, null);
                                     })
                                     .catch(() => {
                                       updateToField(ta.to, null, null, null, null);
@@ -1039,8 +1058,31 @@ const Send: React.FunctionComponent<SendProps> = ({
                                   setTimeout(() => {
                                     setUpdatingToField(false);
                                   }, 500);
-                                } else if (ta.to !== itemValue) {
-                                  updateToField(itemValue, null, null, null, null);
+                                } else if (ta.to !== pickerTempSelectedAddress) {
+                                  updateToField(pickerTempSelectedAddress, null, null, null, null);
+                                }
+                                setPickerTempSelectedAddress('');
+                              }}
+                              onValueChange={async (itemValue: string) => {
+                                // only for Android
+                                if (Platform.OS === GlobalConst.platformOSandroid) {
+                                  if (validAddress === 1 && ta.to && itemValue && ta.to !== itemValue) {
+                                    setUpdatingToField(true);
+                                    await ShowAddressAlertAsync(translate)
+                                      .then(() => {
+                                        updateToField(itemValue, null, null, null, null);
+                                      })
+                                      .catch(() => {
+                                        updateToField(ta.to, null, null, null, null);
+                                      });
+                                    setTimeout(() => {
+                                      setUpdatingToField(false);
+                                    }, 500);
+                                  } else if (ta.to !== itemValue) {
+                                    updateToField(itemValue, null, null, null, null);
+                                  }
+                                } else {
+                                  setPickerTempSelectedAddress(itemValue);
                                 }
                               }}>
                               <FontAwesomeIcon
@@ -1226,7 +1268,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           />
                         </View>
                       </TouchableOpacity>
-                      {donation && !donationAddress && (
+                      {donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress && (
                         <View
                           style={{
                             display: 'flex',
@@ -1246,7 +1288,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <FadeText>
                             {(translate('send.confirm-donation') as string) +
                               ': ' +
-                              Utils.getDefaultDonationAmount() +
+                              Utils.getZenniesDonationAmount() +
                               ' '}
                           </FadeText>
                           <FadeText>{')'}</FadeText>
@@ -1616,12 +1658,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                 onPress={() => {
                   // donation - a Zenny is the minimum
                   if (
+                    server.chainName === ChainNameEnum.mainChainName &&
                     donationAddress &&
                     Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) <
-                      Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+                      Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
                   ) {
                     addLastSnackbar({ message: `${translate('send.donation-minimum-message') as string}` });
-                    updateToField(null, Utils.getDefaultDonationAmount(), null, null, false);
+                    updateToField(null, Utils.getZenniesDonationAmount(), null, null, false);
                     return;
                   }
                   if (!netInfo.isConnected) {
@@ -1655,6 +1698,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   defaultValueFee();
                   defaultValuesSpendableMaxAmount();
                   clearToAddr();
+                  setPickerTempSelectedAddress('');
                 }}
               />
             </View>
@@ -1695,9 +1739,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                       if (update) {
                         updateToField(
                           await Utils.getDonationAddress(server.chainName),
-                          Utils.getDefaultDonationAmount(),
+                          Utils.getDonationAmount(),
                           null,
-                          Utils.getDefaultDonationMemo(translate),
+                          Utils.getDonationMemo(translate),
                           true,
                         );
                       }

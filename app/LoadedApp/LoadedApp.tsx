@@ -262,8 +262,11 @@ export default function LoadedApp(props: LoadedAppProps) {
         setBackground(backgroundJson);
       }
 
-      // reading the address book
-      const ab = await AddressBookFileImpl.readAddressBook();
+      // adding `Zenny Tips` address always.
+      const ab = await AddressBookFileImpl.writeAddressBookItem(
+        translate('zenny-tips-ab') as string,
+        await Utils.getZenniesDonationAddress(server.chainName),
+      );
       setAddressBook(ab);
 
       setLoading(false);
@@ -914,8 +917,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   sendTransaction = async (setSendProgress: (arg0: SendProgressClass) => void): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
-      const { sendPageState, uaAddress, addresses, server, donation, translate } = this.state;
-      const sendJson = await Utils.getSendManyJSON(sendPageState, uaAddress, addresses, server, donation, translate);
+      const { sendPageState, uaAddress, addresses, server, donation } = this.state;
+      const sendJson = await Utils.getSendManyJSON(sendPageState, uaAddress, addresses, server, donation);
       const txid = await this.rpc.sendTransaction(sendJson, setSendProgress);
 
       return txid;
@@ -1038,7 +1041,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       let update = false;
       if (
         this.state.sendPageState.toaddr.to &&
-        this.state.sendPageState.toaddr.to !== (await Utils.getDonationAddress(this.state.server.chainName))
+        this.state.sendPageState.toaddr.to !== (await Utils.getNymDonationAddress(this.state.server.chainName))
       ) {
         await ShowAddressAlertAsync(this.state.translate)
           .then(async () => {
@@ -1055,9 +1058,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         let uriToAddr: ToAddrClass = new ToAddrClass(0);
         const to = new ToAddrClass(Utils.getNextToAddrID());
 
-        to.to = await Utils.getDonationAddress(this.state.server.chainName);
-        to.amount = Utils.getDefaultDonationAmount();
-        to.memo = this.state.translate('loadedapp.nymmemo') as string;
+        to.to = await Utils.getNymDonationAddress(this.state.server.chainName);
+        to.amount = Utils.getNymDonationAmount();
+        to.memo = Utils.getNymDonationMemo(this.state.translate);
         to.includeUAMemo = true;
 
         uriToAddr = to;

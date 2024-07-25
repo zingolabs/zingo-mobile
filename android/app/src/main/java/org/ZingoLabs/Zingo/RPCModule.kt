@@ -444,6 +444,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
+    fun getZenniesDonationAddress(promise: Promise) {
+        // Log.i("MAIN", "Initialize Light Client")
+
+        uniffi.zingo.initLogging()
+
+        // Initialize Light Client
+        val resp = uniffi.zingo.getZenniesForZingoDonationAddress()
+
+        promise.resolve(resp)
+    }
+
+    @ReactMethod
     fun getValueTransfersList(promise: Promise) {
         // Log.i("MAIN", "Initialize Light Client")
 
