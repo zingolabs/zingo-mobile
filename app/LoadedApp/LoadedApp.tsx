@@ -315,15 +315,10 @@ export default function LoadedApp(props: LoadedAppProps) {
 
 type LoadingProps = {
   background: string;
-  translate: (key: string) => TranslateType;
 };
 
-const Loading: React.FC<LoadingProps> = ({ background, translate }) => {
-  return (
-    <View style={{ backgroundColor: background, height: '100%' }}>
-      <Text>{translate('loading') as string}</Text>
-    </View>
-  );
+const Loading: React.FC<LoadingProps> = ({ background }) => {
+  return <View style={{ backgroundColor: background, height: '100%' }} />;
 };
 
 type LoadedAppClassProps = {
@@ -1570,7 +1565,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={aboutModalVisible}
             onRequestClose={() => this.setState({ aboutModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <About closeModal={() => this.setState({ aboutModalVisible: false })} />
             </Suspense>
           </Modal>
@@ -1580,7 +1575,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={infoModalVisible}
             onRequestClose={() => this.setState({ infoModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <Info closeModal={() => this.setState({ infoModalVisible: false })} setZecPrice={this.setZecPrice} />
             </Suspense>
           </Modal>
@@ -1590,7 +1585,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={syncReportModalVisible}
             onRequestClose={() => this.setState({ syncReportModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <SyncReport closeModal={() => this.setState({ syncReportModalVisible: false })} />
             </Suspense>
           </Modal>
@@ -1600,7 +1595,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={poolsModalVisible}
             onRequestClose={() => this.setState({ poolsModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <Pools
                 closeModal={() => this.setState({ poolsModalVisible: false })}
                 setPrivacyOption={this.setPrivacyOption}
@@ -1613,7 +1608,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={insightModalVisible}
             onRequestClose={() => this.setState({ insightModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <Insight
                 closeModal={() => this.setState({ insightModalVisible: false })}
                 setPrivacyOption={this.setPrivacyOption}
@@ -1626,7 +1621,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={rescanModalVisible}
             onRequestClose={() => this.setState({ rescanModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <Rescan closeModal={() => this.setState({ rescanModalVisible: false })} doRescan={this.doRescan} />
             </Suspense>
           </Modal>
@@ -1657,7 +1652,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={seedViewModalVisible}
             onRequestClose={() => this.setState({ seedViewModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <Seed
                 onClickOK={() => this.setState({ seedViewModalVisible: false })}
                 onClickCancel={() => this.setState({ seedViewModalVisible: false })}
@@ -1672,7 +1667,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={seedChangeModalVisible}
             onRequestClose={() => this.setState({ seedChangeModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <Seed
                 onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
@@ -1687,7 +1682,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={seedBackupModalVisible}
             onRequestClose={() => this.setState({ seedBackupModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <Seed
                 onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
@@ -1702,7 +1697,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={seedServerModalVisible}
             onRequestClose={() => this.setState({ seedServerModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <Seed
                 onClickOK={async () => await this.onClickOKServerWallet()}
                 onClickCancel={async () => {
@@ -1721,7 +1716,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={ufvkViewModalVisible}
             onRequestClose={() => this.setState({ ufvkViewModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <ShowUfvk
                 onClickOK={() => this.setState({ ufvkViewModalVisible: false })}
                 onClickCancel={() => this.setState({ ufvkViewModalVisible: false })}
@@ -1736,7 +1731,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={ufvkChangeModalVisible}
             onRequestClose={() => this.setState({ ufvkChangeModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <ShowUfvk
                 onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ ufvkChangeModalVisible: false })}
@@ -1751,7 +1746,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={ufvkBackupModalVisible}
             onRequestClose={() => this.setState({ ufvkBackupModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <ShowUfvk
                 onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ ufvkBackupModalVisible: false })}
@@ -1766,7 +1761,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={ufvkServerModalVisible}
             onRequestClose={() => this.setState({ ufvkServerModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <ShowUfvk
                 onClickOK={async () => await this.onClickOKServerWallet()}
                 onClickCancel={async () => {
@@ -1785,7 +1780,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={computingModalVisible}
             onRequestClose={() => this.setState({ computingModalVisible: false })}>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <ComputingTxContent />
             </Suspense>
           </Modal>
@@ -1801,7 +1796,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 addressBookOpenPriorModal: () => {},
               })
             }>
-            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
+            <Suspense fallback={<Loading background={colors.background} />}>
               <AddressBook
                 closeModal={() =>
                   this.setState({
