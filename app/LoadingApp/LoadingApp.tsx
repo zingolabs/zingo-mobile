@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { Component, Suspense, useState, useMemo, useEffect } from 'react';
+import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
   View,
   Alert,
@@ -77,11 +77,12 @@ import { isEqual } from 'lodash';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
 import { RestoreFromTypeEnum } from '../AppState';
 
-const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
-const Button = React.lazy(() => import('../../components/Components/Button'));
-const Seed = React.lazy(() => import('../../components/Seed'));
-const ImportUfvk = React.lazy(() => import('../../components/Ufvk/ImportUfvk'));
-const ChainTypeToggle = React.lazy(() => import('../../components/Components/ChainTypeToggle'));
+// no lazy load because slowing down screens.
+import BoldText from '../../components/Components/BoldText';
+import Button from '../../components/Components/Button';
+import Seed from '../../components/Seed';
+import ImportUfvk from '../../components/Ufvk/ImportUfvk';
+import ChainTypeToggle from '../../components/Components/ChainTypeToggle';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -1314,19 +1315,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               transparent={false}
               visible={screen === 2}
               onRequestClose={() => this.navigateToLoadedApp()}>
-              <Suspense
-                fallback={
-                  <View>
-                    <Text>{translate('loading') as string}</Text>
-                  </View>
-                }>
-                <Seed
-                  onClickOK={() => this.navigateToLoadedApp()}
-                  onClickCancel={() => this.navigateToLoadedApp()}
-                  action={SeedActionEnum.new}
-                  setPrivacyOption={this.setPrivacyOption}
-                />
-              </Suspense>
+              <Seed
+                onClickOK={() => this.navigateToLoadedApp()}
+                onClickCancel={() => this.navigateToLoadedApp()}
+                action={SeedActionEnum.new}
+                setPrivacyOption={this.setPrivacyOption}
+              />
             </Modal>
           )}
           {screen === 3 && (
@@ -1335,17 +1329,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               transparent={false}
               visible={screen === 3}
               onRequestClose={() => this.setState({ screen: 1 })}>
-              <Suspense
-                fallback={
-                  <View>
-                    <Text>{translate('loading') as string}</Text>
-                  </View>
-                }>
-                <ImportUfvk
-                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                  onClickCancel={() => this.setState({ screen: 1 })}
-                />
-              </Suspense>
+              <ImportUfvk
+                onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                onClickCancel={() => this.setState({ screen: 1 })}
+              />
             </Modal>
           )}
         </SafeAreaView>

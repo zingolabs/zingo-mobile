@@ -83,20 +83,21 @@ import AddressBookFileImpl from '../../components/AddressBook/AddressBookFileImp
 import simpleBiometrics from '../simpleBiometrics';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
 
-const History = React.lazy(() => import('../../components/History'));
-const Send = React.lazy(() => import('../../components/Send'));
-const Receive = React.lazy(() => import('../../components/Receive'));
+import History from '../../components/History';
+import Send from '../../components/Send';
+import Receive from '../../components/Receive';
+
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
 const Info = React.lazy(() => import('../../components/Info'));
 const SyncReport = React.lazy(() => import('../../components/SyncReport'));
 const Rescan = React.lazy(() => import('../../components/Rescan'));
-const Settings = React.lazy(() => import('../../components/Settings'));
+import Settings from '../../components/Settings';
 const Pools = React.lazy(() => import('../../components/Pools'));
 const Insight = React.lazy(() => import('../../components/Insight'));
 const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
 
-const Menu = React.lazy(() => import('./components/Menu'));
+import Menu from './components/Menu';
 const ComputingTxContent = React.lazy(() => import('./components/ComputingTxContent'));
 
 const en = require('../translations/en.json');
@@ -311,6 +312,19 @@ export default function LoadedApp(props: LoadedAppProps) {
     );
   }
 }
+
+type LoadingProps = {
+  background: string;
+  translate: (key: string) => TranslateType;
+};
+
+const Loading: React.FC<LoadingProps> = ({ background, translate }) => {
+  return (
+    <View style={{ backgroundColor: background, height: '100%' }}>
+      <Text>{translate('loading') as string}</Text>
+    </View>
+  );
+};
 
 type LoadedAppClassProps = {
   navigation: StackScreenProps<any>['navigation'];
@@ -1523,16 +1537,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       rescanMenu: this.state.rescanMenu,
     };
 
-    const menu = (
-      <Suspense
-        fallback={
-          <View>
-            <Text>Loading...</Text>
-          </View>
-        }>
-        <Menu onItemSelected={this.onMenuItemSelected} updateMenuState={this.updateMenuState} />
-      </Suspense>
-    );
+    const menu = <Menu onItemSelected={this.onMenuItemSelected} updateMenuState={this.updateMenuState} />;
 
     const fnTabBarIcon = (route: StackScreenProps<any>['route'], focused: boolean) => {
       var iconName;
@@ -1565,12 +1570,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={aboutModalVisible}
             onRequestClose={() => this.setState({ aboutModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <About closeModal={() => this.setState({ aboutModalVisible: false })} />
             </Suspense>
           </Modal>
@@ -1580,12 +1580,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={infoModalVisible}
             onRequestClose={() => this.setState({ infoModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <Info closeModal={() => this.setState({ infoModalVisible: false })} setZecPrice={this.setZecPrice} />
             </Suspense>
           </Modal>
@@ -1595,12 +1590,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={syncReportModalVisible}
             onRequestClose={() => this.setState({ syncReportModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <SyncReport closeModal={() => this.setState({ syncReportModalVisible: false })} />
             </Suspense>
           </Modal>
@@ -1610,12 +1600,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={poolsModalVisible}
             onRequestClose={() => this.setState({ poolsModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <Pools
                 closeModal={() => this.setState({ poolsModalVisible: false })}
                 setPrivacyOption={this.setPrivacyOption}
@@ -1628,12 +1613,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={insightModalVisible}
             onRequestClose={() => this.setState({ insightModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <Insight
                 closeModal={() => this.setState({ insightModalVisible: false })}
                 setPrivacyOption={this.setPrivacyOption}
@@ -1646,12 +1626,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={rescanModalVisible}
             onRequestClose={() => this.setState({ rescanModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <Rescan closeModal={() => this.setState({ rescanModalVisible: false })} doRescan={this.doRescan} />
             </Suspense>
           </Modal>
@@ -1661,27 +1636,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={settingsModalVisible}
             onRequestClose={() => this.setState({ settingsModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
-              <Settings
-                closeModal={() => this.setState({ settingsModalVisible: false })}
-                setWalletOption={this.setWalletOption}
-                setServerOption={this.setServerOption}
-                setCurrencyOption={this.setCurrencyOption}
-                setLanguageOption={this.setLanguageOption}
-                setSendAllOption={this.setSendAllOption}
-                setDonationOption={this.setDonationOption}
-                setPrivacyOption={this.setPrivacyOption}
-                setModeOption={this.setModeOption}
-                setSecurityOption={this.setSecurityOption}
-                setSelectServerOption={this.setSelectServerOption}
-                setRescanMenuOption={this.setRescanMenuOption}
-              />
-            </Suspense>
+            <Settings
+              closeModal={() => this.setState({ settingsModalVisible: false })}
+              setWalletOption={this.setWalletOption}
+              setServerOption={this.setServerOption}
+              setCurrencyOption={this.setCurrencyOption}
+              setLanguageOption={this.setLanguageOption}
+              setSendAllOption={this.setSendAllOption}
+              setDonationOption={this.setDonationOption}
+              setPrivacyOption={this.setPrivacyOption}
+              setModeOption={this.setModeOption}
+              setSecurityOption={this.setSecurityOption}
+              setSelectServerOption={this.setSelectServerOption}
+              setRescanMenuOption={this.setRescanMenuOption}
+            />
           </Modal>
 
           <Modal
@@ -1689,12 +1657,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={seedViewModalVisible}
             onRequestClose={() => this.setState({ seedViewModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <Seed
                 onClickOK={() => this.setState({ seedViewModalVisible: false })}
                 onClickCancel={() => this.setState({ seedViewModalVisible: false })}
@@ -1709,12 +1672,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={seedChangeModalVisible}
             onRequestClose={() => this.setState({ seedChangeModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <Seed
                 onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
@@ -1729,12 +1687,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={seedBackupModalVisible}
             onRequestClose={() => this.setState({ seedBackupModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <Seed
                 onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
@@ -1749,12 +1702,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={seedServerModalVisible}
             onRequestClose={() => this.setState({ seedServerModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <Seed
                 onClickOK={async () => await this.onClickOKServerWallet()}
                 onClickCancel={async () => {
@@ -1773,12 +1721,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={ufvkViewModalVisible}
             onRequestClose={() => this.setState({ ufvkViewModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <ShowUfvk
                 onClickOK={() => this.setState({ ufvkViewModalVisible: false })}
                 onClickCancel={() => this.setState({ ufvkViewModalVisible: false })}
@@ -1793,12 +1736,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={ufvkChangeModalVisible}
             onRequestClose={() => this.setState({ ufvkChangeModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <ShowUfvk
                 onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ ufvkChangeModalVisible: false })}
@@ -1813,12 +1751,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={ufvkBackupModalVisible}
             onRequestClose={() => this.setState({ ufvkBackupModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <ShowUfvk
                 onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ ufvkBackupModalVisible: false })}
@@ -1833,12 +1766,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={ufvkServerModalVisible}
             onRequestClose={() => this.setState({ ufvkServerModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <ShowUfvk
                 onClickOK={async () => await this.onClickOKServerWallet()}
                 onClickCancel={async () => {
@@ -1857,12 +1785,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={computingModalVisible}
             onRequestClose={() => this.setState({ computingModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <ComputingTxContent />
             </Suspense>
           </Modal>
@@ -1878,12 +1801,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 addressBookOpenPriorModal: () => {},
               })
             }>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading background={colors.background} translate={translate} />}>
               <AddressBook
                 closeModal={() =>
                   this.setState({
@@ -1923,40 +1841,33 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
                 {() => (
                   <>
-                    <Suspense
-                      fallback={
-                        <View>
-                          <Text>{translate('loading') as string}</Text>
-                        </View>
-                      }>
-                      {/*<History
-                        doRefresh={this.doRefresh}
-                        toggleMenuDrawer={this.toggleMenuDrawer}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                        setZecPrice={this.setZecPrice}
-                        setComputingModalVisible={this.setComputingModalVisible}
-                        setPrivacyOption={this.setPrivacyOption}
-                        setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                        setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
-                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                        setSendPageState={this.setSendPageState}
-                      />*/}
-                      <History
-                        doRefresh={this.doRefresh}
-                        toggleMenuDrawer={this.toggleMenuDrawer}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                        setZecPrice={this.setZecPrice}
-                        setComputingModalVisible={this.setComputingModalVisible}
-                        setPrivacyOption={this.setPrivacyOption}
-                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                        setSendPageState={this.setSendPageState}
-                        setShieldingAmount={this.setShieldingAmount}
-                        setScrollToTop={this.setScrollToTop}
-                        scrollToTop={scrollToTop}
-                      />
-                    </Suspense>
+                    {/*<History
+                      doRefresh={this.doRefresh}
+                      toggleMenuDrawer={this.toggleMenuDrawer}
+                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                      poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                      setZecPrice={this.setZecPrice}
+                      setComputingModalVisible={this.setComputingModalVisible}
+                      setPrivacyOption={this.setPrivacyOption}
+                      setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                      setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                      setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                      setSendPageState={this.setSendPageState}
+                    />*/}
+                    <History
+                      doRefresh={this.doRefresh}
+                      toggleMenuDrawer={this.toggleMenuDrawer}
+                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                      poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                      setZecPrice={this.setZecPrice}
+                      setComputingModalVisible={this.setComputingModalVisible}
+                      setPrivacyOption={this.setPrivacyOption}
+                      setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                      setSendPageState={this.setSendPageState}
+                      setShieldingAmount={this.setShieldingAmount}
+                      setScrollToTop={this.setScrollToTop}
+                      scrollToTop={scrollToTop}
+                    />
                   </>
                 )}
               </Tab.Screen>
@@ -1966,41 +1877,34 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                     {() => (
                       <>
-                        <Suspense
-                          fallback={
-                            <View>
-                              <Text>{translate('loading') as string}</Text>
-                            </View>
-                          }>
-                          {/*<Send
-                            setSendPageState={this.setSendPageState}
-                            sendTransaction={this.sendTransaction}
-                            clearToAddr={this.clearToAddr}
-                            setSendProgress={this.setSendProgress}
-                            toggleMenuDrawer={this.toggleMenuDrawer}
-                            syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                            poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                            setZecPrice={this.setZecPrice}
-                            setComputingModalVisible={this.setComputingModalVisible}
-                            setPrivacyOption={this.setPrivacyOption}
-                            setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                            setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
-                          />*/}
-                          <Send
-                            setSendPageState={this.setSendPageState}
-                            sendTransaction={this.sendTransaction}
-                            clearToAddr={this.clearToAddr}
-                            setSendProgress={this.setSendProgress}
-                            toggleMenuDrawer={this.toggleMenuDrawer}
-                            syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                            poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                            setZecPrice={this.setZecPrice}
-                            setComputingModalVisible={this.setComputingModalVisible}
-                            setPrivacyOption={this.setPrivacyOption}
-                            setShieldingAmount={this.setShieldingAmount}
-                            setScrollToTop={this.setScrollToTop}
-                          />
-                        </Suspense>
+                        {/*<Send
+                          setSendPageState={this.setSendPageState}
+                          sendTransaction={this.sendTransaction}
+                          clearToAddr={this.clearToAddr}
+                          setSendProgress={this.setSendProgress}
+                          toggleMenuDrawer={this.toggleMenuDrawer}
+                          syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                          poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                          setZecPrice={this.setZecPrice}
+                          setComputingModalVisible={this.setComputingModalVisible}
+                          setPrivacyOption={this.setPrivacyOption}
+                          setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
+                          setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
+                        />*/}
+                        <Send
+                          setSendPageState={this.setSendPageState}
+                          sendTransaction={this.sendTransaction}
+                          clearToAddr={this.clearToAddr}
+                          setSendProgress={this.setSendProgress}
+                          toggleMenuDrawer={this.toggleMenuDrawer}
+                          syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                          poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                          setZecPrice={this.setZecPrice}
+                          setComputingModalVisible={this.setComputingModalVisible}
+                          setPrivacyOption={this.setPrivacyOption}
+                          setShieldingAmount={this.setShieldingAmount}
+                          setScrollToTop={this.setScrollToTop}
+                        />
                       </>
                     )}
                   </Tab.Screen>
@@ -2008,20 +1912,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
                 {() => (
                   <>
-                    <Suspense
-                      fallback={
-                        <View>
-                          <Text>{translate('loading') as string}</Text>
-                        </View>
-                      }>
-                      <Receive
-                        setUaAddress={this.setUaAddress}
-                        toggleMenuDrawer={this.toggleMenuDrawer}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        setPrivacyOption={this.setPrivacyOption}
-                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                      />
-                    </Suspense>
+                    <Receive
+                      setUaAddress={this.setUaAddress}
+                      toggleMenuDrawer={this.toggleMenuDrawer}
+                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                      setPrivacyOption={this.setPrivacyOption}
+                      setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                    />
                   </>
                 )}
               </Tab.Screen>
