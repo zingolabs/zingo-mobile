@@ -411,6 +411,10 @@ export default class RPC {
       this.timers.splice(deleted[i], 1);
     }
 
+    await this.fetchWalletHeight();
+    await this.fetchWalletBirthday();
+    //await this.fetchInfoAndServerHeight();
+
     // Load the current wallet data
     await this.loadWalletData();
 
@@ -606,10 +610,11 @@ export default class RPC {
   }
 
   async loadWalletData() {
-    await this.fetchTotalBalance();
     await this.fetchTandZandOValueTransfers();
-    await this.fetchWalletSettings();
+    await this.fetchAddresses();
+    await this.fetchTotalBalance();
     await this.fetchInfoAndServerHeight();
+    await this.fetchWalletSettings();
   }
 
   async updateData() {
@@ -629,7 +634,7 @@ export default class RPC {
 
     await this.fetchWalletHeight();
     await this.fetchWalletBirthday();
-    await this.fetchInfoAndServerHeight();
+    //await this.fetchInfoAndServerHeight();
 
     // And fetch the rest of the data.
     await this.loadWalletData();
@@ -650,12 +655,12 @@ export default class RPC {
       return;
     }
 
-    // And fetch the rest of the data.
-    await this.loadWalletData();
-
     await this.fetchWalletHeight();
     await this.fetchWalletBirthday();
-    await this.fetchInfoAndServerHeight();
+    //await this.fetchInfoAndServerHeight();
+
+    // And fetch the rest of the data.
+    await this.loadWalletData();
 
     if (!this.lastServerBlockHeight) {
       //console.log('the last server block is zero');
@@ -765,12 +770,12 @@ export default class RPC {
         // if the syncId change then reset the %
         if (this.prevSyncId !== this.syncId) {
           if (this.prevSyncId !== -1) {
-            // And fetch the rest of the data.
-            await this.loadWalletData();
-
             await this.fetchWalletHeight();
             await this.fetchWalletBirthday();
-            await this.fetchInfoAndServerHeight();
+            //await this.fetchInfoAndServerHeight();
+
+            // And fetch the rest of the data.
+            await this.loadWalletData();
 
             await RPCModule.doSave();
 
@@ -898,12 +903,12 @@ export default class RPC {
           // here we can release the screen...
           this.keepAwake(false);
 
-          // And fetch the rest of the data.
-          await this.loadWalletData();
-
           await this.fetchWalletHeight();
           await this.fetchWalletBirthday();
-          await this.fetchInfoAndServerHeight();
+          //await this.fetchInfoAndServerHeight();
+
+          // And fetch the rest of the data.
+          await this.loadWalletData();
 
           await RPCModule.doSave();
 
@@ -930,12 +935,12 @@ export default class RPC {
           if (this.prevBatchNum !== batchNum) {
             // if finished batches really fast, the App have to save the wallet delayed.
             if (this.prevBatchNum !== -1 && this.batches >= 1) {
-              // And fetch the rest of the data.
-              await this.loadWalletData();
-
               await this.fetchWalletHeight();
               await this.fetchWalletBirthday();
-              await this.fetchInfoAndServerHeight();
+              //await this.fetchInfoAndServerHeight();
+
+              // And fetch the rest of the data.
+              await this.loadWalletData();
 
               await RPCModule.doSave();
               this.batches = 0;
@@ -1143,6 +1148,50 @@ export default class RPC {
       this.fnSetAllAddresses(allAddresses);
     } catch (error) {
       console.log(`Critical Error notes ${error}`);
+      return;
+    }
+  }
+
+  // This method will get the total balances
+  async fetchAddresses() {
+    try {
+      const addressesStr: string = await RPCModule.execute(CommandEnum.addresses, '');
+      if (addressesStr) {
+        if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error addresses ${addressesStr}`);
+          return;
+        }
+      } else {
+        console.log('Internal Error addresses');
+        return;
+      }
+      const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr);
+
+      let allAddresses: AddressClass[] = [];
+
+      addressesJSON.forEach((u: RPCAddressType) => {
+        // If this has any pending txns, show that in the UI
+        const receivers: string =
+          (u.receivers.orchard_exists ? ReceiverEnum.o : '') +
+          (u.receivers.sapling ? ReceiverEnum.z : '') +
+          (u.receivers.transparent ? ReceiverEnum.t : '');
+        if (u.address) {
+          const abu = new AddressClass(u.address, u.address, AddressKindEnum.u, receivers);
+          allAddresses.push(abu);
+        }
+        if (u.address && u.receivers.sapling) {
+          const abz = new AddressClass(u.address, u.receivers.sapling, AddressKindEnum.z, receivers);
+          allAddresses.push(abz);
+        }
+        if (u.address && u.receivers.transparent) {
+          const abt = new AddressClass(u.address, u.receivers.transparent, AddressKindEnum.t, receivers);
+          allAddresses.push(abt);
+        }
+      });
+
+      this.fnSetAllAddresses(allAddresses);
+    } catch (error) {
+      console.log(`Critical Error addresses ${error}`);
       return;
     }
   }

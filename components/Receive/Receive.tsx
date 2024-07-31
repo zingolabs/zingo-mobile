@@ -53,7 +53,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   };
 
   useEffect(() => {
-    if (addresses && addresses.length && uaAddress) {
+    if (addresses && addresses.length > 0 && uaAddress) {
       const uadd = addresses.filter(a => a.addressKind === AddressKindEnum.u) || [];
       const zadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === AddressKindEnum.z) || [];
       const tadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === AddressKindEnum.t) || [];
@@ -63,6 +63,16 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
       const uaAddressIndex = uadd.findIndex(a => a.address === uaAddress);
       setUIndex(uaAddressIndex);
+    } else if (addresses && addresses.length > 0) {
+      const uadd = addresses.filter(a => a.addressKind === AddressKindEnum.u) || [];
+      setUaddrs(uadd);
+
+      setUIndex(0);
+    } else {
+      // try to get the info from the server
+      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@ no addesses in receive screen');
+      console.log(addresses);
+      console.log(uaAddress);
     }
   }, [addresses, uaAddress]);
 

@@ -1475,6 +1475,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       totalBalance,
       translate,
       scrollToTop,
+      addresses,
     } = this.state;
     const { colors } = this.props.theme;
 
@@ -1899,11 +1900,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
-          {mode !== ModeEnum.basic ||
-          (mode === ModeEnum.basic &&
-            (!(mode === ModeEnum.basic && valueTransfers.length <= 0) ||
-              (!readOnly &&
-                !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0)))) ? (
+          {(!!valueTransfers && valueTransfers.length > 0) ||
+          (!readOnly &&
+            (mode === ModeEnum.advanced ||
+              (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0))) ? (
             <Tab.Navigator
               initialRouteName={translate('loadedapp.wallet-menu') as string}
               screenOptions={({ route }) => ({
@@ -1961,7 +1961,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 )}
               </Tab.Screen>
               {!readOnly &&
-                !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
+                (mode === ModeEnum.advanced ||
+                  (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0)) && (
                   <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                     {() => (
                       <>
@@ -2026,37 +2027,49 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               </Tab.Screen>
             </Tab.Navigator>
           ) : (
-            <Tab.Navigator
-              initialRouteName={translate('loadedapp.wallet-menu') as string}
-              screenOptions={{
-                tabBarStyle: {
-                  borderTopColor: colors.background,
-                  borderTopWidth: 0,
-                  height: 0,
-                },
-                headerShown: false,
-              }}>
-              <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
-                {() => (
-                  <>
-                    <Suspense
-                      fallback={
-                        <View>
-                          <Text>{translate('loading') as string}</Text>
-                        </View>
-                      }>
-                      <Receive
-                        setUaAddress={this.setUaAddress}
-                        toggleMenuDrawer={this.toggleMenuDrawer}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        setPrivacyOption={this.setPrivacyOption}
-                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                      />
-                    </Suspense>
-                  </>
-                )}
-              </Tab.Screen>
-            </Tab.Navigator>
+            <>
+              {!!addresses && addresses.length > 0 ? (
+                <Tab.Navigator
+                  initialRouteName={translate('loadedapp.wallet-menu') as string}
+                  screenOptions={{
+                    tabBarStyle: {
+                      borderTopColor: colors.background,
+                      borderTopWidth: 0,
+                      height: 0,
+                    },
+                    headerShown: false,
+                  }}>
+                  <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
+                    {() => (
+                      <>
+                        <Suspense
+                          fallback={
+                            <View>
+                              <Text>{translate('loading') as string}</Text>
+                            </View>
+                          }>
+                          <Receive
+                            setUaAddress={this.setUaAddress}
+                            toggleMenuDrawer={this.toggleMenuDrawer}
+                            syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                            setPrivacyOption={this.setPrivacyOption}
+                            setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                          />
+                        </Suspense>
+                      </>
+                    )}
+                  </Tab.Screen>
+                </Tab.Navigator>
+              ) : (
+                <SafeAreaView
+                  style={{
+                    backgroundColor: colors.background,
+                    height: '100%',
+                  }}>
+                  <View />
+                </SafeAreaView>
+              )}
+            </>
           )}
         </SideMenu>
       </ContextAppLoadedProvider>
