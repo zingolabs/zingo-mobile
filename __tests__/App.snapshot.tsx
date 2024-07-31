@@ -45,6 +45,7 @@ jest.mock('react-native', () => {
 
   return RN;
 });
+jest.mock('react-native-picker-select', () => 'RNPickerSelect');
 
 // test suite
 describe('Component App - test', () => {

@@ -74,6 +74,7 @@ jest.mock('react-native-fs', () => ({
   writeFile: jest.fn(() => Promise.resolve()), // o Promise.reject(new Error('Write failed'))
   // Agrega más funciones mockeadas según sea necesario
 }));
+jest.mock('react-native-picker-select', () => 'RNPickerSelect');
 
 // test suite
 describe('Component LoadedApp - test', () => {
