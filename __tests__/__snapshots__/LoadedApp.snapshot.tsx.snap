@@ -366,28 +366,27 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
       visible={false}
     />
     <View />
-    <RCTSafeAreaView
+    <View
       style={
         {
           "alignItems": "center",
           "backgroundColor": "#011401",
+          "display": "flex",
           "height": "100%",
           "justifyContent": "center",
         }
       }
     >
-      <View>
-        <ActivityIndicator
-          color="#18bd18"
-          size="large"
-          style={
-            {
-              "marginVertical": 20,
-            }
+      <ActivityIndicator
+        color="#18bd18"
+        size="large"
+        style={
+          {
+            "marginVertical": 20,
           }
-        />
-      </View>
-    </RCTSafeAreaView>
+        }
+      />
+    </View>
   </View>
 </View>
 `;
