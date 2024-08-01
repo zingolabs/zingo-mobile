@@ -12,6 +12,7 @@ import {
   Linking,
   SafeAreaView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -358,9 +359,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       navigation: props.navigation,
       netInfo: {} as NetInfoType,
       wallet: {} as WalletType,
-      totalBalance: {} as TotalBalanceClass,
-      addresses: [] as AddressClass[],
-      valueTransfers: [] as ValueTransferType[],
+      totalBalance: null,
+      addresses: null,
+      valueTransfers: null,
       walletSettings: {} as WalletSettingsClass,
       syncingStatus: {} as SyncingStatusClass,
       sendProgress: {} as SendProgressClass,
@@ -717,14 +718,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({ shieldingAmount: value });
   };
 
-  //setPoolsToShieldSelectSapling = (value: boolean) => {
-  //  this.setState({ poolsToShieldSelectSapling: value });
-  //};
-
-  //setPoolsToShieldSelectTransparent = (value: boolean) => {
-  //  this.setState({ poolsToShieldSelectTransparent: value });
-  //};
-
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
       //console.log('fetch total balance');
@@ -766,7 +759,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       const pending: number =
         valueTransfers.length > 0 ? valueTransfers.filter((vt: ValueTransferType) => vt.confirmations === 0).length : 0;
       // if a ValueTransfer go from 0 confirmations to > 0 -> Show a message about a ValueTransfer is confirmed
-      this.state.valueTransfers.length > 0 &&
+      this.state.valueTransfers &&
+        this.state.valueTransfers.length > 0 &&
         this.state.valueTransfers
           .filter((vtOld: ValueTransferType) => !vtOld.confirmations || vtOld.confirmations === 0)
           .forEach((vtOld: ValueTransferType) => {
@@ -927,7 +921,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     try {
       // Construct a sendJson from the sendPage state
       const { sendPageState, uaAddress, addresses, server, donation } = this.state;
-      const sendJson = await Utils.getSendManyJSON(sendPageState, uaAddress, addresses, server, donation);
+      const sendJson = await Utils.getSendManyJSON(
+        sendPageState,
+        uaAddress,
+        addresses ? addresses : ([] as AddressClass[]),
+        server,
+        donation,
+      );
       const txid = await this.rpc.sendTransaction(sendJson, setSendProgress);
 
       return txid;
@@ -1555,7 +1555,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       );
     };
 
-    //console.log('render LoadedAppClass - 3', translate('version'));
+    console.log('render LoadedAppClass - 3');
+    console.log('vt', valueTransfers);
+    console.log('ad', addresses);
+    console.log('ba', totalBalance);
 
     return (
       <ContextAppLoadedProvider value={context}>
@@ -1813,10 +1816,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
-          {(!!valueTransfers && valueTransfers.length > 0) ||
-          (!readOnly &&
-            (mode === ModeEnum.advanced ||
-              (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0))) ? (
+          {mode === ModeEnum.advanced ||
+          (!!valueTransfers && valueTransfers.length > 0) ||
+          (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
             <Tab.Navigator
               initialRouteName={translate('loadedapp.wallet-menu') as string}
               screenOptions={({ route }) => ({
@@ -1836,19 +1838,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
                 {() => (
                   <>
-                    {/*<History
-                      doRefresh={this.doRefresh}
-                      toggleMenuDrawer={this.toggleMenuDrawer}
-                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                      poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                      setZecPrice={this.setZecPrice}
-                      setComputingModalVisible={this.setComputingModalVisible}
-                      setPrivacyOption={this.setPrivacyOption}
-                      setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                      setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
-                      setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                      setSendPageState={this.setSendPageState}
-                    />*/}
                     <History
                       doRefresh={this.doRefresh}
                       toggleMenuDrawer={this.toggleMenuDrawer}
@@ -1872,20 +1861,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                     {() => (
                       <>
-                        {/*<Send
-                          setSendPageState={this.setSendPageState}
-                          sendTransaction={this.sendTransaction}
-                          clearToAddr={this.clearToAddr}
-                          setSendProgress={this.setSendProgress}
-                          toggleMenuDrawer={this.toggleMenuDrawer}
-                          syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                          poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                          setZecPrice={this.setZecPrice}
-                          setComputingModalVisible={this.setComputingModalVisible}
-                          setPrivacyOption={this.setPrivacyOption}
-                          setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                          setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
-                        />*/}
                         <Send
                           setSendPageState={this.setSendPageState}
                           sendTransaction={this.sendTransaction}
@@ -1920,7 +1895,19 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             </Tab.Navigator>
           ) : (
             <>
-              {!!addresses && addresses.length > 0 ? (
+              {valueTransfers === null || addresses === null || totalBalance === null ? (
+                <SafeAreaView
+                  style={{
+                    backgroundColor: colors.background,
+                    height: '100%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <View>
+                    <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
+                  </View>
+                </SafeAreaView>
+              ) : (
                 <Tab.Navigator
                   initialRouteName={translate('loadedapp.wallet-menu') as string}
                   screenOptions={{
@@ -1952,14 +1939,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     )}
                   </Tab.Screen>
                 </Tab.Navigator>
-              ) : (
-                <SafeAreaView
-                  style={{
-                    backgroundColor: colors.background,
-                    height: '100%',
-                  }}>
-                  <View />
-                </SafeAreaView>
               )}
             </>
           )}

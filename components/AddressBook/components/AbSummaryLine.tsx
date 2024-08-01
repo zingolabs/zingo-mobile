@@ -136,7 +136,11 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
         )}
         {!readOnly &&
           !addressProtected &&
-          !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
+          !(
+            mode === ModeEnum.basic &&
+            totalBalance &&
+            totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0
+          ) && (
             <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
               <TouchableOpacity
                 style={{ zIndex: 999, padding: 10 }}

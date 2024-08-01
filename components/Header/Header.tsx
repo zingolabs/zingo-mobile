@@ -237,7 +237,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         console.log(proposeFee, proposeAmount);
       })();
     }
-  }, [readOnly, setShieldingAmount, totalBalance.transparentBal, somePending]);
+  }, [readOnly, setShieldingAmount, totalBalance?.transparentBal, somePending]);
 
   useEffect(() => {
     setShowShieldButton(!readOnly && (somePending ? 0 : shieldingAmount) > 0);
@@ -681,11 +681,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             currencyName={info.currencyName}
             color={colors.text}
             size={36}
-            amtZec={totalBalance.total}
+            amtZec={totalBalance ? totalBalance.total : 0}
             privacy={privacy}
             smallPrefix={true}
           />
           {mode !== ModeEnum.basic &&
+            totalBalance &&
             (totalBalance.orchardBal !== totalBalance.spendableOrchard ||
               totalBalance.privateBal > 0 ||
               totalBalance.transparentBal > 0) && (
@@ -711,7 +712,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </View>
       )}
 
-      {receivedLegend && totalBalance.total > 0 && (
+      {receivedLegend && totalBalance && totalBalance.total > 0 && (
         <View
           style={{
             flexDirection: 'row',
@@ -737,7 +738,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           <CurrencyAmount
             style={{ marginTop: 0, marginBottom: 5 }}
             price={zecPrice.zecPrice}
-            amtZec={totalBalance.total}
+            amtZec={totalBalance ? totalBalance.total : 0}
             currency={currency}
             privacy={privacy}
           />
@@ -883,8 +884,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           {readOnly && (
             <>
               {setUfvkViewModalVisible &&
-              !(mode === ModeEnum.basic && valueTransfers.length <= 0) &&
-              !(mode === ModeEnum.basic && totalBalance.total <= 0) ? (
+              !(mode === ModeEnum.basic && valueTransfers && valueTransfers.length <= 0) &&
+              !(mode === ModeEnum.basic && totalBalance && totalBalance.total <= 0) ? (
                 <TouchableOpacity onPress={() => ufvkShowModal()}>
                   <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
                 </TouchableOpacity>

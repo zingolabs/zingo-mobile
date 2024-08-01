@@ -134,7 +134,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   };
 
   const thisWalletAddress: (add: string) => boolean = (add: string) => {
-    const address: AddressClass[] = addresses.filter((a: AddressClass) => a.address === add);
+    const address: AddressClass[] = addresses ? addresses.filter((a: AddressClass) => a.address === add) : [];
     return address.length >= 1;
   };
 

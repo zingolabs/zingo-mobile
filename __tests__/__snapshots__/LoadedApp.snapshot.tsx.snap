@@ -152,6 +152,20 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
             >
               text translated
             </Text>
+            <Text
+              onPress={[Function]}
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 14,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                  "paddingTop": 25,
+                }
+              }
+            >
+              text translated
+            </Text>
           </View>
         </View>
       </RCTScrollView>
@@ -355,12 +369,24 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
     <RCTSafeAreaView
       style={
         {
+          "alignItems": "center",
           "backgroundColor": "#011401",
           "height": "100%",
+          "justifyContent": "center",
         }
       }
     >
-      <View />
+      <View>
+        <ActivityIndicator
+          color="#18bd18"
+          size="large"
+          style={
+            {
+              "marginVertical": 20,
+            }
+          }
+        />
+      </View>
     </RCTSafeAreaView>
   </View>
 </View>

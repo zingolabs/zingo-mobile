@@ -54,7 +54,6 @@ export default class RPC {
   syncStatusTimerID?: NodeJS.Timeout;
 
   updateDataLock: boolean;
-  updateDataCtr: number;
 
   lastWalletBlockHeight: number;
   lastServerBlockHeight: number;
@@ -98,8 +97,6 @@ export default class RPC {
     this.keepAwake = keepAwake;
 
     this.updateDataLock = false;
-    this.updateDataCtr = 0;
-
     this.lastWalletBlockHeight = 0;
     this.lastServerBlockHeight = 0;
     this.walletBirthday = 0;
@@ -235,13 +232,18 @@ export default class RPC {
   }
 
   static async rpcFetchServerHeight(): Promise<number> {
-    const info = await RPC.rpcGetInfoObject();
+    try {
+      const info = await RPC.rpcGetInfoObject();
 
-    if (info) {
-      return info.latestBlock;
+      if (info) {
+        return info.latestBlock;
+      }
+
+      return 0;
+    } catch (error) {
+      console.log(`Critical Error server block height ${error}`);
+      return 0;
     }
-
-    return 0;
   }
 
   static async rpcFetchWalletHeight(): Promise<number> {
@@ -620,13 +622,7 @@ export default class RPC {
   async updateData() {
     //console.log("Update data triggered");
     if (this.updateDataLock) {
-      //console.log("Update lock, returning");
-      return;
-    }
-
-    this.updateDataCtr += 1;
-    if ((this.inRefresh || this.inSend) && this.updateDataCtr % 5 !== 0) {
-      // We're refreshing, or sending, in which case update every 5th time
+      console.log('Update lock, returning');
       return;
     }
 
@@ -647,6 +643,8 @@ export default class RPC {
     } catch (error) {
       console.log('Internal error update data', error);
       this.updateDataLock = false;
+      // relaunch the interval task just in case they are aborted.
+      this.configure();
     }
   }
 
@@ -704,7 +702,7 @@ export default class RPC {
           spendableOrchard: 0,
           spendablePrivate: 0,
           total: 0,
-        });
+        } as TotalBalanceClass);
         this.doRescan()
           .then(result => {
             console.log('rescan finished', result);
@@ -1021,17 +1019,24 @@ export default class RPC {
 
       this.fnSetWalletSettings(walletSettings);
     } catch (error) {
-      console.log(`Critical Error transaction filter threshold ${error}`);
+      console.log(`Critical Error wallet settings ${error}`);
       return;
     }
   }
 
   async fetchInfoAndServerHeight(): Promise<void> {
-    const info = await RPC.rpcGetInfoObject();
+    try {
+      const info = await RPC.rpcGetInfoObject();
 
-    if (info) {
-      this.fnSetInfo(info);
-      this.lastServerBlockHeight = info.latestBlock;
+      if (info) {
+        this.fnSetInfo(info);
+        this.lastServerBlockHeight = info.latestBlock;
+      }
+    } catch (error) {
+      console.log(`Critical Error info & server block height ${error}`);
+      // relaunch the interval task just in case they are aborted.
+      this.configure();
+      return;
     }
   }
 
@@ -1154,7 +1159,9 @@ export default class RPC {
 
       this.fnSetAllAddresses(allAddresses);
     } catch (error) {
-      console.log(`Critical Error notes ${error}`);
+      console.log(`Critical Error addresses balances notes ${error}`);
+      // relaunch the interval task just in case they are aborted.
+      this.configure();
       return;
     }
   }
@@ -1199,6 +1206,8 @@ export default class RPC {
       this.fnSetAllAddresses(allAddresses);
     } catch (error) {
       console.log(`Critical Error addresses ${error}`);
+      // relaunch the interval task just in case they are aborted.
+      this.configure();
       return;
     }
   }
@@ -1220,15 +1229,24 @@ export default class RPC {
       this.lastWalletBlockHeight = heightJSON.height;
     } catch (error) {
       console.log(`Critical Error wallet height ${error}`);
+      // relaunch the interval task just in case they are aborted.
+      this.configure();
       return;
     }
   }
 
   async fetchWalletBirthday(): Promise<void> {
-    const wallet = await RPC.rpcFetchWallet(this.readOnly);
+    try {
+      const wallet = await RPC.rpcFetchWallet(this.readOnly);
 
-    if (wallet) {
-      this.walletBirthday = wallet.birthday;
+      if (wallet) {
+        this.walletBirthday = wallet.birthday;
+      }
+    } catch (error) {
+      console.log(`Critical Error wallet birthday ${error}`);
+      // relaunch the interval task just in case they are aborted.
+      this.configure();
+      return;
     }
   }
 
@@ -1250,6 +1268,8 @@ export default class RPC {
 
       //console.log(valueTransfersJSON);
 
+      await this.fetchWalletHeight();
+      await this.fetchWalletBirthday();
       await this.fetchInfoAndServerHeight();
 
       let vtList: ValueTransferType[] = [];
@@ -1305,6 +1325,8 @@ export default class RPC {
       this.fnSetValueTransfersList(vtList);
     } catch (error) {
       console.log(`Critical Error txs list value transfers ${error}`);
+      // relaunch the interval task just in case they are aborted.
+      this.configure();
       return;
     }
   }

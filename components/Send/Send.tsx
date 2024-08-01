@@ -34,6 +34,7 @@ import {
   ChainNameEnum,
   ButtonTypeEnum,
   GlobalConst,
+  AddressClass,
 } from '../../app/AppState';
 import { parseZcashURI, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
@@ -180,10 +181,10 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const defaultValuesSpendableMaxAmount = useCallback((): void => {
-    setSpendable(totalBalance.spendableOrchard + totalBalance.spendablePrivate);
+    setSpendable(totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0);
     const max =
-      totalBalance.spendableOrchard +
-      totalBalance.spendablePrivate -
+      (totalBalance ? totalBalance.spendableOrchard : 0) +
+      (totalBalance ? totalBalance.spendablePrivate : 0) -
       (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
         ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
         : 0);
@@ -197,7 +198,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setNegativeMaxAmount(true);
     }
     setSpendableBalanceLastError('');
-  }, [donation, donationAddress, server.chainName, totalBalance.spendableOrchard, totalBalance.spendablePrivate]);
+  }, [donation, donationAddress, server.chainName, totalBalance]);
 
   const calculateFeeWithPropose = useCallback(
     async (
@@ -230,7 +231,13 @@ const Send: React.FunctionComponent<SendProps> = ({
         sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemo;
         sendPageStateCalculateFee.toaddr.amount = amount;
 
-        sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, uaAddress, addresses, server, donation);
+        sendJson = await Utils.getSendManyJSON(
+          sendPageStateCalculateFee,
+          uaAddress,
+          addresses ? addresses : ([] as AddressClass[]),
+          server,
+          donation,
+        );
         console.log('SEND', sendJson);
       }
 
@@ -308,7 +315,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         return;
       }
       // spendable
-      let spendableBalance = totalBalance.spendableOrchard + totalBalance.spendablePrivate;
+      let spendableBalance = totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0;
       let zenniesForZingo = donationAddress ? false : donation;
       const spendableBalanceJSON = { address, zennies_for_zingo: zenniesForZingo };
       console.log('SPENDABLEBALANCE', spendableBalanceJSON);
@@ -363,16 +370,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
       //setSendAllClick(false);
     },
-    [
-      defaultValuesSpendableMaxAmount,
-      donation,
-      donationAddress,
-      totalBalance.spendableOrchard,
-      totalBalance.spendablePrivate,
-      validAddress,
-      //sendAllClick,
-      //updateToField,
-    ],
+    [defaultValuesSpendableMaxAmount, donation, donationAddress, totalBalance, validAddress],
   );
 
   const memoTotal = useCallback((memoPar: string, includeUAMemoPar: boolean, uaAddressPar: string) => {
@@ -464,8 +462,8 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     const stillConf =
-      totalBalance.orchardBal !== totalBalance.spendableOrchard ||
-      totalBalance.privateBal !== totalBalance.spendablePrivate ||
+      (totalBalance ? totalBalance.orchardBal : 0) !== (totalBalance ? totalBalance.spendableOrchard : 0) ||
+      (totalBalance ? totalBalance.privateBal : 0) !== (totalBalance ? totalBalance.spendablePrivate : 0) ||
       somePending;
     const showShield = (somePending ? 0 : shieldingAmount) > 0;
     //const showUpgrade =
@@ -475,10 +473,11 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [
     shieldingAmount,
     somePending,
-    totalBalance.orchardBal,
-    totalBalance.privateBal,
-    totalBalance.spendableOrchard,
-    totalBalance.spendablePrivate,
+    totalBalance,
+    totalBalance?.orchardBal,
+    totalBalance?.privateBal,
+    totalBalance?.spendableOrchard,
+    totalBalance?.spendablePrivate,
   ]);
 
   useEffect(() => {

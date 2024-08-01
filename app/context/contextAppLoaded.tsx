@@ -3,13 +3,11 @@ import { StackScreenProps } from '@react-navigation/stack';
 
 import {
   SyncingStatusClass,
-  TotalBalanceClass,
   ReceivePageStateClass,
   SendProgressClass,
   WalletSettingsClass,
   InfoType,
   WalletType,
-  AddressClass,
   ZecPriceType,
   BackgroundType,
   SendPageStateClass,
@@ -25,16 +23,15 @@ import {
   SelectServerEnum,
   SnackbarType,
   AppContextLoaded,
-  ValueTransferType,
 } from '../AppState';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
   navigation: {} as StackScreenProps<any>['navigation'],
   netInfo: {} as NetInfoType,
   syncingStatus: new SyncingStatusClass(),
-  totalBalance: new TotalBalanceClass(),
-  addresses: [] as AddressClass[],
-  valueTransfers: [] as ValueTransferType[],
+  totalBalance: null,
+  addresses: null,
+  valueTransfers: null,
   sendPageState: new SendPageStateClass(new ToAddrClass(0)),
   receivePageState: new ReceivePageStateClass(''),
   info: {} as InfoType,
