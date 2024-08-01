@@ -630,17 +630,24 @@ export default class RPC {
       return;
     }
 
-    this.updateDataLock = true;
+    // if the App have an error here
+    // this try-catch prevent to have true in updateDataLock.
+    try {
+      this.updateDataLock = true;
 
-    await this.fetchWalletHeight();
-    await this.fetchWalletBirthday();
-    //await this.fetchInfoAndServerHeight();
+      await this.fetchWalletHeight();
+      await this.fetchWalletBirthday();
+      //await this.fetchInfoAndServerHeight();
 
-    // And fetch the rest of the data.
-    await this.loadWalletData();
+      // And fetch the rest of the data.
+      await this.loadWalletData();
 
-    //console.log(`Finished update data at ${lastServerBlockHeight}`);
-    this.updateDataLock = false;
+      //console.log(`Finished update data at ${lastServerBlockHeight}`);
+      this.updateDataLock = false;
+    } catch (error) {
+      console.log('Internal error update data', error);
+      this.updateDataLock = false;
+    }
   }
 
   async refresh(fullRefresh: boolean, fullRescan?: boolean) {
