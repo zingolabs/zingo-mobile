@@ -270,7 +270,7 @@ export default class RPC {
   static async rpcShieldFunds(): Promise<string> {
     try {
       const shieldStr: string = await RPCModule.execute(CommandEnum.confirm, '');
-      console.log(shieldStr);
+      //console.log(shieldStr);
       if (shieldStr) {
         if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error shield ${shieldStr}`);
@@ -571,8 +571,7 @@ export default class RPC {
   async doSend(sendJSON: string): Promise<string> {
     try {
       console.log('send JSON', sendJSON);
-      const preSendStr: String = await RPCModule.execute(CommandEnum.send, sendJSON);
-      console.log(preSendStr);
+      await RPCModule.execute(CommandEnum.send, sendJSON);
       const sendStr: string = await RPCModule.execute(CommandEnum.confirm, '');
       if (sendStr) {
         if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1405,7 +1404,7 @@ export default class RPC {
           progress = await JSON.parse(pro);
           sendId = progress.id;
         } catch (e) {
-          console.log(e);
+          console.log('Error parsing status send progress', e);
           if (!sendTxid && !sendError) {
             return;
           }

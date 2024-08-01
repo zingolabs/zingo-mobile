@@ -206,35 +206,35 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         const runProposeStr = await runShieldPropose();
         if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
           // snack with error
-          console.log(runProposeStr);
+          console.log('Error shield proposing', runProposeStr);
           //Alert.alert('Calculating the FEE', runProposeStr);
         } else {
           try {
             const runProposeJson: RPCShieldProposeType = JSON.parse(runProposeStr);
             if (runProposeJson.error) {
               // snack with error
-              console.log(runProposeJson.error);
+              console.log('Error shield proposing', runProposeJson.error);
               //Alert.alert('Calculating the FEE', runProposeJson.error);
             } else {
               if (runProposeJson.fee) {
-                console.log('fee', runProposeJson.fee);
+                //console.log('fee', runProposeJson.fee);
                 proposeFee = runProposeJson.fee / 10 ** 8;
               }
               if (runProposeJson.value_to_shield) {
-                console.log('value to shield', runProposeJson.fee);
+                //console.log('value to shield', runProposeJson.fee);
                 proposeAmount = runProposeJson.value_to_shield / 10 ** 8;
               }
             }
           } catch (e) {
             // snack with error
-            console.log(runProposeStr);
+            console.log('Error shield proposing', e);
             //Alert.alert('Calculating the FEE', runProposeJson.error);
           }
         }
 
         setShieldingFee(proposeFee);
         setShieldingAmount(proposeAmount);
-        console.log(proposeFee, proposeAmount);
+        //console.log(proposeFee, proposeAmount);
       })();
     }
   }, [readOnly, setShieldingAmount, totalBalance?.transparentBal, somePending]);
@@ -304,8 +304,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
     // because I don't what the user is doing, I need to the re-run the shield
     // command right before the confirmation
-    const proposeStr: string = await RPCModule.execute(CommandEnum.shield, '');
-    console.log(proposeStr);
+    await RPCModule.execute(CommandEnum.shield, '');
     const shieldStr = await RPC.rpcShieldFunds();
 
     if (shieldStr) {

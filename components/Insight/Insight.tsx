@@ -123,7 +123,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
       try {
         resultJSON = await JSON.parse(resultStr);
       } catch (e) {
-        console.log(resultStr);
+        console.log('Error getting info from the server', e);
         resultJSON = {};
       }
       let amounts: { value: number; address: string; tag: string }[] = [];

@@ -68,11 +68,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       setUaddrs(uadd);
 
       setUIndex(0);
-    } else {
-      // try to get the info from the server
-      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@ no addesses in receive screen');
-      console.log(addresses);
-      console.log(uaAddress);
     }
   }, [addresses, uaAddress]);
 

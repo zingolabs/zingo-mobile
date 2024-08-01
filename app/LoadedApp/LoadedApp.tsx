@@ -498,7 +498,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           this.state.appStateStatus === AppStateStatusEnum.background) &&
         nextAppState === AppStateStatusEnum.active
       ) {
-        console.log('App LOADED Android & IOS has come to the foreground!');
+        //console.log('App LOADED Android & IOS has come to the foreground!');
         if (Platform.OS === GlobalConst.platformOSios) {
           //console.log('LOADED SAVED IOS foreground', nextAppState);
           this.setState({ appStateStatus: nextAppState });
@@ -531,7 +531,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.state.appStateStatus === AppStateStatusEnum.active &&
         (nextAppState === AppStateStatusEnum.inactive || nextAppState === AppStateStatusEnum.background)
       ) {
-        console.log('App LOADED is gone to the background!');
+        //console.log('App LOADED is gone to the background!');
         // re-activate the interruption sync flag
         await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
         // setting value for background task Android
@@ -780,8 +780,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               (vt: ValueTransferType) =>
                 vt.txid === vtOld.txid && vt.address === vtOld.address && vt.poolType === vtOld.poolType,
             );
-            console.log('old', vtOld);
-            console.log('new', vtNew);
+            //console.log('old', vtOld);
+            //console.log('new', vtNew);
             // the ValueTransfer is confirmed
             if (vtNew.length > 0 && vtNew[0].confirmations > 0) {
               let message: string = '';
@@ -1152,7 +1152,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             error = true;
           }
         } catch (e) {
-          console.log(result);
           error = true;
         }
       } else {
@@ -1567,10 +1566,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       );
     };
 
-    console.log('render LoadedAppClass - 3');
-    console.log('vt', valueTransfers);
-    console.log('ad', addresses);
-    console.log('ba', totalBalance);
+    //console.log('render LoadedAppClass - 3');
+    //console.log('vt', valueTransfers);
+    //console.log('ad', addresses);
+    //console.log('ba', totalBalance);
 
     return (
       <ContextAppLoadedProvider value={context}>
