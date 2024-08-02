@@ -380,11 +380,6 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
       <ActivityIndicator
         color="#18bd18"
         size="large"
-        style={
-          {
-            "marginVertical": 20,
-          }
-        }
       />
     </View>
   </View>
