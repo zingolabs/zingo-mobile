@@ -74,8 +74,6 @@ type SendProps = {
   setZecPrice: (p: number, d: number) => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setShieldingAmount: (value: number) => void;
-  //setPoolsToShieldSelectSapling: (v: boolean) => void;
-  //setPoolsToShieldSelectTransparent: (v: boolean) => void;
   setScrollToTop: (value: boolean) => void;
 };
 
@@ -91,8 +89,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   setZecPrice,
   setPrivacyOption,
   setShieldingAmount,
-  //setPoolsToShieldSelectSapling,
-  //setPoolsToShieldSelectTransparent,
   setScrollToTop,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -933,8 +929,6 @@ const Send: React.FunctionComponent<SendProps> = ({
             setComputingModalVisible={setComputingModalVisible}
             setBackgroundError={setBackgroundError}
             setPrivacyOption={setPrivacyOption}
-            //setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
-            //setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
             addLastSnackbar={addLastSnackbar}
             setShieldingAmount={setShieldingAmount}
             setScrollToTop={setScrollToTop}

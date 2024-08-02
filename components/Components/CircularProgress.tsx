@@ -27,7 +27,6 @@ const CircularProgress: React.FunctionComponent<circularProgressProps> = props =
   return (
     <View style={{ margin: 10 }}>
       <Svg width={size} height={size}>
-        {/* Background Circle */}
         <Circle
           stroke={props.bgColor ? props.bgColor : colors.card}
           fill="none"
@@ -37,7 +36,6 @@ const CircularProgress: React.FunctionComponent<circularProgressProps> = props =
           {...{ strokeWidth }}
         />
 
-        {/* Progress Circle */}
         <Circle
           stroke={props.pgColor ? props.pgColor : colors.primary}
           fill="none"
@@ -51,7 +49,6 @@ const CircularProgress: React.FunctionComponent<circularProgressProps> = props =
           {...{ strokeWidth }}
         />
 
-        {/* Text */}
         <SVGText
           fontSize={props.textSize ? props.textSize : '10'}
           x={size / 2}

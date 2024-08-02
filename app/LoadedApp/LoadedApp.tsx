@@ -87,18 +87,17 @@ import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressA
 import History from '../../components/History';
 import Send from '../../components/Send';
 import Receive from '../../components/Receive';
+import Settings from '../../components/Settings';
+import Menu from './components/Menu';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
 const Info = React.lazy(() => import('../../components/Info'));
 const SyncReport = React.lazy(() => import('../../components/SyncReport'));
 const Rescan = React.lazy(() => import('../../components/Rescan'));
-import Settings from '../../components/Settings';
 const Pools = React.lazy(() => import('../../components/Pools'));
 const Insight = React.lazy(() => import('../../components/Insight'));
 const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
-
-import Menu from './components/Menu';
 const ComputingTxContent = React.lazy(() => import('./components/ComputingTxContent'));
 
 const en = require('../translations/en.json');
@@ -329,7 +328,7 @@ const Loading: React.FC<LoadingProps> = ({ backgroundColor, spinColor }) => {
         backgroundColor: backgroundColor,
         height: '100%',
       }}>
-      <ActivityIndicator size="large" color={spinColor} style={{ marginVertical: 20 }} />
+      <ActivityIndicator size="large" color={spinColor} />
     </View>
   );
 };
@@ -1248,8 +1247,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, value);
     this.setState({
       mode: value as ModeEnum,
-      //poolsToShieldSelectSapling: true,
-      //poolsToShieldSelectTransparent: true,
     });
     // this function change the Theme in the App component.
     this.props.toggleTheme(value as ModeEnum);

@@ -59,8 +59,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   setBackgroundError: () => {},
   privacy: false,
   readOnly: false,
-  //poolsToShieldSelectSapling: true,
-  //poolsToShieldSelectTransparent: true,
   mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},

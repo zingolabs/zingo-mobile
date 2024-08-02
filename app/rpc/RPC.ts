@@ -383,7 +383,7 @@ export default class RPC {
       this.refreshTimerID = setInterval(() => {
         //console.log('interval refresh');
         this.refresh(false);
-      }, 15 * 1000); // 30 seconds
+      }, 15 * 1000); // 15 seconds
       //console.log('create refresh timer', this.refreshTimerID);
       this.timers.push(this.refreshTimerID);
     }
