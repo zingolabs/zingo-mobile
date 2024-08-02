@@ -31,6 +31,7 @@ type AddressItemProps = {
   withIcon?: boolean;
   withSendIcon?: boolean;
   setSendPageState?: (s: SendPageStateClass) => void;
+  addressProtected?: boolean;
 };
 
 const AddressItem: React.FunctionComponent<AddressItemProps> = ({
@@ -42,6 +43,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   closeModal,
   openModal,
   setSendPageState,
+  addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -127,7 +129,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         {(!oneLine || (oneLine && !contact)) && !onlyContact && (
           <TouchableOpacity
             onPress={() => {
-              if (address && !oneLine) {
+              if (address && !oneLine && !addressProtected) {
                 Clipboard.setString(address);
                 addLastSnackbar({
                   message: translate('history.addresscopied') as string,
@@ -178,9 +180,14 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
       )}
       {withSendIcon &&
         setSendPageState &&
+        !addressProtected &&
         contact &&
         !readOnly &&
-        !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
+        !(
+          mode === ModeEnum.basic &&
+          totalBalance &&
+          totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0
+        ) && (
           <TouchableOpacity
             style={{ marginLeft: 10 }}
             onPress={() => {

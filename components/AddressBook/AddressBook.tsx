@@ -36,6 +36,7 @@ import AddressBookFileImpl from './AddressBookFileImpl';
 import RPC from '../../app/rpc';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
+import Utils from '../../app/utils';
 
 type AddressBookProps = {
   closeModal: () => void;
@@ -45,13 +46,14 @@ type AddressBookProps = {
 
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, setAddressBook, setSendPageState }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, addressBook, addressBookCurrentAddress, addressBookOpenPriorModal } = context;
+  const { translate, language, addressBook, addressBookCurrentAddress, addressBookOpenPriorModal, server } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
   const [numAb, setNumAb] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   const [addressBookSorted, setAddressBookSorted] = useState<AddressBookFileClass[]>([]);
+  const [addressBookProtected, setAddressBookProtected] = useState<AddressBookFileClass[]>([]);
 
   const [currentItem, setCurrentItem] = useState<number | null>(null);
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
@@ -64,20 +66,29 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   useScrollToTop(scrollViewRef);
 
   const fetchAddressBookSorted = useMemo(async () => {
+    // excluding this address from the list
+    const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
     return addressBook
+      .filter((ab: AddressBookFileClass) => ab.address !== zennyTips)
       .sort((a, b) => {
-        const nA = a.label.toUpperCase();
-        const nB = b.label.toUpperCase();
-        if (nA < nB) {
-          return -1;
-        } else if (nA > nB) {
-          return 1;
-        } else {
-          return 0;
-        }
+        const aLabel = a.label;
+        const bLabel = b.label;
+        return aLabel.localeCompare(bLabel);
       })
       .slice(0, numAb);
-  }, [addressBook, numAb]);
+  }, [addressBook, numAb, server.chainName]);
+
+  const fetchAddressBookProtected = useMemo(async () => {
+    // only protected address to use internally ZingoLabs.
+    const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
+    return addressBook
+      .filter((ab: AddressBookFileClass) => ab.address === zennyTips)
+      .sort((a, b) => {
+        const aLabel = a.label;
+        const bLabel = b.label;
+        return aLabel.localeCompare(bLabel);
+      });
+  }, [addressBook, server.chainName]);
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
@@ -87,8 +98,10 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   useEffect(() => {
     (async () => {
       const abs = await fetchAddressBookSorted;
+      const abp = await fetchAddressBookProtected;
       setLoadMoreButton(numAb < (abs.length || 0));
       setAddressBookSorted(abs);
+      setAddressBookProtected(abp);
       // find the current address
       if (addressBookCurrentAddress) {
         const index: number = abs.findIndex((i: AddressBookFileClass) => i.address === addressBookCurrentAddress);
@@ -100,7 +113,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
         setCurrentItem(index);
       }
     })();
-  }, [addressBookCurrentAddress, fetchAddressBookSorted, numAb]);
+  }, [addressBookCurrentAddress, fetchAddressBookProtected, fetchAddressBookSorted, numAb]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -225,7 +238,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
             doAction={doAction}
           />
         )}
-        {addressBookSorted.length === 0 && currentItem !== -1 && (
+        {!addressBookCurrentAddress && addressBookSorted.length === 0 && currentItem !== -1 && (
           <View
             style={{
               height: 150,
@@ -274,6 +287,25 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                     doAction={doAction}
                   />
                 )}
+              </View>
+            );
+          })}
+        {!addressBookCurrentAddress &&
+          addressBookProtected.flatMap((aBItem, index) => {
+            return (
+              <View key={`container-${index}-${aBItem.label}`}>
+                <AbSummaryLine
+                  index={index}
+                  key={`line-${index}-${aBItem.label}`}
+                  item={aBItem}
+                  setCurrentItem={setCurrentItem}
+                  setAction={setAction}
+                  setSendPageState={setSendPageState}
+                  closeModal={closeModal}
+                  handleScrollToTop={handleScrollToTop}
+                  doAction={doAction}
+                  addressProtected={true}
+                />
               </View>
             );
           })}

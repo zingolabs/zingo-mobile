@@ -26,10 +26,192 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
       ]
     }
   >
-    <View>
-      <Text>
-        Loading...
-      </Text>
+    <View
+      style={
+        {
+          "height": "100%",
+        }
+      }
+    >
+      <RCTScrollView
+        contentContainerStyle={
+          {
+            "display": "flex",
+          }
+        }
+        scrollsToTop={false}
+        style={
+          {
+            "backgroundColor": "#010101",
+            "flex": 1,
+            "height": 1334,
+            "width": 750,
+          }
+        }
+      >
+        <View>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 18,
+                "fontWeight": "600",
+                "marginLeft": 30,
+                "marginVertical": 10,
+                "opacity": 1,
+              }
+            }
+          >
+            text translated
+          </Text>
+          <View
+            style={
+              {
+                "backgroundColor": "rgb(0, 122, 255)",
+                "height": 1,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "display": "flex",
+                "marginLeft": 20,
+              }
+            }
+          >
+            <Text
+              onPress={[Function]}
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 14,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                  "paddingTop": 25,
+                }
+              }
+            >
+              text translated
+            </Text>
+            <Text
+              onPress={[Function]}
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 14,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                  "paddingTop": 25,
+                }
+              }
+              testID="menu.settings"
+            >
+              text translated
+            </Text>
+            <Text
+              onPress={[Function]}
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 14,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                  "paddingTop": 25,
+                }
+              }
+              testID="menu.addressbook"
+            >
+              text translated
+            </Text>
+            <Text
+              onPress={[Function]}
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 14,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                  "paddingTop": 25,
+                }
+              }
+            >
+              text translated
+            </Text>
+            <Text
+              onPress={[Function]}
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 14,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                  "paddingTop": 25,
+                }
+              }
+            >
+              text translated
+            </Text>
+            <Text
+              onPress={[Function]}
+              style={
+                {
+                  "color": "rgb(28, 28, 30)",
+                  "fontSize": 14,
+                  "fontWeight": "600",
+                  "opacity": 1,
+                  "paddingTop": 25,
+                }
+              }
+            >
+              text translated
+            </Text>
+          </View>
+        </View>
+      </RCTScrollView>
+      <View
+        style={
+          {
+            "backgroundColor": "#010101",
+            "bottom": 5,
+            "flexDirection": "row",
+            "padding": 10,
+            "position": "absolute",
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(216, 216, 216)",
+              "fontSize": 8,
+            }
+          }
+        >
+          Version : 
+        </Text>
+        <Text
+          style={
+            {
+              "color": undefined,
+              "fontSize": 8,
+            }
+          }
+        >
+          text translated
+        </Text>
+        <Text
+          style={
+            {
+              "color": "rgb(216, 216, 216)",
+              "fontSize": 8,
+              "marginLeft": 10,
+            }
+          }
+        >
+          text translatedtext translated
+        </Text>
+      </View>
     </View>
   </View>
   <View
@@ -184,20 +366,22 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
       visible={false}
     />
     <View />
-    <MockedBottomTabNavigator
-      initialRouteName="text translated"
-      screenOptions={[Function]}
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#011401",
+          "display": "flex",
+          "height": "100%",
+          "justifyContent": "center",
+        }
+      }
     >
-      <MockedScreen
-        name="text translated"
+      <ActivityIndicator
+        color="#18bd18"
+        size="large"
       />
-      <MockedScreen
-        name="text translated"
-      />
-      <MockedScreen
-        name="text translated"
-      />
-    </MockedBottomTabNavigator>
+    </View>
   </View>
 </View>
 `;

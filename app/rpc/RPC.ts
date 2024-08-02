@@ -54,7 +54,6 @@ export default class RPC {
   syncStatusTimerID?: NodeJS.Timeout;
 
   updateDataLock: boolean;
-  updateDataCtr: number;
 
   lastWalletBlockHeight: number;
   lastServerBlockHeight: number;
@@ -98,8 +97,6 @@ export default class RPC {
     this.keepAwake = keepAwake;
 
     this.updateDataLock = false;
-    this.updateDataCtr = 0;
-
     this.lastWalletBlockHeight = 0;
     this.lastServerBlockHeight = 0;
     this.walletBirthday = 0;
@@ -235,13 +232,18 @@ export default class RPC {
   }
 
   static async rpcFetchServerHeight(): Promise<number> {
-    const info = await RPC.rpcGetInfoObject();
+    try {
+      const info = await RPC.rpcGetInfoObject();
 
-    if (info) {
-      return info.latestBlock;
+      if (info) {
+        return info.latestBlock;
+      }
+
+      return 0;
+    } catch (error) {
+      console.log(`Critical Error server block height ${error}`);
+      return 0;
     }
-
-    return 0;
   }
 
   static async rpcFetchWalletHeight(): Promise<number> {
@@ -268,7 +270,7 @@ export default class RPC {
   static async rpcShieldFunds(): Promise<string> {
     try {
       const shieldStr: string = await RPCModule.execute(CommandEnum.confirm, '');
-      console.log(shieldStr);
+      //console.log(shieldStr);
       if (shieldStr) {
         if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error shield ${shieldStr}`);
@@ -376,12 +378,12 @@ export default class RPC {
     // clean start.
     await this.stopSyncProcess();
 
-    // every 30 seconds the App try to Sync the new blocks.
+    // every 15 seconds the App try to Sync the new blocks.
     if (!this.refreshTimerID) {
       this.refreshTimerID = setInterval(() => {
         //console.log('interval refresh');
         this.refresh(false);
-      }, 30 * 1000); // 30 seconds
+      }, 15 * 1000); // 15 seconds
       //console.log('create refresh timer', this.refreshTimerID);
       this.timers.push(this.refreshTimerID);
     }
@@ -411,6 +413,10 @@ export default class RPC {
       this.timers.splice(deleted[i], 1);
     }
 
+    await this.fetchWalletHeight();
+    await this.fetchWalletBirthday();
+    //await this.fetchInfoAndServerHeight();
+
     // Load the current wallet data
     await this.loadWalletData();
 
@@ -435,7 +441,7 @@ export default class RPC {
       return;
     }
 
-    console.log('stop sync process. in progress', ss.in_progress);
+    //console.log('stop sync process. in progress', ss.in_progress);
 
     while (ss.in_progress) {
       // interrupting sync process
@@ -447,7 +453,7 @@ export default class RPC {
       returnStatus = await this.doSyncStatus();
       ss = await JSON.parse(returnStatus);
 
-      console.log('stop sync process. in progress', ss.in_progress);
+      //console.log('stop sync process. in progress', ss.in_progress);
     }
     console.log('stop sync process. STOPPED');
 
@@ -518,7 +524,7 @@ export default class RPC {
       return rescanStr;
     } catch (error) {
       console.log(`Critical Error rescan ${error}`);
-      return `Error: ${error}`;
+      return `Error: rescan ${error}`;
     }
   }
 
@@ -538,7 +544,7 @@ export default class RPC {
       return syncStr;
     } catch (error) {
       console.log(`Critical Error sync ${error}`);
-      return `Error: ${error}`;
+      return `Error: sync ${error}`;
     }
   }
 
@@ -558,15 +564,14 @@ export default class RPC {
       return syncStatusStr;
     } catch (error) {
       console.log(`Critical Error sync status ${error}`);
-      return `Error: ${error}`;
+      return `Error: sync status ${error}`;
     }
   }
 
   async doSend(sendJSON: string): Promise<string> {
     try {
       console.log('send JSON', sendJSON);
-      const preSendStr: String = await RPCModule.execute(CommandEnum.send, sendJSON);
-      console.log(preSendStr);
+      await RPCModule.execute(CommandEnum.send, sendJSON);
       const sendStr: string = await RPCModule.execute(CommandEnum.confirm, '');
       if (sendStr) {
         if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -581,7 +586,7 @@ export default class RPC {
       return sendStr;
     } catch (error) {
       console.log(`Critical Error send ${error}`);
-      return `Error: ${error}`;
+      return `Error: send ${error}`;
     }
   }
 
@@ -601,41 +606,45 @@ export default class RPC {
       return sendProgressStr;
     } catch (error) {
       console.log(`Critical Error send progress ${error}`);
-      return `Error: ${error}`;
+      return `Error: send progress ${error}`;
     }
   }
 
   async loadWalletData() {
-    await this.fetchTotalBalance();
     await this.fetchTandZandOValueTransfers();
-    await this.fetchWalletSettings();
+    await this.fetchAddresses();
+    await this.fetchTotalBalance();
     await this.fetchInfoAndServerHeight();
+    await this.fetchWalletSettings();
   }
 
   async updateData() {
     //console.log("Update data triggered");
     if (this.updateDataLock) {
-      //console.log("Update lock, returning");
+      console.log('Update lock, returning');
       return;
     }
 
-    this.updateDataCtr += 1;
-    if ((this.inRefresh || this.inSend) && this.updateDataCtr % 5 !== 0) {
-      // We're refreshing, or sending, in which case update every 5th time
-      return;
+    // if the App have an error here
+    // this try-catch prevent to have true in updateDataLock.
+    try {
+      this.updateDataLock = true;
+
+      await this.fetchWalletHeight();
+      await this.fetchWalletBirthday();
+      //await this.fetchInfoAndServerHeight();
+
+      // And fetch the rest of the data.
+      await this.loadWalletData();
+
+      //console.log(`Finished update data at ${lastServerBlockHeight}`);
+      this.updateDataLock = false;
+    } catch (error) {
+      console.log('Internal error update data', error);
+      this.updateDataLock = false;
+      // relaunch the interval tasks just in case they are aborted.
+      this.configure();
     }
-
-    this.updateDataLock = true;
-
-    await this.fetchWalletHeight();
-    await this.fetchWalletBirthday();
-    await this.fetchInfoAndServerHeight();
-
-    // And fetch the rest of the data.
-    await this.loadWalletData();
-
-    //console.log(`Finished update data at ${lastServerBlockHeight}`);
-    this.updateDataLock = false;
   }
 
   async refresh(fullRefresh: boolean, fullRescan?: boolean) {
@@ -650,12 +659,12 @@ export default class RPC {
       return;
     }
 
-    // And fetch the rest of the data.
-    await this.loadWalletData();
-
     await this.fetchWalletHeight();
     await this.fetchWalletBirthday();
-    await this.fetchInfoAndServerHeight();
+    //await this.fetchInfoAndServerHeight();
+
+    // And fetch the rest of the data.
+    await this.loadWalletData();
 
     if (!this.lastServerBlockHeight) {
       //console.log('the last server block is zero');
@@ -692,7 +701,7 @@ export default class RPC {
           spendableOrchard: 0,
           spendablePrivate: 0,
           total: 0,
-        });
+        } as TotalBalanceClass);
         this.doRescan()
           .then(result => {
             console.log('rescan finished', result);
@@ -765,12 +774,12 @@ export default class RPC {
         // if the syncId change then reset the %
         if (this.prevSyncId !== this.syncId) {
           if (this.prevSyncId !== -1) {
-            // And fetch the rest of the data.
-            await this.loadWalletData();
-
             await this.fetchWalletHeight();
             await this.fetchWalletBirthday();
-            await this.fetchInfoAndServerHeight();
+            //await this.fetchInfoAndServerHeight();
+
+            // And fetch the rest of the data.
+            await this.loadWalletData();
 
             await RPCModule.doSave();
 
@@ -898,12 +907,12 @@ export default class RPC {
           // here we can release the screen...
           this.keepAwake(false);
 
-          // And fetch the rest of the data.
-          await this.loadWalletData();
-
           await this.fetchWalletHeight();
           await this.fetchWalletBirthday();
-          await this.fetchInfoAndServerHeight();
+          //await this.fetchInfoAndServerHeight();
+
+          // And fetch the rest of the data.
+          await this.loadWalletData();
 
           await RPCModule.doSave();
 
@@ -930,12 +939,12 @@ export default class RPC {
           if (this.prevBatchNum !== batchNum) {
             // if finished batches really fast, the App have to save the wallet delayed.
             if (this.prevBatchNum !== -1 && this.batches >= 1) {
-              // And fetch the rest of the data.
-              await this.loadWalletData();
-
               await this.fetchWalletHeight();
               await this.fetchWalletBirthday();
-              await this.fetchInfoAndServerHeight();
+              //await this.fetchInfoAndServerHeight();
+
+              // And fetch the rest of the data.
+              await this.loadWalletData();
 
               await RPCModule.doSave();
               this.batches = 0;
@@ -1009,17 +1018,24 @@ export default class RPC {
 
       this.fnSetWalletSettings(walletSettings);
     } catch (error) {
-      console.log(`Critical Error transaction filter threshold ${error}`);
+      console.log(`Critical Error wallet settings ${error}`);
       return;
     }
   }
 
   async fetchInfoAndServerHeight(): Promise<void> {
-    const info = await RPC.rpcGetInfoObject();
+    try {
+      const info = await RPC.rpcGetInfoObject();
 
-    if (info) {
-      this.fnSetInfo(info);
-      this.lastServerBlockHeight = info.latestBlock;
+      if (info) {
+        this.fnSetInfo(info);
+        this.lastServerBlockHeight = info.latestBlock;
+      }
+    } catch (error) {
+      console.log(`Critical Error info & server block height ${error}`);
+      // relaunch the interval tasks just in case they are aborted.
+      this.configure();
+      return;
     }
   }
 
@@ -1142,7 +1158,55 @@ export default class RPC {
 
       this.fnSetAllAddresses(allAddresses);
     } catch (error) {
-      console.log(`Critical Error notes ${error}`);
+      console.log(`Critical Error addresses balances notes ${error}`);
+      // relaunch the interval tasks just in case they are aborted.
+      this.configure();
+      return;
+    }
+  }
+
+  // This method will get the total balances
+  async fetchAddresses() {
+    try {
+      const addressesStr: string = await RPCModule.execute(CommandEnum.addresses, '');
+      if (addressesStr) {
+        if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error addresses ${addressesStr}`);
+          return;
+        }
+      } else {
+        console.log('Internal Error addresses');
+        return;
+      }
+      const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr);
+
+      let allAddresses: AddressClass[] = [];
+
+      addressesJSON.forEach((u: RPCAddressType) => {
+        // If this has any pending txns, show that in the UI
+        const receivers: string =
+          (u.receivers.orchard_exists ? ReceiverEnum.o : '') +
+          (u.receivers.sapling ? ReceiverEnum.z : '') +
+          (u.receivers.transparent ? ReceiverEnum.t : '');
+        if (u.address) {
+          const abu = new AddressClass(u.address, u.address, AddressKindEnum.u, receivers);
+          allAddresses.push(abu);
+        }
+        if (u.address && u.receivers.sapling) {
+          const abz = new AddressClass(u.address, u.receivers.sapling, AddressKindEnum.z, receivers);
+          allAddresses.push(abz);
+        }
+        if (u.address && u.receivers.transparent) {
+          const abt = new AddressClass(u.address, u.receivers.transparent, AddressKindEnum.t, receivers);
+          allAddresses.push(abt);
+        }
+      });
+
+      this.fnSetAllAddresses(allAddresses);
+    } catch (error) {
+      console.log(`Critical Error addresses ${error}`);
+      // relaunch the interval tasks just in case they are aborted.
+      this.configure();
       return;
     }
   }
@@ -1164,15 +1228,24 @@ export default class RPC {
       this.lastWalletBlockHeight = heightJSON.height;
     } catch (error) {
       console.log(`Critical Error wallet height ${error}`);
+      // relaunch the interval tasks just in case they are aborted.
+      this.configure();
       return;
     }
   }
 
   async fetchWalletBirthday(): Promise<void> {
-    const wallet = await RPC.rpcFetchWallet(this.readOnly);
+    try {
+      const wallet = await RPC.rpcFetchWallet(this.readOnly);
 
-    if (wallet) {
-      this.walletBirthday = wallet.birthday;
+      if (wallet) {
+        this.walletBirthday = wallet.birthday;
+      }
+    } catch (error) {
+      console.log(`Critical Error wallet birthday ${error}`);
+      // relaunch the interval tasks just in case they are aborted.
+      this.configure();
+      return;
     }
   }
 
@@ -1194,6 +1267,8 @@ export default class RPC {
 
       //console.log(valueTransfersJSON);
 
+      await this.fetchWalletHeight();
+      await this.fetchWalletBirthday();
       await this.fetchInfoAndServerHeight();
 
       let vtList: ValueTransferType[] = [];
@@ -1249,6 +1324,8 @@ export default class RPC {
       this.fnSetValueTransfersList(vtList);
     } catch (error) {
       console.log(`Critical Error txs list value transfers ${error}`);
+      // relaunch the interval tasks just in case they are aborted.
+      this.configure();
       return;
     }
   }
@@ -1327,7 +1404,7 @@ export default class RPC {
           progress = await JSON.parse(pro);
           sendId = progress.id;
         } catch (e) {
-          console.log(e);
+          console.log('Error parsing status send progress', e);
           if (!sendTxid && !sendError) {
             return;
           }

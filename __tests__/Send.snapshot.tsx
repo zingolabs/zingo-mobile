@@ -90,8 +90,6 @@ describe('Component Send - test', () => {
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
           setPrivacyOption={onFunction}
-          //setPoolsToShieldSelectSapling={onFunction}
-          //setPoolsToShieldSelectTransparent={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
         />
@@ -120,8 +118,6 @@ describe('Component Send - test', () => {
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
           setPrivacyOption={onFunction}
-          //setPoolsToShieldSelectSapling={onFunction}
-          //setPoolsToShieldSelectTransparent={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
         />

@@ -35,8 +35,6 @@ type HistoryProps = {
   setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
-  //setPoolsToShieldSelectSapling: (v: boolean) => void;
-  //setPoolsToShieldSelectTransparent: (v: boolean) => void;
   setUfvkViewModalVisible?: (v: boolean) => void;
   setSendPageState: (s: SendPageStateClass) => void;
   setShieldingAmount: (value: number) => void;
@@ -52,8 +50,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   setZecPrice,
   setComputingModalVisible,
   setPrivacyOption,
-  //setPoolsToShieldSelectSapling,
-  //setPoolsToShieldSelectTransparent,
   setUfvkViewModalVisible,
   setSendPageState,
   setShieldingAmount,
@@ -69,7 +65,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [valueTransferDetail, setValueTransferDetail] = useState<ValueTransferType>({} as ValueTransferType);
   const [valueTransferDetailIndex, setValueTransferDetailIndex] = useState<number>(-1);
   const [numVt, setNumVt] = useState<number>(50);
-  const [loadMoreButton, setLoadMoreButton] = useState<boolean>(numVt < (valueTransfers.length || 0));
+  const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   const [valueTransfersSorted, setValueTransfersSorted] = useState<ValueTransferType[]>([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -85,6 +81,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
     // - txid
     // - address
     // - pool
+    if (!valueTransfers) {
+      return [] as ValueTransferType[];
+    }
     return valueTransfers
       .sort((a: ValueTransferType, b: ValueTransferType) => {
         const timeComparison = b.time - a.time;
@@ -119,7 +118,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   }, [valueTransfers, numVt]);
 
   useEffect(() => {
-    setLoadMoreButton(numVt < (valueTransfers.length || 0));
+    setLoadMoreButton(numVt < (valueTransfers ? valueTransfers.length : 0));
     setValueTransfersSorted(fetchValueTransfersSorted);
   }, [fetchValueTransfersSorted, numVt, valueTransfers]);
 
@@ -175,7 +174,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         <ValueTransferDetail
           index={valueTransferDetailIndex}
           length={valueTransfersSorted.length}
-          totalLength={valueTransfers.length}
+          totalLength={valueTransfers ? valueTransfers.length : 0}
           vt={valueTransferDetail}
           closeModal={() => setValueTransferDetailModalShowing(false)}
           openModal={() => setValueTransferDetailModalShowing(true)}
@@ -195,8 +194,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
         setComputingModalVisible={setComputingModalVisible}
         setBackgroundError={setBackgroundError}
         setPrivacyOption={setPrivacyOption}
-        //setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
-        //setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
         setUfvkViewModalVisible={setUfvkViewModalVisible}
         addLastSnackbar={addLastSnackbar}
         setShieldingAmount={setShieldingAmount}

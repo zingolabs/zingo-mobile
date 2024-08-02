@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback, useRef } from 'react';
 import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Text, Alert } from 'react-native';
 import {
   faQrcode,
@@ -34,6 +34,7 @@ import {
   ChainNameEnum,
   ButtonTypeEnum,
   GlobalConst,
+  AddressClass,
 } from '../../app/AppState';
 import { parseZcashURI, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
@@ -73,8 +74,6 @@ type SendProps = {
   setZecPrice: (p: number, d: number) => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setShieldingAmount: (value: number) => void;
-  //setPoolsToShieldSelectSapling: (v: boolean) => void;
-  //setPoolsToShieldSelectTransparent: (v: boolean) => void;
   setScrollToTop: (value: boolean) => void;
 };
 
@@ -90,8 +89,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   setZecPrice,
   setPrivacyOption,
   setShieldingAmount,
-  //setPoolsToShieldSelectSapling,
-  //setPoolsToShieldSelectTransparent,
   setScrollToTop,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -142,9 +139,13 @@ const Send: React.FunctionComponent<SendProps> = ({
   //const [sendAllClick, setSendAllClick] = useState<boolean>(false);
   const [proposeSendLastError, setProposeSendLastError] = useState<string>('');
   const [spendableBalanceLastError, setSpendableBalanceLastError] = useState<string>('');
+  const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
+  const [contentHeight, setContentHeight] = useState<number>(0);
+  const [pickerTempSelectedAddress, setPickerTempSelectedAddress] = useState<string>('');
   const isFocused = useIsFocused();
 
   const slideAnim = useSharedValue(0);
+  const scrollViewRef = useRef<ScrollView>(null);
   const { decimalSeparator } = getNumberFormatSettings();
 
   const runSendPropose = async (
@@ -176,11 +177,13 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const defaultValuesSpendableMaxAmount = useCallback((): void => {
-    setSpendable(totalBalance.spendableOrchard + totalBalance.spendablePrivate);
+    setSpendable(totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0);
     const max =
-      totalBalance.spendableOrchard +
-      totalBalance.spendablePrivate -
-      (donation && !donationAddress ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) : 0);
+      (totalBalance ? totalBalance.spendableOrchard : 0) +
+      (totalBalance ? totalBalance.spendablePrivate : 0) -
+      (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+        ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
+        : 0);
     if (max >= 0) {
       // if max is 0 then the user can send a memo with amount 0.
       setMaxAmount(max);
@@ -191,7 +194,15 @@ const Send: React.FunctionComponent<SendProps> = ({
       setNegativeMaxAmount(true);
     }
     setSpendableBalanceLastError('');
-  }, [donation, donationAddress, totalBalance.spendableOrchard, totalBalance.spendablePrivate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    donation,
+    donationAddress,
+    server.chainName,
+    totalBalance,
+    totalBalance?.spendableOrchard,
+    totalBalance?.spendablePrivate,
+  ]);
 
   const calculateFeeWithPropose = useCallback(
     async (
@@ -227,10 +238,9 @@ const Send: React.FunctionComponent<SendProps> = ({
         sendJson = await Utils.getSendManyJSON(
           sendPageStateCalculateFee,
           uaAddress,
-          addresses,
+          addresses ? addresses : ([] as AddressClass[]),
           server,
           donation,
-          translate,
         );
         console.log('SEND', sendJson);
       }
@@ -280,8 +290,8 @@ const Send: React.FunctionComponent<SendProps> = ({
             if (runProposeJson.amount) {
               const newAmount =
                 runProposeJson.amount / 10 ** 8 -
-                (donation && !donationAddress
-                  ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+                (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+                  ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
                   : 0);
               console.log('AMOUNT', newAmount);
               updateToField(null, Utils.parseNumberFloatToStringLocale(newAmount, 8), null, null, null);
@@ -309,7 +319,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         return;
       }
       // spendable
-      let spendableBalance = totalBalance.spendableOrchard + totalBalance.spendablePrivate;
+      let spendableBalance = totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0;
       let zenniesForZingo = donationAddress ? false : donation;
       const spendableBalanceJSON = { address, zennies_for_zingo: zenniesForZingo };
       console.log('SPENDABLEBALANCE', spendableBalanceJSON);
@@ -364,15 +374,15 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
       //setSendAllClick(false);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       defaultValuesSpendableMaxAmount,
       donation,
       donationAddress,
-      totalBalance.spendableOrchard,
-      totalBalance.spendablePrivate,
+      totalBalance,
+      totalBalance?.spendableOrchard,
+      totalBalance?.spendablePrivate,
       validAddress,
-      //sendAllClick,
-      //updateToField,
     ],
   );
 
@@ -465,8 +475,8 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     const stillConf =
-      totalBalance.orchardBal !== totalBalance.spendableOrchard ||
-      totalBalance.privateBal !== totalBalance.spendablePrivate ||
+      (totalBalance ? totalBalance.orchardBal : 0) !== (totalBalance ? totalBalance.spendableOrchard : 0) ||
+      (totalBalance ? totalBalance.privateBal : 0) !== (totalBalance ? totalBalance.spendablePrivate : 0) ||
       somePending;
     const showShield = (somePending ? 0 : shieldingAmount) > 0;
     //const showUpgrade =
@@ -476,10 +486,11 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [
     shieldingAmount,
     somePending,
-    totalBalance.orchardBal,
-    totalBalance.privateBal,
-    totalBalance.spendableOrchard,
-    totalBalance.spendablePrivate,
+    totalBalance,
+    totalBalance?.orchardBal,
+    totalBalance?.privateBal,
+    totalBalance?.spendableOrchard,
+    totalBalance?.spendablePrivate,
   ]);
 
   useEffect(() => {
@@ -663,9 +674,11 @@ const Send: React.FunctionComponent<SendProps> = ({
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
       slideAnim.value = withTiming(0 - titleViewHeight + 25, { duration: 100, easing: Easing.linear });
+      setKeyboardVisible(true);
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
       slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
+      setKeyboardVisible(false);
     });
 
     return () => {
@@ -693,12 +706,22 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [mode, setZecPrice]);
 
   useEffect(() => {
-    const items = addressBook.map((item: AddressBookFileClass) => ({
-      label: item.label,
-      value: item.address,
-    }));
-    setItemsPicker(items);
-  }, [addressBook]);
+    (async () => {
+      const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
+      const items = addressBook
+        .filter((item: AddressBookFileClass) => item.address !== zennyTips)
+        .sort((a, b) => {
+          const aLabel = a.label;
+          const bLabel = b.label;
+          return aLabel.localeCompare(bLabel);
+        })
+        .map((item: AddressBookFileClass) => ({
+          label: item.label,
+          value: item.address,
+        }));
+      setItemsPicker(items);
+    })();
+  }, [addressBook, server.chainName]);
 
   useEffect(() => {
     (async () => {
@@ -714,7 +737,10 @@ const Send: React.FunctionComponent<SendProps> = ({
     const address = sendPageState.toaddr.to;
     if (address) {
       (async () => {
-        const donationA = address === (await Utils.getDonationAddress(server.chainName));
+        const donationA =
+          address === (await Utils.getDonationAddress(server.chainName)) ||
+          address === (await Utils.getZenniesDonationAddress(server.chainName)) ||
+          address === (await Utils.getNymDonationAddress(server.chainName));
         setDonationAddress(donationA);
       })();
     } else {
@@ -802,6 +828,13 @@ const Send: React.FunctionComponent<SendProps> = ({
     return len;
   };
 
+  const scrollToEnd = () => {
+    if (scrollViewRef.current) {
+      //console.log('scrolling to end', keyboardVisible);
+      scrollViewRef.current.scrollTo({ y: contentHeight, animated: true });
+    }
+  };
+
   //console.log('render Send - 4', sendPageState);
   console.log(
     'Render, spendable',
@@ -812,6 +845,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     fee,
     'Amount',
     sendPageState.toaddr.amount,
+    keyboardVisible,
+    contentHeight,
   );
 
   const returnPage = (
@@ -847,7 +882,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           calculatedFee={fee}
           donationAmount={
             donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
-              ? Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+              ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
               : 0
           }
           closeModal={() => {
@@ -894,8 +929,6 @@ const Send: React.FunctionComponent<SendProps> = ({
             setComputingModalVisible={setComputingModalVisible}
             setBackgroundError={setBackgroundError}
             setPrivacyOption={setPrivacyOption}
-            //setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
-            //setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
             addLastSnackbar={addLastSnackbar}
             setShieldingAmount={setShieldingAmount}
             setScrollToTop={setScrollToTop}
@@ -907,21 +940,27 @@ const Send: React.FunctionComponent<SendProps> = ({
         <FadeText
           style={{
             textAlign: 'center',
-            marginHorizontal: 10,
+            marginHorizontal: 5,
             marginTop: 5,
-            color: colors.zingo,
+            color: colors.background,
             opacity: 1,
             fontWeight: '700',
+            backgroundColor: colors.primaryDisabled,
           }}>
           {translate('warning-binance') as string}
         </FadeText>
       )}
 
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{}} testID="send.scroll-view">
-        <View style={{ marginBottom: 30 }}>
+      <ScrollView
+        ref={scrollViewRef}
+        onContentSizeChange={(_, height) => setContentHeight(height)}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{}}
+        testID="send.scroll-view">
+        <View style={{ marginBottom: Platform.OS === GlobalConst.platformOSandroid ? 30 : 250 }}>
           {[sendPageState.toaddr].map((ta, i) => {
             return (
-              <View key={i} style={{ display: 'flex', padding: 10, marginTop: 10 }}>
+              <View key={i} style={{ display: 'flex', padding: 10, paddingTop: 5, marginTop: 0 }}>
                 <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                   <View style={{ display: 'flex', flexDirection: 'row' }}>
                     <RegText style={{ marginRight: 10 }}>{translate('send.toaddress') as string}</RegText>
@@ -998,7 +1037,11 @@ const Send: React.FunctionComponent<SendProps> = ({
                           {!updatingToField ? (
                             <RNPickerSelect
                               fixAndroidTouchableBug={true}
-                              value={ta.to}
+                              value={
+                                pickerTempSelectedAddress && Platform.OS === GlobalConst.platformOSios
+                                  ? pickerTempSelectedAddress
+                                  : ta.to
+                              }
                               items={itemsPicker}
                               placeholder={{
                                 label: translate('addressbook.select-placeholder') as string,
@@ -1006,12 +1049,18 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 color: colors.primary,
                               }}
                               useNativeAndroidPickerStyle={false}
-                              onValueChange={async (itemValue: string) => {
-                                if (validAddress === 1 && ta.to && itemValue && ta.to !== itemValue) {
+                              onDonePress={async () => {
+                                // only for IOS
+                                if (
+                                  validAddress === 1 &&
+                                  ta.to &&
+                                  pickerTempSelectedAddress &&
+                                  ta.to !== pickerTempSelectedAddress
+                                ) {
                                   setUpdatingToField(true);
                                   await ShowAddressAlertAsync(translate)
                                     .then(() => {
-                                      updateToField(itemValue, null, null, null, null);
+                                      updateToField(pickerTempSelectedAddress, null, null, null, null);
                                     })
                                     .catch(() => {
                                       updateToField(ta.to, null, null, null, null);
@@ -1019,8 +1068,31 @@ const Send: React.FunctionComponent<SendProps> = ({
                                   setTimeout(() => {
                                     setUpdatingToField(false);
                                   }, 500);
-                                } else if (ta.to !== itemValue) {
-                                  updateToField(itemValue, null, null, null, null);
+                                } else if (ta.to !== pickerTempSelectedAddress) {
+                                  updateToField(pickerTempSelectedAddress, null, null, null, null);
+                                }
+                                setPickerTempSelectedAddress('');
+                              }}
+                              onValueChange={async (itemValue: string) => {
+                                // only for Android
+                                if (Platform.OS === GlobalConst.platformOSandroid) {
+                                  if (validAddress === 1 && ta.to && itemValue && ta.to !== itemValue) {
+                                    setUpdatingToField(true);
+                                    await ShowAddressAlertAsync(translate)
+                                      .then(() => {
+                                        updateToField(itemValue, null, null, null, null);
+                                      })
+                                      .catch(() => {
+                                        updateToField(ta.to, null, null, null, null);
+                                      });
+                                    setTimeout(() => {
+                                      setUpdatingToField(false);
+                                    }, 500);
+                                  } else if (ta.to !== itemValue) {
+                                    updateToField(itemValue, null, null, null, null);
+                                  }
+                                } else {
+                                  setPickerTempSelectedAddress(itemValue);
                                 }
                               }}>
                               <FontAwesomeIcon
@@ -1053,8 +1125,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                   </View>
                 </View>
 
-                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', minWidth: 48, minHeight: 48 }}>
+                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                     <View
                       style={{
                         alignItems: 'center',
@@ -1063,8 +1135,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                         margin: 0,
                         padding: 0,
                         paddingBottom: 3,
-                        minWidth: 48,
-                        minHeight: 48,
                       }}>
                       <FadeText>{`${translate('send.amount')}`}</FadeText>
                     </View>
@@ -1094,8 +1164,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                             margin: 0,
                             padding: 0,
                             marginLeft: 10,
-                            minWidth: 48,
-                            minHeight: 48,
                           }}>
                           <RegText color={colors.primary}>{translate('send.sendall') as string}</RegText>
                         </View>
@@ -1186,7 +1254,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             flexDirection: 'row',
                             justifyContent: 'flex-start',
                             alignItems: 'center',
-                            marginTop: 5,
+                            marginTop: 0,
                           }}>
                           <RegText
                             style={{
@@ -1210,12 +1278,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                           />
                         </View>
                       </TouchableOpacity>
-                      {donation && !donationAddress && (
+                      {donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress && (
                         <View
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
-                            marginTop: 5,
+                            marginTop: 0,
                             backgroundColor: colors.card,
                             padding: 5,
                             borderRadius: 10,
@@ -1230,7 +1298,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <FadeText>
                             {(translate('send.confirm-donation') as string) +
                               ': ' +
-                              Utils.getDefaultDonationAmount() +
+                              Utils.getZenniesDonationAmount() +
                               ' '}
                           </FadeText>
                           <FadeText>{')'}</FadeText>
@@ -1241,7 +1309,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
-                            marginTop: 5,
+                            marginTop: 0,
                             backgroundColor: colors.card,
                             padding: 5,
                             borderRadius: 10,
@@ -1278,7 +1346,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             style={{
                               display: 'flex',
                               flexDirection: 'row',
-                              marginTop: 5,
+                              marginTop: 0,
                               backgroundColor: colors.card,
                               padding: 5,
                               borderRadius: 10,
@@ -1289,7 +1357,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               color={colors.primary}
                               style={{ marginRight: 5 }}
                             />
-                            <FadeText>{translate('send.somefunds') as string}</FadeText>
+                            <FadeText style={{ fontSize: 12.5 }}>{translate('send.somefunds') as string}</FadeText>
                           </View>
                         </TouchableOpacity>
                       )}
@@ -1299,7 +1367,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             style={{
                               display: 'flex',
                               flexDirection: 'row',
-                              marginTop: 5,
+                              marginTop: 0,
                               backgroundColor: colors.card,
                               padding: 5,
                               borderRadius: 10,
@@ -1383,20 +1451,21 @@ const Send: React.FunctionComponent<SendProps> = ({
                         </View>
                       </View>
 
-                      <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <RegText style={{ marginTop: 11, fontSize: 12.5 }}>
+                      <View style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                          <RegText style={{ marginTop: 5, fontSize: 12.5 }}>
                             {translate('send.spendable') as string}
                           </RegText>
                           <CurrencyAmount
-                            style={{ marginTop: 11, fontSize: 12.5 }}
+                            style={{ marginTop: 5, fontSize: 12.5 }}
                             price={zecPrice.zecPrice}
                             amtZec={maxAmount}
                             currency={CurrencyEnum.USDCurrency}
                             privacy={privacy}
                           />
                         </View>
-                        <View style={{ marginLeft: 5 }}>
+                        <View style={{ marginLeft: 5, flexDirection: 'row', justifyContent: 'flex-start' }}>
+                          <View style={{ width: '40%' }} />
                           <PriceFetcher setZecPrice={setZecPrice} />
                         </View>
                       </View>
@@ -1412,9 +1481,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         justifyContent: 'space-between',
                         alignItems: 'center',
                       }}>
-                      <FadeText style={{ marginTop: 10, marginBottom: 15 }}>
-                        {translate('send.memo') as string}
-                      </FadeText>
+                      <FadeText style={{ marginTop: 0, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
                       <View style={{ flexDirection: 'row' }}>
                         <FadeText style={{ marginTop: 6 }}>{translate('send.includeua') as string}</FadeText>
                         <CheckBox
@@ -1447,7 +1514,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           borderColor: colors.text,
                           minWidth: 48,
                           minHeight: 48,
-                          maxHeight: 150,
+                          maxHeight: 130,
                         }}>
                         <TextInput
                           testID="send.memo-field"
@@ -1491,6 +1558,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               !memoIcon
                             ) {
                               setMemoIcon(true);
+                              scrollToEnd();
                             }
                             if (
                               e.nativeEvent.contentSize.height <=
@@ -1501,6 +1569,17 @@ const Send: React.FunctionComponent<SendProps> = ({
                             }
                           }}
                           maxLength={GlobalConst.memoMaxLength}
+                          onFocus={() => {
+                            // I need to wait for the keyboard is totally open
+                            // otherwise the scroll to end never happened.
+                            if (keyboardVisible) {
+                              scrollToEnd();
+                            } else {
+                              setTimeout(() => {
+                                scrollToEnd();
+                              }, 1000);
+                            }
+                          }}
                         />
                         {ta.memo && (
                           <TouchableOpacity
@@ -1538,12 +1617,17 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}>
                       <FadeText
                         style={{
-                          marginTop: 5,
+                          marginTop: 0,
                           fontWeight: 'bold',
+                          fontSize: 12.5,
                           color: validMemo === -1 ? 'red' : colors.text,
                         }}>{`${countMemoBytes(ta.memo, ta.includeUAMemo)} `}</FadeText>
-                      <FadeText style={{ marginTop: 5 }}>{translate('loadedapp.of') as string}</FadeText>
-                      <FadeText style={{ marginTop: 5 }}>{' ' + GlobalConst.memoMaxLength.toString() + ' '}</FadeText>
+                      <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
+                        {translate('loadedapp.of') as string}
+                      </FadeText>
+                      <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
+                        {' ' + GlobalConst.memoMaxLength.toString() + ' '}
+                      </FadeText>
                     </View>
                   </>
                 )}
@@ -1556,7 +1640,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
-              marginVertical: 5,
+              marginVertical: 0,
             }}>
             <View
               style={{
@@ -1584,12 +1668,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                 onPress={() => {
                   // donation - a Zenny is the minimum
                   if (
+                    server.chainName === ChainNameEnum.mainChainName &&
                     donationAddress &&
                     Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) <
-                      Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount())
+                      Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
                   ) {
                     addLastSnackbar({ message: `${translate('send.donation-minimum-message') as string}` });
-                    updateToField(null, Utils.getDefaultDonationAmount(), null, null, false);
+                    updateToField(null, Utils.getZenniesDonationAmount(), null, null, false);
                     return;
                   }
                   if (!netInfo.isConnected) {
@@ -1623,6 +1708,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   defaultValueFee();
                   defaultValuesSpendableMaxAmount();
                   clearToAddr();
+                  setPickerTempSelectedAddress('');
                 }}
               />
             </View>
@@ -1663,9 +1749,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                       if (update) {
                         updateToField(
                           await Utils.getDonationAddress(server.chainName),
-                          Utils.getDefaultDonationAmount(),
+                          Utils.getDonationAmount(),
                           null,
-                          Utils.getDefaultDonationMemo(translate),
+                          Utils.getDonationMemo(translate),
                           true,
                         );
                       }

@@ -32,6 +32,7 @@ type AbSummaryLineProps = {
   closeModal: () => void;
   handleScrollToTop: () => void;
   doAction: (action: AddressBookActionEnum, label: string, address: string) => void;
+  addressProtected?: boolean;
 };
 const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   index,
@@ -42,6 +43,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   closeModal,
   handleScrollToTop,
   doAction,
+  addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, navigation, readOnly, mode, totalBalance, language } = context;
@@ -80,25 +82,34 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           flexDirection: 'row',
           marginTop: 15,
           paddingBottom: 15,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border,
+          borderBottomWidth: addressProtected ? 3 : 1,
+          borderBottomColor: addressProtected ? colors.zingo : colors.border,
+          opacity: addressProtected ? 0.5 : 1,
         }}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-start' }}>
           <TouchableOpacity
             onPress={() => {
-              setCurrentItem(index);
-              setAction(AddressBookActionEnum.Modify);
-              handleScrollToTop();
+              if (!addressProtected) {
+                setCurrentItem(index);
+                setAction(AddressBookActionEnum.Modify);
+                handleScrollToTop();
+              }
             }}>
             <View style={{ flexDirection: 'row', marginBottom: 5 }}>
               <FontAwesomeIcon
                 style={{ marginHorizontal: 10 }}
                 size={24}
                 icon={faAddressCard}
-                color={colors.primaryDisabled}
+                color={addressProtected ? colors.zingo : colors.primaryDisabled}
               />
               <FadeText
-                style={{ fontSize: 18, marginHorizontal: 10, color: colors.primary, opacity: 1, fontWeight: 'bold' }}>
+                style={{
+                  fontSize: 18,
+                  marginHorizontal: 10,
+                  color: addressProtected ? colors.zingo : colors.primary,
+                  opacity: 1,
+                  fontWeight: 'bold',
+                }}>
                 {displayContact}
               </FadeText>
             </View>
@@ -110,19 +121,26 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
             </View>
           </TouchableOpacity>
         </View>
-        <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-          <TouchableOpacity
-            style={{ zIndex: 999, padding: 10 }}
-            onPress={() => {
-              setCurrentItem(index);
-              setAction(AddressBookActionEnum.Modify);
-              handleScrollToTop();
-            }}>
-            <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faPencil} color={colors.money} />
-          </TouchableOpacity>
-        </View>
+        {!addressProtected && (
+          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+            <TouchableOpacity
+              style={{ zIndex: 999, padding: 10 }}
+              onPress={() => {
+                setCurrentItem(index);
+                setAction(AddressBookActionEnum.Modify);
+                handleScrollToTop();
+              }}>
+              <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faPencil} color={colors.money} />
+            </TouchableOpacity>
+          </View>
+        )}
         {!readOnly &&
-          !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
+          !addressProtected &&
+          !(
+            mode === ModeEnum.basic &&
+            totalBalance &&
+            totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0
+          ) && (
             <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
               <TouchableOpacity
                 style={{ zIndex: 999, padding: 10 }}
@@ -141,11 +159,13 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
               </TouchableOpacity>
             </View>
           )}
-        <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-          <TouchableOpacity style={{ zIndex: 999, padding: 10 }} onPress={() => onPressDelete()}>
-            <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faTrashCan} color={colors.money} />
-          </TouchableOpacity>
-        </View>
+        {!addressProtected && (
+          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+            <TouchableOpacity style={{ zIndex: 999, padding: 10 }} onPress={() => onPressDelete()}>
+              <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faTrashCan} color={colors.money} />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );

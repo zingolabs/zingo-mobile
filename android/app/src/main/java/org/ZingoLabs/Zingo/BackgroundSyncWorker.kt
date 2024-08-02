@@ -31,6 +31,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
+import org.ZingoLabs.Zingo.Constants.*
 
 class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
 
@@ -38,7 +39,6 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
     override fun doWork(): Result {
         val reactContext = ReactApplicationContext(MainApplication.getAppContext())
         val rpcModule = RPCModule(reactContext)
-        val errorPrefix = "error"
 
         Log.i("SCHEDULED_TASK_RUN", "Task running")
 
@@ -50,7 +50,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundStart")
 
         // checking if the wallet file exists
-        val exists: Boolean = rpcModule.wallet_exists()
+        val exists: Boolean = rpcModule.fileExists(WalletFileName.value)
 
         if (exists) {
             uniffi.zingo.initLogging()
@@ -58,7 +58,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
             // check the Server, because the task can run without the App.
             val balance = uniffi.zingo.executeCommand("balance", "")
             Log.i("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
-            if (balance.lowercase().startsWith(errorPrefix)) {
+            if (balance.lowercase().startsWith(ErrorPrefix.value)) {
                 // this means this task is running with the App closed
                 loadWalletFile(rpcModule)
             } else {

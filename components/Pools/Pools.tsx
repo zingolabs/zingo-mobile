@@ -66,104 +66,107 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOpti
         <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
           <BoldText>{translate('pools.orchard-title') as string}</BoldText>
 
-          <View style={{ display: 'flex', marginLeft: 25 }}>
-            <DetailLine label={translate('pools.orchard-balance') as string}>
-              <ZecAmount
-                testID="orchard-total-balance"
-                amtZec={totalBalance.orchardBal}
-                size={18}
-                currencyName={info.currencyName}
-                style={{
-                  opacity:
-                    totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
-                      ? 1
-                      : 0.5,
-                }}
-                privacy={privacy}
-              />
-            </DetailLine>
-            <DetailLine label={translate('pools.orchard-spendable-balance') as string}>
-              <ZecAmount
-                testID="orchard-spendable-balance"
-                amtZec={totalBalance.spendableOrchard}
-                size={18}
-                currencyName={info.currencyName}
-                color={
-                  totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
-                    ? colors.primary
-                    : 'red'
-                }
-                privacy={privacy}
-              />
-            </DetailLine>
-          </View>
+          {totalBalance && (
+            <>
+              <View style={{ display: 'flex', marginLeft: 25 }}>
+                <DetailLine label={translate('pools.orchard-balance') as string}>
+                  <ZecAmount
+                    testID="orchard-total-balance"
+                    amtZec={totalBalance.orchardBal}
+                    size={18}
+                    currencyName={info.currencyName}
+                    style={{
+                      opacity:
+                        totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
+                          ? 1
+                          : 0.5,
+                    }}
+                    privacy={privacy}
+                  />
+                </DetailLine>
+                <DetailLine label={translate('pools.orchard-spendable-balance') as string}>
+                  <ZecAmount
+                    testID="orchard-spendable-balance"
+                    amtZec={totalBalance.spendableOrchard}
+                    size={18}
+                    currencyName={info.currencyName}
+                    color={
+                      totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
+                        ? colors.primary
+                        : 'red'
+                    }
+                    privacy={privacy}
+                  />
+                </DetailLine>
+              </View>
 
-          <View style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
+              <View style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
 
-          <BoldText>{translate('pools.sapling-title') as string}</BoldText>
+              <BoldText>{translate('pools.sapling-title') as string}</BoldText>
 
-          <View style={{ display: 'flex', marginLeft: 25 }}>
-            <DetailLine label={translate('pools.sapling-balance') as string}>
-              <ZecAmount
-                testID="sapling-total-balance"
-                amtZec={totalBalance.privateBal}
-                size={18}
-                currencyName={info.currencyName}
-                style={{
-                  opacity:
-                    totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
-                      ? 1
-                      : 0.5,
-                }}
-                privacy={privacy}
-              />
-            </DetailLine>
-            <DetailLine label={translate('pools.sapling-spendable-balance') as string}>
-              <ZecAmount
-                testID="sapling-spendable-balance"
-                amtZec={totalBalance.spendablePrivate}
-                size={18}
-                currencyName={info.currencyName}
-                color={
-                  totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
-                    ? colors.syncing
-                    : 'red'
-                }
-                privacy={privacy}
-              />
-            </DetailLine>
-          </View>
+              <View style={{ display: 'flex', marginLeft: 25 }}>
+                <DetailLine label={translate('pools.sapling-balance') as string}>
+                  <ZecAmount
+                    testID="sapling-total-balance"
+                    amtZec={totalBalance.privateBal}
+                    size={18}
+                    currencyName={info.currencyName}
+                    style={{
+                      opacity:
+                        totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
+                          ? 1
+                          : 0.5,
+                    }}
+                    privacy={privacy}
+                  />
+                </DetailLine>
+                <DetailLine label={translate('pools.sapling-spendable-balance') as string}>
+                  <ZecAmount
+                    testID="sapling-spendable-balance"
+                    amtZec={totalBalance.spendablePrivate}
+                    size={18}
+                    currencyName={info.currencyName}
+                    color={
+                      totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
+                        ? colors.syncing
+                        : 'red'
+                    }
+                    privacy={privacy}
+                  />
+                </DetailLine>
+              </View>
 
-          <View style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
+              <View style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
 
-          <BoldText>{translate('pools.transparent-title') as string}</BoldText>
+              <BoldText>{translate('pools.transparent-title') as string}</BoldText>
 
-          <View style={{ display: 'flex', marginLeft: 25 }}>
-            <DetailLine label={translate('pools.transparent-balance') as string}>
-              <ZecAmount
-                testID="transparent-balance"
-                amtZec={totalBalance.transparentBal}
-                size={18}
-                currencyName={info.currencyName}
-                color={'red'}
-                privacy={privacy}
-              />
-            </DetailLine>
-          </View>
-
-          {somePending && (
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                marginTop: 5,
-                backgroundColor: colors.card,
-                padding: 5,
-                borderRadius: 10,
-              }}>
-              <FontAwesomeIcon icon={faInfoCircle} size={20} color={colors.primary} style={{ marginRight: 5 }} />
-              <FadeText>{translate('send.somefunds') as string}</FadeText>
-            </View>
+              <View style={{ display: 'flex', marginLeft: 25 }}>
+                <DetailLine label={translate('pools.transparent-balance') as string}>
+                  <ZecAmount
+                    testID="transparent-balance"
+                    amtZec={totalBalance.transparentBal}
+                    size={18}
+                    currencyName={info.currencyName}
+                    color={'red'}
+                    privacy={privacy}
+                  />
+                </DetailLine>
+              </View>
+              {somePending && (
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    marginTop: 5,
+                    backgroundColor: colors.card,
+                    padding: 5,
+                    borderRadius: 10,
+                  }}>
+                  <FontAwesomeIcon icon={faInfoCircle} size={20} color={colors.primary} style={{ marginRight: 5 }} />
+                  <FadeText>{translate('send.somefunds') as string}</FadeText>
+                </View>
+              )}
+            </>
           )}
         </View>
       </ScrollView>

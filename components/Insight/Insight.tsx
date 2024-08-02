@@ -18,7 +18,7 @@ import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
-import { ButtonTypeEnum, CommandEnum, SendPageStateClass, SnackbarDurationEnum } from '../../app/AppState';
+import { ButtonTypeEnum, CommandEnum, SnackbarDurationEnum } from '../../app/AppState';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -81,17 +81,10 @@ const getPercent = (percent: number) => {
 
 type InsightProps = {
   closeModal: () => void;
-  openModal: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
-  setSendPageState: (s: SendPageStateClass) => void;
 };
 
-const Insight: React.FunctionComponent<InsightProps> = ({
-  closeModal,
-  setPrivacyOption,
-  openModal,
-  setSendPageState,
-}) => {
+const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, privacy, addLastSnackbar, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -130,7 +123,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({
       try {
         resultJSON = await JSON.parse(resultStr);
       } catch (e) {
-        console.log(resultStr);
+        console.log('Error getting info from the server', e);
         resultJSON = {};
       }
       let amounts: { value: number; address: string; tag: string }[] = [];
@@ -217,10 +210,8 @@ const Insight: React.FunctionComponent<InsightProps> = ({
                     oneLine={true}
                     onlyContact={true}
                     withIcon={true}
-                    withSendIcon={true}
-                    setSendPageState={setSendPageState}
-                    closeModal={closeModal}
-                    openModal={openModal}
+                    closeModal={() => {}}
+                    openModal={() => {}}
                   />
                 )}
                 {!expandAddress[index] && !!item.address && (

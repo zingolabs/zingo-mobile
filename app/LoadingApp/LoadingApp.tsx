@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { Component, Suspense, useState, useMemo, useEffect } from 'react';
+import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
   View,
   Alert,
@@ -54,7 +54,6 @@ import {
   GlobalConst,
   EventListenerEnum,
   AppContextLoading,
-  TotalBalanceClass,
   InfoType,
   ZecPriceType,
   BackgroundErrorType,
@@ -77,11 +76,12 @@ import { isEqual } from 'lodash';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
 import { RestoreFromTypeEnum } from '../AppState';
 
-const BoldText = React.lazy(() => import('../../components/Components/BoldText'));
-const Button = React.lazy(() => import('../../components/Components/Button'));
-const Seed = React.lazy(() => import('../../components/Seed'));
-const ImportUfvk = React.lazy(() => import('../../components/Ufvk/ImportUfvk'));
-const ChainTypeToggle = React.lazy(() => import('../../components/Components/ChainTypeToggle'));
+// no lazy load because slowing down screens.
+import BoldText from '../../components/Components/BoldText';
+import Button from '../../components/Components/Button';
+import Seed from '../../components/Seed';
+import ImportUfvk from '../../components/Ufvk/ImportUfvk';
+import ChainTypeToggle from '../../components/Components/ChainTypeToggle';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -352,7 +352,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       navigation: props.navigation,
       netInfo: netInfo,
       wallet: {} as WalletType,
-      totalBalance: {} as TotalBalanceClass,
       info: {} as InfoType,
       zecPrice: {} as ZecPriceType,
       background: props.background,
@@ -489,7 +488,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                     actionButtonsDisabled: false,
                   });
                 } catch (e) {
-                  console.log(walletKindStr);
+                  //console.log(walletKindStr);
                   this.setState({
                     readOnly: false,
                     actionButtonsDisabled: false,
@@ -502,7 +501,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 error = true;
               }
             } catch (e) {
-              console.log(result);
               error = true;
             }
           } else {
@@ -552,7 +550,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.state.appStateStatus === AppStateStatusEnum.background) &&
         nextAppState === AppStateStatusEnum.active
       ) {
-        console.log('App LOADING has come to the foreground!');
+        //console.log('App LOADING has come to the foreground!');
         // reading background task info
         this.fetchBackgroundSyncing();
         // setting value for background task Android
@@ -566,7 +564,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         (nextAppState === AppStateStatusEnum.inactive || nextAppState === AppStateStatusEnum.background) &&
         this.state.appStateStatus === AppStateStatusEnum.active
       ) {
-        console.log('App LOADING is gone to the background!');
+        //console.log('App LOADING is gone to the background!');
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
       }
@@ -883,7 +881,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             error = true;
           }
         } catch (e) {
-          console.log(result);
           error = true;
         }
       } else {
@@ -974,7 +971,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       navigation: this.state.navigation,
       netInfo: this.state.netInfo,
       wallet: this.state.wallet,
-      totalBalance: this.state.totalBalance,
       info: this.state.info,
       zecPrice: this.state.zecPrice,
       background: this.state.background,
@@ -1314,19 +1310,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               transparent={false}
               visible={screen === 2}
               onRequestClose={() => this.navigateToLoadedApp()}>
-              <Suspense
-                fallback={
-                  <View>
-                    <Text>{translate('loading') as string}</Text>
-                  </View>
-                }>
-                <Seed
-                  onClickOK={() => this.navigateToLoadedApp()}
-                  onClickCancel={() => this.navigateToLoadedApp()}
-                  action={SeedActionEnum.new}
-                  setPrivacyOption={this.setPrivacyOption}
-                />
-              </Suspense>
+              <Seed
+                onClickOK={() => this.navigateToLoadedApp()}
+                onClickCancel={() => this.navigateToLoadedApp()}
+                action={SeedActionEnum.new}
+                setPrivacyOption={this.setPrivacyOption}
+              />
             </Modal>
           )}
           {screen === 3 && (
@@ -1335,17 +1324,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               transparent={false}
               visible={screen === 3}
               onRequestClose={() => this.setState({ screen: 1 })}>
-              <Suspense
-                fallback={
-                  <View>
-                    <Text>{translate('loading') as string}</Text>
-                  </View>
-                }>
-                <ImportUfvk
-                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                  onClickCancel={() => this.setState({ screen: 1 })}
-                />
-              </Suspense>
+              <ImportUfvk
+                onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                onClickCancel={() => this.setState({ screen: 1 })}
+              />
             </Modal>
           )}
         </SafeAreaView>

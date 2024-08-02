@@ -45,7 +45,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
     if (min < 60) {
       return min.toString();
     } else {
-      return (min / 60).toFixed(0).toString() + ':' + (min % 60).toFixed(0).toString();
+      return (min / 60).toFixed(0).toString() + ':' + (min % 60).toFixed(0).toString().padStart(2, '0');
     }
   };
 

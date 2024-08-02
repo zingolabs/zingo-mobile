@@ -67,6 +67,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
   const [showNavigator, setShowNavigator] = useState<boolean>(true);
+  const [addressProtected, setAddressProtected] = useState<boolean>(true);
   const isTheFirstMount = useRef(true);
 
   const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
@@ -90,6 +91,13 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
         : colors.text;
     setSpendColor(spendCo);
   }, [colors.primary, colors.primaryDisabled, colors.text, vt.confirmations, vt.kind]);
+
+  useEffect(() => {
+    (async () => {
+      setAddressProtected(await isAddressProtected(vt.address ? vt.address : ''));
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vt.address]);
 
   const handleTxIDClick = (txid?: string) => {
     if (!txid) {
@@ -126,8 +134,13 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   };
 
   const thisWalletAddress: (add: string) => boolean = (add: string) => {
-    const address: AddressClass[] = addresses.filter((a: AddressClass) => a.address === add);
+    const address: AddressClass[] = addresses ? addresses.filter((a: AddressClass) => a.address === add) : [];
     return address.length >= 1;
+  };
+
+  const isAddressProtected: (add: string) => Promise<boolean> = async (add: string) => {
+    const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
+    return zennyTips === add;
   };
 
   //console.log('vt', index, totalLength, isTheFirstMount);
@@ -287,6 +300,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                 setSendPageState={setSendPageState}
                 closeModal={closeModal}
                 openModal={openModal}
+                addressProtected={addressProtected}
               />
             </View>
           )}

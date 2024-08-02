@@ -106,7 +106,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
             {translate('loadedapp.addressbook') as string}
           </RegText>
 
-          {!(mode === ModeEnum.basic && valueTransfers.length <= 0) && (
+          {!(mode === ModeEnum.basic && valueTransfers && valueTransfers.length <= 0) && (
             <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.WalletSeedUfvk)} style={item}>
               {readOnly
                 ? mode === ModeEnum.basic
@@ -142,7 +142,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
             </RegText>
           )}
 
-          {!(mode === ModeEnum.basic && valueTransfers.length <= 0) && (
+          {!(mode === ModeEnum.basic && valueTransfers && valueTransfers.length <= 0) && (
             <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.Insight)} style={item}>
               {translate('loadedapp.insight') as string}
             </RegText>
@@ -162,7 +162,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
               {translate('loadedapp.restorebackupwallet') as string}
             </RegText>
           )}
-          {mode === ModeEnum.basic && valueTransfers.length === 0 && (
+          {mode === ModeEnum.basic && valueTransfers && valueTransfers.length === 0 && (
             <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.LoadWalletFromSeed)} style={item}>
               {translate('loadedapp.loadwalletfromseed-basic') as string}
             </RegText>
