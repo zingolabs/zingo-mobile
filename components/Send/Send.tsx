@@ -198,7 +198,15 @@ const Send: React.FunctionComponent<SendProps> = ({
       setNegativeMaxAmount(true);
     }
     setSpendableBalanceLastError('');
-  }, [donation, donationAddress, server.chainName, totalBalance]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    donation,
+    donationAddress,
+    server.chainName,
+    totalBalance,
+    totalBalance?.spendableOrchard,
+    totalBalance?.spendablePrivate,
+  ]);
 
   const calculateFeeWithPropose = useCallback(
     async (
@@ -370,7 +378,16 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
       //setSendAllClick(false);
     },
-    [defaultValuesSpendableMaxAmount, donation, donationAddress, totalBalance, validAddress],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      defaultValuesSpendableMaxAmount,
+      donation,
+      donationAddress,
+      totalBalance,
+      totalBalance?.spendableOrchard,
+      totalBalance?.spendablePrivate,
+      validAddress,
+    ],
   );
 
   const memoTotal = useCallback((memoPar: string, includeUAMemoPar: boolean, uaAddressPar: string) => {

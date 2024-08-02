@@ -206,6 +206,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
     // whatever else
     return '-';
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     addLastSnackbar,
     calculatedFee,
@@ -214,6 +215,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     sendPageState.toaddr.to,
     server.chainName,
     totalBalance,
+    totalBalance?.spendableOrchard,
+    totalBalance?.spendablePrivate,
     translate,
   ]);
 
