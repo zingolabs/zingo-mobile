@@ -378,12 +378,12 @@ export default class RPC {
     // clean start.
     await this.stopSyncProcess();
 
-    // every 30 seconds the App try to Sync the new blocks.
+    // every 15 seconds the App try to Sync the new blocks.
     if (!this.refreshTimerID) {
       this.refreshTimerID = setInterval(() => {
         //console.log('interval refresh');
         this.refresh(false);
-      }, 30 * 1000); // 30 seconds
+      }, 15 * 1000); // 30 seconds
       //console.log('create refresh timer', this.refreshTimerID);
       this.timers.push(this.refreshTimerID);
     }
@@ -441,7 +441,7 @@ export default class RPC {
       return;
     }
 
-    console.log('stop sync process. in progress', ss.in_progress);
+    //console.log('stop sync process. in progress', ss.in_progress);
 
     while (ss.in_progress) {
       // interrupting sync process
@@ -453,7 +453,7 @@ export default class RPC {
       returnStatus = await this.doSyncStatus();
       ss = await JSON.parse(returnStatus);
 
-      console.log('stop sync process. in progress', ss.in_progress);
+      //console.log('stop sync process. in progress', ss.in_progress);
     }
     console.log('stop sync process. STOPPED');
 
@@ -524,7 +524,7 @@ export default class RPC {
       return rescanStr;
     } catch (error) {
       console.log(`Critical Error rescan ${error}`);
-      return `Error: ${error}`;
+      return `Error: rescan ${error}`;
     }
   }
 
@@ -544,7 +544,7 @@ export default class RPC {
       return syncStr;
     } catch (error) {
       console.log(`Critical Error sync ${error}`);
-      return `Error: ${error}`;
+      return `Error: sync ${error}`;
     }
   }
 
@@ -564,7 +564,7 @@ export default class RPC {
       return syncStatusStr;
     } catch (error) {
       console.log(`Critical Error sync status ${error}`);
-      return `Error: ${error}`;
+      return `Error: sync status ${error}`;
     }
   }
 
@@ -586,7 +586,7 @@ export default class RPC {
       return sendStr;
     } catch (error) {
       console.log(`Critical Error send ${error}`);
-      return `Error: ${error}`;
+      return `Error: send ${error}`;
     }
   }
 
@@ -606,7 +606,7 @@ export default class RPC {
       return sendProgressStr;
     } catch (error) {
       console.log(`Critical Error send progress ${error}`);
-      return `Error: ${error}`;
+      return `Error: send progress ${error}`;
     }
   }
 
@@ -642,7 +642,7 @@ export default class RPC {
     } catch (error) {
       console.log('Internal error update data', error);
       this.updateDataLock = false;
-      // relaunch the interval task just in case they are aborted.
+      // relaunch the interval tasks just in case they are aborted.
       this.configure();
     }
   }
@@ -1033,7 +1033,7 @@ export default class RPC {
       }
     } catch (error) {
       console.log(`Critical Error info & server block height ${error}`);
-      // relaunch the interval task just in case they are aborted.
+      // relaunch the interval tasks just in case they are aborted.
       this.configure();
       return;
     }
@@ -1159,7 +1159,7 @@ export default class RPC {
       this.fnSetAllAddresses(allAddresses);
     } catch (error) {
       console.log(`Critical Error addresses balances notes ${error}`);
-      // relaunch the interval task just in case they are aborted.
+      // relaunch the interval tasks just in case they are aborted.
       this.configure();
       return;
     }
@@ -1205,7 +1205,7 @@ export default class RPC {
       this.fnSetAllAddresses(allAddresses);
     } catch (error) {
       console.log(`Critical Error addresses ${error}`);
-      // relaunch the interval task just in case they are aborted.
+      // relaunch the interval tasks just in case they are aborted.
       this.configure();
       return;
     }
@@ -1228,7 +1228,7 @@ export default class RPC {
       this.lastWalletBlockHeight = heightJSON.height;
     } catch (error) {
       console.log(`Critical Error wallet height ${error}`);
-      // relaunch the interval task just in case they are aborted.
+      // relaunch the interval tasks just in case they are aborted.
       this.configure();
       return;
     }
@@ -1243,7 +1243,7 @@ export default class RPC {
       }
     } catch (error) {
       console.log(`Critical Error wallet birthday ${error}`);
-      // relaunch the interval task just in case they are aborted.
+      // relaunch the interval tasks just in case they are aborted.
       this.configure();
       return;
     }
@@ -1324,7 +1324,7 @@ export default class RPC {
       this.fnSetValueTransfersList(vtList);
     } catch (error) {
       console.log(`Critical Error txs list value transfers ${error}`);
-      // relaunch the interval task just in case they are aborted.
+      // relaunch the interval tasks just in case they are aborted.
       this.configure();
       return;
     }
