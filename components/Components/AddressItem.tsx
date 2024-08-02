@@ -183,7 +183,11 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         !addressProtected &&
         contact &&
         !readOnly &&
-        !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
+        !(
+          mode === ModeEnum.basic &&
+          totalBalance &&
+          totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0
+        ) && (
           <TouchableOpacity
             style={{ marginLeft: 10 }}
             onPress={() => {

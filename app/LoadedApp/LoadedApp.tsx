@@ -12,6 +12,7 @@ import {
   Linking,
   SafeAreaView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -83,20 +84,20 @@ import AddressBookFileImpl from '../../components/AddressBook/AddressBookFileImp
 import simpleBiometrics from '../simpleBiometrics';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
 
-const History = React.lazy(() => import('../../components/History'));
-const Send = React.lazy(() => import('../../components/Send'));
-const Receive = React.lazy(() => import('../../components/Receive'));
+import History from '../../components/History';
+import Send from '../../components/Send';
+import Receive from '../../components/Receive';
+import Settings from '../../components/Settings';
+import Menu from './components/Menu';
+
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
 const Info = React.lazy(() => import('../../components/Info'));
 const SyncReport = React.lazy(() => import('../../components/SyncReport'));
 const Rescan = React.lazy(() => import('../../components/Rescan'));
-const Settings = React.lazy(() => import('../../components/Settings'));
 const Pools = React.lazy(() => import('../../components/Pools'));
 const Insight = React.lazy(() => import('../../components/Insight'));
 const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
-
-const Menu = React.lazy(() => import('./components/Menu'));
 const ComputingTxContent = React.lazy(() => import('./components/ComputingTxContent'));
 
 const en = require('../translations/en.json');
@@ -312,6 +313,26 @@ export default function LoadedApp(props: LoadedAppProps) {
   }
 }
 
+type LoadingProps = {
+  backgroundColor: string;
+  spinColor: string;
+};
+
+const Loading: React.FC<LoadingProps> = ({ backgroundColor, spinColor }) => {
+  return (
+    <View
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: backgroundColor,
+        height: '100%',
+      }}>
+      <ActivityIndicator size="large" color={spinColor} />
+    </View>
+  );
+};
+
 type LoadedAppClassProps = {
   navigation: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
@@ -349,9 +370,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       navigation: props.navigation,
       netInfo: {} as NetInfoType,
       wallet: {} as WalletType,
-      totalBalance: {} as TotalBalanceClass,
-      addresses: [] as AddressClass[],
-      valueTransfers: [] as ValueTransferType[],
+      totalBalance: null,
+      addresses: null,
+      valueTransfers: null,
       walletSettings: {} as WalletSettingsClass,
       syncingStatus: {} as SyncingStatusClass,
       sendProgress: {} as SendProgressClass,
@@ -476,7 +497,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           this.state.appStateStatus === AppStateStatusEnum.background) &&
         nextAppState === AppStateStatusEnum.active
       ) {
-        console.log('App LOADED Android & IOS has come to the foreground!');
+        //console.log('App LOADED Android & IOS has come to the foreground!');
         if (Platform.OS === GlobalConst.platformOSios) {
           //console.log('LOADED SAVED IOS foreground', nextAppState);
           this.setState({ appStateStatus: nextAppState });
@@ -509,7 +530,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.state.appStateStatus === AppStateStatusEnum.active &&
         (nextAppState === AppStateStatusEnum.inactive || nextAppState === AppStateStatusEnum.background)
       ) {
-        console.log('App LOADED is gone to the background!');
+        //console.log('App LOADED is gone to the background!');
         // re-activate the interruption sync flag
         await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
         // setting value for background task Android
@@ -708,14 +729,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({ shieldingAmount: value });
   };
 
-  //setPoolsToShieldSelectSapling = (value: boolean) => {
-  //  this.setState({ poolsToShieldSelectSapling: value });
-  //};
-
-  //setPoolsToShieldSelectTransparent = (value: boolean) => {
-  //  this.setState({ poolsToShieldSelectTransparent: value });
-  //};
-
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
       //console.log('fetch total balance');
@@ -757,7 +770,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       const pending: number =
         valueTransfers.length > 0 ? valueTransfers.filter((vt: ValueTransferType) => vt.confirmations === 0).length : 0;
       // if a ValueTransfer go from 0 confirmations to > 0 -> Show a message about a ValueTransfer is confirmed
-      this.state.valueTransfers.length > 0 &&
+      this.state.valueTransfers &&
+        this.state.valueTransfers.length > 0 &&
         this.state.valueTransfers
           .filter((vtOld: ValueTransferType) => !vtOld.confirmations || vtOld.confirmations === 0)
           .forEach((vtOld: ValueTransferType) => {
@@ -765,8 +779,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               (vt: ValueTransferType) =>
                 vt.txid === vtOld.txid && vt.address === vtOld.address && vt.poolType === vtOld.poolType,
             );
-            console.log('old', vtOld);
-            console.log('new', vtNew);
+            //console.log('old', vtOld);
+            //console.log('new', vtNew);
             // the ValueTransfer is confirmed
             if (vtNew.length > 0 && vtNew[0].confirmations > 0) {
               let message: string = '';
@@ -918,7 +932,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     try {
       // Construct a sendJson from the sendPage state
       const { sendPageState, uaAddress, addresses, server, donation } = this.state;
-      const sendJson = await Utils.getSendManyJSON(sendPageState, uaAddress, addresses, server, donation);
+      const sendJson = await Utils.getSendManyJSON(
+        sendPageState,
+        uaAddress,
+        addresses ? addresses : ([] as AddressClass[]),
+        server,
+        donation,
+      );
       const txid = await this.rpc.sendTransaction(sendJson, setSendProgress);
 
       return txid;
@@ -1131,7 +1151,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             error = true;
           }
         } catch (e) {
-          console.log(result);
           error = true;
         }
       } else {
@@ -1228,8 +1247,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, value);
     this.setState({
       mode: value as ModeEnum,
-      //poolsToShieldSelectSapling: true,
-      //poolsToShieldSelectTransparent: true,
     });
     // this function change the Theme in the App component.
     this.props.toggleTheme(value as ModeEnum);
@@ -1475,6 +1492,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       totalBalance,
       translate,
       scrollToTop,
+      addresses,
     } = this.state;
     const { colors } = this.props.theme;
 
@@ -1522,16 +1540,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       rescanMenu: this.state.rescanMenu,
     };
 
-    const menu = (
-      <Suspense
-        fallback={
-          <View>
-            <Text>Loading...</Text>
-          </View>
-        }>
-        <Menu onItemSelected={this.onMenuItemSelected} updateMenuState={this.updateMenuState} />
-      </Suspense>
-    );
+    const menu = <Menu onItemSelected={this.onMenuItemSelected} updateMenuState={this.updateMenuState} />;
 
     const fnTabBarIcon = (route: StackScreenProps<any>['route'], focused: boolean) => {
       var iconName;
@@ -1554,7 +1563,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       );
     };
 
-    //console.log('render LoadedAppClass - 3', translate('version'));
+    //console.log('render LoadedAppClass - 3');
+    //console.log('vt', valueTransfers);
+    //console.log('ad', addresses);
+    //console.log('ba', totalBalance);
 
     return (
       <ContextAppLoadedProvider value={context}>
@@ -1564,12 +1576,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={aboutModalVisible}
             onRequestClose={() => this.setState({ aboutModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <About closeModal={() => this.setState({ aboutModalVisible: false })} />
             </Suspense>
           </Modal>
@@ -1579,12 +1586,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={infoModalVisible}
             onRequestClose={() => this.setState({ infoModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <Info closeModal={() => this.setState({ infoModalVisible: false })} setZecPrice={this.setZecPrice} />
             </Suspense>
           </Modal>
@@ -1594,12 +1596,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={syncReportModalVisible}
             onRequestClose={() => this.setState({ syncReportModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <SyncReport closeModal={() => this.setState({ syncReportModalVisible: false })} />
             </Suspense>
           </Modal>
@@ -1609,12 +1606,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={poolsModalVisible}
             onRequestClose={() => this.setState({ poolsModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <Pools
                 closeModal={() => this.setState({ poolsModalVisible: false })}
                 setPrivacyOption={this.setPrivacyOption}
@@ -1627,12 +1619,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={insightModalVisible}
             onRequestClose={() => this.setState({ insightModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <Insight
                 closeModal={() => this.setState({ insightModalVisible: false })}
                 setPrivacyOption={this.setPrivacyOption}
@@ -1645,12 +1632,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={rescanModalVisible}
             onRequestClose={() => this.setState({ rescanModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <Rescan closeModal={() => this.setState({ rescanModalVisible: false })} doRescan={this.doRescan} />
             </Suspense>
           </Modal>
@@ -1660,27 +1642,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={settingsModalVisible}
             onRequestClose={() => this.setState({ settingsModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
-              <Settings
-                closeModal={() => this.setState({ settingsModalVisible: false })}
-                setWalletOption={this.setWalletOption}
-                setServerOption={this.setServerOption}
-                setCurrencyOption={this.setCurrencyOption}
-                setLanguageOption={this.setLanguageOption}
-                setSendAllOption={this.setSendAllOption}
-                setDonationOption={this.setDonationOption}
-                setPrivacyOption={this.setPrivacyOption}
-                setModeOption={this.setModeOption}
-                setSecurityOption={this.setSecurityOption}
-                setSelectServerOption={this.setSelectServerOption}
-                setRescanMenuOption={this.setRescanMenuOption}
-              />
-            </Suspense>
+            <Settings
+              closeModal={() => this.setState({ settingsModalVisible: false })}
+              setWalletOption={this.setWalletOption}
+              setServerOption={this.setServerOption}
+              setCurrencyOption={this.setCurrencyOption}
+              setLanguageOption={this.setLanguageOption}
+              setSendAllOption={this.setSendAllOption}
+              setDonationOption={this.setDonationOption}
+              setPrivacyOption={this.setPrivacyOption}
+              setModeOption={this.setModeOption}
+              setSecurityOption={this.setSecurityOption}
+              setSelectServerOption={this.setSelectServerOption}
+              setRescanMenuOption={this.setRescanMenuOption}
+            />
           </Modal>
 
           <Modal
@@ -1688,12 +1663,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={seedViewModalVisible}
             onRequestClose={() => this.setState({ seedViewModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <Seed
                 onClickOK={() => this.setState({ seedViewModalVisible: false })}
                 onClickCancel={() => this.setState({ seedViewModalVisible: false })}
@@ -1708,12 +1678,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={seedChangeModalVisible}
             onRequestClose={() => this.setState({ seedChangeModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <Seed
                 onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ seedChangeModalVisible: false })}
@@ -1728,12 +1693,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={seedBackupModalVisible}
             onRequestClose={() => this.setState({ seedBackupModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <Seed
                 onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ seedBackupModalVisible: false })}
@@ -1748,12 +1708,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={seedServerModalVisible}
             onRequestClose={() => this.setState({ seedServerModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <Seed
                 onClickOK={async () => await this.onClickOKServerWallet()}
                 onClickCancel={async () => {
@@ -1772,12 +1727,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={ufvkViewModalVisible}
             onRequestClose={() => this.setState({ ufvkViewModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <ShowUfvk
                 onClickOK={() => this.setState({ ufvkViewModalVisible: false })}
                 onClickCancel={() => this.setState({ ufvkViewModalVisible: false })}
@@ -1792,12 +1742,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={ufvkChangeModalVisible}
             onRequestClose={() => this.setState({ ufvkChangeModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <ShowUfvk
                 onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
                 onClickCancel={() => this.setState({ ufvkChangeModalVisible: false })}
@@ -1812,12 +1757,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={ufvkBackupModalVisible}
             onRequestClose={() => this.setState({ ufvkBackupModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <ShowUfvk
                 onClickOK={async () => await this.onClickOKRestoreBackup()}
                 onClickCancel={() => this.setState({ ufvkBackupModalVisible: false })}
@@ -1832,12 +1772,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={ufvkServerModalVisible}
             onRequestClose={() => this.setState({ ufvkServerModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <ShowUfvk
                 onClickOK={async () => await this.onClickOKServerWallet()}
                 onClickCancel={async () => {
@@ -1856,12 +1791,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             transparent={false}
             visible={computingModalVisible}
             onRequestClose={() => this.setState({ computingModalVisible: false })}>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <ComputingTxContent />
             </Suspense>
           </Modal>
@@ -1877,12 +1807,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 addressBookOpenPriorModal: () => {},
               })
             }>
-            <Suspense
-              fallback={
-                <View>
-                  <Text>{translate('loading') as string}</Text>
-                </View>
-              }>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
               <AddressBook
                 closeModal={() =>
                   this.setState({
@@ -1899,11 +1824,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
-          {mode !== ModeEnum.basic ||
-          (mode === ModeEnum.basic &&
-            (!(mode === ModeEnum.basic && valueTransfers.length <= 0) ||
-              (!readOnly &&
-                !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0)))) ? (
+          {mode === ModeEnum.advanced ||
+          (!!valueTransfers && valueTransfers.length > 0) ||
+          (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
             <Tab.Navigator
               initialRouteName={translate('loadedapp.wallet-menu') as string}
               screenOptions={({ route }) => ({
@@ -1923,46 +1846,77 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
                 {() => (
                   <>
-                    <Suspense
-                      fallback={
-                        <View>
-                          <Text>{translate('loading') as string}</Text>
-                        </View>
-                      }>
-                      {/*<History
-                        doRefresh={this.doRefresh}
-                        toggleMenuDrawer={this.toggleMenuDrawer}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                        setZecPrice={this.setZecPrice}
-                        setComputingModalVisible={this.setComputingModalVisible}
-                        setPrivacyOption={this.setPrivacyOption}
-                        setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                        setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
-                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                        setSendPageState={this.setSendPageState}
-                      />*/}
-                      <History
-                        doRefresh={this.doRefresh}
-                        toggleMenuDrawer={this.toggleMenuDrawer}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                        setZecPrice={this.setZecPrice}
-                        setComputingModalVisible={this.setComputingModalVisible}
-                        setPrivacyOption={this.setPrivacyOption}
-                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                        setSendPageState={this.setSendPageState}
-                        setShieldingAmount={this.setShieldingAmount}
-                        setScrollToTop={this.setScrollToTop}
-                        scrollToTop={scrollToTop}
-                      />
-                    </Suspense>
+                    <History
+                      doRefresh={this.doRefresh}
+                      toggleMenuDrawer={this.toggleMenuDrawer}
+                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                      poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                      setZecPrice={this.setZecPrice}
+                      setComputingModalVisible={this.setComputingModalVisible}
+                      setPrivacyOption={this.setPrivacyOption}
+                      setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                      setSendPageState={this.setSendPageState}
+                      setShieldingAmount={this.setShieldingAmount}
+                      setScrollToTop={this.setScrollToTop}
+                      scrollToTop={scrollToTop}
+                    />
                   </>
                 )}
               </Tab.Screen>
               {!readOnly &&
-                !(mode === ModeEnum.basic && totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0) && (
+                (mode === ModeEnum.advanced ||
+                  (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0)) && (
                   <Tab.Screen name={translate('loadedapp.send-menu') as string}>
+                    {() => (
+                      <>
+                        <Send
+                          setSendPageState={this.setSendPageState}
+                          sendTransaction={this.sendTransaction}
+                          clearToAddr={this.clearToAddr}
+                          setSendProgress={this.setSendProgress}
+                          toggleMenuDrawer={this.toggleMenuDrawer}
+                          syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                          poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                          setZecPrice={this.setZecPrice}
+                          setComputingModalVisible={this.setComputingModalVisible}
+                          setPrivacyOption={this.setPrivacyOption}
+                          setShieldingAmount={this.setShieldingAmount}
+                          setScrollToTop={this.setScrollToTop}
+                        />
+                      </>
+                    )}
+                  </Tab.Screen>
+                )}
+              <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
+                {() => (
+                  <>
+                    <Receive
+                      setUaAddress={this.setUaAddress}
+                      toggleMenuDrawer={this.toggleMenuDrawer}
+                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                      setPrivacyOption={this.setPrivacyOption}
+                      setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                    />
+                  </>
+                )}
+              </Tab.Screen>
+            </Tab.Navigator>
+          ) : (
+            <>
+              {valueTransfers === null || addresses === null || totalBalance === null ? (
+                <Loading backgroundColor={colors.background} spinColor={colors.primary} />
+              ) : (
+                <Tab.Navigator
+                  initialRouteName={translate('loadedapp.wallet-menu') as string}
+                  screenOptions={{
+                    tabBarStyle: {
+                      borderTopColor: colors.background,
+                      borderTopWidth: 0,
+                      height: 0,
+                    },
+                    headerShown: false,
+                  }}>
+                  <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
                     {() => (
                       <>
                         <Suspense
@@ -1971,92 +1925,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                               <Text>{translate('loading') as string}</Text>
                             </View>
                           }>
-                          {/*<Send
-                            setSendPageState={this.setSendPageState}
-                            sendTransaction={this.sendTransaction}
-                            clearToAddr={this.clearToAddr}
-                            setSendProgress={this.setSendProgress}
+                          <Receive
+                            setUaAddress={this.setUaAddress}
                             toggleMenuDrawer={this.toggleMenuDrawer}
                             syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                            poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                            setZecPrice={this.setZecPrice}
-                            setComputingModalVisible={this.setComputingModalVisible}
                             setPrivacyOption={this.setPrivacyOption}
-                            setPoolsToShieldSelectSapling={this.setPoolsToShieldSelectSapling}
-                            setPoolsToShieldSelectTransparent={this.setPoolsToShieldSelectTransparent}
-                          />*/}
-                          <Send
-                            setSendPageState={this.setSendPageState}
-                            sendTransaction={this.sendTransaction}
-                            clearToAddr={this.clearToAddr}
-                            setSendProgress={this.setSendProgress}
-                            toggleMenuDrawer={this.toggleMenuDrawer}
-                            syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                            poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                            setZecPrice={this.setZecPrice}
-                            setComputingModalVisible={this.setComputingModalVisible}
-                            setPrivacyOption={this.setPrivacyOption}
-                            setShieldingAmount={this.setShieldingAmount}
-                            setScrollToTop={this.setScrollToTop}
+                            setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                           />
                         </Suspense>
                       </>
                     )}
                   </Tab.Screen>
-                )}
-              <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
-                {() => (
-                  <>
-                    <Suspense
-                      fallback={
-                        <View>
-                          <Text>{translate('loading') as string}</Text>
-                        </View>
-                      }>
-                      <Receive
-                        setUaAddress={this.setUaAddress}
-                        toggleMenuDrawer={this.toggleMenuDrawer}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        setPrivacyOption={this.setPrivacyOption}
-                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                      />
-                    </Suspense>
-                  </>
-                )}
-              </Tab.Screen>
-            </Tab.Navigator>
-          ) : (
-            <Tab.Navigator
-              initialRouteName={translate('loadedapp.wallet-menu') as string}
-              screenOptions={{
-                tabBarStyle: {
-                  borderTopColor: colors.background,
-                  borderTopWidth: 0,
-                  height: 0,
-                },
-                headerShown: false,
-              }}>
-              <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
-                {() => (
-                  <>
-                    <Suspense
-                      fallback={
-                        <View>
-                          <Text>{translate('loading') as string}</Text>
-                        </View>
-                      }>
-                      <Receive
-                        setUaAddress={this.setUaAddress}
-                        toggleMenuDrawer={this.toggleMenuDrawer}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        setPrivacyOption={this.setPrivacyOption}
-                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                      />
-                    </Suspense>
-                  </>
-                )}
-              </Tab.Screen>
-            </Tab.Navigator>
+                </Tab.Navigator>
+              )}
+            </>
           )}
         </SideMenu>
       </ContextAppLoadedProvider>

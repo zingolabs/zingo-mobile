@@ -1,7 +1,5 @@
 import { StackScreenProps } from '@react-navigation/stack';
 
-import TotalBalanceClass from './classes/TotalBalanceClass';
-
 import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
 import ZecPriceType from './types/ZecPriceType';
@@ -23,7 +21,6 @@ export default interface AppContextLoading {
   navigation: StackScreenProps<any>['navigation'];
   netInfo: NetInfoType;
   wallet: WalletType;
-  totalBalance: TotalBalanceClass;
   info: InfoType;
   zecPrice: ZecPriceType;
   background: BackgroundType;

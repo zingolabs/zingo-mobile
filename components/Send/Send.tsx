@@ -34,6 +34,7 @@ import {
   ChainNameEnum,
   ButtonTypeEnum,
   GlobalConst,
+  AddressClass,
 } from '../../app/AppState';
 import { parseZcashURI, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
@@ -73,8 +74,6 @@ type SendProps = {
   setZecPrice: (p: number, d: number) => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setShieldingAmount: (value: number) => void;
-  //setPoolsToShieldSelectSapling: (v: boolean) => void;
-  //setPoolsToShieldSelectTransparent: (v: boolean) => void;
   setScrollToTop: (value: boolean) => void;
 };
 
@@ -90,8 +89,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   setZecPrice,
   setPrivacyOption,
   setShieldingAmount,
-  //setPoolsToShieldSelectSapling,
-  //setPoolsToShieldSelectTransparent,
   setScrollToTop,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -180,10 +177,10 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const defaultValuesSpendableMaxAmount = useCallback((): void => {
-    setSpendable(totalBalance.spendableOrchard + totalBalance.spendablePrivate);
+    setSpendable(totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0);
     const max =
-      totalBalance.spendableOrchard +
-      totalBalance.spendablePrivate -
+      (totalBalance ? totalBalance.spendableOrchard : 0) +
+      (totalBalance ? totalBalance.spendablePrivate : 0) -
       (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
         ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
         : 0);
@@ -197,7 +194,15 @@ const Send: React.FunctionComponent<SendProps> = ({
       setNegativeMaxAmount(true);
     }
     setSpendableBalanceLastError('');
-  }, [donation, donationAddress, server.chainName, totalBalance.spendableOrchard, totalBalance.spendablePrivate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    donation,
+    donationAddress,
+    server.chainName,
+    totalBalance,
+    totalBalance?.spendableOrchard,
+    totalBalance?.spendablePrivate,
+  ]);
 
   const calculateFeeWithPropose = useCallback(
     async (
@@ -230,7 +235,13 @@ const Send: React.FunctionComponent<SendProps> = ({
         sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemo;
         sendPageStateCalculateFee.toaddr.amount = amount;
 
-        sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, uaAddress, addresses, server, donation);
+        sendJson = await Utils.getSendManyJSON(
+          sendPageStateCalculateFee,
+          uaAddress,
+          addresses ? addresses : ([] as AddressClass[]),
+          server,
+          donation,
+        );
         console.log('SEND', sendJson);
       }
 
@@ -308,7 +319,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         return;
       }
       // spendable
-      let spendableBalance = totalBalance.spendableOrchard + totalBalance.spendablePrivate;
+      let spendableBalance = totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0;
       let zenniesForZingo = donationAddress ? false : donation;
       const spendableBalanceJSON = { address, zennies_for_zingo: zenniesForZingo };
       console.log('SPENDABLEBALANCE', spendableBalanceJSON);
@@ -363,15 +374,15 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
       //setSendAllClick(false);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       defaultValuesSpendableMaxAmount,
       donation,
       donationAddress,
-      totalBalance.spendableOrchard,
-      totalBalance.spendablePrivate,
+      totalBalance,
+      totalBalance?.spendableOrchard,
+      totalBalance?.spendablePrivate,
       validAddress,
-      //sendAllClick,
-      //updateToField,
     ],
   );
 
@@ -464,8 +475,8 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     const stillConf =
-      totalBalance.orchardBal !== totalBalance.spendableOrchard ||
-      totalBalance.privateBal !== totalBalance.spendablePrivate ||
+      (totalBalance ? totalBalance.orchardBal : 0) !== (totalBalance ? totalBalance.spendableOrchard : 0) ||
+      (totalBalance ? totalBalance.privateBal : 0) !== (totalBalance ? totalBalance.spendablePrivate : 0) ||
       somePending;
     const showShield = (somePending ? 0 : shieldingAmount) > 0;
     //const showUpgrade =
@@ -475,10 +486,11 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [
     shieldingAmount,
     somePending,
-    totalBalance.orchardBal,
-    totalBalance.privateBal,
-    totalBalance.spendableOrchard,
-    totalBalance.spendablePrivate,
+    totalBalance,
+    totalBalance?.orchardBal,
+    totalBalance?.privateBal,
+    totalBalance?.spendableOrchard,
+    totalBalance?.spendablePrivate,
   ]);
 
   useEffect(() => {
@@ -917,8 +929,6 @@ const Send: React.FunctionComponent<SendProps> = ({
             setComputingModalVisible={setComputingModalVisible}
             setBackgroundError={setBackgroundError}
             setPrivacyOption={setPrivacyOption}
-            //setPoolsToShieldSelectSapling={setPoolsToShieldSelectSapling}
-            //setPoolsToShieldSelectTransparent={setPoolsToShieldSelectTransparent}
             addLastSnackbar={addLastSnackbar}
             setShieldingAmount={setShieldingAmount}
             setScrollToTop={setScrollToTop}

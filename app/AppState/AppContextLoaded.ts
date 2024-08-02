@@ -31,14 +31,14 @@ export default interface AppContextLoaded {
   netInfo: NetInfoType;
 
   // The total confirmed and pending balance in this wallet
-  totalBalance: TotalBalanceClass;
+  totalBalance: TotalBalanceClass | null;
 
   // List of all addresses in the wallet, including change addresses and addresses
   // that don't have any balance or are unused
-  addresses: AddressClass[];
+  addresses: AddressClass[] | null;
 
   // List of all T and Z and O value transfers
-  valueTransfers: ValueTransferType[];
+  valueTransfers: ValueTransferType[] | null;
 
   // The state of the send page
   sendPageState: SendPageStateClass;
