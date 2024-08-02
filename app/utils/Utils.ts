@@ -107,6 +107,7 @@ export default class Utils {
     return Utils.nextToAddrID++;
   }
 
+  // DONATION TO ZINGOLABS
   static async getDonationAddress(chainName: ChainNameEnum): Promise<string> {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
@@ -117,14 +118,52 @@ export default class Utils {
     return '';
   }
 
-  static getDefaultDonationAmount(): string {
+  static getDonationAmount(): string {
     const { decimalSeparator } = getNumberFormatSettings();
 
     return '0' + decimalSeparator + '01';
   }
 
-  static getDefaultDonationMemo(translate: (key: string) => TranslateType): string {
+  static getDonationMemo(translate: (key: string) => TranslateType): string {
     return translate('donation') as string;
+  }
+
+  // ZENNIES FOR ZINGO
+  static async getZenniesDonationAddress(chainName: ChainNameEnum): Promise<string> {
+    // donations only for mainnet.
+    if (chainName === ChainNameEnum.mainChainName) {
+      // UA -> we need a fresh one.
+      const ua: string = await RPCModule.getZenniesDonationAddress();
+      return ua;
+    }
+    return '';
+  }
+
+  static getZenniesDonationAmount(): string {
+    const { decimalSeparator } = getNumberFormatSettings();
+
+    return '0' + decimalSeparator + '01';
+  }
+
+  // NYM
+  static async getNymDonationAddress(chainName: ChainNameEnum): Promise<string> {
+    // donations only for mainnet.
+    if (chainName === ChainNameEnum.mainChainName) {
+      // UA -> we need a fresh one.
+      const ua: string = await RPCModule.getDonationAddress();
+      return ua;
+    }
+    return '';
+  }
+
+  static getNymDonationAmount(): string {
+    const { decimalSeparator } = getNumberFormatSettings();
+
+    return '0' + decimalSeparator + '01';
+  }
+
+  static getNymDonationMemo(translate: (key: string) => TranslateType): string {
+    return translate('nym-donation') as string;
   }
 
   static utf16Split(s: string, chunksize: number): string[] {
@@ -198,7 +237,6 @@ export default class Utils {
     addresses: AddressClass[],
     server: ServerType,
     donation: boolean,
-    translate: (key: string) => TranslateType,
   ): Promise<SendJsonToTypeType[]> {
     let donationAddress: boolean = false;
     const json: Promise<SendJsonToTypeType[][]> = Promise.all(
@@ -206,7 +244,10 @@ export default class Utils {
         const memo = `${to.memo || ''}${to.includeUAMemo ? '\nReply to: \n' + uaAddress : ''}`;
         const amount = parseInt((Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(0), 10);
 
-        donationAddress = to.to === (await Utils.getDonationAddress(server.chainName));
+        donationAddress =
+          to.to === (await Utils.getDonationAddress(server.chainName)) ||
+          to.to === (await Utils.getZenniesDonationAddress(server.chainName)) ||
+          to.to === (await Utils.getNymDonationAddress(server.chainName));
 
         if (memo === '') {
           return [{ address: to.to, amount } as SendJsonToTypeType];
@@ -240,16 +281,16 @@ export default class Utils {
     const donationTransaction: SendJsonToTypeType[] = [];
 
     // we need to exclude 2 use cases:
-    // 1. send to self (make no sense to do a donation here)
-    // 2. send to donation UA (make no sense to do a double donation)
+    // 2. send to one of our donation UA's
+    // (make no sense to do a double donation)
     if (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress) {
       donationTransaction.push({
-        address: await Utils.getDonationAddress(server.chainName),
+        address: await Utils.getZenniesDonationAddress(server.chainName),
         amount: parseInt(
-          (Utils.parseStringLocaleToNumberFloat(Utils.getDefaultDonationAmount()) * 10 ** 8).toFixed(0),
+          (Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount()) * 10 ** 8).toFixed(0),
           10,
         ),
-        memo: Utils.getDefaultDonationMemo(translate) + '\n' + translate('settings.donation-title'),
+        memo: '', // zancas decision to not leak info with no reason.
       });
     }
 

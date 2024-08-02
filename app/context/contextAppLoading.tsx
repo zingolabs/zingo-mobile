@@ -4,7 +4,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 import {
   AppContextLoading,
   InfoType,
-  TotalBalanceClass,
   WalletType,
   ZecPriceType,
   BackgroundType,
@@ -23,7 +22,6 @@ export const defaultAppContextLoading: AppContextLoading = {
   navigation: {} as StackScreenProps<any>['navigation'],
   netInfo: {} as NetInfoType,
   wallet: {} as WalletType,
-  totalBalance: new TotalBalanceClass(),
   info: {} as InfoType,
   server: {} as ServerType,
   currency: CurrencyEnum.noCurrency,
