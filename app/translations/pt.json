@@ -526,7 +526,8 @@
     "contactcopied": "Contato copiado para a Área de Transparência",
     "address-http": "Zingo não tem ideia de quem lhe enviou este Endereço! Você deve autenticar o Remetente.",
     "address-https": "Endereço Zingo-Authenticated",
-    "type": "Tipo"
+    "type": "Tipo",
+    "not-confirmed": "Transação ainda não confirmada"
   },
   "report": {
     "title": "Relatório de Sincronização / Rescan",
