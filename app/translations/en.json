@@ -526,7 +526,8 @@
     "contactcopied": "Copied Contact to Clipboard",
     "address-http": "Zingo has no idea who sent you this Address! It's entirely up to you to authenticate the Sender.",
     "address-https": "Zingo-Authenticated Address",
-    "type": "Type"
+    "type": "Type",
+    "not-confirmed": "Transaction not yet confirmed"
   },
   "report": {
     "title": "Sync / Rescan Report",
