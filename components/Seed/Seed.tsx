@@ -365,6 +365,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
             }
           }}
         />
+        {times > 0 && (
+          <Button
+            type={ButtonTypeEnum.Secondary}
+            title={translate('cancel') as string}
+            style={{ marginLeft: 10 }}
+            onPress={onClickCancel}
+          />
+        )}
       </View>
     </SafeAreaView>
   );
