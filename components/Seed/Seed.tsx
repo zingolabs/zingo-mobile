@@ -47,8 +47,15 @@ type SeedProps = {
   onClickCancel: () => void;
   action: SeedActionEnum;
   setPrivacyOption: (value: boolean) => Promise<void>;
+  keepAwake?: (v: boolean) => void;
 };
-const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, action, setPrivacyOption }) => {
+const Seed: React.FunctionComponent<SeedProps> = ({
+  onClickOK,
+  onClickCancel,
+  action,
+  setPrivacyOption,
+  keepAwake,
+}) => {
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
   let wallet: WalletType,
@@ -92,9 +99,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
 
   useEffect(() => {
     (async () => {
-      setBasicFirstViewSeed((await SettingsFileImpl.readSettings()).basicFirstViewSeed);
+      const bfvs: boolean = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
+      setBasicFirstViewSeed(bfvs);
+      if (!bfvs && keepAwake) {
+        // keep the screen awake while the user is writting the seed
+        keepAwake(true);
+      }
     })();
-  }, []);
+  }, [keepAwake]);
 
   useEffect(() => {
     if (privacy) {
@@ -327,8 +339,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               return;
             }
             // the user just see the seed for the first time.
-            if (mode === ModeEnum.basic && !basicFirstViewSeed) {
+            if (mode === ModeEnum.basic && !basicFirstViewSeed && keepAwake) {
               await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
+              keepAwake(false);
             }
             if (times === 0) {
               onClickOK(seedPhrase, Number(birthdayNumber));
