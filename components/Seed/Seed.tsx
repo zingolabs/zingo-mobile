@@ -1,9 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext } from 'react';
-import { View, SafeAreaView, ScrollView, TouchableOpacity, Text, Keyboard, Alert } from 'react-native';
+import { View, SafeAreaView, ScrollView, TouchableOpacity, Text, Alert } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-community/clipboard';
-import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
@@ -87,12 +86,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   const [birthdayNumber, setBirthdayNumber] = useState<string>('');
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
-  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
   const [expandSeed, setExpandSeed] = useState<boolean>(false);
   const [expandBirthday, setExpandBithday] = useState<boolean>(false);
   const [basicFirstViewSeed, setBasicFirstViewSeed] = useState<boolean>(true);
-
-  const slideAnim = useSharedValue(0);
 
   useEffect(() => {
     (async () => {
@@ -136,20 +132,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
     setBirthdayNumber((wallet.birthday && wallet.birthday.toString()) || '');
   }, [action, wallet.seed, wallet.birthday, wallet, translate]);
 
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      slideAnim.value = withTiming(0 - titleViewHeight + 25, { duration: 100, easing: Easing.linear });
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
-    });
-
-    return () => {
-      !!keyboardDidShowListener && keyboardDidShowListener.remove();
-      !!keyboardDidHideListener && keyboardDidHideListener.remove();
-    };
-  }, [slideAnim, titleViewHeight]);
-
   // because this screen is fired from more places than the menu.
   useEffect(() => {
     if (action !== SeedActionEnum.new) {
@@ -187,7 +169,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
   //console.log('=================================');
   //console.log(wallet.seed, wallet.birthday);
   //console.log(seedPhrase, birthdayNumber);
-  //console.log(latestBlock);
 
   return (
     <SafeAreaView
@@ -198,26 +179,18 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Animated.View style={{ marginTop: slideAnim }}>
-        <View
-          onLayout={e => {
-            const { height } = e.nativeEvent.layout;
-            setTitleViewHeight(height);
-          }}>
-          <Header
-            title={translate('seed.title') + ' (' + translate(`seed.${action}`) + ')'}
-            noBalance={true}
-            noSyncingStatus={true}
-            noDrawMenu={true}
-            setPrivacyOption={setPrivacyOption}
-            translate={translate}
-            netInfo={netInfo}
-            mode={mode}
-            addLastSnackbar={addLastSnackbar}
-            receivedLegend={action === SeedActionEnum.view ? !basicFirstViewSeed : false}
-          />
-        </View>
-      </Animated.View>
+      <Header
+        title={translate('seed.title') + ' (' + translate(`seed.${action}`) + ')'}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        setPrivacyOption={setPrivacyOption}
+        translate={translate}
+        netInfo={netInfo}
+        mode={mode}
+        addLastSnackbar={addLastSnackbar}
+        receivedLegend={action === SeedActionEnum.view ? !basicFirstViewSeed : false}
+      />
 
       <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
 
@@ -358,7 +331,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({ onClickOK, onClickCancel, ac
               await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
             }
             if (times === 0) {
-              Keyboard.dismiss();
               onClickOK(seedPhrase, Number(birthdayNumber));
             } else if (times === 1) {
               onPressOK();
