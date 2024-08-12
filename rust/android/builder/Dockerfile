@@ -1,6 +1,6 @@
 FROM debian:bullseye-slim
-ARG android_ndk_ver=r26d
-# "26.3.11579264"
+ARG android_ndk_ver=r23c
+# "23.2.8568313"
 
 # Install dependencies
 RUN apt update \
