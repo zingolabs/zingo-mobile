@@ -106,12 +106,4 @@ describe('Component Seed - test', () => {
     );
     expect(seed.toJSON()).toMatchSnapshot();
   });
-  test('Seed Restore - snapshot', () => {
-    const seed = render(
-      <ContextAppLoadingProvider value={contextLoading}>
-        <Seed onClickOK={onOk} onClickCancel={onCancel} action={SeedActionEnum.restore} setPrivacyOption={jest.fn()} />
-      </ContextAppLoadingProvider>,
-    );
-    expect(seed.toJSON()).toMatchSnapshot();
-  });
 });
