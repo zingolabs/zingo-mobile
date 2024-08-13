@@ -75,6 +75,7 @@ import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
 import { RestoreFromTypeEnum } from '../AppState';
+import { createUpdateWalletKeys } from '../WalletKeysSave';
 
 // no lazy load because slowing down screens.
 import BoldText from '../../components/Components/BoldText';
@@ -483,6 +484,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 //console.log(walletKindStr);
                 try {
                   const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
+                  // if the seed & birthday are not stored in Keychain/Keystore, do it now.
+                  if (walletKindJSON.kind === RPCWalletKindEnum.Seeded) {
+                    const wallet: WalletType = await RPC.rpcFetchWallet(
+                      walletKindJSON.kind === RPCWalletKindEnum.Seeded ? false : true,
+                    );
+                    await createUpdateWalletKeys(wallet, this.props.translate);
+                  }
                   this.setState({
                     readOnly: walletKindJSON.kind === RPCWalletKindEnum.Seeded ? false : true,
                     actionButtonsDisabled: false,
@@ -771,9 +779,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chainName);
 
       if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
-        let wallet = {} as WalletType;
+        let seedJSON = {} as RPCSeedType;
         try {
-          wallet = JSON.parse(seed);
+          seedJSON = JSON.parse(seed);
         } catch (e) {
           this.setState({ actionButtonsDisabled: false });
           createAlert(
@@ -784,8 +792,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           );
           return;
         }
+        const wallet: WalletType = { seed: seedJSON.seed, birthday: seedJSON.birthday || 0 };
         // default values for wallet options
         this.setWalletOption(WalletOptionEnum.downloadMemos, DownloadMemosEnum.walletMemos);
+        // storing the seed & birthday in KeyChain/KeyStore
+        await createUpdateWalletKeys(wallet, this.props.translate);
         // basic mode -> same screen.
         this.setState(state => ({
           wallet,
@@ -847,6 +858,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         type = RestoreFromTypeEnum.ufvkRestoreFrom;
       }
 
+      let wallet: WalletType;
       let result: string;
       if (type === RestoreFromTypeEnum.seedRestoreFrom) {
         result = await RPCModule.restoreWalletFromSeed(
@@ -855,6 +867,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.state.server.uri,
           this.state.server.chainName,
         );
+        wallet = { seed: seedUfvk.toLowerCase(), birthday: Number(walletBirthday) };
       } else {
         result = await RPCModule.restoreWalletFromUfvk(
           seedUfvk.toLowerCase(),
@@ -862,6 +875,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.state.server.uri,
           this.state.server.chainName,
         );
+        wallet = {} as WalletType;
       }
 
       //console.log(seedUfvk);
@@ -872,6 +886,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           // here result can have an `error` field for watch-only which is actually OK.
           const resultJson: RPCSeedType = await JSON.parse(result);
           if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
+            // storing the seed/ufvk & birthday in KeyChain/KeyStore
+            if (wallet.seed) {
+              await createUpdateWalletKeys(wallet, this.props.translate);
+            }
             this.setState({
               actionButtonsDisabled: false,
               readOnly: type === RestoreFromTypeEnum.seedRestoreFrom ? false : true,
