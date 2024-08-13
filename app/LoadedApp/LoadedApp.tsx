@@ -1599,6 +1599,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       security: this.state.security,
       selectServer: this.state.selectServer,
       rescanMenu: this.state.rescanMenu,
+      recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
     };
 
     const menu = <Menu onItemSelected={this.onMenuItemSelected} updateMenuState={this.updateMenuState} />;

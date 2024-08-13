@@ -91,6 +91,7 @@ export default interface AppContextLoaded {
   security: SecurityType;
   selectServer: SelectServerEnum;
   rescanMenu: boolean;
+  recoveryWalletInfoOnDevice: boolean;
 
   // snackbar queue
   snackbars: SnackbarType[];
