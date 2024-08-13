@@ -18,6 +18,7 @@
   "close": "Cerrar",
   "cancel": "Cancelar",
   "save": "Guardar",
+  "copy": "Copiar",
   "confirm": "Confirmar",
   "menudrawer-acc": "Abrir Menú Lateral",
   "menu-acc": "Abrir Menú",
@@ -87,7 +88,8 @@
     "serverfirsttry": "Intentando realizar la acción con un servidor diferente. El servidor actual puede estar fallando.",
     "serversecondtry": "No parece haber ningún problema con el servidor. Ocurre algo diferente.",
     "alert-donation-title": "APOYAR A ZINGOLABS",
-    "alert-donation-body": "¿Quieres ayudar a ZingoLabs a que Zcash sea más útil? Opta por dar una propina de un Zenny (0.01 ZEC) a ZingoLabs con cada transacción! Si es así, presione confirmar, de lo contrario presione Cancelar."
+    "alert-donation-body": "¿Quieres ayudar a ZingoLabs a que Zcash sea más útil? Opta por dar una propina de un Zenny (0.01 ZEC) a ZingoLabs con cada transacción! Si es así, presione confirmar, de lo contrario presione Cancelar.",
+    "recoverseed": "Recuperar la última semilla usada en este dispositivo"
   },
   "loadedapp": {
     "about": "Sobre Zingo",
@@ -314,7 +316,8 @@
     "netherlands": "Paises Bajos",
     "uk": "Reino Unido",
     "select-placeholder": "Elige un Servidor...",
-    "value-language-ru": "Ruso"
+    "value-language-ru": "Ruso",
+    "walletkeyssaved": "La Semilla del Monedero almacenada de forma segura en el dispositivo."
   },
   "info": {
     "version": "Versión",

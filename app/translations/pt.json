@@ -18,6 +18,7 @@
   "close": "Fechar",
   "cancel": "Cancelar",
   "save": "Salvar",
+  "copy": "Cópia de",
   "confirm": "Confirmar",
   "menudrawer-acc": "Abrir Menu Lateral",
   "menu-acc": "Abrir Menu",
@@ -87,7 +88,8 @@
     "serverfirsttry": "Tentando executar a ação com um servidor diferente. O servidor atual pode estar falhando.",
     "serversecondtry": "Não parece haver nenhum problema com o servidor. Algo mais está acontecendo.",
     "alert-donation-title": "APOIAR A ZINGOLABS",
-    "alert-donation-body": "Você quer ajudar o ZingoLabs a tornar o Zcash mais útil? Opte por dar uma gorjeta de um Zenny (0.01 ZEC) para ZingoLabs em cada transação! Se sim, pressione confirmar, caso contrário, pressione Cancelar."
+    "alert-donation-body": "Você quer ajudar o ZingoLabs a tornar o Zcash mais útil? Opte por dar uma gorjeta de um Zenny (0.01 ZEC) para ZingoLabs em cada transação! Se sim, pressione confirmar, caso contrário, pressione Cancelar.",
+    "recoverseed": "Recuperar a última Frases de Recuperação usada neste dispositivo"
   },
   "loadedapp": {
     "about": "Sobre a Zingo",
@@ -314,7 +316,8 @@
     "netherlands": "Holanda",
     "uk": "Reino Unido",
     "select-placeholder": "Escolha um Servidor...",
-    "value-language-ru": "Russo"
+    "value-language-ru": "Russo",
+    "walletkeyssaved" : "Chaves da Carteira armazenada com segurança no seu dispositivo."
   },
   "info": {
     "version": "Versão",

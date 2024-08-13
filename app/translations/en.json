@@ -18,6 +18,7 @@
   "close": "Close",
   "cancel": "Cancel",
   "save": "Save",
+  "copy": "Copy",
   "confirm": "Confirm",
   "menudrawer-acc": "Open Menu Drawer",
   "menu-acc": "Open Menu",
@@ -87,7 +88,8 @@
     "serverfirsttry": "Trying to perform the action with a different server. The current server may be failing.",
     "serversecondtry": "It doesn't seem to be a problem with the server. Someting else is happening.",
     "alert-donation-title": "TIP ZINGOLABS",
-    "alert-donation-body": "Do you want to help ZingoLabs make Zcash more useful? Opt in to tip one Zenny (0.01 ZEC) to ZingoLabs with each transaction! If so, press confirm, otherwise press Cancel."
+    "alert-donation-body": "Do you want to help ZingoLabs make Zcash more useful? Opt in to tip one Zenny (0.01 ZEC) to ZingoLabs with each transaction! If so, press confirm, otherwise press Cancel.",
+    "recoverseed": "Recover last Seed Phrase used in this device"
   },
   "loadedapp": {
     "about": "About Zingo",
@@ -314,7 +316,8 @@
     "netherlands": "Netherlands",
     "uk": "UK",
     "select-placeholder": "Choose a Server...",
-    "value-language-ru": "Russian"
+    "value-language-ru": "Russian",
+    "walletkeyssaved" : "Wallet Seed Phrase stored safely in the device."
   },
   "info": {
     "version": "Version",
