@@ -262,6 +262,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           translate(`history.shield-title-${pools}`) as string,
           `${translate(`history.shield-error-${pools}`)} ${shieldStr}`,
           true,
+          translate,
         );
       } else {
         try {
@@ -274,6 +275,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               translate(`history.shield-title-${pools}`) as string,
               `${translate(`history.shield-error-${pools}`)} ${shieldJSON.error}`,
               true,
+              translate,
             );
           } else if (shieldJSON.txids) {
             createAlert(
@@ -282,6 +284,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               translate(`history.shield-title-${pools}`) as string,
               `${translate(`history.shield-message-${pools}`)} ${shieldJSON.txids.join(', ')}`,
               true,
+              translate,
             );
           }
         } catch (e) {
@@ -291,6 +294,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             translate(`history.shield-title-${pools}`) as string,
             `${translate(`history.shield-message-${pools}`)} ${shieldStr}`,
             true,
+            translate,
           );
         }
       }

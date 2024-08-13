@@ -76,6 +76,7 @@ import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
+import { sendEmail } from '../sendEmail';
 import Snackbars from '../../components/Components/Snackbars';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
@@ -837,7 +838,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   this.state.info.currencyName;
                 title = this.state.translate('loadedapp.send-menu') as string;
               }
-              createAlert(this.setBackgroundError, this.addLastSnackbar, title, message, true);
+              createAlert(this.setBackgroundError, this.addLastSnackbar, title, message, true, this.state.translate);
             }
             // the ValueTransfer is gone -> Likely Reverted by the server
             if (vtNew.length === 0) {
@@ -847,6 +848,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 this.state.translate('loadedapp.send-menu') as string,
                 this.state.translate('loadedapp.valuetransfer-reverted') as string,
                 true,
+                this.state.translate,
               );
             }
           });
@@ -1095,25 +1097,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         initial: false,
       });
     } else if (item === MenuItemEnum.Support) {
-      this.sendEmail();
+      sendEmail(this.state.translate);
     }
-  };
-
-  sendEmail = () => {
-    const email: string = this.state.translate('email') as string;
-    const subject: string = this.state.translate('subject') as string;
-    const body: string = this.state.translate('body') as string;
-
-    const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-    Linking.openURL(url)
-      .then(() => {
-        console.log('Email client opened', url);
-      })
-      .catch((err: any) => {
-        console.error('Error opening email client:', err);
-        Alert.alert(this.state.translate('loadedapp.email-error') as string, JSON.stringify(err));
-      });
   };
 
   setWalletOption = async (walletOption: string, value: string): Promise<void> => {
@@ -1342,6 +1327,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.addLastSnackbar,
         this.state.translate('loadedapp.changingwallet-label') as string,
         resultStr,
+        false,
+        this.state.translate,
+        sendEmail,
       );
       return;
     }
@@ -1363,6 +1351,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.addLastSnackbar,
         this.state.translate('loadedapp.restoringwallet-label') as string,
         resultStr,
+        false,
+        this.state.translate,
+        sendEmail,
       );
       return;
     }
@@ -1413,6 +1404,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           this.addLastSnackbar,
           this.state.translate('loadedapp.changingwallet-label') as string,
           resultStr2,
+          false,
+          this.state.translate,
+          sendEmail,
         );
         //return;
       }

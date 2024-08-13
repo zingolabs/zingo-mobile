@@ -82,6 +82,7 @@ import Button from '../../components/Components/Button';
 import Seed from '../../components/Seed';
 import ImportUfvk from '../../components/Ufvk/ImportUfvk';
 import ChainTypeToggle from '../../components/Components/ChainTypeToggle';
+import { sendEmail } from '../sendEmail';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -689,7 +690,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     const workingServer = await this.checkServer(this.state.server);
     if (workingServer) {
       // the server is working -> this error is something not related with the server availability
-      createAlert(this.setBackgroundError, this.addLastSnackbar, title, result);
+      createAlert(this.setBackgroundError, this.addLastSnackbar, title, result, false, this.state.translate, sendEmail);
       this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
     } else {
       // let's change to another server
@@ -712,7 +713,15 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           });
           this.componentDidMount();
         } else {
-          createAlert(this.setBackgroundError, this.addLastSnackbar, title, result);
+          createAlert(
+            this.setBackgroundError,
+            this.addLastSnackbar,
+            title,
+            result,
+            false,
+            this.state.translate,
+            sendEmail,
+          );
           this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
         }
       } else {
@@ -722,7 +731,15 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           duration: SnackbarDurationEnum.longer,
         });
         setTimeout(() => {
-          createAlert(this.setBackgroundError, this.addLastSnackbar, title, result);
+          createAlert(
+            this.setBackgroundError,
+            this.addLastSnackbar,
+            title,
+            result,
+            false,
+            this.state.translate,
+            sendEmail,
+          );
           this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
         }, 1000);
       }
@@ -781,6 +798,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             this.addLastSnackbar,
             this.state.translate('loadingapp.creatingwallet-label') as string,
             seed,
+            false,
+            this.state.translate,
+            sendEmail,
           );
           return;
         }
@@ -810,6 +830,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         this.addLastSnackbar,
         this.state.translate('loadingapp.emptyseedufvk-label') as string,
         this.state.translate('loadingapp.emptyseedufvk-error') as string,
+        false,
+        this.state.translate,
+        sendEmail,
       );
       return;
     }
@@ -824,6 +847,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         this.addLastSnackbar,
         this.state.translate('loadingapp.invalidseedufvk-label') as string,
         this.state.translate('loadingapp.invalidseedufvk-error') as string,
+        false,
+        this.state.translate,
+        sendEmail,
       );
       return;
     }
