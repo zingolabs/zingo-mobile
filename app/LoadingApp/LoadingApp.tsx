@@ -15,6 +15,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native';
+import Clipboard from '@react-native-community/clipboard';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
@@ -74,7 +75,7 @@ import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
 import { RestoreFromTypeEnum } from '../AppState';
-import { createUpdateWalletKeys } from '../WalletKeysSave';
+import { createUpdateWalletKeys, getWalletKeys, hasWalletKeys } from '../WalletKeysSave';
 
 // no lazy load because slowing down screens.
 import BoldText from '../../components/Components/BoldText';
@@ -397,6 +398,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       serverErrorTries: 0,
       donationAlert: props.donationAlert,
       firstLaunchingMessage: props.firstLaunchingMessage,
+      hasWalletKeysStored: false,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -451,6 +453,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     }
 
     (async () => {
+      // has the device the Wallet Keys stored?
+      const has = await hasWalletKeys(this.props.translate);
+      this.setState({ hasWalletKeysStored: has });
+
       // First, if it's server automatic
       // here I need to check the servers and select the best one
       // likely only when the user install or update the new version with this feature.
@@ -518,7 +524,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                     readOnly: false,
                     actionButtonsDisabled: false,
                   });
-                  this.state.addLastSnackbar({ message: walletKindStr });
+                  this.addLastSnackbar({ message: walletKindStr });
                 }
                 this.navigateToLoadedApp();
                 //console.log('navigate to LoadedApp');
@@ -548,9 +554,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       } else {
         //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
         // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
+        // but first we need to check if exists some seed stored in the device from a prior installation
+        // of Zingo.
         if (this.state.mode === ModeEnum.basic) {
           // setting the prop basicFirstViewSeed to false.
           // this means when the user have funds, the seed screen will show up.
+          if (this.state.hasWalletKeysStored) {
+            this.recoverWalletKeys(false);
+          }
           await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, false);
           this.createNewWallet();
           this.setState({ actionButtonsDisabled: false });
@@ -1068,6 +1079,41 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.componentDidMount();
   };
 
+  recoverWalletKeys = async (security: boolean) => {
+    const resultBio = security ? await simpleBiometrics({ translate: this.props.translate }) : true;
+    // can be:
+    // - true      -> the user do pass the authentication
+    // - false     -> the user do NOT pass the authentication
+    // - undefined -> no biometric authentication available -> Passcode.
+    //console.log('BIOMETRIC --------> ', resultBio);
+    if (resultBio === false) {
+      // snack with Error & closing the menu.
+      this.addLastSnackbar({ message: this.props.translate('biometrics-error') as string });
+    } else {
+      // recover the wallet keys from the device
+      const wallet = await getWalletKeys(this.props.translate);
+      const txt = wallet.seed + '\n\n' + wallet.birthday;
+      Alert.alert(
+        this.props.translate('loadedapp.walletseed-basic') as string,
+        txt,
+        [
+          {
+            text: this.props.translate('copy') as string,
+            onPress: () => {
+              Clipboard.setString(txt);
+              this.addLastSnackbar({
+                message: this.props.translate('txtcopied') as string,
+                duration: SnackbarDurationEnum.short,
+              });
+            },
+          },
+          { text: this.props.translate('cancel') as string, style: 'cancel' },
+        ],
+        { cancelable: false, userInterfaceStyle: 'light' },
+      );
+    }
+  };
+
   render() {
     const {
       screen,
@@ -1084,6 +1130,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       firstLaunchingMessage,
       biometricsFailed,
       translate,
+      hasWalletKeysStored,
     } = this.state;
     const { colors } = this.props.theme;
 
@@ -1157,16 +1204,36 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                         customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
                         buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
-                        options={[translate('loadingapp.advancedmode'), translate('cancel')]}
-                        actions={[() => this.changeMode(ModeEnum.advanced)]}
+                        options={
+                          hasWalletKeysStored
+                            ? [
+                                translate('loadingapp.recoverseed'),
+                                translate('loadingapp.advancedmode'),
+                                translate('cancel'),
+                              ]
+                            : [translate('loadingapp.advancedmode'), translate('cancel')]
+                        }
+                        actions={
+                          hasWalletKeysStored
+                            ? [() => this.recoverWalletKeys(true), () => this.changeMode(ModeEnum.advanced)]
+                            : [() => this.changeMode(ModeEnum.advanced)]
+                        }
                       />
                     ) : (
                       <OptionsMenu
                         customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
                         buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
-                        options={[translate('loadingapp.custom'), translate('cancel')]}
-                        actions={[this.customServer]}
+                        options={
+                          hasWalletKeysStored
+                            ? [translate('loadingapp.recoverseed'), translate('loadingapp.custom'), translate('cancel')]
+                            : [translate('loadingapp.custom'), translate('cancel')]
+                        }
+                        actions={
+                          hasWalletKeysStored
+                            ? [() => this.recoverWalletKeys(true), this.customServer]
+                            : [this.customServer]
+                        }
                       />
                     )}
                   </>

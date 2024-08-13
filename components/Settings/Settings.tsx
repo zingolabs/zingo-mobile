@@ -908,7 +908,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         {!readOnly && walletKeysSaved && mode === ModeEnum.advanced && (
           <View style={{ display: 'flex' }}>
             <FadeText style={{ color: colors.primary, textAlign: 'center', marginBottom: 10, padding: 5 }}>
-              {'Wallet Seed & Birthday stored safely in the device.'}
+              {translate('settings.walletkeyssaved') as string}
             </FadeText>
           </View>
         )}
