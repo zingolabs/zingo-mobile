@@ -34,6 +34,7 @@ export default interface AppStateLoaded {
 
   // to do scroll to top in history
   scrollToTop: boolean;
+  recoveryWalletInfoOnDevice: boolean;
 
   // eslint-disable-next-line semi
 }

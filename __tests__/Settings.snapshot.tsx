@@ -60,6 +60,7 @@ describe('Component Settings - test', () => {
   state.language = LanguageEnum.en;
   state.sendAll = false;
   state.rescanMenu = false;
+  state.recoveryWalletInfoOnDevice = true;
   state.donation = false;
   state.walletSettings = mockWalletSettings;
   const onClose = jest.fn();
@@ -80,6 +81,7 @@ describe('Component Settings - test', () => {
           setSecurityOption={onSetOption}
           setSelectServerOption={onSetOption}
           setRescanMenuOption={onSetOption}
+          set_recoveryWalletInfoOnDevice_option={onSetOption}
         />
       </ContextAppLoadedProvider>,
     );

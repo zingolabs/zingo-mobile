@@ -84,6 +84,7 @@ describe('Component LoadedApp - test', () => {
     const currency = CurrencyEnum.noCurrency;
     const sendAll = false;
     const rescanMenu = false;
+    const recoveryWalletInfoOnDevice = true;
     const donation = false;
     const privacy = false;
     const mode = ModeEnum.basic;
@@ -110,6 +111,7 @@ describe('Component LoadedApp - test', () => {
         security={mockSecurity}
         selectServer={selectServer}
         rescanMenu={rescanMenu}
+        recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
       />,
     );
     expect(loadedapp.toJSON()).toMatchSnapshot();

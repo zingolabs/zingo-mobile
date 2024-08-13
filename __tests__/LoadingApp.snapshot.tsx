@@ -87,6 +87,7 @@ describe('Component LoadingApp - test', () => {
     const currency = CurrencyEnum.noCurrency;
     const sendAll = false;
     const rescanMenu = false;
+    const recoveryWalletInfoOnDevice = true;
     const donation = false;
     const privacy = false;
     const mode = ModeEnum.basic;
@@ -114,6 +115,7 @@ describe('Component LoadingApp - test', () => {
         selectServer={selectServer}
         donationAlert={donationAlert}
         rescanMenu={rescanMenu}
+        recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
       />,
     );
     expect(loadingapp.toJSON()).toMatchSnapshot();

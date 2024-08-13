@@ -246,6 +246,16 @@
         "text": "Desativar/ocultar a opção de menu para reescanear a carteira."
       }
     ],
+    "recoverywalletinfoondevices": [
+      {
+        "value": true,
+        "text": "Faça backup da carteira Seed/Birthday no dispositivo."
+      },
+      {
+        "value": false,
+        "text": "Não salve nada relacionado à carteira no dispositivo."
+      }
+    ],
     "nochanges": "Nenhuma alteração registrada.",
     "ismemo": "Você precisa escolher a opção MEMO para salvar.",
     "isthreshold": "Você precisa escolher a opção Limite para salvar.",
@@ -276,6 +286,7 @@
     "privacy-title": "Alterar entre Privacidade Alta ou Normal",
     "mode-title": "Alterar entre o modo Básico ou Avançado",
     "rescanmenu-title": "A OPÇÃO DE MENU RESCAN",
+    "recoverywalletinfoondevice-title": "Armazene informações de recuperação da carteira no dispositivo",
     "value-currency-": "Sem Saldo",
     "value-currency-USD": "US Dólares",
     "value-language-en": "Inglês",
@@ -296,6 +307,8 @@
     "value-chainname-regtest": "Regtest",
     "value-rescanmenu-true": "Habilitar",
     "value-rescanmenu-false": "Desabilitar",
+    "value-recoverywalletinfoondevice-true": "Habilitar",
+    "value-recoverywalletinfoondevice-false": "Desabilitar",
     "security-title": "APLICAR SEGURANÇA DO DISPOSITIVO PARA AS TELAS/OPÇÕES",
     "security-startapp": "Quando o App inicia",
     "security-foregroundapp": "Quando o aplicativo vai para o primeiro plano",
@@ -318,7 +331,7 @@
     "uk": "Reino Unido",
     "select-placeholder": "Escolha um Servidor...",
     "value-language-ru": "Russo",
-    "walletkeyssaved" : "Chaves da Carteira armazenada com segurança no seu dispositivo."
+    "walletkeyssaved" : "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo."
   },
   "info": {
     "version": "Versão",

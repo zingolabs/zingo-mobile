@@ -246,6 +246,16 @@
         "text": "Disable/Hide the menu option to rescan the wallet."
       }
     ],
+    "recoverywalletinfoondevices": [
+      {
+        "value": true,
+        "text": "Backup wallet Seed/Birthday to device."
+      },
+      {
+        "value": false,
+        "text": "Do not save anything related to the wallet on the device."
+      }
+    ],
     "nochanges": "No changes registered.",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
@@ -276,6 +286,7 @@
     "privacy-title": "Switch between High or Normal Privacy",
     "mode-title": "Switch between Basic or Advanced Mode",
     "rescanmenu-title": "THE RESCAN MENU OPTION",
+    "recoverywalletinfoondevice-title": "Store Wallet Recovery Info in the Device",
     "value-currency-": "No currency",
     "value-currency-USD": "US Dollar",
     "value-language-en": "English",
@@ -296,6 +307,8 @@
     "value-chainname-regtest": "Regtest",
     "value-rescanmenu-true": "Enable",
     "value-rescanmenu-false": "Disable",
+    "value-recoverywalletinfoondevice-true": "Enable",
+    "value-recoverywalletinfoondevice-false": "Disable",
     "security-title": "APPLY DEVICE SECURITY TO SCREENS/OPTIONS",
     "security-startapp": "When the App starts",
     "security-foregroundapp": "When the App go to the Foreground",
@@ -318,7 +331,7 @@
     "uk": "UK",
     "select-placeholder": "Choose a Server...",
     "value-language-ru": "Russian",
-    "walletkeyssaved" : "Wallet Seed Phrase stored safely in the device."
+    "walletkeyssaved" : "The last Wallet Recovery Info stored safely in the device."
   },
   "info": {
     "version": "Version",

@@ -2,7 +2,10 @@ import * as Keychain from 'react-native-keychain';
 import { TranslateType, WalletType } from './AppState';
 import { isEqual } from 'lodash';
 
-export const saveWalletKeys = async (keys: WalletType, translate: (key: string) => TranslateType): Promise<void> => {
+export const saveRecoveryWalletInfo = async (
+  keys: WalletType,
+  translate: (key: string) => TranslateType,
+): Promise<void> => {
   if (!keys.seed) {
     console.log('no seed to store');
     return;
@@ -17,7 +20,7 @@ export const saveWalletKeys = async (keys: WalletType, translate: (key: string) 
   }
 };
 
-export const getWalletKeys = async (translate: (key: string) => TranslateType): Promise<WalletType> => {
+export const getRecoveryWalletInfo = async (translate: (key: string) => TranslateType): Promise<WalletType> => {
   try {
     const credentials = await Keychain.getGenericPassword();
     if (credentials) {
@@ -38,8 +41,8 @@ export const getWalletKeys = async (translate: (key: string) => TranslateType): 
   return {} as WalletType;
 };
 
-export const hasWalletKeys = async (translate: (key: string) => TranslateType): Promise<boolean> => {
-  const keys: WalletType = await getWalletKeys(translate);
+export const hasRecoveryWalletInfo = async (translate: (key: string) => TranslateType): Promise<boolean> => {
+  const keys: WalletType = await getRecoveryWalletInfo(translate);
   if (keys.seed) {
     return true;
   } else {
@@ -47,21 +50,37 @@ export const hasWalletKeys = async (translate: (key: string) => TranslateType): 
   }
 };
 
-export const createUpdateWalletKeys = async (
+export const createUpdateRecoveryWalletInfo = async (
   keys: WalletType,
   translate: (key: string) => TranslateType,
 ): Promise<void> => {
-  if (await hasWalletKeys(translate)) {
+  if (await hasRecoveryWalletInfo(translate)) {
     // have Wallet Keys
-    const oldKeys: WalletType = await getWalletKeys(translate);
+    const oldKeys: WalletType = await getRecoveryWalletInfo(translate);
     if (!isEqual(keys, oldKeys)) {
       // if different update
       console.log('updating keys');
-      await saveWalletKeys(keys, translate);
+      await saveRecoveryWalletInfo(keys, translate);
     }
   } else {
     // have not Wallet Keys
     console.log('creating keys');
-    await saveWalletKeys(keys, translate);
+    await saveRecoveryWalletInfo(keys, translate);
+  }
+};
+
+export const removeRecoveryWalletInfo = async (translate: (key: string) => TranslateType): Promise<void> => {
+  if (await hasRecoveryWalletInfo(translate)) {
+    // have Wallet Keys
+    const removed: boolean = await Keychain.resetGenericPassword();
+    if (!removed) {
+      // error removing keys
+      console.log('error removing keys');
+    } else {
+      console.log('keys removed');
+    }
+  } else {
+    // have not Wallet Keys
+    console.log('no keys to remove');
   }
 };
