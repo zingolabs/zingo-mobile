@@ -74,6 +74,7 @@ import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
 import { RestoreFromTypeEnum } from '../AppState';
+import { createUpdateWalletKeys } from '../WalletKeysSave';
 
 // no lazy load because slowing down screens.
 import BoldText from '../../components/Components/BoldText';
@@ -83,6 +84,7 @@ import ImportUfvk from '../../components/Ufvk/ImportUfvk';
 import ChainTypeToggle from '../../components/Components/ChainTypeToggle';
 import { sendEmail } from '../sendEmail';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
+import { RPCAdressKindEnum } from '../rpc/enums/RPCAddressKindEnum';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -496,6 +498,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                   // 2. USK
                   // 3. UFVK - watch-only wallet
                   // 4. No keys - watch-only wallet (possibly an error)
+
+                  // if the seed & birthday are not stored in Keychain/Keystore, do it now.
+                  if (walletKindJSON.kind === RPCWalletKindEnum.LoadedFromSeedPhrase ||  walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedSpendingKey) {
+                    const wallet: WalletType = await RPC.rpcFetchWallet(false);
+                    await createUpdateWalletKeys(wallet, this.props.translate);
+                  }
                   this.setState({
                     readOnly:
                       walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
@@ -864,9 +872,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chainName);
 
       if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
-        let wallet = {} as WalletType;
+        let seedJSON = {} as RPCSeedType;
         try {
-          wallet = JSON.parse(seed);
+          seedJSON = JSON.parse(seed);
         } catch (e) {
           this.setState({ actionButtonsDisabled: false });
           createAlert(
@@ -881,8 +889,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           );
           return;
         }
+        const wallet: WalletType = { seed: seedJSON.seed, birthday: seedJSON.birthday || 0 };
         // default values for wallet options
         this.setWalletOption(WalletOptionEnum.downloadMemos, DownloadMemosEnum.walletMemos);
+        // storing the seed & birthday in KeyChain/KeyStore
+        await createUpdateWalletKeys(wallet, this.props.translate);
         // basic mode -> same screen.
         this.setState(state => ({
           wallet,
@@ -952,6 +963,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         type = RestoreFromTypeEnum.ufvkRestoreFrom;
       }
 
+      let wallet: WalletType;
       let result: string;
       if (type === RestoreFromTypeEnum.seedRestoreFrom) {
         result = await RPCModule.restoreWalletFromSeed(
@@ -960,6 +972,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.state.server.uri,
           this.state.server.chainName,
         );
+        wallet = { seed: seedUfvk.toLowerCase(), birthday: Number(walletBirthday) };
       } else {
         result = await RPCModule.restoreWalletFromUfvk(
           seedUfvk.toLowerCase(),
@@ -967,6 +980,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.state.server.uri,
           this.state.server.chainName,
         );
+        wallet = {} as WalletType;
       }
 
       //console.log(seedUfvk);
@@ -977,6 +991,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           // here result can have an `error` field for watch-only which is actually OK.
           const resultJson: RPCSeedType = await JSON.parse(result);
           if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
+            // storing the seed/ufvk & birthday in KeyChain/KeyStore
+            if (wallet.seed) {
+              await createUpdateWalletKeys(wallet, this.props.translate);
+            }
             this.setState({
               actionButtonsDisabled: false,
               readOnly: type === RestoreFromTypeEnum.seedRestoreFrom ? false : true,

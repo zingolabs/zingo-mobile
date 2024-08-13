@@ -318,7 +318,7 @@ export default class RPC {
         return {} as WalletType;
       }
     } else {
-      // seed & viewing key & birthday
+      // only seed & birthday
       try {
         const seedStr: string = await RPCModule.execute(CommandEnum.seed, '');
         if (seedStr) {
@@ -332,31 +332,12 @@ export default class RPC {
         }
         const RPCseed: RPCSeedType = await JSON.parse(seedStr);
 
-        const ufvkStr: string = await RPCModule.execute(CommandEnum.exportufvk, '');
-        if (ufvkStr) {
-          if (ufvkStr.toLowerCase().startsWith(GlobalConst.error)) {
-            console.log(`Error ufvk ${ufvkStr}`);
-            return {} as WalletType;
-          }
-        } else {
-          console.log('Internal Error ufvk');
-          return {} as WalletType;
-        }
-        const RPCufvk: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
-
         const wallet: WalletType = {} as WalletType;
         if (RPCseed.seed) {
           wallet.seed = RPCseed.seed;
         }
         if (RPCseed.birthday) {
           wallet.birthday = RPCseed.birthday;
-        }
-        if (RPCufvk.ufvk) {
-          wallet.ufvk = RPCufvk.ufvk;
-        }
-
-        if (RPCseed.birthday !== RPCufvk.birthday) {
-          console.log('seed birthday', RPCseed.birthday, 'ufvk birthday', RPCufvk.birthday);
         }
 
         return wallet;

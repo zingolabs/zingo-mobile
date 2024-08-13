@@ -37,6 +37,7 @@ import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import CheckBox from '@react-native-community/checkbox';
 import RNPickerSelect from 'react-native-picker-select';
+import { hasWalletKeys } from '../../app/WalletKeysSave';
 
 type SettingsProps = {
   closeModal: () => void;
@@ -177,8 +178,17 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [listIcon, setListIcon] = useState<IconDefinition>(farCircle);
   const [disabled, setDisabled] = useState<boolean>();
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
+  const [walletKeysSaved, setWalletKeysSaved] = useState<boolean>(false);
 
   const slideAnim = useSharedValue(0);
+
+  useEffect(() => {
+    (async () => {
+      if (await hasWalletKeys(translate)) {
+        setWalletKeysSaved(true);
+      }
+    })();
+  }, [translate]);
 
   useEffect(() => {
     if (selectServerContext === SelectServerEnum.auto) {
@@ -893,6 +903,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               )}
             </View>
           </>
+        )}
+
+        {!readOnly && walletKeysSaved && mode === ModeEnum.advanced && (
+          <View style={{ display: 'flex' }}>
+            <FadeText style={{ color: colors.primary, textAlign: 'center', marginBottom: 10, padding: 5 }}>
+              {'Wallet Seed & Birthday stored safely in the device.'}
+            </FadeText>
+          </View>
         )}
       </ScrollView>
       <View
