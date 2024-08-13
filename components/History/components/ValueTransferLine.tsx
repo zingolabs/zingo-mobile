@@ -160,6 +160,11 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   ? (translate('history.shield') as string)
                   : ''}
               </FadeText>
+              {vt.confirmations === 0 && (
+                <FadeText style={{ color: colors.syncing, fontSize: 12, opacity: 1, fontWeight: '900' }}>
+                  {('[ ' + translate('history.not-confirmed') + ' ]') as string}
+                </FadeText>
+              )}
               <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 <FadeText>{vt.time ? moment((vt.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
                 {haveMemo && (

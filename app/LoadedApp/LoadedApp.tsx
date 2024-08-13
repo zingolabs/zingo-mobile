@@ -1671,6 +1671,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 onClickCancel={() => this.setState({ seedViewModalVisible: false })}
                 action={SeedActionEnum.view}
                 setPrivacyOption={this.setPrivacyOption}
+                keepAwake={this.keepAwake}
               />
             </Suspense>
           </Modal>
