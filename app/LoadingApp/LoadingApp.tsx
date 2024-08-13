@@ -383,6 +383,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       security: props.security,
       selectServer: props.selectServer,
       rescanMenu: props.rescanMenu,
+      recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
 
       // state
       appStateStatus: AppState.currentState,
@@ -404,7 +405,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       serverErrorTries: 0,
       donationAlert: props.donationAlert,
       firstLaunchingMessage: props.firstLaunchingMessage,
-      recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
+      hasRecoveryWalletInfoSaved: false,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -1080,6 +1081,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       security: this.state.security,
       selectServer: this.state.selectServer,
       rescanMenu: this.state.rescanMenu,
+      recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
     };
 
     return (
