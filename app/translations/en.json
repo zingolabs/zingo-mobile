@@ -27,6 +27,9 @@
   "restarting": "Error connecting to the Server, the App will restart in a few seconds.",
   "change-privacy": "New privacy policy: ",
   "warning-binance": "WARNING: Binance is collecting and holding user funds without timely recourse. Do NOT deposit into Binance from this Wallet.",
+  "email": "zingo@zingolabs.org",
+  "subject": "Zingo Support...",
+  "body": "I need help with...",
   "addressbook": {
     "title": "Address Book",
     "end": "End",
@@ -108,6 +111,7 @@
     "addressbook": "Address Book",
     "tipzingolabs-basic": "Tip ZingoLabs",
     "votefornym": "Vote for Nym",
+    "support": "Zingo support email",
     "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
@@ -137,7 +141,8 @@
     "incoming-funds": "Incoming funds\n",
     "valuetransfer-confirmed": "Transaction confirmed\n",
     "payment-made": "Payment made\n",
-    "valuetransfer-reverted": "The transaction was reverted by the server, try again."
+    "valuetransfer-reverted": "The transaction was never confirmed by a validator.",
+    "email-error": "Error opening email client"
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",

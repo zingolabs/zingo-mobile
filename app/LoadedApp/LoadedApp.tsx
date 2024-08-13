@@ -1094,7 +1094,26 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         screen: this.state.translate('loadedapp.send-menu'),
         initial: false,
       });
+    } else if (item === MenuItemEnum.Support) {
+      this.sendEmail();
     }
+  };
+
+  sendEmail = () => {
+    const email: string = this.state.translate('email') as string;
+    const subject: string = this.state.translate('subject') as string;
+    const body: string = this.state.translate('body') as string;
+
+    const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    Linking.openURL(url)
+      .then(() => {
+        console.log('Email client opened', url);
+      })
+      .catch((err: any) => {
+        console.error('Error opening email client:', err);
+        Alert.alert(this.state.translate('loadedapp.email-error') as string, JSON.stringify(err));
+      });
   };
 
   setWalletOption = async (walletOption: string, value: string): Promise<void> => {

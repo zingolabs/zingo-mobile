@@ -177,6 +177,9 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
               {translate('loadedapp.votefornym') as string}
             </RegText>
           )}
+          <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.Support)} style={item}>
+            {translate('loadedapp.support') as string}
+          </RegText>
         </View>
       </ScrollView>
       <View
