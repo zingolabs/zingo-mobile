@@ -526,7 +526,8 @@
     "contactcopied": "Contacto copiado al portapapeles",
     "address-http": "¡Zingo no tiene idea de quién te envió esta dirección! Depende totalmente de ti autenticar al remitente.",
     "address-https": "Dirección autenticada por Zingo",
-    "type": "Tipo"
+    "type": "Tipo",
+    "not-confirmed": "Transacción no confirmada todavía"
   },
   "report": {
     "title": "Informe de Sincronización",
