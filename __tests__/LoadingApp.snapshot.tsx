@@ -78,6 +78,26 @@ jest.mock('react-native-fs', () => ({
   writeFile: jest.fn(() => Promise.resolve()), // o Promise.reject(new Error('Write failed'))
   // Agrega más funciones mockeadas según sea necesario
 }));
+jest.mock('react-native-keychain', () => ({
+  ACCESS_CONTROL: {
+    BIOMETRY_CURRENT_SET: 'biometryCurrentSet',
+  },
+  ACCESSIBLE: {
+    WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'whenUnlockedThisDeviceOnly',
+  },
+  AUTHENTICATION_TYPE: {
+    BIOMETRICS: 'biometrics',
+  },
+  SECURITY_LEVEL: {
+    SECURE_SOFTWARE: 'secureSoftware',
+  },
+  SECURITY_RULES: {
+    NONE: 'none',
+  },
+  setGenericPassword: jest.fn(),
+  getGenericPassword: jest.fn(),
+  resetGenericPassword: jest.fn(),
+}));
 
 // test suite
 describe('Component LoadingApp - test', () => {
