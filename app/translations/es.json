@@ -85,7 +85,7 @@
     "changeserver-basic": "Cambiar de Servidor y\nAbrir Monedero Activo",
     "alert-newwallet-title": "CREAR UN NUEVO MONEDERO",
     "alert-newwallet-body": "Puedes confirmar que realmente quieres crear un nuevo monedero y perder el acceso al monedero actual.",
-    "serverfirsttry": "Intentando realizar la acción con un servidor diferente. El servidor actual puede estar fallando.",
+    "serverfirsttry": "Se produjo un error al intentar conectarse al servidor activo, actualmente verificando los servidores en la lista.",
     "serversecondtry": "No parece haber ningún problema con el servidor. Ocurre algo diferente.",
     "alert-donation-title": "APOYAR A ZINGOLABS",
     "alert-donation-body": "¿Quieres ayudar a ZingoLabs a que Zcash sea más útil? Opta por dar una propina de un Zenny (0.01 ZEC) a ZingoLabs con cada transacción! Si es así, presione confirmar, de lo contrario presione Cancelar.",
