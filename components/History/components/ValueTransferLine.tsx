@@ -120,7 +120,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             />
           </View>
           <View style={{ display: 'flex' }}>
-            {!!vt.address && (
+            {!!vt.address && vt.confirmations > 0 && (
               <View>
                 <AddressItem address={vt.address} oneLine={true} closeModal={() => {}} openModal={() => {}} />
               </View>
@@ -128,8 +128,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             <View
               style={{
                 display: 'flex',
-                flexDirection: vt.kind === ValueTransferKindEnum.Sent ? 'row' : 'column',
-                alignItems: vt.kind === ValueTransferKindEnum.Sent ? 'center' : 'flex-start',
+                flexDirection: vt.kind === ValueTransferKindEnum.Sent && vt.confirmations > 0 ? 'row' : 'column',
+                alignItems: vt.kind === ValueTransferKindEnum.Sent && vt.confirmations > 0 ? 'center' : 'flex-start',
               }}>
               <FadeText
                 style={{
@@ -161,7 +161,14 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   : ''}
               </FadeText>
               {vt.confirmations === 0 && (
-                <FadeText style={{ color: colors.syncing, fontSize: 12, opacity: 1, fontWeight: '900' }}>
+                <FadeText
+                  style={{
+                    color: colors.syncing,
+                    fontSize: 12,
+                    opacity: 1,
+                    fontWeight: '900',
+                    marginLeft: 10,
+                  }}>
                   {('[ ' + translate('history.not-confirmed') + ' ]') as string}
                 </FadeText>
               )}
