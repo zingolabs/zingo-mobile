@@ -37,7 +37,7 @@ import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import CheckBox from '@react-native-community/checkbox';
 import RNPickerSelect from 'react-native-picker-select';
-import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfo';
+import { getStorageRecoveryWalletInfo, hasRecoveryWalletInfo } from '../../app/recoveryWalletInfo';
 
 type SettingsProps = {
   closeModal: () => void;
@@ -190,14 +190,16 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [listIcon, setListIcon] = useState<IconDefinition>(farCircle);
   const [disabled, setDisabled] = useState<boolean>();
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
-  const [recoveryWalletInfoSaved, setRecoveryWalletInfoSaved] = useState<boolean>(false);
+  const [hasRecoveryWalletInfoSaved, setHasRecoveryWalletInfoSaved] = useState<boolean>(false);
+  const [storageRecoveryWalletInfo, setStorageRecoveryWalletInfo] = useState<string>('');
 
   const slideAnim = useSharedValue(0);
 
   useEffect(() => {
     (async () => {
       if (await hasRecoveryWalletInfo()) {
-        setRecoveryWalletInfoSaved(true);
+        setHasRecoveryWalletInfoSaved(true);
+        setStorageRecoveryWalletInfo(await getStorageRecoveryWalletInfo());
       }
     })();
   }, [translate]);
@@ -933,10 +935,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               )}
             </View>
 
-            {recoveryWalletInfoSaved && (
+            {hasRecoveryWalletInfoSaved && (
               <View style={{ display: 'flex' }}>
                 <FadeText style={{ color: colors.primary, textAlign: 'center', marginVertical: 10, padding: 5 }}>
-                  {translate('settings.walletkeyssaved') as string}
+                  {(translate('settings.walletkeyssaved') as string) +
+                    (storageRecoveryWalletInfo ? ' [' + storageRecoveryWalletInfo + ']' : '')}
                 </FadeText>
               </View>
             )}

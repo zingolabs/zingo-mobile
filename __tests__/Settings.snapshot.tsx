@@ -62,6 +62,9 @@ jest.mock('react-native-keychain', () => ({
   SECURITY_RULES: {
     NONE: 'none',
   },
+  STORAGE_TYPE: {
+    AES: 'AES',
+  },
   setGenericPassword: jest.fn(),
   getGenericPassword: jest.fn(),
   resetGenericPassword: jest.fn(),
@@ -101,7 +104,7 @@ describe('Component Settings - test', () => {
           setSecurityOption={onSetOption}
           setSelectServerOption={onSetOption}
           setRescanMenuOption={onSetOption}
-          set_recoveryWalletInfoOnDevice_option={onSetOption}
+          setRecoveryWalletInfoOnDeviceOption={onSetOption}
         />
       </ContextAppLoadedProvider>,
     );

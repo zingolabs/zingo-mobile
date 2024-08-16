@@ -84,6 +84,9 @@ jest.mock('react-native-keychain', () => ({
   SECURITY_RULES: {
     NONE: 'none',
   },
+  STORAGE_TYPE: {
+    AES: 'AES',
+  },
   setGenericPassword: jest.fn(),
   getGenericPassword: jest.fn(),
   resetGenericPassword: jest.fn(),
