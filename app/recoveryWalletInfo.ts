@@ -2,15 +2,18 @@ import * as Keychain from 'react-native-keychain';
 import { GlobalConst, WalletType } from './AppState';
 import { isEqual } from 'lodash';
 
-const options = {
-  service: GlobalConst.serviceKeyChain,
-  accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET,
-  accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-  authenticationType: Keychain.AUTHENTICATION_TYPE.BIOMETRICS,
-  securityLevel: Keychain.SECURITY_LEVEL.SECURE_SOFTWARE,
-  rules: Keychain.SECURITY_RULES.NONE,
-  storage: Keychain.STORAGE_TYPE.AES,
-} as Keychain.Options;
+const options = (biometrics: Keychain.BIOMETRY_TYPE | null): Keychain.Options => {
+  return {
+    service: GlobalConst.serviceKeyChain,
+    accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE, // for both
+    accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY, // for both
+    authenticationType: Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS, // for both
+    rules: Keychain.SECURITY_RULES.NONE, // for both
+    securityLevel: Keychain.SECURITY_LEVEL.SECURE_HARDWARE, // for both
+    // with biometrics in the device -> RSA
+    storage: biometrics ? Keychain.STORAGE_TYPE.RSA : Keychain.STORAGE_TYPE.AES,
+  } as Keychain.Options;
+};
 
 export const saveRecoveryWalletInfo = async (keys: WalletType): Promise<void> => {
   if (!keys.seed) {
@@ -18,7 +21,11 @@ export const saveRecoveryWalletInfo = async (keys: WalletType): Promise<void> =>
     return;
   }
   try {
-    await Keychain.setGenericPassword(GlobalConst.keyKeyChain, JSON.stringify(keys), options);
+    await Keychain.setGenericPassword(
+      GlobalConst.keyKeyChain,
+      JSON.stringify(keys),
+      options(await Keychain.getSupportedBiometryType()),
+    );
     console.log('keys saved correctly');
     //console.log('key:', GlobalConst.keyKeyChain);
     //console.log('value:', keys);
@@ -37,11 +44,10 @@ export const saveRecoveryWalletInfo = async (keys: WalletType): Promise<void> =>
 
 export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
   try {
-    const credentials = await Keychain.getGenericPassword(options);
+    const credentials = await Keychain.getGenericPassword(options(await Keychain.getSupportedBiometryType()));
     if (credentials) {
       console.log('keys read correctly', credentials);
-      console.log(await Keychain.getSupportedBiometryType());
-      console.log(await Keychain.getSecurityLevel());
+      console.log('biometrics', await Keychain.getSupportedBiometryType());
       //console.log('key:', credentials.username);
       //console.log('value:', credentials.password);
       if (credentials.username === GlobalConst.keyKeyChain && credentials.service === GlobalConst.serviceKeyChain) {
@@ -60,7 +66,7 @@ export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
 
 export const getStorageRecoveryWalletInfo = async (): Promise<string> => {
   try {
-    const credentials = await Keychain.getGenericPassword(options);
+    const credentials = await Keychain.getGenericPassword(options(await Keychain.getSupportedBiometryType()));
     if (credentials) {
       console.log('keys read correctly', credentials);
       if (credentials.username === GlobalConst.keyKeyChain && credentials.service === GlobalConst.serviceKeyChain) {
@@ -106,7 +112,7 @@ export const createUpdateRecoveryWalletInfo = async (keys: WalletType): Promise<
 export const removeRecoveryWalletInfo = async (): Promise<void> => {
   if (await hasRecoveryWalletInfo()) {
     // have Wallet Keys
-    const removed: boolean = await Keychain.resetGenericPassword(options);
+    const removed: boolean = await Keychain.resetGenericPassword(options(await Keychain.getSupportedBiometryType()));
     if (!removed) {
       // error removing keys
       console.log('error removing keys');
