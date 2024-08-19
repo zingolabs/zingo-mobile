@@ -10,7 +10,8 @@ export const createAlert = async (
   error: string,
   toast: boolean,
   translate: (key: string) => TranslateType,
-  sendEmail?: (translate: (key: string) => TranslateType, s?: string, b?: string) => void,
+  sendEmail?: (translate: (key: string) => TranslateType, z: string, s?: string, b?: string) => void,
+  zingolibVersion?: string,
 ) => {
   const background = await AsyncStorage.getItem(GlobalConst.background);
   if (background === GlobalConst.yes) {
@@ -29,7 +30,7 @@ export const createAlert = async (
           [
             {
               text: translate('support') as string,
-              onPress: async () => sendEmail(translate, title, error),
+              onPress: async () => sendEmail(translate, zingolibVersion ? zingolibVersion : '', title, error),
             },
             { text: translate('cancel') as string, style: 'cancel' },
           ],

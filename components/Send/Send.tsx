@@ -821,6 +821,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             false,
             translate,
             sendEmail,
+            info.zingolib,
           );
         }, 1000);
         setComputingModalVisible(false);
@@ -1259,6 +1260,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                                   onPress: async () =>
                                     sendEmail(
                                       translate,
+                                      info.zingolib,
                                       translate('send.spendable') as string,
                                       spendableBalanceLastError,
                                     ),
@@ -1352,7 +1354,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                                     {
                                       text: translate('support') as string,
                                       onPress: async () =>
-                                        sendEmail(translate, translate('send.fee') as string, proposeSendLastError),
+                                        sendEmail(
+                                          translate,
+                                          info.zingolib,
+                                          translate('send.fee') as string,
+                                          proposeSendLastError,
+                                        ),
                                     },
                                     { text: translate('cancel') as string, style: 'cancel' },
                                   ],

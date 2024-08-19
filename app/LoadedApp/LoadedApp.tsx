@@ -1097,7 +1097,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         initial: false,
       });
     } else if (item === MenuItemEnum.Support) {
-      sendEmail(this.state.translate);
+      sendEmail(this.state.translate, this.state.info.zingolib);
     }
   };
 
@@ -1330,6 +1330,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         false,
         this.state.translate,
         sendEmail,
+        this.state.info.zingolib,
       );
       return;
     }
@@ -1354,6 +1355,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         false,
         this.state.translate,
         sendEmail,
+        this.state.info.zingolib,
       );
       return;
     }
@@ -1407,6 +1409,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           false,
           this.state.translate,
           sendEmail,
+          this.state.info.zingolib,
         );
         //return;
       }

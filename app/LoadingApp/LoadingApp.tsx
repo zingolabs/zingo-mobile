@@ -690,7 +690,16 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     const workingServer = await this.checkServer(this.state.server);
     if (workingServer) {
       // the server is working -> this error is something not related with the server availability
-      createAlert(this.setBackgroundError, this.addLastSnackbar, title, result, false, this.state.translate, sendEmail);
+      createAlert(
+        this.setBackgroundError,
+        this.addLastSnackbar,
+        title,
+        result,
+        false,
+        this.state.translate,
+        sendEmail,
+        this.state.info.zingolib,
+      );
       this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
     } else {
       // let's change to another server
@@ -721,6 +730,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             false,
             this.state.translate,
             sendEmail,
+            this.state.info.zingolib,
           );
           this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
         }
@@ -739,6 +749,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             false,
             this.state.translate,
             sendEmail,
+            this.state.info.zingolib,
           );
           this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
         }, 1000);
@@ -801,6 +812,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             false,
             this.state.translate,
             sendEmail,
+            this.state.info.zingolib,
           );
           return;
         }
@@ -833,6 +845,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         false,
         this.state.translate,
         sendEmail,
+        this.state.info.zingolib,
       );
       return;
     }
@@ -850,6 +863,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         false,
         this.state.translate,
         sendEmail,
+        this.state.info.zingolib,
       );
       return;
     }
