@@ -274,11 +274,11 @@ else
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
+    wait_for $timeout_seconds check_device_online
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
     echo -e "\nWaiting for AVD to boot..."
     wait_for $timeout_seconds check_boot
-    wait_for $timeout_seconds check_device_online
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Device online"
     sleep 1
