@@ -5,6 +5,8 @@
 
 - 🇬🇧 [English](../../README.md)  
   Comprehensive guide to using Zingo Mobile in English.
+- 🇩🇪 [Deutsch](./docs/de/readme-de.md)
+  Umfassender Leitfaden zur Verwendung von Zingo Mobile auf Deutsch.
 
 ## Apps Zingo para Android e iOS
 App Store: [https://apps.apple.com/app/zingo/id1668209531](https://apps.apple.com/app/zingo/id1668209531)  
