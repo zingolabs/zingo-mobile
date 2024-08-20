@@ -1,12 +1,14 @@
-# Zingo Mobile Documentation
+# Documentacion de Zingo Mobile
 
-## 🌍 Language Menu
-> Select your preferred language for documentation:
+## 🌍 Menu de idiomas
+> Seleccione su idioma preferido para la documentación:
 
 - 🇬🇧 [English](../../README.md)  
   Comprehensive guide to using Zingo Mobile in English.
-- 🇩🇪 [Deutsch](./docs/de/readme-de.md)
+- 🇩🇪 [Deutsch](../de/readme-de.md)
   Umfassender Leitfaden zur Verwendung von Zingo Mobile auf Deutsch.
+- 🇹🇷 [Türkçe](../tu/readme-tu.md)
+  Zingo Mobile'nin Türkçe kullanımı için kapsamlı kılavuz
 
 ## Apps Zingo para Android e iOS
 App Store: [https://apps.apple.com/app/zingo/id1668209531](https://apps.apple.com/app/zingo/id1668209531)  
