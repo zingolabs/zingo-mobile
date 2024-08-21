@@ -49,7 +49,7 @@ function wait_for() {
     fi
 }
 
-while getopts 'e:sx:h' OPTION; do
+while getopts 'a:e:sx:h' OPTION; do
     case "$OPTION" in
         a)
             abi="$OPTARG"
