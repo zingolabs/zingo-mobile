@@ -32,7 +32,6 @@ jobs:
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      abi: armeabi-v7a
 
   android-integration-test:
     uses: ./.github/workflows/android-integration-test.yaml
