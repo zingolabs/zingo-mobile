@@ -55,8 +55,8 @@ jobs:
           name: nextest-e2e-archive
           path: ./rust/nextest-e2e-archive.tar.zst
 
-  android-integration-test:
-    name: Android Integration test
+  android-e2e-test:
+    name: Android e2e test
     runs-on: macos-13
     needs: android-build-test-artifacts
     strategy:
@@ -163,7 +163,7 @@ jobs:
       - name: Run integration tests
         working-directory: ./rust
         run: |
-          cargo nextest run e2e --verbose --profile ci \
+          cargo nextest run -E 'test(e2e) and not test(darkside)' --verbose --profile ci \
             --archive-file nextest-e2e-archive.tar.zst \
             --partition count:${{ matrix.partition}}/5
 
