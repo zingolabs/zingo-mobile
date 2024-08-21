@@ -47,6 +47,7 @@ jobs:
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      abi: x86_64
 
   ios-build:
     uses: ./.github/workflows/ios-build.yaml
