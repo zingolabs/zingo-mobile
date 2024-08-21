@@ -324,6 +324,7 @@ mod e2e {
     }
 
     mod darkside {
+        const ABI: &str = "x86_64";
 
         #[tokio::test]
         async fn simple_sync() {
