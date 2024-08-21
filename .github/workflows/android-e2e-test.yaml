@@ -17,48 +17,9 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
-  android-build-test-artifacts:
-    name: Android Build test artifacts
-    runs-on: macos-13
-    steps:
-      - name: Set envs for zingolib CI
-        if: ${{ contains(github.repository, 'zingolib') }}
-        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
-
-      - name: Install protoc
-        run: brew install protobuf
-
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-
-      - name: Install nextest
-        uses: taiki-e/install-action@nextest
-
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust
-
-      - name: Build and archive tests
-        working-directory: ./rust
-        run: cargo nextest archive --verbose --features "ci regchest" --archive-file nextest-e2e-archive.tar.zst
-
-      - name: Upload archive
-        uses: actions/upload-artifact@v4
-        with:
-          name: nextest-e2e-archive
-          path: ./rust/nextest-e2e-archive.tar.zst
-
   android-e2e-test:
     name: Android e2e test
     runs-on: macos-13
-    needs: android-build-test-artifacts
     strategy:
       matrix:
         partition: [1, 2]
@@ -157,15 +118,15 @@ jobs:
       - name: Download archive
         uses: actions/download-artifact@v4
         with:
-          name: nextest-e2e-archive
+          name: nextest-archive
           path: ./rust
 
       - name: Run integration tests
         working-directory: ./rust
         run: |
           cargo nextest run -E 'test(e2e) and not test(darkside)' --verbose --profile ci \
-            --archive-file nextest-e2e-archive.tar.zst \
-            --partition count:${{ matrix.partition}}/5
+            --archive-file nextest-archive.tar.zst \
+            --partition count:${{ matrix.partition}}/2
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
