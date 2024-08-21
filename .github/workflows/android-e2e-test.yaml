@@ -1,0 +1,176 @@
+name: Android e2e test
+
+on:
+  workflow_call:
+    inputs:
+      timestamp:
+        required: true
+        type: string
+      cache-key:
+        required: true
+        type: string
+    
+env:
+  CACHE-KEY: ${{ inputs.cache-key }}
+  TIMESTAMP: ${{ inputs.timestamp }}
+  REPO-OWNER: ${{ github.repository_owner }}
+  RUSTFLAGS: -D warnings
+
+jobs:
+  android-build-test-artifacts:
+    name: Android Build test artifacts
+    runs-on: macos-13
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+
+      - name: Install protoc
+        run: brew install protobuf
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
+
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Build and archive tests
+        working-directory: ./rust
+        run: cargo nextest archive --verbose --features "ci regchest" --archive-file nextest-e2e-archive.tar.zst
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextest-e2e-archive
+          path: ./rust/nextest-e2e-archive.tar.zst
+
+  android-integration-test:
+    name: Android Integration test
+    runs-on: macos-13
+    needs: android-build-test-artifacts
+    strategy:
+      matrix:
+        partition: [1, 2]
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+            
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+        
+      - name: Setup Docker 1 try
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry1
+        continue-on-error: true
+        with:
+          lima: v0.18.0
+          colima: v0.5.6
+
+      - name: checking outcome 1
+        run: echo ${{ steps.dockerTry1.outcome }}
+
+      - name: Setup Docker 2 try
+        if: steps.dockerTry1.outcome != 'success'
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry2
+        continue-on-error: true
+        with:
+          lima: v0.18.0
+          colima: v0.5.6
+
+      - name: checking outcome 2
+        run: echo ${{ steps.dockerTry2.outcome }}
+
+      - name: Setup Docker Manually
+        if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
+        run: |
+          brew uninstall colima
+          brew tap colima/releases
+          brew install colima@0.5.6
+          brew install --formula docker
+          colima start
+
+      - name: Pull regchest docker image
+        run: docker pull zingodevops/regchest:007
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
+
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Native rust cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/src/main/jniLibs/x86_64
+          key: native-android-uniffi-x86_64-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      
+      - name: Add emulator to PATH
+        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
+            
+      - name: Gradle cache
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.2
+          build-root-directory: ./android
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
+      
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with: 
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-e2e-integ
+          
+      - name: Download archive
+        uses: actions/download-artifact@v4
+        with:
+          name: nextest-e2e-archive
+          path: ./rust
+
+      - name: Run integration tests
+        working-directory: ./rust
+        run: |
+          cargo nextest run e2e --verbose --profile ci \
+            --archive-file nextest-e2e-archive.tar.zst \
+            --partition count:${{ matrix.partition}}/5
+
+      - name: Upload test reports
+        if: ${{ ! cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-x86_64-${{ matrix.partition}}-${{ env.TIMESTAMP }}
+          path: android/app/build/outputs/integration_test_reports
+
