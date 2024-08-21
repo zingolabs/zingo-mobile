@@ -1,11 +1,10 @@
 const { log, device, by, element } = require('detox');
 
-import { loadTestWallet } from "./e2e-utils/loadTestWallet.js";
+import { loadRecipientWallet } from "./e2e-utils/loadRecipientWallet.js";
 
 describe('Renders wallet data correctly.', () => {
   // i just pulled this seed out of thin air
-  it('loads a wallet', loadTestWallet);
-  
+  it('loads a wallet', loadRecipientWallet);
   it('correctly renders the scanner', async () => {
     await element(by.text('SEND')).tap();
     
@@ -17,7 +16,7 @@ describe('Renders wallet data correctly.', () => {
   it('adds return address to the memo if that option is selected, and correctly renders confirm screen', async () => {
     
     await element(by.id('send.addressplaceholder')).replaceText(
-      'u1lx7nlnqqqs7p4hcqz4hyjgnw7h8zskcgr2f8dfhm96np0gnfdzu7jtms7q2pxd7ufy96wxzdsdy65jvp3td7fj2ltcz0jpak86ddyszl9ykn5s86q3xataya5867z3tj2x8cw0ljyrenymr2gcqmjf50gmexqj233yn3kdaxn2yukwcx87emurufakf82wapgnu5h3fvae6aw9uus2r',
+      'zregtestsapling1fkc26vpg566hgnx33n5uvgye4neuxt4358k68atnx78l5tg2dewdycesmr4m5pn56ffzsa7lyj6',
     );
     await element(by.id('send.amount')).replaceText('0');
     await element(by.id('send.checkboxUA')).tap();
@@ -32,7 +31,7 @@ describe('Renders wallet data correctly.', () => {
 
     await expect(memo).toBeVisible(100);
     await expect(memo).toHaveText(
-      '1\n2\n3\n4\n5\n6\n7\n8\nReply to: \nu1lx7nlnqqqs7p4hcqz4hyjgnw7h8zskcgr2f8dfhm96np0gnfdzu7jtms7q2pxd7ufy96wxzdsdy65jvp3td7fj2ltcz0jpak86ddyszl9ykn5s86q3xataya5867z3tj2x8cw0ljyrenymr2gcqmjf50gmexqj233yn3kdaxn2yukwcx87emurufakf82wapgnu5h3fvae6aw9uus2r',
+      '1\n2\n3\n4\n5\n6\n7\n8\nReply to: \nzregtestsapling1fkc26vpg566hgnx33n5uvgye4neuxt4358k68atnx78l5tg2dewdycesmr4m5pn56ffzsa7lyj6',
     );
   });
   

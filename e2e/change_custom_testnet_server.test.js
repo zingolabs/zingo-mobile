@@ -7,7 +7,6 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 describe('Change the Server.', () => {
   // i just pulled this seed out of thin air
   it('loads a wallet', loadTestWallet);
-  
   it('Go settings & change to a correct Testnet server URI.', async () => {
     // go to setting modal screen again
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);

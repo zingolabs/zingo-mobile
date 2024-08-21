@@ -7,8 +7,9 @@ import { loadRecipientWallet } from "./e2e-utils/loadRecipientWallet.js";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 describe('Maintains correct information while tx pending', () => {
+  it('loads the wallet', loadRecipientWallet);
   it('should send from orchard to sapling pool', async () => {
-    await loadRecipientWallet();
+    // wait for fully synced.
     await sleep(10000);
     await element(by.text('SEND')).tap();
     await element(by.id('send.addressplaceholder')).replaceText(
