@@ -81,7 +81,15 @@ if [[ $set_test_name == false ]]; then
 fi
 
 # Setup working directory
-cd $(git rev-parse --show-toplevel)
+# cd $(git rev-parse --show-toplevel)
+if [ ! -d "./android/app" ]; then
+    echo "Error: Incorrect working directory" >&2
+    echo "Try './scripts/$(basename $0)' from zingo-mobile root directory." >&2
+    exit 1
+fi
+
+echo -e "\nRemoving node_modules before yarn..."
+rm -rf ./node_modules
 
 echo -e "\nRunning yarn..."
 yarn
@@ -108,7 +116,7 @@ if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${device}"
 
     echo -e "\n\nWaiting for emulator to launch..."
-    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -gpu swiftshader_indirect -no-boot-anim \
+    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> /dev/null &
     wait_for $timeout_seconds check_launch
     wait_for $timeout_seconds check_device_online
@@ -125,20 +133,23 @@ if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
     ../scripts/kill_emulators.sh
 fi
 
+echo -e "\nCleaning before run tests..."
+./gradlew clean
+
 # Create integration test report directory
 test_report_dir="app/build/outputs/e2e_test_reports/${avd_name}"
 rm -rf "${test_report_dir}"
 mkdir -p "${test_report_dir}"
 
 echo -e "\n\nWaiting for emulator to launch..."
-nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -gpu swiftshader_indirect -no-boot-anim \
+nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
     -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
 wait_for $timeout_seconds check_launch
+wait_for $timeout_seconds check_device_online
 echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
 echo -e "\nWaiting for AVD to boot..."
 wait_for $timeout_seconds check_boot
-wait_for $timeout_seconds check_device_online
 echo $(adb -s emulator-5554 emu avd name | head -1)
 echo "Device online"
 sleep 1
@@ -188,6 +199,3 @@ echo -e "\nEnd-to-end tests PASSED"
 
 # Kill all emulators
 ../scripts/kill_emulators.sh
-
-killall node
-
