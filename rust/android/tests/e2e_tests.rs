@@ -275,6 +275,7 @@ async fn simple_sync(abi: &str) {
 }
 
 mod e2e {
+    use super::*;
     const ABI: &str = "x86_64";
 
     #[tokio::test]
