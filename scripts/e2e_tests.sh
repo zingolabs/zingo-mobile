@@ -1,11 +1,13 @@
 #!/bin/bash
 set -Eeuo pipefail
 
+set_abi=false
 set_test_name=false
+intel_host_os=true
 timeout_seconds=1800  # default timeout set to 30 minutes
-api_level="30"
-api_target="google_apis_playstore"
-arch="x86_64"
+#api_level="30"
+#api_target="google_apis_playstore"
+#arch="x86_64"
 device="pixel_7"
 
 function check_launch() {
@@ -49,6 +51,10 @@ function wait_for() {
 
 while getopts 'e:sx:h' OPTION; do
     case "$OPTION" in
+        a)
+            abi="$OPTARG"
+            set_abi=true
+            ;;
         e)
             test_name="$OPTARG"
             set_test_name=true
@@ -63,6 +69,12 @@ while getopts 'e:sx:h' OPTION; do
             ;;
         h)
             echo -e "\nRun end-to-end tests. Requires Android SDK Command-line Tools."
+            echo -e "\n  -a\t\tSelect ABI (required)"
+            echo -e "      \t\t  Options:"
+            echo -e "      \t\t  'x86_64' - default system image: API 30 google_apis_playstore x86_64"
+            echo -e "      \t\t  'x86' - default system image: API 30 google_apis_playstore x86"
+            echo -e "      \t\t  'arm64-v8a' - default system image: API 30 google_apis_playstore x86_64"
+            echo -e "      \t\t  'armeabi-v7a' - default system image: API 30 google_apis_playstore x86"
             echo -e "\n  -e\t\tSelect test name"
             echo -e "\n  -x\t\tSet timeout in seconds for emulator launch and AVD boot-up (optional)"
             echo -e "      \t\t  Default: 1800"
@@ -74,6 +86,56 @@ while getopts 'e:sx:h' OPTION; do
             ;;
     esac
 done
+if [[ $set_abi == false ]]; then 
+    echo "Error: ABI not specified" >&2
+    echo "Try '$(basename $0) -h' for more information." >&2
+    exit 1
+fi
+
+case "$abi" in
+    x86_64)
+        api_level_default="30"
+        api_target_default="google_apis_playstore"
+        if [ $intel_host_os == true ]; then       
+            arch="x86_64"
+        else
+            arch="arm64-v8a"
+        fi
+        ;;
+    x86) 
+        api_level_default="30"
+        api_target_default="google_apis_playstore"
+        if [ $intel_host_os == true ]; then       
+            arch="x86"
+        else
+            arch="arm64-v8a"
+        fi
+        ;;
+    arm64-v8a)
+        api_level_default="30"
+        api_target_default="google_apis_playstore"
+        if [ $intel_host_os == true ]; then       
+            arch="x86_64"
+        else
+            arch="arm64-v8a"
+        fi
+        ;;
+    armeabi-v7a)
+        api_level_default="30"
+        api_target_default="google_apis_playstore"
+        if [ $intel_host_os == true ]; then       
+            arch="x86"
+        else
+            arch="arm64-v8a"
+        fi
+        ;;
+    *)
+        echo "Error: Invalid ABI" >&2
+        echo "Try '$(basename $0) -h' for more information." >&2
+        exit 1
+        ;;
+esac
+
 if [[ $set_test_name == false ]]; then 
     echo "Error: Test not specified" >&2
     echo "Try '$(basename $0) -h' for more information." >&2
@@ -81,7 +143,6 @@ if [[ $set_test_name == false ]]; then
 fi
 
 # Setup working directory
-# cd $(git rev-parse --show-toplevel)
 if [ ! -d "./android/app" ]; then
     echo "Error: Incorrect working directory" >&2
     echo "Try './scripts/$(basename $0)' from zingo-mobile root directory." >&2
@@ -116,7 +177,7 @@ if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${device}"
 
     echo -e "\n\nWaiting for emulator to launch..."
-    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> /dev/null &
     wait_for $timeout_seconds check_launch
     wait_for $timeout_seconds check_device_online
@@ -142,7 +203,7 @@ rm -rf "${test_report_dir}"
 mkdir -p "${test_report_dir}"
 
 echo -e "\n\nWaiting for emulator to launch..."
-nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -gpu swiftshader_indirect -no-boot-anim \
     -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
 wait_for $timeout_seconds check_launch
 wait_for $timeout_seconds check_device_online
