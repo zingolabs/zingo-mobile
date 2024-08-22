@@ -91,6 +91,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
                   "paddingTop": 25,
                 }
               }
+              testID="menu.about"
             >
               text translated
             </Text>
@@ -135,6 +136,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
                   "paddingTop": 25,
                 }
               }
+              testID="menu.walletseedufvk"
             >
               text translated
             </Text>
@@ -149,6 +151,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
                   "paddingTop": 25,
                 }
               }
+              testID="menu.insight"
             >
               text translated
             </Text>
@@ -163,6 +166,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
                   "paddingTop": 25,
                 }
               }
+              testID="menu.tipzingolabs"
             >
               text translated
             </Text>

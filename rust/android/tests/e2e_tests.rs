@@ -46,10 +46,26 @@ async fn change_custom_server(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
-async fn change_custom_testnet_server(abi: &str) {
-    let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "change_custom_testnet_server");
+async fn change_custom_regtest_server(abi: &str) {
+    #[cfg(not(feature = "regchest"))]
+    let (_regtest_manager, _child_process_handler) =
+        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    #[cfg(feature = "regchest")]
+    let docker =
+        match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
+            Ok(d) => d,
+            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+        };
 
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test(abi, "change_custom_regtest_server");
+
+    #[cfg(feature = "regchest")]
+    match regchest_utils::close(&docker).await {
+        Ok(_) => (),
+        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
+    }
+    
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
     println!("Error: {}", error);
@@ -177,8 +193,8 @@ mod e2e {
     }
 
     #[tokio::test]
-    async fn change_custom_testnet_server() {
-        super::change_custom_testnet_server(ABI).await;
+    async fn change_custom_regtest_server() {
+        super::change_custom_regtest_server(ABI).await;
     }
 
     #[tokio::test]
