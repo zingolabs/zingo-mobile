@@ -26,7 +26,7 @@ jobs:
     runs-on: macos-13
     strategy:
       matrix:
-        partition: [1]
+        partition: [1, 2, 3, 4, 5]
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -157,12 +157,12 @@ jobs:
           name: nextest-archive
           path: ./rust
 
-      - name: Run integration tests
+      - name: Run Android integration tests
         working-directory: ./rust
         run: |
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive.tar.zst \
-            --partition count:${{ matrix.partition}}/1
+            --partition count:${{ matrix.partition}}/5
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}

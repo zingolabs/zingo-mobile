@@ -20,7 +20,8 @@ let loadRecipientWallet = async () => {
   await element(by.id('header.drawmenu')).tap();
   await waitFor(element(by.id('menu.settings'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.id('menu.settings')).tap();
-  await waitFor(element(by.text('MEMO DOWNLOAD'))).toBeVisible().whileElement(by.id('settings.scroll-view')).scroll(200, 'down');
+  await waitFor(element(by.text('MEMO DOWNLOAD'))).toBeVisible()
+        .whileElement(by.id('settings.scroll-view')).scroll(200, 'down');
   await element(by.id('settings.custom-server')).tap();
   await element(by.id("settings.custom-server-chain.regtest")).tap();
   await element(by.id("settings.custom-server-field")).replaceText('http://10.0.2.2:20000');

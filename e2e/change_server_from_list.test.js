@@ -14,11 +14,9 @@ describe('Change the Server.', () => {
     await waitFor(element(by.id('menu.settings'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('menu.settings')).tap();
 
-    // scrolling until find the second server field
-    await element(by.id('settings.scroll-view')).scroll(400, 'down');
-
     // waiting for second server radio button
-    await waitFor(element(by.id('settings.secondServer'))).toBeVisible().withTimeout(sync_timeout);
+    await waitFor(element(by.id('settings.secondServer'))).toBeVisible()
+          .whileElement(by.id('settings.scroll-view')).scroll(200, 'down');
 
     // choose the second server & save the settings.
     await element(by.id('settings.secondServer')).tap();

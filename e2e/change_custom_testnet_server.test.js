@@ -14,11 +14,9 @@ describe('Change the Server.', () => {
     await waitFor(element(by.id('menu.settings'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('menu.settings')).tap();
 
-    // scrolling until find the custom server field
-    await element(by.id('settings.scroll-view')).scroll(500, 'down');
-
     // waiting for the custom server radio
-    await waitFor(element(by.id('settings.custom-server'))).toBeVisible().withTimeout(sync_timeout);
+    await waitFor(element(by.id('settings.custom-server'))).toBeVisible()
+          .whileElement(by.id('settings.scroll-view')).scroll(200, 'down');
 
     // choose the custom server 
     await element(by.id('settings.custom-server')).tap();
