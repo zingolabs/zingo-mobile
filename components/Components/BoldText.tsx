@@ -6,9 +6,10 @@ import { ThemeType } from '../../app/types/ThemeType';
 type BoldTextProps = {
   style?: TextStyle;
   children: string | string[];
+  testID?: string;
 };
 
-const BoldText: React.FunctionComponent<BoldTextProps> = ({ style, children }) => {
+const BoldText: React.FunctionComponent<BoldTextProps> = ({ style, children, testID }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   const totalStyle: TextStyle = {
     color: colors.text,
@@ -18,7 +19,11 @@ const BoldText: React.FunctionComponent<BoldTextProps> = ({ style, children }) =
     ...style,
   };
 
-  return <Text style={totalStyle}>{children}</Text>;
+  return (
+    <Text testID={testID} style={totalStyle}>
+      {children}
+    </Text>
+  );
 };
 
 export default BoldText;

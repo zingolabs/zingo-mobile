@@ -184,6 +184,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
               justifyContent: 'center',
             }}>
             <TextInput
+              testID="import.seedufvkinput"
               multiline
               style={{
                 color: colors.text,
@@ -236,6 +237,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
               minHeight: 48,
             }}>
             <TextInput
+              testID="import.birthdayinput"
               placeholder={'#'}
               placeholderTextColor={colors.placeholder}
               style={{
@@ -274,6 +276,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           marginVertical: 5,
         }}>
         <Button
+          testID="import.button.OK"
           type={ButtonTypeEnum.Primary}
           title={translate('import.button') as string}
           onPress={() => {
@@ -282,6 +285,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           }}
         />
         <Button
+          testID="import.button.Cancel"
           type={ButtonTypeEnum.Secondary}
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}

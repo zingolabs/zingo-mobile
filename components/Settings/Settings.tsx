@@ -792,7 +792,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             </View>
 
             <View style={{ display: 'flex', margin: 10 }}>
-              <BoldText>{translate('settings.security-title') as string}</BoldText>
+              <BoldText testID="settings.securitytitle">{translate('settings.security-title') as string}</BoldText>
             </View>
 
             {securityCheckBox(
