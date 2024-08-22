@@ -90,6 +90,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
                 "textAlignVertical": "top",
               }
             }
+            testID="import.seedufvkinput"
             value=""
           />
         </View>
@@ -206,6 +207,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
                 "minWidth": "20%",
               }
             }
+            testID="import.birthdayinput"
             value=""
           />
         </View>
@@ -280,6 +282,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
+      testID="import.button.OK"
     >
       <View
         style={
@@ -354,6 +357,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
+      testID="import.button.Cancel"
     >
       <View
         style={
