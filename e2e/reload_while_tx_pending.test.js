@@ -11,6 +11,7 @@ describe('Maintains correct information while tx pending', () => {
   it('should send from orchard to sapling pool', async () => {
     // wait for fully synced.
     await sleep(10000);
+    
     await element(by.text('SEND')).tap();
     await element(by.id('send.addressplaceholder')).replaceText(
       'zregtestsapling1fkc26vpg566hgnx33n5uvgye4neuxt4358k68atnx78l5tg2dewdycesmr4m5pn56ffzsa7lyj6',

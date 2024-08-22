@@ -24,12 +24,11 @@ describe('New Wallet', () => {
     await waitFor(element(by.text('CONFIRM'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.text('CONFIRM')).tap();
 
-    let newWalletButton = element(by.text('CREATE NEW WALLET (NEW SEED)'));
-    await newWalletButton.tap();
+    await waitFor(element(by.text('CREATE NEW WALLET'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.text('CREATE NEW WALLET')).tap();
+    await waitFor(element(by.text('I HAVE SAVED \n THE SEED'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.text('I HAVE SAVED \n THE SEED')).tap();
-    // For some reason, the element that says 'ZEC', according to react,
-    // has text of ' ---'
-    // let zecText = element(by.text(" ---")).atIndex(1);
+
     let text = element(by.id('ValueTransfer text'));
     let attributes = await text.getAttributes();
     log.info(attributes);
@@ -41,6 +40,7 @@ describe('New Wallet', () => {
     await expect(text).toBeVisible();
     await expect(text).toHaveText('History');
 
-    //expect(element(by.traits(['button'])).filter())
+    // waiting new wallet fully synced
+    await waitFor(element(by.id('header.checkicon'))).toBeVisible().withTimeout(sync_timeout);
   });
 });

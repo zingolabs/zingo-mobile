@@ -73,6 +73,17 @@ async fn change_custom_regtest_server(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
+async fn change_custom_testnet_server(abi: &str) {
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test(abi, "change_custom_testnet_server");
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
+
 async fn change_server_from_list(abi: &str) {
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "change_server_from_list");
@@ -195,6 +206,11 @@ mod e2e {
     #[tokio::test]
     async fn change_custom_regtest_server() {
         super::change_custom_regtest_server(ABI).await;
+    }
+
+    #[tokio::test]
+    async fn change_custom_testnet_server() {
+        super::change_custom_testnet_server(ABI).await;
     }
 
     #[tokio::test]

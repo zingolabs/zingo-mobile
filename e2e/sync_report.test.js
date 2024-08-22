@@ -8,6 +8,8 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
   // i just pulled this seed out of thin air
   it('loads a wallet', loadTestWallet);
   it('When App go to background & back to foreground -> Report Screen: blocks & batches are aligned', async () => {
+    await sleep(2000);
+
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();
     await waitFor(element(by.id('menu.syncreport'))).toBeVisible().withTimeout(sync_timeout);
@@ -22,6 +24,7 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     await sleep(20000);
     // put the App in foregroung again
     await device.launchApp({ newInstance: false });
+    await sleep(2000);
 
     // waiting for starting the sync process again
     await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(sync_timeout);
