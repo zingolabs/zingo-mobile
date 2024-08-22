@@ -59,7 +59,7 @@ jobs:
         run: |
           pod install
 
-      - name: Run integration tests
+      - name: Run IOS integration tests
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 60
