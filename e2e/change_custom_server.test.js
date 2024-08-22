@@ -22,17 +22,26 @@ describe('Change the Server.', () => {
     await element(by.id('settings.custom-server')).tap();
 
     // waiting for the custom server field
-    await waitFor(element(by.id('settings.custom-server-field'))).toBeVisible().withTimeout(sync_timeout);
+    await waitFor(element(by.id('settings.custom-server-field'))).toBeVisible()
+          .whileElement(by.id('settings.scroll-view')).scroll(200, 'down');
     await element(by.id("settings.custom-server-field")).replaceText('https://lwd1.zcash-infra.com:9067');
 
+    // waiting for the toggle, tap on mainnet
+    await waitFor(element(by.id('settings.custom-server-chain.mainnet'))).toBeVisible()
+          .whileElement(by.id('settings.scroll-view')).scroll(200, 'down');
+    await element(by.id('settings.custom-server-chain.mainnet')).tap();
+    
     // save the new server
+    await waitFor(element(by.id('settings.button.save'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('settings.button.save')).tap();
 
     // waiting for starting to sync
     await waitFor(element(by.id('header.playIcon'))).toBeVisible().withTimeout(sync_timeout);
 
     // the sync process have to run normally with the new server
+    await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();
+    await waitFor(element(by.id('menu.syncreport'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('menu.syncreport')).tap();
 
     // waiting for starting the sync process again
