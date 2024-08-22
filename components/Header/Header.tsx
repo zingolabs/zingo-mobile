@@ -477,6 +477,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         </View>
                       ) : (
                         <TouchableOpacity
+                          testID="header.playicon"
                           onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
                           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                             <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />

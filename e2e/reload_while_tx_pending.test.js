@@ -23,7 +23,7 @@ describe('Maintains correct information while tx pending', () => {
     // verify pool balances
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();
-    await element(by.id('menu.fund-pools')).tap();
+    await element(by.id('menu.fundpools')).tap();
     await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0097');
     await expect(element(by.id('orchard-total-balance.small-part'))).not.toBeVisible();
     await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 0.0000');
@@ -34,7 +34,7 @@ describe('Maintains correct information while tx pending', () => {
     await expect(element(by.id('sapling-spendable-balance.small-part'))).not.toBeVisible();
     await expect(element(by.id('transparent-balance.big-part'))).toHaveText(' 0.0000');
     await expect(element(by.id('transparent-total-balance.small-part'))).not.toBeVisible();
-    await element(by.id('fund-pools.button.close')).tap();
+    await element(by.id('fundpools.button.close')).tap();
   });
   it('should show correct pool balances after going to background', async () => {
     await device.sendToHome();
@@ -44,7 +44,7 @@ describe('Maintains correct information while tx pending', () => {
     // verify pool balances
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();
-    await element(by.id('menu.fund-pools')).tap();
+    await element(by.id('menu.fundpools')).tap();
     await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0097');
     await expect(element(by.id('orchard-total-balance.small-part'))).not.toBeVisible();
     await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 0.0000');
@@ -64,7 +64,7 @@ describe('Maintains correct information while tx pending', () => {
     // verify pool balances
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();
-    await element(by.id('menu.fund-pools')).tap();
+    await element(by.id('menu.fundpools')).tap();
     await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0097');
     await expect(element(by.id('orchard-total-balance.small-part'))).not.toBeVisible();
     await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 0.0000');

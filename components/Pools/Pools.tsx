@@ -180,7 +180,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOpti
           marginVertical: 5,
         }}>
         <Button
-          testID="fund-pools.button.close"
+          testID="fundpools.button.close"
           type={ButtonTypeEnum.Secondary}
           title={translate('close') as string}
           onPress={closeModal}

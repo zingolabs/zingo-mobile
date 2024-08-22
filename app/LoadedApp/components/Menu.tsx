@@ -85,12 +85,12 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
         <View style={{ height: 1, backgroundColor: colors.primary }} />
 
         <View style={{ display: 'flex', marginLeft: 20 }}>
-          <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.About)} style={item}>
+          <RegText testID="menu.about" onPress={() => onItemSelectedWrapper(MenuItemEnum.About)} style={item}>
             {translate('loadedapp.about') as string}
           </RegText>
 
           {mode !== ModeEnum.basic && (
-            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.Info)} style={item}>
+            <RegText testID="menu.info" onPress={() => onItemSelectedWrapper(MenuItemEnum.Info)} style={item}>
               {translate('loadedapp.info') as string}
             </RegText>
           )}
@@ -107,7 +107,10 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
           </RegText>
 
           {!(mode === ModeEnum.basic && valueTransfers && valueTransfers.length <= 0) && (
-            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.WalletSeedUfvk)} style={item}>
+            <RegText
+              testID="menu.walletseedufvk"
+              onPress={() => onItemSelectedWrapper(MenuItemEnum.WalletSeedUfvk)}
+              style={item}>
               {readOnly
                 ? mode === ModeEnum.basic
                   ? (translate('loadedapp.walletufvk-basic') as string)
@@ -119,7 +122,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
           )}
 
           {mode !== ModeEnum.basic && rescanMenu && (
-            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.Rescan)} style={item}>
+            <RegText testID="menu.rescan" onPress={() => onItemSelectedWrapper(MenuItemEnum.Rescan)} style={item}>
               {translate('loadedapp.rescanwallet') as string}
             </RegText>
           )}
@@ -134,16 +137,13 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
           )}
 
           {mode !== ModeEnum.basic && (
-            <RegText
-              testID="menu.fund-pools"
-              onPress={() => onItemSelectedWrapper(MenuItemEnum.FundPools)}
-              style={item}>
+            <RegText testID="menu.fundpools" onPress={() => onItemSelectedWrapper(MenuItemEnum.FundPools)} style={item}>
               {translate('loadedapp.fundpools') as string}
             </RegText>
           )}
 
           {!(mode === ModeEnum.basic && valueTransfers && valueTransfers.length <= 0) && (
-            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.Insight)} style={item}>
+            <RegText testID="menu.insight" onPress={() => onItemSelectedWrapper(MenuItemEnum.Insight)} style={item}>
               {translate('loadedapp.insight') as string}
             </RegText>
           )}
@@ -158,22 +158,34 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
           )}
 
           {mode !== ModeEnum.basic && (
-            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.RestoreWalletBackup)} style={item}>
+            <RegText
+              testID="menu.restorebackupwallet"
+              onPress={() => onItemSelectedWrapper(MenuItemEnum.RestoreWalletBackup)}
+              style={item}>
               {translate('loadedapp.restorebackupwallet') as string}
             </RegText>
           )}
           {mode === ModeEnum.basic && valueTransfers && valueTransfers.length === 0 && (
-            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.LoadWalletFromSeed)} style={item}>
+            <RegText
+              testID="menu.loadwalletfromseed"
+              onPress={() => onItemSelectedWrapper(MenuItemEnum.LoadWalletFromSeed)}
+              style={item}>
               {translate('loadedapp.loadwalletfromseed-basic') as string}
             </RegText>
           )}
           {mode === ModeEnum.basic && !readOnly && (
-            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.TipZingoLabs)} style={item}>
+            <RegText
+              testID="menu.tipzingolabs"
+              onPress={() => onItemSelectedWrapper(MenuItemEnum.TipZingoLabs)}
+              style={item}>
               {translate('loadedapp.tipzingolabs-basic') as string}
             </RegText>
           )}
           {mode !== ModeEnum.basic && !readOnly && (
-            <RegText onPress={() => onItemSelectedWrapper(MenuItemEnum.VoteForNym)} style={item}>
+            <RegText
+              testID="menu.votefornym"
+              onPress={() => onItemSelectedWrapper(MenuItemEnum.VoteForNym)}
+              style={item}>
               {translate('loadedapp.votefornym') as string}
             </RegText>
           )}
