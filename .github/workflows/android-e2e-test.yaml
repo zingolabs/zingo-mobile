@@ -149,7 +149,7 @@ jobs:
         with:
           timeout_minutes: 60
           max_attempts: 3
-          command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
+          command: ./scripts/e2e_tests.sh -a ${{ env.AVD-ARCH }} -s
 
       - name: Download archive
         uses: actions/download-artifact@v4
