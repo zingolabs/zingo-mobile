@@ -135,7 +135,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
       
       - name: AVD cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         id: avd-cache
         with: 
           path: |
@@ -150,6 +150,16 @@ jobs:
           timeout_minutes: 60
           max_attempts: 3
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
+
+      - name: AVD cache saving
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        id: avd-cache-saving
+        with: 
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.AVD-ARCH }}-integ
 
       - name: Download archive
         uses: actions/download-artifact@v4
