@@ -62,6 +62,7 @@ jobs:
             ~/.android/avd/*
             ~/.android/adb*
           key: avd-${{ env.AVD-ARCH }}-integ
+          lookup-only: true
 
       - name: Setup Android SDK
         if: steps.avd-cache.outputs.cache-hit != 'true'
