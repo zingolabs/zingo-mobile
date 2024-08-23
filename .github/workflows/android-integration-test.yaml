@@ -12,7 +12,7 @@ on:
       abi:
         required: true
         type: string
-    
+
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
   TIMESTAMP: ${{ inputs.timestamp }}
@@ -31,12 +31,12 @@ jobs:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-            
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
-        
+
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
         run: |
@@ -85,7 +85,7 @@ jobs:
       #  run: echo ${{ steps.dockerTry2.outcome }}
 
       - name: Setup Docker Manually
-      #  if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
+        #  if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
         run: |
           brew install colima
           brew install --formula docker
@@ -112,35 +112,35 @@ jobs:
           path: android/app/src/main/jniLibs/${{ env.ABI }}
           key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
-      
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-      
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-      
+
       - name: Add emulator to PATH
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
-            
+
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.2
           build-root-directory: ./android
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
-      
+
       - name: AVD cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         id: avd-cache
-        with: 
+        with:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
           key: avd-${{ env.AVD-ARCH }}-integ
-          
+
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: nick-fields/retry@v3
@@ -149,12 +149,15 @@ jobs:
           max_attempts: 3
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
-      - name: Kotlin uniffi cache
-        uses: actions/cache/restore@v4
+      - name: AVD cache saving
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        id: avd-cache-saving
         with:
-          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
-          key: kotlin-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.AVD-ARCH }}-integ
 
       - name: Download archive
         uses: actions/download-artifact@v4
@@ -175,4 +178,3 @@ jobs:
         with:
           name: test-integration-reports-${{ env.ABI }}-${{ matrix.partition}}-${{ env.TIMESTAMP }}
           path: android/app/build/outputs/integration_test_reports
-
