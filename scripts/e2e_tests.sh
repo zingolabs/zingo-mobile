@@ -8,7 +8,7 @@ set_api_target=false
 intel_host_os=true
 create_snapshot=false
 test_name_default="new_wallet"
-valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33" "34")
+valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33" "34" "35")
 valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
 timeout_seconds=1800  # default timeout set to 30 minutes
@@ -275,7 +275,7 @@ else
     mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch..."
-    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -gpu swiftshader_indirect -no-boot-anim \
+    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
     wait_for $timeout_seconds check_launch
     wait_for $timeout_seconds check_device_online
