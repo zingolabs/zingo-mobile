@@ -83,8 +83,6 @@ jobs:
           if cat rust/lib/Cargo.toml | grep "^zingolib\|^zingoconfig" | grep -q "branch"; then exit 1; fi
           cd rust
           cargo update -p zingolib -p zingoconfig --aggressive
-          cargo install --version ^3 cargo-ndk
-          rustup default nightly
       
       - name: Set envs for x86_64
         if: ${{ env.ARCH == 'x86_64' }}
@@ -149,17 +147,15 @@ jobs:
           name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
 
-      - name: Cargo NDK
-        run: |
-          rustup target add ${{ env.TARGET }}
-          rustup install stable
-          rustup default stable
+      - name: Rust toolchain stable
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
 
       - name: Cargo build uniffi
         working-directory: ./rust
         run: |
-          cargo run --target ${{ env.TARGET }} /
-          --release --features=uniffi/cli --bin uniffi-bindgen /
+          cargo run --release --features=uniffi/cli --bin uniffi-bindgen /
           generate ./lib/src/zingo.udl --language kotlin /
           --out-dir ../android/app/build/generated/source/uniffi/debug/java"
 
