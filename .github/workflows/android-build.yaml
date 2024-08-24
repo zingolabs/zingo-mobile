@@ -172,6 +172,7 @@ jobs:
       - name: Cargo build uniffi
         working-directory: ./rust
         run: |
+          rustup target add ${{ env.TARGET }}
           cargo run --target ${{ env.TARGET }} /
           --release --features=uniffi/cli --bin uniffi-bindgen /
           generate ./lib/src/zingo.udl --language kotlin /
