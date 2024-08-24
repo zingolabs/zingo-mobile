@@ -267,7 +267,7 @@ else
     ./gradlew clean
 
     echo -e "\nBuilding APKs..."
-    ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug -PsplitApk=true
+    yarn detox build -c android.att.debug
 
     # Create e2e test report directory
     test_report_dir="app/build/outputs/e2e_test_reports/${abi}"
@@ -292,25 +292,6 @@ else
     adb shell settings put global window_animation_scale 0.0
     adb shell settings put global transition_animation_scale 0.0
     adb shell settings put global animator_duration_scale 0.0
-
-    echo -e "\nInstalling APKs..."
-    i=0
-    step_complete=false
-    until [[ $step_complete == true ]]; do
-        if adb -s emulator-5554 install-multi-package -r -t -d --abi "${abi}" \
-                "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
-                "app/build/outputs/apk/debug/app-${abi}-debug.apk" &> "${test_report_dir}/apk_installation.txt"; then
-            step_complete=true
-            echo "Successfully installed APKs"
-        fi              
-        if [[ $i -ge 100 ]]; then
-            echo "Error: Failed to install APKs" >&2
-            echo "For more information see 'android/${test_report_dir}/apk_installation.txt'" >&2
-            exit 1
-        fi
-        i=$((i+1))
-        sleep 1
-    done
 
     # Store emulator info and start logging
     adb -s emulator-5554 shell getprop &> "${test_report_dir}/getprop.txt"
