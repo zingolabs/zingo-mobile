@@ -266,7 +266,7 @@ else
     ./gradlew clean
 
     echo -e "\nBuilding APKs..."
-    ./gradlew assembleDebug assembleAndroidTest -PsplitApk=true
+    ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug -PsplitApk=true
 
     # Create integration test report directory
     test_report_dir="app/build/outputs/integration_test_reports/${abi}"
