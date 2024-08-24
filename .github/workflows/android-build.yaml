@@ -114,6 +114,10 @@ jobs:
           echo "CC=armv7a-linux-androideabi" >> $GITHUB_ENV
           echo "OPENSSL_PATH=armv7" >> $GITHUB_ENV
 
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
       - name: Cargo NDK
         run: |
           cargo install --version ^3 cargo-ndk
