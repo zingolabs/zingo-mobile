@@ -181,10 +181,17 @@ jobs:
       - name: Native rust cache
         uses: actions/cache/restore@v4
         with:
-          path: android/app/src/main/jniLibs/x86_64
-          key: native-android-uniffi-x86_64-${{ env.CACHE-KEY }}
+          path: android/app/src/main/jniLibs/${{ env.ABI }}
+          key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
-      
+
+      - name: Kotlin rust cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
+          key: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
