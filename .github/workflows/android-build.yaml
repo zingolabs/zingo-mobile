@@ -20,7 +20,7 @@ jobs:
     name: Check build cache
     runs-on: macos-13
     outputs:
-      native-cache-found: ${{ steps.native-set-cache-found.outputs.native-cache-found }}
+      android-cache-found: ${{ steps.android-set-cache-found.outputs.android-cache-found }}
     steps:     
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -32,21 +32,21 @@ jobs:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
         
       - name: Check if native rust cache exists
-        id: native-check-build-cache
+        id: android-check-build-cache
         uses: actions/cache/restore@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
-          key: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          key: android-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           lookup-only: true
 
       - name: Set cache-found
-        id: native-set-cache-found
-        run: echo "native-cache-found=${{ steps.native-check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+        id: android-set-cache-found
+        run: echo "android-cache-found=${{ steps.android-check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
 
   android-build:
     name: Build native rust
     needs: android-check-build-cache
-    if: ${{ needs.native-check-build-cache.outputs.android-cache-found != 'true' }}
+    if: ${{ needs.android-check-build-cache.outputs.android-cache-found != 'true' }}
     runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:009
@@ -104,7 +104,7 @@ jobs:
           cargo install --version ^3 cargo-ndk
           rustup default nightly
 
-      - name: Cargo cache before
+      - name: Cargo cache
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust
