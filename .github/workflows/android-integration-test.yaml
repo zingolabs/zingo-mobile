@@ -223,7 +223,7 @@ jobs:
         with:
           timeout_minutes: 60
           max_attempts: 3
-          command: ./scripts/integration_tests.sh -a ${{ env.NEXTEST-ABI }}
+          command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }}
 
 
       - name: Run Android integration tests
