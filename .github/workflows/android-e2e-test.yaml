@@ -91,7 +91,7 @@ jobs:
           key: avd-${{ env.AVD-ARCH }}-e2e
 
   android-e2e-test:
-    needs: [ android-e2e-avd-cache, pre-build-android ]
+    needs: [ android-e2e-avd-cache ]
     name: Android e2e test
     runs-on: macos-13
     strategy:
