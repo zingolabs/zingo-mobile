@@ -60,6 +60,9 @@ jobs:
           build-root-directory: ./android
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
 
+      - name: Yarn
+        run: yarn
+
       - name: Pre-build
         working-directory: ./android
         run: ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug -PsplitApk=true
