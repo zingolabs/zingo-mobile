@@ -114,10 +114,6 @@ jobs:
           echo "CC=armv7a-linux-androideabi" >> $GITHUB_ENV
           echo "OPENSSL_PATH=armv7" >> $GITHUB_ENV
 
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-
       - name: Cargo NDK
         run: |
           cargo install --version ^3 cargo-ndk
@@ -153,10 +149,15 @@ jobs:
           name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
 
+      - name: Cargo NDK
+        run: |
+          rustup target add ${{ env.TARGET }}
+          rustup install stable
+          rustup default stable
+
       - name: Cargo build uniffi
         working-directory: ./rust
         run: |
-          rustup target add ${{ env.TARGET }}
           cargo run --target ${{ env.TARGET }} /
           --release --features=uniffi/cli --bin uniffi-bindgen /
           generate ./lib/src/zingo.udl --language kotlin /
