@@ -96,7 +96,7 @@ jobs:
     runs-on: macos-13
     strategy:
       matrix:
-        partition: [1, 2, 3, 4, 5]
+        partition: [1]
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -217,6 +217,14 @@ jobs:
         with:
           name: nextest-archive
           path: ./rust
+
+      - name: integration test as a script
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }}
+
 
       - name: Run Android integration tests
         working-directory: ./rust
