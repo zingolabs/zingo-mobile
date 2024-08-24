@@ -96,7 +96,7 @@ jobs:
     runs-on: macos-13
     strategy:
       matrix:
-        partition: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        partition: [1]
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}

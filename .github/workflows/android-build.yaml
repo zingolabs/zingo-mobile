@@ -21,7 +21,6 @@ jobs:
     runs-on: macos-13
     outputs:
       native-cache-found: ${{ steps.native-set-cache-found.outputs.native-cache-found }}
-      kotlin-cache-found: ${{ steps.kotlin-set-cache-found.outputs.kotlin-cache-found }}
     steps:     
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -44,22 +43,10 @@ jobs:
         id: native-set-cache-found
         run: echo "native-cache-found=${{ steps.native-check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
 
-      - name: Check if kotlin rust cache exists
-        id: kotlin-check-build-cache
-        uses: actions/cache/restore@v4
-        with:
-          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
-          key: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-          lookup-only: true
-  
-      - name: Set cache-found
-        id: kotlin-set-cache-found
-        run: echo "kotlin-cache-found=${{ steps.kotlin-check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
-
   android-build:
-    name: Build native & kotlin rust
+    name: Build native rust
     needs: android-check-build-cache
-    if: ${{ needs.native-check-build-cache.outputs.android-cache-found != 'true' || needs.kotlin-check-build-cache.outputs.android-cache-found != 'true' }}
+    if: ${{ needs.native-check-build-cache.outputs.android-cache-found != 'true' }}
     runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:009
@@ -147,29 +134,6 @@ jobs:
           name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
 
-      - name: Rust toolchain stable
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-
-      - name: Cargo build uniffi
-        working-directory: ./rust
-        run: |
-          cargo run --release --features=uniffi/cli --bin uniffi-bindgen /
-          generate ./lib/src/zingo.udl --language kotlin /
-          --out-dir ../android/app/build/generated/source/uniffi/debug/java"
-
-      - name: Upload kotlin rust
-        uses: actions/upload-artifact@v4
-        with:
-          name: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo/zingo.kt
-
-      - name: Cargo cache after
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust
-
   cache-native-android-uniffi:
     name: Cache native rust
     needs: android-build
@@ -195,16 +159,4 @@ jobs:
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
           key: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-
-      - name: Download kotlin rust
-        uses: actions/download-artifact@v4
-        with: 
-          name: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
-
-      - name: Cache kotlin rust
-        uses: actions/cache/save@v4
-        with:
-          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
-          key: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
 
