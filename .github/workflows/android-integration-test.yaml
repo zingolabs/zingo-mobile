@@ -164,7 +164,8 @@ jobs:
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
 
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Rust toolchain stable
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
 

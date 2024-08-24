@@ -82,28 +82,7 @@ jobs:
           sed -i "/^zingolib/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
           if cat rust/lib/Cargo.toml | grep "^zingolib" | grep -q "branch"; then exit 1; fi
           cd rust
-          cargo update -p zingolib --aggressive
-
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust
-
-      - name: Cargo default nightly
-        run: rustup default nightly
-
-      - name: Cargo uniffi kotlin
-        working-directory: ./rust/lib
-        run: |
-          cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
-          generate ./src/zingo.udl --language kotlin \
-          --out-dir ../../android/app/build/generated/source/uniffi/debug/java
-
-      - name: Upload kotlin uniffi
-        uses: actions/upload-artifact@v4
-        with:
-          name: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo/zingo.kt
+          cargo update -p zingolib -p zingoconfig --aggressive
 
       - name: Set envs for x86_64
         if: ${{ env.ARCH == 'x86_64' }}
@@ -143,10 +122,7 @@ jobs:
 
       - name: Cargo build
         working-directory: ./rust/lib
-        run: |
-          cargo ndk \
-          --target ${{ env.TARGET }} build \
-          --release -Z build-std
+        run: cargo ndk --target ${{ env.TARGET }} build --release -Z build-std
         env:
           AR: llvm-ar
           LD: ld
@@ -169,17 +145,15 @@ jobs:
           name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
 
-      - name: Cargo NDK
-        run: |
-          rustup target add ${{ env.TARGET }}
-          rustup install stable
-          rustup default stable
+      - name: Rust toolchain stable
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
 
       - name: Cargo build uniffi
         working-directory: ./rust
         run: |
-          cargo run --target ${{ env.TARGET }} /
-          --release --features=uniffi/cli --bin uniffi-bindgen /
+          cargo run --release --features=uniffi/cli --bin uniffi-bindgen /
           generate ./lib/src/zingo.udl --language kotlin /
           --out-dir ../android/app/build/generated/source/uniffi/debug/java"
 
