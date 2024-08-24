@@ -106,7 +106,7 @@ jobs:
           cargo install --version ^3 cargo-ndk
           rustup default nightly
 
-      - name: Cargo cache
+      - name: Cargo cache before
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust
@@ -135,7 +135,25 @@ jobs:
         with:
           name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
-      
+
+      - name: Cargo build uniffi
+        working-directory: ./rust
+        run: | 
+          cargo run --release --features=uniffi/cli --bin uniffi-bindgen /
+          generate ./lib/src/zingo.udl --language kotlin /
+          --out-dir ../android/app/build/generated/source/uniffi/debug/java"
+
+      - name: Upload kotlin rust
+        uses: actions/upload-artifact@v4
+        with:
+          name: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo/zingo.kt
+
+      - name: Cargo cache after
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
   cache-native-android-uniffi:
     name: Cache native rust
     needs: android-build
@@ -155,10 +173,22 @@ jobs:
         with: 
           name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
-      
+
+      - name: Download kotlin rust
+        uses: actions/download-artifact@v4
+        with: 
+          name: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
+
       - name: Cache native rust
         uses: actions/cache/save@v4
         with:
           path: android/app/src/main/jniLibs/${{ env.ARCH }}
           key: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
+
+      - name: Cache kotlin rust
+        uses: actions/cache/save@v4
+        with:
+          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
+          key: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
 
