@@ -129,7 +129,9 @@ jobs:
 
       - name: generic build
         working-directory: ./rust/lib
-        run: cargo build --release
+        run: cargo \
+          --target ${{ env.TARGET }} build \
+          --release -Z build-std 
 
       - name: Cargo uniffi kotlin
         working-directory: ./rust/lib
