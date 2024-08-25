@@ -93,11 +93,8 @@ jobs:
 
       - name: Cargo uniffi kotlin
         working-directory: ./rust/lib
-        run: cargo run \
-          --release \
-          --features=uniffi/cli \
-          --bin uniffi-bindgen generate ./src/zingo.udl \
-          --language kotlin \ 
+        run: cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
+          generate ./src/zingo.udl --language kotlin \ 
           --out-dir ./src
 
       - name: Upload kotlin uniffi
