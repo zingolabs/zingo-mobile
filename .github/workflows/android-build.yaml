@@ -112,8 +112,10 @@ jobs:
           echo "CC=armv7a-linux-androideabi" >> $GITHUB_ENV
           echo "OPENSSL_PATH=armv7" >> $GITHUB_ENV
 
-      - name: Cargo defaul nightly
-        run: rustup default nightly
+      - name: Cargo default nightly
+        run: |
+          rustup target add ${{ env.TARGET }}
+          rustup default nightly
 
       - name: show
         run: rustup show
