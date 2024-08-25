@@ -115,18 +115,6 @@ jobs:
       - name: Cargo defaul nightly
         run: rustup default nightly
 
-      - name: Cargo uniffi kotlin
-        working-directory: ./rust/lib
-        run: cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
-          generate ./src/zingo.udl --language kotlin \
-          --out-dir ./src
-
-      - name: Upload kotlin uniffi
-        uses: actions/upload-artifact@v4
-        with:
-          name: kotlin-android-uniffi-${{ env.CACHE-KEY }}
-          path: rust/lib/src/uniffi/zingo/zingo.kt
-
       - name: Cargo NDK
         run: cargo install --version ^3 cargo-ndk
 
@@ -159,6 +147,18 @@ jobs:
         with:
           name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
+
+      - name: Cargo uniffi kotlin
+        working-directory: ./rust/lib
+        run: cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
+          generate ./src/zingo.udl --language kotlin \
+          --out-dir ./src
+
+      - name: Upload kotlin uniffi
+        uses: actions/upload-artifact@v4
+        with:
+          name: kotlin-android-uniffi-${{ env.CACHE-KEY }}
+          path: rust/lib/src/uniffi/zingo/zingo.kt
 
   cache-native-android-uniffi:
     name: Cache native rust
