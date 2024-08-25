@@ -47,17 +47,14 @@ jobs:
 
       - name: Copy libs to ios folder
         working-directory: rust/lib/Generated
-        run: |
-          cp ./*.* ../../../ios
+        run: cp ./*.* ../../../ios
 
       - name: Yarn
-        run: |
-          yarn
+        run: yarn
 
       - name: Pod Install
         working-directory: ios
-        run: |
-          pod install
+        run: pod install
 
       - name: Run IOS integration tests
         uses: nick-fields/retry@v3
