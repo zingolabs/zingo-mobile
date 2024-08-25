@@ -84,11 +84,13 @@ jobs:
           cd rust
           cargo update -p zingolib -p zingoconfig --aggressive
 
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
       - name: Cargo default nightly
         run: rustup default nightly
-
-      - name: show
-        run: rustup show
 
       - name: Cargo uniffi kotlin
         working-directory: ./rust/lib
@@ -161,11 +163,6 @@ jobs:
         with:
           name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
-
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust
 
   cache-native-android-uniffi:
     name: Cache native rust
