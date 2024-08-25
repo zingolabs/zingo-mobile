@@ -119,9 +119,8 @@ jobs:
 
       - name: Cargo default nightly
         run: |
-          rustup target remove ${{ env.TARGET }}
-          rustup target add ${{ env.TARGET }}
           rustup default nightly
+          rustup update
 
       - name: Cargo NDK
         run: cargo install --version ^3 cargo-ndk
