@@ -84,6 +84,28 @@ jobs:
           cd rust
           cargo update -p zingolib -p zingoconfig --aggressive
 
+      - name: Cargo default nightly
+        run: |
+          rustup default nightly
+
+      - name: show
+        run: rustup show
+
+      - name: Cargo uniffi kotlin
+        working-directory: ./rust/lib
+        run: cargo run \
+          --release \
+          --features=uniffi/cli \
+          --bin uniffi-bindgen generate ./src/zingo.udl \
+          --language kotlin \
+          --out-dir ./src
+
+      - name: Upload kotlin uniffi
+        uses: actions/upload-artifact@v4
+        with:
+          name: kotlin-android-uniffi-${{ env.CACHE-KEY }}
+          path: rust/lib/src/uniffi/zingo/zingo.kt
+
       - name: Set envs for x86_64
         if: ${{ env.ARCH == 'x86_64' }}
         run: |
@@ -112,41 +134,8 @@ jobs:
           echo "CC=armv7a-linux-androideabi" >> $GITHUB_ENV
           echo "OPENSSL_PATH=armv7" >> $GITHUB_ENV
 
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust
-
-      - name: Cargo default nightly
-        run: |
-          rustup default nightly
-
       - name: Cargo NDK
         run: cargo install --version ^3 cargo-ndk
-
-      - name: show
-        run: rustup show
-
-      - name: generic build
-        working-directory: ./rust/lib
-        run: cargo \
-          --target ${{ env.TARGET }} build \
-          --release -Z build-std 
-
-      - name: Cargo uniffi kotlin
-        working-directory: ./rust/lib
-        run: cargo run \
-          --release \
-          --features=uniffi/cli \
-          --bin uniffi-bindgen generate ./src/zingo.udl \
-          --language kotlin \
-          --out-dir ./src
-
-      - name: Upload kotlin uniffi
-        uses: actions/upload-artifact@v4
-        with:
-          name: kotlin-android-uniffi-${{ env.CACHE-KEY }}
-          path: rust/lib/src/uniffi/zingo/zingo.kt
 
       - name: Cargo build
         working-directory: ./rust/lib
@@ -174,6 +163,11 @@ jobs:
         with:
           name: native-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           path: rust/target/${{ env.TARGET }}/release/libuniffi_zingo.so
+
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
 
   cache-native-android-uniffi:
     name: Cache native rust
