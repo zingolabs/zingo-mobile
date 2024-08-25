@@ -184,6 +184,13 @@ jobs:
           key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
 
+      - name: Kotlin uniffi cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
+          key: kotlin-android-uniffi-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -224,7 +231,6 @@ jobs:
           timeout_minutes: 60
           max_attempts: 1
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }}
-
 
       - name: Run Android integration tests
         working-directory: ./rust
