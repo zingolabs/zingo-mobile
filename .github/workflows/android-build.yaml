@@ -128,11 +128,16 @@ jobs:
       - name: show
         run: rustup show
 
+      - name: generic build
+        run: cargo build --release --target ${{ env.TARGET }}
+
       - name: Cargo uniffi kotlin
         working-directory: ./rust/lib
-        run: cargo ndk --target ${{ env.TARGET }} \
-          --release --features=uniffi/cli --bin uniffi-bindgen \
-          generate ./src/zingo.udl --language kotlin \ 
+        run: cargo run \
+          --release \
+          --features=uniffi/cli \
+          --bin uniffi-bindgen generate ./src/zingo.udl \
+          --language kotlin \ 
           --out-dir ./src
         env:
           AR: llvm-ar
@@ -150,7 +155,9 @@ jobs:
       
       - name: Cargo build
         working-directory: ./rust/lib
-        run: cargo ndk --target ${{ env.TARGET }} build --release -Z build-std 
+        run: cargo ndk \
+          --target ${{ env.TARGET }} build \
+          --release -Z build-std 
         env:
           AR: llvm-ar
           LD: ld
