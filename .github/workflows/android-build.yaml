@@ -136,7 +136,8 @@ jobs:
 
       - name: Cargo build
         working-directory: ./rust/lib
-        run: cargo ndk \
+        run: |
+          cargo ndk \
           --target ${{ env.TARGET }} build \
           --release -Z build-std
         env:
