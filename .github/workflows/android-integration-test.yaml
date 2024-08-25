@@ -222,7 +222,7 @@ jobs:
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 60
-          max_attempts: 3
+          max_attempts: 1
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }}
 
 
