@@ -129,6 +129,7 @@ jobs:
         run: rustup show
 
       - name: generic build
+        working-directory: ./rust/lib
         run: cargo build --release --target ${{ env.TARGET }}
 
       - name: Cargo uniffi kotlin
