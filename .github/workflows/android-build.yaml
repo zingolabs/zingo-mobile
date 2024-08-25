@@ -120,7 +120,6 @@ jobs:
       - name: Cargo default nightly
         run: |
           rustup default nightly
-          rustup update
 
       - name: Cargo NDK
         run: cargo install --version ^3 cargo-ndk
@@ -130,7 +129,7 @@ jobs:
 
       - name: generic build
         working-directory: ./rust/lib
-        run: cargo build --release --target ${{ env.TARGET }}
+        run: cargo build --release
 
       - name: Cargo uniffi kotlin
         working-directory: ./rust/lib
@@ -140,13 +139,6 @@ jobs:
           --bin uniffi-bindgen generate ./src/zingo.udl \
           --language kotlin \ 
           --out-dir ./src
-        env:
-          AR: llvm-ar
-          LD: ld
-          RANLIB: llvm-ranlib
-          CC: ${{ env.CC }}24-clang
-          OPENSSL_DIR: /opt/openssl-3.3.1/${{ env.OPENSSL_PATH }}
-          CARGO_FEATURE_STD: true
 
       - name: Upload kotlin uniffi
         uses: actions/upload-artifact@v4
