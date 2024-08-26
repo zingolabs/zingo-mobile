@@ -263,7 +263,7 @@ else
         echo "AVD found: ${avd_name}"
     fi
 
-    echo -e "\nBuilding APKs..."
+    echo -e "\nBuilding Detox..."
     yarn detox build -c android.att.debug
 
     # Create e2e test report directory
