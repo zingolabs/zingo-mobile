@@ -59,7 +59,7 @@ jobs:
   android-build:
     name: Build native rust & kotlin uniffi
     needs: android-check-build-cache
-    if: ${{ needs.native-check-build-cache.outputs.native-cache-found != 'true' || needs.kotlin-check-build-cache.outputs.kotlin-cache-found != 'true' }}
+    if: ${{ needs.android-check-build-cache.outputs.native-cache-found != 'true' || needs.android-check-build-cache.outputs.kotlin-cache-found != 'true' }}
     runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:009
