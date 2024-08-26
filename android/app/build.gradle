@@ -204,20 +204,17 @@ android.applicationVariants.configureEach { variant ->
 }
 
 // change this to build.sh script
-//android.applicationVariants.configureEach { variant ->
+android.applicationVariants.configureEach { variant ->
 //    def t = tasks.register("generate${variant.name.capitalize()}UniFFIBindings", Exec) {
 //        workingDir "${rootProject.projectDir}/../rust"
-        // Runs the bindings generation, note that you must have uniffi-bindgen installed and in your PATH environment variable
 //        commandLine 'cargo', 'run', '--release', '--features=uniffi/cli', '--bin', 'uniffi-bindgen', 
 //        'generate', '../rust/lib/src/zingo.udl', '--language', 'kotlin', 
 //        '--out-dir', "${buildDir}/generated/source/uniffi/${variant.name}/java"
 //    }
 //    variant.javaCompileProvider.get().dependsOn(t)
-//    def sourceSet = variant.sourceSets.find { it.name == variant.name }
-//    sourceSet.java.srcDir new File(buildDir, "generated/source/uniffi/${variant.name}/java")
-    // XXX: I've been trying to make this work but I can't, so the compiled bindings will show as "regular sources" in Android Studio.
-    //idea.module.generatedSourceDirs += file("${buildDir}/generated/source/uniffi/${variant.name}/java/uniffi")
-//}
+    def sourceSet = variant.sourceSets.find { it.name == variant.name }
+    sourceSet.java.srcDir new File(buildDir, "generated/source/uniffi/${variant.name}/java")
+}
             
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
