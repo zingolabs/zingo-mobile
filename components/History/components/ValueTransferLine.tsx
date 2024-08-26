@@ -80,7 +80,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     setHaveMemo(memos.length > 0);
   }, [vt.memos]);
 
-  console.log('render ValueTransferLine - 5', index);
+  //console.log('render ValueTransferLine - 5', index);
 
   //if (index === 0) {
   //  vt.confirmations = 0;
