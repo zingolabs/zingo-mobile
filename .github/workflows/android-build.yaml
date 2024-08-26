@@ -48,7 +48,7 @@ jobs:
         id: kotlin-check-build-cache
         uses: actions/cache/restore@v4
         with:
-          path: android/app/src/main/jniLibs/${{ env.ARCH }}
+          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
           key: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
           lookup-only: true
 
@@ -97,14 +97,14 @@ jobs:
         run: |
           cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
           generate ./src/zingo.udl --language kotlin \
-          --out-dir ./src
+          --out-dir ../../android/app/build/generated/source/uniffi/debug/java
 
       - name: Upload kotlin uniffi
         uses: actions/upload-artifact@v4
         with:
           name: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-          path: rust/lib/src/uniffi/zingo/zingo.kt
-
+          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo/zingo.kt
+          
       - name: Set envs for x86_64
         if: ${{ env.ARCH == 'x86_64' }}
         run: |
@@ -194,10 +194,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
-          path: rust/lib/src/uniffi/zingo
+          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
 
       - name: Cache kotlin uniffi
         uses: actions/cache/save@v4
         with:
-          path: rust/lib/src/uniffi/zingo
+          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
           key: kotlin-android-uniffi-${{ env.ARCH }}-${{ env.CACHE-KEY }}
