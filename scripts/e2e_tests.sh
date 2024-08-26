@@ -263,8 +263,8 @@ else
         echo "AVD found: ${avd_name}"
     fi
 
-    echo -e "\nBuilding Detox..."
-    yarn detox build -c android.att.debug
+    echo -e "\nBuilding APKs..."
+    ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug -PsplitApk=true
 
     # Create e2e test report directory
     test_report_dir="app/build/outputs/e2e_test_reports/${abi}"
@@ -290,6 +290,25 @@ else
     adb shell settings put global transition_animation_scale 0.0
     adb shell settings put global animator_duration_scale 0.0
 
+    echo -e "\nInstalling APKs..."
+    i=0
+    step_complete=false
+    until [[ $step_complete == true ]]; do
+        if adb -s emulator-5554 install-multi-package -r -t -d --abi "${abi}" \
+                "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
+                "app/build/outputs/apk/debug/app-${abi}-debug.apk" &> "${test_report_dir}/apk_installation.txt"; then
+            step_complete=true
+            echo "Successfully installed APKs"
+        fi              
+        if [[ $i -ge 100 ]]; then
+            echo "Error: Failed to install APKs" >&2
+            echo "For more information see 'android/${test_report_dir}/apk_installation.txt'" >&2
+            exit 1
+        fi
+        i=$((i+1))
+        sleep 1
+    done
+
     # Store emulator info and start logging
     adb -s emulator-5554 shell getprop &> "${test_report_dir}/getprop.txt"
     adb -s emulator-5554 shell cat /proc/meminfo &> "${test_report_dir}/meminfo.txt"
@@ -302,7 +321,7 @@ else
 
     echo -e "\nRunning end-to-end tests..."
     nohup yarn start &> "${test_report_dir}/metro.txt" &
-    yarn detox test -c android.att.debug ${test_name}.test.js
+    yarn detox test -c android.att.debug ${test_name}.test.js --reuse
     success_status=$?
 
     # Store additional test outputs

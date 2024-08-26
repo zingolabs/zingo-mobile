@@ -72,7 +72,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     setHaveMemo(memos.length > 0);
   }, [vt.memos]);
 
-  console.log('render ValueTransferLine - 5', index);
+  //console.log('render ValueTransferLine - 5', index);
 
   return (
     <View testID={`vt-${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
