@@ -194,9 +194,6 @@ if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
     ../scripts/kill_emulators.sh
 fi
 
-echo -e "\nCleaning before run tests..."
-./gradlew clean
-
 # Create e2e test report directory
 test_report_dir="app/build/outputs/e2e_test_reports/${avd_name}"
 rm -rf "${test_report_dir}"

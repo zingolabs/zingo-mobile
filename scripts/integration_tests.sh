@@ -262,9 +262,6 @@ else
         echo "AVD found: ${avd_name}"
     fi
 
-    echo -e "\nCleaning before Building APKs..."
-    ./gradlew clean
-
     echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug -PsplitApk=true
 
