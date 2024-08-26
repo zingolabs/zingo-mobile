@@ -180,6 +180,9 @@ jobs:
           key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
 
+      - name: Folder for Kotlin uniffi
+        run: mkdir -p android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
+
       - name: Kotlin uniffi cache
         uses: actions/cache/restore@v4
         with:
