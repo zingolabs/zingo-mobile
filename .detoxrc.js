@@ -29,6 +29,14 @@ module.exports = {
         8081
       ]
     },
+    'android.debug.x86_64': {
+      type: 'android.apk',
+      binaryPath: 'android/app/build/outputs/apk/debug/app-x86_64-debug.apk',
+      build: 'cd android ; ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug ; cd -',
+      reversePorts: [
+        8081
+      ]
+    },
     'android.release': {
       type: 'android.apk',
       binaryPath: 'android/app/build/outputs/apk/release/app-release.apk',
@@ -73,6 +81,10 @@ module.exports = {
     'android.att.debug': {
       device: 'attached',
       app: 'android.debug'
+    },
+    'android.att.debug.x86_64': {
+      device: 'attached',
+      app: 'android.debug.x86_64'
     },
     'android.att.release': {
       device: 'attached',

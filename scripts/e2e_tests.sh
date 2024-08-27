@@ -313,7 +313,7 @@ else
 
     echo -e "\nRunning end-to-end tests..."
     nohup yarn start &> "${test_report_dir}/metro.txt" &
-    yarn detox test -c android.att.debug ${test_name}.test.js --reuse
+    yarn detox test -c android.att.debug.${abi} ${test_name}.test.js --reuse
     success_status=$?
 
     # Store additional test outputs
