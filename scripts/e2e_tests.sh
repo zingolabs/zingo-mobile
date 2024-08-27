@@ -230,6 +230,7 @@ avd_name="${device}_api-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
 sdkmanager --install "${sdk}"
 echo y | sdkmanager --licenses
+sdkmanager "ndk;23.2.8568313"
 
 # Kill all emulators
 ../scripts/kill_emulators.sh
@@ -244,6 +245,7 @@ if [[ $create_snapshot == true ]]; then
     adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
+    echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed" 
     sleep 1
     echo -e "\nSnapshot saved"
@@ -273,6 +275,7 @@ else
     adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
+    echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Device online"
     sleep 1
 
