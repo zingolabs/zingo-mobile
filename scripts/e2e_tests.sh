@@ -279,11 +279,11 @@ else
     echo "Device online"
     sleep 1
 
-        # Disable animations
-    adb shell input keyevent 82
-    adb shell settings put global window_animation_scale 0.0
-    adb shell settings put global transition_animation_scale 0.0
-    adb shell settings put global animator_duration_scale 0.0
+    # Disable animations
+    #adb shell input keyevent 82
+    #adb shell settings put global window_animation_scale 0.0
+    #adb shell settings put global transition_animation_scale 0.0
+    #adb shell settings put global animator_duration_scale 0.0
 
     echo -e "\nInstalling APKs..."
     i=0
