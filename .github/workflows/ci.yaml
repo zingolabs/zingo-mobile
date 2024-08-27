@@ -19,7 +19,7 @@ jobs:
   android-build:
     strategy:
       matrix:
-        arch: [ x86_64 ]
+        arch: [ x86_64, x86 ]
     uses: ./.github/workflows/android-build.yaml
     needs: create-cache-key
     with:
@@ -36,7 +36,7 @@ jobs:
   android-e2e-test:
     strategy:
       matrix:
-        abi: [ x86_64 ]
+        abi: [ x86_64, x86 ]
     uses: ./.github/workflows/android-e2e-test.yaml
     needs: [ create-timestamp, create-cache-key, android-test ]
     with:
@@ -47,7 +47,7 @@ jobs:
   android-integration-test:
     strategy:
       matrix:
-        abi: [ x86_64 ]
+        abi: [ x86_64, x86 ]
     uses: ./.github/workflows/android-integration-test.yaml
     needs: [ create-timestamp, create-cache-key, android-test ]
     with:
