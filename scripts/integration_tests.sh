@@ -229,6 +229,7 @@ avd_name="android-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
 sdkmanager --install "${sdk}"
 echo y | sdkmanager --licenses
+sdkmanager "ndk;23.2.8568313"
 
 # Kill all emulators
 ../scripts/kill_emulators.sh
@@ -237,15 +238,12 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
 
-    echo -e "\n\nWaiting for emulator to launch..."
+    echo -e "\n\nWaiting for emulator to launch & boot..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> /dev/null &
-    wait_for $timeout_seconds check_launch
-    wait_for $timeout_seconds check_device_online
+    adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
-    echo -e "\nWaiting for AVD to boot..."
-    wait_for $timeout_seconds check_boot
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed" 
     sleep 1
@@ -270,15 +268,12 @@ else
     rm -rf "${test_report_dir}"
     mkdir -p "${test_report_dir}"
 
-    echo -e "\n\nWaiting for emulator to launch..."
+    echo -e "\n\nWaiting for emulator to launch & boot..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
-    wait_for $timeout_seconds check_launch
-    wait_for $timeout_seconds check_device_online
+    adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
-    echo -e "\nWaiting for AVD to boot..."
-    wait_for $timeout_seconds check_boot
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Device online"
     sleep 1
