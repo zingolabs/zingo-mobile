@@ -37,6 +37,30 @@ module.exports = {
         8081
       ]
     },
+    'android.debug.x86': {
+      type: 'android.apk',
+      binaryPath: 'android/app/build/outputs/apk/debug/app-x86-debug.apk',
+      build: 'cd android ; ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug ; cd -',
+      reversePorts: [
+        8081
+      ]
+    },
+    'android.debug.arm64-v8a': {
+      type: 'android.apk',
+      binaryPath: 'android/app/build/outputs/apk/debug/app-arm64-v8a-debug.apk',
+      build: 'cd android ; ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug ; cd -',
+      reversePorts: [
+        8081
+      ]
+    },
+    'android.debug.armeabi-v7a': {
+      type: 'android.apk',
+      binaryPath: 'android/app/build/outputs/apk/debug/app-armeabi-v7a-debug.apk',
+      build: 'cd android ; ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug ; cd -',
+      reversePorts: [
+        8081
+      ]
+    },
     'android.release': {
       type: 'android.apk',
       binaryPath: 'android/app/build/outputs/apk/release/app-release.apk',
