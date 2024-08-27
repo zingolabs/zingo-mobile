@@ -58,22 +58,22 @@ while getopts 'a:l:t:sx:h' OPTION; do
             case "$abi" in
                 x86_64)
                     api_level_default="30"
-                    api_target_default="google_apis_playstore"
+                    api_target_default="default"
                     arch="x86_64"
                     ;;
                 x86) 
                     api_level_default="30"
-                    api_target_default="google_apis_playstore"
+                    api_target_default="default"
                     arch="x86"
                     ;;
                 arm64-v8a)
                     api_level_default="30"
-                    api_target_default="google_apis_playstore"
+                    api_target_default="default"
                     arch="x86_64"
                     ;;
                 armeabi-v7a)
                     api_level_default="30"
-                    api_target_default="google_apis_playstore"
+                    api_target_default="default"
                     arch="x86"
                     ;;
                 *)
