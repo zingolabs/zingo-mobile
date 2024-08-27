@@ -151,7 +151,7 @@ fi
 
 case "$abi" in
     x86_64)
-        api_level_default="30"
+        api_level_default="34"
         api_target_default="google_atd"
         if [ $intel_host_os == true ]; then       
             arch="x86_64"
@@ -169,7 +169,7 @@ case "$abi" in
         fi
         ;;
     arm64-v8a)
-        api_level_default="30"
+        api_level_default="34"
         api_target_default="google_atd"
         if [ $intel_host_os == true ]; then       
             arch="x86_64"

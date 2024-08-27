@@ -57,7 +57,7 @@ while getopts 'a:l:t:sx:h' OPTION; do
             abi="$OPTARG"
             case "$abi" in
                 x86_64)
-                    api_level_default="30"
+                    api_level_default="34"
                     api_target_default="google_atd"
                     arch="x86_64"
                     ;;
@@ -67,7 +67,7 @@ while getopts 'a:l:t:sx:h' OPTION; do
                     arch="x86"
                     ;;
                 arm64-v8a)
-                    api_level_default="30"
+                    api_level_default="34"
                     api_target_default="google_atd"
                     arch="x86_64"
                     ;;
