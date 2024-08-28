@@ -226,7 +226,8 @@ echo "Installing latest emulator..."
 sdkmanager --install emulator --channel=0
 
 echo "Installing system image..."
-avd_name="${device}_api-${api_level}_${api_target}_${arch}"
+#avd_name="${device}_api-${api_level}_${api_target}_${arch}"
+avd_name="android-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
 sdkmanager --install "${sdk}"
 echo y | sdkmanager --licenses
@@ -236,10 +237,10 @@ echo y | sdkmanager --licenses
 
 if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
-    echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "${device}"
+    echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" #--device "${device}"
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
-    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu off -no-boot-anim \
+    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu off -no-boot-anim -camera-back none \
         -no-snapshot-load -port 5554 &> /dev/null &
     adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
@@ -253,7 +254,7 @@ else
     if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
         echo "AVD not found"
         echo -e "\nCreating AVD..."
-        echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" --device "$(device)"
+        echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" #--device "$(device)"
         echo -e "\n\nTo create a quick-boot snapshot for faster e2e tests use the '-s' flag"
         echo "Try '$(basename $0) -h' for more information."
     else
@@ -272,7 +273,7 @@ else
     mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
-    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu off -no-boot-anim \
+    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu off -no-boot-anim -camera-back none \
         -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
     adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
@@ -318,7 +319,7 @@ else
 
     echo -e "\nRunning end-to-end tests..."
     nohup yarn start &> "${test_report_dir}/metro.txt" &
-    yarn detox test -c android.att.debug.${abi} ${test_name}.test.js --reuse
+    yarn detox test -c android.att.debug.${abi} ${test_name}.test.js --reuse --headless
     success_status=$?
 
     # Store additional test outputs
