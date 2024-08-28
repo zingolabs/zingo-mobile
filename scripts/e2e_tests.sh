@@ -152,7 +152,7 @@ fi
 case "$abi" in
     x86_64)
         api_level_default="30"
-        api_target_default="google_apis"
+        api_target_default="google_apis_playstore"
         if [ $intel_host_os == true ]; then       
             arch="x86_64"
         else
@@ -161,7 +161,7 @@ case "$abi" in
         ;;
     x86) 
         api_level_default="30"
-        api_target_default="google_apis"
+        api_target_default="google_apis_playstore"
         if [ $intel_host_os == true ]; then       
             arch="x86"
         else
@@ -170,7 +170,7 @@ case "$abi" in
         ;;
     arm64-v8a)
         api_level_default="30"
-        api_target_default="google_apis"
+        api_target_default="google_apis_playstore"
         if [ $intel_host_os == true ]; then       
             arch="x86_64"
         else
@@ -179,7 +179,7 @@ case "$abi" in
         ;;
     armeabi-v7a)
         api_level_default="30"
-        api_target_default="google_apis"
+        api_target_default="google_apis_playstore"
         if [ $intel_host_os == true ]; then       
             arch="x86"
         else
@@ -280,10 +280,10 @@ else
     sleep 1
 
     # Disable animations
-    #adb shell input keyevent 82
-    #adb shell settings put global window_animation_scale 0.0
-    #adb shell settings put global transition_animation_scale 0.0
-    #adb shell settings put global animator_duration_scale 0.0
+    adb shell input keyevent 82
+    adb shell settings put global window_animation_scale 0.0
+    adb shell settings put global transition_animation_scale 0.0
+    adb shell settings put global animator_duration_scale 0.0
 
     echo -e "\nInstalling APKs..."
     i=0
