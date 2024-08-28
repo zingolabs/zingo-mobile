@@ -110,6 +110,18 @@ module.exports = {
       device: 'attached',
       app: 'android.debug.x86_64'
     },
+    'android.att.debug.x86': {
+      device: 'attached',
+      app: 'android.debug.x86'
+    },
+    'android.att.debug.arm64-v8a': {
+      device: 'attached',
+      app: 'android.debug.arm64-v8a'
+    },
+    'android.att.debug.armeabi-v7a': {
+      device: 'attached',
+      app: 'android.debug.armeabi-v7a'
+    },
     'android.att.release': {
       device: 'attached',
       app: 'android.release'

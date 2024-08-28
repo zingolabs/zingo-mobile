@@ -229,7 +229,6 @@ avd_name="android-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
 sdkmanager --install "${sdk}"
 echo y | sdkmanager --licenses
-sdkmanager "ndk;23.2.8568313"
 
 # Kill all emulators
 ../scripts/kill_emulators.sh
@@ -259,6 +258,9 @@ else
     else
         echo "AVD found: ${avd_name}"
     fi
+
+    echo -e "\nInstalling NDK..."
+    sdkmanager "ndk;23.2.8568313"
 
     echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug -PsplitApk=true
