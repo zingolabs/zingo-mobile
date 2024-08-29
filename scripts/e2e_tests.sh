@@ -189,7 +189,8 @@ sdkmanager --install emulator --channel=0
 echo "Installing system image..."
 avd_name="${device}_api-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
-sdkmanager --install "${sdk}"
+platform="platforms;android-${api_level}"
+sdkmanager --install "${sdk}" "${platform}"
 echo y | sdkmanager --licenses
 
 # Kill all emulators
