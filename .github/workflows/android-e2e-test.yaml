@@ -68,7 +68,7 @@ jobs:
         if: steps.avd-cache.outputs.cache-hit != 'true'
         run: |
           echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
-          echo "${HOME}/.android/avd" >> $GITHUB_PATH
+          echo ANDROID_AVD_HOME="${HOME}/.android/avd" >> $GITHUB_ENV
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
