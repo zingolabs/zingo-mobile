@@ -200,9 +200,10 @@ if [[ $create_snapshot == true ]]; then
     echo no | avdmanager --verbose create avd --force --name "${avd_name}" --abi "${arch}" --package "${sdk}" --device "${device}"
 
     echo -e "\nAVD's List..."
-    echo avdmanager list avd
+    echo "$(avdmanager list avd)"
 
     avd_path="$(avdmanager list avd | grep "Path:" | cut -f2)"
+    echo "$(ls -la $avd_path)"
     echo "hw.lcd.density=420" >> "${avd_path}/config.ini"
     echo "hw.lcd.height=2400" >> "${avd_path}/config.ini"
     echo "hw.lcd.width=1080" >> "${avd_path}/config.ini"
@@ -228,7 +229,7 @@ else
         echo no | avdmanager --verbose create avd --force --name "${avd_name}" --abi "${arch}" --package "${sdk}" --device "${device}"
 
         echo -e "\nAVD's List..."
-        echo avdmanager list avd
+        echo "$(avdmanager list avd)"
 
         avd_path="$(avdmanager list avd | grep "Path:" | cut -f2)"
         echo "hw.lcd.density=420" >> "${avd_path}/config.ini"
