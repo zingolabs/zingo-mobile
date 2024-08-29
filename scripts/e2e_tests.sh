@@ -202,7 +202,7 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\nAVD's List..."
     echo "$(avdmanager list avd)"
 
-    avd_path="---$(avdmanager list avd | grep "Path:" | cut -f2)/config.ini---"
+    avd_path="$(avdmanager list avd | grep "Path:" | cut -d':' -f2 | tr -d ' ')/config.ini"
     echo "$(ls -la "${avd_path}")"
     echo "hw.lcd.density=420" > "${avd_path}"
     echo "hw.lcd.height=2400" > "${avd_path}"
@@ -231,7 +231,7 @@ else
         echo -e "\nAVD's List..."
         echo "$(avdmanager list avd)"
 
-        avd_path="---$(avdmanager list avd | grep "Path:" | cut -f2)/config.ini---"
+        avd_path="$(avdmanager list avd | grep "Path:" | cut -d':' -f2 | tr -d ' ')/config.ini"
         echo "$(ls -la "${avd_path}")"
         echo "hw.lcd.density=420" > "${avd_path}"
         echo "hw.lcd.height=2400" > "${avd_path}"
