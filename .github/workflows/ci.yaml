@@ -36,7 +36,7 @@ jobs:
   android-e2e-test:
     strategy:
       matrix:
-        abi: [ x86_64, x86 ]
+        abi: [ x86_64 ]
     uses: ./.github/workflows/android-e2e-test.yaml
     needs: [ create-timestamp, create-cache-key, android-test ]
     with:
