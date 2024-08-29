@@ -14,45 +14,6 @@ valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" 
 timeout_seconds=1800  # default timeout set to 30 minutes
 device="pixel_7"
 
-function check_launch() {
-    emulator_status=$(adb devices | grep "emulator-5554" | cut -f1)
-    if [ "${emulator_status}" = "emulator-5554" ]; then
-        return 0;
-    else
-        return 1;
-    fi
-}
-
-function check_boot() {
-    boot_status=$(adb -s emulator-5554 shell getprop sys.boot_completed)
-    if [ "${boot_status}" = "1" ]; then
-        return 0;
-    else
-        return 1;
-    fi
-}
-
-function check_device_online() {
-    device_status=$(adb devices | grep emulator-5554 | cut -f2)
-    if [ "${device_status}" = "offline" ]; then
-        return 1;
-    fi
-    return 0;
-}
-
-function wait_for() {
-    timeout_seconds=$1
-    shift 1
-    until [ $timeout_seconds -le 0 ] || ("$@" &> /dev/null); do
-        sleep 1
-        timeout_seconds=$(( timeout_seconds - 1 ))
-    done
-    if [ $timeout_seconds -le 0 ]; then
-        echo -e "\nError: Timeout" >&2
-        exit 1
-    fi
-}
-
 while getopts 'a:Al:e:t:sx:h' OPTION; do
     case "$OPTION" in
         a)
@@ -240,7 +201,7 @@ if [[ $create_snapshot == true ]]; then
     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" #--device "${device}"
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
-    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu off -no-boot-anim -camera-back none \
+    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim -camera-back none \
         -no-snapshot-load -port 5554 &> /dev/null &
     adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
@@ -261,9 +222,6 @@ else
         echo "AVD found: ${avd_name}"
     fi
 
-    echo -e "\nInstalling NDK..."
-    sdkmanager "ndk;23.2.8568313"
-
     echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug -PsplitApk=true
 
@@ -273,7 +231,7 @@ else
     mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
-    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu off -no-boot-anim -camera-back none \
+    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim -camera-back none \
         -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
     adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
@@ -283,10 +241,10 @@ else
     sleep 1
 
     # Disable animations
-    #adb shell input keyevent 82
-    #adb shell settings put global window_animation_scale 0.0
-    #adb shell settings put global transition_animation_scale 0.0
-    #adb shell settings put global animator_duration_scale 0.0
+    adb shell input keyevent 82
+    adb shell settings put global window_animation_scale 0.0
+    adb shell settings put global transition_animation_scale 0.0
+    adb shell settings put global animator_duration_scale 0.0
 
     echo -e "\nInstalling APKs..."
     i=0
