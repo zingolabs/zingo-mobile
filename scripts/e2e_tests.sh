@@ -212,7 +212,7 @@ if [[ $create_snapshot == true ]]; then
     echo "disk.dataPartition.size=4G" > "${avd_path}"
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
-    nohup emulator -avd "${avd_name}" -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim
+    nohup emulator -avd "${avd_name}" -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim -port 5554
     adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
@@ -254,7 +254,7 @@ else
     mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
-    nohup emulator -avd "${avd_name}" -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim &> "${test_report_dir}/emulator.txt" &
+    nohup emulator -avd "${avd_name}" -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim -port 5554 &> "${test_report_dir}/emulator.txt" &
     adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 

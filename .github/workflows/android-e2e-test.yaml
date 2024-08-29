@@ -66,7 +66,9 @@ jobs:
       
       - name: Add emulator to PATH
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
+        run: |
+          echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
+          echo "${HOME}/.android/avd" >> $GITHUB_PATH
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -192,7 +194,10 @@ jobs:
         uses: android-actions/setup-android@v3
       
       - name: Add emulator to PATH
-        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
+        run: |
+          echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
+          echo "${HOME}/.android/avd" >> $GITHUB_PATH
+
             
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
