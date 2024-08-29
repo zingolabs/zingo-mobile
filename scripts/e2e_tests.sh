@@ -213,7 +213,7 @@ if [[ $create_snapshot == true ]]; then
     echo "disk.dataPartition.size=4G" > "${avd_path}"
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
-    nohup emulator --verbose -avd "${avd_name}" -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim  &> /dev/null &
+    nohup emulator -avd "${avd_name}" -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim
     adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
@@ -239,7 +239,7 @@ else
 
         echo "vm.heapSize=576" > "${avd_path}"
         echo "hw.ramSize=2048" > "${avd_path}"
-        echo "disk.dataPartition.size=4G" >> "${avd_path}"
+        echo "disk.dataPartition.size=4G" > "${avd_path}"
 
         echo -e "\n\nTo create a quick-boot snapshot for faster e2e tests use the '-s' flag"
         echo "Try '$(basename $0) -h' for more information."
