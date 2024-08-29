@@ -113,7 +113,7 @@ fi
 case "$abi" in
     x86_64)
         api_level_default="30"
-        api_target_default="google_apis_playstore"
+        api_target_default="default"
         if [ $intel_host_os == true ]; then       
             arch="x86_64"
         else
@@ -122,7 +122,7 @@ case "$abi" in
         ;;
     x86) 
         api_level_default="30"
-        api_target_default="google_apis_playstore"
+        api_target_default="default"
         if [ $intel_host_os == true ]; then       
             arch="x86"
         else
@@ -131,7 +131,7 @@ case "$abi" in
         ;;
     arm64-v8a)
         api_level_default="30"
-        api_target_default="google_apis_playstore"
+        api_target_default="default"
         if [ $intel_host_os == true ]; then       
             arch="x86_64"
         else
@@ -140,7 +140,7 @@ case "$abi" in
         ;;
     armeabi-v7a)
         api_level_default="30"
-        api_target_default="google_apis_playstore"
+        api_target_default="default"
         if [ $intel_host_os == true ]; then       
             arch="x86"
         else
@@ -187,8 +187,7 @@ echo "Installing latest emulator..."
 sdkmanager --install emulator --channel=0
 
 echo "Installing system image..."
-#avd_name="${device}_api-${api_level}_${api_target}_${arch}"
-avd_name="android-${api_level}_${api_target}_${arch}"
+avd_name="${device}_api-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
 sdkmanager --install "${sdk}"
 echo y | sdkmanager --licenses
@@ -198,24 +197,48 @@ echo y | sdkmanager --licenses
 
 if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
-    echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" #--device "${device}"
+    echo no | avdmanager --verbose create avd --force --name "${avd_name}" --abi "${arch}" --package "${sdk}" --device "${device}"
+
+    echo -e "\nAVD's List..."
+    echo avdmanager list avd
+
+    avd_path="$(avdmanager list avd | grep "Path:" | cut -f2)"
+    echo "hw.lcd.density=420" > "${avd_path}/config.ini"
+    echo "hw.lcd.height=2400" > "${avd_path}/config.ini"
+    echo "hw.lcd.width=1080" > "${avd_path}/config.ini"
+
+    echo "vm.heapSize=576" > "${avd_path}/config.ini"
+    echo "hw.ramSize=2048" > "${avd_path}/config.ini"
+    echo "disk.dataPartition.size=4G" > "${avd_path}/config.ini"
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
-    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim -camera-back none \
-        -no-snapshot-load -port 5554 &> /dev/null &
+    nohup emulator --verbose -avd "${avd_name}" -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim  &> /dev/null &
     adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed" 
-    sleep 1
+    sleep 5
     echo -e "\nSnapshot saved"
 else
     echo -e "\nChecking for AVD..."
     if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
         echo "AVD not found"
         echo -e "\nCreating AVD..."
-        echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}" #--device "$(device)"
+        echo no | avdmanager --verbose create avd --force --name "${avd_name}" --abi "${arch}" --package "${sdk}" --device "${device}"
+
+        echo -e "\nAVD's List..."
+        echo avdmanager list avd
+
+        avd_path="$(avdmanager list avd | grep "Path:" | cut -f2)"
+        echo "hw.lcd.density=420" > "${avd_path}/config.ini"
+        echo "hw.lcd.height=2400" > "${avd_path}/config.ini"
+        echo "hw.lcd.width=1080" > "${avd_path}/config.ini"
+
+        echo "vm.heapSize=576" > "${avd_path}/config.ini"
+        echo "hw.ramSize=2048" > "${avd_path}/config.ini"
+        echo "disk.dataPartition.size=4G" > "${avd_path}/config.ini"
+
         echo -e "\n\nTo create a quick-boot snapshot for faster e2e tests use the '-s' flag"
         echo "Try '$(basename $0) -h' for more information."
     else
@@ -231,20 +254,22 @@ else
     mkdir -p "${test_report_dir}"
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
-    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim -camera-back none \
-        -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
+    nohup emulator -avd "${avd_name}" -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim &> "${test_report_dir}/emulator.txt" &
     adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Device online"
-    sleep 1
+    sleep 5
 
     # Disable animations
     adb shell input keyevent 82
     adb shell settings put global window_animation_scale 0.0
     adb shell settings put global transition_animation_scale 0.0
     adb shell settings put global animator_duration_scale 0.0
+
+    # restart adb in root mode
+    adb root
 
     echo -e "\nInstalling APKs..."
     i=0
