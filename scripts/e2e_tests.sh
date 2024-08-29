@@ -202,15 +202,15 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\nAVD's List..."
     echo "$(avdmanager list avd)"
 
-    avd_path="$(avdmanager list avd | grep "Path:" | cut -f2)"
-    echo "$(ls -la $avd_path)"
-    echo "hw.lcd.density=420" >> "${avd_path}/config.ini"
-    echo "hw.lcd.height=2400" >> "${avd_path}/config.ini"
-    echo "hw.lcd.width=1080" >> "${avd_path}/config.ini"
+    avd_path="---$(avdmanager list avd | grep "Path:" | cut -f2)/config.ini---"
+    echo "$(ls -la "${avd_path}")"
+    echo "hw.lcd.density=420" > "${avd_path}"
+    echo "hw.lcd.height=2400" > "${avd_path}"
+    echo "hw.lcd.width=1080" > "${avd_path}"
 
-    echo "vm.heapSize=576" >> "${avd_path}/config.ini"
-    echo "hw.ramSize=2048" >> "${avd_path}/config.ini"
-    echo "disk.dataPartition.size=4G" >> "${avd_path}/config.ini"
+    echo "vm.heapSize=576" > "${avd_path}"
+    echo "hw.ramSize=2048" > "${avd_path}"
+    echo "disk.dataPartition.size=4G" > "${avd_path}"
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
     nohup emulator --verbose -avd "${avd_name}" -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim  &> /dev/null &
@@ -231,14 +231,15 @@ else
         echo -e "\nAVD's List..."
         echo "$(avdmanager list avd)"
 
-        avd_path="$(avdmanager list avd | grep "Path:" | cut -f2)"
-        echo "hw.lcd.density=420" >> "${avd_path}/config.ini"
-        echo "hw.lcd.height=2400" >> "${avd_path}/config.ini"
-        echo "hw.lcd.width=1080" >> "${avd_path}/config.ini"
+        avd_path="---$(avdmanager list avd | grep "Path:" | cut -f2)/config.ini---"
+        echo "$(ls -la "${avd_path}")"
+        echo "hw.lcd.density=420" > "${avd_path}"
+        echo "hw.lcd.height=2400" > "${avd_path}"
+        echo "hw.lcd.width=1080" > "${avd_path}"
 
-        echo "vm.heapSize=576" >> "${avd_path}/config.ini"
-        echo "hw.ramSize=2048" >> "${avd_path}/config.ini"
-        echo "disk.dataPartition.size=4G" >> "${avd_path}/config.ini"
+        echo "vm.heapSize=576" > "${avd_path}"
+        echo "hw.ramSize=2048" > "${avd_path}"
+        echo "disk.dataPartition.size=4G" >> "${avd_path}"
 
         echo -e "\n\nTo create a quick-boot snapshot for faster e2e tests use the '-s' flag"
         echo "Try '$(basename $0) -h' for more information."
@@ -323,7 +324,7 @@ else
         exit 1
     fi
 
-    echo -e "\e2e tests PASSED"
+    echo -e "\ne2e tests PASSED"
 fi
 
 # Kill all emulators
