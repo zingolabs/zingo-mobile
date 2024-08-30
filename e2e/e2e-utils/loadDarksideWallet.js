@@ -1,7 +1,11 @@
 // loads the 'darkside faucet' wallet for the darkside module in zingo-mobile e2e tests
 // requires e2e test to be run by cargo test runner
 // see `rust/android/test/e2e_tests.rs` and `README.md`
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 let loadDarksideWallet = async () => {
+  await sleep(10000);
+  
   // the start always is like a fress install -> create a new wallet
   // go to setting modal screen
   await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);

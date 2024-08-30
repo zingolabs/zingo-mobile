@@ -10,7 +10,7 @@ describe('Maintains correct information while tx pending', () => {
   it('loads the wallet', loadRecipientWallet);
   it('should send from orchard to sapling pool', async () => {
     // wait for fully synced.
-    await sleep(10000);
+    await sleep(4000);
     
     await element(by.text('SEND')).tap();
     await element(by.id('send.addressplaceholder')).replaceText(
