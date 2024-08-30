@@ -172,24 +172,33 @@ if [ ! -d "./android/app" ]; then
     exit 1
 fi
 
-echo -e "\nRemoving node_modules before yarn..."
-rm -rf ./node_modules
+#echo -e "\nRemoving node_modules before yarn..."
+#rm -rf ./node_modules
 
 echo -e "\nRunning yarn..."
 yarn
 
 cd android
 
-echo -e "\nInstalling latest build tools, platform tools, and platform..."
-sdkmanager --install 'build-tools;34.0.0' platform-tools
-
-echo "Installing latest emulator..."
-sdkmanager --install emulator --channel=0
-
-echo "Installing system image..."
 avd_name="${device}_api-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
+platform="platforms;android-${api-level}"
+
+#echo -e "\nInstalling latest build tools..."
+#sdkmanager --install 'build-tools;34.0.0'
+
+#echo -e "\nInstalling platform tools..."
+#sdkmanager --install platform-tools
+
+echo "Installing android platform..."
+sdkmanager --install "${platform}"
+
+#echo "Installing latest emulator..."
+#sdkmanager --install emulator --channel=0
+
+echo "Installing system image..."
 sdkmanager --install "${sdk}"
+
 echo y | sdkmanager --licenses
 
 # Kill all emulators
