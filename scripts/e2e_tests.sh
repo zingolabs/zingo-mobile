@@ -252,23 +252,40 @@ else
     adb root
 
     # Disable animations
-    adb shell input keyevent 82
-    adb shell settings put global window_animation_scale 0.0
-    adb shell settings put global transition_animation_scale 0.0
-    adb shell settings put global animator_duration_scale 0.0
+    #adb shell input keyevent 82
+    #adb shell settings put global window_animation_scale 0.0
+    #adb shell settings put global transition_animation_scale 0.0
+    #adb shell settings put global animator_duration_scale 0.0
 
-    echo -e "\nInstalling APKs..."
+    echo -e "\nInstalling Test APK..."
     i=0
     step_complete=false
     until [[ $step_complete == true ]]; do
-        if adb -s emulator-5554 install-multi-package -r -t -d --abi "${abi}" \
-                "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
-                "app/build/outputs/apk/debug/app-${abi}-debug.apk" &> "${test_report_dir}/apk_installation.txt"; then
+        if adb -s emulator-5554 install -r -t -d \
+                "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" &> "${test_report_dir}/apk_installation.txt"; then
             step_complete=true
-            echo "Successfully installed APKs"
+            echo "Successfully installed Test APK"
         fi              
         if [[ $i -ge 100 ]]; then
-            echo "Error: Failed to install APKs" >&2
+            echo "Error: Failed to install Test APK" >&2
+            echo "For more information see 'android/${test_report_dir}/apk_installation.txt'" >&2
+            exit 1
+        fi
+        i=$((i+1))
+        sleep 1
+    done
+
+    echo -e "\nInstalling ABI APK..."
+    i=0
+    step_complete=false
+    until [[ $step_complete == true ]]; do
+        if adb -s emulator-5554 install -r -t -d --abi "${abi}" \
+                "app/build/outputs/apk/debug/app-${abi}-debug.apk" &> "${test_report_dir}/apk_installation.txt"; then
+            step_complete=true
+            echo "Successfully installed ABI APK"
+        fi              
+        if [[ $i -ge 100 ]]; then
+            echo "Error: Failed to install ABI APK" >&2
             echo "For more information see 'android/${test_report_dir}/apk_installation.txt'" >&2
             exit 1
         fi
