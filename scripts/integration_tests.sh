@@ -180,6 +180,9 @@ yarn
 
 cd android
 
+avd_name="android-${api_level}_${api_target}_${arch}"
+sdk="system-images;android-${api_level};${api_target};${arch}"
+
 echo -e "\nInstalling latest build tools, platform tools, and platform..."
 sdkmanager --install 'build-tools;34.0.0' platform-tools
 
@@ -187,10 +190,8 @@ echo "Installing latest emulator..."
 sdkmanager --install emulator --channel=0
 
 echo "Installing system image..."
-
-avd_name="android-${api_level}_${api_target}_${arch}"
-sdk="system-images;android-${api_level};${api_target};${arch}"
 sdkmanager --install "${sdk}"
+
 echo y | sdkmanager --licenses
 
 # Kill all emulators
@@ -202,7 +203,7 @@ if [[ $create_snapshot == true ]]; then
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-        -no-snapshot-load -port 5554 &
+        -no-snapshot-load -port 5554 &> /dev/null &
     echo -e "\n\nWaiting more..."
     adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"

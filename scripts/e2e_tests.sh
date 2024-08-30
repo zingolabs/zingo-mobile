@@ -113,7 +113,7 @@ fi
 case "$abi" in
     x86_64)
         api_level_default="30"
-        api_target_default="default"
+        api_target_default="aosp_atd"
         if [ $intel_host_os == true ]; then       
             arch="x86_64"
         else
@@ -122,7 +122,7 @@ case "$abi" in
         ;;
     x86) 
         api_level_default="30"
-        api_target_default="default"
+        api_target_default="aosp_atd"
         if [ $intel_host_os == true ]; then       
             arch="x86"
         else
@@ -131,7 +131,7 @@ case "$abi" in
         ;;
     arm64-v8a)
         api_level_default="30"
-        api_target_default="default"
+        api_target_default="aosp_atd"
         if [ $intel_host_os == true ]; then       
             arch="x86_64"
         else
@@ -140,7 +140,7 @@ case "$abi" in
         ;;
     armeabi-v7a)
         api_level_default="30"
-        api_target_default="default"
+        api_target_default="aosp_atd"
         if [ $intel_host_os == true ]; then       
             arch="x86"
         else
@@ -182,7 +182,7 @@ cd android
 
 avd_name="${device}_api-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
-platform="platforms;android-${api-level}"
+platform="platforms;android-${api_level}"
 
 echo -e "\nInstalling platform tools..."
 sdkmanager --install platform-tools
