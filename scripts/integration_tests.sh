@@ -210,7 +210,7 @@ if [[ $create_snapshot == true ]]; then
 
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed" 
-    sleep 1
+    sleep 5
     echo -e "\nSnapshot saved"
 else
     echo -e "\nChecking for AVD..."
@@ -235,15 +235,16 @@ else
     echo -e "\n\nWaiting for emulator to launch & boot..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
-    adb wait-for-device
-    echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
+    adb wait-for-device \
+        shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
+    #echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
-    echo $(adb -s emulator-5554 emu avd name | head -1)
+    #echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Device online"
-    sleep 1
+    sleep 5
 
     # Disable animations
-    adb shell input keyevent 82
+    #adb shell input keyevent 82
     adb shell settings put global window_animation_scale 0.0
     adb shell settings put global transition_animation_scale 0.0
     adb shell settings put global animator_duration_scale 0.0
