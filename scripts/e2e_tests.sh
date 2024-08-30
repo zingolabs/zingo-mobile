@@ -241,15 +241,16 @@ else
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
     nohup emulator -avd "${avd_name}" -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim -port 5554 &> "${test_report_dir}/emulator.txt" &
-    adb wait-for-device
-    echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
+    adb wait-for-device \
+        shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
+    #echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
-    echo $(adb -s emulator-5554 emu avd name | head -1)
+    #echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Device online"
     sleep 5
 
     # restart adb in root mode
-    adb root
+    #adb root
 
     # Disable animations
     #adb shell input keyevent 82
