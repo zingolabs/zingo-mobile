@@ -112,7 +112,7 @@ fi
 
 case "$abi" in
     x86_64)
-        api_level_default="31"
+        api_level_default="30"
         api_target_default="default"
         if [ $intel_host_os == true ]; then       
             arch="x86_64"
@@ -130,7 +130,7 @@ case "$abi" in
         fi
         ;;
     arm64-v8a)
-        api_level_default="31"
+        api_level_default="30"
         api_target_default="default"
         if [ $intel_host_os == true ]; then       
             arch="x86_64"
@@ -189,8 +189,7 @@ sdkmanager --install emulator --channel=0
 echo "Installing system image..."
 avd_name="${device}_api-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
-platform="platforms;android-${api_level}"
-sdkmanager --install "${platform}" "${sdk}"
+sdkmanager --install "${sdk}"
 echo y | sdkmanager --licenses
 
 # Kill all emulators
