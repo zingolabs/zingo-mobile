@@ -3,6 +3,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let loadTestWallet = async () => {
   // waiting while app is detecting the best server
   await sleep(10000);
+  
   // the start always is like a fresh install -> create a new wallet
   // go to setting modal screen
   await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);

@@ -8,7 +8,7 @@ describe('Change the Server from the list.', () => {
   // i just pulled this seed out of thin air
   it('loads a wallet', loadTestWallet);
   it('Go settings & change to an existent server in the list.', async () => {
-    await sleep(2000);
+    await sleep(4000);
 
     // go to setting modal screen
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);

@@ -1,7 +1,11 @@
 const { log, device, by, element } = require('detox');
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 describe('New Wallet', () => {
   it('New wallet creation flow works.', async () => {
+    await sleep(10000);
+
     // go to setting modal screen
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();

@@ -9,7 +9,7 @@ describe('Kepp the screen awake while syncing.', () => {
   // i just pulled this seed out of thin air
   it('loads a wallet', loadTestWallet);
   it('When App is syncing -> The screen have to be awake all the time', async () => {
-    await sleep(2000);
+    await sleep(4000);
     
     // Set the screen off timeout to 10 seconds
     const resultSet = spawnSync('adb', ['-e', 'shell', 'settings', 'put', 'system', 'screen_off_timeout', '10000']);
