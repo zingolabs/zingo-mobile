@@ -242,9 +242,6 @@ else
     echo "Device online"
     sleep 1
 
-    # restart adb in root mode
-    adb root
-
     # Disable animations
     adb shell input keyevent 82
     adb shell settings put global window_animation_scale 0.0
