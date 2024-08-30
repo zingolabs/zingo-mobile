@@ -202,7 +202,8 @@ if [[ $create_snapshot == true ]]; then
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-        -no-snapshot-load -port 5554
+        -no-snapshot-load -port 5554 &
+    echo -e "\n\nWaiting more..."
     adb wait-for-device
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
