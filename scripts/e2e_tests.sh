@@ -208,18 +208,6 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
     echo no | avdmanager --verbose create avd --force --name "${avd_name}" --abi "${arch}" --package "${sdk}" --device "${device}"
 
-    #echo -e "\nAVD's List..."
-    #echo "$(avdmanager list avd)"
-
-    #avd_path="$(avdmanager list avd | grep "Path:" | cut -d':' -f2 | tr -d ' ')/config.ini"
-    #echo "hw.lcd.density=420" > "${avd_path}"
-    #echo "hw.lcd.height=2400" > "${avd_path}"
-    #echo "hw.lcd.width=1080" > "${avd_path}"
-
-    #echo "vm.heapSize=576" > "${avd_path}"
-    #echo "hw.ramSize=2048" > "${avd_path}"
-    #echo "disk.dataPartition.size=4G" > "${avd_path}"
-
     echo -e "\n\nWaiting for emulator to launch & boot..."
     nohup emulator -avd "${avd_name}" -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim -port 5554 &
     echo -e "\n\nWaiting more..."
@@ -236,18 +224,6 @@ else
         echo "AVD not found"
         echo -e "\nCreating AVD..."
         echo no | avdmanager --verbose create avd --force --name "${avd_name}" --abi "${arch}" --package "${sdk}" --device "${device}"
-
-        echo -e "\nAVD's List..."
-        echo "$(avdmanager list avd)"
-
-        avd_path="$(avdmanager list avd | grep "Path:" | cut -d':' -f2 | tr -d ' ')/config.ini"
-        echo "hw.lcd.density=420" > "${avd_path}"
-        echo "hw.lcd.height=2400" > "${avd_path}"
-        echo "hw.lcd.width=1080" > "${avd_path}"
-
-        echo "vm.heapSize=576" > "${avd_path}"
-        echo "hw.ramSize=2048" > "${avd_path}"
-        echo "disk.dataPartition.size=4G" > "${avd_path}"
 
         echo -e "\n\nTo create a quick-boot snapshot for faster e2e tests use the '-s' flag"
         echo "Try '$(basename $0) -h' for more information."
@@ -272,14 +248,14 @@ else
     echo "Device online"
     sleep 5
 
+    # restart adb in root mode
+    adb root
+
     # Disable animations
     adb shell input keyevent 82
     adb shell settings put global window_animation_scale 0.0
     adb shell settings put global transition_animation_scale 0.0
     adb shell settings put global animator_duration_scale 0.0
-
-    # restart adb in root mode
-    adb root
 
     echo -e "\nInstalling APKs..."
     i=0
