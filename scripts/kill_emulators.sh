@@ -26,8 +26,7 @@ function wait_for() {
 # Kill all emulators
 until ! adb devices | grep -q emulator; do
     emulator_id=$(adb devices | grep emulator | tail -1 | cut -f1)
-    #adb -s $emulator_id emu kill &> /dev/null
-    killall $emulator_id &> /dev/null
+    adb -s $emulator_id emu kill &> /dev/null
     echo -e "\nWaiting for ${emulator_id} to shutdown..."
     if wait_for 10 check_kill $emulator_id; then
         echo "Successfully shutdown ${emulator_id}."
