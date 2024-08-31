@@ -584,6 +584,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
+      testID="seed.button.Cancel"
     >
       <View
         style={
@@ -1202,6 +1203,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
+      testID="seed.button.Cancel"
     >
       <View
         style={
@@ -2362,6 +2364,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
+      testID="seed.button.Cancel"
     >
       <View
         style={

@@ -28,10 +28,10 @@ describe('New Wallet', () => {
     await waitFor(element(by.text('CONFIRM'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.text('CONFIRM')).tap();
 
-    await waitFor(element(by.text('CREATE NEW WALLET'))).toBeVisible().withTimeout(sync_timeout);
-    await element(by.text('CREATE NEW WALLET')).tap();
-    await waitFor(element(by.text('I HAVE SAVED \n THE SEED'))).toBeVisible().withTimeout(sync_timeout);
-    await element(by.text('I HAVE SAVED \n THE SEED')).tap();
+    await waitFor(element(by.id('loadingapp.createnewwallet'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('loadingapp.createnewwallet')).tap();
+    await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('seed.button.OK')).tap();
 
     let text = element(by.id('ValueTransfer text'));
     let attributes = await text.getAttributes();
