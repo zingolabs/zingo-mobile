@@ -48,7 +48,7 @@ describe('Change the Server from the list.', () => {
     log.info('blocks 1:', blockssyncednowNum_1);
 
     // wait a little bit
-    await sleep(10000);
+    await sleep(25000);
 
     // getting blocks now synced from the screen
     const blockssyncednow_2 = element(by.id('syncreport.syncednow'));

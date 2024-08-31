@@ -51,6 +51,7 @@ describe('Change the Server.', () => {
     await element(by.id('loadingapp.createnewwallet')).tap();
     
     // click the button accepting the new regtest seed
+    await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('seed.button.OK')).tap();
 
     // waiting for a regtest new wallet fully synced

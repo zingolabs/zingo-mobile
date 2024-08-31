@@ -352,6 +352,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         />
         {times > 0 && (
           <Button
+            testID="seed.button.Cancel"
             type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
             style={{ marginLeft: 10 }}
