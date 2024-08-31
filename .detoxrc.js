@@ -4,10 +4,10 @@ module.exports = {
     args: {
       '$0': 'jest',
       config: 'e2e/e2e-utils/jest.config.js',
-      "testTimeout": 1000000,
+      "testTimeout": 1800000,
     },
     jest: {
-      setupTimeout: 1000000
+      setupTimeout: 1800000
     }
   },
   apps: {

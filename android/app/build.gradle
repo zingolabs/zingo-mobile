@@ -220,7 +220,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
-    androidTestImplementation('com.wix:detox:20.22.2')
+    androidTestImplementation('com.wix:detox:20.25.6')
     implementation 'androidx.appcompat:appcompat:1.7.0'
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"

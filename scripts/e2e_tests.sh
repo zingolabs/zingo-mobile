@@ -305,7 +305,7 @@ else
     #adb -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_e2e_test_output"
 
     echo -e "\nRunning end-to-end tests..."
-    nohup yarn start &> "${test_report_dir}/metro.txt" &
+    nohup npx react-native start --sourceExts mock.ts,js,json,ts,tsx &> "${test_report_dir}/metro.txt" &
     yarn detox test -c android.att.debug.${abi} ${test_name}.test.js --reuse
     success_status=$?
 

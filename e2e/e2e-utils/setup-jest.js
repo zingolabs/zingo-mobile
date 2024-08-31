@@ -1,7 +1,5 @@
 beforeAll(async () => {
-  await device.launchApp({
-    launchArgs: { detoxEnableSynchronization: 0 }
-  });
+  await device.launchApp();
 });
 
 beforeEach(async () => {});
