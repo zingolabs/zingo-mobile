@@ -3,6 +3,9 @@ name: End-to-end test
 on:
   workflow_call:
     inputs:
+      timestamp:
+        required: true
+        type: string
       cache-key:
         required: true
         type: string
@@ -32,6 +35,41 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
         
+      - name: Setup Docker 1 try
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry1
+        continue-on-error: true
+        with:
+          lima: v0.18.0
+          colima: v0.5.6
+
+      - name: checking outcome 1
+        run: echo ${{ steps.dockerTry1.outcome }}
+
+      - name: Setup Docker 2 try
+        if: steps.dockerTry1.outcome != 'success'
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry2
+        continue-on-error: true
+        with:
+          lima: v0.18.0
+          colima: v0.5.6
+
+      - name: checking outcome 2
+        run: echo ${{ steps.dockerTry2.outcome }}
+
+      - name: Setup Docker Manually
+        if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
+        run: |
+          brew uninstall colima
+          brew tap colima/releases
+          brew install colima@0.5.6
+          brew install --formula docker
+          colima start
+
+      - name: Pull regchest docker image
+        run: docker pull zingodevops/regchest:007
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -60,7 +98,14 @@ jobs:
           path: android/app/src/main/jniLibs/${{ matrix.arch }}
           key: native-android-uniffi-${{ matrix.arch }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
-      
+
+      - name: Kotlin uniffi cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
+          key: kotlin-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
@@ -87,5 +132,5 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: yarn detox test -c android.emu.debug -n test
+          script: yarn detox test -c android.emu.debug -n new_wallet
 
