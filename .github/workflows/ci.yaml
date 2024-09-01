@@ -44,6 +44,13 @@ jobs:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: ${{ matrix.abi }}
 
+  android-e2e-test-bis:
+    uses: ./.github/workflows/e2e-test_old.yaml
+    needs: [ create-timestamp, create-cache-key, android-test ]
+    with:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+
   android-integration-test:
     strategy:
       matrix:
