@@ -83,15 +83,6 @@ jobs:
           build-root-directory: ./android
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
       
-      - name: AVD cache
-        uses: actions/cache@v4
-        id: avd-cache
-        with: 
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-e2e
-
       - name: Native rust cache
         uses: actions/cache/restore@v4
         with:
@@ -105,6 +96,15 @@ jobs:
           path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
           key: kotlin-android-uniffi-${{ matrix.arch }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
+
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with: 
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-e2e
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -132,5 +132,5 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: yarn detox test -c android.emu.debug -n new_wallet
+          script: yarn detox test -c android.emu.debug -n test
 
