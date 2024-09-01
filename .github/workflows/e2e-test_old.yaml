@@ -127,7 +127,7 @@ jobs:
             ~/.android/adb*
           key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-e2e
 
-      -name: Yarn install
+      - name: Yarn install
         run: yarn
       
       - name: Run Detox Build
