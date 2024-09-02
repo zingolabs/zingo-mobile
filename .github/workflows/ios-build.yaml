@@ -40,7 +40,7 @@ jobs:
         run: echo "ios-cache-found=${{ steps.ios-check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
   
   ios-build:
-    name: Build native rust
+    name: Build native rust & swift uniffi
     needs: ios-check-build-cache
     if: ${{ needs.ios-check-build-cache.outputs.ios-cache-found != 'true' }}
     runs-on: macos-13
