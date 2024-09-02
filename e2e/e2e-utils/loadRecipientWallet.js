@@ -4,7 +4,7 @@
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 let loadRecipientWallet = async () => {
-  await sleep(10000);
+  await sleep(5000);
   
   // the start always is like a fress install -> create a new wallet
   // go to setting modal screen
@@ -49,8 +49,8 @@ let loadRecipientWallet = async () => {
   await element(by.id('settings.button.save')).tap();
 
   // waiting for seed server change screen
-  await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
-  await element(by.id('seed.button.OK')).tap();
+  await waitFor(element(by.id('seed.button.ok'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.id('seed.button.ok')).tap();
   await waitFor(element(by.text('CONFIRM'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.text('CONFIRM')).tap();
 
@@ -64,8 +64,8 @@ let loadRecipientWallet = async () => {
   );
   await waitFor(element(by.id('seed.birthdayinput'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.id("seed.birthdayinput")).replaceText('1994579');
-  await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
-  await element(by.id('seed.button.OK')).tap();
+  await waitFor(element(by.id('seed.button.ok'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.id('seed.button.ok')).tap();
 }
 
 export { loadRecipientWallet };

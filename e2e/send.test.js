@@ -8,7 +8,7 @@ describe('Renders wallet data correctly.', () => {
   // i just pulled this seed out of thin air
   it('loads a wallet', loadTestWallet);
   it('correctly renders the scanner', async () => {
-    await sleep(4000);
+    //await sleep(4000);
 
     await element(by.text('SEND')).tap();
     

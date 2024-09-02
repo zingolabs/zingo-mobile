@@ -276,7 +276,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           marginVertical: 5,
         }}>
         <Button
-          testID="import.button.OK"
+          testID="import.button.ok"
           type={ButtonTypeEnum.Primary}
           title={translate('import.button') as string}
           onPress={() => {
@@ -285,7 +285,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           }}
         />
         <Button
-          testID="import.button.Cancel"
+          testID="import.button.cancel"
           type={ButtonTypeEnum.Secondary}
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}

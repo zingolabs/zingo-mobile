@@ -8,7 +8,7 @@ describe('Syncs a darkside chain', () => {
   it('loads the wallet', loadDarksideWallet);
   it('should sync the darkside chain', async () => {
     // wait for fully synced.
-    await sleep(4000);
+    //await sleep(4000);
 
     // verify pool balances
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);

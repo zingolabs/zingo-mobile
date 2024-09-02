@@ -696,7 +696,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "paddingHorizontal": 5,
           }
         }
-        testID="ValueTransfer text"
+        testID="valuetransfer text"
       >
         text translated
       </Text>
@@ -2614,7 +2614,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "paddingHorizontal": 5,
           }
         }
-        testID="ValueTransfer text"
+        testID="valuetransfer text"
       >
         text translated
       </Text>
