@@ -13,7 +13,7 @@ env:
 jobs:
   create-cache-key:
     name: Create cache key
-    runs-on: macos-13
+    runs-on: ubuntu-22.04
     container:
       image: zingodevops/android_builder:009
     env:
