@@ -26,6 +26,7 @@ import ValueTransferDetail from './components/ValueTransferDetail';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
+import { Swipeable } from 'react-native-gesture-handler';
 
 type HistoryProps = {
   doRefresh: () => void;
@@ -154,6 +155,16 @@ const History: React.FunctionComponent<HistoryProps> = ({
     setIsAtTop(isTop);
   };
 
+  const handleRenderLeftActions = () => {
+    return <View />;
+  };
+
+  const handleOnSwipeOpen = (direction: 'left' | 'right', swipeable: Swipeable) => {
+    if (direction === 'left') {
+      console.log(swipeable);
+    }
+  };
+
   //console.log('render History - 4');
 
   return (
@@ -225,18 +236,20 @@ const History: React.FunctionComponent<HistoryProps> = ({
           }
 
           return (
-            <ValueTransferLine
-              index={index}
-              key={`${index}-${vt.txid}-${vt.kind}`}
-              vt={vt}
-              month={month}
-              setValueTransferDetail={(ttt: ValueTransferType) => setValueTransferDetail(ttt)}
-              setValueTransferDetailIndex={(iii: number) => setValueTransferDetailIndex(iii)}
-              setValueTransferDetailModalShowing={(bbb: boolean) => setValueTransferDetailModalShowing(bbb)}
-              nextLineWithSameTxid={
-                index >= valueTransfersSorted.length - 1 ? false : valueTransfersSorted[index + 1].txid === vt.txid
-              }
-            />
+            <Swipeable renderLeftActions={handleRenderLeftActions} onSwipeableOpen={handleOnSwipeOpen}>
+              <ValueTransferLine
+                index={index}
+                key={`${index}-${vt.txid}-${vt.kind}`}
+                vt={vt}
+                month={month}
+                setValueTransferDetail={(ttt: ValueTransferType) => setValueTransferDetail(ttt)}
+                setValueTransferDetailIndex={(iii: number) => setValueTransferDetailIndex(iii)}
+                setValueTransferDetailModalShowing={(bbb: boolean) => setValueTransferDetailModalShowing(bbb)}
+                nextLineWithSameTxid={
+                  index >= valueTransfersSorted.length - 1 ? false : valueTransfersSorted[index + 1].txid === vt.txid
+                }
+              />
+            </Swipeable>
           );
         })}
         {loadMoreButton ? (
