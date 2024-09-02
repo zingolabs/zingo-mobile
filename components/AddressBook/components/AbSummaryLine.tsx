@@ -75,7 +75,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   //console.log('render Ab SummaryLine - 5', index);
 
   return (
-    <View testID={`addressBookList.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
+    <View testID={`addressbooklist.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
       <View
         style={{
           display: 'flex',

@@ -8,7 +8,7 @@ describe('Change the Server.', () => {
   // i just pulled this seed out of thin air
   it('loads a wallet', loadTestWallet);
   it('Go settings & change to a correct Testnet server URI.', async () => {
-    await sleep(4000);
+    //await sleep(4000);
 
     // go to setting modal screen again
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
@@ -40,8 +40,8 @@ describe('Change the Server.', () => {
     await element(by.id('settings.button.save')).tap();
 
     // waiting for seed server change screen
-    await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
-    await element(by.id('seed.button.OK')).tap();
+    await waitFor(element(by.id('seed.button.ok'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('seed.button.ok')).tap();
     await waitFor(element(by.text('CONFIRM'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.text('CONFIRM')).tap();
 
@@ -51,8 +51,8 @@ describe('Change the Server.', () => {
     await element(by.id('loadingapp.createnewwallet')).tap();
     
     // click the button accepting the new regtest seed
-    await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
-    await element(by.id('seed.button.OK')).tap();
+    await waitFor(element(by.id('seed.button.ok'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('seed.button.ok')).tap();
 
     // waiting for a regtest new wallet fully synced
     await waitFor(element(by.id('header.checkicon'))).toBeVisible().withTimeout(sync_timeout);

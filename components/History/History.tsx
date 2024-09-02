@@ -185,7 +185,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
       </Modal>
 
       <Header
-        testID="ValueTransfer text"
+        testID="valuetransfer text"
         poolsMoreInfoOnClick={poolsMoreInfoOnClick}
         syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
         toggleMenuDrawer={toggleMenuDrawer}

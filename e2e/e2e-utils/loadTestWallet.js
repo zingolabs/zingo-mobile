@@ -2,7 +2,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 let loadTestWallet = async () => {
   // waiting while app is detecting the best server
-  await sleep(10000);
+  await sleep(5000);
   
   // the start always is like a fresh install -> create a new wallet
   // go to setting modal screen
@@ -19,8 +19,8 @@ let loadTestWallet = async () => {
   );
   await waitFor(element(by.id('import.birthdayinput'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.id("import.birthdayinput")).replaceText('1994579');
-  await waitFor(element(by.id('import.button.OK'))).toBeVisible().withTimeout(sync_timeout);
-  await element(by.id('import.button.OK')).tap();
+  await waitFor(element(by.id('import.button.ok'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.id('import.button.ok')).tap();
 }
 
 export { loadTestWallet };

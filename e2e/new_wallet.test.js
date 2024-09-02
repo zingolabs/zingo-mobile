@@ -4,7 +4,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 describe('New Wallet', () => {
   it('New wallet creation flow works.', async () => {
-    await sleep(10000);
+    //await sleep(5000);
 
     // go to setting modal screen
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
@@ -23,16 +23,17 @@ describe('New Wallet', () => {
     await element(by.id('header.drawmenu')).tap();
     await waitFor(element(by.id('menu.changewallet'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('menu.changewallet')).tap();
-    await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
-    await element(by.id('seed.button.OK')).tap();
+    await waitFor(element(by.id('seed.button.ok'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('seed.button.ok')).tap();
     await waitFor(element(by.text('CONFIRM'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.text('CONFIRM')).tap();
 
     await waitFor(element(by.id('loadingapp.createnewwallet'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('loadingapp.createnewwallet')).tap();
-    await waitFor(element(by.id('seed.button.OK'))).toBeVisible().withTimeout(sync_timeout);
-    await element(by.id('seed.button.OK')).tap();
+    await waitFor(element(by.id('seed.button.ok'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('seed.button.ok')).tap();
 
+    await waitFor(element(by.id('ValueTransfer text'))).toBeVisible().withTimeout(sync_timeout);
     let text = element(by.id('ValueTransfer text'));
     let attributes = await text.getAttributes();
     log.info(attributes);

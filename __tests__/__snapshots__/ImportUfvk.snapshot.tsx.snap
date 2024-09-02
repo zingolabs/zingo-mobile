@@ -282,7 +282,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
-      testID="import.button.OK"
+      testID="import.button.ok"
     >
       <View
         style={
@@ -357,7 +357,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
-      testID="import.button.Cancel"
+      testID="import.button.cancel"
     >
       <View
         style={
