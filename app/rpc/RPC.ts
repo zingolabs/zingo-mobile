@@ -1294,7 +1294,10 @@ export default class RPC {
             : undefined;
         currentValueTransferList.fee = (!vt.transaction_fee ? 0 : vt.transaction_fee) / 10 ** 8;
         currentValueTransferList.zecPrice = !vt.zec_price ? 0 : vt.zec_price;
-        if (vt.status === RPCValueTransfersStatusEnum.pending) {
+        if (
+          vt.status === RPCValueTransfersStatusEnum.transmitted ||
+          vt.status === RPCValueTransfersStatusEnum.mempool
+        ) {
           currentValueTransferList.confirmations = 0;
         } else if (vt.status === RPCValueTransfersStatusEnum.confirmed) {
           currentValueTransferList.confirmations = this.lastServerBlockHeight
@@ -1304,7 +1307,7 @@ export default class RPC {
           // impossible case... I guess.
           currentValueTransferList.confirmations = 0;
         }
-
+        currentValueTransferList.status = vt.status;
         currentValueTransferList.address = !vt.recipient_address ? undefined : vt.recipient_address;
         currentValueTransferList.amount = (!vt.value ? 0 : vt.value) / 10 ** 8;
         currentValueTransferList.memos = !vt.memos || vt.memos.length === 0 ? undefined : vt.memos;

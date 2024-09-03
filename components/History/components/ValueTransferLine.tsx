@@ -169,7 +169,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     fontWeight: '900',
                     marginLeft: 10,
                   }}>
-                  {('[ ' + translate('history.not-confirmed') + ' ]') as string}
+                  {('[ ' + translate('history.not-confirmed') + ' ] - ' + vt.status) as string}
                 </FadeText>
               )}
               <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
