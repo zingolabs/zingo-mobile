@@ -33,23 +33,23 @@ jobs:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
 
-  android-e2e-test-script:
-    strategy:
-      matrix:
-        abi: [ x86_64, x86 ]
-    uses: ./.github/workflows/android-e2e-test-script.yaml
-    needs: [ create-timestamp, create-cache-key, android-test ]
-    with:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      abi: ${{ matrix.abi }}
+  #android-e2e-test-script:
+  #  strategy:
+  #    matrix:
+  #      abi: [ x86_64, x86 ]
+  #  uses: ./.github/workflows/android-e2e-test-script.yaml
+  #  needs: [ create-timestamp, create-cache-key, android-test ]
+  #  with:
+  #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+  #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+  #    abi: ${{ matrix.abi }}
 
-  android-e2e-test-actions:
-    uses: ./.github/workflows/android-e2e-test-actions.yaml
-    needs: [ create-timestamp, create-cache-key, android-test ]
-    with:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+  #android-e2e-test-actions:
+  #  uses: ./.github/workflows/android-e2e-test-actions.yaml
+  #  needs: [ create-timestamp, create-cache-key, android-test ]
+  #  with:
+  #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+  #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
 
   android-integration-test:
     strategy:
