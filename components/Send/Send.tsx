@@ -835,19 +835,18 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   };
 
-  //console.log('render Send - 4', sendPageState);
-  console.log(
-    'Render, spendable',
-    spendable,
-    'maxAmount',
-    maxAmount,
-    'Fee',
-    fee,
-    'Amount',
-    sendPageState.toaddr.amount,
-    keyboardVisible,
-    contentHeight,
-  );
+  //console.log(
+  //  'Render, spendable',
+  //  spendable,
+  //  'maxAmount',
+  //  maxAmount,
+  //  'Fee',
+  //  fee,
+  //  'Amount',
+  //  sendPageState.toaddr.amount,
+  //  keyboardVisible,
+  //  contentHeight,
+  //);
 
   const returnPage = (
     <View
