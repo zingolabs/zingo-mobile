@@ -89,10 +89,10 @@ jobs:
   android-integration-test:
     needs: [ android-integration-avd-cache ]
     name: Android Integration test
-    runs-on: ubuntu-22.04
+    runs-on: macos-13
     strategy:
       matrix:
-        partition: [1]
+        partition: [1, 2, 3, 4, 5]
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -103,12 +103,6 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
         
-      - name: Enable KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
         run: |
@@ -133,37 +127,37 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      #- name: Setup Docker 1 try
-      #  uses: douglascamata/setup-docker-macos-action@v1-alpha
-      #  id: dockerTry1
-      #  continue-on-error: true
-      #  with:
-      #    lima: v0.18.0
-      #    colima: v0.5.6
+      - name: Setup Docker 1 try
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry1
+        continue-on-error: true
+        with:
+          lima: v0.18.0
+          colima: v0.5.6
 
-      #- name: checking outcome 1
-      #  run: echo ${{ steps.dockerTry1.outcome }}
+      - name: checking outcome 1
+        run: echo ${{ steps.dockerTry1.outcome }}
 
-      #- name: Setup Docker 2 try
-      #  if: steps.dockerTry1.outcome != 'success'
-      #  uses: douglascamata/setup-docker-macos-action@v1-alpha
-      #  id: dockerTry2
-      #  continue-on-error: true
-      #  with:
-      #    lima: v0.18.0
-      #    colima: v0.5.6
+      - name: Setup Docker 2 try
+        if: steps.dockerTry1.outcome != 'success'
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry2
+        continue-on-error: true
+        with:
+          lima: v0.18.0
+          colima: v0.5.6
 
-      #- name: checking outcome 2
-      #  run: echo ${{ steps.dockerTry2.outcome }}
+      - name: checking outcome 2
+        run: echo ${{ steps.dockerTry2.outcome }}
 
-      #- name: Setup Docker Manually
-      #  if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
-      #  run: |
-      #    brew uninstall colima
-      #    brew tap colima/releases
-      #    brew install colima@0.5.6
-      #    brew install --formula docker
-      #    colima start
+      - name: Setup Docker Manually
+        if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
+        run: |
+          brew uninstall colima
+          brew tap colima/releases
+          brew install colima@0.5.6
+          brew install --formula docker
+          colima start
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
@@ -229,12 +223,12 @@ jobs:
           name: nextest-archive
           path: ./rust
 
-      - name: integration test as a script
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 120
-          max_attempts: 1
-          command: ./scripts/integration_tests.sh -a ${{ env.ABI }}
+      #- name: integration test as a script
+      #  uses: nick-fields/retry@v3
+      #  with:
+      #    timeout_minutes: 120
+      #    max_attempts: 1
+      #    command: ./scripts/integration_tests.sh -a ${{ env.ABI }}
 
       - name: Run Android integration tests
         working-directory: ./rust
