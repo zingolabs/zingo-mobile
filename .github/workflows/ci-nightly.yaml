@@ -27,7 +27,7 @@ jobs:
 
   android-test:
     uses: ./.github/workflows/android-test.yaml
-    needs: [ create-timestamp, create-cache-key, android-build ]
+    needs: [ create-timestamp, android-build ]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
@@ -57,7 +57,7 @@ jobs:
         abi: [ x86_64, x86, arm64-v8a, armeabi-v7a ]
       fail-fast: false
     uses: ./.github/workflows/android-integration-test.yaml
-    needs: [ create-timestamp, create-cache-key, android-test ]
+    needs: [ android-test ]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
@@ -71,7 +71,7 @@ jobs:
        
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
-    needs: [ create-timestamp, create-cache-key, ios-build ]
+    needs: [ create-timestamp, ios-build ]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
