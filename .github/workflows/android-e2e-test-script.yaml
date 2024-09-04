@@ -86,7 +86,7 @@ jobs:
             ~/.android/adb*
           key: avd-${{ env.AVD-ARCH }}-e2e
 
-  android-e2e-test:
+  android-e2e-test-script:
     needs: [ android-e2e-avd-cache ]
     name: Android e2e test
     runs-on: ubuntu-22.04
