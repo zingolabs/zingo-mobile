@@ -452,13 +452,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
   }
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
     this.clearToAddr();
 
-    (async () => {
-      // Configure the RPC to start doing refreshes
-      await this.rpc.configure();
-    })();
+    // Configure the RPC to start doing refreshes
+    await this.rpc.configure();
 
     this.appstate = AppState.addEventListener(EventListenerEnum.change, async nextAppState => {
       //console.log('LOADED', 'prior', this.state.appState, 'next', nextAppState);
@@ -487,6 +485,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           this.setSyncingStatus(new SyncingStatusClass());
           //console.log('clear sync status state');
           //console.log('LOADED SAVED IOS background', nextAppState);
+          // We need to save the wallet file here because
+          // sometimes the App can lose the last synced chunk
+          await RPCModule.doSave();
           this.setState({ appStateStatus: nextAppState });
           return;
         }
@@ -540,6 +541,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         //console.log('clear timers');
         this.setSyncingStatus(new SyncingStatusClass());
         //console.log('clear sync status state');
+        // We need to save the wallet file here because
+        // sometimes the App can lose the last synced chunk
+        await RPCModule.doSave();
         if (Platform.OS === GlobalConst.platformOSios) {
           //console.log('LOADED SAVED IOS background', nextAppState);
           this.setState({ appStateStatus: nextAppState });
@@ -560,12 +564,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
     });
 
-    (async () => {
-      const initialUrl = await Linking.getInitialURL();
-      if (initialUrl !== null) {
-        this.readUrl(initialUrl);
-      }
-    })();
+    const initialUrl = await Linking.getInitialURL();
+    if (initialUrl !== null) {
+      this.readUrl(initialUrl);
+    }
 
     this.linking = Linking.addEventListener(EventListenerEnum.url, async ({ url }) => {
       //console.log(url);
