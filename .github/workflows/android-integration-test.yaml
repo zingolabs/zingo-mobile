@@ -158,7 +158,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '18'
+          java-version: '17'
       
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -169,7 +169,7 @@ jobs:
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: 8.0.1
+          gradle-version: 8.2
           build-root-directory: ./android
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
       
