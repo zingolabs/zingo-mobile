@@ -637,18 +637,23 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
   selectTheBestServer = async (aDifferentOne: boolean) => {
     // avoiding obsolete ones
+    let withMessage: boolean = true;
     const servers = await selectingServer(serverUris(this.state.translate).filter((s: ServerUrisType) => !s.obsolete));
     const actualServer = this.state.server;
     let fasterServer: ServerType = this.state.server;
     if (servers.length > 0) {
       const serversSorted: ServerType[] = servers
-        .filter((s: ServerUrisType) => s.latency !== null && s.uri !== (aDifferentOne ? this.state.server.uri : ''))
+        .filter((s: ServerUrisType) => s.latency !== null && s.uri !== (aDifferentOne ? actualServer.uri : ''))
         .sort((a, b) => (a.latency ? a.latency : Infinity) - (b.latency ? b.latency : Infinity))
         .map((s: ServerUrisType) => {
           return { uri: s.uri, chainName: s.chainName };
         });
       if (serversSorted.length > 0) {
         fasterServer = serversSorted[0];
+      } else {
+        // likely here there is a internet conection problem
+        // all of the servers return an error because they are unreachable probably.
+        withMessage = false;
       }
     }
     console.log(fasterServer);
@@ -659,7 +664,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     await SettingsFileImpl.writeSettings(SettingsNameEnum.server, fasterServer);
     await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, SelectServerEnum.list);
     // message with the result only for advanced users
-    if (this.state.mode === ModeEnum.advanced) {
+    if (this.state.mode === ModeEnum.advanced && withMessage) {
       if (isEqual(actualServer, fasterServer)) {
         this.addLastSnackbar({
           message: this.state.translate('loadedapp.selectingserversame') as string,
@@ -687,6 +692,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
   walletErrorHandle = async (result: string, title: string, screen: number, start: boolean) => {
     // first check the actual server
+    // if the server is not working properly sometimes can take more than one minute to fail.
+    if (start) {
+      this.addLastSnackbar({
+        message: this.state.translate('restarting') as string,
+        duration: SnackbarDurationEnum.long,
+      });
+    }
     const workingServer = await this.checkServer(this.state.server);
     if (workingServer) {
       // the server is working -> this error is something not related with the server availability
@@ -705,7 +717,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       // let's change to another server
       if (this.state.serverErrorTries === 0) {
         // first try
-        this.setState({ screen: 1, actionButtonsDisabled: true });
+        this.setState({ screen, actionButtonsDisabled: true });
         setTimeout(() => {
           this.addLastSnackbar({
             message: this.state.translate('loadingapp.serverfirsttry') as string,

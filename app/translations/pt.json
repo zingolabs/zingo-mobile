@@ -88,7 +88,7 @@
     "changeserver-basic": "Altere o Servidor e\nAbra a Carteira Atual",
     "alert-newwallet-title": "CRIAR UMA NOVA CARTEIRA",
     "alert-newwallet-body": "Você pode confirmar que deseja realmente criar uma nova carteira e perder o acesso à carteira atual.",
-    "serverfirsttry": "Tentando executar a ação com um servidor diferente. O servidor atual pode estar falhando.",
+    "serverfirsttry": "Ocorreu um erro ao tentar conectar-se ao servidor acima, atualmente verificando os servidores na lista.",
     "serversecondtry": "Não parece haver nenhum problema com o servidor. Algo mais está acontecendo.",
     "alert-donation-title": "APOIAR A ZINGOLABS",
     "alert-donation-body": "Você quer ajudar o ZingoLabs a tornar o Zcash mais útil? Opte por dar uma gorjeta de um Zenny (0.01 ZEC) para ZingoLabs em cada transação! Se sim, pressione confirmar, caso contrário, pressione Cancelar."

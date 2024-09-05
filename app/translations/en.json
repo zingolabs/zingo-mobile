@@ -88,7 +88,7 @@
     "changeserver-basic": "Change the Server and\nOpen Current Wallet",
     "alert-newwallet-title": "CREATE A NEW WALLET",
     "alert-newwallet-body": "Can you confirm that you really want to create a new wallet and lose access to the current wallet.",
-    "serverfirsttry": "Trying to perform the action with a different server. The current server may be failing.",
+    "serverfirsttry": "An error occurred while trying to connect to the above server, currently checking the servers on the list.",
     "serversecondtry": "It doesn't seem to be a problem with the server. Someting else is happening.",
     "alert-donation-title": "TIP ZINGOLABS",
     "alert-donation-body": "Do you want to help ZingoLabs make Zcash more useful? Opt in to tip one Zenny (0.01 ZEC) to ZingoLabs with each transaction! If so, press confirm, otherwise press Cancel."
