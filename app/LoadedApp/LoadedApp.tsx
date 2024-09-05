@@ -3,7 +3,6 @@ import React, { Component, Suspense, useState, useMemo, useEffect } from 'react'
 import {
   Modal,
   View,
-  Text,
   Alert,
   I18nManager,
   EmitterSubscription,
@@ -453,13 +452,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.unsubscribeNetInfo = {} as NetInfoSubscription;
   }
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
     this.clearToAddr();
 
-    (async () => {
-      // Configure the RPC to start doing refreshes
-      await this.rpc.configure();
-    })();
+    // Configure the RPC to start doing refreshes
+    await this.rpc.configure();
 
     this.appstate = AppState.addEventListener(EventListenerEnum.change, async nextAppState => {
       //console.log('LOADED', 'prior', this.state.appState, 'next', nextAppState);
@@ -488,6 +485,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           this.setSyncingStatus(new SyncingStatusClass());
           //console.log('clear sync status state');
           //console.log('LOADED SAVED IOS background', nextAppState);
+          // We need to save the wallet file here because
+          // sometimes the App can lose the last synced chunk
+          await RPCModule.doSave();
           this.setState({ appStateStatus: nextAppState });
           return;
         }
@@ -541,6 +541,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         //console.log('clear timers');
         this.setSyncingStatus(new SyncingStatusClass());
         //console.log('clear sync status state');
+        // We need to save the wallet file here because
+        // sometimes the App can lose the last synced chunk
+        await RPCModule.doSave();
         if (Platform.OS === GlobalConst.platformOSios) {
           //console.log('LOADED SAVED IOS background', nextAppState);
           this.setState({ appStateStatus: nextAppState });
@@ -561,12 +564,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
     });
 
-    (async () => {
-      const initialUrl = await Linking.getInitialURL();
-      if (initialUrl !== null) {
-        this.readUrl(initialUrl);
-      }
-    })();
+    const initialUrl = await Linking.getInitialURL();
+    if (initialUrl !== null) {
+      this.readUrl(initialUrl);
+    }
 
     this.linking = Linking.addEventListener(EventListenerEnum.url, async ({ url }) => {
       //console.log(url);
@@ -1846,22 +1847,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               })}>
               <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
                 {() => (
-                  <>
-                    <History
-                      doRefresh={this.doRefresh}
-                      toggleMenuDrawer={this.toggleMenuDrawer}
-                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                      poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                      setZecPrice={this.setZecPrice}
-                      setComputingModalVisible={this.setComputingModalVisible}
-                      setPrivacyOption={this.setPrivacyOption}
-                      setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                      setSendPageState={this.setSendPageState}
-                      setShieldingAmount={this.setShieldingAmount}
-                      setScrollToTop={this.setScrollToTop}
-                      scrollToTop={scrollToTop}
-                    />
-                  </>
+                  <History
+                    doRefresh={this.doRefresh}
+                    toggleMenuDrawer={this.toggleMenuDrawer}
+                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                    poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                    setZecPrice={this.setZecPrice}
+                    setComputingModalVisible={this.setComputingModalVisible}
+                    setPrivacyOption={this.setPrivacyOption}
+                    setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                    setSendPageState={this.setSendPageState}
+                    setShieldingAmount={this.setShieldingAmount}
+                    setScrollToTop={this.setScrollToTop}
+                    scrollToTop={scrollToTop}
+                  />
                 )}
               </Tab.Screen>
               {!readOnly &&
@@ -1869,36 +1868,32 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0)) && (
                   <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                     {() => (
-                      <>
-                        <Send
-                          setSendPageState={this.setSendPageState}
-                          sendTransaction={this.sendTransaction}
-                          clearToAddr={this.clearToAddr}
-                          setSendProgress={this.setSendProgress}
-                          toggleMenuDrawer={this.toggleMenuDrawer}
-                          syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                          poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                          setZecPrice={this.setZecPrice}
-                          setComputingModalVisible={this.setComputingModalVisible}
-                          setPrivacyOption={this.setPrivacyOption}
-                          setShieldingAmount={this.setShieldingAmount}
-                          setScrollToTop={this.setScrollToTop}
-                        />
-                      </>
+                      <Send
+                        setSendPageState={this.setSendPageState}
+                        sendTransaction={this.sendTransaction}
+                        clearToAddr={this.clearToAddr}
+                        setSendProgress={this.setSendProgress}
+                        toggleMenuDrawer={this.toggleMenuDrawer}
+                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                        setZecPrice={this.setZecPrice}
+                        setComputingModalVisible={this.setComputingModalVisible}
+                        setPrivacyOption={this.setPrivacyOption}
+                        setShieldingAmount={this.setShieldingAmount}
+                        setScrollToTop={this.setScrollToTop}
+                      />
                     )}
                   </Tab.Screen>
                 )}
               <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
                 {() => (
-                  <>
-                    <Receive
-                      setUaAddress={this.setUaAddress}
-                      toggleMenuDrawer={this.toggleMenuDrawer}
-                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                      setPrivacyOption={this.setPrivacyOption}
-                      setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                    />
-                  </>
+                  <Receive
+                    setUaAddress={this.setUaAddress}
+                    toggleMenuDrawer={this.toggleMenuDrawer}
+                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                    setPrivacyOption={this.setPrivacyOption}
+                    setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                  />
                 )}
               </Tab.Screen>
             </Tab.Navigator>
@@ -1919,22 +1914,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   }}>
                   <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
                     {() => (
-                      <>
-                        <Suspense
-                          fallback={
-                            <View>
-                              <Text>{translate('loading') as string}</Text>
-                            </View>
-                          }>
-                          <Receive
-                            setUaAddress={this.setUaAddress}
-                            toggleMenuDrawer={this.toggleMenuDrawer}
-                            syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                            setPrivacyOption={this.setPrivacyOption}
-                            setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                          />
-                        </Suspense>
-                      </>
+                      <Receive
+                        setUaAddress={this.setUaAddress}
+                        toggleMenuDrawer={this.toggleMenuDrawer}
+                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                        setPrivacyOption={this.setPrivacyOption}
+                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                      />
                     )}
                   </Tab.Screen>
                 </Tab.Navigator>
