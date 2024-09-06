@@ -119,7 +119,8 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
   useEffect(() => {
     setLoadMoreButton(numVt < (valueTransfers ? valueTransfers.length : 0));
     setValueTransfersSorted(fetchValueTransfersSorted);
-  }, [fetchValueTransfersSorted, numVt, valueTransfers]);
+    setScrollToBottom(true);
+  }, [fetchValueTransfersSorted, numVt, setScrollToBottom, valueTransfers]);
 
   useEffect(() => {
     if (scrollToBottom) {
@@ -154,7 +155,7 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
     setIsAtBottom(isBottom);
   };
 
-  //console.log('render History - 4');
+  //console.log('render History - 4', !!scrollViewRef.current);
 
   return (
     <View
