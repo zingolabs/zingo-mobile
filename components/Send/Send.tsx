@@ -76,6 +76,7 @@ type SendProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
   setShieldingAmount: (value: number) => void;
   setScrollToTop: (value: boolean) => void;
+  setScrollToBottom: (value: boolean) => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -91,6 +92,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setPrivacyOption,
   setShieldingAmount,
   setScrollToTop,
+  setScrollToBottom,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -783,6 +785,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
         // scroll to top in history, just in case.
         setScrollToTop(true);
+        setScrollToBottom(true);
 
         createAlert(
           setBackgroundError,
@@ -937,6 +940,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             addLastSnackbar={addLastSnackbar}
             setShieldingAmount={setShieldingAmount}
             setScrollToTop={setScrollToTop}
+            setScrollToBottom={setScrollToBottom}
           />
         </View>
       </Animated.View>

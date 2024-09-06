@@ -35,5 +35,8 @@ export default interface AppStateLoaded {
   // to do scroll to top in history
   scrollToTop: boolean;
 
+  // to do scroll to bottom in messages
+  scrollToBottom: boolean;
+
   // eslint-disable-next-line semi
 }

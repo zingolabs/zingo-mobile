@@ -14,9 +14,9 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import { useScrollToTop, useTheme } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
+import { faAnglesDown } from '@fortawesome/free-solid-svg-icons';
 
 import { ButtonTypeEnum, SendPageStateClass, ValueTransferType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
@@ -26,7 +26,6 @@ import ValueTransferDetail from '../History/components/ValueTransferDetail';
 import MessageLine from './components/MessageLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
-import { Swipeable } from 'react-native-gesture-handler';
 
 type MessagesProps = {
   doRefresh: () => void;
@@ -39,8 +38,8 @@ type MessagesProps = {
   setUfvkViewModalVisible?: (v: boolean) => void;
   setSendPageState: (s: SendPageStateClass) => void;
   setShieldingAmount: (value: number) => void;
-  setScrollToTop: (value: boolean) => void;
-  scrollToTop: boolean;
+  setScrollToBottom: (value: boolean) => void;
+  scrollToBottom: boolean;
 };
 
 const Messages: React.FunctionComponent<MessagesProps> = ({
@@ -54,8 +53,8 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
   setUfvkViewModalVisible,
   setSendPageState,
   setShieldingAmount,
-  setScrollToTop,
-  scrollToTop,
+  setScrollToBottom,
+  scrollToBottom,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, valueTransfers, language, setBackgroundError, addLastSnackbar } = context;
@@ -68,10 +67,8 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
   const [numVt, setNumVt] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   const [valueTransfersSorted, setValueTransfersSorted] = useState<ValueTransferType[]>([]);
-  const [isAtTop, setIsAtTop] = useState<boolean>(true);
+  const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
   const scrollViewRef = useRef<ScrollView>(null);
-
-  useScrollToTop(scrollViewRef);
 
   var lastMonth = '';
 
@@ -125,11 +122,11 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
   }, [fetchValueTransfersSorted, numVt, valueTransfers]);
 
   useEffect(() => {
-    if (scrollToTop) {
-      handleScrollToTop();
-      setScrollToTop(false);
+    if (scrollToBottom) {
+      handleScrollToBottom();
+      setScrollToBottom(false);
     }
-  }, [scrollToTop, setScrollToTop]);
+  }, [scrollToBottom, setScrollToBottom]);
 
   const loadMoreClicked = useCallback(() => {
     setNumVt(numVt + 50);
@@ -144,26 +141,17 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
     }
   };
 
-  const handleScrollToTop = () => {
+  const handleScrollToBottom = () => {
     if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+      scrollViewRef.current.scrollToEnd({ animated: true });
     }
   };
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { contentOffset } = event.nativeEvent;
-    const isTop = contentOffset.y === 0;
-    setIsAtTop(isTop);
-  };
-
-  const handleRenderLeftActions = () => {
-    return <View />;
-  };
-
-  const handleOnSwipeOpen = (direction: 'left' | 'right', swipeable: Swipeable) => {
-    if (direction === 'left') {
-      console.log(swipeable);
-    }
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    const isBottom = contentOffset.y >= Number((contentSize.height - layoutMeasurement.height).toFixed(0));
+    //console.log(contentOffset.y, Number((contentSize.height - layoutMeasurement.height).toFixed(0)), isBottom);
+    setIsAtBottom(isBottom);
   };
 
   //console.log('render History - 4');
@@ -209,7 +197,7 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
         setUfvkViewModalVisible={setUfvkViewModalVisible}
         addLastSnackbar={addLastSnackbar}
         setShieldingAmount={setShieldingAmount}
-        setScrollToTop={setScrollToTop}
+        setScrollToBottom={setScrollToBottom}
       />
 
       <ScrollView
@@ -227,31 +215,6 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
           />
         }
         style={{ flexGrow: 1, marginTop: 10, width: '100%' }}>
-        {valueTransfersSorted.flatMap((vt, index) => {
-          let txmonth = vt.time ? moment(vt.time * 1000).format('MMM YYYY') : '--- ----';
-
-          var month = '';
-          if (txmonth !== lastMonth) {
-            month = txmonth;
-            lastMonth = txmonth;
-          }
-
-          return (
-            <Swipeable
-              renderLeftActions={handleRenderLeftActions}
-              onSwipeableOpen={handleOnSwipeOpen}
-              key={`${index}-${vt.txid}-${vt.kind}`}>
-              <MessageLine
-                index={index}
-                vt={vt}
-                month={month}
-                setValueTransferDetail={(ttt: ValueTransferType) => setValueTransferDetail(ttt)}
-                setValueTransferDetailIndex={(iii: number) => setValueTransferDetailIndex(iii)}
-                setValueTransferDetailModalShowing={(bbb: boolean) => setValueTransferDetailModalShowing(bbb)}
-              />
-            </Swipeable>
-          );
-        })}
         {loadMoreButton ? (
           <View
             style={{
@@ -259,7 +222,7 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
               alignItems: 'center',
               justifyContent: 'flex-start',
               marginTop: 10,
-              marginBottom: 30,
+              marginBottom: 10,
             }}>
             <Button
               type={ButtonTypeEnum.Secondary}
@@ -276,21 +239,44 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
                   alignItems: 'center',
                   justifyContent: 'flex-start',
                   marginTop: 10,
-                  marginBottom: 30,
+                  marginBottom: 10,
                 }}>
                 <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
               </View>
             )}
           </>
         )}
+
+        {valueTransfersSorted.flatMap((vt, index) => {
+          let txmonth = vt.time ? moment(vt.time * 1000).format('MMM YYYY') : '--- ----';
+
+          var month = '';
+          if (txmonth !== lastMonth) {
+            month = txmonth;
+            lastMonth = txmonth;
+          }
+
+          return (
+            <MessageLine
+              key={`${index}-${vt.txid}-${vt.kind}`}
+              index={index}
+              vt={vt}
+              month={month}
+              setValueTransferDetail={(ttt: ValueTransferType) => setValueTransferDetail(ttt)}
+              setValueTransferDetailIndex={(iii: number) => setValueTransferDetailIndex(iii)}
+              setValueTransferDetailModalShowing={(bbb: boolean) => setValueTransferDetailModalShowing(bbb)}
+            />
+          );
+        })}
+        <View style={{ marginBottom: 30 }} />
       </ScrollView>
-      {!isAtTop && (
-        <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 10 }}>
+      {!isAtBottom && (
+        <TouchableOpacity onPress={handleScrollToBottom} style={{ position: 'absolute', bottom: 30, right: 10 }}>
           <FontAwesomeIcon
             style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
             size={50}
-            icon={faAnglesUp}
-            color={colors.zingo}
+            icon={faAnglesDown}
+            color={colors.border}
           />
         </TouchableOpacity>
       )}

@@ -435,6 +435,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       newServer: {} as ServerType,
       somePending: false,
       scrollToTop: false,
+      scrollToBottom: false,
     };
 
     this.rpc = new RPC(
@@ -1483,6 +1484,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
   };
 
+  setScrollToBottom = (value: boolean) => {
+    this.setState({
+      scrollToBottom: value,
+    });
+  };
+
   render() {
     const {
       aboutModalVisible,
@@ -1510,6 +1517,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       totalBalance,
       translate,
       scrollToTop,
+      scrollToBottom,
       addresses,
     } = this.state;
     const { colors } = this.props.theme;
@@ -1900,6 +1908,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                         setPrivacyOption={this.setPrivacyOption}
                         setShieldingAmount={this.setShieldingAmount}
                         setScrollToTop={this.setScrollToTop}
+                        setScrollToBottom={this.setScrollToBottom}
                       />
                     )}
                   </Tab.Screen>
@@ -1928,8 +1937,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     setUfvkViewModalVisible={this.setUfvkViewModalVisible}
                     setSendPageState={this.setSendPageState}
                     setShieldingAmount={this.setShieldingAmount}
-                    setScrollToTop={this.setScrollToTop}
-                    scrollToTop={scrollToTop}
+                    setScrollToBottom={this.setScrollToBottom}
+                    scrollToBottom={scrollToBottom}
                   />
                 )}
               </Tab.Screen>

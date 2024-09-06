@@ -72,6 +72,7 @@ type HeaderProps = {
   receivedLegend?: boolean;
   setShieldingAmount?: (value: number) => void;
   setScrollToTop?: (value: boolean) => void;
+  setScrollToBottom?: (value: boolean) => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
@@ -96,6 +97,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   receivedLegend,
   setShieldingAmount,
   setScrollToTop,
+  setScrollToBottom,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -237,7 +239,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }, [readOnly, shieldingAmount, somePending]);
 
   const shieldFunds = async () => {
-    if (!setComputingModalVisible || !setBackgroundError || !addLastSnackbar || !setScrollToTop) {
+    if (!setComputingModalVisible || !setBackgroundError || !addLastSnackbar) {
       return;
     }
 
@@ -304,7 +306,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         navigation.navigate(translate('loadedapp.history-menu') as string);
       }
       // scroll to top in history, just in case.
-      setScrollToTop(true);
+      if (setScrollToTop) {
+        setScrollToTop(true);
+      }
+      // scroll to bottom in messages, just in case.
+      if (setScrollToBottom) {
+        setScrollToBottom(true);
+      }
       setComputingModalVisible(false);
     }
   };
