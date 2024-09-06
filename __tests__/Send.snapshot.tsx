@@ -98,6 +98,7 @@ describe('Component Send - test', () => {
           setPrivacyOption={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
+          setScrollToBottom={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
@@ -126,6 +127,7 @@ describe('Component Send - test', () => {
           setPrivacyOption={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
+          setScrollToBottom={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

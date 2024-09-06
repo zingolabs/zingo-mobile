@@ -121,8 +121,8 @@ describe('Component Messages - test', () => {
           setPrivacyOption={onFunction}
           setSendPageState={onFunction}
           setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          scrollToTop={false}
+          setScrollToBottom={onFunction}
+          scrollToBottom={false}
         />
       </ContextAppLoadedProvider>,
     );
@@ -148,8 +148,8 @@ describe('Component Messages - test', () => {
           setPrivacyOption={onFunction}
           setSendPageState={onFunction}
           setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          scrollToTop={false}
+          setScrollToBottom={onFunction}
+          scrollToBottom={false}
         />
       </ContextAppLoadedProvider>,
     );
