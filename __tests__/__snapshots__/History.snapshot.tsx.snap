@@ -948,7 +948,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               <View
                 style={
                   {
-                    "alignItems": "center",
                     "display": "flex",
                   }
                 }
@@ -1223,7 +1222,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               <View
                 style={
                   {
-                    "alignItems": "center",
                     "display": "flex",
                   }
                 }
@@ -1523,7 +1521,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               <View
                 style={
                   {
-                    "alignItems": "center",
                     "display": "flex",
                   }
                 }
@@ -1823,7 +1820,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               <View
                 style={
                   {
-                    "alignItems": "center",
                     "display": "flex",
                   }
                 }
@@ -2098,7 +2094,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               <View
                 style={
                   {
-                    "alignItems": "center",
                     "display": "flex",
                   }
                 }
@@ -2912,7 +2907,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               <View
                 style={
                   {
-                    "alignItems": "center",
                     "display": "flex",
                   }
                 }
@@ -3188,7 +3182,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               <View
                 style={
                   {
-                    "alignItems": "center",
                     "display": "flex",
                   }
                 }
@@ -3503,7 +3496,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               <View
                 style={
                   {
-                    "alignItems": "center",
                     "display": "flex",
                   }
                 }
@@ -3804,7 +3796,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               <View
                 style={
                   {
-                    "alignItems": "center",
                     "display": "flex",
                   }
                 }
@@ -4080,7 +4071,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               <View
                 style={
                   {
-                    "alignItems": "center",
                     "display": "flex",
                   }
                 }

@@ -75,6 +75,15 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
 
   //console.log('render ValueTransferLine - 5', index, nextLineWithSameTxid);
 
+  //if (index === 0) {
+  //  vt.confirmations = 0;
+  //  vt.status = RPCValueTransfersStatusEnum.transmitted;
+  //}
+  //if (index === 1) {
+  //  vt.confirmations = 0;
+  //  vt.status = RPCValueTransfersStatusEnum.mempool;
+  //}
+
   return (
     <View testID={`valueTransferList.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
       {month !== '' && (
@@ -121,7 +130,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 color={amountColor}
               />
             </View>
-            <View style={{ display: 'flex', alignItems: 'center' }}>
+            <View style={{ display: 'flex' }}>
               {!!vt.address && vt.confirmations > 0 && (
                 <View>
                   <AddressItem address={vt.address} oneLine={true} closeModal={() => {}} openModal={() => {}} />

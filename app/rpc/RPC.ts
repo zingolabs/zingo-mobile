@@ -1317,6 +1317,9 @@ export default class RPC {
           console.log('valuetranfer: ', vt);
           console.log('--------------------------------------------------');
         }
+        if (vt.status === RPCValueTransfersStatusEnum.transmitted) {
+          console.log('TRANSMITTED ))))))))))))))))))))))))))))))))))');
+        }
 
         //console.log(currentValueTransferList);
         vtList.push(currentValueTransferList);
