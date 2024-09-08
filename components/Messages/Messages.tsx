@@ -136,9 +136,14 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
 
   useEffect(() => {
     if (!loading) {
-      console.log('scroll bottom');
-      handleScrollToBottom();
+      if (!valueTransfersSorted || !valueTransfersSorted.length) {
+        setFirstScrollToBottomDone(true);
+      } else {
+        console.log('scroll bottom');
+        handleScrollToBottom();
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
   const loadMoreClicked = useCallback(() => {
@@ -217,7 +222,7 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
         setScrollToBottom={setScrollToBottom}
       />
 
-      {(loading || !firstScrollToBottomDone || valueTransfersSorted.length === 0) && (
+      {(loading || !firstScrollToBottomDone) && (
         <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
       )}
       <ScrollView
@@ -238,7 +243,7 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
           flexGrow: 1,
           marginTop: 10,
           width: '100%',
-          opacity: loading || !firstScrollToBottomDone || valueTransfersSorted.length === 0 ? 0 : 1,
+          opacity: loading || !firstScrollToBottomDone ? 0 : 1,
         }}>
         {loadMoreButton ? (
           <View
@@ -295,7 +300,7 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
         })}
         <View style={{ marginBottom: 30 }} />
       </ScrollView>
-      {!isAtBottom && (
+      {!isAtBottom && !(loading || !firstScrollToBottomDone) && (
         <TouchableOpacity onPress={handleScrollToBottom} style={{ position: 'absolute', bottom: 30, right: 10 }}>
           <FontAwesomeIcon
             style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}

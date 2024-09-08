@@ -216,7 +216,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         setScrollToTop={setScrollToTop}
       />
 
-      {loading || valueTransfersSorted.length === 0 ? (
+      {loading ? (
         <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
       ) : (
         <>
