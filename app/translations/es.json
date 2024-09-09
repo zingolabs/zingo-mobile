@@ -19,6 +19,7 @@
   "cancel": "Cancelar",
   "save": "Guardar",
   "confirm": "Confirmar",
+  "support": "Enviar Email",
   "menudrawer-acc": "Abrir Menú Lateral",
   "menu-acc": "Abrir Menú",
   "donation": "¡Donación a Zingo!\n¡Gracias por apoyar a ZingoLabs!",
@@ -27,6 +28,9 @@
   "restarting": "Error conectando con el servidor, la Aplicación se reiniciará en breves segundos.",
   "change-privacy": "Nueva Política de Privacidad: ",
   "warning-binance": "ADVERTENCIA: Binance recopila y retiene los fondos de los usuarios sin un recurso oportuno. NO deposite en Binance desde este Monedero.",
+  "email": "zingo@zingolabs.org",
+  "subject": "Soporte Zingo...",
+  "body": "Necesito ayuda con...",
   "addressbook": {
     "title": "Libreta de Direcciones",
     "end": "Fin",
@@ -108,6 +112,7 @@
     "addressbook": "Libreta de Direcciones",
     "tipzingolabs-basic": "Apoyar a ZingoLabs",
     "votefornym": "Vota por Nym",
+    "support": "Email de soporte de Zingo",
     "restoremainnet-error": "Esta opción está solamente disponible para la Red: 'Mainnet'.",
     "changeservernew-error": "Error al intentar cambiar al Servidor nuevo: ",
     "readingwallet-error": "Error al intentar leer el monedero activo usando el Servidor nuevo:",
@@ -137,7 +142,8 @@
     "incoming-funds": "Fondos entrantes\n",
     "valuetransfer-confirmed": "Transacción confirmada\n",
     "payment-made": "Pago realizado\n",
-    "valuetransfer-reverted": "La transacción fue revertida por el servidor, vuelva a intentarlo."
+    "valuetransfer-reverted": "La transacción nunca fue confirmada por un validador.",
+    "email-error": "Error al abrir el cliente de correo electrónico"
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",
