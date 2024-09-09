@@ -15,7 +15,6 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
-import { mockRoute } from '../__mocks__/dataMocks/mockRoute';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -124,7 +123,6 @@ describe('Component Messages - test', () => {
           setShieldingAmount={onFunction}
           setScrollToBottom={onFunction}
           scrollToBottom={false}
-          route={mockRoute}
         />
       </ContextAppLoadedProvider>,
     );
@@ -152,7 +150,6 @@ describe('Component Messages - test', () => {
           setShieldingAmount={onFunction}
           setScrollToBottom={onFunction}
           scrollToBottom={false}
-          route={mockRoute}
         />
       </ContextAppLoadedProvider>,
     );
