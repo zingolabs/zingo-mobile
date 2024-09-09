@@ -71,6 +71,8 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
   const [firstScrollToBottomDone, setFirstScrollToBottomDone] = useState<boolean>(false);
+  const [scrollViewHeight, setScrollViewHeight] = useState<number>(0);
+  const [scrollable, setScrollable] = useState<boolean>(false);
   const scrollViewRef = useRef<ScrollView>(null);
 
   var lastMonth = '';
@@ -120,13 +122,14 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
   }, [valueTransfers, numVt]);
 
   useEffect(() => {
-    setLoading(true);
     setLoadMoreButton(numVt < (valueTransfers ? valueTransfers.length : 0));
     setValueTransfersSorted(fetchValueTransfersSorted);
-    setTimeout(() => {
-      setLoading(false);
-    }, 500);
-  }, [fetchValueTransfersSorted, numVt, valueTransfers]);
+    if (loading) {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  }, [fetchValueTransfersSorted, loading, numVt, valueTransfers]);
 
   useEffect(() => {
     if (scrollToBottom) {
@@ -168,7 +171,8 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
-    const isBottom = Math.round(contentOffset.y) >= Math.round(contentSize.height - layoutMeasurement.height);
+    const isBottom =
+      Math.round(contentOffset.y) >= Math.round(contentSize.height - layoutMeasurement.height) && scrollable;
     console.log(Math.round(contentOffset.y), Math.round(contentSize.height - layoutMeasurement.height), isBottom);
     setIsAtBottom(isBottom);
     if (isBottom && !firstScrollToBottomDone) {
@@ -229,6 +233,21 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
       <ScrollView
         ref={scrollViewRef}
         onScroll={handleScroll}
+        onLayout={e => {
+          const { height } = e.nativeEvent.layout;
+          //console.log('HEIGHT >>>>>>>>>>>>>', height);
+          setScrollViewHeight(height);
+        }}
+        onContentSizeChange={(w: number, h: number) => {
+          console.log(w, h);
+          setIsAtBottom(false);
+          if (h >= scrollViewHeight) {
+            //console.log('SCROLLABLE >>>>>>>>>>>>>');
+            setScrollable(true);
+          } else {
+            setScrollable(false);
+          }
+        }}
         scrollEventThrottle={100}
         accessible={true}
         accessibilityLabel={translate('history.list-acc') as string}
@@ -301,7 +320,7 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
         })}
         <View style={{ marginBottom: 30 }} />
       </ScrollView>
-      {!isAtBottom && !(loading || !firstScrollToBottomDone) && (
+      {!isAtBottom && scrollable && (
         <TouchableOpacity onPress={handleScrollToBottom} style={{ position: 'absolute', bottom: 30, right: 10 }}>
           <FontAwesomeIcon
             style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
