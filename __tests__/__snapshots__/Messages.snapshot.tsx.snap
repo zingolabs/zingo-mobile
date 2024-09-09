@@ -826,6 +826,8 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
   <RCTScrollView
     accessibilityLabel="text translated"
     accessible={true}
+    onContentSizeChange={[Function]}
+    onLayout={[Function]}
     onScroll={[Function]}
     refreshControl={
       <RefreshControlMock
@@ -1915,6 +1917,8 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
   <RCTScrollView
     accessibilityLabel="text translated"
     accessible={true}
+    onContentSizeChange={[Function]}
+    onLayout={[Function]}
     onScroll={[Function]}
     refreshControl={
       <RefreshControlMock
