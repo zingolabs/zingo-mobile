@@ -75,6 +75,7 @@ import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
 import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
+import { sendEmail } from '../sendEmail';
 import Snackbars from '../../components/Components/Snackbars';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
@@ -838,7 +839,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   this.state.info.currencyName;
                 title = this.state.translate('loadedapp.send-menu') as string;
               }
-              createAlert(this.setBackgroundError, this.addLastSnackbar, title, message, true);
+              createAlert(this.setBackgroundError, this.addLastSnackbar, title, message, true, this.state.translate);
             }
             // the ValueTransfer is gone -> Likely Reverted by the server
             if (vtNew.length === 0) {
@@ -848,6 +849,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 this.state.translate('loadedapp.send-menu') as string,
                 this.state.translate('loadedapp.valuetransfer-reverted') as string,
                 true,
+                this.state.translate,
               );
             }
           });
@@ -1095,6 +1097,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         screen: this.state.translate('loadedapp.send-menu'),
         initial: false,
       });
+    } else if (item === MenuItemEnum.Support) {
+      sendEmail(this.state.translate, this.state.info.zingolib);
     }
   };
 
@@ -1324,6 +1328,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.addLastSnackbar,
         this.state.translate('loadedapp.changingwallet-label') as string,
         resultStr,
+        false,
+        this.state.translate,
+        sendEmail,
+        this.state.info.zingolib,
       );
       return;
     }
@@ -1345,6 +1353,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.addLastSnackbar,
         this.state.translate('loadedapp.restoringwallet-label') as string,
         resultStr,
+        false,
+        this.state.translate,
+        sendEmail,
+        this.state.info.zingolib,
       );
       return;
     }
@@ -1395,6 +1407,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           this.addLastSnackbar,
           this.state.translate('loadedapp.changingwallet-label') as string,
           resultStr2,
+          false,
+          this.state.translate,
+          sendEmail,
+          this.state.info.zingolib,
         );
         //return;
       }
