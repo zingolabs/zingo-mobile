@@ -215,15 +215,25 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             borderColor: colors.border,
           }}>
           <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
-            {vt.kind === ValueTransferKindEnum.Sent
+            {vt.kind === ValueTransferKindEnum.Sent && vt.confirmations === 0
+              ? (translate('history.sending') as string)
+              : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations > 0
               ? (translate('history.sent') as string)
-              : vt.kind === ValueTransferKindEnum.Received
+              : vt.kind === ValueTransferKindEnum.Received && vt.confirmations === 0
+              ? (translate('history.receiving') as string)
+              : vt.kind === ValueTransferKindEnum.Received && vt.confirmations > 0
               ? (translate('history.received') as string)
-              : vt.kind === ValueTransferKindEnum.MemoToSelf
+              : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations === 0
+              ? (translate('history.sendingtoself') as string)
+              : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations > 0
               ? (translate('history.memotoself') as string)
-              : vt.kind === ValueTransferKindEnum.SendToSelf
+              : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations === 0
+              ? (translate('history.sendingtoself') as string)
+              : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations > 0
               ? (translate('history.sendtoself') as string)
-              : vt.kind === ValueTransferKindEnum.Shield
+              : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations === 0
+              ? (translate('history.shielding') as string)
+              : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations > 0
               ? (translate('history.shield') as string)
               : ''}
           </BoldText>
