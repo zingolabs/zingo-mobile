@@ -78,6 +78,12 @@ jest.mock('react-native-fs', () => ({
   writeFile: jest.fn(() => Promise.resolve()), // o Promise.reject(new Error('Write failed'))
   // Agrega más funciones mockeadas según sea necesario
 }));
+jest.mock('react-native-device-info', () => ({
+  getSystemName: jest.fn(() => 'Mocked System Name'),
+  getSystemVersion: jest.fn(() => 'Mocked System Version'),
+  getManufacturer: jest.fn(() => 'Mocked Manufacturer'),
+  getModel: jest.fn(() => 'Mocked Model'),
+}));
 
 // test suite
 describe('Component LoadingApp - test', () => {

@@ -46,6 +46,12 @@ jest.mock('react-native', () => {
   return RN;
 });
 jest.mock('react-native-picker-select', () => 'RNPickerSelect');
+jest.mock('react-native-device-info', () => ({
+  getSystemName: jest.fn(() => 'Mocked System Name'),
+  getSystemVersion: jest.fn(() => 'Mocked System Version'),
+  getManufacturer: jest.fn(() => 'Mocked Manufacturer'),
+  getModel: jest.fn(() => 'Mocked Model'),
+}));
 
 // test suite
 describe('Component App - test', () => {

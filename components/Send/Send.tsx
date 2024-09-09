@@ -61,6 +61,7 @@ import { Buffer } from 'buffer';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
 import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
 import { RPCSendallProposeType } from '../../app/rpc/types/RPCSendallProposeType';
+import { sendEmail } from '../../app/sendEmail';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -789,6 +790,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           translate('send.confirm-title') as string,
           `${translate('send.Broadcast')} ${txid}`,
           true,
+          translate,
         );
         setComputingModalVisible(false);
       } catch (err) {
@@ -816,6 +818,10 @@ const Send: React.FunctionComponent<SendProps> = ({
             addLastSnackbar,
             translate('send.sending-error') as string,
             `${customError ? customError : error}`,
+            false,
+            translate,
+            sendEmail,
+            info.zingolib,
           );
         }, 1000);
         setComputingModalVisible(false);
@@ -1245,7 +1251,24 @@ const Send: React.FunctionComponent<SendProps> = ({
                       <TouchableOpacity
                         onPress={() => {
                           if (spendableBalanceLastError && mode === ModeEnum.advanced) {
-                            Alert.alert(translate('send.spendable') as string, spendableBalanceLastError);
+                            Alert.alert(
+                              translate('send.spendable') as string,
+                              spendableBalanceLastError,
+                              [
+                                {
+                                  text: translate('support') as string,
+                                  onPress: async () =>
+                                    sendEmail(
+                                      translate,
+                                      info.zingolib,
+                                      translate('send.spendable') as string,
+                                      spendableBalanceLastError,
+                                    ),
+                                },
+                                { text: translate('cancel') as string, style: 'cancel' },
+                              ],
+                              { cancelable: false, userInterfaceStyle: 'light' },
+                            );
                           }
                         }}>
                         <View
@@ -1324,7 +1347,24 @@ const Send: React.FunctionComponent<SendProps> = ({
                           <TouchableOpacity
                             onPress={() => {
                               if (proposeSendLastError && mode === ModeEnum.advanced) {
-                                Alert.alert(translate('send.fee') as string, proposeSendLastError);
+                                Alert.alert(
+                                  translate('send.fee') as string,
+                                  proposeSendLastError,
+                                  [
+                                    {
+                                      text: translate('support') as string,
+                                      onPress: async () =>
+                                        sendEmail(
+                                          translate,
+                                          info.zingolib,
+                                          translate('send.fee') as string,
+                                          proposeSendLastError,
+                                        ),
+                                    },
+                                    { text: translate('cancel') as string, style: 'cancel' },
+                                  ],
+                                  { cancelable: false, userInterfaceStyle: 'light' },
+                                );
                               }
                             }}>
                             <FadeText
