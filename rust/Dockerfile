@@ -10,8 +10,13 @@ COPY Cargo.lock /opt/zingo/rust/Cargo.lock
 COPY Cargo.toml /opt/zingo/rust/Cargo.toml
 COPY zingomobile_utils/ /opt/zingo/rust/zingomobile_utils/
 
-RUN cargo install --version ^3 cargo-ndk
 RUN rustup default nightly
+
+RUN cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
+    generate ./src/zingo.udl --language kotlin \ 
+    --out-dir ./src
+
+RUN cargo install --version ^3 cargo-ndk
 
 #RUN AR=llvm-ar LD=ld RANLIB=llvm-ranlib CC=aarch64-linux-android24-clang \
 #    OPENSSL_DIR=/opt/openssl-3.3.1/aarch64 cargo +nightly build -Z build-std \
