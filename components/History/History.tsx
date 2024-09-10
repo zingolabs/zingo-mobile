@@ -27,6 +27,7 @@ import ValueTransferDetail from './components/ValueTransferDetail';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
+import MessagesAddress from '../Messages/MessagesAddress';
 
 type HistoryProps = {
   doRefresh: () => void;
@@ -41,6 +42,8 @@ type HistoryProps = {
   setShieldingAmount: (value: number) => void;
   setScrollToTop: (value: boolean) => void;
   scrollToTop: boolean;
+  setScrollToBottom: (value: boolean) => void;
+  scrollToBottom: boolean;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -56,6 +59,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
   setShieldingAmount,
   setScrollToTop,
   scrollToTop,
+  setScrollToBottom,
+  scrollToBottom,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, valueTransfers, language, setBackgroundError, addLastSnackbar } = context;
@@ -63,6 +68,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   moment.locale(language);
 
   const [isValueTransferDetailModalShowing, setValueTransferDetailModalShowing] = useState<boolean>(false);
+  const [isMessagesAddressModalShowing, setMessagesAddressModalShowing] = useState<boolean>(false);
   const [valueTransferDetail, setValueTransferDetail] = useState<ValueTransferType>({} as ValueTransferType);
   const [valueTransferDetailIndex, setValueTransferDetailIndex] = useState<number>(-1);
   const [numVt, setNumVt] = useState<number>(50);
@@ -159,6 +165,22 @@ const History: React.FunctionComponent<HistoryProps> = ({
     setIsAtTop(isTop);
   };
 
+  const messagesAddress = (vt: ValueTransferType) => {
+    if (vt.address) {
+      return vt.address;
+    } else {
+      const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
+      if (memoTotal.includes('\nReply to: \n')) {
+        let memoArray = memoTotal.split('\nReply to: \n');
+        const memoPoped = memoArray.pop();
+        if (memoPoped) {
+          return memoPoped;
+        }
+      }
+    }
+    return '';
+  };
+
   //console.log('render History - 4');
 
   return (
@@ -188,6 +210,31 @@ const History: React.FunctionComponent<HistoryProps> = ({
           moveValueTransferDetail={moveValueTransferDetail}
         />
       </Modal>
+
+      {isMessagesAddressModalShowing && (
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={isMessagesAddressModalShowing}
+          onRequestClose={() => setMessagesAddressModalShowing(false)}>
+          <MessagesAddress
+            doRefresh={doRefresh}
+            toggleMenuDrawer={toggleMenuDrawer}
+            syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
+            poolsMoreInfoOnClick={poolsMoreInfoOnClick}
+            setZecPrice={setZecPrice}
+            setComputingModalVisible={setComputingModalVisible}
+            setPrivacyOption={setPrivacyOption}
+            setUfvkViewModalVisible={setUfvkViewModalVisible}
+            setSendPageState={setSendPageState}
+            setShieldingAmount={setShieldingAmount}
+            setScrollToBottom={setScrollToBottom}
+            scrollToBottom={scrollToBottom}
+            address={messagesAddress(valueTransferDetail)}
+            closeModal={() => setMessagesAddressModalShowing(false)}
+          />
+        </Modal>
+      )}
 
       <Header
         testID="valuetransfer text"
@@ -250,6 +297,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                     index >= valueTransfersSorted.length - 1 ? false : valueTransfersSorted[index + 1].txid === vt.txid
                   }
                   setSendPageState={setSendPageState}
+                  setMessagesAddressModalShowing={(bbb: boolean) => setMessagesAddressModalShowing(bbb)}
                 />
               );
             })}

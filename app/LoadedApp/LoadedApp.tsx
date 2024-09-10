@@ -1887,6 +1887,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     setShieldingAmount={this.setShieldingAmount}
                     setScrollToTop={this.setScrollToTop}
                     scrollToTop={scrollToTop}
+                    setScrollToBottom={this.setScrollToBottom}
+                    scrollToBottom={scrollToBottom}
                   />
                 )}
               </Tab.Screen>

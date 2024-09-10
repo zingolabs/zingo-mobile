@@ -123,6 +123,8 @@ describe('Component History - test', () => {
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           scrollToTop={false}
+          setScrollToBottom={onFunction}
+          scrollToBottom={false}
         />
       </ContextAppLoadedProvider>,
     );
@@ -150,6 +152,8 @@ describe('Component History - test', () => {
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           scrollToTop={false}
+          setScrollToBottom={onFunction}
+          scrollToBottom={false}
         />
       </ContextAppLoadedProvider>,
     );
