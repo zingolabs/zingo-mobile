@@ -890,7 +890,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           <View
             style={
               {
-                "alignItems": "center",
+                "alignItems": "flex-start",
                 "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
@@ -1164,7 +1164,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           <View
             style={
               {
-                "alignItems": "center",
+                "alignItems": "flex-start",
                 "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
@@ -1463,7 +1463,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           <View
             style={
               {
-                "alignItems": "center",
+                "alignItems": "flex-start",
                 "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
@@ -1762,7 +1762,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           <View
             style={
               {
-                "alignItems": "center",
+                "alignItems": "flex-start",
                 "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
@@ -2036,7 +2036,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           <View
             style={
               {
-                "alignItems": "center",
+                "alignItems": "flex-start",
                 "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
@@ -2849,7 +2849,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           <View
             style={
               {
-                "alignItems": "center",
+                "alignItems": "flex-start",
                 "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
@@ -3124,7 +3124,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           <View
             style={
               {
-                "alignItems": "center",
+                "alignItems": "flex-start",
                 "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
@@ -3438,7 +3438,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           <View
             style={
               {
-                "alignItems": "center",
+                "alignItems": "flex-start",
                 "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
@@ -3738,7 +3738,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           <View
             style={
               {
-                "alignItems": "center",
+                "alignItems": "flex-start",
                 "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
@@ -4013,7 +4013,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           <View
             style={
               {
-                "alignItems": "center",
+                "alignItems": "flex-start",
                 "borderBottomColor": "#ffffff",
                 "borderBottomWidth": 1.5,
                 "borderStyle": "solid",
