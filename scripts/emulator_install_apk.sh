@@ -21,8 +21,7 @@ until [[ $step_complete == true ]]; do
         echo "Error: Failed to install APKs" >&2
         echo "For more information see '${output_dir}/emulator_install_apk.txt'" >&2
         exit 1
-    fi
+    fiTHE
     i=$((i+1))
     sleep 1
 done
-

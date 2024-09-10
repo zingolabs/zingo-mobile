@@ -23,6 +23,6 @@ WHO PAYS?
 At this time seednode.link is paid for and maintained by operating volunteers. In the future, addresses for contribution to keep the project going may be published.
 
 MORE?
-Radicle official project chat: https://radicle.zulipchat.com
+Radicle official project chat: htt_test_ps://radicle.zulipchat.com
 Radicle Improvement Proposals (RIPs) showcase the elegant design of the system: https://app.radicle.xyz/seeds/seed.radicle.xyz/rad:z3trNYnLWS11cJWC6BbxDs5niGo82
 Unofficial Matrix Chat: #radicle:matrix.org

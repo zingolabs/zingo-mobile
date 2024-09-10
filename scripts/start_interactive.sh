@@ -10,4 +10,5 @@ cd $(git rev-parse --show-toplevel)
 
 ./scripts/flow_emulator_setup.sh $@
 
-./scripts/flow_emulate_interactive.sh
+./scripts/flow_emulate_interactive.sh    "start": "react-native start",
+
