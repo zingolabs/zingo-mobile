@@ -100,31 +100,31 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Setup Docker 1 try
-        uses: douglascamata/setup-docker-macos-action@v1-alpha
-        id: dockerTry1
-        continue-on-error: true
-        with:
-          lima: v0.18.0
-          colima: v0.5.6
+      #- name: Setup Docker 1 try
+      #  uses: douglascamata/setup-docker-macos-action@v1-alpha
+      #  id: dockerTry1
+      #  continue-on-error: true
+      #  with:
+      #    lima: v0.18.0
+      #    colima: v0.5.6
 
-      - name: checking outcome 1
-        run: echo ${{ steps.dockerTry1.outcome }}
+      #- name: checking outcome 1
+      #  run: echo ${{ steps.dockerTry1.outcome }}
 
-      - name: Setup Docker 2 try
-        if: steps.dockerTry1.outcome != 'success'
-        uses: douglascamata/setup-docker-macos-action@v1-alpha
-        id: dockerTry2
-        continue-on-error: true
-        with:
-          lima: v0.18.0
-          colima: v0.5.6
+      #- name: Setup Docker 2 try
+      #  if: steps.dockerTry1.outcome != 'success'
+      #  uses: douglascamata/setup-docker-macos-action@v1-alpha
+      #  id: dockerTry2
+      #  continue-on-error: true
+      #  with:
+      #    lima: v0.18.0
+      #    colima: v0.5.6
 
-      - name: checking outcome 2
-        run: echo ${{ steps.dockerTry2.outcome }}
+      #- name: checking outcome 2
+      #  run: echo ${{ steps.dockerTry2.outcome }}
 
       - name: Setup Docker Manually
-        if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
+      #  if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
         run: |
           brew uninstall colima
           brew tap colima/releases
