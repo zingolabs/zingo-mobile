@@ -421,14 +421,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun getLatestBlock(server: String, promise: Promise) {
-        // Log.i("MAIN", "Initialize Light Client")
+        thread {
+            // Log.i("MAIN", "Initialize Light Client")
+            
+            uniffi.zingo.initLogging()
+            
+            // Initialize Light Client
+            val resp = uniffi.zingo.getLatestBlockServer(server)
+            promise.resolve(resp)
+        }
 
-        uniffi.zingo.initLogging()
-
-        // Initialize Light Client
-        val resp = uniffi.zingo.getLatestBlockServer(server)
-
-        promise.resolve(resp)
     }
 
     @ReactMethod
