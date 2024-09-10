@@ -403,7 +403,7 @@
     "youreceived": "Recibiste"
   },
   "send": {
-    "Broadcast": "Transmitida con éxito Tx:",
+    "Broadcast": "Transmitida y esperando confirmación Tx:",
     "sending-error": "Error enviando transacción",
     "title": "Enviar",
     "title-syncing": "Enviar - Sincronizando",

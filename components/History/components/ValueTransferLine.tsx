@@ -3,7 +3,14 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { IconDefinition, faArrowDown, faArrowUp, faRefresh, faComment } from '@fortawesome/free-solid-svg-icons';
+import {
+  IconDefinition,
+  faArrowDown,
+  faArrowUp,
+  faRefresh,
+  faComment,
+  faTriangleExclamation,
+} from '@fortawesome/free-solid-svg-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import ZecAmount from '../../Components/ZecAmount';
@@ -110,7 +117,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
           style={{
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
+            alignItems: vt.status === RPCValueTransfersStatusEnum.transmitted ? 'center' : 'flex-start',
             marginTop: 15,
             paddingBottom: 10,
             borderBottomWidth: nextLineWithSameTxid ? (Platform.OS === GlobalConst.platformOSandroid ? 1 : 0.5) : 1.5,
@@ -127,7 +134,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
                 size={30}
                 icon={vtIcon}
-                color={amountColor}
+                color={vt.status === RPCValueTransfersStatusEnum.transmitted ? colors.syncing : amountColor}
               />
             </View>
             <View style={{ display: 'flex' }}>
@@ -194,17 +201,29 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             />
           </View>
           {vt.confirmations === 0 && (
-            <FadeText
-              style={{
-                color: vt.status === RPCValueTransfersStatusEnum.transmitted ? 'red' : colors.syncing,
-                fontSize: 12,
-                opacity: 1,
-                fontWeight: '700',
-                textAlign: 'center',
-                textDecorationLine: 'underline',
-              }}>
-              {translate(`history.${vt.status}`) as string}
-            </FadeText>
+            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+              {vt.status === RPCValueTransfersStatusEnum.transmitted && (
+                <FontAwesomeIcon
+                  style={{ marginRight: 5 }}
+                  icon={faTriangleExclamation}
+                  color={colors.syncing}
+                  size={15}
+                />
+              )}
+              <FadeText
+                style={{
+                  color:
+                    vt.status === RPCValueTransfersStatusEnum.transmitted ? colors.primary : colors.primaryDisabled,
+                  fontSize: 12,
+                  opacity: 1,
+                  fontWeight: '700',
+                  textAlign: vt.status === RPCValueTransfersStatusEnum.transmitted ? 'center' : 'left',
+                  textDecorationLine: vt.status === RPCValueTransfersStatusEnum.transmitted ? 'underline' : 'none',
+                  marginLeft: vt.status === RPCValueTransfersStatusEnum.transmitted ? 0 : 40,
+                }}>
+                {translate(`history.${vt.status}`) as string}
+              </FadeText>
+            </View>
           )}
         </View>
       </TouchableOpacity>
