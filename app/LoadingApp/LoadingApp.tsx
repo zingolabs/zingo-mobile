@@ -635,28 +635,16 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     });
   };
 
-  selectTheBestServer = async (aDifferentOne: boolean) => {
+  selectTheBestServer = async (_aDifferentOne: boolean) => {
     // avoiding obsolete ones
     let withMessage: boolean = true;
-    const servers = await selectingServer(serverUris(this.state.translate).filter((s: ServerUrisType) => !s.obsolete));
+    const fasterServer = await selectingServer(
+      serverUris(this.state.translate).filter(
+        (s: ServerUrisType) => !s.obsolete && s.uri !== (_aDifferentOne ? actualServer.uri : ''),
+      ),
+    );
     const actualServer = this.state.server;
-    let fasterServer: ServerType = this.state.server;
-    if (servers.length > 0) {
-      const serversSorted: ServerType[] = servers
-        .filter((s: ServerUrisType) => s.latency !== null && s.uri !== (aDifferentOne ? actualServer.uri : ''))
-        .sort((a, b) => (a.latency ? a.latency : Infinity) - (b.latency ? b.latency : Infinity))
-        .map((s: ServerUrisType) => {
-          return { uri: s.uri, chainName: s.chainName };
-        });
-      if (serversSorted.length > 0) {
-        fasterServer = serversSorted[0];
-      } else {
-        // likely here there is a internet conection problem
-        // all of the servers return an error because they are unreachable probably.
-        withMessage = false;
-      }
-    }
-    console.log(fasterServer);
+    // console.log('Fastest server calculated with promise.race', fasterServer);
     this.setState({
       server: fasterServer,
       selectServer: SelectServerEnum.list,
