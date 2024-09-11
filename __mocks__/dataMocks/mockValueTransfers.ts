@@ -1,10 +1,12 @@
 import { PoolEnum, ValueTransferType, ValueTransferKindEnum } from '../../app/AppState';
+import { RPCValueTransfersStatusEnum } from '../../app/rpc/enums/RPCValueTransfersStatusEnum';
 
 export const mockValueTransfers: ValueTransferType[] = [
   {
     kind: ValueTransferKindEnum.Sent,
     fee: 0.0001,
     confirmations: 22,
+    status: RPCValueTransfersStatusEnum.confirmed,
     txid: 'sent-txid-1234567890',
     time: Date.now() - 1000,
     zecPrice: 33.33,
@@ -16,6 +18,7 @@ export const mockValueTransfers: ValueTransferType[] = [
     kind: ValueTransferKindEnum.MemoToSelf,
     fee: 0.0001,
     confirmations: 12,
+    status: RPCValueTransfersStatusEnum.confirmed,
     txid: 'memotooself-txid-1234567890',
     time: Date.now() - 100,
     zecPrice: 33.33,
@@ -27,6 +30,7 @@ export const mockValueTransfers: ValueTransferType[] = [
     kind: ValueTransferKindEnum.SendToSelf,
     fee: 0.0001,
     confirmations: 12,
+    status: RPCValueTransfersStatusEnum.confirmed,
     txid: 'sendtooself-txid-1234567890',
     time: Date.now() - 100,
     zecPrice: 33.33,
@@ -36,6 +40,7 @@ export const mockValueTransfers: ValueTransferType[] = [
   {
     kind: ValueTransferKindEnum.Received,
     confirmations: 133,
+    status: RPCValueTransfersStatusEnum.confirmed,
     txid: 'receive-txid-1234567890',
     time: Date.now() - 10,
     zecPrice: 66.66,
@@ -48,6 +53,7 @@ export const mockValueTransfers: ValueTransferType[] = [
     kind: ValueTransferKindEnum.Shield,
     fee: 0.0001,
     confirmations: 12,
+    status: RPCValueTransfersStatusEnum.confirmed,
     txid: 'shield-txid-1234567890',
     time: Date.now(),
     zecPrice: 33.33,

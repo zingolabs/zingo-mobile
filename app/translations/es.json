@@ -403,7 +403,7 @@
     "youreceived": "Recibiste"
   },
   "send": {
-    "Broadcast": "Transmitida con éxito Tx:",
+    "Broadcast": "Transmitida y esperando confirmación Tx:",
     "sending-error": "Error enviando transacción",
     "title": "Enviar",
     "title-syncing": "Enviar - Sincronizando",
@@ -533,7 +533,9 @@
     "address-http": "¡Zingo no tiene idea de quién te envió esta dirección! Depende totalmente de ti autenticar al remitente.",
     "address-https": "Dirección autenticada por Zingo",
     "type": "Tipo",
-    "not-confirmed": "Transacción no confirmada todavía"
+    "not-confirmed": "Transacción no confirmada todavía",
+    "transmitted": "Transmitida",
+    "mempool": "En Mempool"
   },
   "report": {
     "title": "Informe de Sincronización",
