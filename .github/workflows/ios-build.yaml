@@ -66,6 +66,12 @@ jobs:
           sudo cargo update -p zingolib --aggressive
           sudo rustup default nightly
 
+      - name: AWS libcrypto rust building
+        run: |
+          brew install cmake
+          brew install llvm
+          cargo install --force --locked bindgen-cli
+
       - name: Install Cargo Lipo
         run: sudo cargo install cargo-lipo
 
