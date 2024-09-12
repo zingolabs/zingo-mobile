@@ -235,9 +235,6 @@ else
     echo -e "\nRunning yarn..."
     yarn
 
-    echo -e "\nCleaning before Building APKs..."
-    ./gradlew clean
-
     echo -e "\nBuilding APKs..."
     ./gradlew assembleDebug -PsplitApk=true
 
