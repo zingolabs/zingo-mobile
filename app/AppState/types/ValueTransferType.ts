@@ -1,5 +1,6 @@
 import { ValueTransferKindEnum } from '../enums/ValueTransferKindEnum';
 import { PoolEnum } from '../enums/PoolEnum';
+import { RPCValueTransfersStatusEnum } from '../../rpc/enums/RPCValueTransfersStatusEnum';
 
 export default interface ValueTransferType {
   txid: string;
@@ -12,5 +13,6 @@ export default interface ValueTransferType {
   amount: number;
   memos?: string[];
   poolType?: PoolEnum;
+  status: RPCValueTransfersStatusEnum;
   // eslint-disable-next-line semi
 }

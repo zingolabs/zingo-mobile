@@ -16,7 +16,8 @@
     "build:release:split": "cd android && ./gradlew assembleRelease -PsplitApk=true && cd ..",
     "build:debug": "cd android && ./gradlew assembleDebug && cd ..",
     "build:debug:split": "cd android && ./gradlew assembleDebug -PsplitApk=true && cd ..",
-    "cargo:update": "cd rust && cargo update -p zingolib -p zingoconfig --aggressive"
+    "cargo:update": "cd rust && cargo update -p zingolib --aggressive && cd ..",
+    "cargo:clean": "cd rust && cargo clean && cd .."
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.2.0",

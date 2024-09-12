@@ -33,6 +33,7 @@ import AddressItem from '../../Components/AddressItem';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 // this is for http. (red)
 import { faTriangleExclamation, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 // this is for https. (primary)
 //import { faLock } from '@fortawesome/free-solid-svg-icons';
 
@@ -248,6 +249,30 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             <CurrencyAmount price={vt.zecPrice} amtZec={vt.amount} currency={currency} privacy={privacy} />
           )}
         </View>
+
+        {vt.confirmations === 0 && (
+          <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            {vt.status === RPCValueTransfersStatusEnum.transmitted && (
+              <FontAwesomeIcon
+                style={{ marginRight: 5 }}
+                icon={faTriangleExclamation}
+                color={colors.syncing}
+                size={15}
+              />
+            )}
+            <FadeText
+              style={{
+                color: vt.status === RPCValueTransfersStatusEnum.transmitted ? colors.primary : colors.primaryDisabled,
+                fontSize: 12,
+                opacity: 1,
+                fontWeight: '700',
+                textAlign: vt.status === RPCValueTransfersStatusEnum.transmitted ? 'center' : 'left',
+                textDecorationLine: vt.status === RPCValueTransfersStatusEnum.transmitted ? 'underline' : 'none',
+              }}>
+              {(translate(`history.${vt.status}`) as string) + ' - ' + (translate('history.not-confirmed') as string)}
+            </FadeText>
+          </View>
+        )}
 
         <View style={{ margin: 10 }}>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>

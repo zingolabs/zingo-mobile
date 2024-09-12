@@ -34,9 +34,9 @@ jobs:
         if: ${{ contains(github.repository, 'zingolib') }}
         run: |
           echo "zingolib_ref=$(echo ${GITHUB_REF} | sed 's/\//\\\//g')" >> $GITHUB_ENV
-          sed -i "/^zingolib\|^zingoconfig/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
-          if cat rust/lib/Cargo.toml | grep "^zingolib\|^zingoconfig" | grep -q "branch"; then exit 1; fi
-          cd rust && cargo update -p zingolib -p zingoconfig --aggressive
+          sed -i "/^zingolib/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
+          if cat rust/lib/Cargo.toml | grep "^zingolib" | grep -q "branch"; then exit 1; fi
+          cd rust && cargo update -p zingolib --aggressive
       
       - name: Store Cargo version
         run: echo $(cargo --version) >> rust/cargo_version.txt

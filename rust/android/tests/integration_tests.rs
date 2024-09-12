@@ -1,5 +1,5 @@
 #[cfg(not(feature = "regchest"))]
-use zingo_testutils::{self, scenarios};
+use zingolib::testutils::{scenarios};
 
 #[cfg(feature = "ci")]
 const UNIX_SOCKET: Option<&str> = Some("/Users/runner/.colima/default/docker.sock");

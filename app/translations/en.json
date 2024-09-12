@@ -403,7 +403,7 @@
     "youreceived": "You received"
   },
   "send": {
-    "Broadcast": "Successfully Broadcast Tx:",
+    "Broadcast": "Broadcasted and awaiting confirmation Tx:",
     "sending-error": "Error sending transaction",
     "title": "Send",
     "title-syncing": "Send - Syncing",
@@ -533,7 +533,9 @@
     "address-http": "Zingo has no idea who sent you this Address! It's entirely up to you to authenticate the Sender.",
     "address-https": "Zingo-Authenticated Address",
     "type": "Type",
-    "not-confirmed": "Transaction not yet confirmed"
+    "not-confirmed": "Transaction not yet confirmed",
+    "transmitted": "Transmitted",
+    "mempool": "In Mempool"
   },
   "report": {
     "title": "Sync / Rescan Report",
