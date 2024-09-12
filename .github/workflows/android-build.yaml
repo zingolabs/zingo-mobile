@@ -89,6 +89,9 @@ jobs:
         with:
           workspaces: rust
 
+      - name: Bindgen-cli install
+        run: cargo install --force --locked bindgen-cli
+
       - name: Cargo default nightly
         run: rustup default nightly
 
