@@ -68,8 +68,6 @@ jobs:
 
       - name: AWS libcrypto rust building
         run: |
-          brew install cmake
-          brew install llvm
           cargo install --force --locked bindgen-cli
 
       - name: Install Cargo Lipo
