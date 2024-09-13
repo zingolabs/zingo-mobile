@@ -171,7 +171,7 @@ async fn transaction_history(abi: &str) {
 async fn simple_sync(abi: &str) {
     let darkside_handler = DarksideHandler::new(Some(20000));
 
-    let server_id = zingoconfig::construct_lightwalletd_uri(Some(format!(
+    let server_id = zingolib::config::construct_lightwalletd_uri(Some(format!(
         "http://127.0.0.1:{}",
         darkside_handler.grpc_port
     )));
