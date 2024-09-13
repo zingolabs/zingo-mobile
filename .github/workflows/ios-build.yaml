@@ -71,12 +71,6 @@ jobs:
       - name: AWS libcrypto rust building
         run: sudo cargo install --force --locked bindgen-cli
 
-      - name: Install Cargo Lipo
-        run: sudo cargo install cargo-lipo
-
-      - name: Install rust Target
-        run: sudo rustup target add x86_64-apple-ios
-      
       - name: Cargo uniffi swift
         working-directory: rust/lib
         run: |
@@ -84,6 +78,12 @@ jobs:
           generate ./src/zingo.udl --language swift \
           --out-dir ./Generated
 
+      - name: Install Cargo Lipo
+        run: sudo cargo install cargo-lipo
+
+      - name: Install rust Target
+        run: sudo rustup target add x86_64-apple-ios
+      
       - name: Cargo lipo universal library
         working-directory: rust/lib
         run: |
