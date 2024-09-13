@@ -157,7 +157,7 @@ jobs:
           brew install colima
           brew install --formula docker
           colima delete
-          colima start --vm-type qemu
+          colima start --vm-type qemu --arch x86_64
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
