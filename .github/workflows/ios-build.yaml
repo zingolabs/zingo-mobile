@@ -64,7 +64,9 @@ jobs:
           if cat rust/lib/Cargo.toml | grep "^zingolib" | grep -q "branch"; then exit 1; fi
           cd rust
           sudo cargo update -p zingolib --aggressive
-          sudo rustup default nightly
+
+      - name: Cargo default nightly
+        run: rustup default nightly
 
       - name: AWS libcrypto rust building
         run: |
@@ -76,13 +78,23 @@ jobs:
       - name: Install rust Target
         run: sudo rustup target add x86_64-apple-ios
       
-      - name: Build Universal rust lib & uniffi lib and copy to ios folder
+      - name: Cargo uniffi swift
         working-directory: rust/lib
         run: |
-          sudo cargo run --release --bin uniffi-bindgen generate ./src/zingo.udl --language swift --out-dir ./Generated
+          sudo cargo run --release --bin uniffi-bindgen \
+          generate ./src/zingo.udl --language swift \
+          --out-dir ./Generated
+
+      - name: Cargo lipo universal library
+        working-directory: rust/lib
+        run: |
           sudo cargo lipo --release --targets x86_64-apple-ios
+
+      - name: Copy libraries to ios folder
+        working-directory: rust/lib
+        run: |
           sudo cp ../target/universal/release/libzingo.a ./Generated/libuniffi_zingo.a
-      
+
       - name: Upload native rust
         uses: actions/upload-artifact@v4
         with:
