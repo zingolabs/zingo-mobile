@@ -77,6 +77,9 @@ jobs:
       - name: rustup show
         run: sudo rustup show
 
+      - name: Install rust Target
+        run: sudo rustup target add x86_64-apple-darwin
+
       - name: Cargo uniffi swift
         working-directory: rust/lib
         run: |
