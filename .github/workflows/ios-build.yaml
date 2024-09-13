@@ -43,7 +43,7 @@ jobs:
     name: Build native rust & swift uniffi
     needs: ios-check-build-cache
     if: ${{ needs.ios-check-build-cache.outputs.ios-cache-found != 'true' }}
-    runs-on: macos-13
+    runs-on: macos-12
     env:
       RUSTUP_HOME: /root/.rustup
     steps:
@@ -76,9 +76,6 @@ jobs:
 
       - name: rustup show
         run: sudo rustup show
-
-      - name: Install rust Target
-        run: sudo rustup target add x86_64-apple-darwin
 
       - name: Cargo uniffi swift
         working-directory: rust/lib
