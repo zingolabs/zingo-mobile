@@ -94,6 +94,12 @@ jobs:
       matrix:
         partition: [1, 2, 3, 4, 5]
     steps:
+      - name: Install QEMU 9.0.2
+        run: brew install qemu@9.0.2
+
+      - name: Link QEMU 9.0.2
+        run: brew link qemu@9.0.2
+
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
