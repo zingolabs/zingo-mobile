@@ -9,17 +9,17 @@ on:
 jobs:
   jest-test:
     uses: ./.github/workflows/jest-test.yaml
-    
+
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
-    
+
   create-cache-key:
     uses: ./.github/workflows/create-cache-key.yaml
-    
+
   android-build:
     strategy:
       matrix:
-        arch: [ x86_64, x86 ]
+        arch: [x86]
     uses: ./.github/workflows/android-build.yaml
     needs: create-cache-key
     with:
@@ -28,7 +28,7 @@ jobs:
 
   android-test:
     uses: ./.github/workflows/android-test.yaml
-    needs: [ create-timestamp, android-build ]
+    needs: [create-timestamp, android-build]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
@@ -54,9 +54,9 @@ jobs:
   android-integration-test:
     strategy:
       matrix:
-        abi: [ x86_64, x86 ]
+        abi: [x86_64, x86]
     uses: ./.github/workflows/android-integration-test.yaml
-    needs: [ android-test ]
+    needs: [android-test]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
@@ -70,8 +70,7 @@ jobs:
 
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
-    needs: [ create-timestamp, ios-build ]
+    needs: [create-timestamp, ios-build]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      
