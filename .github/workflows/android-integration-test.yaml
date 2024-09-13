@@ -156,6 +156,7 @@ jobs:
           brew uninstall --force colima
           brew install colima
           brew install --formula docker
+          colima delete
           colima start --vm-type qemu
 
       - name: Pull regchest docker image
