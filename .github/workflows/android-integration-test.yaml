@@ -153,7 +153,7 @@ jobs:
       - name: Setup Docker Manually
         if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
         run: |
-          brew uninstall colima
+          brew uninstall --force colima
           brew tap colima/releases
           brew install colima@0.5.6
           brew install --formula docker
