@@ -94,11 +94,8 @@ jobs:
       matrix:
         partition: [1, 2, 3, 4, 5]
     steps:
-      - name: Install QEMU 9.0.2
-        run: brew install qemu@9.0.2
-
-      - name: Link QEMU 9.0.2
-        run: brew link qemu@9.0.2
+      - name: Start Colima Without SSH
+        run: colima start --ssh=false
 
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
