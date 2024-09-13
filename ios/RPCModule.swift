@@ -354,7 +354,11 @@ class RPCModule: NSObject {
   @objc(getLatestBlock:resolve:reject:)
   func getLatestBlock(_ server: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let dict: [String: Any] = ["server": server, "resolve": resolve]
-      self.getLatestBlockAsync(dict)
+       DispatchQueue.global().async { [weak self] in
+          if let self = self {
+              self.getLatestBlockAsync(dict)
+          }
+      }
   }
 
   func getDonationAddressAsync(_ dict: [AnyHashable: Any]) {
