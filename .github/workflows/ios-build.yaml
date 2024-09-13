@@ -43,7 +43,7 @@ jobs:
     name: Build native rust & swift uniffi
     needs: ios-check-build-cache
     if: ${{ needs.ios-check-build-cache.outputs.ios-cache-found != 'true' }}
-    runs-on: macos-12
+    runs-on: macos-13
     env:
       RUSTUP_HOME: /root/.rustup
     steps:
