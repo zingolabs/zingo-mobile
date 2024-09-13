@@ -68,7 +68,7 @@ jobs:
 
       - name: AWS libcrypto rust building
         run: |
-          cargo install --force --locked bindgen-cli
+          sudo cargo install --force --locked bindgen-cli
 
       - name: Install Cargo Lipo
         run: sudo cargo install cargo-lipo
