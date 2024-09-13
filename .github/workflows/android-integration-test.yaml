@@ -153,10 +153,8 @@ jobs:
       - name: Setup Docker Manually
         if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
         run: |
-          brew uninstall --force colima
-          brew install colima
-          brew install --formula docker
-          colima delete
+          brew install --head colima
+          brew install docker
           colima start --vm-type qemu --arch x86_64
 
       - name: Pull regchest docker image
