@@ -225,7 +225,7 @@ jobs:
       #    command: ./scripts/integration_tests.sh -a ${{ env.ABI }}
 
       - name: Run integration tests
-        working-directory: ./rust
+        working-directory: rust
         run: |
           cd $GITHUB_WORKSPACE/zingo-mobile/rust
           ls -la
