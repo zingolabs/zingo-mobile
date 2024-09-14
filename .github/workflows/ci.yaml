@@ -19,7 +19,7 @@ jobs:
   android-build:
     strategy:
       matrix:
-        arch: [x86]
+        arch: [x86_64, x86]
     uses: ./.github/workflows/android-build.yaml
     needs: create-cache-key
     with:
