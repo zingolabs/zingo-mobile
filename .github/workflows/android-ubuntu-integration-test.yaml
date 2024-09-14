@@ -209,7 +209,7 @@ jobs:
         run: |
           pwd
           ls -la rust
-          ls -la ~/work/zingo-mobile
+          ls -la ${{ github.workspace }}
 
       #- name: integration test as a script
       #  uses: nick-fields/retry@v3
@@ -226,7 +226,7 @@ jobs:
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive.tar.zst \
             --partition count:${{ matrix.partition }}/5 \
-            --workspace-remap ~/work/zingo-mobile/rust
+            --workspace-remap ${{ github.workspace }}/rust
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
