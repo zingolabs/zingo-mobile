@@ -216,8 +216,6 @@ jobs:
           pwd
           ls -la rust
           ls -la ~/zingo-mobile/zingo-mobile/rust
-          ls -la $GITHUB_WORKSPACE/zingo-mobile
-          ls -la $GITHUB_WORKSPACE/zingo-mobile/rust
 
       #- name: integration test as a script
       #  uses: nick-fields/retry@v3
@@ -227,7 +225,7 @@ jobs:
       #    command: ./scripts/integration_tests.sh -a ${{ env.ABI }}
 
       - name: Run integration tests
-        working-directory: rust
+        working-directory: ~/zingo-mobile/zingo-mobile/rust
         run: |
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive.tar.zst \
