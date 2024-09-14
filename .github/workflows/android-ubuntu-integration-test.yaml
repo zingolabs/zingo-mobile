@@ -209,7 +209,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: nextest-archive
-          path: ~/zingo-mobile/rust
+          path: ~/zingo-mobile/zingo-mobile/rust
 
       - name: Print workspace remap
         run: |
