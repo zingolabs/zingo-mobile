@@ -10,6 +10,9 @@ const calculateLatency = async (server: ServerUrisType, _index: number) => {
   if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
     latency = end - start;
   }
+
+  console.log('Checking SERVER', server, latency);
+
   return latency;
 };
 

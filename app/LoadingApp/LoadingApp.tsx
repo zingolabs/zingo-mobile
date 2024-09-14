@@ -716,12 +716,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       if (this.state.serverErrorTries === 0) {
         // first try
         this.setState({ screen, actionButtonsDisabled: true });
-        setTimeout(() => {
-          this.addLastSnackbar({
-            message: this.state.translate('loadingapp.serverfirsttry') as string,
-            duration: SnackbarDurationEnum.longer,
-          });
-        }, 1000);
+        this.addLastSnackbar({
+          message: this.state.translate('loadingapp.serverfirsttry') as string,
+          duration: SnackbarDurationEnum.longer,
+        });
         // a different server.
         await this.selectTheBestServer(true);
         if (start) {
