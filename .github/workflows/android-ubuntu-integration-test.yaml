@@ -215,6 +215,7 @@ jobs:
         run: |
           pwd
           ls -la rust
+          ls -la ~
           ls -la ~/rust
 
       #- name: integration test as a script
