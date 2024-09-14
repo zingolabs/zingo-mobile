@@ -226,13 +226,10 @@ jobs:
 
       - name: Run integration tests
         run: |
-          cd $GITHUB_WORKSPACE/zingo-mobile/zingo-mobile/rust
-          ls -la
-          pwd
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive.tar.zst \
             --partition count:${{ matrix.partition }}/5 \
-            --workspace-remap $GITHUB_WORKSPACE/zingo-mobile/zingo-mobile/rust
+            --workspace-remap ~/zingo-mobile/zingo-mobile/rust
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
