@@ -209,10 +209,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: nextest-archive
-          path: ~/zingo-mobile/zingo-mobile/rust
+          path: rust
 
       - name: Print workspace remap
         run: |
+          pwd
+          ls -la rust
           ls -la ~/zingo-mobile/zingo-mobile/rust
           ls -la $GITHUB_WORKSPACE/zingo-mobile
           ls -la $GITHUB_WORKSPACE/zingo-mobile/rust
@@ -225,11 +227,11 @@ jobs:
       #    command: ./scripts/integration_tests.sh -a ${{ env.ABI }}
 
       - name: Run integration tests
+        working-directory: rust
         run: |
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive.tar.zst \
             --partition count:${{ matrix.partition }}/5 \
-            --workspace-remap ~/zingo-mobile/zingo-mobile/rust
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
