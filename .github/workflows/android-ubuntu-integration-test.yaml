@@ -213,7 +213,7 @@ jobs:
 
       - name: Print workspace remap
         run: |
-          ls -la $GITHUB_WORKSPACE
+          ls -la ~/zingo-mobile/zingo-mobile/rust
           ls -la $GITHUB_WORKSPACE/zingo-mobile
           ls -la $GITHUB_WORKSPACE/zingo-mobile/rust
 
