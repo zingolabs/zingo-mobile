@@ -55,7 +55,7 @@ jobs:
     strategy:
       matrix:
         abi: [x86_64, x86]
-    uses: ./.github/workflows/android-integration-test.yaml
+    uses: ./.github/workflows/android-ubuntu-integration-test.yaml
     needs: [android-test]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
