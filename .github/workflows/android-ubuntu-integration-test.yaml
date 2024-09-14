@@ -225,14 +225,14 @@ jobs:
       #    command: ./scripts/integration_tests.sh -a ${{ env.ABI }}
 
       - name: Run integration tests
-        working-directory: rust
         run: |
-          cd $GITHUB_WORKSPACE/zingo-mobile/rust
+          cd $GITHUB_WORKSPACE/zingo-mobile/zingo-mobile/rust
           ls -la
           pwd
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive.tar.zst \
             --partition count:${{ matrix.partition }}/5 \
+            --workspace-remap $GITHUB_WORKSPACE/zingo-mobile/zingo-mobile/rust
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
