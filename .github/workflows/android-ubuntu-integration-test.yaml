@@ -229,6 +229,7 @@ jobs:
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive.tar.zst \
             --partition count:${{ matrix.partition }}/5 \
+            --workspace-remap ../rust
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
