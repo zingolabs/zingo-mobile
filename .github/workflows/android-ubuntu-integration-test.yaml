@@ -33,6 +33,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
+          path: zingo-mobile
 
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
@@ -108,6 +109,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
+          path: zingo-mobile
 
       - name: Enable KVM group perms
         run: |
@@ -216,12 +218,12 @@ jobs:
       #    max_attempts: 1
       #    command: ./scripts/integration_tests.sh -a ${{ env.ABI }}
 
-      - name: Run Android integration tests
-        working-directory: ./rust
+      - name: Run integration tests
         run: |
+          cd $GITHUB_WORKSPACE/rust
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive.tar.zst \
-            --partition count:${{ matrix.partition}}/5
+            --partition count:${{ matrix.partition }}/5
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
