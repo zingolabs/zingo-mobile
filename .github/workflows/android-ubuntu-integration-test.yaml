@@ -108,7 +108,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+          repository: ${{ env.repository }}
 
       - name: Enable KVM group perms
         run: |
