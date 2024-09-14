@@ -31,9 +31,6 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
-          path: zingo-mobile
 
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
@@ -107,8 +104,6 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          repository: ${{ env.repository }}
 
       - name: Enable KVM group perms
         run: |
