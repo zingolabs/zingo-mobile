@@ -209,7 +209,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: nextest-archive
-          path: ./rust
+          path: $GITHUB_WORKSPACE/zingo-mobile/rust
 
       #- name: integration test as a script
       #  uses: nick-fields/retry@v3
