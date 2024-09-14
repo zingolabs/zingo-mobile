@@ -226,6 +226,8 @@ jobs:
       - name: Run integration tests
         working-directory: rust
         run: |
+          pwd
+          ls -la
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive.tar.zst \
             --partition count:${{ matrix.partition }}/5 \
