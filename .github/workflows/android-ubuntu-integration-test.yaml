@@ -139,12 +139,8 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Setup Docker
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
-          sudo systemctl start docker
-          sudo usermod -aG docker $USER
+      - name: Print Docker version
+        run: docker --version
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
