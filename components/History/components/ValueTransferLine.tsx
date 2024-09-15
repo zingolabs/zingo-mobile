@@ -32,7 +32,6 @@ import 'moment/locale/ru';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
-import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 
 type ValueTransferLineProps = {
   index: number;
