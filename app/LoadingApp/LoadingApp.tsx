@@ -635,7 +635,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     });
   };
 
-  selectTheBestServer = async (aDifferentOne: boolean) => {
+  selectTheBestServer = async (_aDifferentOne: boolean) => {
     // avoiding obsolete ones
     let withMessage: boolean = true;
     const server = await selectingServer(
