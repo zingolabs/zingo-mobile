@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        partition: [1]
+        partition: [1, 2, 3, 4, 5]
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -204,24 +204,16 @@ jobs:
           name: nextest-archive
           path: rust
 
-      - name: Print workspace remap
-        run: |
-          pwd
-          ls -la rust
-          ls -la ${{ github.workspace }}
-
-      - name: integration test as a script
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 120
-          max_attempts: 1
-          command: ${{ github.workspace }}/scripts/integration_tests.sh -a ${{ env.ABI }}
+      #- name: integration test as a script
+      #  uses: nick-fields/retry@v3
+      #  with:
+      #    timeout_minutes: 120
+      #    max_attempts: 1
+      #    command: ${{ github.workspace }}/scripts/integration_tests.sh -a ${{ env.ABI }}
 
       - name: Run integration tests
         working-directory: rust
         run: |
-          pwd
-          ls -la
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive.tar.zst \
             --partition count:${{ matrix.partition }}/5 \
