@@ -31,6 +31,9 @@
   "email": "zingo@zingolabs.org",
   "subject": "Soporte Zingo...",
   "body": "Necesito ayuda con...",
+  "messages": {
+    "title": "Mensajes"
+  },
   "addressbook": {
     "title": "Libreta de Direcciones",
     "end": "Fin",

@@ -8,6 +8,7 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -68,6 +69,8 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   const [valueTransfersSorted, setValueTransfersSorted] = useState<ValueTransferType[]>([]);
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [firstScrollToBottomDone, setFirstScrollToBottomDone] = useState<boolean>(false);
   const scrollViewRef = useRef<ScrollView>(null);
 
   var lastMonth = '';
@@ -83,7 +86,7 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
       return [] as ValueTransferType[];
     }
     return valueTransfers
-      .filter((a: ValueTransferType) => a.memos && a.memos.filter(m => !!m).length > 0)
+      .filter((a: ValueTransferType) => a.memos && a.memos.length > 0)
       .sort((a: ValueTransferType, b: ValueTransferType) => {
         const timeComparison = a.time - b.time;
         if (timeComparison === 0) {
@@ -113,14 +116,16 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
           return timeComparison;
         }
       })
-      .slice(0, numVt);
+      .slice(-numVt);
   }, [valueTransfers, numVt]);
 
   useEffect(() => {
     setLoadMoreButton(numVt < (valueTransfers ? valueTransfers.length : 0));
     setValueTransfersSorted(fetchValueTransfersSorted);
-    setScrollToBottom(true);
-  }, [fetchValueTransfersSorted, numVt, setScrollToBottom, valueTransfers]);
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
+  }, [fetchValueTransfersSorted, numVt, valueTransfers]);
 
   useEffect(() => {
     if (scrollToBottom) {
@@ -128,6 +133,13 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
       setScrollToBottom(false);
     }
   }, [scrollToBottom, setScrollToBottom]);
+
+  useEffect(() => {
+    if (!loading) {
+      console.log('scroll bottom');
+      handleScrollToBottom();
+    }
+  }, [loading]);
 
   const loadMoreClicked = useCallback(() => {
     setNumVt(numVt + 50);
@@ -150,9 +162,13 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
-    const isBottom = contentOffset.y >= Number((contentSize.height - layoutMeasurement.height).toFixed(0));
-    //console.log(contentOffset.y, Number((contentSize.height - layoutMeasurement.height).toFixed(0)), isBottom);
+    const isBottom = Math.round(contentOffset.y) >= Math.round(contentSize.height - layoutMeasurement.height);
+    console.log(Math.round(contentOffset.y), Math.round(contentSize.height - layoutMeasurement.height), isBottom);
     setIsAtBottom(isBottom);
+    if (isBottom && !firstScrollToBottomDone) {
+      console.log('first scroll bottom done');
+      setFirstScrollToBottomDone(true);
+    }
   };
 
   //console.log('render History - 4', !!scrollViewRef.current);
@@ -186,12 +202,12 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
       </Modal>
 
       <Header
-        testID="ValueTransfer text"
+        testID=""
         poolsMoreInfoOnClick={poolsMoreInfoOnClick}
         syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
         toggleMenuDrawer={toggleMenuDrawer}
         setZecPrice={setZecPrice}
-        title={translate('history.title') as string}
+        title={translate('messages.title') as string}
         setComputingModalVisible={setComputingModalVisible}
         setBackgroundError={setBackgroundError}
         setPrivacyOption={setPrivacyOption}
@@ -201,6 +217,9 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
         setScrollToBottom={setScrollToBottom}
       />
 
+      {(loading || !firstScrollToBottomDone || valueTransfersSorted.length === 0) && (
+        <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
+      )}
       <ScrollView
         ref={scrollViewRef}
         onScroll={handleScroll}
@@ -215,7 +234,12 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
             title={translate('history.refreshing') as string}
           />
         }
-        style={{ flexGrow: 1, marginTop: 10, width: '100%' }}>
+        style={{
+          flexGrow: 1,
+          marginTop: 10,
+          width: '100%',
+          opacity: loading || !firstScrollToBottomDone || valueTransfersSorted.length === 0 ? 0 : 1,
+        }}>
         {loadMoreButton ? (
           <View
             style={{
@@ -233,7 +257,7 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
           </View>
         ) : (
           <>
-            {!!valueTransfers && !!valueTransfers.length && (
+            {!!valueTransfersSorted && !!valueTransfersSorted.length && (
               <View
                 style={{
                   display: 'flex',

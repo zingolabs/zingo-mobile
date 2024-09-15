@@ -696,7 +696,7 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
             "paddingHorizontal": 5,
           }
         }
-        testID="ValueTransfer text"
+        testID=""
       >
         text translated
       </Text>
@@ -814,6 +814,15 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
       }
     />
   </View>
+  <ActivityIndicator
+    color="#18bd18"
+    size="large"
+    style={
+      {
+        "marginVertical": 20,
+      }
+    }
+  />
   <RCTScrollView
     accessibilityLabel="text translated"
     accessible={true}
@@ -824,24 +833,10 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
           [MockFunction] {
             "calls": [
               [
-                true,
-              ],
-              [
                 0,
-              ],
-              [
-                true,
               ],
             ],
             "results": [
-              {
-                "type": "return",
-                "value": undefined,
-              },
-              {
-                "type": "return",
-                "value": undefined,
-              },
               {
                 "type": "return",
                 "value": undefined,
@@ -859,6 +854,7 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
       {
         "flexGrow": 1,
         "marginTop": 10,
+        "opacity": 0,
         "width": "100%",
       }
     }
@@ -1789,7 +1785,7 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
             "paddingHorizontal": 5,
           }
         }
-        testID="ValueTransfer text"
+        testID=""
       >
         text translated
       </Text>
@@ -1907,27 +1903,22 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
       }
     />
   </View>
+  <ActivityIndicator
+    color="#18bd18"
+    size="large"
+    style={
+      {
+        "marginVertical": 20,
+      }
+    }
+  />
   <RCTScrollView
     accessibilityLabel="text translated"
     accessible={true}
     onScroll={[Function]}
     refreshControl={
       <RefreshControlMock
-        onRefresh={
-          [MockFunction] {
-            "calls": [
-              [
-                true,
-              ],
-            ],
-            "results": [
-              {
-                "type": "return",
-                "value": undefined,
-              },
-            ],
-          }
-        }
+        onRefresh={[MockFunction]}
         refreshing={false}
         tintColor="#c3c3c3"
         title="text translated"
@@ -1938,6 +1929,7 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
       {
         "flexGrow": 1,
         "marginTop": 10,
+        "opacity": 0,
         "width": "100%",
       }
     }

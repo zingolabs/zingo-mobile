@@ -619,23 +619,27 @@ export default class RPC {
   }
 
   async updateData() {
-    //console.log("Update data triggered");
+    //console.log('Update data triggered');
     if (this.updateDataLock) {
-      console.log('Update lock, returning');
+      //console.log('Update lock, returning');
       return;
     }
 
+    //console.log('UPDATING');
     // if the App have an error here
     // this try-catch prevent to have true in updateDataLock.
     try {
       this.updateDataLock = true;
 
       await this.fetchWalletHeight();
+      //console.log('despues de 1 fetchWalletHeight');
       await this.fetchWalletBirthday();
+      //console.log('despues de 2 fetchWalletBirthday');
       //await this.fetchInfoAndServerHeight();
 
       // And fetch the rest of the data.
       await this.loadWalletData();
+      //console.log('despues de 3 loadWalletData');
 
       //console.log(`Finished update data at ${lastServerBlockHeight}`);
       this.updateDataLock = false;

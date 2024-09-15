@@ -31,6 +31,9 @@
   "email": "zingo@zingolabs.org",
   "subject": "Zingo Support...",
   "body": "I need help with...",
+  "messages": {
+    "title": "Messages"
+  },
   "addressbook": {
     "title": "Address Book",
     "end": "End",

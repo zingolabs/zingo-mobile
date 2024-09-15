@@ -25,6 +25,7 @@ import 'moment/locale/ru';
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
 import RegText from '../../Components/RegText';
+import Utils from '../../../app/utils';
 
 type MessageLineProps = {
   index: number;
@@ -188,7 +189,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             flexDirection: vt.kind === ValueTransferKindEnum.Received ? 'row' : 'row-reverse',
             alignItems: 'center',
           }}>
-          {vt.amount > 0 && (
+          {vt.amount >= Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount()) && (
             <ZecAmount
               style={{
                 paddingRight: 5,
