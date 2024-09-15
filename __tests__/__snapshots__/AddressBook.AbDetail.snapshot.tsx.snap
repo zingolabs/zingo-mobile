@@ -11,7 +11,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
       "margin": 10,
     }
   }
-  testID="addressBookDetail.0"
+  testID="addressbookdetail.0"
 >
   <Text
     style={
@@ -415,7 +415,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
       "margin": 10,
     }
   }
-  testID="addressBookDetail.2"
+  testID="addressbookdetail.2"
 >
   <Text
     style={
@@ -888,7 +888,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
       "margin": 10,
     }
   }
-  testID="addressBookDetail.1"
+  testID="addressbookdetail.1"
 >
   <Text
     style={

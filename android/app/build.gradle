@@ -205,14 +205,13 @@ android.applicationVariants.configureEach { variant ->
 
 // change this to build.sh script
 android.applicationVariants.configureEach { variant ->
-    //def t = tasks.register("generate${variant.name.capitalize()}UniFFIBindings", Exec) {
-    //    workingDir "${rootProject.projectDir}/../rust"
-    // Runs the bindings generation, note that you must have uniffi-bindgen installed and in your PATH environment variable
-    //    commandLine 'cargo', 'run', '--release', '--features=uniffi/cli', '--bin', 'uniffi-bindgen', 
-    //    'generate', '../rust/lib/src/zingo.udl', '--language', 'kotlin', 
-    //    '--out-dir', "${buildDir}/generated/source/uniffi/${variant.name}/java"
-    //}
-    //variant.javaCompileProvider.get().dependsOn(t)
+//    def t = tasks.register("generate${variant.name.capitalize()}UniFFIBindings", Exec) {
+//        workingDir "${rootProject.projectDir}/../rust"
+//        commandLine 'cargo', 'run', '--release', '--features=uniffi/cli', '--bin', 'uniffi-bindgen', 
+//        'generate', '../rust/lib/src/zingo.udl', '--language', 'kotlin', 
+//        '--out-dir', "${buildDir}/generated/source/uniffi/${variant.name}/java"
+//    }
+//    variant.javaCompileProvider.get().dependsOn(t)
     def sourceSet = variant.sourceSets.find { it.name == variant.name }
     sourceSet.java.srcDir new File(buildDir, "generated/source/uniffi/${variant.name}/java")
 }
@@ -221,7 +220,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
-    androidTestImplementation('com.wix:detox:20.22.2')
+    androidTestImplementation('com.wix:detox:20.25.6')
     implementation 'androidx.appcompat:appcompat:1.7.0'
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"

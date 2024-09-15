@@ -3,6 +3,9 @@ name: End-to-end test
 on:
   workflow_call:
     inputs:
+      timestamp:
+        required: true
+        type: string
       cache-key:
         required: true
         type: string
@@ -11,9 +14,9 @@ env:
   REPO-OWNER: ${{ github.repository_owner }}
 
 jobs:
-  e2e-test:
+  android-e2e-test-actions:
     name: End-to-end test
-    runs-on: macos-13
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         include:
@@ -31,7 +34,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
-        
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Pull regchest docker image
+        run: docker pull zingodevops/regchest:007
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -45,8 +57,22 @@ jobs:
           build-root-directory: ./android
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
       
-      - name: AVD cache
-        uses: actions/cache@v4
+      - name: Native rust cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/src/main/jniLibs/${{ matrix.arch }}
+          key: native-android-uniffi-${{ matrix.arch }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Kotlin uniffi cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
+          key: kotlin-android-uniffi-${{ matrix.arch }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Restore AVD cache
+        uses: actions/cache/restore@v4
         id: avd-cache
         with: 
           path: |
@@ -54,13 +80,6 @@ jobs:
             ~/.android/adb*
           key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-e2e
 
-      - name: Native rust cache
-        uses: actions/cache/restore@v4
-        with:
-          path: android/app/src/main/jniLibs/${{ matrix.arch }}
-          key: native-android-uniffi-${{ matrix.arch }}-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
-      
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
@@ -71,14 +90,26 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
-      
-      - run: yarn
-      
-      - run: nohup yarn react-native start > "yarn_react_native_start.out" &
+
+      - name: Save AVD cache
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        id: avd-cache-saving
+        with: 
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-e2e
+
+      - name: Yarn install
+        run: yarn
       
       - name: Run Detox Build
         run: yarn detox build -c android.emu.debug -n test
-      
+
+      - name: Yarn Start
+        run: nohup yarn start > "yarn_react_native_start.out" &
+
       - name: Run Detox Test
         uses: reactivecircus/android-emulator-runner@v2
         with:

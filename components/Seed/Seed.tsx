@@ -320,7 +320,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           marginVertical: 5,
         }}>
         <Button
-          testID="seed.button.OK"
+          testID="seed.button.ok"
           type={mode === ModeEnum.basic ? ButtonTypeEnum.Secondary : ButtonTypeEnum.Primary}
           style={{
             backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
@@ -352,6 +352,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         />
         {times > 0 && (
           <Button
+            testID="seed.button.cancel"
             type={ButtonTypeEnum.Secondary}
             title={translate('cancel') as string}
             style={{ marginLeft: 10 }}

@@ -673,7 +673,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         alignItems: 'center',
                       }}>
                       {listIcon && <FontAwesomeIcon icon={listIcon} size={20} color={colors.border} />}
-                      <RegText style={{ marginLeft: 10 }}>{translate('settings.server-list') as string}</RegText>
+                      <RegText testID="settings.list-server" style={{ marginLeft: 10 }}>
+                        {translate('settings.server-list') as string}
+                      </RegText>
                       {listIcon === faDotCircle && <FadeText style={{ marginLeft: 10 }}>{listServerUri}</FadeText>}
                     </View>
                   </RNPickerSelect>
@@ -792,7 +794,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             </View>
 
             <View style={{ display: 'flex', margin: 10 }}>
-              <BoldText>{translate('settings.security-title') as string}</BoldText>
+              <BoldText testID="settings.securitytitle">{translate('settings.security-title') as string}</BoldText>
             </View>
 
             {securityCheckBox(

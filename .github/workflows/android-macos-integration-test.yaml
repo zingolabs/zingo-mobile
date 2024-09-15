@@ -12,7 +12,7 @@ on:
       abi:
         required: true
         type: string
-    
+
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
   TIMESTAMP: ${{ inputs.timestamp }}
@@ -21,8 +21,8 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
-  android-build-test-artifacts:
-    name: Android Build test artifacts
+  android-integration-avd-cache:
+    name: Android integration AVD cache
     runs-on: macos-13
     steps:
       - name: Set envs for zingolib CI
@@ -34,35 +34,62 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Install protoc
-        run: brew install protobuf
+      - name: Set envs for x86_64
+        if: ${{ env.ABI == 'x86_64' }}
+        run: echo "AVD-ARCH=x86_64" >> $GITHUB_ENV
 
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Set envs for x86
+        if: ${{ env.ABI == 'x86' }}
+        run: echo "AVD-ARCH=x86" >> $GITHUB_ENV
+
+      - name: Set envs for arm64-v8a
+        if: ${{ env.ABI == 'arm64-v8a' }}
+        run: echo "AVD-ARCH=x86_64" >> $GITHUB_ENV
+
+      - name: Set envs for armeabi-v7a
+        if: ${{ env.ABI == 'armeabi-v7a' }}
+        run: echo "AVD-ARCH=x86" >> $GITHUB_ENV
+
+      - name: AVD cache
+        uses: actions/cache/restore@v4
+        id: avd-cache
         with:
-          toolchain: stable
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.AVD-ARCH }}-integ
+          lookup-only: true
 
-      - name: Install nextest
-        uses: taiki-e/install-action@nextest
+      - name: Setup Android SDK
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: android-actions/setup-android@v3
 
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
+      - name: Add emulator to PATH
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
+
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: nick-fields/retry@v3
         with:
-          workspaces: rust
+          timeout_minutes: 60
+          max_attempts: 3
+          command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
-      - name: Build and archive tests
-        working-directory: ./rust
-        run: cargo nextest archive --verbose --features "ci regchest" --archive-file nextest-archive-${{ env.ABI }}.tar.zst
-
-      - name: Upload archive
-        uses: actions/upload-artifact@v4
+      - name: AVD cache saving
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        id: avd-cache-saving
         with:
-          name: nextest-archive-${{ env.ABI }}
-          path: ./rust/nextest-archive-${{ env.ABI }}.tar.zst
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.AVD-ARCH }}-integ
 
   android-integration-test:
+    needs: [android-integration-avd-cache]
     name: Android Integration test
     runs-on: macos-13
-    needs: android-build-test-artifacts
     strategy:
       matrix:
         partition: [1, 2, 3, 4, 5]
@@ -70,12 +97,12 @@ jobs:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-            
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
-        
+
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
         run: |
@@ -100,45 +127,48 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      #- name: Setup Docker 1 try
-      #  uses: douglascamata/setup-docker-macos-action@v1-alpha
-      #  id: dockerTry1
-      #  continue-on-error: true
-      #  with:
-      #    lima: v0.18.0
-      #    colima: v0.5.6
+      # - name: Setup Docker 1 try
+      #   uses: douglascamata/setup-docker-macos-action@v1-alpha
+      #   id: dockerTry1
+      #   continue-on-error: true
+      #   with:
+      #     lima: v0.18.0
+      #     colima: v0.5.6
 
-      #- name: checking outcome 1
-      #  run: echo ${{ steps.dockerTry1.outcome }}
+      # - name: checking outcome 1
+      #   run: echo ${{ steps.dockerTry1.outcome }}
 
-      #- name: Setup Docker 2 try
-      #  if: steps.dockerTry1.outcome != 'success'
-      #  uses: douglascamata/setup-docker-macos-action@v1-alpha
-      #  id: dockerTry2
-      #  continue-on-error: true
-      #  with:
-      #    lima: v0.18.0
-      #    colima: v0.5.6
+      # - name: Setup Docker 2 try
+      #   if: steps.dockerTry1.outcome != 'success'
+      #   uses: douglascamata/setup-docker-macos-action@v1-alpha
+      #   id: dockerTry2
+      #   continue-on-error: true
+      #   with:
+      #     lima: v0.18.0
+      #     colima: v0.5.6
 
-      #- name: checking outcome 2
-      #  run: echo ${{ steps.dockerTry2.outcome }}
+      # - name: checking outcome 2
+      #   run: echo ${{ steps.dockerTry2.outcome }}
 
       - name: Setup Docker Manually
-      #  if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
+        if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
         run: |
-          brew install colima
-          brew install --formula docker
-          colima start
+          brew install --head colima
+          brew install docker
+          colima start --vm-type qemu --arch x86_64
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:007
 
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Rust toolchain stable
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
 
       - name: Install nextest
-        uses: taiki-e/install-action@nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: nextest
 
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
@@ -151,42 +181,34 @@ jobs:
           path: android/app/src/main/jniLibs/${{ env.ABI }}
           key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
-      
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-      
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-      
+
       - name: Add emulator to PATH
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
-            
+
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.2
           build-root-directory: ./android
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
-      
+
       - name: AVD cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         id: avd-cache
-        with: 
+        with:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
           key: avd-${{ env.AVD-ARCH }}-integ
-          
-      - name: Create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 60
-          max_attempts: 3
-          command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
       - name: Kotlin uniffi cache
         uses: actions/cache/restore@v4
@@ -198,20 +220,26 @@ jobs:
       - name: Download archive
         uses: actions/download-artifact@v4
         with:
-          name: nextest-archive-${{ env.ABI }}
+          name: nextest-archive
           path: ./rust
 
-      - name: Run integration tests
+      #- name: integration test as a script
+      #  uses: nick-fields/retry@v3
+      #  with:
+      #    timeout_minutes: 120
+      #    max_attempts: 1
+      #    command: ./scripts/integration_tests.sh -a ${{ env.ABI }}
+
+      - name: Run Android integration tests
         working-directory: ./rust
         run: |
           cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
-            --archive-file nextest-archive-${{ env.ABI }}.tar.zst \
+            --archive-file nextest-archive.tar.zst \
             --partition count:${{ matrix.partition}}/5
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports-${{ env.ABI }}-${{ matrix.partition}}-${{ env.TIMESTAMP }}
+          name: test-integration-reports-${{ env.ABI }}-${{ matrix.partition}}-${{ env.TIMESTAMP }}
           path: android/app/build/outputs/integration_test_reports
-

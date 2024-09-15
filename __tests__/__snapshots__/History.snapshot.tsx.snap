@@ -696,7 +696,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "paddingHorizontal": 5,
           }
         }
-        testID="ValueTransfer text"
+        testID="valuetransfer text"
       >
         text translated
       </Text>
@@ -858,7 +858,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "flexDirection": "column",
           }
         }
-        testID="valueTransferList.1"
+        testID="vt-1"
       >
         <View
           style={
@@ -1156,7 +1156,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "flexDirection": "column",
           }
         }
-        testID="valueTransferList.2"
+        testID="vt-2"
       >
         <View
           onPress={[Function]}
@@ -1455,7 +1455,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "flexDirection": "column",
           }
         }
-        testID="valueTransferList.3"
+        testID="vt-3"
       >
         <View
           onPress={[Function]}
@@ -1754,7 +1754,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "flexDirection": "column",
           }
         }
-        testID="valueTransferList.4"
+        testID="vt-4"
       >
         <View
           onPress={[Function]}
@@ -2028,7 +2028,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             "flexDirection": "column",
           }
         }
-        testID="valueTransferList.5"
+        testID="vt-5"
       >
         <View
           onPress={[Function]}
@@ -2669,7 +2669,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "paddingHorizontal": 5,
           }
         }
-        testID="ValueTransfer text"
+        testID="valuetransfer text"
       >
         text translated
       </Text>
@@ -2817,7 +2817,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "flexDirection": "column",
           }
         }
-        testID="valueTransferList.1"
+        testID="vt-1"
       >
         <View
           style={
@@ -3116,7 +3116,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "flexDirection": "column",
           }
         }
-        testID="valueTransferList.2"
+        testID="vt-2"
       >
         <View
           onPress={[Function]}
@@ -3430,7 +3430,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "flexDirection": "column",
           }
         }
-        testID="valueTransferList.3"
+        testID="vt-3"
       >
         <View
           onPress={[Function]}
@@ -3730,7 +3730,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "flexDirection": "column",
           }
         }
-        testID="valueTransferList.4"
+        testID="vt-4"
       >
         <View
           onPress={[Function]}
@@ -4005,7 +4005,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             "flexDirection": "column",
           }
         }
-        testID="valueTransferList.5"
+        testID="vt-5"
       >
         <View
           onPress={[Function]}

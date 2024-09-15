@@ -48,7 +48,7 @@ pub fn android_integration_test(abi: &str, test_name: &str) -> (i32, String, Str
     (exit_code, stdout, stderr)
 }
 
-pub fn android_e2e_test(test_name: &str) -> (i32, String, String) {
+pub fn android_e2e_test(abi: &str, test_name: &str) -> (i32, String, String) {
     let command: String;
     let arg: String;
     #[cfg(unix)]
@@ -63,14 +63,28 @@ pub fn android_e2e_test(test_name: &str) -> (i32, String, String) {
         arg = "/C".to_string();
     }
 
+    #[cfg(not(any(target_arch = "arm", target_arch = "aarch64")))]
     let output = Command::new(command)
         .arg(arg)
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
-            ./scripts/e2e_tests.sh -e {}
+            ./scripts/e2e_tests.sh -a {} -e {}
             "#,
-            test_name
+            abi, test_name
+        ))
+        .output()
+        .expect("Failed to execute command");
+
+    #[cfg(any(target_arch = "arm", target_arch = "aarch64"))]
+    let output = Command::new(command)
+        .arg(arg)
+        .arg(format!(
+            r#"
+            cd $(git rev-parse --show-toplevel)
+            ./scripts/e2e_tests.sh -a {} -e {} -A
+            "#,
+            abi, test_name
         ))
         .output()
         .expect("Failed to execute command");

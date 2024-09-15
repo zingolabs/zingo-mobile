@@ -9,6 +9,10 @@ import { LoadingApp } from './app/LoadingApp';
 import { ThemeType } from './app/types';
 import { ModeEnum, RouteEnums } from './app/AppState';
 
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs(['Require cycle: app\\uris\\serverUris.mock.ts -> app\\uris\\serverUris.mock.ts']);
+
 const advancedTheme: ThemeType = {
   dark: true,
   colors: {

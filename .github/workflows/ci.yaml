@@ -9,31 +9,59 @@ on:
 jobs:
   jest-test:
     uses: ./.github/workflows/jest-test.yaml
-    
+
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
-    
+
   create-cache-key:
     uses: ./.github/workflows/create-cache-key.yaml
-    
+
   android-build:
     strategy:
       matrix:
-        arch: [ x86_64, armeabi-v7a ]
+        arch: [x86_64, x86]
     uses: ./.github/workflows/android-build.yaml
     needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
-       
-  android-integration-test:
-    uses: ./.github/workflows/android-integration-test.yaml
-    needs: [ create-timestamp, create-cache-key, android-build ]
+
+  android-test:
+    uses: ./.github/workflows/android-test.yaml
+    needs: [create-timestamp, android-build]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      abi: armeabi-v7a
- 
+
+  #android-e2e-test-script:
+  #  strategy:
+  #    matrix:
+  #      abi: [ x86_64, x86 ]
+  #  uses: ./.github/workflows/android-e2e-test-script.yaml
+  #  needs: [ create-timestamp, create-cache-key, android-test ]
+  #  with:
+  #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+  #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+  #    abi: ${{ matrix.abi }}
+
+  #android-e2e-test-actions:
+  #  uses: ./.github/workflows/android-e2e-test-actions.yaml
+  #  needs: [ create-timestamp, create-cache-key, android-test ]
+  #  with:
+  #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+  #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+
+  android-integration-test:
+    strategy:
+      matrix:
+        abi: [x86_64, x86]
+    uses: ./.github/workflows/android-ubuntu-integration-test.yaml
+    needs: [android-test]
+    with:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      abi: ${{ matrix.abi }}
+
   ios-build:
     uses: ./.github/workflows/ios-build.yaml
     needs: create-cache-key
@@ -42,8 +70,7 @@ jobs:
 
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
-    needs: [ create-timestamp, create-cache-key, ios-build ]
+    needs: [create-timestamp, ios-build]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      

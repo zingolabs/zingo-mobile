@@ -49,7 +49,7 @@ while getopts 'a:l:t:h' OPTION; do
                     ;;
                 armeabi-v7a)
                     api_level_default="25"
-                    api_target_default="google_apis"
+                    api_target_default="google_apis_playstore"
                     arch="armeabi-v7a"
                     abi="armeabi-v7a"
                     ;;

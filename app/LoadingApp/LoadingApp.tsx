@@ -638,24 +638,22 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
   selectTheBestServer = async (aDifferentOne: boolean) => {
     // avoiding obsolete ones
     let withMessage: boolean = true;
-    const servers = await selectingServer(serverUris(this.state.translate).filter((s: ServerUrisType) => !s.obsolete));
+    const server = await selectingServer(
+      serverUris(this.state.translate).filter(
+        (s: ServerUrisType) => !s.obsolete && s.uri !== (aDifferentOne ? actualServer.uri : ''),
+      ),
+    );
     const actualServer = this.state.server;
-    let fasterServer: ServerType = this.state.server;
-    if (servers.length > 0) {
-      const serversSorted: ServerType[] = servers
-        .filter((s: ServerUrisType) => s.latency !== null && s.uri !== (aDifferentOne ? actualServer.uri : ''))
-        .sort((a, b) => (a.latency ? a.latency : Infinity) - (b.latency ? b.latency : Infinity))
-        .map((s: ServerUrisType) => {
-          return { uri: s.uri, chainName: s.chainName };
-        });
-      if (serversSorted.length > 0) {
-        fasterServer = serversSorted[0];
-      } else {
-        // likely here there is a internet conection problem
-        // all of the servers return an error because they are unreachable probably.
-        withMessage = false;
-      }
+    let fasterServer: ServerType = {} as ServerType;
+    if (server.latency) {
+      fasterServer = { uri: server.uri, chainName: server.chainName };
+    } else {
+      fasterServer = actualServer;
+      // likely here there is a internet conection problem
+      // all of the servers return an error because they are unreachable probably.
+      withMessage = false;
     }
+    console.log(server);
     console.log(fasterServer);
     this.setState({
       server: fasterServer,
@@ -718,12 +716,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       if (this.state.serverErrorTries === 0) {
         // first try
         this.setState({ screen, actionButtonsDisabled: true });
-        setTimeout(() => {
-          this.addLastSnackbar({
-            message: this.state.translate('loadingapp.serverfirsttry') as string,
-            duration: SnackbarDurationEnum.longer,
-          });
-        }, 1000);
+        this.addLastSnackbar({
+          message: this.state.translate('loadingapp.serverfirsttry') as string,
+          duration: SnackbarDurationEnum.longer,
+        });
         // a different server.
         await this.selectTheBestServer(true);
         if (start) {

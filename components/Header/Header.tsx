@@ -426,7 +426,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                       minWidth: 25,
                       minHeight: 25,
                     }}>
-                    <View style={{ margin: 0, padding: 0 }}>
+                    <View testID="header.checkicon" style={{ margin: 0, padding: 0 }}>
                       <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
                     </View>
                   </View>
@@ -481,6 +481,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         </View>
                       ) : (
                         <TouchableOpacity
+                          testID="header.playicon"
                           onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
                           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                             <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />

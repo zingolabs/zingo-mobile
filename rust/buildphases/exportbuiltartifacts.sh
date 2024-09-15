@@ -30,5 +30,4 @@ docker cp \
 docker cp \
     $id:/opt/zingo/rust/lib/src/uniffi/zingo/zingo.kt \
     ../android/app/build/generated/source/uniffi/release/java/uniffi/zingo/zingo.kt
-    
 docker rm -v $id

@@ -4,10 +4,10 @@ module.exports = {
     args: {
       '$0': 'jest',
       config: 'e2e/e2e-utils/jest.config.js',
-      "testTimeout": 1000000,
+      "testTimeout": 1800000,
     },
     jest: {
-      setupTimeout: 1000000
+      setupTimeout: 1800000
     }
   },
   apps: {
@@ -24,6 +24,38 @@ module.exports = {
     'android.debug': {
       type: 'android.apk',
       binaryPath: 'android/app/build/outputs/apk/debug/app-debug.apk',
+      build: 'cd android ; ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug ; cd -',
+      reversePorts: [
+        8081
+      ]
+    },
+    'android.debug.x86_64': {
+      type: 'android.apk',
+      binaryPath: 'android/app/build/outputs/apk/debug/app-x86_64-debug.apk',
+      build: 'cd android ; ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug ; cd -',
+      reversePorts: [
+        8081
+      ]
+    },
+    'android.debug.x86': {
+      type: 'android.apk',
+      binaryPath: 'android/app/build/outputs/apk/debug/app-x86-debug.apk',
+      build: 'cd android ; ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug ; cd -',
+      reversePorts: [
+        8081
+      ]
+    },
+    'android.debug.arm64-v8a': {
+      type: 'android.apk',
+      binaryPath: 'android/app/build/outputs/apk/debug/app-arm64-v8a-debug.apk',
+      build: 'cd android ; ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug ; cd -',
+      reversePorts: [
+        8081
+      ]
+    },
+    'android.debug.armeabi-v7a': {
+      type: 'android.apk',
+      binaryPath: 'android/app/build/outputs/apk/debug/app-armeabi-v7a-debug.apk',
       build: 'cd android ; ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug ; cd -',
       reversePorts: [
         8081
@@ -73,6 +105,22 @@ module.exports = {
     'android.att.debug': {
       device: 'attached',
       app: 'android.debug'
+    },
+    'android.att.debug.x86_64': {
+      device: 'attached',
+      app: 'android.debug.x86_64'
+    },
+    'android.att.debug.x86': {
+      device: 'attached',
+      app: 'android.debug.x86'
+    },
+    'android.att.debug.arm64-v8a': {
+      device: 'attached',
+      app: 'android.debug.arm64-v8a'
+    },
+    'android.att.debug.armeabi-v7a': {
+      device: 'attached',
+      app: 'android.debug.armeabi-v7a'
     },
     'android.att.release': {
       device: 'attached',

@@ -1734,6 +1734,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                     "opacity": 1,
                   }
                 }
+                testID="settings.list-server"
               >
                 text translated
               </Text>
@@ -1891,6 +1892,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               "opacity": 0.87,
             }
           }
+          testID="settings.securitytitle"
         >
           text translated
         </Text>

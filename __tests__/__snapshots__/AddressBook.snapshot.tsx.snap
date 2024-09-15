@@ -28,7 +28,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
         "maxHeight": "85%",
       }
     }
-    testID="addressbook.scrollView"
+    testID="addressbook.scroll-view"
   >
     <View>
       <View

@@ -4,38 +4,41 @@ import { loadTestWallet } from "./e2e-utils/loadTestWallet.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-describe('Change the Server.', () => {
+describe('Change the Server from the list.', () => {
   // i just pulled this seed out of thin air
   it('loads a wallet', loadTestWallet);
-  
   it('Go settings & change to an existent server in the list.', async () => {
+    //await sleep(4000);
+
     // go to setting modal screen
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();
     await waitFor(element(by.id('menu.settings'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('menu.settings')).tap();
 
-    // scrolling until find the second server field
-    await element(by.id('settings.scroll-view')).scroll(400, 'down');
-
     // waiting for second server radio button
-    await waitFor(element(by.id('settings.secondServer'))).toBeVisible().withTimeout(sync_timeout);
+    await waitFor(element(by.id('settings.scroll-view'))).toBeVisible().withTimeout(sync_timeout);
+    await waitFor(element(by.id('settings.list-server'))).toBeVisible()
+          .whileElement(by.id('settings.scroll-view')).scroll(200, 'down');
 
-    // choose the second server & save the settings.
-    await element(by.id('settings.secondServer')).tap();
+    // choose another server from the list
+    await waitFor(element(by.id('settings.list-server'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('settings.list-server')).tap();
+
+    // select https://lwd2.zcash-infra.com:9067
+    await waitFor(element(by.text('Hong Kong https://lwd2.zcash-infra.com:9067'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.text('Hong Kong https://lwd2.zcash-infra.com:9067')).tap();
 
     // save the new server
+    await waitFor(element(by.id('settings.button.save'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('settings.button.save')).tap();
 
     // waiting for second server radio button
-    await waitFor(element(by.id('header.playIcon'))).toBeVisible().withTimeout(sync_timeout);
-
-    // the sync process have to run normally with the other server
-    await element(by.id('header.drawmenu')).tap();
-    await element(by.id('menu.syncreport')).tap();
+    await waitFor(element(by.id('header.playicon'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('header.playicon')).tap();
 
     // waiting for starting the sync process again
-    await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(sync_timeout);
+    await waitFor(element(by.id('syncreport.syncednow'))).toBeVisible().withTimeout(sync_timeout);
 
     // getting blocks now synced from the screen
     const blockssyncednow_1 = element(by.id('syncreport.syncednow'));
@@ -45,7 +48,7 @@ describe('Change the Server.', () => {
     log.info('blocks 1:', blockssyncednowNum_1);
 
     // wait a little bit
-    await sleep(10000);
+    await sleep(25000);
 
     // getting blocks now synced from the screen
     const blockssyncednow_2 = element(by.id('syncreport.syncednow'));

@@ -509,7 +509,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
-      testID="seed.button.OK"
+      testID="seed.button.ok"
     >
       <View
         style={
@@ -584,6 +584,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
+      testID="seed.button.cancel"
     >
       <View
         style={
@@ -1127,7 +1128,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
-      testID="seed.button.OK"
+      testID="seed.button.ok"
     >
       <View
         style={
@@ -1202,6 +1203,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
+      testID="seed.button.cancel"
     >
       <View
         style={
@@ -1745,7 +1747,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
-      testID="seed.button.OK"
+      testID="seed.button.ok"
     >
       <View
         style={
@@ -2287,7 +2289,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
-      testID="seed.button.OK"
+      testID="seed.button.ok"
     >
       <View
         style={
@@ -2362,6 +2364,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
+      testID="seed.button.cancel"
     >
       <View
         style={
@@ -2905,7 +2908,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
           "paddingRight": 20,
         }
       }
-      testID="seed.button.OK"
+      testID="seed.button.ok"
     >
       <View
         style={

@@ -123,7 +123,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
 
   return (
     <View
-      testID={`addressBookDetail.${index + 1}`}
+      testID={`addressbookdetail.${index + 1}`}
       style={{ display: 'flex', flexDirection: 'column', borderColor: colors.primary, borderWidth: 1, margin: 10 }}>
       <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>{translate('addressbook.label') as string}</RegText>
       <View

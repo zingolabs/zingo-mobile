@@ -28,12 +28,12 @@ describe('Change the Server.', () => {
     // waiting for the custom server field
     await waitFor(element(by.id('settings.custom-server-field'))).toBeVisible()
           .whileElement(by.id('settings.scroll-view')).scroll(100, 'down');
-    await element(by.id("settings.custom-server-field")).replaceText('https://testnet.zec.rocks:443');
+    await element(by.id("settings.custom-server-field")).replaceText('http://10.0.2.2:20000');
 
-    // waiting for the toggle, tap on testnet
-    await waitFor(element(by.id('settings.custom-server-chain.testnet'))).toBeVisible()
+    // waiting for the toggle, tap on regtest
+    await waitFor(element(by.id('settings.custom-server-chain.regtest'))).toBeVisible()
           .whileElement(by.id('settings.scroll-view')).scroll(100, 'down');
-    await element(by.id('settings.custom-server-chain.testnet')).tap();
+    await element(by.id('settings.custom-server-chain.regtest')).tap();
 
     // save the new testnet server
     await waitFor(element(by.id('settings.button.save'))).toBeVisible().withTimeout(sync_timeout);
@@ -45,16 +45,16 @@ describe('Change the Server.', () => {
     await waitFor(element(by.text('CONFIRM'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.text('CONFIRM')).tap();
 
-    // restart the App with the new testnet server, without any wallet.
-    // create a new wallet in testnet
+    // restart the App with the new regtest server, without any wallet.
+    // create a new wallet in regtest
     await waitFor(element(by.id('loadingapp.createnewwallet'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('loadingapp.createnewwallet')).tap();
     
-    // click the button accepting the new testnet seed
+    // click the button accepting the new regtest seed
     await waitFor(element(by.id('seed.button.ok'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('seed.button.ok')).tap();
 
-    // waiting for a testnet new wallet fully synced
+    // waiting for a regtest new wallet fully synced
     await waitFor(element(by.id('header.checkicon'))).toBeVisible().withTimeout(sync_timeout);
   });
 });

@@ -40,7 +40,7 @@ jobs:
         run: echo "ios-cache-found=${{ steps.ios-check-build-cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
   
   ios-build:
-    name: Build native rust
+    name: Build native rust & swift uniffi
     needs: ios-check-build-cache
     if: ${{ needs.ios-check-build-cache.outputs.ios-cache-found != 'true' }}
     runs-on: macos-13
@@ -67,12 +67,10 @@ jobs:
           sudo rustup default nightly
 
       - name: Install Cargo Lipo
-        run: |
-          sudo cargo install cargo-lipo
+        run: sudo cargo install cargo-lipo
 
       - name: Install rust Target
-        run: |
-          sudo rustup target add x86_64-apple-ios
+        run: sudo rustup target add x86_64-apple-ios
       
       - name: Build Universal rust lib & uniffi lib and copy to ios folder
         working-directory: rust/lib

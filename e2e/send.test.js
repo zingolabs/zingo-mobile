@@ -2,11 +2,14 @@ const { log, device, by, element } = require('detox');
 
 import { loadTestWallet } from "./e2e-utils/loadTestWallet.js";
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 describe('Renders wallet data correctly.', () => {
   // i just pulled this seed out of thin air
   it('loads a wallet', loadTestWallet);
-  
   it('correctly renders the scanner', async () => {
+    //await sleep(4000);
+
     await element(by.text('SEND')).tap();
     
     await element(by.id('send.scan-button')).tap();

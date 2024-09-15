@@ -1524,7 +1524,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       <View style={{ flexDirection: 'row' }}>
                         <FadeText style={{ marginTop: 6 }}>{translate('send.includeua') as string}</FadeText>
                         <CheckBox
-                          testID="send.checkboxUA"
+                          testID="send.checkboxua"
                           disabled={false}
                           value={ta.includeUAMemo}
                           onValueChange={(value: boolean) => updateToField(null, null, null, null, value)}
