@@ -1,0 +1,20 @@
+# Ignore node_modules to avoid sending unnecessary files
+node_modules
+
+# Ignore the build artifacts
+/build
+/dist
+
+# Ignore Git repo
+.git
+.gitignore
+
+# Ignore local development environment config files
+.env
+.idea/
+.vscode/
+.DS_Store
+
+# Ignore large assets or files not required for the build
+*.log
+*.tmp

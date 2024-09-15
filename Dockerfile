@@ -1,55 +1,110 @@
-# Use an Arch Linux base image
-FROM archlinux:latest
+# Base image - Alpine for all stages
+FROM alpine:3.18 AS base
 
-# Install necessary packages
-RUN pacman -Syu --noconfirm \
-    && pacman -S --noconfirm \
-        base-devel \
-        git \
-        curl \
-        nodejs \
-        npm \
-        yarn \
-        rust \
-        docker \
-        openjdk17 \
-        android-sdk \
-        android-sdk-platform-tools \
-        android-sdk-build-tools \
-        android-sdk-cmdline-tools \
-        android-ndk \
-        && pacman -Scc --noconfirm
+# Global environment variables
+ENV ANDROID_HOME="/usr/local/android-sdk" \
+    JAVA_HOME="/usr/lib/jvm/default-jvm" \
+    ANDROID_SDK_TOOLS="https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip" \
+    ANDROID_SDK_ZIP="sdk-tools.zip" \
+    # Define environment variables for key Android and Java paths
+    ANDROID_CMD_TOOLS=${ANDROID_HOME}/cmdline-tools/latest/bin \
+    ANDROID_PLATFORM_TOOLS=${ANDROID_HOME}/platform-tools \
+    ANDROID_EMULATOR=${ANDROID_HOME}/emulator \
+    JAVA_BIN=$JAVA_HOME/bin \
+# Update the PATH
+    PATH="${ANDROID_CMD_TOOLS}:${ANDROID_PLATFORM_TOOLS}:${ANDROID_EMULATOR}:${JAVA_BIN}:${PATH}"
 
-# Install cargo-lipo and CocoaPods
-RUN cargo install cargo-lipo \
-    && gem install cocoapods
 
-# Set environment variables
-ENV JAVA_HOME=/usr/lib/jvm/java-18-openjdk \
-    ANDROID_HOME=/usr/lib/android-sdk \
-    ANDROID_SDK_ROOT=/usr/lib/android-sdk \
-    PATH="/usr/lib/android-sdk/cmdline-tools/latest/bin:/usr/lib/android-sdk/platform-tools:$PATH"
+# Common dependencies across all stages
+RUN apk add --no-cache bash curl git libstdc++ build-base python3 libc6-compat dumb-init
 
-# Configure Android SDK and NDK
-RUN mkdir -p /root/.android \
-    && touch /root/.android/repositories.cfg \
-    && sdkmanager --update \
-    && sdkmanager "platforms;android-30" "build-tools;30.0.3" "ndk;23.1.7779620"
+RUN echo "TEST"
+# --------------------------------------
+# Stage 1: Setup Tools and Dependencies
+# ----------------------`----------------
+FROM base AS setup-stage
+
+# Install development tools and packages for building
+RUN apk add --no-cache \
+    openjdk17-jdk \
+    nodejs \
+    npm \
+    rust \
+    cargo
+    # kotlin \
+    # gradle
+
+# Install pnpm globally (instead of npm for caching node_modules)
+RUN npm install -g pnpm
+
+# Install Android SDK and tools
+RUN mkdir -p ${ANDROID_HOME} && \
+    curl -o ${ANDROID_SDK_ZIP} ${ANDROID_SDK_TOOLS} && \
+    unzip ${ANDROID_SDK_ZIP} -d ${ANDROID_HOME}/cmdline-tools && \
+    mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest && \
+    rm ${ANDROID_SDK_ZIP}
 
 # Clone the Zingo Mobile repository
-RUN git clone https://github.com/zingolabs/zingo-mobile.git /zingo-mobile
+# to do RUN git clone https://github.com/zingolabs/zingo-mobile.git
+RUN cd ${ANDROID_HOME} \
+RUN POINT=$(pwd)
+RUN echo `$POINT`
+RUN ls
+RUN cd ${ANDROID_HOME}
+RUN ls 
+
+# Accept Android SDK licenses and install essential SDK components
+RUN yes | ${ANDROID_CMD_TOOLS}/sdkmanager --licenses && \
+    ${ANDROID_CMD_TOOLS}/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "emulator" \
+    "system-images;android-30;google_apis;x86_64" && \
+    ${ANDROID_CMD_TOOLS}/sdkmanager "avdmanager"
+
+
+# Create Android AVD for Pixel 2 (API 30) and avoid remounting
+RUN echo "no" | avdmanager create avd -n Pixel_2_API_30 -k "system-images;android-30;google_apis;x86_64" --device "pixel_2"
+
+
+
+# --------------------------------------
+# Stage 2: Build the Application with Caching
+# --------------------------------------
+FROM base AS build-stage
+
+# Copy the Android SDK from the setup stage
+COPY --from=setup-stage /usr/local/android-sdk /usr/local/android-sdk
 
 # Set working directory
 WORKDIR /zingo-mobile
 
-# Install dependencies
-RUN yarn install
+# Copy package.json and pnpm-lock.yaml for caching
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile  # Cache dependencies
 
-# Run Android build scripts
-RUN cd rust/android && ./build.sh
+# Copy the rest of the source code and build the app
+COPY . /zingo-mobile
+RUN ./rust/build.sh 
+RUN pnpm run build
 
-# Expose ports for development
-EXPOSE 8081 8082
+# --------------------------------------
+# Stage 3: Testing the Application
+# --------------------------------------
+FROM base AS test-stage
 
-# Set up the entry point
-ENTRYPOINT ["yarn", "start"]
+# Copy the built app and SDK from the build stage
+COPY --from=build-stage /app /app
+COPY --from=setup-stage /usr/local/android-sdk /usr/local/android-sdk
+
+# Install emulator dependencies and prepare the AVD for testing
+RUN apk add --no-cache bash libstdc++
+
+# Mount volume to persist AVD state across test runs
+VOLUME /root/.android/avd
+
+# Use dumb-init to clean up orphaned processes
+#ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
+# Expose the port for React Native server
+EXPOSE 8081
+
+# Command to start the React Native server for testing
+CMD ["yarn", "start"]

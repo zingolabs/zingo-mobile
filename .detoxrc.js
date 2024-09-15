@@ -84,7 +84,7 @@ module.exports = {
     },
     'android.emu.x86_64': {
       device: 'emulator_x86_64',
-      app: 'android.debug'
+      app: 'Pixel_2_API_30'
     },
     'android.emu.x86': {
       device: 'emulator_x86',
