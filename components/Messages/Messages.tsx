@@ -22,13 +22,13 @@ import { ButtonTypeEnum, SendPageStateClass, ValueTransferType } from '../../app
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
-import ValueTransferDetail from './components/ValueTransferDetail';
-import ValueTransferLine from './components/ValueTransferLine';
+import ValueTransferDetail from '../History/components/ValueTransferDetail';
+import MessageLine from './components/MessageLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import { Swipeable } from 'react-native-gesture-handler';
 
-type HistoryProps = {
+type MessagesProps = {
   doRefresh: () => void;
   toggleMenuDrawer: () => void;
   poolsMoreInfoOnClick: () => void;
@@ -43,7 +43,7 @@ type HistoryProps = {
   scrollToTop: boolean;
 };
 
-const History: React.FunctionComponent<HistoryProps> = ({
+const Messages: React.FunctionComponent<MessagesProps> = ({
   doRefresh,
   toggleMenuDrawer,
   poolsMoreInfoOnClick,
@@ -78,7 +78,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const fetchValueTransfersSorted = useMemo(() => {
     // we need to sort the array properly.
     // by:
-    // - time
+    // - time (reverse)
     // - txid
     // - address
     // - pool
@@ -86,8 +86,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
       return [] as ValueTransferType[];
     }
     return valueTransfers
+      .filter((a: ValueTransferType) => a.memos && a.memos.filter(m => !!m).length > 0)
       .sort((a: ValueTransferType, b: ValueTransferType) => {
-        const timeComparison = b.time - a.time;
+        const timeComparison = a.time - b.time;
         if (timeComparison === 0) {
           // same time
           const txidComparison = a.txid.localeCompare(b.txid);
@@ -196,7 +197,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
       </Modal>
 
       <Header
-        testID="valuetransfer text"
+        testID="ValueTransfer text"
         poolsMoreInfoOnClick={poolsMoreInfoOnClick}
         syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
         toggleMenuDrawer={toggleMenuDrawer}
@@ -240,16 +241,13 @@ const History: React.FunctionComponent<HistoryProps> = ({
               renderLeftActions={handleRenderLeftActions}
               onSwipeableOpen={handleOnSwipeOpen}
               key={`${index}-${vt.txid}-${vt.kind}`}>
-              <ValueTransferLine
+              <MessageLine
                 index={index}
                 vt={vt}
                 month={month}
                 setValueTransferDetail={(ttt: ValueTransferType) => setValueTransferDetail(ttt)}
                 setValueTransferDetailIndex={(iii: number) => setValueTransferDetailIndex(iii)}
                 setValueTransferDetailModalShowing={(bbb: boolean) => setValueTransferDetailModalShowing(bbb)}
-                nextLineWithSameTxid={
-                  index >= valueTransfersSorted.length - 1 ? false : valueTransfersSorted[index + 1].txid === vt.txid
-                }
               />
             </Swipeable>
           );
@@ -300,4 +298,4 @@ const History: React.FunctionComponent<HistoryProps> = ({
   );
 };
 
-export default React.memo(History);
+export default React.memo(Messages);

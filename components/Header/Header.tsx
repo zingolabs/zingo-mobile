@@ -299,9 +299,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         }
       }
       await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
-      // change to the history scrren, just in case.
+      // change to the history screen, just in case.
       if (navigation) {
-        navigation.navigate(translate('loadedapp.wallet-menu') as string);
+        navigation.navigate(translate('loadedapp.history-menu') as string);
       }
       // scroll to top in history, just in case.
       setScrollToTop(true);
