@@ -219,9 +219,10 @@ jobs:
       #    command: ./scripts/integration_tests.sh -a ${{ env.ABI }}
 
       - name: Inspect nextest archive
+        continue-on-error: true
         run: |
           tar -tvf rust/nextest-archive.tar.zst
-          ls -R /tmp/nextest-archive-*
+          ls -R /tmp/
 
       - name: Run integration tests
         working-directory: rust
