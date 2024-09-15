@@ -9,13 +9,21 @@ import {
   faArrowUp,
   faRefresh,
   faComment,
-  faTriangleExclamation,
+  faComments,
+  faFileLines,
 } from '@fortawesome/free-solid-svg-icons';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Swipeable, TouchableOpacity } from 'react-native-gesture-handler';
 
 import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
-import { ValueTransferType, ValueTransferKindEnum, GlobalConst } from '../../../app/AppState';
+import {
+  ValueTransferType,
+  ValueTransferKindEnum,
+  GlobalConst,
+  SendPageStateClass,
+  ToAddrClass,
+  RouteEnums,
+} from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -34,6 +42,7 @@ type ValueTransferLineProps = {
   setValueTransferDetailIndex: (i: number) => void;
   setValueTransferDetailModalShowing: (b: boolean) => void;
   nextLineWithSameTxid: boolean;
+  setSendPageState: (s: SendPageStateClass) => void;
 };
 const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   index,
@@ -43,9 +52,10 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   setValueTransferDetailIndex,
   setValueTransferDetailModalShowing,
   nextLineWithSameTxid,
+  setSendPageState,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, privacy, info } = context;
+  const { translate, language, privacy, info, navigation } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -80,16 +90,77 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     setHaveMemo(memos.length > 0);
   }, [vt.memos]);
 
-  //console.log('render ValueTransferLine - 5', index);
+  const handleRenderActions = (direction: 'left' | 'right') => {
+    return (
+      <>
+        {!!vt.address && (
+          <View
+            style={{
+              flexDirection: direction === 'right' ? 'row' : 'row-reverse',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+              <TouchableOpacity
+                style={{ zIndex: 999, padding: 10 }}
+                onPress={() => {
+                  navigation.navigate(RouteEnums.LoadedApp, {
+                    screen: translate('loadedapp.messages-menu'),
+                    initial: false,
+                    params: {
+                      address: vt.address,
+                    },
+                  });
+                }}>
+                <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faComments} color={colors.money} />
+              </TouchableOpacity>
+            </View>
+            <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+              <TouchableOpacity
+                style={{ zIndex: 999, padding: 10 }}
+                onPress={() => {
+                  // enviar
+                  const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+                  sendPageState.toaddr.to = vt.address ? vt.address : '';
+                  setSendPageState(sendPageState);
+                  navigation.navigate(RouteEnums.LoadedApp, {
+                    screen: translate('loadedapp.send-menu'),
+                    initial: false,
+                  });
+                }}>
+                <FontAwesomeIcon size={30} icon={faArrowUp} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+            <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+              <TouchableOpacity
+                style={{ zIndex: 999, padding: 10 }}
+                onPress={() => {
+                  setValueTransferDetail(vt);
+                  setValueTransferDetailIndex(index);
+                  setValueTransferDetailModalShowing(true);
+                }}>
+                <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faFileLines} color={colors.money} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      </>
+    );
+  };
 
-  //if (index === 0) {
-  //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.transmitted;
-  //}
-  //if (index === 1) {
-  //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.mempool;
-  //}
+  //const handleRenderLeftActions = () => {
+  //  return handleRenderActions('left');
+  //};
+
+  const handleRenderRightActions = () => {
+    return handleRenderActions('right');
+  };
+
+  const handleOnSwipeOpen = (direction: 'left' | 'right') => {
+    console.log(direction);
+  };
+
+  //console.log('render ValueTransferLine - 5', index, nextLineWithSameTxid);
 
   return (
     <View testID={`vt-${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
@@ -107,38 +178,38 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
           <FadeText>{month}</FadeText>
         </View>
       )}
-      <TouchableOpacity
-        onPress={() => {
-          setValueTransferDetail(vt);
-          setValueTransferDetailIndex(index);
-          setValueTransferDetailModalShowing(true);
-        }}>
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: vt.status === RPCValueTransfersStatusEnum.transmitted ? 'center' : 'flex-start',
-            marginTop: 15,
-            paddingBottom: 10,
-            borderBottomWidth: nextLineWithSameTxid ? (Platform.OS === GlobalConst.platformOSandroid ? 1 : 0.5) : 1.5,
-            borderBottomColor: nextLineWithSameTxid ? colors.primaryDisabled : colors.border,
-            borderStyle: nextLineWithSameTxid
-              ? Platform.OS === GlobalConst.platformOSandroid
-                ? 'dotted'
-                : 'solid'
-              : 'solid',
+      <Swipeable renderRightActions={handleRenderRightActions} onSwipeableOpen={handleOnSwipeOpen}>
+        <TouchableOpacity
+          onPress={() => {
+            setValueTransferDetail(vt);
+            setValueTransferDetailIndex(index);
+            setValueTransferDetailModalShowing(true);
           }}>
-          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginTop: 15,
+              paddingBottom: 10,
+              borderBottomWidth: nextLineWithSameTxid ? (Platform.OS === GlobalConst.platformOSandroid ? 1 : 0.5) : 1.5,
+              borderBottomColor: nextLineWithSameTxid ? colors.primaryDisabled : colors.border,
+              borderStyle: nextLineWithSameTxid
+                ? Platform.OS === GlobalConst.platformOSandroid
+                  ? 'dotted'
+                  : 'solid'
+                : 'solid',
+            }}>
             <View style={{ display: 'flex' }}>
               <FontAwesomeIcon
                 style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
                 size={30}
                 icon={vtIcon}
-                color={vt.status === RPCValueTransfersStatusEnum.transmitted ? colors.syncing : amountColor}
+                color={amountColor}
               />
             </View>
             <View style={{ display: 'flex' }}>
-              {!!vt.address && vt.confirmations > 0 && (
+              {!!vt.address && (
                 <View>
                   <AddressItem address={vt.address} oneLine={true} closeModal={() => {}} openModal={() => {}} />
                 </View>
@@ -146,8 +217,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               <View
                 style={{
                   display: 'flex',
-                  flexDirection: vt.kind === ValueTransferKindEnum.Sent && vt.confirmations > 0 ? 'row' : 'column',
-                  alignItems: vt.kind === ValueTransferKindEnum.Sent && vt.confirmations > 0 ? 'center' : 'flex-start',
+                  flexDirection: vt.kind === ValueTransferKindEnum.Sent ? 'row' : 'column',
+                  alignItems: vt.kind === ValueTransferKindEnum.Sent ? 'center' : 'flex-start',
                 }}>
                 <FadeText
                   style={{
@@ -178,6 +249,11 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     ? (translate('history.shield') as string)
                     : ''}
                 </FadeText>
+                {vt.confirmations === 0 && (
+                  <FadeText style={{ color: colors.syncing, fontSize: 12, opacity: 1, fontWeight: '900' }}>
+                    {('[ ' + translate('history.not-confirmed') + ' ]') as string}
+                  </FadeText>
+                )}
                 <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                   <FadeText>{vt.time ? moment((vt.time || 0) * 1000).format('MMM D, h:mm a') : '--'}</FadeText>
                   {haveMemo && (
@@ -200,33 +276,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               privacy={privacy}
             />
           </View>
-          {vt.confirmations === 0 && (
-            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              {vt.status === RPCValueTransfersStatusEnum.transmitted && (
-                <FontAwesomeIcon
-                  style={{ marginRight: 5 }}
-                  icon={faTriangleExclamation}
-                  color={colors.syncing}
-                  size={15}
-                />
-              )}
-              <FadeText
-                style={{
-                  color:
-                    vt.status === RPCValueTransfersStatusEnum.transmitted ? colors.primary : colors.primaryDisabled,
-                  fontSize: 12,
-                  opacity: 1,
-                  fontWeight: '700',
-                  textAlign: vt.status === RPCValueTransfersStatusEnum.transmitted ? 'center' : 'left',
-                  textDecorationLine: vt.status === RPCValueTransfersStatusEnum.transmitted ? 'underline' : 'none',
-                  marginLeft: vt.status === RPCValueTransfersStatusEnum.transmitted ? 0 : 40,
-                }}>
-                {translate(`history.${vt.status}`) as string}
-              </FadeText>
-            </View>
-          )}
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </Swipeable>
     </View>
   );
 };

@@ -1939,6 +1939,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     setShieldingAmount={this.setShieldingAmount}
                     setScrollToBottom={this.setScrollToBottom}
                     scrollToBottom={scrollToBottom}
+                    route={this.props.route}
                   />
                 )}
               </Tab.Screen>

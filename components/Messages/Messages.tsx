@@ -27,6 +27,7 @@ import ValueTransferDetail from '../History/components/ValueTransferDetail';
 import MessageLine from './components/MessageLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
+import { StackScreenProps } from '@react-navigation/stack';
 
 type MessagesProps = {
   doRefresh: () => void;
@@ -41,6 +42,7 @@ type MessagesProps = {
   setShieldingAmount: (value: number) => void;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
+  route: StackScreenProps<any>['route'];
 };
 
 const Messages: React.FunctionComponent<MessagesProps> = ({
@@ -56,11 +58,14 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
   setShieldingAmount,
   setScrollToBottom,
   scrollToBottom,
+  route,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, valueTransfers, language, setBackgroundError, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
+
+  const address = !!route.params && !!route.params.params ? route.params.params.address : '';
 
   const [isValueTransferDetailModalShowing, setValueTransferDetailModalShowing] = useState<boolean>(false);
   const [valueTransferDetail, setValueTransferDetail] = useState<ValueTransferType>({} as ValueTransferType);
@@ -75,6 +80,13 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
 
   var lastMonth = '';
 
+  const findAddress = (addrs: string | undefined, memos: string[]): boolean => {
+    if (!address) {
+      return true;
+    }
+    return addrs === address || memos.join('\n').includes(address);
+  };
+
   const fetchValueTransfersSorted = useMemo(() => {
     // we need to sort the array properly.
     // by:
@@ -86,7 +98,7 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
       return [] as ValueTransferType[];
     }
     return valueTransfers
-      .filter((a: ValueTransferType) => a.memos && a.memos.length > 0)
+      .filter((a: ValueTransferType) => a.memos && a.memos.length > 0 && findAddress(a.address, a.memos))
       .sort((a: ValueTransferType, b: ValueTransferType) => {
         const timeComparison = a.time - b.time;
         if (timeComparison === 0) {
@@ -117,9 +129,11 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
         }
       })
       .slice(-numVt);
-  }, [valueTransfers, numVt]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [valueTransfers, numVt, address]);
 
   useEffect(() => {
+    setLoading(true);
     setLoadMoreButton(numVt < (valueTransfers ? valueTransfers.length : 0));
     setValueTransfersSorted(fetchValueTransfersSorted);
     setTimeout(() => {
@@ -176,7 +190,7 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
     }
   };
 
-  //console.log('render History - 4', !!scrollViewRef.current);
+  console.log('render History - 4', address);
 
   return (
     <View
