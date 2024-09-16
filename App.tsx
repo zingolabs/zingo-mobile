@@ -12,6 +12,7 @@ import { ModeEnum, RouteEnums } from './app/AppState';
 import { LogBox } from 'react-native';
 
 LogBox.ignoreLogs(['Require cycle: app\\uris\\serverUris.mock.ts -> app\\uris\\serverUris.mock.ts']);
+LogBox.ignoreLogs(['[Reanimated] Reduced motion setting is enabled on this device.']);
 
 const advancedTheme: ThemeType = {
   dark: true,
