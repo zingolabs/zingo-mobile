@@ -105,7 +105,7 @@ jobs:
         run: yarn
 
       - name: Run Detox Build
-        run: yarn detox build -c android.emu.release -n test
+        run: yarn detox build -c android.emu.debug -n test
 
       - name: Yarn Start
         run: nohup yarn start > "yarn_react_native_start.out" &
@@ -118,4 +118,4 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: yarn detox test -c android.emu.release -n test e2e/new_wallet.test.js
+          script: yarn detox test -c android.emu.debug -n test e2e/new_wallet.test.js
