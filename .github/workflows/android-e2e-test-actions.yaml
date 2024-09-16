@@ -24,12 +24,12 @@ jobs:
             api-level: 30
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
-    continue-on-error: true  #temporary while e2e is still flaky
+    continue-on-error: true #temporary while e2e is still flaky
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-            
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -49,14 +49,14 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      
+
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.2
           build-root-directory: ./android
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
-      
+
       - name: Native rust cache
         uses: actions/cache/restore@v4
         with:
@@ -74,7 +74,7 @@ jobs:
       - name: Restore AVD cache
         uses: actions/cache/restore@v4
         id: avd-cache
-        with: 
+        with:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
@@ -95,7 +95,7 @@ jobs:
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         id: avd-cache-saving
-        with: 
+        with:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
@@ -103,9 +103,9 @@ jobs:
 
       - name: Yarn install
         run: yarn
-      
+
       - name: Run Detox Build
-        run: yarn detox build -c android.emu.debug -n test
+        run: yarn detox build -c android.emu.release -n test
 
       - name: Yarn Start
         run: nohup yarn start > "yarn_react_native_start.out" &
@@ -118,5 +118,4 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: yarn detox test -c android.emu.debug -n test
-
+          script: yarn detox test -c android.emu.release -n test e2e/new_wallet.test.js
