@@ -41,8 +41,8 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:007
+      # - name: Pull regchest docker image
+      #   run: docker pull zingodevops/regchest:007
 
       - name: Setup Java
         uses: actions/setup-java@v4
