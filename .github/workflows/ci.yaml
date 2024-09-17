@@ -17,7 +17,7 @@ jobs:
     uses: ./.github/workflows/create-cache-key.yaml
 
   detox-test:
-    uses: ./.github/workflows/detox-test.yaml
+    uses: ./.github/workflows/new-detox.yaml
     needs: [create-timestamp, create-cache-key]
     # with:
     #   timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
