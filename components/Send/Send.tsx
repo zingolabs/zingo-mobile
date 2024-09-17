@@ -46,7 +46,6 @@ import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import RPC from '../../app/rpc';
 import Header from '../Header';
-import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
 import Memo from '../Memo';
@@ -55,8 +54,6 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
-import { RPCParseStatusEnum } from '../../app/rpc/enums/RPCParseStatusEnum';
-import { RPCAdressKindEnum } from '../../app/rpc/enums/RPCAddressKindEnum';
 import { Buffer } from 'buffer';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
 import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
@@ -521,40 +518,18 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [calculateSpendableBalance, sendPageState.toaddr.to]);
 
   useEffect(() => {
-    const getMemoEnabled = async (address: string): Promise<boolean> => {
+    const getMemoEnabled = async (address: string, serverChainName: string): Promise<boolean> => {
       if (!netInfo.isConnected) {
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
         return false;
       }
-      const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
-      //console.log(result);
-      if (result) {
-        if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
-          return false;
-        }
-      } else {
-        return false;
-      }
-      let resultJSON = {} as RPCParseAddressType;
-      try {
-        resultJSON = await JSON.parse(result);
-      } catch (e) {
-        return false;
-      }
-
-      //console.log('parse-memo', address, resultJSON);
-
-      return (
-        resultJSON.status === RPCParseStatusEnum.successParse &&
-        resultJSON.address_kind !== RPCAdressKindEnum.transparentAddressKind &&
-        resultJSON.chain_name === server.chainName
-      );
+      return await Utils.isValidOrchardOrSaplingAddress(address, serverChainName);
     };
 
     const address = sendPageState.toaddr.to;
 
     if (address) {
-      getMemoEnabled(address).then(r => {
+      getMemoEnabled(address, server.chainName).then(r => {
         setMemoEnabled(r);
         if (!r) {
           updateToField(null, null, null, '', false);
@@ -568,36 +543,18 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [server.chainName, netInfo.isConnected, sendPageState.toaddr.to, translate, addLastSnackbar]);
 
   useEffect(() => {
-    const parseAdressJSON = async (address: string): Promise<boolean> => {
+    const parseAddress = async (address: string, serverChainName: string): Promise<boolean> => {
       if (!netInfo.isConnected) {
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
         return false;
       }
-      const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
-      //console.log(result);
-      if (result) {
-        if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
-          return false;
-        }
-      } else {
-        return false;
-      }
-      let resultJSON = {} as RPCParseAddressType;
-      try {
-        resultJSON = await JSON.parse(result);
-      } catch (e) {
-        return false;
-      }
-
-      //console.log('parse-address', address, resultJSON, resultJSON.status === RPCParseStatusEnum.successParse);
-
-      return resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chainName;
+      return await Utils.isValidAdress(address, serverChainName);
     };
 
     var to = sendPageState.toaddr;
 
     if (to.to) {
-      parseAdressJSON(to.to).then(r => {
+      parseAddress(to.to, server.chainName).then(r => {
         setValidAddress(r ? 1 : -1);
       });
     } else {

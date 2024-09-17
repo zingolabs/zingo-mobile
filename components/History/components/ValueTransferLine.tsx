@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
-import { Platform, View } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Platform, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -12,7 +12,8 @@ import {
   faComments,
   faFileLines,
 } from '@fortawesome/free-solid-svg-icons';
-import { Swipeable, TouchableOpacity } from 'react-native-gesture-handler';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
@@ -32,6 +33,7 @@ import 'moment/locale/ru';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
+import Utils from '../../../app/utils';
 
 type ValueTransferLineProps = {
   index: number;
@@ -56,13 +58,20 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   setMessagesAddressModalShowing,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, privacy, info, navigation } = context;
+  const { translate, language, privacy, info, navigation, server } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
   const [amountColor, setAmountColor] = useState<string>(colors.primaryDisabled);
   const [vtIcon, setVtIcon] = useState<IconDefinition>(faRefresh);
   const [haveMemo, setHaveMemo] = useState<boolean>(false);
+  const [messagesAddress, setMessagesAddress] = useState<boolean>(false);
+
+  const dimensions = {
+    width: Dimensions.get('screen').width,
+    height: Dimensions.get('screen').height,
+  };
+  const maxWidthHit = useRef(false);
 
   useEffect(() => {
     const amountCo =
@@ -91,32 +100,48 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     setHaveMemo(memos.length > 0);
   }, [vt.memos]);
 
-  const messagesAddress = (vvtt: ValueTransferType) => {
-    if (vvtt.address) {
-      return vvtt.address;
-    } else {
-      const memoTotal = vvtt.memos && vvtt.memos.length > 0 ? vvtt.memos.join('\n') : '';
-      if (memoTotal.includes('\nReply to: \n')) {
-        let memoArray = memoTotal.split('\nReply to: \n');
-        const memoPoped = memoArray.pop();
-        if (memoPoped) {
-          return memoPoped;
-        }
-      }
-    }
-    return '';
-  };
+  useEffect(() => {
+    (async () => {
+      setMessagesAddress(await Utils.isMessagesAddress(vt, server.chainName));
+    })();
+  }, [vt, server.chainName]);
 
-  const handleRenderActions = (direction: 'left' | 'right') => {
+  const handleRenderRightActions = (
+    progress: Animated.AnimatedInterpolation<number>,
+    dragX: Animated.AnimatedInterpolation<number>,
+    swipeable: Swipeable,
+  ) => {
+    const trans = progress.interpolate({
+      inputRange: [0, 1],
+      outputRange: [150, 0],
+      extrapolate: 'clamp',
+    });
+
+    dragX.addListener(({ value }) => {
+      if (-value >= dimensions.width * (2 / 3) && messagesAddress) {
+        if (!maxWidthHit.current) {
+          console.log(value);
+          setValueTransferDetail(vt);
+          setValueTransferDetailIndex(index);
+          setMessagesAddressModalShowing(true);
+          swipeable.reset();
+        }
+        maxWidthHit.current = true;
+      } else {
+        maxWidthHit.current = false;
+      }
+    });
+
     return (
       <>
-        <View
+        <Animated.View
           style={{
-            flexDirection: direction === 'right' ? 'row' : 'row-reverse',
+            flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
+            transform: [{ translateX: trans }],
           }}>
-          {messagesAddress(vt) && (
+          {messagesAddress && (
             <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
               <TouchableOpacity
                 style={{ zIndex: 999, padding: 10 }}
@@ -124,6 +149,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                   setValueTransferDetail(vt);
                   setValueTransferDetailIndex(index);
                   setMessagesAddressModalShowing(true);
+                  swipeable.reset();
                 }}>
                 <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faComments} color={colors.money} />
               </TouchableOpacity>
@@ -142,6 +168,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     screen: translate('loadedapp.send-menu'),
                     initial: false,
                   });
+                  swipeable.reset();
                 }}>
                 <FontAwesomeIcon size={30} icon={faArrowUp} color={colors.primary} />
               </TouchableOpacity>
@@ -154,25 +181,22 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 setValueTransferDetail(vt);
                 setValueTransferDetailIndex(index);
                 setValueTransferDetailModalShowing(true);
+                swipeable.reset();
               }}>
               <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faFileLines} color={colors.money} />
             </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
       </>
     );
   };
 
-  //const handleRenderLeftActions = () => {
-  //  return handleRenderActions('left');
-  //};
-
-  const handleRenderRightActions = () => {
-    return handleRenderActions('right');
-  };
-
-  const handleOnSwipeOpen = (direction: 'left' | 'right') => {
-    console.log(direction);
+  const handleRenderLeftActions = (
+    _progress: Animated.AnimatedInterpolation<number>,
+    _dragX: Animated.AnimatedInterpolation<number>,
+    _swipeable: Swipeable,
+  ) => {
+    return null;
   };
 
   //console.log('render ValueTransferLine - 5', index, nextLineWithSameTxid);
@@ -193,7 +217,10 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
           <FadeText>{month}</FadeText>
         </View>
       )}
-      <Swipeable renderRightActions={handleRenderRightActions} onSwipeableOpen={handleOnSwipeOpen}>
+      <Swipeable
+        overshootLeft={false}
+        renderRightActions={handleRenderRightActions}
+        renderLeftActions={handleRenderLeftActions}>
         <TouchableOpacity
           onPress={() => {
             setValueTransferDetail(vt);

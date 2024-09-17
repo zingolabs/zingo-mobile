@@ -1,16 +1,14 @@
 import React, { useContext } from 'react';
 
-import RPCModule from '../../../app/RPCModule';
 import { ContextAppLoaded } from '../../../app/context';
 import { BarCodeReadEvent } from 'react-native-camera';
-import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
 import Scanner from '../../Components/Scanner';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { CommandEnum, GlobalConst } from '../../../app/AppState';
-import { RPCParseStatusEnum } from '../../../app/rpc/enums/RPCParseStatusEnum';
+import { GlobalConst } from '../../../app/AppState';
+import Utils from '../../../app/utils';
 
 type ScannerAddressProps = {
   setAddress: (address: string) => void;
@@ -33,29 +31,9 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
       return;
     }
 
-    const result: string = await RPCModule.execute(CommandEnum.parseAddress, scannedAddress);
-    if (result) {
-      if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
-        addLastSnackbar({ message: translate('scanner.nozcash-error') as string });
-        return;
-      }
-    } else {
-      addLastSnackbar({ message: translate('scanner.nozcash-error') as string });
-      return;
-    }
-    let resultJSON = {} as RPCParseAddressType;
-    try {
-      resultJSON = await JSON.parse(result);
-    } catch (e) {
-      addLastSnackbar({ message: translate('scanner.nozcash-error') as string });
-      return;
-    }
+    const validAddress: boolean = await Utils.isValidAdress(scannedAddress, server.chainName);
 
-    //console.log('parse-1', scannedAddress, resultJSON);
-
-    const valid = resultJSON.status === RPCParseStatusEnum.successParse && server.chainName === resultJSON.chain_name;
-
-    if (valid) {
+    if (validAddress) {
       setAddress(scannedAddress);
       closeModal();
     }

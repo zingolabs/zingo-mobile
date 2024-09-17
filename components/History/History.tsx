@@ -232,6 +232,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             scrollToBottom={scrollToBottom}
             address={messagesAddress(valueTransferDetail)}
             closeModal={() => setMessagesAddressModalShowing(false)}
+            openModal={() => setMessagesAddressModalShowing(true)}
           />
         </Modal>
       )}

@@ -27,6 +27,7 @@ type MessagesAddressProps = {
   scrollToBottom: boolean;
   address: string;
   closeModal: () => void;
+  openModal: () => void;
 };
 
 const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
@@ -44,6 +45,7 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
   scrollToBottom,
   address,
   closeModal,
+  openModal,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language } = context;
@@ -73,6 +75,8 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
         setScrollToBottom={setScrollToBottom}
         scrollToBottom={scrollToBottom}
         address={address}
+        closeModal={closeModal}
+        openModal={openModal}
       />
       <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10 }}>
         <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />

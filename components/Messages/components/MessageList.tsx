@@ -27,6 +27,7 @@ import ValueTransferDetail from '../../History/components/ValueTransferDetail';
 import MessageLine from './MessageLine';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
+import AddressItem from '../../Components/AddressItem';
 
 type MessageListProps = {
   doRefresh: () => void;
@@ -42,6 +43,8 @@ type MessageListProps = {
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
   address?: string;
+  closeModal?: () => void;
+  openModal?: () => void;
 };
 
 const MessageList: React.FunctionComponent<MessageListProps> = ({
@@ -58,6 +61,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   setScrollToBottom,
   scrollToBottom,
   address,
+  closeModal,
+  openModal,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, valueTransfers, language, setBackgroundError, addLastSnackbar } = context;
@@ -231,21 +236,42 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         />
       </Modal>
 
-      <Header
-        testID=""
-        poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-        syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
-        toggleMenuDrawer={toggleMenuDrawer}
-        setZecPrice={setZecPrice}
-        title={translate('messages.title') as string}
-        setComputingModalVisible={setComputingModalVisible}
-        setBackgroundError={setBackgroundError}
-        setPrivacyOption={setPrivacyOption}
-        setUfvkViewModalVisible={setUfvkViewModalVisible}
-        addLastSnackbar={addLastSnackbar}
-        setShieldingAmount={setShieldingAmount}
-        setScrollToBottom={setScrollToBottom}
-      />
+      {address && closeModal && openModal ? (
+        <>
+          <Header
+            title={translate('messages.title') as string}
+            noBalance={true}
+            noSyncingStatus={true}
+            noDrawMenu={true}
+            noPrivacy={true}
+          />
+          <View style={{ display: 'flex', alignItems: 'center', marginHorizontal: 10, marginVertical: 20 }}>
+            <AddressItem
+              address={address}
+              oneLine={true}
+              withIcon={true}
+              closeModal={closeModal}
+              openModal={openModal}
+            />
+          </View>
+        </>
+      ) : (
+        <Header
+          testID=""
+          poolsMoreInfoOnClick={poolsMoreInfoOnClick}
+          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
+          toggleMenuDrawer={toggleMenuDrawer}
+          setZecPrice={setZecPrice}
+          title={translate('messages.title') as string}
+          setComputingModalVisible={setComputingModalVisible}
+          setBackgroundError={setBackgroundError}
+          setPrivacyOption={setPrivacyOption}
+          setUfvkViewModalVisible={setUfvkViewModalVisible}
+          addLastSnackbar={addLastSnackbar}
+          setShieldingAmount={setShieldingAmount}
+          setScrollToBottom={setScrollToBottom}
+        />
+      )}
 
       {(loading || !firstScrollToBottomDone) && (
         <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
