@@ -175,7 +175,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   }, [loading]);
 
   useEffect(() => {
-    console.log(scrollViewHeight, contentScrollViewHeight);
+    //console.log(scrollViewHeight, contentScrollViewHeight);
     if (contentScrollViewHeight > 0 && scrollViewHeight > 0) {
       //setIsAtBottom(false);
       if (contentScrollViewHeight >= scrollViewHeight) {
