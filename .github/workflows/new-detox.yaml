@@ -1,10 +1,17 @@
-# .github/workflows/e2e-android.yml
-name: e2e-android
+name: Android Detox Tests
+
 on:
-  pull_request:
-  push:
-    branches: [main, dev, stable]
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      timestamp:
+        required: true
+        type: string
+      cache-key:
+        required: true
+        type: string
+      abi:
+        required: true
+        type: string
 
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
@@ -14,15 +21,19 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
-  e2e-android:
-    runs-on: macos-14
-    strategy:
-      matrix:
-        include:
-          - arch: arm64-v7a
-            api-level: 30
-
+  android-e2e-avd-cache:
+    name: Android e2e AVD cache
+    runs-on: macos-13
     steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
         run: echo "AVD-ARCH=x86_64" >> $GITHUB_ENV
@@ -31,34 +42,13 @@ jobs:
         if: ${{ env.ABI == 'x86' }}
         run: echo "AVD-ARCH=x86" >> $GITHUB_ENV
 
-      - name: Set envs for arm64-v7a
-        if: ${{ env.ABI == 'arm64-v7a' }}
-        run: echo "AVD-ARCH=arm64-v7a" >> $GITHUB_ENV
+      - name: Set envs for arm64-v8a
+        if: ${{ env.ABI == 'arm64-v8a' }}
+        run: echo "AVD-ARCH=x86_64" >> $GITHUB_ENV
 
       - name: Set envs for armeabi-v7a
         if: ${{ env.ABI == 'armeabi-v7a' }}
         run: echo "AVD-ARCH=x86" >> $GITHUB_ENV
-
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup yarn
-        run: npm install -g yarn
-
-      - name: Setup Nodejs with yarn caching
-        uses: actions/setup-node@v4
-        with:
-          cache: yarn
-
-      - name: Install Yarn dependencies
-        run: yarn install --prefer-offline
-
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          cache: gradle
-          distribution: temurin
-          java-version: 17
 
       - name: AVD cache
         uses: actions/cache/restore@v4
@@ -71,17 +61,12 @@ jobs:
           lookup-only: true
 
       - name: Setup Android SDK
+        if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: android-actions/setup-android@v3
-        with:
-          packages: 'tools platform-tools'
 
-      # - name: Cargo cache
-      #   uses: Swatinem/rust-cache@v2
-      #   with:
-      #     workspaces: rust
-
-      - name: Cargo default nightly
-        run: rustup default nightly
+      - name: Add emulator to PATH
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -101,61 +86,191 @@ jobs:
             ~/.android/adb*
           key: avd-${{ env.AVD-ARCH }}-e2e
 
+  android-e2e-test-script:
+    needs: [android-e2e-avd-cache]
+    name: Android e2e test
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        #partition: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        partition: [1]
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Set envs for x86_64
+        if: ${{ env.ABI == 'x86_64' }}
+        run: |
+          echo "AVD-ARCH=x86_64" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=x86_64" >> $GITHUB_ENV
+
+      - name: Set envs for x86
+        if: ${{ env.ABI == 'x86' }}
+        run: |
+          echo "AVD-ARCH=x86" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=x86_32" >> $GITHUB_ENV
+
+      - name: Set envs for arm64-v8a
+        if: ${{ env.ABI == 'arm64-v8a' }}
+        run: |
+          echo "AVD-ARCH=x86_64" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=arm64" >> $GITHUB_ENV
+
+      - name: Set envs for armeabi-v7a
+        if: ${{ env.ABI == 'armeabi-v7a' }}
+        run: |
+          echo "AVD-ARCH=x86" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
+
+      #- name: Setup Docker 1 try
+      #  uses: douglascamata/setup-docker-macos-action@v1-alpha
+      #  id: dockerTry1
+      #  continue-on-error: true
+      #  with:
+      #    lima: v0.18.0
+      #    colima: v0.5.6
+
+      #- name: checking outcome 1
+      #  run: echo ${{ steps.dockerTry1.outcome }}
+
+      #- name: Setup Docker 2 try
+      #  if: steps.dockerTry1.outcome != 'success'
+      #  uses: douglascamata/setup-docker-macos-action@v1-alpha
+      #  id: dockerTry2
+      #  continue-on-error: true
+      #  with:
+      #    lima: v0.18.0
+      #    colima: v0.5.6
+
+      #- name: checking outcome 2
+      #  run: echo ${{ steps.dockerTry2.outcome }}
+
+      #- name: Setup Docker Manually
+      #  if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
+      #  run: |
+      #    brew uninstall colima
+      #    brew tap colima/releases
+      #    brew install colima@0.5.6
+      #    brew install --formula docker
+      #    colima start
+
+      # - name: Pull regchest docker image
+      #   run: docker pull zingodevops/regchest:007
+
+      - name: Rust toolchain stable
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      # - name: Install nextest
+      #   uses: taiki-e/install-action@v2
+      #   with:
+      #     tool: nextest
+
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
       - name: Native rust cache
         uses: actions/cache/restore@v4
         with:
-          path: android/app/src/main/jniLibs/${{ matrix.arch }}
-          key: native-android-uniffi-${{ matrix.arch }}-${{ env.CACHE-KEY }}
+          path: android/app/src/main/jniLibs/${{ env.ABI }}
+          key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Add emulator to PATH
+        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
+
+      - name: Gradle cache
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.2
+          build-root-directory: ./android
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
+
+      - name: AVD cache
+        uses: actions/cache/restore@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.AVD-ARCH }}-e2e
 
       - name: Kotlin uniffi cache
         uses: actions/cache/restore@v4
         with:
           path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
-          key: kotlin-android-uniffi-${{ matrix.arch }}-${{ env.CACHE-KEY }}
+          key: kotlin-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
 
-      - name: Cargo uniffi kotlin
-        working-directory: ./rust/lib
-        run: |
-          cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
-          generate ./src/zingo.udl --language kotlin \
-          --out-dir ../../android/app/build/generated/source/uniffi/debug/java
+      # - name: Download archive
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: nextest-archive
+      #     path: ./rust
 
-      - name: Cache Detox build
-        id: cache-detox-build
-        uses: actions/cache@v3
-        with:
-          path: android/app/build
-          key: ${{ runner.os }}-detox-build
-          restore-keys: |
-            ${{ runner.os }}-detox-build
+      # - name: e2e test as a script (testing without cargo nextest)
+      #   uses: nick-fields/retry@v3
+      #   with:
+      #     timeout_minutes: 120
+      #     max_attempts: 1
+      #     command: ./scripts/e2e_tests.sh -a ${{ env.ABI }}
 
-      - name: Detox build
-        run: yarn detox build --configuration android.emu.debug
+      - name: Yarn install
+        run: yarn
 
-      # - name: Print devices
-      #   run: adb devices
+      - name: Run Detox Build
+        run: yarn detox build -c android.emu.debug -n test
 
-      - name: Print files
-        run: ls -al
+      - name: Print available storage
+        run: df -h
 
-      - name: Get device name
-        working-directory:
-        id: device
-        run: node -e "console.log('AVD_NAME=' + require('./.detoxrc.js').devices.emulator.device.avdName)" >> $GITHUB_OUTPUT
+      - name: Yarn Start
+        run: nohup yarn start > "yarn_react_native_start.out" &
 
-      - name: Detox test
+      - name: Run Detox Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 31
-          arch: x86_64
-          avd-name: ${{ steps.device.outputs.AVD_NAME }}
-          script: yarn detox test --configuration android.emu.debug --headless --record-logs all
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: yarn detox test -c android.emu.debug -n test e2e/new_wallet.test.js
 
-      - name: Upload artifacts
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: detox-artifacts
-          path: artifacts
+      # - name: Run e2e tests
+      #   working-directory: ./rust
+      #   run: |
+      #     cargo nextest run -E 'test(e2e) and not test(darkside)' --verbose --profile ci \
+      #       --archive-file nextest-archive.tar.zst \
+      #       --partition count:${{ matrix.partition }}/10
+
+      # - name: Upload test reports
+      #   if: ${{ ! cancelled() }}
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: test-e2e-reports-${{ env.ABI }}-${{ matrix.partition}}-${{ env.TIMESTAMP }}
+      #     path: android/app/build/outputs/e2e_test_reports
