@@ -21,7 +21,7 @@ jobs:
     needs: [create-timestamp, create-cache-key]
     strategy:
       matrix:
-        abi: [x86_64, x86]
+        abi: [x86]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
