@@ -32,6 +32,8 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
       # - name: Cargo cache
       #   uses: Swatinem/rust-cache@v2
       #   with:
