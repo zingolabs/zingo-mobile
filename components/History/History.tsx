@@ -27,7 +27,7 @@ import ValueTransferDetail from './components/ValueTransferDetail';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
-import MessagesAddress from '../Messages/MessagesAddress';
+import { MessagesAddress } from '../Messages';
 
 type HistoryProps = {
   doRefresh: () => void;

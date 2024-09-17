@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
-import AddressBook from '../components/AddressBook/AddressBook';
+import { AddressBook } from '../components/AddressBook';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockTheme } from '../__mocks__/dataMocks/mockTheme';

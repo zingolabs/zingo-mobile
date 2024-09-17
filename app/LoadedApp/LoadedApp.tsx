@@ -72,15 +72,15 @@ import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider } from '../context';
 import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
-import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
+import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { sendEmail } from '../sendEmail';
 import Snackbars from '../../components/Components/Snackbars';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
-import AddressBook from '../../components/AddressBook/AddressBook';
-import AddressBookFileImpl from '../../components/AddressBook/AddressBookFileImpl';
+import { AddressBook } from '../../components/AddressBook';
+import { AddressBookFileImpl } from '../../components/AddressBook';
 import simpleBiometrics from '../simpleBiometrics';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
 
@@ -89,7 +89,7 @@ import Send from '../../components/Send';
 import Receive from '../../components/Receive';
 import Settings from '../../components/Settings';
 import Menu from './components/Menu';
-import Messages from '../../components/Messages';
+import { Messages } from '../../components/Messages';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));

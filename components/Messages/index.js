@@ -1,3 +1,4 @@
 import Messages from './Messages';
+import MessagesAddress from './MessagesAddress';
 
-export default Messages;
+export { Messages, MessagesAddress };

@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import { Messages } from '../components/Messages';
+import { MessagesAddress } from '../components/Messages';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
 import { CurrencyEnum, ModeEnum } from '../app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
@@ -91,7 +91,7 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 // test suite
-describe('Component Messages - test', () => {
+describe('Component Messages Address - test', () => {
   //snapshot test
   const state = defaultAppContextLoaded;
   state.valueTransfers = mockValueTransfers;
@@ -102,7 +102,7 @@ describe('Component Messages - test', () => {
   state.totalBalance = mockTotalBalance;
   const onFunction = jest.fn();
 
-  test('Messages no currency, privacy normal & mode basic - snapshot', () => {
+  test('Messages Address - snapshot', () => {
     // no currency
     state.currency = CurrencyEnum.noCurrency;
     // privacy normal
@@ -111,7 +111,7 @@ describe('Component Messages - test', () => {
     state.mode = ModeEnum.basic;
     const messages = render(
       <ContextAppLoadedProvider value={state}>
-        <Messages
+        <MessagesAddress
           doRefresh={onFunction}
           toggleMenuDrawer={onFunction}
           poolsMoreInfoOnClick={onFunction}
@@ -123,33 +123,9 @@ describe('Component Messages - test', () => {
           setShieldingAmount={onFunction}
           setScrollToBottom={onFunction}
           scrollToBottom={false}
-        />
-      </ContextAppLoadedProvider>,
-    );
-    expect(messages.toJSON()).toMatchSnapshot();
-  });
-
-  test('Messages currency USD, privacy high & mode advanced - snapshot', () => {
-    // no currency
-    state.currency = CurrencyEnum.USDCurrency;
-    // privacy normal
-    state.privacy = true;
-    // mode basic
-    state.mode = ModeEnum.advanced;
-    const messages = render(
-      <ContextAppLoadedProvider value={state}>
-        <Messages
-          doRefresh={onFunction}
-          toggleMenuDrawer={onFunction}
-          poolsMoreInfoOnClick={onFunction}
-          syncingStatusMoreInfoOnClick={onFunction}
-          setZecPrice={onFunction}
-          setComputingModalVisible={onFunction}
-          setPrivacyOption={onFunction}
-          setSendPageState={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToBottom={onFunction}
-          scrollToBottom={false}
+          address={mockAddresses[0].uaAddress}
+          closeModal={onFunction}
+          openModal={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
