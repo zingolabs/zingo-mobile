@@ -45,13 +45,6 @@ jobs:
       - name: Cargo default nightly
         run: rustup default nightly
 
-      - name: Cargo uniffi kotlin
-        working-directory: ./rust/lib
-        run: |
-          cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
-          generate ./src/zingo.udl --language kotlin \
-          --out-dir ../../android/app/build/generated/source/uniffi/debug/java
-
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
@@ -72,6 +65,27 @@ jobs:
             ~/.android/avd/*
             ~/.android/adb*
           key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-e2e
+
+      - name: Native rust cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/src/main/jniLibs/${{ matrix.arch }}
+          key: native-android-uniffi-${{ matrix.arch }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Kotlin uniffi cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
+          key: kotlin-android-uniffi-${{ matrix.arch }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Cargo uniffi kotlin
+        working-directory: ./rust/lib
+        run: |
+          cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
+          generate ./src/zingo.udl --language kotlin \
+          --out-dir ../../android/app/build/generated/source/uniffi/debug/java
 
       - name: Cache Detox build
         id: cache-detox-build
