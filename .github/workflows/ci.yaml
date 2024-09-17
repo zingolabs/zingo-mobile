@@ -16,22 +16,25 @@ jobs:
   create-cache-key:
     uses: ./.github/workflows/create-cache-key.yaml
 
-  android-build:
-    strategy:
-      matrix:
-        arch: [x86_64, x86]
-    uses: ./.github/workflows/android-build.yaml
-    needs: create-cache-key
-    with:
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      arch: ${{ matrix.arch }}
+  new-detox:
+    uses: ./.github/workflows/new-detox.yaml
 
-  android-test:
-    uses: ./.github/workflows/android-test.yaml
-    needs: [create-timestamp, android-build]
-    with:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+  # android-build:
+  #   strategy:
+  #     matrix:
+  #       arch: [x86_64, x86]
+  #   uses: ./.github/workflows/android-build.yaml
+  #   needs: create-cache-key
+  #   with:
+  #     cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+  #     arch: ${{ matrix.arch }}
+
+  # android-test:
+  #   uses: ./.github/workflows/android-test.yaml
+  #   needs: [create-timestamp, android-build]
+  #   with:
+  #     timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+  #     cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
 
   #android-e2e-test-script:
   #  strategy:
