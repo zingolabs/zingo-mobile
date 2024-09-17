@@ -9,6 +9,8 @@ on:
 jobs:
   e2e-android:
     runs-on: macos-latest
+    env:
+      RUSTUP_HOME: /root/.rustup
 
     steps:
       - name: Checkout repository
@@ -29,8 +31,23 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Compile uniffi
-        run: cd rust && ./build.sh
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Cargo default nightly
+        run: rustup default nightly
+
+      - name: Cargo uniffi kotlin
+        working-directory: ./rust/lib
+        run: |
+          cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
+          generate ./src/zingo.udl --language kotlin \
+          --out-dir ../../android/app/build/generated/source/uniffi/debug/java
+
+      # - name: Compile uniffi
+      #   run: cd rust && ./build.sh
 
       - name: Cache Detox build
         id: cache-detox-build
