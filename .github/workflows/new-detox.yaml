@@ -52,8 +52,26 @@ jobs:
           generate ./src/zingo.udl --language kotlin \
           --out-dir ../../android/app/build/generated/source/uniffi/debug/java
 
-      # - name: Compile uniffi
-      #   run: cd rust && ./build.sh
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Save AVD cache
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        id: avd-cache-saving
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-e2e
 
       - name: Cache Detox build
         id: cache-detox-build
