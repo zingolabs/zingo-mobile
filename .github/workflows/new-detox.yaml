@@ -8,16 +8,17 @@ on:
 
 jobs:
   e2e-android:
-    runs-on: macos-latest
-    env:
-      RUSTUP_HOME: /root/.rustup
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Setup yarn
+        run: npm install -g yarn
+
+      - name: Setup Nodejs with yarn caching
+        uses: actions/setup-node@v4
         with:
           cache: yarn
 
@@ -31,10 +32,10 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust
+      # - name: Cargo cache
+      #   uses: Swatinem/rust-cache@v2
+      #   with:
+      #     workspaces: rust
 
       - name: Cargo default nightly
         run: rustup default nightly
