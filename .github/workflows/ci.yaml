@@ -20,8 +20,8 @@ jobs:
     uses: ./.github/workflows/new-detox.yaml
     needs: [create-timestamp, create-cache-key]
     strategy:
-    matrix:
-      abi: [x86_64, x86]
+      matrix:
+        abi: [x86_64, x86]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
