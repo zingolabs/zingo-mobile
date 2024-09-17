@@ -62,8 +62,8 @@ jobs:
       - name: Detox build
         run: yarn detox build --configuration android.emu.debug
 
-      - name: Print devices
-        run: adb devices
+      # - name: Print devices
+      #   run: adb devices
 
       - name: Print files
         run: ls -al
