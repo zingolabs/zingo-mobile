@@ -79,6 +79,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [firstScrollToBottomDone, setFirstScrollToBottomDone] = useState<boolean>(false);
   const [scrollViewHeight, setScrollViewHeight] = useState<number>(0);
+  const [contentScrollViewHeight, setContentScrollViewHeight] = useState<number>(0);
   const [scrollable, setScrollable] = useState<boolean>(false);
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -173,6 +174,20 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
+  useEffect(() => {
+    console.log(scrollViewHeight, contentScrollViewHeight);
+    if (contentScrollViewHeight > 0 && scrollViewHeight > 0) {
+      //setIsAtBottom(false);
+      if (contentScrollViewHeight >= scrollViewHeight) {
+        //console.log('SCROLLABLE >>>>>>>>>>>>>');
+        setScrollable(true);
+      } else {
+        setScrollable(false);
+      }
+      setFirstScrollToBottomDone(true);
+    }
+  }, [contentScrollViewHeight, scrollViewHeight]);
+
   const loadMoreClicked = useCallback(() => {
     setNumVt(numVt + 50);
   }, [numVt]);
@@ -204,8 +219,17 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     }
   };
 
-  //if (address) {
-  //  console.log('render History - 4', valueTransfersSorted.length, 'bottom', isAtBottom, 'loading', loading);
+  //f (address) {
+  //  console.log(
+  //    'render History - 4',
+  //    valueTransfersSorted.length,
+  //    'loading',
+  //    loading,
+  //    'first scroll done',
+  //    firstScrollToBottomDone,
+  //    'scrollable',
+  //    scrollable,
+  //  );
   //}
 
   return (
@@ -281,18 +305,13 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         onScroll={handleScroll}
         onLayout={e => {
           const { height } = e.nativeEvent.layout;
-          //console.log('HEIGHT >>>>>>>>>>>>>', height);
+          //console.log('layout HEIGHT >>>>>>>>>>>>>', height);
           setScrollViewHeight(height);
         }}
-        onContentSizeChange={(w: number, h: number) => {
-          console.log(w, h);
+        onContentSizeChange={(_w: number, h: number) => {
+          //console.log('content HEIGHT >>>>>>>>>>>>>', h);
+          setContentScrollViewHeight(h);
           setIsAtBottom(false);
-          if (h >= scrollViewHeight) {
-            //console.log('SCROLLABLE >>>>>>>>>>>>>');
-            setScrollable(true);
-          } else {
-            setScrollable(false);
-          }
         }}
         scrollEventThrottle={100}
         accessible={true}
