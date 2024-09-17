@@ -19,6 +19,9 @@ jobs:
   detox-test:
     uses: ./.github/workflows/new-detox.yaml
     needs: [create-timestamp, create-cache-key]
+    strategy:
+      matrix:
+        arch: [x86_64, x86, arm64-v8a]
     # with:
     #   timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
     #   cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
