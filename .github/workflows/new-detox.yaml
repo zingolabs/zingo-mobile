@@ -23,12 +23,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Enable KVM group perms
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
       - name: Setup yarn
         run: npm install -g yarn
 
@@ -47,6 +41,16 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: AVD cache
+        uses: actions/cache/restore@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.AVD-ARCH }}-e2e
+          lookup-only: true
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
@@ -62,16 +66,13 @@ jobs:
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: nick-fields/retry@v3
         with:
-          api-level: ${{ matrix.api-level }}
-          arch: ${{ matrix.arch }}
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
+          timeout_minutes: 60
+          max_attempts: 3
+          command: ./scripts/e2e_tests.sh -a ${{ env.AVD-ARCH }} -s
 
-      - name: Save AVD cache
+      - name: AVD cache saving
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         id: avd-cache-saving
@@ -79,7 +80,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-e2e
+          key: avd-${{ env.AVD-ARCH }}-e2e
 
       - name: Native rust cache
         uses: actions/cache/restore@v4
