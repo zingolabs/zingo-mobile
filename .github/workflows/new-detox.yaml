@@ -34,6 +34,9 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: 'tools platform-tools'
+
       # - name: Cargo cache
       #   uses: Swatinem/rust-cache@v2
       #   with:
