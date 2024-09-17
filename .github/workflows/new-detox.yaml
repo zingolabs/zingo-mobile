@@ -29,9 +29,8 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      -name: Compile uniffi
+      - name: Compile uniffi
         run: cd rust && ./build.sh
-
 
       - name: Cache Detox build
         id: cache-detox-build
