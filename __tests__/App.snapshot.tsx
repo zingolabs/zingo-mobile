@@ -52,6 +52,22 @@ jest.mock('react-native-device-info', () => ({
   getManufacturer: jest.fn(() => 'Mocked Manufacturer'),
   getModel: jest.fn(() => 'Mocked Model'),
 }));
+jest.mock('react-native-gesture-handler', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RNGestureHandlerModule = {
+    attachGestureHandler: jest.fn(),
+    createGestureHandler: jest.fn(),
+    dropGestureHandler: jest.fn(),
+    updateGestureHandler: jest.fn(),
+    forceTouchAvailable: jest.fn(),
+    State: {},
+    Directions: {},
+  };
+  return {
+    RNGestureHandlerModule: RN,
+  };
+});
 
 // test suite
 describe('Component App - test', () => {

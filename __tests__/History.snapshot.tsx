@@ -62,11 +62,33 @@ jest.mock('moment/locale/ru', () => () => ({
 
 jest.mock('react-native-gesture-handler', () => {
   const View = require('react-native').View;
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RNGestureHandlerModule = {
+    attachGestureHandler: jest.fn(),
+    createGestureHandler: jest.fn(),
+    dropGestureHandler: jest.fn(),
+    updateGestureHandler: jest.fn(),
+    forceTouchAvailable: jest.fn(),
+    State: {},
+    Directions: {},
+  };
   return {
     TouchableOpacity: View,
     Swipeable: View,
+    RNGestureHandlerModule: RN,
   };
 });
+jest.mock('@react-native-community/netinfo', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RNCNetInfo = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
+
 jest.mock('@react-native-community/netinfo', () => {
   const RN = jest.requireActual('react-native');
 
