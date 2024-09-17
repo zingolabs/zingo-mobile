@@ -9,6 +9,11 @@ on:
 jobs:
   e2e-android:
     runs-on: macos-14
+    strategy:
+      matrix:
+        include:
+          - arch: x86_64
+            api-level: 30
 
     steps:
       - name: Checkout repository
