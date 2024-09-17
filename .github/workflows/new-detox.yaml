@@ -39,7 +39,7 @@ jobs:
             ${{ runner.os }}-detox-build
 
       - name: Detox build
-        run: yarn detox build --configuration android.emu.release
+        run: yarn detox build --configuration android.emu.debug
 
       - name: Get device name
         id: device
@@ -51,7 +51,7 @@ jobs:
           api-level: 31
           arch: x86_64
           avd-name: ${{ steps.device.outputs.AVD_NAME }}
-          script: yarn detox test --configuration android.emu.release --headless --record-logs all
+          script: yarn detox test --configuration android.emu.debug --headless --record-logs all
 
       - name: Upload artifacts
         if: failure()
