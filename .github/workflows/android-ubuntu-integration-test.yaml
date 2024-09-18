@@ -1,4 +1,4 @@
-name: Android Integration test
+name: Android Ubuntu Integration test
 
 on:
   workflow_call:

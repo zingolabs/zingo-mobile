@@ -180,25 +180,16 @@ yarn
 
 cd android
 
-avd_name="${device}_api-${api_level}_${api_target}_${arch}"
-sdk="system-images;android-${api_level};${api_target};${arch}"
-platform="platforms;android-${api_level}"
-
-echo -e "\nInstalling platform tools..."
-sdkmanager --install platform-tools
-
-echo "Installing system image..."
-sdkmanager --install "${sdk}"
-
-echo "Installing android platform..."
-sdkmanager --install "${platform}"
-
-echo -e "\nInstalling latest build tools..."
-sdkmanager --install 'build-tools;34.0.0'
+echo -e "\nInstalling latest build tools, platform tools, and platform..."
+sdkmanager --install 'build-tools;34.0.0' platform-tools
 
 echo "Installing latest emulator..."
-sdkmanager --install emulator
+sdkmanager --install emulator --channel=0
 
+echo "Installing system image..."
+avd_name="android-${api_level}_${api_target}_${arch}"
+sdk="system-images;android-${api_level};${api_target};${arch}"
+sdkmanager --install "${sdk}"
 echo y | sdkmanager --licenses
 
 # Kill all emulators
@@ -206,17 +197,16 @@ echo y | sdkmanager --licenses
 
 if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
-    echo no | avdmanager --verbose create avd --force --name "${avd_name}" --abi "${arch}" --package "${sdk}" --device "${device}" -p ~/.android/avd
-
-    echo "$(pwd)"
-    echo "$(ls -la ~/.android)"
-    echo "$(ls -la ~/.android/avd)"
+    echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-        -no-snapshot-load -port 5554 -sysdir ~/.android/avd &
+        -no-snapshot-load -port 5554 &> /dev/null &
+
     echo -e "\n\nWaiting more..."
-    adb wait-for-device
+    adb wait-for-device \
+        shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
+
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
     echo $(adb -s emulator-5554 emu avd name | head -1)
@@ -228,7 +218,7 @@ else
     if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
         echo "AVD not found"
         echo -e "\nCreating AVD..."
-        echo no | avdmanager --verbose create avd --force --name "${avd_name}" --abi "${arch}" --package "${sdk}" --device "${device}" -p ~/.android/avd
+        echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
         echo -e "\n\nTo create a quick-boot snapshot for faster integration tests use the '-s' flag"
         echo "Try '$(basename $0) -h' for more information."
     else
@@ -245,7 +235,7 @@ else
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
-        -no-snapshot-save -read-only -port 5554 -sysdir ~/.android/avd &> "${test_report_dir}/emulator.txt" &
+        -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
     adb wait-for-device \
         shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
     #echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
