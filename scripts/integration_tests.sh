@@ -199,7 +199,7 @@ echo y | sdkmanager --licenses
 
 if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
-    echo no | avdmanager --verbose create avd --force --name "${avd_name}" --package "${sdk}"
+    echo no | avdmanager --verbose create avd --force --name "${avd_name}" --package "${sdk}" -p ~/.android/avd
 
     echo "$(pwd)"
     echo "$(ls -la ~/.android)"
