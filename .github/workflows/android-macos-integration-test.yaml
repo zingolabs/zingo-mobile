@@ -149,6 +149,7 @@ jobs:
           colima: v0.5.6
 
       - name: checking outcome 2
+        if: steps.dockerTry1.outcome != 'success'
         run: echo ${{ steps.dockerTry2.outcome }}
 
       - name: Setup Docker Manually
