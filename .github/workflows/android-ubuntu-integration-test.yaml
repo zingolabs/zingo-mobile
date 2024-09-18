@@ -71,6 +71,7 @@ jobs:
       - name: ANDROID_SDK_ROOT
         run: |
           echo "${ANDROID_SDK_ROOT}"
+          echo "${PATH}"
           echo "$(which sdkmanager)"
 
       - name: Add emulator to PATH
