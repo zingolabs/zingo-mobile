@@ -184,6 +184,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       } else {
         setScrollable(false);
       }
+      //console.log('first scroll bottom done');
       setFirstScrollToBottomDone(true);
     }
   }, [contentScrollViewHeight, scrollViewHeight]);
@@ -311,7 +312,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         onContentSizeChange={(_w: number, h: number) => {
           //console.log('content HEIGHT >>>>>>>>>>>>>', h);
           setContentScrollViewHeight(h);
-          setIsAtBottom(false);
         }}
         scrollEventThrottle={100}
         accessible={true}
