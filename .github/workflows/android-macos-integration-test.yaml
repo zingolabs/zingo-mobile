@@ -88,7 +88,7 @@ jobs:
 
   android-integration-test:
     needs: [android-integration-avd-cache]
-    name: Android Integration test ${{ env.ABI }}
+    name: Android Integration test
     runs-on: macos-13
 
     strategy:
