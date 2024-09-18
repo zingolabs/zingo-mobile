@@ -203,9 +203,10 @@ if [[ $create_snapshot == true ]]; then
 
     echo "$(pwd)"
     echo "$(ls -la ~/.android)"
+    echo "$(ls -la ~/.android/avd)"
 
     echo -e "\n\nWaiting for emulator to launch & boot..."
-    nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
+    nohup emulator -sysdir ~/.android/avd -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &
     echo -e "\n\nWaiting more..."
     adb wait-for-device
