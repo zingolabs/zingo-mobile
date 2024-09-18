@@ -174,6 +174,8 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 12.0
 
       - name: Add emulator to PATH
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
