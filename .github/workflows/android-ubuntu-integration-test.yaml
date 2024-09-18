@@ -1,4 +1,4 @@
-name: Android Ubuntu Integration test
+name: Android Ubuntu Integration tests
 
 on:
   workflow_call:
@@ -22,7 +22,7 @@ env:
 
 jobs:
   android-integration-avd-cache:
-    name: Android integration AVD cache
+    name: Android Ubuntu integration AVD cache
     runs-on: ubuntu-24.04
     steps:
       - name: Set envs for zingolib CI
@@ -95,7 +95,7 @@ jobs:
 
   android-integration-test:
     needs: [android-integration-avd-cache]
-    name: Android Integration test
+    name: Android Ubuntu Integration test
     runs-on: ubuntu-22.04
     strategy:
       matrix:
