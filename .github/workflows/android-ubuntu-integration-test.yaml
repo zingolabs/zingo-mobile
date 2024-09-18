@@ -61,7 +61,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ
+          key: avd-${{ env.AVD-ARCH }}-integ-ubuntu
           lookup-only: true
 
       - name: Setup Android SDK
@@ -73,14 +73,7 @@ jobs:
       - name: Add emulator to PATH
         if: steps.avd-cache.outputs.cache-hit != 'true'
         run: |
-          echo ~/.android/avd >> $GITHUB_PATH
-          echo "${ANDROID_SDK_ROOT}" >> $GITHUB_PATH
           echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
-
-      - name: PATH
-        run: | 
-          echo "${PATH}"
-          ls -la "${ANDROID_SDK_ROOT}"
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -98,7 +91,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ
+          key: avd-${{ env.AVD-ARCH }}-integ-ubuntu
 
   android-integration-test:
     needs: [android-integration-avd-cache]
@@ -199,7 +192,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ
+          key: avd-${{ env.AVD-ARCH }}-integ-ubuntu
 
       - name: Kotlin uniffi cache
         uses: actions/cache/restore@v4

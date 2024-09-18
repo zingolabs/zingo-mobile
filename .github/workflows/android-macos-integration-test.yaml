@@ -57,7 +57,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ
+          key: avd-${{ env.AVD-ARCH }}-integ-macos
           lookup-only: true
 
       - name: Setup Android SDK
@@ -84,7 +84,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ
+          key: avd-${{ env.AVD-ARCH }}-integ-macos
 
   android-integration-test:
     needs: [android-integration-avd-cache]
@@ -208,7 +208,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ
+          key: avd-${{ env.AVD-ARCH }}-integ-macos
 
       - name: Kotlin uniffi cache
         uses: actions/cache/restore@v4

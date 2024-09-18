@@ -180,17 +180,24 @@ yarn
 
 cd android
 
-avd_name="android-${api_level}_${api_target}_${arch}"
+avd_name="${device}_api-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
+platform="platforms;android-${api_level}"
 
-echo -e "\nInstalling latest build tools, platform tools, and platform..."
-sdkmanager --install 'build-tools;34.0.0' platform-tools
-
-echo "Installing latest emulator..."
-sdkmanager --install emulator --channel=0
+echo -e "\nInstalling platform tools..."
+sdkmanager --install platform-tools
 
 echo "Installing system image..."
 sdkmanager --install "${sdk}"
+
+echo "Installing android platform..."
+sdkmanager --install "${platform}"
+
+echo -e "\nInstalling latest build tools..."
+sdkmanager --install 'build-tools;34.0.0'
+
+echo "Installing latest emulator..."
+sdkmanager --install emulator
 
 echo y | sdkmanager --licenses
 
@@ -199,7 +206,7 @@ echo y | sdkmanager --licenses
 
 if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
-    echo no | avdmanager --verbose create avd --force --name "${avd_name}" --package "${sdk}" -p ~/.android/avd
+    echo no | avdmanager -p ~/.android/avd --verbose create avd --force --name "${avd_name}" --abi "${arch}" --package "${sdk}" --device "${device}"
 
     echo "$(pwd)"
     echo "$(ls -la ~/.android)"
@@ -221,7 +228,7 @@ else
     if [ $(emulator -list-avds | grep -ow "${avd_name}" | wc -w) -ne 1 ]; then
         echo "AVD not found"
         echo -e "\nCreating AVD..."
-        echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
+        echo no | avdmanager -p ~/.android/avd --verbose create avd --force --name "${avd_name}" --abi "${arch}" --package "${sdk}" --device "${device}"
         echo -e "\n\nTo create a quick-boot snapshot for faster integration tests use the '-s' flag"
         echo "Try '$(basename $0) -h' for more information."
     else
