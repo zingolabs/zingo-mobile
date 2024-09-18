@@ -89,7 +89,7 @@ jobs:
   android-integration-test:
     needs: [android-integration-avd-cache]
     name: Android Integration test
-    runs-on: macos-12
+    runs-on: macos-14
     env:
       HOMEBREW_NO_INSTALL_UPGRADE: "0"
       HOMEBREW_NO_AUTO_UPDATE: "0"
