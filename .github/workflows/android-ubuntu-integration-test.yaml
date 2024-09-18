@@ -64,15 +64,11 @@ jobs:
           key: avd-${{ env.AVD-ARCH }}-integ
           lookup-only: true
 
-      #- name: Setup Android SDK
-      #  if: steps.avd-cache.outputs.cache-hit != 'true'
-      #  uses: android-actions/setup-android@v3
-
-      - name: ANDROID_SDK_ROOT
-        run: |
-          echo "${ANDROID_SDK_ROOT}"
-          echo "${PATH}"
-          echo "$(which sdkmanager)"
+      - name: Setup Android SDK
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 12.0
 
       - name: Add emulator to PATH
         if: steps.avd-cache.outputs.cache-hit != 'true'
