@@ -51,18 +51,6 @@ jobs:
   #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
   #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
   
-  android-ubuntu-integration-test:
-    strategy:
-      matrix:
-        abi: [ x86_64, x86, arm64-v8a, armeabi-v7a ]
-      fail-fast: false
-    uses: ./.github/workflows/android-ubuntu-integration-test.yaml
-    needs: [ android-test ]
-    with:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      abi: ${{ matrix.abi }}
-
   android-macos-integration-test:
     strategy:
       matrix:
