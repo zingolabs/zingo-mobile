@@ -184,8 +184,8 @@ avd_name="${device}_api-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
 platform="platforms;android-${api_level}"
 
-#echo -e "\nInstalling platform tools..."
-#sdkmanager --install platform-tools
+echo -e "\nInstalling platform tools..."
+sdkmanager --install platform-tools
 
 echo "Installing system image..."
 sdkmanager --install "${sdk}"
@@ -193,11 +193,11 @@ sdkmanager --install "${sdk}"
 echo "Installing android platform..."
 sdkmanager --install "${platform}"
 
-#echo -e "\nInstalling latest build tools..."
-#sdkmanager --install 'build-tools;34.0.0'
+echo -e "\nInstalling latest build tools..."
+sdkmanager --install 'build-tools;34.0.0'
 
-#echo "Installing latest emulator..."
-#sdkmanager --install emulator
+echo "Installing latest emulator..."
+sdkmanager --install emulator
 
 echo y | sdkmanager --licenses
 
