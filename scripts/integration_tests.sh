@@ -201,6 +201,8 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
 
+    echo "$(ls -la ~/.android/avd)"
+
     echo -e "\n\nWaiting for emulator to launch & boot..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &
