@@ -81,7 +81,7 @@ jobs:
         with:
           timeout_minutes: 60
           max_attempts: 3
-          command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
+          command: sudo ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
       - name: AVD cache saving
         if: steps.avd-cache.outputs.cache-hit != 'true'
