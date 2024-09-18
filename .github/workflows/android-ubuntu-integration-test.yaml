@@ -23,7 +23,7 @@ env:
 jobs:
   android-integration-avd-cache:
     name: Android integration AVD cache
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
