@@ -183,11 +183,11 @@ cd android
 avd_name="android-${api_level}_${api_target}_${arch}"
 sdk="system-images;android-${api_level};${api_target};${arch}"
 
-#echo -e "\nInstalling latest build tools, platform tools, and platform..."
-#sdkmanager --install 'build-tools;34.0.0' platform-tools
+echo -e "\nInstalling latest build tools, platform tools, and platform..."
+sdkmanager --install 'build-tools;34.0.0' platform-tools
 
-#echo "Installing latest emulator..."
-#sdkmanager --install emulator --channel=0
+echo "Installing latest emulator..."
+sdkmanager --install emulator --channel=0
 
 echo "Installing system image..."
 sdkmanager --install "${sdk}"
