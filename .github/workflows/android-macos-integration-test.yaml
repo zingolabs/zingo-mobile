@@ -1,4 +1,4 @@
-name: Android Integration test
+name: Android Macos Integration tests
 
 on:
   workflow_call:
@@ -21,8 +21,8 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
-  android-integration-avd-cache:
-    name: Android integration AVD cache
+  android-macos-integration-avd-cache:
+    name: Android Macos integration AVD cache
     runs-on: macos-13
     steps:
       - name: Set envs for zingolib CI
@@ -57,8 +57,14 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ
+          key: avd-${{ env.AVD-ARCH }}-integ-macos
           lookup-only: true
+
+      - name: Trying to free space in the runner
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        run: |
+          xcrun simctl delete all
+          sudo rm -rf ~/Library/Developer/CoreSimulator/Caches/*
 
       - name: Setup Android SDK
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -72,7 +78,7 @@ jobs:
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: nick-fields/retry@v3
         with:
-          timeout_minutes: 60
+          timeout_minutes: 30
           max_attempts: 3
           command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
@@ -84,12 +90,13 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ
+          key: avd-${{ env.AVD-ARCH }}-integ-macos
 
-  android-integration-test:
-    needs: [android-integration-avd-cache]
-    name: Android Integration test
+  android-macos-integration-test:
+    needs: [android-macos-integration-avd-cache]
+    name: Android Macos Integration test
     runs-on: macos-13
+
     strategy:
       matrix:
         partition: [1, 2, 3, 4, 5]
@@ -127,34 +134,34 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      # - name: Setup Docker 1 try
-      #   uses: douglascamata/setup-docker-macos-action@v1-alpha
-      #   id: dockerTry1
-      #   continue-on-error: true
-      #   with:
-      #     lima: v0.18.0
-      #     colima: v0.5.6
+      - name: Trying to free space in the runner
+        run: |
+          xcrun simctl delete all
+          sudo rm -rf ~/Library/Developer/CoreSimulator/Caches/*
 
-      # - name: checking outcome 1
-      #   run: echo ${{ steps.dockerTry1.outcome }}
+      - name: Setup Docker 1 try
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry1
+        continue-on-error: true
 
-      # - name: Setup Docker 2 try
-      #   if: steps.dockerTry1.outcome != 'success'
-      #   uses: douglascamata/setup-docker-macos-action@v1-alpha
-      #   id: dockerTry2
-      #   continue-on-error: true
-      #   with:
-      #     lima: v0.18.0
-      #     colima: v0.5.6
+      - name: checking outcome 1
+        run: echo ${{ steps.dockerTry1.outcome }}
 
-      # - name: checking outcome 2
-      #   run: echo ${{ steps.dockerTry2.outcome }}
+      - name: Setup Docker 2 try
+        if: steps.dockerTry1.outcome != 'success'
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry2
+        continue-on-error: true
+
+      - name: checking outcome 2
+        if: steps.dockerTry1.outcome != 'success'
+        run: echo ${{ steps.dockerTry2.outcome }}
 
       - name: Setup Docker Manually
         if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
         run: |
           brew install --head colima
-          brew install docker
+          brew install --formula docker
           colima start --vm-type qemu --arch x86_64
 
       - name: Pull regchest docker image
@@ -190,6 +197,8 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 11.0
 
       - name: Add emulator to PATH
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
@@ -208,7 +217,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ
+          key: avd-${{ env.AVD-ARCH }}-integ-macos
 
       - name: Kotlin uniffi cache
         uses: actions/cache/restore@v4
@@ -226,7 +235,7 @@ jobs:
       #- name: integration test as a script
       #  uses: nick-fields/retry@v3
       #  with:
-      #    timeout_minutes: 120
+      #    timeout_minutes: 40
       #    max_attempts: 1
       #    command: ./scripts/integration_tests.sh -a ${{ env.ABI }}
 

@@ -1,4 +1,4 @@
-name: Android Integration test
+name: Android Ubuntu Integration tests
 
 on:
   workflow_call:
@@ -21,9 +21,9 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
-  android-integration-avd-cache:
-    name: Android integration AVD cache
-    runs-on: ubuntu-22.04
+  android-ubuntu-integration-avd-cache:
+    name: Android Ubuntu integration AVD cache
+    runs-on: ubuntu-24.04
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -61,16 +61,19 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ
+          key: avd-${{ env.AVD-ARCH }}-integ-ubuntu
           lookup-only: true
 
       - name: Setup Android SDK
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 12.0
 
       - name: Add emulator to PATH
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
+        run: |
+          echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -78,7 +81,7 @@ jobs:
         with:
           timeout_minutes: 60
           max_attempts: 3
-          command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
+          command: sudo ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
       - name: AVD cache saving
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -88,11 +91,11 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ
+          key: avd-${{ env.AVD-ARCH }}-integ-ubuntu
 
-  android-integration-test:
-    needs: [android-integration-avd-cache]
-    name: Android Integration test
+  android-ubuntu-integration-test:
+    needs: [android-ubuntu-integration-avd-cache]
+    name: Android Ubuntu Integration test
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -171,6 +174,8 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 12.0
 
       - name: Add emulator to PATH
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
@@ -189,7 +194,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ
+          key: avd-${{ env.AVD-ARCH }}-integ-ubuntu
 
       - name: Kotlin uniffi cache
         uses: actions/cache/restore@v4
