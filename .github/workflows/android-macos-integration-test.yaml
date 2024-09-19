@@ -60,6 +60,12 @@ jobs:
           key: avd-${{ env.AVD-ARCH }}-integ-macos
           lookup-only: true
 
+      - name: Trying to free space in the runner
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        run: |
+          xcrun simctl delete all
+          sudo rm -rf ~/Library/Developer/CoreSimulator/Caches/*
+
       - name: Setup Android SDK
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: android-actions/setup-android@v3
@@ -127,6 +133,11 @@ jobs:
         run: |
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
+
+      - name: Trying to free space in the runner
+        run: |
+          xcrun simctl delete all
+          sudo rm -rf ~/Library/Developer/CoreSimulator/Caches/*
 
       - name: Setup Docker 1 try
         uses: douglascamata/setup-docker-macos-action@bdfe424dd21d3c5ace20fe9400565efc32d1fe6e
