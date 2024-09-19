@@ -23,7 +23,7 @@ env:
 jobs:
   android-integration-avd-cache:
     name: Android Macos integration AVD cache
-    runs-on: macos-14
+    runs-on: macos-13
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -63,8 +63,6 @@ jobs:
       - name: Setup Android SDK
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: android-actions/setup-android@v3
-        with:
-          cmdline-tools-version: 11.0
 
       - name: Add emulator to PATH
         if: steps.avd-cache.outputs.cache-hit != 'true'
