@@ -140,7 +140,7 @@ jobs:
           sudo rm -rf ~/Library/Developer/CoreSimulator/Caches/*
 
       - name: Setup Docker 1 try
-        uses: douglascamata/setup-docker-macos-action@bdfe424dd21d3c5ace20fe9400565efc32d1fe6e
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
         id: dockerTry1
         continue-on-error: true
 
@@ -149,7 +149,7 @@ jobs:
 
       - name: Setup Docker 2 try
         if: steps.dockerTry1.outcome != 'success'
-        uses: douglascamata/setup-docker-macos-action@bdfe424dd21d3c5ace20fe9400565efc32d1fe6e
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
         id: dockerTry2
         continue-on-error: true
 
