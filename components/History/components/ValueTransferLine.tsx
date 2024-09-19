@@ -141,20 +141,18 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             alignItems: 'center',
             transform: [{ translateX: trans }],
           }}>
-          {messagesAddress && (
-            <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-              <TouchableOpacity
-                style={{ zIndex: 999, padding: 10 }}
-                onPress={() => {
-                  setValueTransferDetail(vt);
-                  setValueTransferDetailIndex(index);
-                  setMessagesAddressModalShowing(true);
-                  swipeable.reset();
-                }}>
-                <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faComments} color={colors.money} />
-              </TouchableOpacity>
-            </View>
-          )}
+          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+            <TouchableOpacity
+              style={{ zIndex: 999, padding: 10 }}
+              onPress={() => {
+                setValueTransferDetail(vt);
+                setValueTransferDetailIndex(index);
+                setValueTransferDetailModalShowing(true);
+                swipeable.reset();
+              }}>
+              <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faFileLines} color={colors.money} />
+            </TouchableOpacity>
+          </View>
           {!!vt.address && (
             <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
               <TouchableOpacity
@@ -174,18 +172,20 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               </TouchableOpacity>
             </View>
           )}
-          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-            <TouchableOpacity
-              style={{ zIndex: 999, padding: 10 }}
-              onPress={() => {
-                setValueTransferDetail(vt);
-                setValueTransferDetailIndex(index);
-                setValueTransferDetailModalShowing(true);
-                swipeable.reset();
-              }}>
-              <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faFileLines} color={colors.money} />
-            </TouchableOpacity>
-          </View>
+          {messagesAddress && (
+            <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+              <TouchableOpacity
+                style={{ zIndex: 999, padding: 10 }}
+                onPress={() => {
+                  setValueTransferDetail(vt);
+                  setValueTransferDetailIndex(index);
+                  setMessagesAddressModalShowing(true);
+                  swipeable.reset();
+                }}>
+                <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faComments} color={colors.money} />
+              </TouchableOpacity>
+            </View>
+          )}
         </Animated.View>
       </>
     );
@@ -219,6 +219,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       )}
       <Swipeable
         overshootLeft={false}
+        overshootRight={messagesAddress ? true : false}
         renderRightActions={handleRenderRightActions}
         renderLeftActions={handleRenderLeftActions}>
         <TouchableOpacity
