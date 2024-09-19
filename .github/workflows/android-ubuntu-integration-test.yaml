@@ -21,7 +21,7 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
-  android-integration-avd-cache:
+  android-ubuntu-integration-avd-cache:
     name: Android Ubuntu integration AVD cache
     runs-on: ubuntu-24.04
     steps:
@@ -93,8 +93,8 @@ jobs:
             ~/.android/adb*
           key: avd-${{ env.AVD-ARCH }}-integ-ubuntu
 
-  android-integration-test:
-    needs: [android-integration-avd-cache]
+  android-ubuntu-integration-test:
+    needs: [android-ubuntu-integration-avd-cache]
     name: Android Ubuntu Integration test
     runs-on: ubuntu-22.04
     strategy:

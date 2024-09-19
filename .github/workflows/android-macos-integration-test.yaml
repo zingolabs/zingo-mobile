@@ -21,7 +21,7 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
-  android-integration-avd-cache:
+  android-macos-integration-avd-cache:
     name: Android Macos integration AVD cache
     runs-on: macos-14
     steps:
@@ -86,8 +86,8 @@ jobs:
             ~/.android/adb*
           key: avd-${{ env.AVD-ARCH }}-integ-macos
 
-  android-integration-test:
-    needs: [android-integration-avd-cache]
+  android-macos-integration-test:
+    needs: [android-macos-integration-avd-cache]
     name: Android Macos Integration test
     runs-on: macos-14
     env:

@@ -82,7 +82,7 @@ jobs:
           sed -i "/^zingolib/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
           if cat rust/lib/Cargo.toml | grep "^zingolib" | grep -q "branch"; then exit 1; fi
           cd rust
-          cargo update -p zingolib -p zingoconfig --aggressive
+          cargo update -p zingolib--aggressive
 
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
