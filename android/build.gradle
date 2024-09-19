@@ -28,7 +28,7 @@ allprojects {
      }
      maven { url 'https://www.jitpack.io' }
    }
- }
+}
 
 // this is not the best solution, but while the libraries have no namespace...
 // https://discuss.gradle.org/t/namespace-not-specified-for-agp-8-0-0/45850/5

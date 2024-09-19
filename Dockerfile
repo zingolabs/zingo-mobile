@@ -68,4 +68,4 @@ VOLUME /root/.android/avd
 EXPOSE 8081
 
 # Command to start the React Native server for testing
-#CMD ["pnpm", "android"]
+CMD ["pnpn", "start"]
