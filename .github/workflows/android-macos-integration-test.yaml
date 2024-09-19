@@ -23,7 +23,7 @@ env:
 jobs:
   android-macos-integration-avd-cache:
     name: Android Macos integration AVD cache
-    runs-on: macos-14
+    runs-on: macos-13
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -89,7 +89,7 @@ jobs:
   android-macos-integration-test:
     needs: [android-macos-integration-avd-cache]
     name: Android Macos Integration test
-    runs-on: macos-14
+    runs-on: macos-13
     env:
       HOMEBREW_NO_INSTALL_UPGRADE: "1"
       HOMEBREW_NO_AUTO_UPDATE: "1"
@@ -133,7 +133,7 @@ jobs:
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
       - name: Setup Docker 1 try
-        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        uses: douglascamata/setup-docker-macos-action@bdfe424dd21d3c5ace20fe9400565efc32d1fe6e
         id: dockerTry1
         continue-on-error: true
         with:
@@ -146,7 +146,7 @@ jobs:
 
       - name: Setup Docker 2 try
         if: steps.dockerTry1.outcome != 'success'
-        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        uses: douglascamata/setup-docker-macos-action@bdfe424dd21d3c5ace20fe9400565efc32d1fe6e
         id: dockerTry2
         continue-on-error: true
         with:
