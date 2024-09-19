@@ -23,7 +23,7 @@ env:
 jobs:
   android-integration-avd-cache:
     name: Android Macos integration AVD cache
-    runs-on: macos-13
+    runs-on: macos-14
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -91,9 +91,9 @@ jobs:
     name: Android Macos Integration test
     runs-on: macos-14
     env:
-      HOMEBREW_NO_INSTALL_UPGRADE: "0"
-      HOMEBREW_NO_AUTO_UPDATE: "0"
-      HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: "0"
+      HOMEBREW_NO_INSTALL_UPGRADE: "1"
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: "1"
 
     strategy:
       matrix:
@@ -162,7 +162,7 @@ jobs:
         if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
         run: |
           brew install --head colima
-          brew install docker
+          brew install --formula docker
           colima start --vm-type qemu --arch x86_64
 
       - name: Pull regchest docker image
