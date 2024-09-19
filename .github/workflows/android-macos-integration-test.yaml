@@ -90,10 +90,6 @@ jobs:
     needs: [android-macos-integration-avd-cache]
     name: Android Macos Integration test
     runs-on: macos-13
-    env:
-      HOMEBREW_NO_INSTALL_UPGRADE: "1"
-      HOMEBREW_NO_AUTO_UPDATE: "1"
-      HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: "1"
 
     strategy:
       matrix:
@@ -136,10 +132,6 @@ jobs:
         uses: douglascamata/setup-docker-macos-action@bdfe424dd21d3c5ace20fe9400565efc32d1fe6e
         id: dockerTry1
         continue-on-error: true
-        with:
-          upgrade-qemu: true
-          lima: v0.22.0
-          colima: v0.7.3
 
       - name: checking outcome 1
         run: echo ${{ steps.dockerTry1.outcome }}
@@ -149,10 +141,6 @@ jobs:
         uses: douglascamata/setup-docker-macos-action@bdfe424dd21d3c5ace20fe9400565efc32d1fe6e
         id: dockerTry2
         continue-on-error: true
-        with:
-          upgrade-qemu: true
-          lima: v0.22.0
-          colima: v0.7.3
 
       - name: checking outcome 2
         if: steps.dockerTry1.outcome != 'success'
