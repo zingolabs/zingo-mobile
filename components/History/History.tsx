@@ -276,32 +276,36 @@ const History: React.FunctionComponent<HistoryProps> = ({
               marginTop: 10,
               width: '100%',
             }}>
-            {valueTransfersSorted.flatMap((vt, index) => {
-              let txmonth = vt.time ? moment(vt.time * 1000).format('MMM YYYY') : '--- ----';
+            {valueTransfersSorted &&
+              valueTransfersSorted.length > 0 &&
+              valueTransfersSorted.flatMap((vt, index) => {
+                let txmonth = vt && vt.time ? moment(vt.time * 1000).format('MMM YYYY') : '--- ----';
 
-              var month = '';
-              if (txmonth !== lastMonth) {
-                month = txmonth;
-                lastMonth = txmonth;
-              }
+                var month = '';
+                if (txmonth !== lastMonth) {
+                  month = txmonth;
+                  lastMonth = txmonth;
+                }
 
-              return (
-                <ValueTransferLine
-                  key={`${index}-${vt.txid}-${vt.kind}`}
-                  index={index}
-                  vt={vt}
-                  month={month}
-                  setValueTransferDetail={(ttt: ValueTransferType) => setValueTransferDetail(ttt)}
-                  setValueTransferDetailIndex={(iii: number) => setValueTransferDetailIndex(iii)}
-                  setValueTransferDetailModalShowing={(bbb: boolean) => setValueTransferDetailModalShowing(bbb)}
-                  nextLineWithSameTxid={
-                    index >= valueTransfersSorted.length - 1 ? false : valueTransfersSorted[index + 1].txid === vt.txid
-                  }
-                  setSendPageState={setSendPageState}
-                  setMessagesAddressModalShowing={(bbb: boolean) => setMessagesAddressModalShowing(bbb)}
-                />
-              );
-            })}
+                return (
+                  <ValueTransferLine
+                    key={`${index}-${vt.txid}-${vt.kind}`}
+                    index={index}
+                    vt={vt}
+                    month={month}
+                    setValueTransferDetail={(ttt: ValueTransferType) => setValueTransferDetail(ttt)}
+                    setValueTransferDetailIndex={(iii: number) => setValueTransferDetailIndex(iii)}
+                    setValueTransferDetailModalShowing={(bbb: boolean) => setValueTransferDetailModalShowing(bbb)}
+                    nextLineWithSameTxid={
+                      index >= valueTransfersSorted.length - 1
+                        ? false
+                        : valueTransfersSorted[index + 1].txid === vt.txid
+                    }
+                    setSendPageState={setSendPageState}
+                    setMessagesAddressModalShowing={(bbb: boolean) => setMessagesAddressModalShowing(bbb)}
+                  />
+                );
+              })}
             {loadMoreButton ? (
               <View
                 style={{

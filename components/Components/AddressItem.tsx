@@ -16,7 +16,7 @@ import {
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAddressCard, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faAddressCard, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -201,7 +201,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 initial: false,
               });
             }}>
-            <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faArrowUp} color={colors.primary} />
+            <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faPaperPlane} color={colors.primary} />
           </TouchableOpacity>
         )}
     </View>

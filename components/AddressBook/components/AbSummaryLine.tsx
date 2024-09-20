@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { View, TouchableOpacity, Alert } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAddressCard, faQrcode, faTrashCan, faPencil, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faAddressCard, faQrcode, faTrashCan, faPencil, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 //import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import FadeText from '../../Components/FadeText';
@@ -155,7 +155,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                     initial: false,
                   });
                 }}>
-                <FontAwesomeIcon size={30} icon={faArrowUp} color={colors.primary} />
+                <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />
               </TouchableOpacity>
             </View>
           )}

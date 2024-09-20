@@ -11,6 +11,7 @@ import {
   faComment,
   faComments,
   faFileLines,
+  faPaperPlane,
 } from '@fortawesome/free-solid-svg-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
@@ -113,14 +114,14 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   ) => {
     const trans = progress.interpolate({
       inputRange: [0, 1],
-      outputRange: [150, 0],
-      extrapolate: 'clamp',
+      outputRange: [50, 0],
+      extrapolate: 'extend',
     });
 
     dragX.addListener(({ value }) => {
-      if (-value >= dimensions.width * (2 / 3) && messagesAddress) {
+      if (-value >= dimensions.width * (1 / 2) && messagesAddress) {
         if (!maxWidthHit.current) {
-          console.log(value);
+          //console.log(value);
           setValueTransferDetail(vt);
           setValueTransferDetailIndex(index);
           setMessagesAddressModalShowing(true);
@@ -141,39 +142,14 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
             alignItems: 'center',
             transform: [{ translateX: trans }],
           }}>
-          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-            <TouchableOpacity
-              style={{ zIndex: 999, padding: 10 }}
-              onPress={() => {
-                setValueTransferDetail(vt);
-                setValueTransferDetailIndex(index);
-                setValueTransferDetailModalShowing(true);
-                swipeable.reset();
-              }}>
-              <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faFileLines} color={colors.money} />
-            </TouchableOpacity>
-          </View>
-          {!!vt.address && (
-            <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-              <TouchableOpacity
-                style={{ zIndex: 999, padding: 10 }}
-                onPress={() => {
-                  // enviar
-                  const sendPageState = new SendPageStateClass(new ToAddrClass(0));
-                  sendPageState.toaddr.to = vt.address ? vt.address : '';
-                  setSendPageState(sendPageState);
-                  navigation.navigate(RouteEnums.LoadedApp, {
-                    screen: translate('loadedapp.send-menu'),
-                    initial: false,
-                  });
-                  swipeable.reset();
-                }}>
-                <FontAwesomeIcon size={30} icon={faArrowUp} color={colors.primary} />
-              </TouchableOpacity>
-            </View>
-          )}
           {messagesAddress && (
-            <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+            <View
+              style={{
+                width: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginLeft: 20,
+              }}>
               <TouchableOpacity
                 style={{ zIndex: 999, padding: 10 }}
                 onPress={() => {
@@ -192,11 +168,65 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   };
 
   const handleRenderLeftActions = (
-    _progress: Animated.AnimatedInterpolation<number>,
+    progress: Animated.AnimatedInterpolation<number>,
     _dragX: Animated.AnimatedInterpolation<number>,
-    _swipeable: Swipeable,
+    swipeable: Swipeable,
   ) => {
-    return null;
+    const trans = progress.interpolate({
+      inputRange: [0, 1],
+      outputRange: [-100, 0],
+      extrapolate: 'clamp',
+    });
+
+    return (
+      <>
+        <Animated.View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            transform: [{ translateX: trans }],
+            marginRight: 20,
+          }}>
+          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+            <TouchableOpacity
+              style={{ zIndex: 999, padding: 10 }}
+              onPress={() => {
+                setValueTransferDetail(vt);
+                setValueTransferDetailIndex(index);
+                setValueTransferDetailModalShowing(true);
+                swipeable.reset();
+              }}>
+              <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faFileLines} color={colors.money} />
+            </TouchableOpacity>
+          </View>
+          {!!vt.address && (
+            <View
+              style={{
+                width: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <TouchableOpacity
+                style={{ zIndex: 999, padding: 10 }}
+                onPress={() => {
+                  // enviar
+                  const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+                  sendPageState.toaddr.to = vt.address ? vt.address : '';
+                  setSendPageState(sendPageState);
+                  navigation.navigate(RouteEnums.LoadedApp, {
+                    screen: translate('loadedapp.send-menu'),
+                    initial: false,
+                  });
+                  swipeable.reset();
+                }}>
+                <FontAwesomeIcon size={27} icon={faPaperPlane} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          )}
+        </Animated.View>
+      </>
+    );
   };
 
   //console.log('render ValueTransferLine - 5', index, nextLineWithSameTxid);
@@ -220,6 +250,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       <Swipeable
         overshootLeft={false}
         overshootRight={messagesAddress ? true : false}
+        overshootFriction={1}
         renderRightActions={handleRenderRightActions}
         renderLeftActions={handleRenderLeftActions}>
         <TouchableOpacity
