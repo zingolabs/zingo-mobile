@@ -463,7 +463,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     (async () => {
       // has the device the Wallet Keys stored?
-      const has = await hasRecoveryWalletInfo(this.props.translate);
+      const has = await hasRecoveryWalletInfo();
       this.setState({ hasRecoveryWalletInfoSaved: has });
 
       // First, if it's server automatic
@@ -518,7 +518,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                   if (this.state.recoveryWalletInfoOnDevice) {
                     if (walletKindJSON.kind === RPCWalletKindEnum.LoadedFromSeedPhrase ||  walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedSpendingKey) {
                       const wallet: WalletType = await RPC.rpcFetchWallet(false);
-                      await createUpdateRecoveryWalletInfo(wallet, this.props.translate);
+                      await createUpdateRecoveryWalletInfo(wallet);
                     }
                   }
                   this.setState({
@@ -923,7 +923,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         this.setWalletOption(WalletOptionEnum.downloadMemos, DownloadMemosEnum.walletMemos);
         // storing the seed & birthday in KeyChain/KeyStore
         if (this.state.recoveryWalletInfoOnDevice) {
-          await createUpdateRecoveryWalletInfo(wallet, this.props.translate);
+          await createUpdateRecoveryWalletInfo(wallet);
         }
         // basic mode -> same screen.
         this.setState(state => ({
@@ -1025,7 +1025,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             // storing the seed/ufvk & birthday in KeyChain/KeyStore
             if (this.state.recoveryWalletInfoOnDevice) {
               if (wallet.seed) {
-                await createUpdateRecoveryWalletInfo(wallet, this.props.translate);
+                await createUpdateRecoveryWalletInfo(wallet);
               }
             }
             // when restore a wallet never the user needs that the seed screen shows up with the first funds received.
@@ -1115,7 +1115,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       this.addLastSnackbar({ message: this.props.translate('biometrics-error') as string });
     } else {
       // recover the wallet keys from the device
-      const wallet = await getRecoveryWalletInfo(this.props.translate);
+      const wallet = await getRecoveryWalletInfo();
       const txt = wallet.seed + '\n\n' + wallet.birthday;
       Alert.alert(
         this.props.translate('loadedapp.walletseed-basic') as string,

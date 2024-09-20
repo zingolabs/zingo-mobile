@@ -196,7 +196,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   useEffect(() => {
     (async () => {
-      if (await hasRecoveryWalletInfo(translate)) {
+      if (await hasRecoveryWalletInfo()) {
         setRecoveryWalletInfoSaved(true);
       }
     })();

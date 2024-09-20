@@ -1316,10 +1316,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
 
     if (!value) {
-      await removeRecoveryWalletInfo(this.props.translate);
+      await removeRecoveryWalletInfo();
     } else {
       const wallet: WalletType = await RPC.rpcFetchWallet(this.state.readOnly);
-      await createUpdateRecoveryWalletInfo(wallet, this.props.translate);
+      await createUpdateRecoveryWalletInfo(wallet);
     }
 
     // Refetch the settings to update
