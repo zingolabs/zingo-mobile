@@ -175,7 +175,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
       )}
       {withIcon && !contact && !oneLine && (
         <TouchableOpacity onPress={() => launchAddressBook(address, closeModal, openModal)}>
-          <FontAwesomeIcon style={{ marginTop: 3 }} size={22} icon={faAddressCard} color={colors.primary} />
+          <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faAddressCard} color={colors.primary} />
         </TouchableOpacity>
       )}
       {withSendIcon &&
