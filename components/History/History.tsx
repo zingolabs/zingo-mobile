@@ -8,6 +8,7 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -26,6 +27,8 @@ import ValueTransferDetail from './components/ValueTransferDetail';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
+import { MessagesAddress } from '../Messages';
+import Utils from '../../app/utils';
 
 type HistoryProps = {
   doRefresh: () => void;
@@ -40,6 +43,8 @@ type HistoryProps = {
   setShieldingAmount: (value: number) => void;
   setScrollToTop: (value: boolean) => void;
   scrollToTop: boolean;
+  setScrollToBottom: (value: boolean) => void;
+  scrollToBottom: boolean;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -55,6 +60,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
   setShieldingAmount,
   setScrollToTop,
   scrollToTop,
+  setScrollToBottom,
+  scrollToBottom,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, valueTransfers, language, setBackgroundError, addLastSnackbar } = context;
@@ -62,12 +69,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
   moment.locale(language);
 
   const [isValueTransferDetailModalShowing, setValueTransferDetailModalShowing] = useState<boolean>(false);
+  const [isMessagesAddressModalShowing, setMessagesAddressModalShowing] = useState<boolean>(false);
   const [valueTransferDetail, setValueTransferDetail] = useState<ValueTransferType>({} as ValueTransferType);
   const [valueTransferDetailIndex, setValueTransferDetailIndex] = useState<number>(-1);
   const [numVt, setNumVt] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   const [valueTransfersSorted, setValueTransfersSorted] = useState<ValueTransferType[]>([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const scrollViewRef = useRef<ScrollView>(null);
 
   useScrollToTop(scrollViewRef);
@@ -120,6 +129,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
   useEffect(() => {
     setLoadMoreButton(numVt < (valueTransfers ? valueTransfers.length : 0));
     setValueTransfersSorted(fetchValueTransfersSorted);
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
   }, [fetchValueTransfersSorted, numVt, valueTransfers]);
 
   useEffect(() => {
@@ -184,6 +196,32 @@ const History: React.FunctionComponent<HistoryProps> = ({
         />
       </Modal>
 
+      {isMessagesAddressModalShowing && (
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={isMessagesAddressModalShowing}
+          onRequestClose={() => setMessagesAddressModalShowing(false)}>
+          <MessagesAddress
+            doRefresh={doRefresh}
+            toggleMenuDrawer={toggleMenuDrawer}
+            syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
+            poolsMoreInfoOnClick={poolsMoreInfoOnClick}
+            setZecPrice={setZecPrice}
+            setComputingModalVisible={setComputingModalVisible}
+            setPrivacyOption={setPrivacyOption}
+            setUfvkViewModalVisible={setUfvkViewModalVisible}
+            setSendPageState={setSendPageState}
+            setShieldingAmount={setShieldingAmount}
+            setScrollToBottom={setScrollToBottom}
+            scrollToBottom={scrollToBottom}
+            address={Utils.messagesAddress(valueTransferDetail)}
+            closeModal={() => setMessagesAddressModalShowing(false)}
+            openModal={() => setMessagesAddressModalShowing(true)}
+          />
+        </Modal>
+      )}
+
       <Header
         testID="valuetransfer text"
         poolsMoreInfoOnClick={poolsMoreInfoOnClick}
@@ -200,63 +238,60 @@ const History: React.FunctionComponent<HistoryProps> = ({
         setScrollToTop={setScrollToTop}
       />
 
-      <ScrollView
-        ref={scrollViewRef}
-        onScroll={handleScroll}
-        scrollEventThrottle={100}
-        accessible={true}
-        accessibilityLabel={translate('history.list-acc') as string}
-        refreshControl={
-          <RefreshControl
-            refreshing={false}
-            onRefresh={doRefresh}
-            tintColor={colors.text}
-            title={translate('history.refreshing') as string}
-          />
-        }
-        style={{ flexGrow: 1, marginTop: 10, width: '100%' }}>
-        {valueTransfersSorted.flatMap((vt, index) => {
-          let txmonth = vt.time ? moment(vt.time * 1000).format('MMM YYYY') : '--- ----';
-
-          var month = '';
-          if (txmonth !== lastMonth) {
-            month = txmonth;
-            lastMonth = txmonth;
-          }
-
-          return (
-            <ValueTransferLine
-              index={index}
-              key={`${index}-${vt.txid}-${vt.kind}`}
-              vt={vt}
-              month={month}
-              setValueTransferDetail={(ttt: ValueTransferType) => setValueTransferDetail(ttt)}
-              setValueTransferDetailIndex={(iii: number) => setValueTransferDetailIndex(iii)}
-              setValueTransferDetailModalShowing={(bbb: boolean) => setValueTransferDetailModalShowing(bbb)}
-              nextLineWithSameTxid={
-                index >= valueTransfersSorted.length - 1 ? false : valueTransfersSorted[index + 1].txid === vt.txid
-              }
-            />
-          );
-        })}
-        {loadMoreButton ? (
-          <View
+      {loading ? (
+        <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
+      ) : (
+        <>
+          <ScrollView
+            ref={scrollViewRef}
+            onScroll={handleScroll}
+            scrollEventThrottle={100}
+            accessible={true}
+            accessibilityLabel={translate('history.list-acc') as string}
+            refreshControl={
+              <RefreshControl
+                refreshing={false}
+                onRefresh={doRefresh}
+                tintColor={colors.text}
+                title={translate('history.refreshing') as string}
+              />
+            }
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-start',
+              flexGrow: 1,
               marginTop: 10,
-              marginBottom: 30,
+              width: '100%',
             }}>
-            <Button
-              type={ButtonTypeEnum.Secondary}
-              title={translate('history.loadmore') as string}
-              onPress={loadMoreClicked}
-            />
-          </View>
-        ) : (
-          <>
-            {!!valueTransfers && !!valueTransfers.length && (
+            {valueTransfersSorted &&
+              valueTransfersSorted.length > 0 &&
+              valueTransfersSorted.flatMap((vt, index) => {
+                let txmonth = vt && vt.time ? moment(vt.time * 1000).format('MMM YYYY') : '--- ----';
+
+                var month = '';
+                if (txmonth !== lastMonth) {
+                  month = txmonth;
+                  lastMonth = txmonth;
+                }
+
+                return (
+                  <ValueTransferLine
+                    key={`${index}-${vt.txid}-${vt.kind}`}
+                    index={index}
+                    vt={vt}
+                    month={month}
+                    setValueTransferDetail={(ttt: ValueTransferType) => setValueTransferDetail(ttt)}
+                    setValueTransferDetailIndex={(iii: number) => setValueTransferDetailIndex(iii)}
+                    setValueTransferDetailModalShowing={(bbb: boolean) => setValueTransferDetailModalShowing(bbb)}
+                    nextLineWithSameTxid={
+                      index >= valueTransfersSorted.length - 1
+                        ? false
+                        : valueTransfersSorted[index + 1].txid === vt.txid
+                    }
+                    setSendPageState={setSendPageState}
+                    setMessagesAddressModalShowing={(bbb: boolean) => setMessagesAddressModalShowing(bbb)}
+                  />
+                );
+              })}
+            {loadMoreButton ? (
               <View
                 style={{
                   display: 'flex',
@@ -265,21 +300,40 @@ const History: React.FunctionComponent<HistoryProps> = ({
                   marginTop: 10,
                   marginBottom: 30,
                 }}>
-                <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
+                <Button
+                  type={ButtonTypeEnum.Secondary}
+                  title={translate('history.loadmore') as string}
+                  onPress={loadMoreClicked}
+                />
               </View>
+            ) : (
+              <>
+                {!!valueTransfersSorted && !!valueTransfersSorted.length && (
+                  <View
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                      marginTop: 10,
+                      marginBottom: 30,
+                    }}>
+                    <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
+                  </View>
+                )}
+              </>
             )}
-          </>
-        )}
-      </ScrollView>
-      {!isAtTop && (
-        <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 10 }}>
-          <FontAwesomeIcon
-            style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-            size={50}
-            icon={faAnglesUp}
-            color={colors.zingo}
-          />
-        </TouchableOpacity>
+          </ScrollView>
+          {!isAtTop && (
+            <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 10 }}>
+              <FontAwesomeIcon
+                style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                size={50}
+                icon={faAnglesUp}
+                color={colors.zingo}
+              />
+            </TouchableOpacity>
+          )}
+        </>
       )}
     </View>
   );

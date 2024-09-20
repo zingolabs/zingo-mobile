@@ -63,7 +63,7 @@ import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import RPC from '../rpc';
 import { ThemeType } from '../types';
 import { ContextAppLoadingProvider } from '../context';
-import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
+import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';

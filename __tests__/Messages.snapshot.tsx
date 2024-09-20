@@ -6,17 +6,15 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import Send from '../components/Send';
+import { Messages } from '../components/Messages';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
-import { ModeEnum, CurrencyEnum } from '../app/AppState';
-import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
+import { CurrencyEnum, ModeEnum } from '../app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
-import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
-import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
-import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
+import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
+import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -31,14 +29,43 @@ jest.mock('react-native-localize', () => ({
   },
 }));
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RPCModule = {
-    execute: jest.fn(() => '{}'),
+jest.mock('moment', () => {
+  // Here we are able to mock chain builder pattern
+  const mMoment = {
+    format: (p: string) => {
+      if (p === 'MMM YYYY') {
+        return 'Dec 2022';
+      } else if (p === 'YYYY MMM D h:mm a') {
+        return '2022 Dec 13 8:00 am';
+      } else if (p === 'MMM D, h:mm a') {
+        return 'Dec 13, 8:00 am';
+      }
+    },
   };
+  // Here we are able to mock the constructor and to modify instance methods
+  const fn = () => {
+    return mMoment;
+  };
+  // Here we are able to mock moment methods that depend on moment not on a moment instance
+  fn.locale = jest.fn();
+  return fn;
+});
+jest.mock('moment/locale/es', () => () => ({
+  defineLocale: jest.fn(),
+}));
+jest.mock('moment/locale/pt', () => () => ({
+  defineLocale: jest.fn(),
+}));
+jest.mock('moment/locale/ru', () => () => ({
+  defineLocale: jest.fn(),
+}));
 
-  return RN;
+jest.mock('react-native-gesture-handler', () => {
+  const View = require('react-native').View;
+  return {
+    TouchableOpacity: View,
+    Swipeable: View,
+  };
 });
 jest.mock('@react-native-community/netinfo', () => {
   const RN = jest.requireActual('react-native');
@@ -49,21 +76,22 @@ jest.mock('@react-native-community/netinfo', () => {
 
   return RN;
 });
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  RN.NativeModules.RPCModule = {
+    execute: jest.fn(() => '{}'),
+  };
+
+  return RN;
+});
 jest.mock('@react-navigation/native', () => ({
   useScrollToTop: jest.fn(),
-  useIsFocused: jest.fn(),
   useTheme: () => mockTheme,
-}));
-jest.mock('react-native-picker-select', () => 'RNPickerSelect');
-jest.mock('react-native-device-info', () => ({
-  getSystemName: jest.fn(() => 'Mocked System Name'),
-  getSystemVersion: jest.fn(() => 'Mocked System Version'),
-  getManufacturer: jest.fn(() => 'Mocked Manufacturer'),
-  getModel: jest.fn(() => 'Mocked Model'),
 }));
 
 // test suite
-describe('Component Send - test', () => {
+describe('Component Messages - test', () => {
   //snapshot test
   const state = defaultAppContextLoaded;
   state.valueTransfers = mockValueTransfers;
@@ -71,66 +99,60 @@ describe('Component Send - test', () => {
   state.addresses = mockAddresses;
   state.translate = mockTranslate;
   state.info = mockInfo;
-  state.zecPrice = mockZecPrice;
   state.totalBalance = mockTotalBalance;
-  state.sendPageState = mockSendPageState;
   const onFunction = jest.fn();
 
-  test('Send no currency, privacy normal & mode basic - snapshot', () => {
+  test('Messages no currency, privacy normal & mode basic - snapshot', () => {
     // no currency
     state.currency = CurrencyEnum.noCurrency;
     // privacy normal
     state.privacy = false;
     // mode basic
     state.mode = ModeEnum.basic;
-    const send = render(
+    const messages = render(
       <ContextAppLoadedProvider value={state}>
-        <Send
-          setSendPageState={onFunction}
-          sendTransaction={onFunction}
-          clearToAddr={onFunction}
-          setSendProgress={onFunction}
+        <Messages
+          doRefresh={onFunction}
           toggleMenuDrawer={onFunction}
-          setComputingModalVisible={onFunction}
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
+          setComputingModalVisible={onFunction}
           setPrivacyOption={onFunction}
+          setSendPageState={onFunction}
           setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
           setScrollToBottom={onFunction}
+          scrollToBottom={false}
         />
       </ContextAppLoadedProvider>,
     );
-    expect(send.toJSON()).toMatchSnapshot();
+    expect(messages.toJSON()).toMatchSnapshot();
   });
 
-  test('Send currency USD, privacy high & mode advanced - snapshot', () => {
+  test('Messages currency USD, privacy high & mode advanced - snapshot', () => {
     // no currency
     state.currency = CurrencyEnum.USDCurrency;
     // privacy normal
     state.privacy = true;
     // mode basic
     state.mode = ModeEnum.advanced;
-    const send = render(
+    const messages = render(
       <ContextAppLoadedProvider value={state}>
-        <Send
-          setSendPageState={onFunction}
-          sendTransaction={onFunction}
-          clearToAddr={onFunction}
-          setSendProgress={onFunction}
+        <Messages
+          doRefresh={onFunction}
           toggleMenuDrawer={onFunction}
-          setComputingModalVisible={onFunction}
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
           setZecPrice={onFunction}
+          setComputingModalVisible={onFunction}
           setPrivacyOption={onFunction}
+          setSendPageState={onFunction}
           setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
           setScrollToBottom={onFunction}
+          scrollToBottom={false}
         />
       </ContextAppLoadedProvider>,
     );
-    expect(send.toJSON()).toMatchSnapshot();
+    expect(messages.toJSON()).toMatchSnapshot();
   });
 });

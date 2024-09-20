@@ -8,8 +8,6 @@ import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { ContextAppLoaded } from '../../app/context';
 import ScannerAddress from '../Send/components/ScannerAddress';
-import RPCModule from '../../app/RPCModule';
-import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 import { ThemeType } from '../../app/types';
 import ErrorText from './ErrorText';
 import RegText from './RegText';
@@ -17,8 +15,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { CommandEnum, GlobalConst } from '../../app/AppState';
-import { RPCParseStatusEnum } from '../../app/rpc/enums/RPCParseStatusEnum';
+import Utils from '../../app/utils';
 
 type InputTextAddressProps = {
   address: string;
@@ -41,34 +38,16 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
 
   useEffect(() => {
-    const parseAdressJSON = async (addr: string): Promise<boolean> => {
+    const parseAddress = async (addr: string): Promise<boolean> => {
       if (!netInfo.isConnected) {
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
         return false;
       }
-      const result: string = await RPCModule.execute(CommandEnum.parseAddress, addr);
-      if (result) {
-        if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
-          return false;
-        }
-      } else {
-        return false;
-      }
-      let resultJSON: RPCParseAddressType = {} as RPCParseAddressType;
-      try {
-        resultJSON = await JSON.parse(result);
-      } catch (e) {
-        console.log('parse address JSON error', e);
-        return false;
-      }
-
-      //console.log('parse-address', address, resultJSON.status === RPCParseStatusEnum.success);
-
-      return resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chainName;
+      return await Utils.isValidAdress(addr, server.chainName);
     };
 
     if (address) {
-      parseAdressJSON(address).then(r => {
+      parseAddress(address).then(r => {
         setValidAddress(r ? 1 : -1);
         setError(r ? '' : (translate('send.invalidaddress') as string));
       });

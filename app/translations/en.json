@@ -31,6 +31,9 @@
   "email": "zingo@zingolabs.org",
   "subject": "Zingo Support...",
   "body": "I need help with...",
+  "messages": {
+    "title": "Messages"
+  },
   "addressbook": {
     "title": "Address Book",
     "end": "End",
@@ -125,9 +128,10 @@
     "of": "of",
     "eta": "ETA",
     "sec": "sec",
-    "wallet-menu": "HISTORY",
+    "history-menu": "HISTORY",
     "send-menu": "SEND",
-    "uas-menu": "RECEIVE",
+    "receive-menu": "RECEIVE",
+    "messages-menu": "MESSAGES",
     "syncing": "Pausing the Synchronization to be able to Complete the Transaction.",
     "zcash-url": "You already have an address in the send screen",
     "connection-error": "No Internet connection, Zingo can't work properly this way.",

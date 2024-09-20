@@ -619,9 +619,9 @@ export default class RPC {
   }
 
   async updateData() {
-    //console.log("Update data triggered");
+    //console.log('Update data triggered');
     if (this.updateDataLock) {
-      console.log('Update lock, returning');
+      //console.log('Update lock, returning');
       return;
     }
 

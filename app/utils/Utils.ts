@@ -3,17 +3,22 @@ import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import {
   AddressClass,
   ChainNameEnum,
+  CommandEnum,
   GlobalConst,
   SendJsonToTypeType,
   SendPageStateClass,
   ServerType,
   ToAddrClass,
   TranslateType,
+  ValueTransferType,
 } from '../AppState';
 
 import randomColor from 'randomcolor';
 import RPCModule from '../RPCModule';
 import { Buffer } from 'buffer';
+import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
+import { RPCParseStatusEnum } from '../rpc/enums/RPCParseStatusEnum';
+import { RPCAdressKindEnum } from '../rpc/enums/RPCAddressKindEnum';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
@@ -300,4 +305,83 @@ export default class Utils {
 
     return [...jsonFlat, ...donationTransaction];
   }
+
+  static async isValidAdress(address: string, serverChainName: string): Promise<boolean> {
+    const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
+    //console.log(result);
+    if (result) {
+      if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
+        return false;
+      }
+    } else {
+      return false;
+    }
+    let resultJSON = {} as RPCParseAddressType;
+    try {
+      resultJSON = await JSON.parse(result);
+    } catch (e) {
+      return false;
+    }
+
+    //console.log('parse-address', address, resultJSON, resultJSON.status === RPCParseStatusEnum.successParse);
+
+    return resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === serverChainName;
+  }
+
+  static async isValidOrchardOrSaplingAddress(address: string, serverChainName: string): Promise<boolean> {
+    const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
+    //console.log(result);
+    if (result) {
+      if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
+        return false;
+      }
+    } else {
+      return false;
+    }
+    let resultJSON = {} as RPCParseAddressType;
+    try {
+      resultJSON = await JSON.parse(result);
+    } catch (e) {
+      return false;
+    }
+
+    //console.log('parse-memo', address, resultJSON);
+
+    return (
+      resultJSON.status === RPCParseStatusEnum.successParse &&
+      resultJSON.address_kind !== RPCAdressKindEnum.transparentAddressKind &&
+      resultJSON.chain_name === serverChainName
+    );
+  }
+
+  static async isMessagesAddress(vt: ValueTransferType, serverChainName: string): Promise<boolean> {
+    // only for orchard or sapling
+    if (vt.address) {
+      return await Utils.isValidOrchardOrSaplingAddress(vt.address, serverChainName);
+    } else {
+      const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
+      if (memoTotal.includes('\nReply to: \n')) {
+        let memoArray = memoTotal.split('\nReply to: \n');
+        const memoPoped = memoArray.pop();
+        return !!memoPoped;
+      }
+    }
+    return false;
+  }
+
+  static messagesAddress = (vt: ValueTransferType) => {
+    if (vt.address) {
+      return vt.address;
+    } else {
+      const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
+      if (memoTotal.includes('\nReply to: \n')) {
+        let memoArray = memoTotal.split('\nReply to: \n');
+        const memoPoped = memoArray.pop();
+        if (memoPoped) {
+          return memoPoped;
+        }
+      }
+    }
+    return '';
+  };
 }
