@@ -52,7 +52,7 @@ type SettingsProps = {
   setSecurityOption: (value: SecurityType) => Promise<void>;
   setSelectServerOption: (value: string) => Promise<void>;
   setRescanMenuOption: (value: boolean) => Promise<void>;
-  set_recoveryWalletInfoOnDevice_option: (value: boolean) => Promise<void>;
+  setRecoveryWalletInfoOnDeviceOption: (value: boolean) => Promise<void>;
 };
 
 type Options = {
@@ -72,7 +72,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setSecurityOption,
   setSelectServerOption,
   setRescanMenuOption,
-  set_recoveryWalletInfoOnDevice_option,
+  setRecoveryWalletInfoOnDeviceOption,
   closeModal,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -402,7 +402,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       await setRescanMenuOption(rescanMenu);
     }
     if (recoveryWalletInfoOnDeviceContext !== recoveryWalletInfoOnDevice) {
-      await set_recoveryWalletInfoOnDevice_option(recoveryWalletInfoOnDevice);
+      await setRecoveryWalletInfoOnDeviceOption(recoveryWalletInfoOnDevice);
     }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server

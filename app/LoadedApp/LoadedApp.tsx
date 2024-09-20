@@ -419,6 +419,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       security: props.security,
       selectServer: props.selectServer,
       rescanMenu: props.rescanMenu,
+      recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
 
       // state
       appStateStatus: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
@@ -445,7 +446,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       somePending: false,
       scrollToTop: false,
       scrollToBottom: false,
-      recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
     };
 
     this.rpc = new RPC(
@@ -1309,7 +1309,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.rpc.fetchWalletSettings();
   };
 
-  set_recoveryWalletInfoOnDevice_option = async (value: boolean): Promise<void> => {
+  setRecoveryWalletInfoOnDeviceOption = async (value: boolean): Promise<void> => {
     await SettingsFileImpl.writeSettings(SettingsNameEnum.recoveryWalletInfoOnDevice, value);
     this.setState({
       recoveryWalletInfoOnDevice: value as boolean,
@@ -1728,7 +1728,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setSecurityOption={this.setSecurityOption}
               setSelectServerOption={this.setSelectServerOption}
               setRescanMenuOption={this.setRescanMenuOption}
-              set_recoveryWalletInfoOnDevice_option={this.set_recoveryWalletInfoOnDevice_option}
+              setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
             />
           </Modal>
 
