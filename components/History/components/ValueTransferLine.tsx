@@ -247,18 +247,18 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
           <FadeText>{month}</FadeText>
         </View>
       )}
-      <Swipeable
-        overshootLeft={false}
-        overshootRight={messagesAddress ? true : false}
-        overshootFriction={1}
-        renderRightActions={handleRenderRightActions}
-        renderLeftActions={handleRenderLeftActions}>
-        <TouchableOpacity
-          onPress={() => {
-            setValueTransferDetail(vt);
-            setValueTransferDetailIndex(index);
-            setValueTransferDetailModalShowing(true);
-          }}>
+      <TouchableOpacity
+        onPress={() => {
+          setValueTransferDetail(vt);
+          setValueTransferDetailIndex(index);
+          setValueTransferDetailModalShowing(true);
+        }}>
+        <Swipeable
+          overshootLeft={false}
+          overshootRight={messagesAddress ? true : false}
+          overshootFriction={1}
+          renderRightActions={handleRenderRightActions}
+          renderLeftActions={handleRenderLeftActions}>
           <View
             style={{
               display: 'flex',
@@ -350,8 +350,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               privacy={privacy}
             />
           </View>
-        </TouchableOpacity>
-      </Swipeable>
+        </Swipeable>
+      </TouchableOpacity>
     </View>
   );
 };

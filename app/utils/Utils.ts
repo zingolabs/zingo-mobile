@@ -368,4 +368,20 @@ export default class Utils {
     }
     return false;
   }
+
+  static messagesAddress = (vt: ValueTransferType) => {
+    if (vt.address) {
+      return vt.address;
+    } else {
+      const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
+      if (memoTotal.includes('\nReply to: \n')) {
+        let memoArray = memoTotal.split('\nReply to: \n');
+        const memoPoped = memoArray.pop();
+        if (memoPoped) {
+          return memoPoped;
+        }
+      }
+    }
+    return '';
+  };
 }

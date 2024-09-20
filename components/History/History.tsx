@@ -28,6 +28,7 @@ import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import { MessagesAddress } from '../Messages';
+import Utils from '../../app/utils';
 
 type HistoryProps = {
   doRefresh: () => void;
@@ -165,22 +166,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     setIsAtTop(isTop);
   };
 
-  const messagesAddress = (vt: ValueTransferType) => {
-    if (vt.address) {
-      return vt.address;
-    } else {
-      const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
-      if (memoTotal.includes('\nReply to: \n')) {
-        let memoArray = memoTotal.split('\nReply to: \n');
-        const memoPoped = memoArray.pop();
-        if (memoPoped) {
-          return memoPoped;
-        }
-      }
-    }
-    return '';
-  };
-
   //console.log('render History - 4');
 
   return (
@@ -230,7 +215,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             setShieldingAmount={setShieldingAmount}
             setScrollToBottom={setScrollToBottom}
             scrollToBottom={scrollToBottom}
-            address={messagesAddress(valueTransferDetail)}
+            address={Utils.messagesAddress(valueTransferDetail)}
             closeModal={() => setMessagesAddressModalShowing(false)}
             openModal={() => setMessagesAddressModalShowing(true)}
           />
