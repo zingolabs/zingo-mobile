@@ -75,7 +75,7 @@ import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
 import { RestoreFromTypeEnum } from '../AppState';
-import { createUpdateWalletKeys, getWalletKeys, hasWalletKeys } from '../WalletKeysSave';
+import { createUpdateRecoveryWalletInfo, getRecoveryWalletInfo, hasRecoveryWalletInfo } from '../recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
 import BoldText from '../../components/Components/BoldText';
@@ -131,6 +131,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
   const [donationAlert, setDonationAlert] = useState<boolean>(false);
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
+  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(true);
   const file = useMemo(
     () => ({
       en: en,
@@ -258,6 +259,11 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenu, rescanMenu);
       }
+      if (settings.recoveryWalletInfoOnDevice === true || settings.recoveryWalletInfoOnDevice === false) {
+        setRecoveryWalletInfoOnDevice(settings.recoveryWalletInfoOnDevice);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.recoveryWalletInfoOnDevice, recoveryWalletInfoOnDevice);
+      }
 
       // for testing
       //await delay(5000);
@@ -305,6 +311,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         selectServer={selectServer}
         donationAlert={donationAlert}
         rescanMenu={rescanMenu}
+        recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
       />
     );
   }
@@ -329,6 +336,7 @@ type LoadingAppClassProps = {
   selectServer: SelectServerEnum;
   donationAlert: boolean;
   rescanMenu: boolean;
+  recoveryWalletInfoOnDevice: boolean;
 };
 
 type LoadingAppClassState = AppStateLoading & AppContextLoading;
@@ -398,7 +406,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       serverErrorTries: 0,
       donationAlert: props.donationAlert,
       firstLaunchingMessage: props.firstLaunchingMessage,
-      hasWalletKeysStored: false,
+      recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
+      hasRecoveryWalletInfoSaved: false,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -454,8 +463,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     (async () => {
       // has the device the Wallet Keys stored?
-      const has = await hasWalletKeys(this.props.translate);
-      this.setState({ hasWalletKeysStored: has });
+      const has = await hasRecoveryWalletInfo(this.props.translate);
+      this.setState({ hasRecoveryWalletInfoSaved: has });
 
       // First, if it's server automatic
       // here I need to check the servers and select the best one
@@ -506,9 +515,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                   // 4. No keys - watch-only wallet (possibly an error)
 
                   // if the seed & birthday are not stored in Keychain/Keystore, do it now.
-                  if (walletKindJSON.kind === RPCWalletKindEnum.LoadedFromSeedPhrase ||  walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedSpendingKey) {
-                    const wallet: WalletType = await RPC.rpcFetchWallet(false);
-                    await createUpdateWalletKeys(wallet, this.props.translate);
+                  if (this.state.recoveryWalletInfoOnDevice) {
+                    if (walletKindJSON.kind === RPCWalletKindEnum.LoadedFromSeedPhrase ||  walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedSpendingKey) {
+                      const wallet: WalletType = await RPC.rpcFetchWallet(false);
+                      await createUpdateRecoveryWalletInfo(wallet, this.props.translate);
+                    }
                   }
                   this.setState({
                     readOnly:
@@ -557,8 +568,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         if (this.state.mode === ModeEnum.basic) {
           // but first we need to check if exists some seed stored in the device from a prior installation
           // of Zingo.
-          if (this.state.hasWalletKeysStored) {
-            this.recoverWalletKeys(false);
+          if (this.state.hasRecoveryWalletInfoSaved) {
+            this.recoverRecoveryWalletInfo(false);
             await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
             this.setState({
               screen: 1,
@@ -911,7 +922,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         // default values for wallet options
         this.setWalletOption(WalletOptionEnum.downloadMemos, DownloadMemosEnum.walletMemos);
         // storing the seed & birthday in KeyChain/KeyStore
-        await createUpdateWalletKeys(wallet, this.props.translate);
+        if (this.state.recoveryWalletInfoOnDevice) {
+          await createUpdateRecoveryWalletInfo(wallet, this.props.translate);
+        }
         // basic mode -> same screen.
         this.setState(state => ({
           wallet,
@@ -1010,8 +1023,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           const resultJson: RPCSeedType = await JSON.parse(result);
           if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
             // storing the seed/ufvk & birthday in KeyChain/KeyStore
-            if (wallet.seed) {
-              await createUpdateWalletKeys(wallet, this.props.translate);
+            if (this.state.recoveryWalletInfoOnDevice) {
+              if (wallet.seed) {
+                await createUpdateRecoveryWalletInfo(wallet, this.props.translate);
+              }
             }
             this.setState({
               actionButtonsDisabled: false,
@@ -1086,7 +1101,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.componentDidMount();
   };
 
-  recoverWalletKeys = async (security: boolean) => {
+  recoverRecoveryWalletInfo = async (security: boolean) => {
     const resultBio = security ? await simpleBiometrics({ translate: this.props.translate }) : true;
     // can be:
     // - true      -> the user do pass the authentication
@@ -1098,7 +1113,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       this.addLastSnackbar({ message: this.props.translate('biometrics-error') as string });
     } else {
       // recover the wallet keys from the device
-      const wallet = await getWalletKeys(this.props.translate);
+      const wallet = await getRecoveryWalletInfo(this.props.translate);
       const txt = wallet.seed + '\n\n' + wallet.birthday;
       Alert.alert(
         this.props.translate('loadedapp.walletseed-basic') as string,
@@ -1137,7 +1152,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       firstLaunchingMessage,
       biometricsFailed,
       translate,
-      hasWalletKeysStored,
+      hasRecoveryWalletInfoSaved,
     } = this.state;
     const { colors } = this.props.theme;
 
@@ -1212,7 +1227,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                         buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
                         options={
-                          hasWalletKeysStored
+                          hasRecoveryWalletInfoSaved
                             ? [
                                 translate('loadingapp.recoverseed'),
                                 translate('loadingapp.advancedmode'),
@@ -1221,8 +1236,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                             : [translate('loadingapp.advancedmode'), translate('cancel')]
                         }
                         actions={
-                          hasWalletKeysStored
-                            ? [() => this.recoverWalletKeys(true), () => this.changeMode(ModeEnum.advanced)]
+                          hasRecoveryWalletInfoSaved
+                            ? [() => this.recoverRecoveryWalletInfo(true), () => this.changeMode(ModeEnum.advanced)]
                             : [() => this.changeMode(ModeEnum.advanced)]
                         }
                       />
@@ -1232,13 +1247,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                         buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
                         options={
-                          hasWalletKeysStored
+                          hasRecoveryWalletInfoSaved
                             ? [translate('loadingapp.recoverseed'), translate('loadingapp.custom'), translate('cancel')]
                             : [translate('loadingapp.custom'), translate('cancel')]
                         }
                         actions={
-                          hasWalletKeysStored
-                            ? [() => this.recoverWalletKeys(true), this.customServer]
+                          hasRecoveryWalletInfoSaved
+                            ? [() => this.recoverRecoveryWalletInfo(true), this.customServer]
                             : [this.customServer]
                         }
                       />

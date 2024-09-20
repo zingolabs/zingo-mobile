@@ -49,7 +49,8 @@ export const defaultAppContextLoading: AppContextLoading = {
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
   rescanMenu: false,
-  hasWalletKeysStored: false,
+  recoveryWalletInfoOnDevice: true,
+  hasRecoveryWalletInfoSaved: false,
 };
 
 export const ContextAppLoading = React.createContext(defaultAppContextLoading);

@@ -15,7 +15,8 @@ export default interface AppStateLoading {
   serverErrorTries: number;
   donationAlert: boolean;
   firstLaunchingMessage: boolean;
-  hasWalletKeysStored: boolean;
+  recoveryWalletInfoOnDevice: boolean;
+  hasRecoveryWalletInfoSaved: boolean;
 
   // eslint-disable-next-line semi
 }

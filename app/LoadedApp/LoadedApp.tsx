@@ -83,6 +83,7 @@ import { AddressBook } from '../../components/AddressBook';
 import { AddressBookFileImpl } from '../../components/AddressBook';
 import simpleBiometrics from '../simpleBiometrics';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
+import { createUpdateRecoveryWalletInfo, removeRecoveryWalletInfo } from '../recoveryWalletInfo';
 
 import History from '../../components/History';
 import Send from '../../components/Send';
@@ -146,6 +147,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   });
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
+  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(true);
   const file = useMemo(
     () => ({
       en: en,
@@ -257,6 +259,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenu, rescanMenu);
       }
+      if (settings.recoveryWalletInfoOnDevice === true || settings.recoveryWalletInfoOnDevice === false) {
+        setRecoveryWalletInfoOnDevice(settings.recoveryWalletInfoOnDevice);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.recoveryWalletInfoOnDevice, recoveryWalletInfoOnDevice);
+      }
 
       // reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
@@ -309,6 +316,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         security={security}
         selectServer={selectServer}
         rescanMenu={rescanMenu}
+        recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
       />
     );
   }
@@ -353,6 +361,7 @@ type LoadedAppClassProps = {
   security: SecurityType;
   selectServer: SelectServerEnum;
   rescanMenu: boolean;
+  recoveryWalletInfoOnDevice: boolean;
 };
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
@@ -436,6 +445,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       somePending: false,
       scrollToTop: false,
       scrollToBottom: false,
+      recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
     };
 
     this.rpc = new RPC(
@@ -1299,6 +1309,23 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.rpc.fetchWalletSettings();
   };
 
+  set_recoveryWalletInfoOnDevice_option = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.recoveryWalletInfoOnDevice, value);
+    this.setState({
+      recoveryWalletInfoOnDevice: value as boolean,
+    });
+
+    if (!value) {
+      await removeRecoveryWalletInfo(this.props.translate);
+    } else {
+      const wallet: WalletType = await RPC.rpcFetchWallet(this.state.readOnly);
+      await createUpdateRecoveryWalletInfo(wallet, this.props.translate);
+    }
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
   navigateToLoadingApp = async (state: any) => {
     const { navigation } = this.state;
 
@@ -1700,6 +1727,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setSecurityOption={this.setSecurityOption}
               setSelectServerOption={this.setSelectServerOption}
               setRescanMenuOption={this.setRescanMenuOption}
+              set_recoveryWalletInfoOnDevice_option={this.set_recoveryWalletInfoOnDevice_option}
             />
           </Modal>
 

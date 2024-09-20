@@ -257,6 +257,16 @@
         "text": "Desactivar/Ocultar la opción de menú para re-escanear el monedero."
       }
     ],
+    "recoverywalletinfoondevices": [
+      {
+        "value": true,
+        "text": "Hacer copia de seguridad de la Semilla/Cumpleaños del monedero en el dispositivo."
+      },
+      {
+        "value": false,
+        "text": "No guardar absolutamente nada en el dispositivo referente al monedero."
+      }
+    ],
     "nochanges": "No se han registrado cambios.",
     "ismemo": "Necesitas escoger una opción de Memos para poder guardar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder guardar.",
@@ -287,6 +297,7 @@
     "privacy-title": "Cambiar entre Alta Privacidad o Normal",
     "mode-title": "Cambiar entre Modo Básico o Avanzado",
     "rescanmenu-title": "LA OPCIÓN DE MENU RE-ESCANEAR",
+    "recoverywalletinfoondevice-title": "Almacenar la información de recuperacion del monedero en el dispositivo",
     "value-currency-": "Sin moneda",
     "value-currency-USD": "US Dólares",
     "value-language-en": "Inglés",
@@ -307,6 +318,8 @@
     "value-chainname-regtest": "Regtest",
     "value-rescanmenu-true": "Activar",
     "value-rescanmenu-false": "Desactivar",
+    "value-recoverywalletinfoondevice-true": "Activar",
+    "value-recoverywalletinfoondevice-false": "Desactivar",
     "security-title": "USAR LA SEGURIDAD DEL DISPOSITIVO",
     "security-startapp": "Al inicar la aplicación",
     "security-foregroundapp": "Aplicación va a Primer Plano",
@@ -329,7 +342,7 @@
     "uk": "Reino Unido",
     "select-placeholder": "Elige un Servidor...",
     "value-language-ru": "Ruso",
-    "walletkeyssaved": "La Semilla del Monedero almacenada de forma segura en el dispositivo."
+    "walletkeyssaved": "La ultima información de recuperacion del Monedero almacenada de forma segura en el dispositivo."
   },
   "info": {
     "version": "Versión",
