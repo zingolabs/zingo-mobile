@@ -80,8 +80,9 @@ RUN mkdir x86 \
     && mkdir aarch64 \
     && mkdir armv7 \
     && mkdir x86_64
-# -mno-outline-atomics removed
+
 RUN ./Configure --prefix=/opt/openssl-3.3.1/aarch64 android-arm64 \
+    -mno-outline-atomics \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
