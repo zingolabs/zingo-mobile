@@ -1,0 +1,457 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component Messages Address - test Messages Address - snapshot 1`] = `
+<RCTSafeAreaView
+  style={
+    {
+      "alignItems": "stretch",
+      "backgroundColor": "#011401",
+      "display": "flex",
+      "height": "100%",
+      "justifyContent": "flex-start",
+    }
+  }
+>
+  <View
+    accessibilityLabel="text translated"
+    accessible={true}
+    style={
+      {
+        "display": "flex",
+        "height": "90%",
+        "justifyContent": "flex-start",
+        "width": "100%",
+      }
+    }
+  >
+    <Modal
+      animationType="slide"
+      hardwareAccelerated={false}
+      onRequestClose={[Function]}
+      transparent={false}
+      visible={false}
+    />
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#011401",
+          "display": "flex",
+          "paddingBottom": 0,
+          "paddingTop": 10,
+          "zIndex": -1,
+        }
+      }
+      testID="header"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "flexWrap": "wrap",
+            "height": 40,
+            "justifyContent": "center",
+            "marginHorizontal": 5,
+            "marginTop": 12,
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "height": 20,
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "column",
+            "flexWrap": "wrap",
+            "justifyContent": "center",
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#ffffff",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "marginBottom": 3,
+              "opacity": 1,
+              "paddingHorizontal": 5,
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "flex-start",
+            "left": 0,
+            "padding": 11.5,
+            "position": "absolute",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "flex-end",
+            "padding": 15,
+            "position": "absolute",
+            "right": 0,
+          }
+        }
+      >
+        <Image
+          source={
+            {
+              "testUri": "../../../assets/img/logobig-zingo.png",
+            }
+          }
+          style={
+            {
+              "borderRadius": 10,
+              "height": 38,
+              "resizeMode": "contain",
+              "width": 38,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "#18bd18",
+            "height": 1,
+            "width": "100%",
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "display": "flex",
+          "marginHorizontal": 10,
+          "marginVertical": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "flex-start",
+            "display": "flex",
+            "flexDirection": "row",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "flex-start",
+              "display": "flex",
+              "flexDirection": "column",
+              "marginRight": 10,
+            }
+          }
+        >
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "display": "flex",
+                  "flexDirection": "column",
+                  "flexWrap": "wrap",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "fontSize": 18,
+                    "fontWeight": "600",
+                    "opacity": 1,
+                  }
+                }
+              >
+                UA-1234...4567890
+              </Text>
+            </View>
+          </View>
+        </View>
+        <View
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderColor": "#18bd18",
+                "borderRadius": 5,
+                "borderWidth": 1,
+                "flexDirection": "row",
+                "justifyContent": "center",
+                "paddingBottom": 2,
+                "paddingHorizontal": 4,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "#ffffff",
+                  "fontSize": 13,
+                }
+              }
+            >
+              text translated
+            </Text>
+            <
+              color="#18bd18"
+              icon={
+                {
+                  "icon": [
+                    576,
+                    512,
+                    [
+                      62140,
+                      "contact-card",
+                      "vcard",
+                    ],
+                    "f2bb",
+                    "M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H512c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm80 256h64c44.2 0 80 35.8 80 80c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16c0-44.2 35.8-80 80-80zm-32-96a64 64 0 1 1 128 0 64 64 0 1 1 -128 0zm256-32H496c8.8 0 16 7.2 16 16s-7.2 16-16 16H368c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H496c8.8 0 16 7.2 16 16s-7.2 16-16 16H368c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H496c8.8 0 16 7.2 16 16s-7.2 16-16 16H368c-8.8 0-16-7.2-16-16s7.2-16 16-16z",
+                  ],
+                  "iconName": "address-card",
+                  "prefix": "fas",
+                }
+              }
+              size={20}
+              style={
+                {
+                  "marginTop": 3,
+                }
+              }
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+    <ActivityIndicator
+      color="#18bd18"
+      size="large"
+      style={
+        {
+          "marginVertical": 20,
+        }
+      }
+    />
+    <RCTScrollView
+      accessibilityLabel="text translated"
+      accessible={true}
+      onContentSizeChange={[Function]}
+      onLayout={[Function]}
+      onScroll={[Function]}
+      refreshControl={
+        <RefreshControlMock
+          onRefresh={[MockFunction]}
+          refreshing={false}
+          tintColor="#c3c3c3"
+          title="text translated"
+        />
+      }
+      scrollEventThrottle={100}
+      style={
+        {
+          "flexGrow": 1,
+          "marginTop": 10,
+          "opacity": 0,
+          "width": "100%",
+        }
+      }
+    >
+      <RCTRefreshControl />
+      <View>
+        <View
+          style={
+            {
+              "marginBottom": 30,
+            }
+          }
+        />
+      </View>
+    </RCTScrollView>
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "flexGrow": 1,
+        "justifyContent": "center",
+        "margin": 10,
+      }
+    }
+  >
+    <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#011401",
+          "borderColor": "#18bd18",
+          "borderRadius": 10,
+          "borderWidth": 2,
+          "justifyContent": "center",
+          "maxWidth": "90%",
+          "minHeight": 48,
+          "minWidth": "30%",
+          "opacity": 1,
+          "padding": 0,
+          "paddingLeft": 20,
+          "paddingRight": 20,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "margin": 0,
+            "minHeight": 48,
+            "minWidth": 48,
+            "padding": 0,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "fontSize": 16,
+              "fontWeight": "bold",
+              "textAlign": "center",
+              "textTransform": "uppercase",
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+    </View>
+  </View>
+</RCTSafeAreaView>
+`;

@@ -1,10 +1,8 @@
 import { Base64 } from 'js-base64';
 import Url from 'url-parse';
-import RPCModule from '../RPCModule';
-import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 import ZcashURITargetClass from './classes/ZcashURITargetClass';
-import { CommandEnum, ServerType, TranslateType, GlobalConst } from '../AppState';
-import { RPCParseStatusEnum } from '../rpc/enums/RPCParseStatusEnum';
+import { ServerType, TranslateType, GlobalConst } from '../AppState';
+import Utils from '../utils';
 
 const parseZcashURI = async (
   uri: string,
@@ -28,26 +26,9 @@ const parseZcashURI = async (
   //console.log(address);
 
   if (address) {
-    const resultParse: string = await RPCModule.execute(CommandEnum.parseAddress, address);
-    if (resultParse) {
-      if (resultParse.toLowerCase().startsWith(GlobalConst.error) || resultParse.toLowerCase() === 'null') {
-        return translate('uris.parseerror') as string;
-      }
-    } else {
-      return translate('uris.parseerror') as string;
-    }
-    //console.log(resultParse);
-    let resultParseJSON = {} as RPCParseAddressType;
-    try {
-      resultParseJSON = await JSON.parse(resultParse);
-    } catch (e) {
-      return translate('uris.parseerror') as string;
-    }
+    const validAddress: boolean = await Utils.isValidAdress(address, server.chainName);
 
-    const validParse =
-      resultParseJSON.status === RPCParseStatusEnum.successParse && server.chainName === resultParseJSON.chain_name;
-
-    if (address && !validParse) {
+    if (!validAddress) {
       return `"${address || ''}" ${translate('uris.notvalid')}`;
     }
   }
@@ -88,25 +69,9 @@ const parseZcashURI = async (
         if (typeof target.address !== 'undefined') {
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
-        const result: string = await RPCModule.execute(CommandEnum.parseAddress, value);
-        if (result) {
-          if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
-            return translate('uris.notvalid') as string;
-          }
-        } else {
-          return translate('uris.parseerror') as string;
-        }
-        let resultJSON = {} as RPCParseAddressType;
-        try {
-          resultJSON = await JSON.parse(result);
-        } catch (e) {
-          return translate('uris.parseerror') as string;
-        }
+        const validAddress: boolean = await Utils.isValidAdress(value, server.chainName);
 
-        const valid =
-          resultJSON.status === RPCParseStatusEnum.successParse && server.chainName === resultJSON.chain_name;
-
-        if (!valid) {
+        if (!validAddress) {
           return `"${value}" ${translate('uris.notvalid')}`;
         }
         target.address = value;

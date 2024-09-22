@@ -6,7 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import History from '../components/History';
+import { MessagesAddress } from '../components/Messages';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
 import { CurrencyEnum, ModeEnum } from '../app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
@@ -62,33 +62,11 @@ jest.mock('moment/locale/ru', () => () => ({
 
 jest.mock('react-native-gesture-handler', () => {
   const View = require('react-native').View;
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNGestureHandlerModule = {
-    attachGestureHandler: jest.fn(),
-    createGestureHandler: jest.fn(),
-    dropGestureHandler: jest.fn(),
-    updateGestureHandler: jest.fn(),
-    forceTouchAvailable: jest.fn(),
-    State: {},
-    Directions: {},
-  };
   return {
     TouchableOpacity: View,
     Swipeable: View,
-    RNGestureHandlerModule: RN,
   };
 });
-jest.mock('@react-native-community/netinfo', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNCNetInfo = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
-
 jest.mock('@react-native-community/netinfo', () => {
   const RN = jest.requireActual('react-native');
 
@@ -113,7 +91,7 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 // test suite
-describe('Component History - test', () => {
+describe('Component Messages Address - test', () => {
   //snapshot test
   const state = defaultAppContextLoaded;
   state.valueTransfers = mockValueTransfers;
@@ -124,16 +102,16 @@ describe('Component History - test', () => {
   state.totalBalance = mockTotalBalance;
   const onFunction = jest.fn();
 
-  test('History no currency, privacy normal & mode basic - snapshot', () => {
+  test('Messages Address - snapshot', () => {
     // no currency
     state.currency = CurrencyEnum.noCurrency;
     // privacy normal
     state.privacy = false;
     // mode basic
     state.mode = ModeEnum.basic;
-    const history = render(
+    const messages = render(
       <ContextAppLoadedProvider value={state}>
-        <History
+        <MessagesAddress
           doRefresh={onFunction}
           toggleMenuDrawer={onFunction}
           poolsMoreInfoOnClick={onFunction}
@@ -143,42 +121,14 @@ describe('Component History - test', () => {
           setPrivacyOption={onFunction}
           setSendPageState={onFunction}
           setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          scrollToTop={false}
           setScrollToBottom={onFunction}
           scrollToBottom={false}
+          address={mockAddresses[0].uaAddress}
+          closeModal={onFunction}
+          openModal={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
-    expect(history.toJSON()).toMatchSnapshot();
-  });
-
-  test('History currency USD, privacy high & mode advanced - snapshot', () => {
-    // no currency
-    state.currency = CurrencyEnum.USDCurrency;
-    // privacy normal
-    state.privacy = true;
-    // mode basic
-    state.mode = ModeEnum.advanced;
-    const history = render(
-      <ContextAppLoadedProvider value={state}>
-        <History
-          doRefresh={onFunction}
-          toggleMenuDrawer={onFunction}
-          poolsMoreInfoOnClick={onFunction}
-          syncingStatusMoreInfoOnClick={onFunction}
-          setZecPrice={onFunction}
-          setComputingModalVisible={onFunction}
-          setPrivacyOption={onFunction}
-          setSendPageState={onFunction}
-          setShieldingAmount={onFunction}
-          setScrollToTop={onFunction}
-          scrollToTop={false}
-          setScrollToBottom={onFunction}
-          scrollToBottom={false}
-        />
-      </ContextAppLoadedProvider>,
-    );
-    expect(history.toJSON()).toMatchSnapshot();
+    expect(messages.toJSON()).toMatchSnapshot();
   });
 });

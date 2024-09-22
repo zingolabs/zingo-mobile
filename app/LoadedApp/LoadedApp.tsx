@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faList, faUpload, faDownload, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faList, faUpload, faDownload, faCog, faComments } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
 import SideMenu from 'react-native-side-menu-updated';
 import { I18n } from 'i18n-js';
@@ -72,15 +72,15 @@ import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider } from '../context';
 import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
-import BackgroundFileImpl from '../../components/Background/BackgroundFileImpl';
+import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
 import { sendEmail } from '../sendEmail';
 import Snackbars from '../../components/Components/Snackbars';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
-import AddressBook from '../../components/AddressBook/AddressBook';
-import AddressBookFileImpl from '../../components/AddressBook/AddressBookFileImpl';
+import { AddressBook } from '../../components/AddressBook';
+import { AddressBookFileImpl } from '../../components/AddressBook';
 import simpleBiometrics from '../simpleBiometrics';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
 
@@ -89,6 +89,7 @@ import Send from '../../components/Send';
 import Receive from '../../components/Receive';
 import Settings from '../../components/Settings';
 import Menu from './components/Menu';
+import { Messages } from '../../components/Messages';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -434,6 +435,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       newServer: {} as ServerType,
       somePending: false,
       scrollToTop: false,
+      scrollToBottom: false,
     };
 
     this.rpc = new RPC(
@@ -795,7 +797,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
                   ' ' +
                   this.state.info.currencyName;
-                title = this.state.translate('loadedapp.uas-menu') as string;
+                title = this.state.translate('loadedapp.receive-menu') as string;
               } else if (vtNew[0].kind === ValueTransferKindEnum.MemoToSelf) {
                 message =
                   (this.state.translate('loadedapp.valuetransfer-confirmed') as string) +
@@ -828,7 +830,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   Utils.parseNumberFloatToStringLocale(vtNew[0].amount, 8) +
                   ' ' +
                   this.state.info.currencyName;
-                title = this.state.translate('loadedapp.uas-menu') as string;
+                title = this.state.translate('loadedapp.receive-menu') as string;
               } else {
                 message =
                   (this.state.translate('loadedapp.payment-made') as string) +
@@ -1482,6 +1484,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
   };
 
+  setScrollToBottom = (value: boolean) => {
+    this.setState({
+      scrollToBottom: value,
+    });
+  };
+
   render() {
     const {
       aboutModalVisible,
@@ -1509,6 +1517,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       totalBalance,
       translate,
       scrollToTop,
+      scrollToBottom,
       addresses,
     } = this.state;
     const { colors } = this.props.theme;
@@ -1562,12 +1571,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     const fnTabBarIcon = (route: StackScreenProps<any>['route'], focused: boolean) => {
       var iconName;
 
-      if (route.name === translate('loadedapp.wallet-menu')) {
+      if (route.name === translate('loadedapp.history-menu')) {
         iconName = faList;
       } else if (route.name === translate('loadedapp.send-menu')) {
         iconName = faUpload;
-      } else if (route.name === translate('loadedapp.uas-menu')) {
+      } else if (route.name === translate('loadedapp.receive-menu')) {
         iconName = faDownload;
+      } else if (route.name === translate('loadedapp.messages-menu')) {
+        iconName = faComments;
       } else {
         iconName = faCog;
       }
@@ -1846,7 +1857,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           (!!valueTransfers && valueTransfers.length > 0) ||
           (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
             <Tab.Navigator
-              initialRouteName={translate('loadedapp.wallet-menu') as string}
+              initialRouteName={translate('loadedapp.history-menu') as string}
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
                 tabBarLabelPosition: 'below-icon',
@@ -1861,7 +1872,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 },
                 headerShown: false,
               })}>
-              <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
+              <Tab.Screen name={translate('loadedapp.history-menu') as string}>
                 {() => (
                   <History
                     doRefresh={this.doRefresh}
@@ -1876,6 +1887,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     setShieldingAmount={this.setShieldingAmount}
                     setScrollToTop={this.setScrollToTop}
                     scrollToTop={scrollToTop}
+                    setScrollToBottom={this.setScrollToBottom}
+                    scrollToBottom={scrollToBottom}
                   />
                 )}
               </Tab.Screen>
@@ -1897,11 +1910,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                         setPrivacyOption={this.setPrivacyOption}
                         setShieldingAmount={this.setShieldingAmount}
                         setScrollToTop={this.setScrollToTop}
+                        setScrollToBottom={this.setScrollToBottom}
                       />
                     )}
                   </Tab.Screen>
                 )}
-              <Tab.Screen name={translate('loadedapp.uas-menu') as string}>
+              <Tab.Screen name={translate('loadedapp.receive-menu') as string}>
                 {() => (
                   <Receive
                     setUaAddress={this.setUaAddress}
@@ -1912,6 +1926,24 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   />
                 )}
               </Tab.Screen>
+              <Tab.Screen name={translate('loadedapp.messages-menu') as string}>
+                {() => (
+                  <Messages
+                    doRefresh={this.doRefresh}
+                    toggleMenuDrawer={this.toggleMenuDrawer}
+                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
+                    poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
+                    setZecPrice={this.setZecPrice}
+                    setComputingModalVisible={this.setComputingModalVisible}
+                    setPrivacyOption={this.setPrivacyOption}
+                    setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                    setSendPageState={this.setSendPageState}
+                    setShieldingAmount={this.setShieldingAmount}
+                    setScrollToBottom={this.setScrollToBottom}
+                    scrollToBottom={scrollToBottom}
+                  />
+                )}
+              </Tab.Screen>
             </Tab.Navigator>
           ) : (
             <>
@@ -1919,7 +1951,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 <Loading backgroundColor={colors.background} spinColor={colors.primary} />
               ) : (
                 <Tab.Navigator
-                  initialRouteName={translate('loadedapp.wallet-menu') as string}
+                  initialRouteName={translate('loadedapp.history-menu') as string}
                   screenOptions={{
                     tabBarStyle: {
                       borderTopColor: colors.background,
@@ -1928,7 +1960,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     },
                     headerShown: false,
                   }}>
-                  <Tab.Screen name={translate('loadedapp.wallet-menu') as string}>
+                  <Tab.Screen name={translate('loadedapp.history-menu') as string}>
                     {() => (
                       <Receive
                         setUaAddress={this.setUaAddress}
