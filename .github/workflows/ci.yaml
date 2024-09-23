@@ -51,6 +51,13 @@ jobs:
   #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
   #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
 
+  android-ubuntu-integration-test-actions:
+    uses: ./.github/workflows/android-ubuntu-integration-test-actions.yaml
+    needs: [create-timestamp, android-build]
+    with:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+
   android-macos-integration-test:
     strategy:
       matrix:
@@ -61,13 +68,6 @@ jobs:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: ${{ matrix.abi }}
-
-  android-ubuntu-integration-test-actions:
-    uses: ./.github/workflows/android-ubuntu-integration-test-actions.yaml
-    needs: [android-test]
-    with:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
 
   ios-build:
     uses: ./.github/workflows/ios-build.yaml
