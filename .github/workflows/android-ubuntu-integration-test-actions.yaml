@@ -9,9 +9,17 @@ on:
       cache-key:
         required: true
         type: string
+      abi:
+        required: true
+        type: string
+      api-level:
+        required: true
+        type: string
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
+  ABI: ${{ inputs.abi }}
+  API-LEVEL: ${{ inputs.api-level }}
 
 jobs:
   android-ubuntu-integration-test-actions:
@@ -19,9 +27,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        include:
-          - arch: x86_64
-            api-level: 30
+        test: ["OfflineTestSuite", "ExecuteSyncFromSeed", "ExecuteSendFromOrchard", "UpdateCurrentPriceAndValueTransfersFromSeed", "ExecuteSaplingBalanceFromSeed"]
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
@@ -73,15 +79,15 @@ jobs:
       - name: Native rust cache
         uses: actions/cache/restore@v4
         with:
-          path: android/app/src/main/jniLibs/${{ matrix.arch }}
-          key: native-android-uniffi-${{ matrix.arch }}-${{ env.CACHE-KEY }}
+          path: android/app/src/main/jniLibs/${{ env.ABI }}
+          key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
 
       - name: Kotlin uniffi cache
         uses: actions/cache/restore@v4
         with:
           path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
-          key: kotlin-android-uniffi-${{ matrix.arch }}-${{ env.CACHE-KEY }}
+          key: kotlin-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
           fail-on-cache-miss: true
 
       - name: Restore AVD cache
@@ -91,14 +97,14 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-integ
+          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ matrix.api-level }}
-          arch: ${{ matrix.arch }}
+          api-level: ${{ env.API-LEVEL }}
+          arch: ${{ env.ABI }}
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
@@ -112,7 +118,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.arch }}-api-${{ matrix.api-level }}-integ
+          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
 
       - name: Yarn install
         run: yarn
@@ -124,14 +130,14 @@ jobs:
       - name: Yarn Start
         run: nohup yarn start > "yarn_react_native_start.out" &
 
-      - name: Run Detox Test
+      - name: Run INtegration Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ matrix.api-level }}
-          arch: ${{ matrix.arch }}
+          api-level: ${{ env.API-LEVEL }}
+          arch: ${{ env.ABI }}
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: |
-            adb -s emulator-5554 install-multi-package -r -t -d --abi ${{ matrix.arch }} "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" "android/app/build/outputs/apk/debug/app-${{ matrix.arch }}-debug.apk"
-            adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.OfflineTestSuite -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner
+            adb -s emulator-5554 install-multi-package -r -t -d --abi ${{ env.ABI }} "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" "android/app/build/outputs/apk/debug/app-${{ matrix.arch }}-debug.apk"
+            adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.${{ matrix.test }} -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner
