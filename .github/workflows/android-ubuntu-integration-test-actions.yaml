@@ -140,4 +140,10 @@ jobs:
           disable-animations: true
           script: |
             adb -s emulator-5554 install-multi-package -r -t -d --abi ${{ env.ABI }} "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" "android/app/build/outputs/apk/debug/app-${{ env.ABI }}-debug.apk"
-            adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.${{ matrix.test }} -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner
+            adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.${{ matrix.test }} -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner | tee "android/app/build/outputs/integration_test_reports/${{ env.ABI }}/test_results.txt"
+            if [[ $(cat "android/app/build/outputs/integration_test_reports/${{ env.ABI }}/test_results.txt" | grep INSTRUMENTATION_CODE | cut -d' ' -f2) -ne -1 || \
+                $(cat "android/app/build/outputs/integration_test_reports/${{ env.ABI }}/test_results.txt" | grep 'FAILURES!!!') ]]; then
+              echo -e "\nIntegration tests FAILED"
+              exit 1
+            fi
+            exit 0
