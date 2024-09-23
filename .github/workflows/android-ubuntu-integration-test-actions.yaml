@@ -24,7 +24,6 @@ jobs:
             api-level: 30
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
-    continue-on-error: true
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -134,8 +133,5 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: |
-            adb -s emulator-5554 install-multi-package -r -t -d --abi ${{ matrix.arch }} \
-                "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
-                "android/app/build/outputs/apk/debug/app-${{ matrix.arch }}-debug.apk"
-            adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.OfflineTestSuite \
-            -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner \
+            adb -s emulator-5554 install-multi-package -r -t -d --abi ${{ matrix.arch }} "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" "android/app/build/outputs/apk/debug/app-${{ matrix.arch }}-debug.apk"
+            adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.OfflineTestSuite -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner
