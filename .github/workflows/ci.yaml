@@ -61,7 +61,7 @@ jobs:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: ${{ matrix.abi }}
-      api-level: 30
+      api-level: 29
 
   #android-macos-integration-test:
   #  strategy:
