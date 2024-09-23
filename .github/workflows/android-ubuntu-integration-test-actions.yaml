@@ -24,7 +24,7 @@ env:
 jobs:
   android-ubuntu-integration-test-actions:
     name: Android Ubuntu Integration test
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         test: ["OfflineTestSuite", "ExecuteSyncFromSeed", "ExecuteSendFromOrchard", "UpdateCurrentPriceAndValueTransfersFromSeed", "ExecuteSaplingBalanceFromSeed"]
