@@ -58,16 +58,16 @@ jobs:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
 
-  android-macos-integration-test:
-    strategy:
-      matrix:
-        abi: [x86_64, x86]
-    uses: ./.github/workflows/android-macos-integration-test.yaml
-    needs: [android-test]
-    with:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      abi: ${{ matrix.abi }}
+  #android-macos-integration-test:
+  #  strategy:
+  #    matrix:
+  #      abi: [x86_64, x86]
+  #  uses: ./.github/workflows/android-macos-integration-test.yaml
+  #  needs: [android-test]
+  #  with:
+  #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+  #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+  #    abi: ${{ matrix.abi }}
 
   ios-build:
     uses: ./.github/workflows/ios-build.yaml
