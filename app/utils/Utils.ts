@@ -330,7 +330,7 @@ export default class Utils {
 
   static async isValidOrchardOrSaplingAddress(address: string, serverChainName: string): Promise<boolean> {
     const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
-    console.log(result);
+    //console.log(result);
     if (result) {
       if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
         return false;
