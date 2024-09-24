@@ -20,6 +20,7 @@ env:
   REPO-OWNER: ${{ github.repository_owner }}
   ABI: ${{ inputs.abi }}
   API-LEVEL: ${{ inputs.api-level }}
+  TIMESTAMP: ${{ inputs.timestamp }}
 
 jobs:
   android-ubuntu-integration-test-actions:
@@ -106,7 +107,7 @@ jobs:
           api-level: ${{ env.API-LEVEL }}
           arch: ${{ env.ABI }}
           force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
@@ -139,7 +140,8 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: |
-            sudo ./scripts/integration_tests_actions.sh -a ${{ env.ABI }} -l ${{ env.API-LEVEL }}
+            sudo integration_tests_actions.sh -a ${{ env.ABI }} -l ${{ env.API-LEVEL }}
+          working-directory: ${{ github.workspace }}/scripts
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
