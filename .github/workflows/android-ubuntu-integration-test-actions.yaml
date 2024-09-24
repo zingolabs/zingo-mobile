@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        test: ["OfflineTestSuite", "ExecuteSyncFromSeed", "ExecuteSendFromOrchard", "UpdateCurrentPriceAndValueTransfersFromSeed", "ExecuteSaplingBalanceFromSeed"]
+        test: ["offline_testsuite", "execute_sync_from_seed", "execute_send_from_orchard", "execute_currentprice_and_value_transfers_from_seed", "execute_sapling_balance_from_seed"]
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
