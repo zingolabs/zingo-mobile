@@ -41,6 +41,30 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
+      - name: Set envs for x86_64
+        if: ${{ env.ABI == 'x86_64' }}
+        run: |
+          echo "AVD-ARCH=x86_64" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=x86_64" >> $GITHUB_ENV
+
+      - name: Set envs for x86
+        if: ${{ env.ABI == 'x86' }}
+        run: |
+          echo "AVD-ARCH=x86" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=x86_32" >> $GITHUB_ENV
+
+      - name: Set envs for arm64-v8a
+        if: ${{ env.ABI == 'arm64-v8a' }}
+        run: |
+          echo "AVD-ARCH=x86_64" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=arm64" >> $GITHUB_ENV
+
+      - name: Set envs for armeabi-v7a
+        if: ${{ env.ABI == 'armeabi-v7a' }}
+        run: |
+          echo "AVD-ARCH=x86" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
+
       - name: Remove unnecessary directories to free up space
         run: |
           echo "Disk space before post-build cleanup:"
@@ -122,7 +146,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ env.API-LEVEL }}
-          arch: ${{ env.ABI }}
+          arch: ${{ env.AVD-ARCH }}
           force-avd-creation: false
           emulator-options: -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
@@ -152,12 +176,12 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ env.API-LEVEL }}
-          arch: ${{ env.ABI }}
+          arch: ${{ env.AVD-ARCH }}
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           #script: bash ./scripts/integration_tests_actions.sh -a ${{ env.ABI }}
-          script: cargo nextest run ${{ env.ABI }}::${{ matrix.test }} --features "ci regchest actions" --verbose
+          script: cargo nextest run ${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci regchest actions" --verbose
           working-directory: ./rust
 
       - name: Upload test reports
