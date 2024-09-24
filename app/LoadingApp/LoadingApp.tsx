@@ -432,6 +432,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     this.setState({ actionButtonsDisabled: true });
 
+    // The App needs to set the crypto Provider by default to ring
+    // before anything...
+    const r = await RPCModule.setCryptoDefaultProvider();
+    console.log('crypto provider result', r);
+
     // Here the App ask about the new donation feature if needed.
     // only for Advance Users
     if (this.state.donationAlert && this.state.mode === ModeEnum.advanced) {
@@ -645,12 +650,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     );
     const actualServer = this.state.server;
     let fasterServer: ServerType = {} as ServerType;
-    if (server.latency) {
+    if (server && server.latency) {
       fasterServer = { uri: server.uri, chainName: server.chainName };
     } else {
       fasterServer = actualServer;
       // likely here there is a internet conection problem
       // all of the servers return an error because they are unreachable probably.
+      // the 30 seconds timout was fired.
       withMessage = false;
     }
     console.log(server);

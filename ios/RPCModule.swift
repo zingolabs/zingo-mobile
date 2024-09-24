@@ -441,5 +441,23 @@ class RPCModule: NSObject {
       }
   }
 
+  @objc(setCryptoDefaultProvider:reject:)
+  func setCryptoDefaultProvider(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      self.fnSetCryptoDefaultProvider(dict)
+  }
 
+  func fnSetCryptoDefaultProvider(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = setCryptoDefaultProviderToRing()
+          let respStr = String(resp)
+          resolve(respStr)
+      } else {
+          let err = "Error: [Native] Setting the crypto provider to ring by default. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+              resolve(err)
+          }
+      }
+  }
 }
