@@ -140,7 +140,7 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: |
-            sudo integration_tests_actions.sh -a ${{ env.ABI }} -l ${{ env.API-LEVEL }}
+            integration_tests_actions.sh -a ${{ env.ABI }} -l ${{ env.API-LEVEL }}
           working-directory: ${{ github.workspace }}/scripts
 
       - name: Upload test reports
