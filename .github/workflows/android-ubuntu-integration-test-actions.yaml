@@ -83,6 +83,7 @@ jobs:
         run: |
           sudo chmod 777 /var/run/docker.sock
           ls -la /var/run/docker.sock
+          sudo systemctl status docker
 
       - name: Enable KVM
         run: |

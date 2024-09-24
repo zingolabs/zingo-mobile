@@ -3,7 +3,7 @@ use zingolib::testutils::{scenarios};
 
 // ubuntu ci runner
 #[cfg(feature = "ci")]
-const UNIX_SOCKET: Option<&str> = Some("`/var/run/docker.sock`");
+const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
 // macos ci runner
 //const UNIX_SOCKET: Option<&str> = Some("`/Users/runner/.colima/default/docker.sock`");
 
