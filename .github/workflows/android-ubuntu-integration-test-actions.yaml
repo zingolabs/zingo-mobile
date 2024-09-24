@@ -107,8 +107,8 @@ jobs:
 
       - name: socket
         run: |
+          sudo chmod 777 /var/run/docker.sock
           ls -la /var/run/docker.sock
-          ls -la /Users/runner/.docker/run/docker.sock
 
       - name: Setup Java
         uses: actions/setup-java@v4
