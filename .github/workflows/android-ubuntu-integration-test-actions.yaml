@@ -158,6 +158,7 @@ jobs:
           disable-animations: true
           #script: bash ./scripts/integration_tests_actions.sh -a ${{ env.ABI }}
           script: cargo nextest run ${{ env.ABI }}::${{ matrix.test }} --features "ci regchest actions" --verbose
+          working-directory: ./rust
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
