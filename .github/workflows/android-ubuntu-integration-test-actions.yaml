@@ -79,6 +79,11 @@ jobs:
           echo "Disk space after post-build cleanup:"
           df -h
 
+      - name: socket
+        run: |
+          sudo chmod 777 /var/run/docker.sock
+          ls -la /var/run/docker.sock
+
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -104,11 +109,6 @@ jobs:
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:008
-
-      - name: socket
-        run: |
-          sudo chmod 777 /var/run/docker.sock
-          ls -la /var/run/docker.sock
 
       - name: Setup Java
         uses: actions/setup-java@v4
