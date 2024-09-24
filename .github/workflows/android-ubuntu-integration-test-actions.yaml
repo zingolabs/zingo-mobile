@@ -108,7 +108,6 @@ jobs:
       - name: socket
         run: |
           ls -la /var/run/docker.sock
-          ls -la ~/.docker/run/docker.sock
           ls -la /Users/runner/.docker/run/docker.sock
 
       - name: Setup Java
