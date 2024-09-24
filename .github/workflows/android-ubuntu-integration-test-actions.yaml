@@ -139,8 +139,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: |
-            integration_tests_actions.sh -a ${{ env.ABI }} -l ${{ env.API-LEVEL }}
+          script: bash ./integration_tests_actions.sh -a ${{ env.ABI }} -l ${{ env.API-LEVEL }}
           working-directory: ${{ github.workspace }}/scripts
 
       - name: Upload test reports
