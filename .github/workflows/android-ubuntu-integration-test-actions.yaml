@@ -105,6 +105,12 @@ jobs:
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:008
 
+      - name: socket
+        run: |
+          ls -la /var/run/docker.sock
+          ls -la ~/.docker/run/docker.sock
+          ls -la /Users/runner/.docker/run/docker.sock
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
