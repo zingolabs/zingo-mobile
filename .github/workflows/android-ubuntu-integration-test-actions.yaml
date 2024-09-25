@@ -85,6 +85,7 @@ jobs:
           ls -la /var/run/docker.sock
           sudo systemctl status docker
           sudo chmod 777 ./scripts/integration_tests_actions.sh
+          ls -la ./scripts/integration_tests_actions.sh
 
       - name: Enable KVM
         run: |
