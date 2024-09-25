@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 set -Eeuo pipefail
 
 set_abi=false
