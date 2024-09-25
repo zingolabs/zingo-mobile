@@ -1,4 +1,4 @@
-name: Android e2e test
+name: Android Macos Integration tests
 
 on:
   workflow_call:
@@ -12,7 +12,7 @@ on:
       abi:
         required: true
         type: string
-    
+
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
   TIMESTAMP: ${{ inputs.timestamp }}
@@ -21,14 +21,14 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
-  android-e2e-avd-cache:
-    name: Android e2e AVD cache
+  android-macos-integration-avd-cache:
+    name: Android Macos integration AVD cache
     runs-on: macos-13
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-            
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -53,17 +53,23 @@ jobs:
       - name: AVD cache
         uses: actions/cache/restore@v4
         id: avd-cache
-        with: 
+        with:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-e2e
+          key: avd-${{ env.AVD-ARCH }}-integ-macos
           lookup-only: true
+
+      - name: Trying to free space in the runner
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        run: |
+          xcrun simctl delete all
+          sudo rm -rf ~/Library/Developer/CoreSimulator/Caches/*
 
       - name: Setup Android SDK
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: android-actions/setup-android@v3
-      
+
       - name: Add emulator to PATH
         if: steps.avd-cache.outputs.cache-hit != 'true'
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
@@ -72,43 +78,37 @@ jobs:
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: nick-fields/retry@v3
         with:
-          timeout_minutes: 60
+          timeout_minutes: 30
           max_attempts: 3
-          command: ./scripts/e2e_tests.sh -a ${{ env.AVD-ARCH }} -s
+          command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
       - name: AVD cache saving
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         id: avd-cache-saving
-        with: 
+        with:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-e2e
+          key: avd-${{ env.AVD-ARCH }}-integ-macos
 
-  android-e2e-test-script:
-    needs: [ android-e2e-avd-cache ]
-    name: Android e2e test
-    runs-on: ubuntu-22.04
+  android-macos-integration-test:
+    needs: [android-macos-integration-avd-cache]
+    name: Android Macos Integration test
+    runs-on: macos-13
+
     strategy:
       matrix:
-        #partition: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        partition: [1]
+        partition: [1, 2, 3, 4, 5]
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-            
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
-
-      - name: Enable KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
 
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
@@ -133,38 +133,36 @@ jobs:
         run: |
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
-     
-      #- name: Setup Docker 1 try
-      #  uses: douglascamata/setup-docker-macos-action@v1-alpha
-      #  id: dockerTry1
-      #  continue-on-error: true
-      #  with:
-      #    lima: v0.18.0
-      #    colima: v0.5.6
 
-      #- name: checking outcome 1
-      #  run: echo ${{ steps.dockerTry1.outcome }}
+      - name: Trying to free space in the runner
+        run: |
+          xcrun simctl delete all
+          sudo rm -rf ~/Library/Developer/CoreSimulator/Caches/*
 
-      #- name: Setup Docker 2 try
-      #  if: steps.dockerTry1.outcome != 'success'
-      #  uses: douglascamata/setup-docker-macos-action@v1-alpha
-      #  id: dockerTry2
-      #  continue-on-error: true
-      #  with:
-      #    lima: v0.18.0
-      #    colima: v0.5.6
+      - name: Setup Docker 1 try
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry1
+        continue-on-error: true
 
-      #- name: checking outcome 2
-      #  run: echo ${{ steps.dockerTry2.outcome }}
+      - name: checking outcome 1
+        run: echo ${{ steps.dockerTry1.outcome }}
 
-      #- name: Setup Docker Manually
-      #  if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
-      #  run: |
-      #    brew uninstall colima
-      #    brew tap colima/releases
-      #    brew install colima@0.5.6
-      #    brew install --formula docker
-      #    colima start
+      - name: Setup Docker 2 try
+        if: steps.dockerTry1.outcome != 'success'
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        id: dockerTry2
+        continue-on-error: true
+
+      - name: checking outcome 2
+        if: steps.dockerTry1.outcome != 'success'
+        run: echo ${{ steps.dockerTry2.outcome }}
+
+      - name: Setup Docker Manually
+        if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
+        run: |
+          brew install --head colima
+          brew install --formula docker
+          colima start --vm-type qemu --arch x86_64
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:008
@@ -196,28 +194,30 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-      
+        with:
+          cmdline-tools-version: 11.0
+
       - name: Add emulator to PATH
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
-            
+
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.2
           build-root-directory: ./android
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
-      
+
       - name: AVD cache
         uses: actions/cache/restore@v4
         id: avd-cache
-        with: 
+        with:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-e2e
+          key: avd-${{ env.AVD-ARCH }}-integ-macos
 
       - name: Kotlin uniffi cache
         uses: actions/cache/restore@v4
@@ -232,24 +232,16 @@ jobs:
           name: nextest-archive
           path: ./rust
 
-      - name: e2e test as a script (testing without cargo nextest)
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 120
-          max_attempts: 1
-          command: ./scripts/e2e_tests.sh -a ${{ env.ABI }}
-
-      - name: Run e2e tests
+      - name: Run Android integration tests
         working-directory: ./rust
         run: |
-          cargo nextest run -E 'test(e2e) and not test(darkside)' --verbose --profile ci \
+          cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive.tar.zst \
-            --partition count:${{ matrix.partition }}/10
+            --partition count:${{ matrix.partition}}/5
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-e2e-reports-${{ env.ABI }}-${{ matrix.partition}}-${{ env.TIMESTAMP }}
-          path: android/app/build/outputs/e2e_test_reports
-
+          name: test-integration-reports-${{ env.ABI }}-${{ matrix.partition}}-${{ env.TIMESTAMP }}
+          path: android/app/build/outputs/integration_test_reports

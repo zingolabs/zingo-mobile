@@ -1,4 +1,4 @@
-name: Android Macos Integration tests
+name: Android Ubuntu Integration tests
 
 on:
   workflow_call:
@@ -21,9 +21,9 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
-  android-macos-integration-avd-cache:
-    name: Android Macos integration AVD cache
-    runs-on: macos-13
+  android-ubuntu-integration-avd-cache:
+    name: Android Ubuntu integration AVD cache
+    runs-on: ubuntu-24.04
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -31,8 +31,6 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
@@ -50,6 +48,12 @@ jobs:
         if: ${{ env.ABI == 'armeabi-v7a' }}
         run: echo "AVD-ARCH=x86" >> $GITHUB_ENV
 
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
       - name: AVD cache
         uses: actions/cache/restore@v4
         id: avd-cache
@@ -57,30 +61,27 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ-macos
+          key: avd-${{ env.AVD-ARCH }}-integ-ubuntu
           lookup-only: true
-
-      - name: Trying to free space in the runner
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        run: |
-          xcrun simctl delete all
-          sudo rm -rf ~/Library/Developer/CoreSimulator/Caches/*
 
       - name: Setup Android SDK
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 12.0
 
       - name: Add emulator to PATH
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
+        run: |
+          echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: nick-fields/retry@v3
         with:
-          timeout_minutes: 30
+          timeout_minutes: 60
           max_attempts: 3
-          command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
+          command: sudo ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
       - name: AVD cache saving
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -90,17 +91,15 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ-macos
+          key: avd-${{ env.AVD-ARCH }}-integ-ubuntu
 
-  android-macos-integration-test:
-    needs: [android-macos-integration-avd-cache]
-    name: Android Macos Integration test
-    runs-on: macos-13
-
+  android-ubuntu-integration-test:
+    needs: [android-ubuntu-integration-avd-cache]
+    name: Android Ubuntu Integration test
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        #partition: [1, 2, 3, 4, 5]
-        partition: [1]
+        partition: [1, 2, 3, 4, 5]
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -108,8 +107,12 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
 
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
@@ -135,35 +138,8 @@ jobs:
           echo "AVD-ARCH=x86" >> $GITHUB_ENV
           echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
 
-      - name: Trying to free space in the runner
-        run: |
-          xcrun simctl delete all
-          sudo rm -rf ~/Library/Developer/CoreSimulator/Caches/*
-
-      - name: Setup Docker 1 try
-        uses: douglascamata/setup-docker-macos-action@v1-alpha
-        id: dockerTry1
-        continue-on-error: true
-
-      - name: checking outcome 1
-        run: echo ${{ steps.dockerTry1.outcome }}
-
-      - name: Setup Docker 2 try
-        if: steps.dockerTry1.outcome != 'success'
-        uses: douglascamata/setup-docker-macos-action@v1-alpha
-        id: dockerTry2
-        continue-on-error: true
-
-      - name: checking outcome 2
-        if: steps.dockerTry1.outcome != 'success'
-        run: echo ${{ steps.dockerTry2.outcome }}
-
-      - name: Setup Docker Manually
-        if: steps.dockerTry1.outcome != 'success' && steps.dockerTry2.outcome != 'success'
-        run: |
-          brew install --head colima
-          brew install --formula docker
-          colima start --vm-type qemu --arch x86_64
+      - name: Print Docker version
+        run: docker --version
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:008
@@ -199,7 +175,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          cmdline-tools-version: 11.0
+          cmdline-tools-version: 12.0
 
       - name: Add emulator to PATH
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
@@ -218,7 +194,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.AVD-ARCH }}-integ-macos
+          key: avd-${{ env.AVD-ARCH }}-integ-ubuntu
 
       - name: Kotlin uniffi cache
         uses: actions/cache/restore@v4
@@ -231,21 +207,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: nextest-archive
-          path: ./rust
+          path: rust
 
-      - name: integration test as a script
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 40
-          max_attempts: 1
-          command: ./scripts/integration_tests.sh -a ${{ env.ABI }}
-
-      #- name: Run Android integration tests
-      #  working-directory: ./rust
-      #  run: |
-      #    cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
-      #      --archive-file nextest-archive.tar.zst \
-      #      --partition count:${{ matrix.partition}}/5
+      - name: Run integration tests
+        working-directory: rust
+        run: |
+          cargo nextest run ${{ env.NEXTEST-ABI }} --verbose --profile ci \
+            --archive-file nextest-archive.tar.zst \
+            --partition count:${{ matrix.partition }}/5 \
+            --workspace-remap ${{ github.workspace }}/rust
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
