@@ -1,7 +1,6 @@
-apply plugin: 'com.android.application'
-apply plugin: 'com.facebook.react'
-apply plugin: 'kotlin-android'
-
+apply(plugin = "com.android.application")
+apply(plugin = "com.facebook.react")
+apply(plugin = "kotlin-android")
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -83,7 +82,7 @@ ext.splitApk = project.properties['splitApk'] ?: false
 ext.includeUniversalApk = project.properties['includeUniversalApk'] ?: false
 
 android {
-    ndkVersion rootProject.ext.ndkVersion
+    ndkVersion rootProject.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
