@@ -84,6 +84,7 @@ jobs:
           sudo chmod 777 /var/run/docker.sock
           ls -la /var/run/docker.sock
           sudo systemctl status docker
+          sudo chmod 777 ./scripts/integration_tests_actions.sh
 
       - name: Enable KVM
         run: |
@@ -187,7 +188,7 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           #script: bash ./scripts/integration_tests_actions.sh -a ${{ env.ABI }}
-          script: cargo nextest run ${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci regchest actions" --verbose
+          script: cargo nextest run ${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci regchest actions" --verbose --release
           working-directory: ./rust
 
       - name: Upload test reports
