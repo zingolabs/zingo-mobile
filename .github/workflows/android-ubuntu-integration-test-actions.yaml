@@ -82,10 +82,7 @@ jobs:
       - name: socket
         run: |
           sudo chmod 777 /var/run/docker.sock
-          ls -la /var/run/docker.sock
-          sudo systemctl status docker
           sudo chmod 777 ./scripts/integration_tests_actions.sh
-          ls -la ./scripts/integration_tests_actions.sh
 
       - name: Enable KVM
         run: |
@@ -176,6 +173,20 @@ jobs:
       - name: Run Build
         working-directory: android
         run: ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug -PsplitApk=true
+
+      - name: Remove unnecessary directories to free up space after build
+        run: |
+          echo "Disk space before post-build cleanup:"
+          df -h
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo apt-get clean
+          echo "Disk space after post-build cleanup:"
+          df -h
 
       - name: Yarn Start
         run: nohup yarn start > "yarn_react_native_start.out" &
