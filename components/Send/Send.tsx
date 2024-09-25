@@ -1651,7 +1651,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 marginBottom: 20,
               }}>
               <Button
-                testID="send.button"
+                testID={sendButtonEnabled ? 'send.button' : 'send.button-disabled'}
                 accessible={true}
                 accessibilityLabel={'title ' + translate('send.button')}
                 type={ButtonTypeEnum.Primary}
