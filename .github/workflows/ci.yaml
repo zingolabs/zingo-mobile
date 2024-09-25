@@ -54,8 +54,7 @@ jobs:
   android-ubuntu-integration-test-actions:
     strategy:
       matrix:
-        #abi: [ x86_64, x86 ]
-        abi: [ x86_64 ]
+        abi: [ x86_64, x86 ]
     uses: ./.github/workflows/android-ubuntu-integration-test-actions.yaml
     needs: [create-timestamp, android-build]
     with:

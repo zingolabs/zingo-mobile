@@ -382,10 +382,10 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         assertThat(valueTranfers.value_transfers[1].value).isEqualTo(100000)
         assertThat(valueTranfers.value_transfers[1].transaction_fee).isEqualTo(10000)
         // third item have to be a `fee` from the last `Sent` with the same txid
-        assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("send-to-self")
+        assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("memo-to-self")
         assertThat(valueTranfers.value_transfers[2].status).isEqualTo("confirmed")
         assertThat(valueTranfers.value_transfers[2].value).isEqualTo(0)
-        assertThat(valueTranfers.value_transfers[2].transaction_fee).isEqualTo(10000)
+        assertThat(valueTranfers.value_transfers[2].transaction_fee).isEqualTo(20000)
     }
 }
 
