@@ -226,7 +226,13 @@ if [[ $(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE | 
         $(cat "${test_report_dir}/test_results.txt" | grep 'FAILURES!!!') ]]; then
     echo -e "\nIntegration tests FAILED"
 
+    # Kill all emulators
+    ../scripts/kill_emulators.sh
+
     exit 1
 fi
 
 echo -e "\nIntegration tests PASSED"
+
+# Kill all emulators
+../scripts/kill_emulators.sh
