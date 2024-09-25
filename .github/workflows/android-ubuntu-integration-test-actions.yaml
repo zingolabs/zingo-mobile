@@ -156,7 +156,7 @@ jobs:
         with:
           api-level: ${{ env.API-LEVEL }}
           arch: ${{ env.AVD-ARCH }}
-          force-avd-creation: false
+          force-avd-creation: true
           emulator-options: -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
@@ -186,7 +186,7 @@ jobs:
         with:
           api-level: ${{ env.API-LEVEL }}
           arch: ${{ env.AVD-ARCH }}
-          force-avd-creation: false
+          force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           #script: bash ./scripts/integration_tests_actions.sh -a ${{ env.ABI }}
