@@ -142,7 +142,7 @@ jobs:
         run: docker --version
 
       - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:007
+        run: docker pull zingodevops/regchest:008
 
       - name: Rust toolchain stable
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -208,13 +208,6 @@ jobs:
         with:
           name: nextest-archive
           path: rust
-
-      #- name: integration test as a script
-      #  uses: nick-fields/retry@v3
-      #  with:
-      #    timeout_minutes: 120
-      #    max_attempts: 1
-      #    command: ${{ github.workspace }}/scripts/integration_tests.sh -a ${{ env.ABI }}
 
       - name: Run integration tests
         working-directory: rust

@@ -7,6 +7,7 @@ edition = "2021"
 [features]
 ci = []
 regchest = []
+actions = []
 
 [dev-dependencies]
 zingolib = { workspace = true }
@@ -16,3 +17,4 @@ darkside-tests = { git="https://github.com/zingolabs/zingolib", default-features
 json = "0.12.4"
 env_logger = "0.10.0"
 tokio = { workspace = true }
+rustls = { workspace = true }

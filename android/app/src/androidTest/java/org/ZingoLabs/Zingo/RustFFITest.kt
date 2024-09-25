@@ -118,6 +118,9 @@ class ExecuteAddressesFromSeed {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
+        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+        println(setCrytoProvider)
+
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
@@ -148,6 +151,9 @@ class ExecuteAddressesFromUfvk {
         val birthday: ULong = 1u
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
+
+        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+        println(setCrytoProvider)
 
         val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(server, ufvk, birthday, datadir, chainhint, monitorMempool)
         println("\nInit From UFVK:")
@@ -186,6 +192,9 @@ class ExecuteVersionFromSeed {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
+        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+        println(setCrytoProvider)
+
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
@@ -213,6 +222,9 @@ class ExecuteSyncFromSeed {
         val birthday:ULong = 1u
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
+
+        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+        println(setCrytoProvider)
 
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
@@ -266,6 +278,9 @@ class ExecuteSendFromOrchard {
         val birthday:ULong = 1u
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
+
+        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+        println(setCrytoProvider)
 
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
@@ -328,6 +343,9 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
 
+        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+        println(setCrytoProvider)
+
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
         println(initFromSeedJson)
@@ -364,10 +382,10 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         assertThat(valueTranfers.value_transfers[1].value).isEqualTo(100000)
         assertThat(valueTranfers.value_transfers[1].transaction_fee).isEqualTo(10000)
         // third item have to be a `fee` from the last `Sent` with the same txid
-        assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("send-to-self")
+        assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("memo-to-self")
         assertThat(valueTranfers.value_transfers[2].status).isEqualTo("confirmed")
         assertThat(valueTranfers.value_transfers[2].value).isEqualTo(0)
-        assertThat(valueTranfers.value_transfers[2].transaction_fee).isEqualTo(10000)
+        assertThat(valueTranfers.value_transfers[2].transaction_fee).isEqualTo(20000)
     }
 }
 
@@ -382,6 +400,9 @@ class ExecuteSaplingBalanceFromSeed {
         val birthday:ULong = 1u
         val datadir = MainApplication.getAppContext()!!.filesDir.path
         val monitorMempool = false
+
+        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+        println(setCrytoProvider)
 
         val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
         println("\nInit from seed:")
@@ -402,12 +423,11 @@ class ExecuteSaplingBalanceFromSeed {
         // 1. Received in orchard pool =     +500_000
         // 2. Received in sapling pool =     +250_000
         // 3. Received in transparent pool = +250_000
-        // 4. Send - 100_000 + 10_000fee =   -110_000
-        // 5. MemoToSelf orchard pool =       -10_000 (one item: Fee)
-        // 6. MemoToSelf sapling pool =       -10_000 (one item: Fee)
-        // 7. MemoToSelf transparent pool =   -10_000 (two items: MemoToSelf & Fee)
-        // 8. Shielding transparent pool =    -10_000 (one item: Fee)
-        // 9. Upgrading sapling pool =        -10_000 (one item: Fee)
+        // 4. Send - 100_000 + 20_000fee =   -120_000
+        // 5. MemoToSelf orchard pool =       -10_000 (send-to-self)
+        // 6. MemoToSelf sapling pool =       -20_000 (send-to-self)
+        // 7. MemoToSelf transparent pool =   -15_000 (send-to-self)
+        // 9. Upgrading sapling pool =        -20_000 (shield)
         //
         // orchard pool = 840_000
         // sapling pool = 0
@@ -418,12 +438,12 @@ class ExecuteSaplingBalanceFromSeed {
         println(balanceJson)
         val balance: Balance = mapper.readValue(balanceJson)
 
-        assertThat(balance.orchard_balance).isEqualTo(840000)
-        assertThat(balance.verified_orchard_balance).isEqualTo(840000)
-        assertThat(balance.spendable_orchard_balance).isEqualTo(840000)
-        assertThat(balance.sapling_balance).isEqualTo(0)
-        assertThat(balance.verified_sapling_balance).isEqualTo(0)
-        assertThat(balance.spendable_sapling_balance).isEqualTo(0)
+        assertThat(balance.orchard_balance).isEqualTo(715000)
+        assertThat(balance.verified_orchard_balance).isEqualTo(715000)
+        assertThat(balance.spendable_orchard_balance).isEqualTo(715000)
+        assertThat(balance.sapling_balance).isEqualTo(100000)
+        assertThat(balance.verified_sapling_balance).isEqualTo(100000)
+        assertThat(balance.spendable_sapling_balance).isEqualTo(100000)
         assertThat(balance.transparent_balance).isEqualTo(0)
     }
 }

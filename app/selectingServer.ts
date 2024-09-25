@@ -16,15 +16,23 @@ const calculateLatency = async (server: ServerUrisType, _index: number) => {
   return latency;
 };
 
-const selectingServer = async (serverUris: ServerUrisType[]): Promise<ServerUrisType> => {
+const selectingServer = async (serverUris: ServerUrisType[]): Promise<ServerUrisType | null> => {
   const servers: ServerUrisType[] = serverUris;
 
-  const fastestServer = await Promise.race(
-    servers.map(async (server: ServerUrisType) => {
-      const latency = await calculateLatency(server, servers.indexOf(server));
-      return { ...server, latency };
-    }),
+  // 30 seconds max.
+  const timeoutPromise = new Promise<null>(resolve => setTimeout(() => resolve(null), 30 * 1000));
+
+  const validServersPromises = servers.map(
+    (server: ServerUrisType) =>
+      new Promise<ServerUrisType>(async resolve => {
+        const latency = await calculateLatency(server, servers.indexOf(server));
+        if (latency !== null) {
+          resolve({ ...server, latency });
+        }
+      }),
   );
+
+  const fastestServer = await Promise.race([...validServersPromises, timeoutPromise]);
 
   return fastestServer;
 };

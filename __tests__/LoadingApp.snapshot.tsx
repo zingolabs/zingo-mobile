@@ -66,6 +66,7 @@ jest.mock('react-native', () => {
     getLatestBlock: jest.fn(() => '{}'),
     walletExists: jest.fn(() => 'false'),
     getValueTransfersList: jest.fn(() => '{ "value_transfers": [] }'),
+    setCryptoDefaultProvider: jest.fn(() => 'true'),
   };
 
   return RN;

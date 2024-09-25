@@ -1,4 +1,4 @@
-FROM zingodevops/android_builder:009 as build_android
+FROM zingodevops/android_builder:010 as build_android
 
 WORKDIR /opt/zingo/rust/lib/
 
@@ -11,6 +11,8 @@ COPY Cargo.toml /opt/zingo/rust/Cargo.toml
 COPY zingomobile_utils/ /opt/zingo/rust/zingomobile_utils/
 
 RUN rustup default nightly
+
+RUN cargo install --force --locked bindgen-cli
 
 RUN cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
     generate ./src/zingo.udl --language kotlin \ 

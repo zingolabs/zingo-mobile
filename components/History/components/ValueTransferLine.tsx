@@ -229,7 +229,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     );
   };
 
-  //console.log('render ValueTransferLine - 5', index, nextLineWithSameTxid);
+  //console.log('render ValueTransferLine - 5', index, messagesAddress);
 
   return (
     <View testID={`vt-${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>

@@ -1,6 +1,6 @@
-FROM debian:bullseye-slim
-ARG android_ndk_ver=r23c
-# 23.2.8568313
+FROM ubuntu:latest
+ARG android_ndk_ver=r24
+# 24.0.8215888
 
 # Install dependencies
 RUN apt update \
@@ -10,6 +10,12 @@ RUN apt update \
     build-essential \
     gcc-10-aarch64-linux-gnu \
     libc6-dev \
+    cmake \
+    golang \
+    libclang1 \
+    llvm-dev \
+    libclang-dev \
+    clang \
     make \
     curl \
     automake \
@@ -74,27 +80,34 @@ RUN mkdir x86 \
     && mkdir aarch64 \
     && mkdir armv7 \
     && mkdir x86_64
-# -mno-outline-atomics removed
+
 RUN ./Configure --prefix=/opt/openssl-3.3.1/aarch64 android-arm64 \
-    -U__ANDROID_API__ -D__ANDROID_API__=24 \
+    -mno-outline-atomics \
+    -U__ANDROID_API__ \
+    -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
 RUN ./Configure --prefix=/opt/openssl-3.3.1/armv7 android-arm \
-    -U__ANDROID_API__ -D__ANDROID_API__=24 \
+    -U__ANDROID_API__ \
+    -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
-RUN ./Configure --prefix=/opt/openssl-3.3.1/x86 android-x86 -latomic -DBROKEN_CLANG_ATOMICS \
-    -U__ANDROID_API__ -D__ANDROID_API__=24 \
+RUN ./Configure --prefix=/opt/openssl-3.3.1/x86 android-x86 \
+    -latomic \
+    -DBROKEN_CLANG_ATOMICS \
+    -U__ANDROID_API__ \
+    -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
 RUN ./Configure --prefix=/opt/openssl-3.3.1/x86_64 android-x86_64 \
-    -U__ANDROID_API__  -D__ANDROID_API__=24 \
+    -U__ANDROID_API__ \
+    -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \

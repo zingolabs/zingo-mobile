@@ -75,5 +75,8 @@ RCT_EXTERN_METHOD(getValueTransfersList:
 RCT_EXTERN_METHOD(getTransactionSummariesList:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(setCryptoDefaultProvider:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end
