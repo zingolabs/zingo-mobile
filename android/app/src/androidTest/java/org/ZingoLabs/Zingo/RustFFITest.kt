@@ -423,12 +423,11 @@ class ExecuteSaplingBalanceFromSeed {
         // 1. Received in orchard pool =     +500_000
         // 2. Received in sapling pool =     +250_000
         // 3. Received in transparent pool = +250_000
-        // 4. Send - 100_000 + 10_000fee =   -110_000
-        // 5. MemoToSelf orchard pool =       -10_000 (one item: Fee)
-        // 6. MemoToSelf sapling pool =       -10_000 (one item: Fee)
-        // 7. MemoToSelf transparent pool =   -10_000 (two items: MemoToSelf & Fee)
-        // 8. Shielding transparent pool =    -10_000 (one item: Fee)
-        // 9. Upgrading sapling pool =        -10_000 (one item: Fee)
+        // 4. Send - 100_000 + 20_000fee =   -120_000
+        // 5. MemoToSelf orchard pool =       -10_000 (send-to-self)
+        // 6. MemoToSelf sapling pool =       -20_000 (send-to-self)
+        // 7. MemoToSelf transparent pool =   -15_000 (send-to-self)
+        // 9. Upgrading sapling pool =        -20_000 (shield)
         //
         // orchard pool = 840_000
         // sapling pool = 0
@@ -439,12 +438,12 @@ class ExecuteSaplingBalanceFromSeed {
         println(balanceJson)
         val balance: Balance = mapper.readValue(balanceJson)
 
-        assertThat(balance.orchard_balance).isEqualTo(840000)
-        assertThat(balance.verified_orchard_balance).isEqualTo(840000)
-        assertThat(balance.spendable_orchard_balance).isEqualTo(840000)
-        assertThat(balance.sapling_balance).isEqualTo(0)
-        assertThat(balance.verified_sapling_balance).isEqualTo(0)
-        assertThat(balance.spendable_sapling_balance).isEqualTo(0)
+        assertThat(balance.orchard_balance).isEqualTo(715000)
+        assertThat(balance.verified_orchard_balance).isEqualTo(715000)
+        assertThat(balance.spendable_orchard_balance).isEqualTo(715000)
+        assertThat(balance.sapling_balance).isEqualTo(100000)
+        assertThat(balance.verified_sapling_balance).isEqualTo(100000)
+        assertThat(balance.spendable_sapling_balance).isEqualTo(100000)
         assertThat(balance.transparent_balance).isEqualTo(0)
     }
 }
