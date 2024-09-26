@@ -23,6 +23,82 @@ env:
   TIMESTAMP: ${{ inputs.timestamp }}
 
 jobs:
+  android-ubuntu-integration-test-actions-avd-cache:
+    name: Avd Cache Integration
+    runs-on: ubuntu-22.04
+    env:
+      CACHE-KEY: ${{ inputs.cache-key }}
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+            
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+
+      - name: Set envs for x86_64
+        if: ${{ env.ABI == 'x86_64' }}
+        run: |
+          echo "AVD-ARCH=x86_64" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=x86_64" >> $GITHUB_ENV
+
+      - name: Set envs for x86
+        if: ${{ env.ABI == 'x86' }}
+        run: |
+          echo "AVD-ARCH=x86" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=x86_32" >> $GITHUB_ENV
+
+      - name: Set envs for arm64-v8a
+        if: ${{ env.ABI == 'arm64-v8a' }}
+        run: |
+          echo "AVD-ARCH=arm64-v8a" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=arm64" >> $GITHUB_ENV
+
+      - name: Set envs for armeabi-v7a
+        if: ${{ env.ABI == 'armeabi-v7a' }}
+        run: |
+          echo "AVD-ARCH=arm64-v8a" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Check AVD cache
+        uses: actions/cache/restore@v4
+        id: avd-cache
+        with: 
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
+          lookup-only: true
+
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.API-LEVEL }}
+          arch: ${{ env.AVD-ARCH }}
+          force-avd-creation: true
+          emulator-options: -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Save AVD cache
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        id: avd-cache-saving
+        with: 
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
+
   android-ubuntu-integration-test-actions:
     name: Android Ubuntu Integration test
     runs-on: ubuntu-22.04
@@ -79,7 +155,7 @@ jobs:
           echo "Disk space after post-build cleanup:"
           df -h
 
-      - name: socket
+      - name: Grant permissions
         run: |
           sudo chmod 777 /var/run/docker.sock
           sudo chmod 777 ./scripts/integration_tests_actions.sh
@@ -139,33 +215,12 @@ jobs:
 
       - name: Restore AVD cache
         uses: actions/cache/restore@v4
-        id: avd-cache
         with: 
           path: |
             ~/.android/avd/*
             ~/.android/adb*
           key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
-
-      - name: Create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ env.API-LEVEL }}
-          arch: ${{ env.AVD-ARCH }}
-          force-avd-creation: true
-          emulator-options: -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
-
-      - name: Save AVD cache
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        id: avd-cache-saving
-        with: 
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
+          fail-on-cache-miss: true
 
       - name: Yarn install
         run: yarn
