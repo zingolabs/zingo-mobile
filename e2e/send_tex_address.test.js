@@ -1,11 +1,11 @@
 const { log, device, by, element, expect } = require('detox');
 
-import { loadTestWallet } from './e2e-utils/loadTestWallet.js';
+import { loadRecipientWallet } from './e2e-utils/loadRecipientWallet.js';
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 describe('Renders wallet data correctly.', () => {
-  it('loads a wallet', loadTestWallet);
+  it('loads a wallet', loadRecipientWallet());
   it('parses the TEX address and correctly renders the confirm screen', async () => {
     await waitFor(element(by.id('vt-1')))
       .toExist()
@@ -19,7 +19,7 @@ describe('Renders wallet data correctly.', () => {
       .toExist()
       .withTimeout(5000);
 
-    await element(by.id('send.amount')).replaceText('0');
+    await element(by.id('send.amount')).replaceText('0.0002');
     await element(by.id('send.scroll-view')).scrollTo('bottom');
     await waitFor(element(by.id('send.button')))
       .toBeVisible()

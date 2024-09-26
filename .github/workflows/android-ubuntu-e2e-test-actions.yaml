@@ -101,7 +101,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        test: ["reload_while_tx_pending", "change_custom_server", "change_custom_regtest_server", "change_custom_testnet_server", "change_server_from_list", "new_wallet", "screen_awake", "send", "sync_report", "transaction_history"]
+        test: ["send_tex_address", "reload_while_tx_pending", "change_custom_server", "change_custom_regtest_server", "change_custom_testnet_server", "change_server_from_list", "new_wallet", "screen_awake", "send", "sync_report", "transaction_history"]
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
