@@ -13,7 +13,7 @@ env:
 jobs:
   create-cache-key:
     name: Create cache key
-    runs-on: ubuntu-22.04
+    runs-on: macos-13
     env:
       RUSTUP_HOME: /root/.rustup
     outputs:
@@ -28,17 +28,14 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-
       - name: Cargo update for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: |
           echo "zingolib_ref=$(echo ${GITHUB_REF} | sed 's/\//\\\//g')" >> $GITHUB_ENV
-          sed -i "/^zingolib/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
+          sudo sed -i '' "/^zingolib/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
           if cat rust/lib/Cargo.toml | grep "^zingolib" | grep -q "branch"; then exit 1; fi
-          cd rust && cargo update -p zingolib --aggressive
+          cd rust
+          sudo cargo update -p zingolib --aggressive
       
       - name: Store Cargo version
         run: echo $(cargo --version) >> rust/cargo_version.txt
