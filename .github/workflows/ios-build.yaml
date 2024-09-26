@@ -60,10 +60,10 @@ jobs:
         if: ${{ contains(github.repository, 'zingolib') }}
         run: |
           echo "zingolib_ref=$(echo ${GITHUB_REF} | sed 's/\//\\\//g')" >> $GITHUB_ENV
-          sed -i '' "/^zingolib/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
+          sudo sed -i '' "/^zingolib/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
           if cat rust/lib/Cargo.toml | grep "^zingolib" | grep -q "branch"; then exit 1; fi
           cd rust
-          cargo update -p zingolib --aggressive
+          sudo cargo update -p zingolib --aggressive
 
       - name: Cargo default nightly
         run: |
