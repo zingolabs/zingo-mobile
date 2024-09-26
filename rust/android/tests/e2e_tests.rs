@@ -12,7 +12,7 @@ const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
 #[cfg(all(not(feature = "ci"), feature = "regchest"))]
 const UNIX_SOCKET: Option<&str> = None;
 
-async fn send_text_address(abi: &str) {
+async fn tex_send_address(abi: &str) {
     #[cfg(not(feature = "regchest"))]
     let (_regtest_manager, _child_process_handler) =
         scenarios::funded_orchard_mobileclient(1_000_000).await;
@@ -25,10 +25,10 @@ async fn send_text_address(abi: &str) {
 
     #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "send_text_address");
+        zingomobile_utils::android_e2e_test(abi, "tex_send_address");
     #[cfg(feature = "actions")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test_actions(abi, "send_text_address");
+        zingomobile_utils::android_e2e_test_actions(abi, "tex_send_address");
     
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -242,7 +242,7 @@ async fn transaction_history(abi: &str) {
 }
 
 // darkside is not working with regchest
-async fn simple_sync(abi: &str) {
+async fn darkside_simple_sync(abi: &str) {
     let darkside_handler = DarksideHandler::new(Some(20000));
 
     let server_id = zingolib::config::construct_lightwalletd_uri(Some(format!(
@@ -272,8 +272,8 @@ mod e2e {
     const ABI: &str = "x86_64";
 
     #[tokio::test]
-    async fn send_text_address() {
-        super::send_text_address(ABI).await;
+    async fn tex_send_address() {
+        super::tex_send_address(ABI).await;
     }
 
     #[tokio::test]
@@ -330,8 +330,8 @@ mod e2e {
         const ABI: &str = "x86_64";
 
         #[tokio::test]
-        async fn simple_sync() {
-            super::simple_sync(ABI).await;
+        async fn darkside_simple_sync() {
+            super::darkside_simple_sync(ABI).await;
         }
     }
 }
