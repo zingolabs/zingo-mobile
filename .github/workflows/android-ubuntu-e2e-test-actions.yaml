@@ -1,4 +1,4 @@
-name: Android Ubuntu Integration tests
+name: Android Ubuntu e2e tests
 
 on:
   workflow_call:
@@ -23,8 +23,8 @@ env:
   TIMESTAMP: ${{ inputs.timestamp }}
 
 jobs:
-  android-ubuntu-integration-test-actions-avd-cache:
-    name: Avd Cache Integration
+  android-ubuntu-e2e-test-actions-avd-cache:
+    name: Avd Cache e2e
     runs-on: ubuntu-22.04
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
@@ -71,7 +71,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
+          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-e2e
           lookup-only: true
 
       - name: Create AVD and generate snapshot for caching
@@ -93,15 +93,15 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
+          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-e2e
 
-  android-ubuntu-integration-test-actions:
-    name: Android Ubuntu Integration test
-    needs: android-ubuntu-integration-test-actions-avd-cache
+  android-ubuntu-e2e-test-actions:
+    name: Android Ubuntu e2e test
+    needs: android-ubuntu-e2e-test-actions-avd-cache
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        test: ["offline_testsuite", "execute_sync_from_seed", "execute_send_from_orchard", "execute_currentprice_and_value_transfers_from_seed", "execute_sapling_balance_from_seed"]
+        test: ["reload_while_tx_pending", "change_custom_server", "change_custom_regtest_server", "change_custom_testnet_server", "change_server_from_list", "new_wallet", "screen_awake", "send", "sync_report", "transaction_history"]
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
@@ -155,7 +155,7 @@ jobs:
       - name: Grant permissions
         run: |
           sudo chmod 777 /var/run/docker.sock
-          sudo chmod 777 ./scripts/integration_tests_actions.sh
+          sudo chmod 777 ./scripts/e2e_tests_actions.sh
 
       - name: Enable KVM
         run: |
@@ -216,7 +216,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
+          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-e2e
           fail-on-cache-miss: true
 
       - name: Yarn install
@@ -243,7 +243,7 @@ jobs:
       - name: Yarn Start
         run: nohup yarn start > "yarn_react_native_start.out" &
 
-      - name: Run Integration Test
+      - name: Run e2e Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ env.API-LEVEL }}
@@ -258,5 +258,5 @@ jobs:
         if: ${{ ! cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-integration-reports-${{ env.ABI }}-${{ matrix.test }}-${{ env.TIMESTAMP }}
-          path: android/app/build/outputs/integration_test_reports
+          name: test-e2e-reports-${{ env.ABI }}-${{ matrix.test }}-${{ env.TIMESTAMP }}
+          path: android/app/build/outputs/e2e_test_reports

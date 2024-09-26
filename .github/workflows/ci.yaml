@@ -38,6 +38,18 @@ jobs:
       abi: ${{ matrix.abi }}
       api-level: 29
 
+  android-ubuntu-e2e-test-actions:
+    strategy:
+      matrix:
+        abi: [ x86_64 ]
+    uses: ./.github/workflows/android-ubuntu-e2e-test-actions.yaml
+    needs: [create-timestamp, android-build]
+    with:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+      abi: ${{ matrix.abi }}
+      api-level: 29
+
   ios-build:
     uses: ./.github/workflows/ios-build.yaml
     needs: create-cache-key

@@ -3,8 +3,12 @@ use zingolib::testutils::{scenarios};
 
 use darkside_tests::utils::{prepare_darksidewalletd, DarksideHandler};
 
+// ubuntu ci runner
 #[cfg(feature = "ci")]
-const UNIX_SOCKET: Option<&str> = Some("/Users/runner/.colima/default/docker.sock");
+const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
+// macos ci runner
+//const UNIX_SOCKET: Option<&str> = Some("`/Users/runner/.colima/default/docker.sock`");
+
 #[cfg(all(not(feature = "ci"), feature = "regchest"))]
 const UNIX_SOCKET: Option<&str> = None;
 
@@ -19,9 +23,13 @@ async fn reload_while_tx_pending(abi: &str) {
             Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
         };
 
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "reload_while_tx_pending");
-
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "reload_while_tx_pending");
+    
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
         Ok(_) => (),
@@ -36,8 +44,12 @@ async fn reload_while_tx_pending(abi: &str) {
 }
 
 async fn change_custom_server(abi: &str) {
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "change_custom_server");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "change_custom_server");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -57,9 +69,13 @@ async fn change_custom_regtest_server(abi: &str) {
             Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
         };
 
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "change_custom_regtest_server");
-
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "change_custom_regtest_server");
+    
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
         Ok(_) => (),
@@ -74,8 +90,12 @@ async fn change_custom_regtest_server(abi: &str) {
 }
 
 async fn change_custom_testnet_server(abi: &str) {
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "change_custom_testnet_server");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "change_custom_testnet_server");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -85,8 +105,12 @@ async fn change_custom_testnet_server(abi: &str) {
 }
 
 async fn change_server_from_list(abi: &str) {
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "change_server_from_list");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "change_server_from_list");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -96,8 +120,12 @@ async fn change_server_from_list(abi: &str) {
 }
 
 async fn new_wallet(abi: &str) {
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "new_wallet");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "new_wallet");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -107,8 +135,12 @@ async fn new_wallet(abi: &str) {
 }
 
 async fn screen_awake(abi: &str) {
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "screen_awake");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "screen_awake");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -128,8 +160,12 @@ async fn send(abi: &str) {
             Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
         };
 
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "send");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "send");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -145,8 +181,12 @@ async fn send(abi: &str) {
 }
 
 async fn sync_report(abi: &str) {
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "sync_report");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "sync_report");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -156,6 +196,7 @@ async fn sync_report(abi: &str) {
 }
 
 async fn transaction_history(abi: &str) {
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "transaction_history");
 
@@ -166,8 +207,7 @@ async fn transaction_history(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
-
-
+// darkside is not working with regchest
 async fn simple_sync(abi: &str) {
     let darkside_handler = DarksideHandler::new(Some(20000));
 
@@ -179,9 +219,13 @@ async fn simple_sync(abi: &str) {
         .await
         .unwrap();
 
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "darkside_simple_sync");
-
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "darkside_simple_sync");
+    
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
     println!("Error: {}", error);
