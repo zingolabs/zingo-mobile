@@ -199,6 +199,9 @@ async fn transaction_history(abi: &str) {
     #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "transaction_history");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "transaction_history");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
