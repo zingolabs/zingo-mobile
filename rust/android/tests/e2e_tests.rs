@@ -3,10 +3,45 @@ use zingolib::testutils::{scenarios};
 
 use darkside_tests::utils::{prepare_darksidewalletd, DarksideHandler};
 
+// ubuntu ci runner
 #[cfg(feature = "ci")]
-const UNIX_SOCKET: Option<&str> = Some("/Users/runner/.colima/default/docker.sock");
+const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
+// macos ci runner
+//const UNIX_SOCKET: Option<&str> = Some("`/Users/runner/.colima/default/docker.sock`");
+
 #[cfg(all(not(feature = "ci"), feature = "regchest"))]
 const UNIX_SOCKET: Option<&str> = None;
+
+async fn tex_send_address(abi: &str) {
+    #[cfg(not(feature = "regchest"))]
+    let (_regtest_manager, _child_process_handler) =
+        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    #[cfg(feature = "regchest")]
+    let docker =
+        match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
+            Ok(d) => d,
+            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+        };
+
+    #[cfg(not(feature = "actions"))]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test(abi, "tex_send_address");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "tex_send_address");
+    
+    #[cfg(feature = "regchest")]
+    match regchest_utils::close(&docker).await {
+        Ok(_) => (),
+        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
+    }
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
 
 async fn reload_while_tx_pending(abi: &str) {
     #[cfg(not(feature = "regchest"))]
@@ -19,9 +54,13 @@ async fn reload_while_tx_pending(abi: &str) {
             Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
         };
 
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "reload_while_tx_pending");
-
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "reload_while_tx_pending");
+    
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
         Ok(_) => (),
@@ -36,8 +75,12 @@ async fn reload_while_tx_pending(abi: &str) {
 }
 
 async fn change_custom_server(abi: &str) {
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "change_custom_server");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "change_custom_server");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -57,9 +100,13 @@ async fn change_custom_regtest_server(abi: &str) {
             Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
         };
 
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "change_custom_regtest_server");
-
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "change_custom_regtest_server");
+    
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
         Ok(_) => (),
@@ -74,8 +121,12 @@ async fn change_custom_regtest_server(abi: &str) {
 }
 
 async fn change_custom_testnet_server(abi: &str) {
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "change_custom_testnet_server");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "change_custom_testnet_server");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -85,8 +136,12 @@ async fn change_custom_testnet_server(abi: &str) {
 }
 
 async fn change_server_from_list(abi: &str) {
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "change_server_from_list");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "change_server_from_list");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -96,8 +151,12 @@ async fn change_server_from_list(abi: &str) {
 }
 
 async fn new_wallet(abi: &str) {
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "new_wallet");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "new_wallet");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -107,8 +166,12 @@ async fn new_wallet(abi: &str) {
 }
 
 async fn screen_awake(abi: &str) {
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "screen_awake");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "screen_awake");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -128,8 +191,12 @@ async fn send(abi: &str) {
             Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
         };
 
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "send");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "send");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -145,8 +212,12 @@ async fn send(abi: &str) {
 }
 
 async fn sync_report(abi: &str) {
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "sync_report");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "sync_report");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -156,8 +227,12 @@ async fn sync_report(abi: &str) {
 }
 
 async fn transaction_history(abi: &str) {
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "transaction_history");
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "transaction_history");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -166,9 +241,8 @@ async fn transaction_history(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
-
-
-async fn simple_sync(abi: &str) {
+// darkside is not working with regchest
+async fn darkside_simple_sync(abi: &str) {
     let darkside_handler = DarksideHandler::new(Some(20000));
 
     let server_id = zingolib::config::construct_lightwalletd_uri(Some(format!(
@@ -179,9 +253,13 @@ async fn simple_sync(abi: &str) {
         .await
         .unwrap();
 
+    #[cfg(not(feature = "actions"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test(abi, "darkside_simple_sync");
-
+    #[cfg(feature = "actions")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_actions(abi, "darkside_simple_sync");
+    
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
     println!("Error: {}", error);
@@ -192,6 +270,11 @@ async fn simple_sync(abi: &str) {
 mod e2e {
     use super::*;
     const ABI: &str = "x86_64";
+
+    #[tokio::test]
+    async fn tex_send_address() {
+        super::tex_send_address(ABI).await;
+    }
 
     #[tokio::test]
     async fn reload_while_tx_pending() {
@@ -247,8 +330,8 @@ mod e2e {
         const ABI: &str = "x86_64";
 
         #[tokio::test]
-        async fn simple_sync() {
-            super::simple_sync(ABI).await;
+        async fn darkside_simple_sync() {
+            super::darkside_simple_sync(ABI).await;
         }
     }
 }

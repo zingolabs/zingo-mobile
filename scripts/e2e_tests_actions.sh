@@ -65,7 +65,7 @@ while getopts 'a:Al:e:t:sx:h' OPTION; do
             fi
             ;;
         h)
-            echo -e "\nRun integration tests. Requires Android SDK Command-line Tools."
+            echo -e "\nRun e2e tests. Requires Android SDK Command-line Tools."
             echo -e "\n  -a\t\tSelect ABI (required)"
             echo -e "      \t\t  Options:"
             echo -e "      \t\t  'x86_64' - default system image: API 30 google_apis_playstore x86_64"
@@ -81,13 +81,13 @@ while getopts 'a:Al:e:t:sx:h' OPTION; do
             echo -e "\n  -t\t\tSelect API target (optional)"
             echo -e "      \t\t  See examples on selecting system images below"
             echo -e "\n  -s\t\tCreate an AVD and snapshot for quick-boot (optional)"
-            echo -e "      \t\t  Does not run integration tests"
+            echo -e "      \t\t  Does not run e2e tests"
             echo -e "\n  -x\t\tSet timeout in seconds for emulator launch and AVD boot-up (optional)"
             echo -e "      \t\t  Default: 1800"
             echo -e "      \t\t  Must be an integer"
             echo -e "\nExamples:"
             echo -e "  '$(basename $0) -a x86_64 -s'\tCreates an AVD and quick-boot snapshot for x86_64 ABI"
-            echo -e "  '$(basename $0) -a x86_64'   \tRuns integration tests for x86_64 ABI from snapshot"
+            echo -e "  '$(basename $0) -a x86_64'   \tRuns e2e tests for x86_64 ABI from snapshot"
             echo -e "  '$(basename $0) -a x86 -l 29 -t google_apis'"
             echo -e "                             \t\tSelect system image \"system-images;android-29;google_apis;x86\""
             echo -e "\nRecommended system images for testing ARM ABIs:"
@@ -154,8 +154,8 @@ fi
 
 cd android
 
-# Create integration test report directory
-test_report_dir="app/build/outputs/integration_test_reports/${abi}"
+# Create e2e test report directory
+test_report_dir="app/build/outputs/e2e_test_reports/${abi}"
 rm -rf "${test_report_dir}"
 mkdir -p "${test_report_dir}"
 
@@ -185,26 +185,24 @@ adb -s emulator-5554 shell cat /proc/cpuinfo &> "${test_report_dir}/cpuinfo.txt"
 nohup adb -s emulator-5554 shell logcat -v threadtime -b main &> "${test_report_dir}/logcat.txt" &
 
 # Create additional test output directory
-adb -s emulator-5554 shell rm -rf "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output"
-adb -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output"
+adb -s emulator-5554 shell rm -rf "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_e2e_test_output"
+adb -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_e2e_test_output"
 
-echo -e "\nRunning integration tests..."
-adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.$test_name \
-    -e additionalTestOutputDir /sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output \
-    -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner \
-    | tee "${test_report_dir}/test_results.txt"
+echo -e "\nRunning e2e tests..."
+nohup yarn start &> "${test_report_dir}/metro.txt" &
+yarn detox test -c android.att.debug.${abi} ${test_name}.test.js --reuse
+success_status=$?
 
 # Store additional test outputs
-if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output 2>/dev/null)" ]; then
-    adb -s emulator-5554 shell cat /sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output/* \
-        &> "${test_report_dir}/additional_integration_test_output.txt"
+if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_e2e_test_output 2>/dev/null)" ]; then
+    adb -s emulator-5554 shell cat /sdcard/Android/media/org.ZingoLabs.Zingo/additional_e2e_test_output/* \
+        &> "${test_report_dir}/additional_e2e_test_output.txt"
 fi
 
 echo -e "\nTest reports saved: android/${test_report_dir}"
     
-if [[ $(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE | cut -d' ' -f2) -ne -1 || \
-        $(cat "${test_report_dir}/test_results.txt" | grep 'FAILURES!!!') ]]; then
-    echo -e "\nIntegration tests FAILED"
+if [ $success_status -ne 0 ]; then
+    echo -e "\ne2e tests FAILED"
 
     # Kill all emulators
     ../scripts/kill_emulators.sh
@@ -212,7 +210,7 @@ if [[ $(cat "${test_report_dir}/test_results.txt" | grep INSTRUMENTATION_CODE | 
     exit 1
 fi
 
-echo -e "\nIntegration tests PASSED"
+echo -e "\ne2e tests PASSED"
 
 # Kill all emulators
 ../scripts/kill_emulators.sh
