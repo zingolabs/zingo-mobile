@@ -133,7 +133,7 @@ case "$abi" in
         api_level_default="29"
         api_target_default="default"
         if [ $intel_host_os == true ]; then       
-            arch="x86_64"
+            arch="arm64-v8a"
         else
             arch="arm64-v8a"
         fi
@@ -142,7 +142,7 @@ case "$abi" in
         api_level_default="29"
         api_target_default="default"
         if [ $intel_host_os == true ]; then       
-            arch="x86"
+            arch="arm64-v8a"
         else
             arch="arm64-v8a"
         fi
