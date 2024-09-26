@@ -1,12 +1,16 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-  val kotlinVersion = "1.9.0"
-  val buildToolsVersion = "34.0.0"
-  val minSdkVersion = 24
-  val compileSdkVersion = 34
-  val targetSdkVersion = 34
-  val ndkVersion = "23.2.8568313"
+  extra.apply {  
+    set("kotlinVersion", "1.9.0")
+    set("buildToolsVersion", "34.0.0")
+    set("minSdkVersion", 24)
+    set("compileSdkVersion", 34)
+    set("targetSdkVersion", 34)
+    set("ndkVersion", "23.2.8568313")    
+  }
+
+  val kotlinVersion = extra["kotlinVersion"]
 
   repositories {
     google()

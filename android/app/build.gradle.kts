@@ -54,7 +54,7 @@ react {
 /**
  * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
  */
-def enableProguardInReleaseBuilds = false
+var enableProguardInReleaseBuilds = false
 
 /**
  * The preferred build flavor of JavaScriptCore (JSC).
@@ -67,7 +67,7 @@ def enableProguardInReleaseBuilds = false
  * give correct results when using with locales other than en-US.  Note that
  * this variant is about 6MiB larger per architecture than default.
  */
-def jscFlavor = 'org.webkit:android-jsc:+'
+var jscFlavor = "org.webkit:android-jsc:+"
 
 /**
  * Whether to enable building a separate APK for each ABI.
@@ -82,46 +82,47 @@ ext.splitApk = project.properties['splitApk'] ?: false
 ext.includeUniversalApk = project.properties['includeUniversalApk'] ?: false
 
 android {
-    ndkVersion rootProject.ndkVersion
 
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    var ndkVersion = rootProject.extra["ndkVersion"]
+    var compileSdkVersion = rootProject.extra["compileSdkVersion"]
 
-    namespace 'org.ZingoLabs.Zingo'
+    namespace = "org.ZingoLabs.Zingo" //fun ?
+
     compileOptions {
         sourceCompatibility = "18.0.2.1"
         targetCompatibility = "18.0.2.1"
     }
 
     kotlinOptions {
-        jvmTarget = '18'
+        jvmTarget = "18"
     }
 
     defaultConfig {
-        applicationId 'org.ZingoLabs.Zingo' // Real
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 187 // Real
-        versionName "zingo-1.4.3" // Real
-        missingDimensionStrategy 'react-native-camera', 'general'
-        testBuildType System.getProperty('testBuildType', 'debug')
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        applicationId = namespace // Real 
+        minSdkVersion = rootProject.extra["minSdkVersion"]
+        targetSdkVersion = rootProject.extra["targetSdkVersion"]
+        versionCode = 187 // Real
+        versionName = "zingo-1.4.3" // Real
+        missingDimensionStrategy("react-native-camera", "general")
+        testBuildType(System.getProperty("testBuildType", "debug"))
+        testInstrumentationRunner("androidx.test.runner.AndroidJUnitRunner")
     }
 
     splits {
         abi {
-            enable splitApk.toBoolean()
+            enable(splitApk.toBoolean())
             reset()
-            include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
-            universalApk includeUniversalApk.toBoolean()
+            include("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
+            universalApk(includeUniversalApk.toBoolean())
         }
     }
 
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            storePassword("android")
+            keyAlias("androiddebugkey")
+            keyPassword("android")
         }
     }
 
@@ -133,14 +134,14 @@ android {
 
     buildTypes {
         debug {
-            signingConfig signingConfigs.debug
+            signingConfig(signingConfigs.debug)
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig(signingConfigs.debug)
+            minifyEnabled(enableProguardInReleaseBuilds)
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
 
@@ -177,42 +178,60 @@ android {
 
 
 // Map for the version code that gives each ABI a value.
-ext.abiCodes = ['armeabi-v7a':1, 'x86':2, 'arm64-v8a': 3, 'x86_64':4]
+
+extra.set(
+    "abiCodes", 
+    mapOf(
+        "armeabi-v7a" to 1,
+        "x86" to 2,
+        "arm-v8a" to 3,
+        "x86_64" to 4
+    )
+)
+//ext.abiCodes = [armeabi-v7a':1, 'x86':2, 'arm64-v8a': 3, 'x86_64':4]
 
 // For each APK output variant, override versionCode with a combination of
 // ext.abiCodes * 10000 + variant.versionCode. 
 // variant.versionCode is equal to defaultConfig.versionCode.
 // If you configure product flavors that define their own versionCode, 
 // variant.versionCode uses that value instead.
-android.applicationVariants.all { variant ->
-  variant.outputs.each { output ->
-    def baseAbiVersionCode = project.ext.abiCodes.get(output.getFilter(com.android.build.OutputFile.ABI))
+android.applicationVariants.all {
+    outputs.all {
+        val output = this
+        if (output != null) {
+            val baseAbiVersionCode = (project.extra["abiCodes"] as Map<String, Int>)
+                .get(output.getFilter(com.android.build.OutputFile.ABI))
 
-    // Because abiCodes.get() returns null for ABIs that are not mapped by ext.abiCodes,
-    // the following code doesn't override the version code for universal APKs.
-    // However, because you want universal APKs to have the lowest version code,
-    // this outcome is desirable.
-    if (baseAbiVersionCode != null) {
-
-      // Assigns the new version code to versionCodeOverride, which changes the
-      // version code for only the output APK, not for the variant itself. Skipping
-      // this step causes Gradle to use the value of variant.versionCode for the APK.
-      output.versionCodeOverride = baseAbiVersionCode * 10000 + variant.versionCode
+            // Because abiCodes.get() returns null for ABIs that are not mapped by extra["abiCodes"],
+            // the following code doesn't override the version code for universal APKs.
+            // However, because you want universal APKs to have the lowest version code,
+            // this outcome is desirable.
+            if (baseAbiVersionCode != null) {
+                // Assigns the new version code to versionCodeOverride, which changes the
+                // version code for only the output APK, not for the variant itself. Skipping
+                // this step causes Gradle to use the value of variant.versionCode for the APK.
+                output.versionCodeOverride = baseAbiVersionCode * 10000 + versionCode
+            }
+        }
     }
-  }
 }
 
-android.applicationVariants.all { variant ->
-    def t = tasks.register("generate${variant.name.capitalize()}UniFFIBindings", Exec) {
-        workingDir "${rootProject.projectDir}/../rust"
-        // Runs the bindings generation, note that you must have uniffi-bindgen installed and in your PATH environment variable
-        commandLine 'cargo', 'run', '--release', '--features=uniffi/cli', '--bin', 'uniffi-bindgen', 
-        'generate', '../rust/lib/src/zingo.udl', '--language', 'kotlin', 
-        '--out-dir', "${buildDir}/generated/source/uniffi/${variant.name}/java"
+android.applicationVariants.all {
+    val variant = this
+    val taskName = "generate${variant.name.capitalize()}UniFFIBindings"
+    val task = tasks.register<Exec>(taskName) {
+        workingDir("${rootProject.projectDir}/../rust")
+        // Runs the binding as? com.android.build.gradle.internal.api.BaseVariantOutputImpls generation, note that you must have uniffi-bindgen installed and in your PATH environment variable
+        commandLine(
+            "cargo", "run", "--release", "--features=uniffi/cli", "--bin", "uniffi-bindgen",
+            "generate", "../rust/lib/src/zingo.udl", "--language", "kotlin",
+            "--out-dir", "${buildDir}/generated/source/uniffi/${variant.name}/java"
+        )
     }
-    variant.javaCompileProvider.get().dependsOn(t)
-    def sourceSet = variant.sourceSets.find { it.name == variant.name }
-    sourceSet.java.srcDir new File(buildDir, "generated/source/uniffi/${variant.name}/java")
+    variant.javaCompileProvider.get().dependsOn(task)
+    val sourceSet = variant.sourceSets.find { it.name == variant.name }
+    sourceSet?.java?.srcDir(File(buildDir, "generated/source/uniffi/${variant.name}/java"))
+    
     // XXX: I've been trying to make this work but I can't, so the compiled bindings will show as "regular sources" in Android Studio.
     //idea.module.generatedSourceDirs += file("${buildDir}/generated/source/uniffi/${variant.name}/java/uniffi")
 }
@@ -221,19 +240,19 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
-    androidTestImplementation('com.wix:detox:+')
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    androidTestImplementation("com.wix:detox:+")
+    implementation("androidx.appcompat:appcompat:1.1.0")
 
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
-    implementation 'com.facebook.soloader:soloader:0.10.5+'
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
+    implementation("com.facebook.soloader:soloader:0.10.5+")
 
     
     // Detox tests getAttributes() needs this
-    debugImplementation('com.google.android.material:material:1.2.1')
+    debugImplementation("com.google.android.material:material:1.2.1")
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
-        exclude group:'com.squareup.okhttp3', module:'okhttp'
+        exclude group:"com.squareup.okhttp3', module:'okhttp'
     }
 
     debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
