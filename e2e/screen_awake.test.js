@@ -47,6 +47,6 @@ describe('Kepp the screen awake while syncing.', () => {
       fail('After 20 seconds (screen off timeout 10s) the screen is not awake.');
     }
     const r = spawnSync('adb', ['-e', 'shell', 'settings', 'put', 'system', 'screen_off_timeout', currentValue]);
-    LogBox.info(r);
+    log.info(r);
   });
 });
