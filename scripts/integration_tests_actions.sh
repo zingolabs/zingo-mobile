@@ -114,38 +114,18 @@ case "$abi" in
     x86_64)
         api_level_default="29"
         api_target_default="default"
-        if [ $intel_host_os == true ]; then       
-            arch="x86_64"
-        else
-            arch="arm64-v8a"
-        fi
         ;;
     x86) 
         api_level_default="29"
         api_target_default="default"
-        if [ $intel_host_os == true ]; then       
-            arch="x86"
-        else
-            arch="arm64-v8a"
-        fi
         ;;
     arm64-v8a)
         api_level_default="29"
         api_target_default="default"
-        if [ $intel_host_os == true ]; then       
-            arch="arm64-v8a"
-        else
-            arch="arm64-v8a"
-        fi
         ;;
     armeabi-v7a)
         api_level_default="29"
         api_target_default="default"
-        if [ $intel_host_os == true ]; then       
-            arch="arm64-v8a"
-        else
-            arch="arm64-v8a"
-        fi
         ;;
     *)
         echo "Error: Invalid ABI" >&2
