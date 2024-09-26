@@ -15,9 +15,9 @@ describe('Renders wallet data correctly.', () => {
     // Address taken from the reference implementation
     await element(by.id('send.addressplaceholder')).replaceText('tex1s2rt77ggv6q989lr49rkgzmh5slsksa9khdgte');
 
-    await waitFor(element(by.text('Invalid Address!')))
-      .not.toExist()
-      .withTimeout(2000);
+    await waitFor(element(by.id('send.address.check')))
+      .toExist()
+      .withTimeout(5000);
 
     await element(by.id('send.amount')).replaceText('0');
     await element(by.id('send.scroll-view')).scrollTo('bottom');
