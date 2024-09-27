@@ -10,10 +10,9 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
   it('When App go to background & back to foreground -> Report Screen: blocks & batches are aligned', async () => {
     //await sleep(4000);
 
-    await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
-    await element(by.id('header.drawmenu')).tap();
-    await waitFor(element(by.id('menu.syncreport'))).toBeVisible().withTimeout(sync_timeout);
-    await element(by.id('menu.syncreport')).tap();
+    // waiting for starting to sync and tap on play icon
+    await waitFor(element(by.id('header.playicon'))).toBeVisible().withTimeout(sync_timeout);
+    await element(by.id('header.playicon')).tap();
 
     // waiting for starting the sync process
     await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(sync_timeout);
