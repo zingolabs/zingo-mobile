@@ -1,6 +1,8 @@
-apply(plugin = "com.android.application")
-apply(plugin = "com.facebook.react")
-apply(plugin = "kotlin-android")
+plugins {
+    id("com.android.application")
+    id("com.facebook.react")
+    id("kotlin-android")
+}
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -17,8 +19,7 @@ react {
     //   The cli.js file which is the React Native CLI entrypoint. Default is ../node_modules/react-native/cli.js
     // cliFile = file("../node_modules/react-native/cli.js")
  
-    /* Variants */
-    //   The list of variants to that are debuggable. For those we're going to
+    /* Variants */    //   The list of variants to that are debuggable. For those we're going to
     //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
     //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
     // debuggableVariants = ["liteDebug", "prodDebug"]
@@ -78,19 +79,26 @@ var jscFlavor = "org.webkit:android-jsc:+"
  * Additional option to include a universal APK
  * e.g. ./gradlew assembleRelease -PsplitApk=true -PincludeUniversalApk=true
  */
-ext.splitApk = project.properties['splitApk'] ?: false
-ext.includeUniversalApk = project.properties['includeUniversalApk'] ?: false
+//val splitApk = rootProject.findProperty("splitApk")?.toString().toBoolean()?: false
+val splitApk by lazy {
+    (project.findProperty("splitApk") as? String)?.toBoolean() ?: false
+}
+
+val includeUniversalApk by lazy {
+    (project.findProperty("includeUniversalApk") as?String)?.toBoolean() ?: false
+}
 
 android {
-
-    var ndkVersion = rootProject.extra["ndkVersion"]
-    var compileSdkVersion = rootProject.extra["compileSdkVersion"]
+    var _ndkVersion = rootProject.extra["ndkVersion"]
+    var _compileSdkVersion = rootProject.extra["compileSdkVersion"]
+    var _minSdkVersion = rootProject.extra["minSdkVersion"]
+    var _targetSdkVersion = rootProject.extra["targetSdkVersion"]
 
     namespace = "org.ZingoLabs.Zingo" //fun ?
 
     compileOptions {
-        sourceCompatibility = "18.0.2.1"
-        targetCompatibility = "18.0.2.1"
+        sourceCompatibility = JavaVersion.toVersion("18.0.2.1")
+        targetCompatibility = JavaVersion.toVersion("18.0.2.1")
     }
 
     kotlinOptions {
@@ -98,22 +106,23 @@ android {
     }
 
     defaultConfig {
-        applicationId = namespace // Real 
-        minSdkVersion = rootProject.extra["minSdkVersion"]
-        targetSdkVersion = rootProject.extra["targetSdkVersion"]
+        applicationId = namespace // Real
+        minSdkVersion(_minSdkVersion as Int)
+        targetSdkVersion(_targetSdkVersion as Int)
+
         versionCode = 187 // Real
         versionName = "zingo-1.4.3" // Real
         missingDimensionStrategy("react-native-camera", "general")
-        testBuildType(System.getProperty("testBuildType", "debug"))
-        testInstrumentationRunner("androidx.test.runner.AndroidJUnitRunner")
+        testBuildType = System.getProperty("testBuildType", "debug")        
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     splits {
         abi {
-            enable(splitApk.toBoolean())
+            isEnable = splitApk
             reset()
             include("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
-            universalApk(includeUniversalApk.toBoolean())
+            isUniversalApk = includeUniversalApk
         }
     }
 
@@ -252,7 +261,10 @@ dependencies {
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
-        exclude group:"com.squareup.okhttp3', module:'okhttp'
+        exclude(
+            group="com.squareup.okhttp3",
+            module="okhttp"
+        )
     }
 
     debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
@@ -260,46 +272,48 @@ dependencies {
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
-        implementation jscFlavor
+        implementation(jscFlavor)
     }
 
-	implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.5.0"
+	implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
 
-    def work_version = "2.7.1"
+    val work_version = "2.7.1"
 
     // (Java only)
-    implementation "androidx.work:work-runtime:$work_version"
+    implementation("androidx.work:work-runtime:$work_version")
 
     // Kotlin + coroutines
-    implementation "androidx.work:work-runtime-ktx:$work_version"
+    implementation("androidx.work:work-runtime-ktx:$work_version")
 
     // optional - RxJava2 support
-    implementation "androidx.work:work-rxjava2:$work_version"
+    implementation("androidx.work:work-rxjava2:$work_version")
 
     // optional - GCMNetworkManager support
-    implementation "androidx.work:work-gcm:$work_version"
+    implementation("androidx.work:work-gcm:$work_version")
 
     // optional - Test helpers
-    androidTestImplementation "androidx.work:work-testing:$work_version"
+    androidTestImplementation("androidx.work:work-testing:$work_version")
 
     // optional - Multiprocess support
-    implementation "androidx.work:work-multiprocess:$work_version"
+    implementation("androidx.work:work-multiprocess:$work_version")
     
     // google truth testing framework
-    androidTestImplementation "com.google.truth:truth:1.1.3"
+    androidTestImplementation("com.google.truth:truth:1.1.3")
     
     // JSON parsing
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.14.+"
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.+")
     
     // JUnit test runners
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
 
     // Kotlin extensions for androidx.test.ext.junit
-    androidTestImplementation "androidx.test.ext:junit-ktx:1.1.5"
+    androidTestImplementation("androidx.test.ext:junit-ktx:1.1.5")
 
     // uniffi needs this
-    implementation "net.java.dev.jna:jna:5.9.0@aar"
+    implementation("net.java.dev.jna:jna:5.9.0@aar")
 }
 
-apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+//apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+apply(from = file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"))
+project.extra.applyNativeModulesAppBuildGradle(project)
