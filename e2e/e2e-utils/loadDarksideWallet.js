@@ -4,7 +4,7 @@
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 let loadDarksideWallet = async () => {
-  await sleep(5000);
+  await sleep(2000);
   
   // the start always is like a fress install -> create a new wallet
   // go to setting modal screen
