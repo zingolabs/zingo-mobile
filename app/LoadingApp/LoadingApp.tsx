@@ -591,7 +591,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             type: state.type,
             isConnectionExpensive: state.details && state.details.isConnectionExpensive,
           },
-          screen: screen !== 0 ? 1 : 0,
+          screen: screen === 3 ? 3 : screen !== 0 ? 1 : 0,
           actionButtonsDisabled: true,
         });
         if (isConnected !== state.isConnected) {
