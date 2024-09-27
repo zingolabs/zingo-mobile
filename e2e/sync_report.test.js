@@ -20,11 +20,12 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
 
     // put the App in background
     await device.sendToHome();
-    // put the App to sleep because we need some progress in BS to reproduce the bug
-    await sleep(20000);
+    // put the App to sleep for a while
+    await sleep(5000);
     // put the App in foregroung again
     await device.launchApp({ newInstance: false });
-    await sleep(2000);
+    // we need some time to sync
+    await sleep(15000);
 
     // waiting for starting the sync process again
     await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(sync_timeout);
