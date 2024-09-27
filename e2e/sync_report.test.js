@@ -26,6 +26,8 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     // we need some time to sync
     await sleep(15000);
 
+    await element(by.id('syncreport.scroll-view')).scrollTo('bottom');
+
     // waiting for starting the sync process again
     await waitFor(element(by.id('syncreport.currentbatch'))).toBeVisible().withTimeout(sync_timeout);
 

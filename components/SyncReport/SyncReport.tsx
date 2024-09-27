@@ -232,6 +232,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
       />
 
       <ScrollView
+        testID="syncreport.scroll-view"
         style={{ maxHeight: '85%' }}
         contentContainerStyle={{
           flexDirection: 'column',
