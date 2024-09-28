@@ -445,7 +445,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
                           margin: 5,
                         }}
                       />
-                      <Text style={{ color: colors.text }}>
+                      <Text testID="syncreport.wallettotalblocks" style={{ color: colors.text }}>
                         {serverWallet + (translate('report.blocks') as string)}
                       </Text>
                     </View>
