@@ -1,12 +1,12 @@
 const { log, device, by, element, expect } = require('detox');
 
-import { loadTestWallet } from './e2e-utils/loadTestWallet.js';
+import { loadRecipientWallet } from './e2e-utils/loadRecipientWallet.js';
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 describe('Renders wallet data correctly.', () => {
   // i just pulled this seed out of thin air
-  it('loads a wallet', loadTestWallet);
+  it('loads a wallet', async () => await loadRecipientWallet());
   it('adds return address to the memo if that option is selected, and correctly renders confirm screen', async () => {
     await element(by.text('SEND')).tap();
 

@@ -6,7 +6,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 describe('Renders Sync Report data (blocks & batches) correctly.', () => {
   // i just pulled this seed out of thin air
-  it('loads a wallet', loadTestWallet);
+  it('loads a wallet', async () => await loadTestWallet());
   it('When App go to background & back to foreground -> Report Screen: blocks & batches are aligned', async () => {
     //await sleep(4000);
 

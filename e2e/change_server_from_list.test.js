@@ -6,7 +6,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 describe('Change the Server from the list.', () => {
   // i just pulled this seed out of thin air
-  it('loads a wallet', loadTestWallet);
+  it('loads a wallet', async () => await loadTestWallet());
   it('Go settings & change to an existent server in the list.', async () => {
     //await sleep(4000);
 

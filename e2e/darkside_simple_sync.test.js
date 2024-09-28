@@ -5,7 +5,7 @@ import { loadDarksideWallet } from "./e2e-utils/loadDarksideWallet.js";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 describe('Syncs a darkside chain', () => {
-  it('loads the wallet', loadDarksideWallet);
+  it('loads the wallet', async () => await loadDarksideWallet());
   it('should sync the darkside chain', async () => {
     // wait for fully synced.
     //await sleep(4000);
