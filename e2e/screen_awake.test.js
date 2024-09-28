@@ -1,4 +1,4 @@
-const { log, device, by, element } = require('detox');
+const { log, device, by, element, fail } = require('detox');
 const { spawnSync, execSync } = require('child_process');
 
 import { loadTestWallet } from "./e2e-utils/loadTestWallet.js";

@@ -1,4 +1,4 @@
-const { log, by, element } = require('detox');
+const { log, by, element, fail } = require('detox');
 
 import { loadTestWallet } from "./e2e-utils/loadTestWallet.js";
 
