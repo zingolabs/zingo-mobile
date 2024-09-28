@@ -28,7 +28,7 @@ describe('Change the Server.', () => {
     // waiting for the custom server field
     await waitFor(element(by.id('settings.custom-server-field'))).toBeVisible()
           .whileElement(by.id('settings.scroll-view')).scroll(100, 'down');
-    await element(by.id("settings.custom-server-field")).replaceText('https://lwd1.zcash-infra.com:9067');
+    await element(by.id("settings.custom-server-field")).replaceText('https://lwd2.zcash-infra.com:9067');
 
     // waiting for the toggle, tap on mainnet
     await waitFor(element(by.id('settings.custom-server-chain.mainnet'))).toBeVisible()

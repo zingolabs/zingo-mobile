@@ -54,7 +54,6 @@ let loadRecipientWallet = async () => {
   await waitFor(element(by.text('CONFIRM'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.text('CONFIRM')).tap();
 
-
   // restore from seed
   await waitFor(element(by.id('loadingapp.restorewalletseedufvk'))).toBeVisible().withTimeout(sync_timeout);
   await element(by.id("loadingapp.restorewalletseedufvk")).tap();
