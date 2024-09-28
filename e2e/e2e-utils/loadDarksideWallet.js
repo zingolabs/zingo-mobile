@@ -55,16 +55,16 @@ let loadDarksideWallet = async () => {
   await element(by.text('CONFIRM')).tap();
 
   // restore from seed
-  await waitFor(element(by.id('loadingapp.restorewalletseed'))).toBeVisible().withTimeout(sync_timeout);
-  await element(by.id("loadingapp.restorewalletseed")).tap();
-  await waitFor(element(by.id('seed.seedinput'))).toBeVisible().withTimeout(sync_timeout);
-  await element(by.id("seed.seedinput")).replaceText(
+  await waitFor(element(by.id('loadingapp.restorewalletseedufvk'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.id("loadingapp.restorewalletseedufvk")).tap();
+  await waitFor(element(by.id('import.seedufvkinput'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.id("import.seedufvkinput")).replaceText(
     'still champion voice habit trend flight survey between bitter process artefact blind carbon truly provide dizzy crush flush breeze blouse charge solid fish spread'
   );
-  await waitFor(element(by.id('seed.birthdayinput'))).toBeVisible().withTimeout(sync_timeout);
-  await element(by.id("seed.birthdayinput")).replaceText('0');
-  await waitFor(element(by.id('seed.button.ok'))).toBeVisible().withTimeout(sync_timeout);
-  await element(by.id('seed.button.ok')).tap();
+  await waitFor(element(by.id('import.birthdayinput'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.id("import.birthdayinput")).replaceText('0');
+  await waitFor(element(by.id('import.button.ok'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.id('import.button.ok')).tap();
 }
 
 export { loadDarksideWallet };

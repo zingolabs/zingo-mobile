@@ -1316,7 +1316,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                   {netInfo.isConnected && (
                     <View style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>
                       <Button
-                        testID="loadingapp.restorewalletseed"
+                        testID="loadingapp.restorewalletseedufvk"
                         type={ButtonTypeEnum.Secondary}
                         title={translate('loadingapp.restorewalletseedufvk') as string}
                         disabled={actionButtonsDisabled}

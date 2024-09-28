@@ -56,16 +56,16 @@ let loadRecipientWallet = async () => {
 
 
   // restore from seed
-  await waitFor(element(by.id('loadingapp.restorewalletseed'))).toBeVisible().withTimeout(sync_timeout);
-  await element(by.id("loadingapp.restorewalletseed")).tap();
-  await waitFor(element(by.id('seed.seedinput'))).toBeVisible().withTimeout(sync_timeout);
-  await element(by.id("seed.seedinput")).replaceText(
+  await waitFor(element(by.id('loadingapp.restorewalletseedufvk'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.id("loadingapp.restorewalletseedufvk")).tap();
+  await waitFor(element(by.id('import.seedufvkinput'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.id("import.seedufvkinput")).replaceText(
     'hospital museum valve antique skate museum unfold vocal weird milk scale social vessel identify crowd hospital control album rib bulb path oven civil tank'
   );
-  await waitFor(element(by.id('seed.birthdayinput'))).toBeVisible().withTimeout(sync_timeout);
-  await element(by.id("seed.birthdayinput")).replaceText('1994579');
-  await waitFor(element(by.id('seed.button.ok'))).toBeVisible().withTimeout(sync_timeout);
-  await element(by.id('seed.button.ok')).tap();
+  await waitFor(element(by.id('import.birthdayinput'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.id("import.birthdayinput")).replaceText('1994579');
+  await waitFor(element(by.id('import.button.ok'))).toBeVisible().withTimeout(sync_timeout);
+  await element(by.id('import.button.ok')).tap();
 }
 
 export { loadRecipientWallet };
