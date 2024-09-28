@@ -65,7 +65,7 @@ describe('Change the Server.', () => {
 
     // the 2 blocks have to be greater then the 1 blocks
     if (!(blockssyncednowNum_2 > blockssyncednowNum_1)) {
-      fail('The sync process is not progressing.');
+      throw new Error('The sync process is not progressing.');
     }
   });
 });

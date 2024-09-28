@@ -76,11 +76,11 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     // batch: 1  -> means blocks between 0 and 100
     // batch: 33 -> means blocks between 3200 and 3300
     if (blockssyncednowNum < (batchNum * batchsizeNum) - batchsizeNum || blockssyncednowNum > (batchNum * batchsizeNum)) {
-      fail('The synced blocks are not align with the synced batches');
+      throw new Error('The synced blocks are not align with the synced batches');
     }
     
     if (blockstotalNum < (batchesNum * batchsizeNum) - batchsizeNum || blockstotalNum > (batchesNum * batchsizeNum)) {
-      fail('The total blocks in this process are not align with the total of batches');
+      throw new Error('The total blocks in this process are not align with the total of batches');
     }
   });
 });
