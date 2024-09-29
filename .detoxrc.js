@@ -130,6 +130,10 @@ module.exports = {
       device: 'emulator_x86',
       app: 'android.debug'
     },
+    'android.emu.release': {
+      device: 'emulator_x86',
+      app: 'android.release'
+    },
     'android.emu.x86_64': {
       device: 'emulator_x86_64',
       app: 'android.debug'
