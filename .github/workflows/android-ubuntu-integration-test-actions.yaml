@@ -100,6 +100,7 @@ jobs:
     needs: android-ubuntu-integration-test-actions-avd-cache
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         test: ["offline_testsuite", "execute_sync_from_seed", "execute_send_from_orchard", "execute_currentprice_and_value_transfers_from_seed", "execute_sapling_balance_from_seed"]
     env:
