@@ -27,8 +27,8 @@ describe('Maintains correct information while tx pending', () => {
     await element(by.id('menu.fundpools')).tap();
 
     await waitFor(element(by.id('orchard-total-balance.big-part'))).toBeVisible().withTimeout(sync_timeout);
-    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0097');
-    await expect(element(by.id('orchard-total-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0096');
+    await expect(element(by.id('orchard-total-balance.small-part'))).toHaveText('5000');
     await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 0.0000');
     await expect(element(by.id('orchard-spendable-balance.small-part'))).not.toBeVisible();
     await expect(element(by.id('sapling-total-balance.big-part'))).toHaveText(' 0.0002');
@@ -50,8 +50,8 @@ describe('Maintains correct information while tx pending', () => {
     await element(by.id('menu.fundpools')).tap();
 
     await waitFor(element(by.id('orchard-total-balance.big-part'))).toBeVisible().withTimeout(sync_timeout);
-    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0097');
-    await expect(element(by.id('orchard-total-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0096');
+    await expect(element(by.id('orchard-total-balance.small-part'))).toHaveText('5000');
     await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 0.0000');
     await expect(element(by.id('orchard-spendable-balance.small-part'))).not.toBeVisible();
     await expect(element(by.id('sapling-total-balance.big-part'))).toHaveText(' 0.0002');
@@ -73,8 +73,8 @@ describe('Maintains correct information while tx pending', () => {
     await element(by.id('menu.fundpools')).tap();
 
     await waitFor(element(by.id('orchard-total-balance.big-part'))).toBeVisible().withTimeout(sync_timeout);
-    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0097');
-    await expect(element(by.id('orchard-total-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0096');
+    await expect(element(by.id('orchard-total-balance.small-part'))).toHaveText('5000');
     await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 0.0000');
     await expect(element(by.id('orchard-spendable-balance.small-part'))).not.toBeVisible();
     await expect(element(by.id('sapling-total-balance.big-part'))).toHaveText(' 0.0002');
