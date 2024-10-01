@@ -100,6 +100,7 @@ jobs:
     needs: android-ubuntu-e2e-test-actions-avd-cache
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         # "tex_send_address"
         test: ["reload_while_tx_pending", "change_custom_server", "change_custom_regtest_server", "change_custom_testnet_server", "change_server_from_list", "new_wallet", "screen_awake", "send", "sync_report", "transaction_history"]
