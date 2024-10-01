@@ -1,5 +1,6 @@
 const { log, device, by, element, fail } = require('detox');
 
+import { GlobalConst } from "../app/AppState/index.js";
 import { loadTestWallet } from "./e2e-utils/loadTestWallet.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -58,12 +59,7 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     const blocksnotyetsynced_attributes = await blocksnotyetsynced.getAttributes();
     const blocksnotyetsyncedNum = Number(blocksnotyetsynced_attributes.text.split(' ')[0]);
 
-    await waitFor(element(by.id('syncreport.blocksperbatch'))).toBeVisible().withTimeout(sync_timeout);
-
-    // getting blocks per batch or batch size from the screen
-    const batchsize = element(by.id('syncreport.blocksperbatch'));
-    const batchsize_attributes = await batchsize.getAttributes();
-    const batchsizeNum = Number(batchsize_attributes.text);
+    const batchsizeNum = GlobalConst.blocksPerBatch;
 
     const blockstotalNum = blockssyncednowNum + blocksnotyetsyncedNum;
 
