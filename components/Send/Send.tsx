@@ -814,8 +814,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   //  contentHeight,
   //);
 
-  console.log('render send. Enable memo', memoEnabled);
-
   const returnPage = (
     <View
       accessible={true}
@@ -1492,7 +1490,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                         <FadeText style={{ marginTop: 6 }}>{translate('send.includeua') as string}</FadeText>
                         <CheckBox
                           testID="send.checkboxua"
-                          accessibilityLabel="send.checkboxua"
                           disabled={false}
                           value={ta.includeUAMemo}
                           onValueChange={(value: boolean) => updateToField(null, null, null, null, value)}
