@@ -36,7 +36,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOpti
     (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
   }, []);
 
-  //console.log(totalBalance);
+  console.log('render pools. Balance:', totalBalance);
 
   return (
     <SafeAreaView

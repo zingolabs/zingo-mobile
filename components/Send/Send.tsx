@@ -814,6 +814,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   //  contentHeight,
   //);
 
+  console.log('render send. Enable memo', memoEnabled);
+
   const returnPage = (
     <View
       accessible={true}

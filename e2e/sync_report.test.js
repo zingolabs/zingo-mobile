@@ -37,6 +37,13 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     const batchNum = Number(batches_attributes.text.split(':')[1].split('of')[0]);
     const batchesNum = Number(batches_attributes.text.split(':')[2]);
 
+    await waitFor(element(by.id('syncreport.wallettotalblocks'))).toBeVisible().withTimeout(sync_timeout);
+
+    // calculating total blocks in this sync process
+    const blockstotal = element(by.id('syncreport.wallettotalblocks'));
+    const blockstotal_attributes = await blocksnotyetsynced.getAttributes();
+    const blockstotalNum = Number(blocksnotyetsynced_attributes.text.split(' ')[0]);
+
     await waitFor(element(by.id('syncreport.syncednow'))).toBeVisible().withTimeout(sync_timeout);
 
     // getting blocks now synced from the screen
@@ -50,13 +57,6 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     const blocksnotyetsynced = element(by.id('syncreport.notyetsynced'));
     const blocksnotyetsynced_attributes = await blocksnotyetsynced.getAttributes();
     const blocksnotyetsyncedNum = Number(blocksnotyetsynced_attributes.text.split(' ')[0]);
-
-    await waitFor(element(by.id('syncreport.wallettotalblocks'))).toBeVisible().withTimeout(sync_timeout);
-
-    // calculating total blocks in this sync process
-    const blockstotal = element(by.id('syncreport.wallettotalblocks'));
-    const blockstotal_attributes = await blocksnotyetsynced.getAttributes();
-    const blockstotalNum = Number(blocksnotyetsynced_attributes.text.split(' ')[0]);
 
     await waitFor(element(by.id('syncreport.blocksperbatch'))).toBeVisible().withTimeout(sync_timeout);
 
