@@ -127,31 +127,44 @@ android {
     }
 
     signingConfigs {
-        debug {
-            storeFile file('debug.keystore')
-            storePassword("android")
-            keyAlias("androiddebugkey")
-            keyPassword("android")
+        create("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
         }
     }
 
     packagingOptions {
         jniLibs {
-            pickFirsts += ['lib/armeabi-v7a/libc++_shared.so', 'lib/arm64-v8a/libc++_shared.so', 'lib/x86/libc++_shared.so', 'lib/x86_64/libc++_shared.so']
+            pickFirsts.addAll(
+                listOf(
+                    "lib/armeabi-v7a/libc++_shared.so", 
+                    "lib/arm64-v8a/libc++_shared.so",
+                    "lib/x86/libc++_shared.so",
+                    "lib/x86_64/libc++_shared.so"
+                )
+            )
         }
     }
 
-    buildTypes {
-        debug {
-            signingConfig(signingConfigs.debug)
-        }
-        release {
+    buildTypes {       
+        getByName("release") {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig(signingConfigs.debug)
-            minifyEnabled(enableProguardInReleaseBuilds)
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
+
+            isMinifyEnabled = enableProguardInReleaseBuilds
+            proguardFiles(
+                getDefaultProguardFile("proguard-android.txt"),
+                "proguard-rules.pro"
+            )
         }
+        /* 
+        getByName("debug") {
+            signingConfig = signingConfig.getByName("debug")
+        }
+        */
     }
 
     buildFeatures {
@@ -162,13 +175,13 @@ android {
         // Managed devices for gradle integration testing
         managedDevices {
             devices {
-                pixel2api29_x86 (com.android.build.api.dsl.ManagedVirtualDevice) {
+                create<com.android.build.api.dsl.ManagedVirtualDevice>("pixel2api29_x86") {
                     device = "Pixel 2"
                     apiLevel = 29
                     systemImageSource = "aosp"
                     require64Bit = false
                 }
-                pixel2api30_x86_64 (com.android.build.api.dsl.ManagedVirtualDevice) {
+                create<com.android.build.api.dsl.ManagedVirtualDevice>("pixel2api30_x86_64") { //(com.android.build.api.dsl.ManagedVirtualDevice) {
                     device = "Pixel 2"
                     apiLevel = 30
                     systemImageSource = "aosp"
@@ -176,9 +189,9 @@ android {
                 }
             }
             groups {
-                x86_Archs {
-                    targetDevices.add(devices.pixel2api29_x86)
-                    targetDevices.add(devices.pixel2api30_x86_64)
+                create("x86_Archs") {
+                    targetDevices.add(devices.getByName("pixel2api29_x86"))
+                    targetDevices.add(devices.getByName("pixel2api30_x86_64"))
                 }
             }
         }
@@ -204,45 +217,47 @@ extra.set(
 // variant.versionCode is equal to defaultConfig.versionCode.
 // If you configure product flavors that define their own versionCode, 
 // variant.versionCode uses that value instead.
-android.applicationVariants.all {
-    outputs.all {
-        val output = this
-        if (output != null) {
-            val baseAbiVersionCode = (project.extra["abiCodes"] as Map<String, Int>)
-                .get(output.getFilter(com.android.build.OutputFile.ABI))
+android {
+    applicationVariants.all {
+        val variant = this
+        outputs.map { output ->
+            if (output is com.android.build.gradle.internal.api.ApkVariantOutputImpl) {
+                val abiCodes: Map<String, Int> by project.extra
+                val baseAbiVersionCode = abiCodes[output.filters.find { it.filterType == "ABI" }?.identifier]
 
-            // Because abiCodes.get() returns null for ABIs that are not mapped by extra["abiCodes"],
-            // the following code doesn't override the version code for universal APKs.
-            // However, because you want universal APKs to have the lowest version code,
-            // this outcome is desirable.
-            if (baseAbiVersionCode != null) {
-                // Assigns the new version code to versionCodeOverride, which changes the
-                // version code for only the output APK, not for the variant itself. Skipping
-                // this step causes Gradle to use the value of variant.versionCode for the APK.
-                output.versionCodeOverride = baseAbiVersionCode * 10000 + versionCode
+                baseAbiVersionCode?.let { baseCode ->
+                    output.versionCodeOverride = baseCode * 10000 + (variant.versionCode ?: 0)
+                }
             }
         }
     }
 }
 
-android.applicationVariants.all {
-    val variant = this
-    val taskName = "generate${variant.name.capitalize()}UniFFIBindings"
-    val task = tasks.register<Exec>(taskName) {
-        workingDir("${rootProject.projectDir}/../rust")
-        // Runs the binding as? com.android.build.gradle.internal.api.BaseVariantOutputImpls generation, note that you must have uniffi-bindgen installed and in your PATH environment variable
-        commandLine(
-            "cargo", "run", "--release", "--features=uniffi/cli", "--bin", "uniffi-bindgen",
-            "generate", "../rust/lib/src/zingo.udl", "--language", "kotlin",
-            "--out-dir", "${buildDir}/generated/source/uniffi/${variant.name}/java"
-        )
+android {
+    applicationVariants.all {
+        val variant = this
+        val taskName = "generate${variant.name.capitalize()}UniFFIBindings"
+        
+        val task = tasks.register<Exec>(taskName) {
+            workingDir("${rootProject.projectDir}/../rust")
+            commandLine(
+                "cargo", "run", "--release", "--features=uniffi/cli", "--bin", "uniffi-bindgen",
+                "generate", "../rust/lib/src/zingo.udl", "--language", "kotlin",
+                "--out-dir", "${buildDir}/generated/source/uniffi/${variant.name}/java"
+            )
+        }
+
+        variant.javaCompileProvider.get().dependsOn(task)
+
+        variant.sourceSets.find { it.name == variant.name }?.let { sourceSet ->
+            sourceSet.java.srcDirs(sourceSet.java.srcDirs + File(buildDirs, "generated/source/uniffi/$variant.name/java"))
+        }
+
+        // Note: The following line is commented out as it wasn't working in the original code
+        // project.extensions.getByType<org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension>().sourceSets.getByName(variant.name) {
+        //     kotlin.srcDir("${buildDir}/generated/source/uniffi/${variant.name}/java")
+        // }
     }
-    variant.javaCompileProvider.get().dependsOn(task)
-    val sourceSet = variant.sourceSets.find { it.name == variant.name }
-    sourceSet?.java?.srcDir(File(buildDir, "generated/source/uniffi/${variant.name}/java"))
-    
-    // XXX: I've been trying to make this work but I can't, so the compiled bindings will show as "regular sources" in Android Studio.
-    //idea.module.generatedSourceDirs += file("${buildDir}/generated/source/uniffi/${variant.name}/java/uniffi")
 }
             
 dependencies {
