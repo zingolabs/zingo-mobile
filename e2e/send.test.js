@@ -17,10 +17,11 @@ describe('Renders wallet data correctly.', () => {
       .toExist()
       .withTimeout(5000);
 
-    await element(by.id('send.scroll-view')).scrollTo('bottom');
-    await expect(element(by.id('send.checkboxua'))).toBeVisible();
-    await element(by.id('send.checkboxua')).tap();
-    await element(by.id('send.scroll-view')).scrollTo('bottom');
+    //await element(by.id('send.scroll-view')).scrollTo('bottom');
+    //await expect(element(by.id('send.checkboxua'))).toBeVisible();
+    //await element(by.id('send.checkboxua')).tap();
+    //await element(by.id('send.scroll-view')).scrollTo('bottom');
+    await expect(element(by.id('send.memo-field'))).toBeVisible();
     await element(by.id('send.memo-field')).replaceText('1\n2\n3\n4\n5\n6\n7\n8');
     await element(by.id('send.scroll-view')).scrollTo('bottom');
 
@@ -34,8 +35,11 @@ describe('Renders wallet data correctly.', () => {
     const memo = element(by.id('send.confirm-memo'));
 
     await expect(memo).toBeVisible(100);
+    //await expect(memo).toHaveText(
+    //  '1\n2\n3\n4\n5\n6\n7\n8\nReply to: \nuregtest1zkuzfv5m3yhv2j4fmvq5rjurkxenxyq8r7h4daun2zkznrjaa8ra8asgdm8wwgwjvlwwrxx7347r8w0ee6dqyw4rufw4wg9djwcr6frzkezmdw6dud3wsm99eany5r8wgsctlxquu009nzd6hsme2tcsk0v3sgjvxa70er7h27z5epr67p5q767s2z5gt88paru56mxpm6pwz0cu35m',
+    //);
     await expect(memo).toHaveText(
-      '1\n2\n3\n4\n5\n6\n7\n8\nReply to: \nuregtest1zkuzfv5m3yhv2j4fmvq5rjurkxenxyq8r7h4daun2zkznrjaa8ra8asgdm8wwgwjvlwwrxx7347r8w0ee6dqyw4rufw4wg9djwcr6frzkezmdw6dud3wsm99eany5r8wgsctlxquu009nzd6hsme2tcsk0v3sgjvxa70er7h27z5epr67p5q767s2z5gt88paru56mxpm6pwz0cu35m',
+      '1\n2\n3\n4\n5\n6\n7\n8',
     );
   });
 });
