@@ -11,10 +11,12 @@ describe('Renders wallet data correctly.', () => {
     await element(by.text('SEND')).tap();
 
     await element(by.id('send.addressplaceholder')).replaceText(
-      'u1lx7nlnqqqs7p4hcqz4hyjgnw7h8zskcgr2f8dfhm96np0gnfdzu7jtms7q2pxd7ufy96wxzdsdy65jvp3td7fj2ltcz0jpak86ddyszl9ykn5s86q3xataya5867z3tj2x8cw0ljyrenymr2gcqmjf50gmexqj233yn3kdaxn2yukwcx87emurufakf82wapgnu5h3fvae6aw9uus2r',
+      'uregtest1zkuzfv5m3yhv2j4fmvq5rjurkxenxyq8r7h4daun2zkznrjaa8ra8asgdm8wwgwjvlwwrxx7347r8w0ee6dqyw4rufw4wg9djwcr6frzkezmdw6dud3wsm99eany5r8wgsctlxquu009nzd6hsme2tcsk0v3sgjvxa70er7h27z5epr67p5q767s2z5gt88paru56mxpm6pwz0cu35m',
     );
-    //await element(by.id('send.amount')).replaceText('0');
-    //await element(by.id('send.scroll-view')).scrollTo('bottom');
+    await waitFor(element(by.id('send.address.check')))
+    .toExist()
+    .withTimeout(5000);
+
     await waitFor(element(by.id('send.checkboxua'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('send.checkboxua')).tap();
     await element(by.id('send.scroll-view')).scrollTo('bottom');
@@ -32,7 +34,7 @@ describe('Renders wallet data correctly.', () => {
 
     await expect(memo).toBeVisible(100);
     await expect(memo).toHaveText(
-      '1\n2\n3\n4\n5\n6\n7\n8\nReply to: \nu1lx7nlnqqqs7p4hcqz4hyjgnw7h8zskcgr2f8dfhm96np0gnfdzu7jtms7q2pxd7ufy96wxzdsdy65jvp3td7fj2ltcz0jpak86ddyszl9ykn5s86q3xataya5867z3tj2x8cw0ljyrenymr2gcqmjf50gmexqj233yn3kdaxn2yukwcx87emurufakf82wapgnu5h3fvae6aw9uus2r',
+      '1\n2\n3\n4\n5\n6\n7\n8\nReply to: \nuregtest1zkuzfv5m3yhv2j4fmvq5rjurkxenxyq8r7h4daun2zkznrjaa8ra8asgdm8wwgwjvlwwrxx7347r8w0ee6dqyw4rufw4wg9djwcr6frzkezmdw6dud3wsm99eany5r8wgsctlxquu009nzd6hsme2tcsk0v3sgjvxa70er7h27z5epr67p5q767s2z5gt88paru56mxpm6pwz0cu35m',
     );
   });
 });

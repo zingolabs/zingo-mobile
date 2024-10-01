@@ -212,7 +212,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
     wallet.birthday,
   ]);
 
-  //console.log('render sync report - 5', syncingStatus);
+  console.log('render sync report. ServerWallet:', serverWallet);
 
   return (
     <SafeAreaView
