@@ -5,7 +5,7 @@ import { loadRecipientWallet } from './e2e-utils/loadRecipientWallet.js';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 describe('Renders wallet data correctly.', () => {
-  it('loads a wallet', loadRecipientWallet());
+  it('loads a wallet', async () => await loadRecipientWallet());
   it('parses the TEX address and correctly renders the confirm screen', async () => {
     await waitFor(element(by.id('vt-1')))
       .toExist()

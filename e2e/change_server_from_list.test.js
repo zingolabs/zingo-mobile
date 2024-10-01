@@ -1,4 +1,4 @@
-const { log, by, element } = require('detox');
+const { log, by, element, fail } = require('detox');
 
 import { loadTestWallet } from "./e2e-utils/loadTestWallet.js";
 
@@ -6,7 +6,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 describe('Change the Server from the list.', () => {
   // i just pulled this seed out of thin air
-  it('loads a wallet', loadTestWallet);
+  it('loads a wallet', async () => await loadTestWallet());
   it('Go settings & change to an existent server in the list.', async () => {
     //await sleep(4000);
 
@@ -48,7 +48,7 @@ describe('Change the Server from the list.', () => {
     log.info('blocks 1:', blockssyncednowNum_1);
 
     // wait a little bit
-    await sleep(25000);
+    await sleep(40000);
 
     // getting blocks now synced from the screen
     const blockssyncednow_2 = element(by.id('syncreport.syncednow'));
@@ -59,7 +59,7 @@ describe('Change the Server from the list.', () => {
 
     // the 2 blocks have to be greater then the 1 blocks
     if (!(blockssyncednowNum_2 > blockssyncednowNum_1)) {
-      fail('The sync process is not progressing.');
+      throw new Error('The sync process is not progressing.');
     }
   });
 });

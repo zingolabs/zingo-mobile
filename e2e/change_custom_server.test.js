@@ -1,4 +1,4 @@
-const { log, by, element } = require('detox');
+const { log, by, element, fail } = require('detox');
 
 import { loadTestWallet } from "./e2e-utils/loadTestWallet.js";
 
@@ -6,7 +6,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 describe('Change the Server.', () => {
   // i just pulled this seed out of thin air
-  it('loads a wallet', loadTestWallet);
+  it('loads a wallet', async () => await loadTestWallet());
   it('Go settings & change to a correct Mainnet server URI.', async () => {
     //await sleep(4000);
 
@@ -28,7 +28,7 @@ describe('Change the Server.', () => {
     // waiting for the custom server field
     await waitFor(element(by.id('settings.custom-server-field'))).toBeVisible()
           .whileElement(by.id('settings.scroll-view')).scroll(100, 'down');
-    await element(by.id("settings.custom-server-field")).replaceText('https://lwd1.zcash-infra.com:9067');
+    await element(by.id("settings.custom-server-field")).replaceText('https://lwd2.zcash-infra.com:9067');
 
     // waiting for the toggle, tap on mainnet
     await waitFor(element(by.id('settings.custom-server-chain.mainnet'))).toBeVisible()
@@ -65,7 +65,7 @@ describe('Change the Server.', () => {
 
     // the 2 blocks have to be greater then the 1 blocks
     if (!(blockssyncednowNum_2 > blockssyncednowNum_1)) {
-      fail('The sync process is not progressing.');
+      throw new Error('The sync process is not progressing.');
     }
   });
 });

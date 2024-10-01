@@ -140,6 +140,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         "maxHeight": "85%",
       }
     }
+    testID="syncreport.scroll-view"
   >
     <View>
       <View
