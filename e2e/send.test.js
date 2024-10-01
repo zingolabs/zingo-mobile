@@ -14,8 +14,8 @@ describe('Renders wallet data correctly.', () => {
       'uregtest1zkuzfv5m3yhv2j4fmvq5rjurkxenxyq8r7h4daun2zkznrjaa8ra8asgdm8wwgwjvlwwrxx7347r8w0ee6dqyw4rufw4wg9djwcr6frzkezmdw6dud3wsm99eany5r8wgsctlxquu009nzd6hsme2tcsk0v3sgjvxa70er7h27z5epr67p5q767s2z5gt88paru56mxpm6pwz0cu35m',
     );
     await waitFor(element(by.id('send.address.check')))
-    .toExist()
-    .withTimeout(5000);
+      .toExist()
+      .withTimeout(5000);
 
     //await expect(element(by.id('send.checkboxua'))).toBeVisible();
     await element(by.id('send.checkboxua')).tap();
