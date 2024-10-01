@@ -17,7 +17,7 @@ describe('Renders wallet data correctly.', () => {
     .toExist()
     .withTimeout(5000);
 
-    await expect(element(by.id('send.checkboxua'))).toBeVisible().withTimeout(sync_timeout);
+    await expect(element(by.id('send.checkboxua'))).toBeVisible();
     await element(by.id('send.checkboxua')).tap();
     await element(by.id('send.scroll-view')).scrollTo('bottom');
     await element(by.id('send.memo-field')).replaceText('1\n2\n3\n4\n5\n6\n7\n8');

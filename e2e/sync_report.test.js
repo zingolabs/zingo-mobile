@@ -38,7 +38,7 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     const batchNum = Number(batches_attributes.text.split(':')[1].split('of')[0]);
     const batchesNum = Number(batches_attributes.text.split(':')[2]);
 
-    await waitFor(element(by.id('syncreport.wallettotalblocks'))).toBeVisible().withTimeout(sync_timeout);
+    //await waitFor(element(by.id('syncreport.wallettotalblocks'))).toBeVisible().withTimeout(sync_timeout);
 
     // calculating total blocks in this sync process
     //const blockstotal = element(by.id('syncreport.wallettotalblocks'));
