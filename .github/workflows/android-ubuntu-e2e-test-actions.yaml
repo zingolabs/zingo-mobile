@@ -253,9 +253,6 @@ jobs:
           echo "Disk space after post-build cleanup:"
           df -h
 
-      - name: Yarn Start
-        run: nohup yarn start > "yarn_react_native_start.out" &
-
       - name: Run e2e Test
         uses: reactivecircus/android-emulator-runner@v2
         with:

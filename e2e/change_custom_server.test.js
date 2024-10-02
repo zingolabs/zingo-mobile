@@ -1,4 +1,4 @@
-const { log, by, element, fail } = require('detox');
+const { log, by, element } = require('detox');
 
 import { loadTestWallet } from "./e2e-utils/loadTestWallet.js";
 
@@ -35,7 +35,7 @@ describe('Change the Server.', () => {
           .whileElement(by.id('settings.scroll-view')).scroll(100, 'down');
     await element(by.id('settings.custom-server-chain.mainnet')).tap();
     
-    // save the new server
+    // save the new mainnet server
     await waitFor(element(by.id('settings.button.save'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('settings.button.save')).tap();
 
@@ -54,7 +54,7 @@ describe('Change the Server.', () => {
     log.info('blocks 1:', blockssyncednowNum_1);
 
     // wait a little bit
-    await sleep(15000);
+    await sleep(20000);
 
     // getting blocks now synced from the screen
     const blockssyncednow_2 = element(by.id('syncreport.syncednow'));

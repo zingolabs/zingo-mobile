@@ -10,7 +10,7 @@ describe('Change the Server.', () => {
   it('Go settings & change to a correct Testnet server URI.', async () => {
     //await sleep(4000);
 
-    // go to setting modal screen again
+    // go to setting modal screen
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();
     await waitFor(element(by.id('menu.settings'))).toBeVisible().withTimeout(sync_timeout);

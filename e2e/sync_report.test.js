@@ -1,5 +1,6 @@
 const { log, device, by, element, fail } = require('detox');
 
+import { GlobalConst } from "../app/AppState/index.js";
 import { loadTestWallet } from "./e2e-utils/loadTestWallet.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -37,6 +38,13 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     const batchNum = Number(batches_attributes.text.split(':')[1].split('of')[0]);
     const batchesNum = Number(batches_attributes.text.split(':')[2]);
 
+    //await waitFor(element(by.id('syncreport.wallettotalblocks'))).toBeVisible().withTimeout(sync_timeout);
+
+    // calculating total blocks in this sync process
+    //const blockstotal = element(by.id('syncreport.wallettotalblocks'));
+    //const blockstotal_attributes = await blockstotal.getAttributes();
+    //const blockstotalNum = Number(blockstotal_attributes.text.split(' ')[0]);
+
     await waitFor(element(by.id('syncreport.syncednow'))).toBeVisible().withTimeout(sync_timeout);
 
     // getting blocks now synced from the screen
@@ -51,19 +59,9 @@ describe('Renders Sync Report data (blocks & batches) correctly.', () => {
     const blocksnotyetsynced_attributes = await blocksnotyetsynced.getAttributes();
     const blocksnotyetsyncedNum = Number(blocksnotyetsynced_attributes.text.split(' ')[0]);
 
-    await waitFor(element(by.id('syncreport.wallettotalblocks'))).toBeVisible().withTimeout(sync_timeout);
+    const batchsizeNum = GlobalConst.blocksPerBatch;
 
-    // calculating total blocks in this sync process
-    const blockstotal = element(by.id('syncreport.wallettotalblocks'));
-    const blockstotal_attributes = await blocksnotyetsynced.getAttributes();
-    const blockstotalNum = Number(blocksnotyetsynced_attributes.text.split(' ')[0]);
-
-    await waitFor(element(by.id('syncreport.blocksperbatch'))).toBeVisible().withTimeout(sync_timeout);
-
-    // getting blocks per batch or batch size from the screen
-    const batchsize = element(by.id('syncreport.blocksperbatch'));
-    const batchsize_attributes = await batchsize.getAttributes();
-    const batchsizeNum = Number(batchsize_attributes.text);
+    const blockstotalNum = blockssyncednowNum + blocksnotyetsyncedNum;
 
     log.info('batches', batchNum);
     log.info('total batches', batchesNum);

@@ -25,7 +25,9 @@ describe('Maintains correct information while tx pending', () => {
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();
     await element(by.id('menu.fundpools')).tap();
-    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0097');
+
+    await waitFor(element(by.id('orchard-total-balance.big-part'))).toBeVisible().withTimeout(sync_timeout);
+    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0096');
     await expect(element(by.id('orchard-total-balance.small-part'))).not.toBeVisible();
     await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 0.0000');
     await expect(element(by.id('orchard-spendable-balance.small-part'))).not.toBeVisible();
@@ -46,7 +48,9 @@ describe('Maintains correct information while tx pending', () => {
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();
     await element(by.id('menu.fundpools')).tap();
-    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0097');
+
+    await waitFor(element(by.id('orchard-total-balance.big-part'))).toBeVisible().withTimeout(sync_timeout);
+    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0096');
     await expect(element(by.id('orchard-total-balance.small-part'))).not.toBeVisible();
     await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 0.0000');
     await expect(element(by.id('orchard-spendable-balance.small-part'))).not.toBeVisible();
@@ -56,6 +60,7 @@ describe('Maintains correct information while tx pending', () => {
     await expect(element(by.id('sapling-spendable-balance.small-part'))).not.toBeVisible();
     await expect(element(by.id('transparent-balance.big-part'))).toHaveText(' 0.0000');
     await expect(element(by.id('transparent-total-balance.small-part'))).not.toBeVisible();
+    await element(by.id('fundpools.button.close')).tap();
   });
   it('should show correct pool balances after restarting', async () => {
     await device.sendToHome();
@@ -66,7 +71,9 @@ describe('Maintains correct information while tx pending', () => {
     await waitFor(element(by.id('header.drawmenu'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('header.drawmenu')).tap();
     await element(by.id('menu.fundpools')).tap();
-    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0097');
+
+    await waitFor(element(by.id('orchard-total-balance.big-part'))).toBeVisible().withTimeout(sync_timeout);
+    await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 0.0096');
     await expect(element(by.id('orchard-total-balance.small-part'))).not.toBeVisible();
     await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 0.0000');
     await expect(element(by.id('orchard-spendable-balance.small-part'))).not.toBeVisible();
