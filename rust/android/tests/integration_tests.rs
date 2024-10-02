@@ -161,27 +161,27 @@ mod integration {
 
         #[tokio::test]
         async fn offline_testsuite() {
-            super::offline_testsuite(ABI).await;
+            crate::offline_testsuite(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_sync_from_seed() {
-            super::execute_sync_from_seed(ABI).await;
+            crate::execute_sync_from_seed(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_send_from_orchard() {
-            super::execute_send_from_orchard(ABI).await;
+            crate::execute_send_from_orchard(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_currentprice_and_value_transfers_from_seed() {
-            super::execute_currentprice_and_value_transfers_from_seed(ABI).await;
+            crate::execute_currentprice_and_value_transfers_from_seed(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_sapling_balance_from_seed() {
-            super::execute_sapling_balance_from_seed(ABI).await;
+            crate::execute_sapling_balance_from_seed(ABI).await;
         }
     }
 
@@ -190,27 +190,27 @@ mod integration {
 
         #[tokio::test]
         async fn offline_testsuite() {
-            super::offline_testsuite(ABI).await;
+            crate::offline_testsuite(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_sync_from_seed() {
-            super::execute_sync_from_seed(ABI).await;
+            crate::execute_sync_from_seed(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_send_from_orchard() {
-            super::execute_send_from_orchard(ABI).await;
+            crate::execute_send_from_orchard(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_currentprice_and_value_transfers_from_seed() {
-            super::execute_currentprice_and_value_transfers_from_seed(ABI).await;
+            crate::execute_currentprice_and_value_transfers_from_seed(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_sapling_balance_from_seed() {
-            super::execute_sapling_balance_from_seed(ABI).await;
+            crate::execute_sapling_balance_from_seed(ABI).await;
         }
     }
 
@@ -219,27 +219,27 @@ mod integration {
 
         #[tokio::test]
         async fn offline_testsuite() {
-            super::offline_testsuite(ABI).await;
+            crate::offline_testsuite(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_sync_from_seed() {
-            super::execute_sync_from_seed(ABI).await;
+            crate::execute_sync_from_seed(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_send_from_orchard() {
-            super::execute_send_from_orchard(ABI).await;
+            crate::execute_send_from_orchard(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_currentprice_and_value_transfers_from_seed() {
-            super::execute_currentprice_and_value_transfers_from_seed(ABI).await;
+            crate::execute_currentprice_and_value_transfers_from_seed(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_sapling_balance_from_seed() {
-            super::execute_sapling_balance_from_seed(ABI).await;
+            crate::execute_sapling_balance_from_seed(ABI).await;
         }
     }
 
@@ -248,27 +248,27 @@ mod integration {
 
         #[tokio::test]
         async fn offline_testsuite() {
-            super::offline_testsuite(ABI).await;
+            crate::offline_testsuite(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_sync_from_seed() {
-            super::execute_sync_from_seed(ABI).await;
+            crate::execute_sync_from_seed(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_send_from_orchard() {
-            super::execute_send_from_orchard(ABI).await;
+            crate::execute_send_from_orchard(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_currentprice_and_value_transfers_from_seed() {
-            super::execute_currentprice_and_value_transfers_from_seed(ABI).await;
+            crate::execute_currentprice_and_value_transfers_from_seed(ABI).await;
         }
 
         #[tokio::test]
         async fn execute_sapling_balance_from_seed() {
-            super::execute_sapling_balance_from_seed(ABI).await;
+            crate::execute_sapling_balance_from_seed(ABI).await;
         }
     }
 }

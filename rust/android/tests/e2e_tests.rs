@@ -269,277 +269,273 @@ async fn darkside_simple_sync(abi: &str) {
 
 mod e2e {
     mod x86_32 {
-        use super::*;
         const ABI: &str = "x86";
 
         #[tokio::test]
         async fn tex_send_address() {
-            super::tex_send_address(ABI).await;
+            crate::tex_send_address(ABI).await;
         }
 
         #[tokio::test]
         async fn reload_while_tx_pending() {
-            super::reload_while_tx_pending(ABI).await;
+            crate::reload_while_tx_pending(ABI).await;
         }
 
         #[tokio::test]
         async fn change_custom_server() {
-            super::change_custom_server(ABI).await;
+            crate::change_custom_server(ABI).await;
         }
 
         #[tokio::test]
         async fn change_custom_regtest_server() {
-            super::change_custom_regtest_server(ABI).await;
+            crate::change_custom_regtest_server(ABI).await;
         }
 
         #[tokio::test]
         async fn change_custom_testnet_server() {
-            super::change_custom_testnet_server(ABI).await;
+            crate::change_custom_testnet_server(ABI).await;
         }
 
         #[tokio::test]
         async fn change_server_from_list() {
-            super::change_server_from_list(ABI).await;
+            crate::change_server_from_list(ABI).await;
         }
 
         #[tokio::test]
         async fn new_wallet() {
-            super::new_wallet(ABI).await;
+            crate::new_wallet(ABI).await;
         }
 
         #[tokio::test]
         async fn screen_awake() {
-            super::screen_awake(ABI).await;
+            crate::screen_awake(ABI).await;
         }
 
         #[tokio::test]
         async fn send() {
-            super::send(ABI).await;
+            crate::send(ABI).await;
         }
 
         #[tokio::test]
         async fn sync_report() {
-            super::sync_report(ABI).await;
+            crate::sync_report(ABI).await;
         }
 
         #[tokio::test]
         async fn transaction_history() {
-            super::transaction_history(ABI).await;
+            crate::transaction_history(ABI).await;
         }
 
         mod darkside {
-            const ABI: &str = "x86";
+            //const ABI: &str = "x86";
 
             #[tokio::test]
             async fn darkside_simple_sync() {
-                super::darkside_simple_sync(ABI).await;
+                crate::darkside_simple_sync(super::ABI).await;
             }
         }
     }
 
     mod x86_64 {
-        use super::*;
         const ABI: &str = "x86_64";
 
         #[tokio::test]
         async fn tex_send_address() {
-            super::tex_send_address(ABI).await;
+            crate::tex_send_address(ABI).await;
         }
 
         #[tokio::test]
         async fn reload_while_tx_pending() {
-            super::reload_while_tx_pending(ABI).await;
+            crate::reload_while_tx_pending(ABI).await;
         }
 
         #[tokio::test]
         async fn change_custom_server() {
-            super::change_custom_server(ABI).await;
+            crate::change_custom_server(ABI).await;
         }
 
         #[tokio::test]
         async fn change_custom_regtest_server() {
-            super::change_custom_regtest_server(ABI).await;
+            crate::change_custom_regtest_server(ABI).await;
         }
 
         #[tokio::test]
         async fn change_custom_testnet_server() {
-            super::change_custom_testnet_server(ABI).await;
+            crate::change_custom_testnet_server(ABI).await;
         }
 
         #[tokio::test]
         async fn change_server_from_list() {
-            super::change_server_from_list(ABI).await;
+            crate::change_server_from_list(ABI).await;
         }
 
         #[tokio::test]
         async fn new_wallet() {
-            super::new_wallet(ABI).await;
+            crate::new_wallet(ABI).await;
         }
 
         #[tokio::test]
         async fn screen_awake() {
-            super::screen_awake(ABI).await;
+            crate::screen_awake(ABI).await;
         }
 
         #[tokio::test]
         async fn send() {
-            super::send(ABI).await;
+            crate::send(ABI).await;
         }
 
         #[tokio::test]
         async fn sync_report() {
-            super::sync_report(ABI).await;
+            crate::sync_report(ABI).await;
         }
 
         #[tokio::test]
         async fn transaction_history() {
-            super::transaction_history(ABI).await;
+            crate::transaction_history(ABI).await;
         }
 
         mod darkside {
-            const ABI: &str = "x86_64";
+            //const ABI: &str = "x86_64";
 
             #[tokio::test]
             async fn darkside_simple_sync() {
-                super::darkside_simple_sync(ABI).await;
+                crate::darkside_simple_sync(super::ABI).await;
             }
         }
     }
 
     mod arm32 {
-        use super::*;
         const ABI: &str = "armeabi-v7a";
 
         #[tokio::test]
         async fn tex_send_address() {
-            super::tex_send_address(ABI).await;
+            crate::tex_send_address(ABI).await;
         }
 
         #[tokio::test]
         async fn reload_while_tx_pending() {
-            super::reload_while_tx_pending(ABI).await;
+            crate::reload_while_tx_pending(ABI).await;
         }
 
         #[tokio::test]
         async fn change_custom_server() {
-            super::change_custom_server(ABI).await;
+            crate::change_custom_server(ABI).await;
         }
 
         #[tokio::test]
         async fn change_custom_regtest_server() {
-            super::change_custom_regtest_server(ABI).await;
+            crate::change_custom_regtest_server(ABI).await;
         }
 
         #[tokio::test]
         async fn change_custom_testnet_server() {
-            super::change_custom_testnet_server(ABI).await;
+            crate::change_custom_testnet_server(ABI).await;
         }
 
         #[tokio::test]
         async fn change_server_from_list() {
-            super::change_server_from_list(ABI).await;
+            crate::change_server_from_list(ABI).await;
         }
 
         #[tokio::test]
         async fn new_wallet() {
-            super::new_wallet(ABI).await;
+            crate::new_wallet(ABI).await;
         }
 
         #[tokio::test]
         async fn screen_awake() {
-            super::screen_awake(ABI).await;
+            crate::screen_awake(ABI).await;
         }
 
         #[tokio::test]
         async fn send() {
-            super::send(ABI).await;
+            crate::send(ABI).await;
         }
 
         #[tokio::test]
         async fn sync_report() {
-            super::sync_report(ABI).await;
+            crate::sync_report(ABI).await;
         }
 
         #[tokio::test]
         async fn transaction_history() {
-            super::transaction_history(ABI).await;
+            crate::transaction_history(ABI).await;
         }
 
         mod darkside {
-            const ABI: &str = "armeabi-v7a";
+            //const ABI: &str = "armeabi-v7a";
 
             #[tokio::test]
             async fn darkside_simple_sync() {
-                super::darkside_simple_sync(ABI).await;
+                crate::darkside_simple_sync(super::ABI).await;
             }
         }
     }
 
     mod arm64 {
-        use super::*;
         const ABI: &str = "arm64-v8a";
 
         #[tokio::test]
         async fn tex_send_address() {
-            super::tex_send_address(ABI).await;
+            crate::tex_send_address(ABI).await;
         }
 
         #[tokio::test]
         async fn reload_while_tx_pending() {
-            super::reload_while_tx_pending(ABI).await;
+            crate::reload_while_tx_pending(ABI).await;
         }
 
         #[tokio::test]
         async fn change_custom_server() {
-            super::change_custom_server(ABI).await;
+            crate::change_custom_server(ABI).await;
         }
 
         #[tokio::test]
         async fn change_custom_regtest_server() {
-            super::change_custom_regtest_server(ABI).await;
+            crate::change_custom_regtest_server(ABI).await;
         }
 
         #[tokio::test]
         async fn change_custom_testnet_server() {
-            super::change_custom_testnet_server(ABI).await;
+            crate::change_custom_testnet_server(ABI).await;
         }
 
         #[tokio::test]
         async fn change_server_from_list() {
-            super::change_server_from_list(ABI).await;
+            crate::change_server_from_list(ABI).await;
         }
 
         #[tokio::test]
         async fn new_wallet() {
-            super::new_wallet(ABI).await;
+            crate::new_wallet(ABI).await;
         }
 
         #[tokio::test]
         async fn screen_awake() {
-            super::screen_awake(ABI).await;
+            crate::screen_awake(ABI).await;
         }
 
         #[tokio::test]
         async fn send() {
-            super::send(ABI).await;
+            crate::send(ABI).await;
         }
 
         #[tokio::test]
         async fn sync_report() {
-            super::sync_report(ABI).await;
+            crate::sync_report(ABI).await;
         }
 
         #[tokio::test]
         async fn transaction_history() {
-            super::transaction_history(ABI).await;
+            crate::transaction_history(ABI).await;
         }
 
         mod darkside {
-            const ABI: &str = "arm64-v8a";
+            //const ABI: &str = "arm64-v8a";
 
             #[tokio::test]
             async fn darkside_simple_sync() {
-                super::darkside_simple_sync(ABI).await;
+                crate::darkside_simple_sync(super::ABI).await;
             }
         }
     }
