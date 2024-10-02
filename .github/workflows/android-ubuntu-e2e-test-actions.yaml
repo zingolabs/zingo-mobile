@@ -64,6 +64,12 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      - name: JVM Heap Size
+        run: export _JAVA_OPTIONS="-Xmx4g"
+
+      - name: Monitor memory usage
+        run: top -b -n1 | head -n 20
+
       - name: Check AVD cache
         uses: actions/cache/restore@v4
         id: avd-cache
@@ -84,6 +90,10 @@ jobs:
           emulator-options: -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
+          ram-size: 4096M
+          heap-size: 512M
+          disk-size: 4096M
+          pre-emulator-launch-script: top -b -n1 | head -n 20
 
       - name: Save AVD cache
         if: steps.avd-cache.outputs.cache-hit != 'true'
