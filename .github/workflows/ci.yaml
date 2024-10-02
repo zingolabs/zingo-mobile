@@ -48,7 +48,7 @@ jobs:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: ${{ matrix.abi }}
-      api-level: 29
+      api-level: 28
 
   ios-build:
     uses: ./.github/workflows/ios-build.yaml

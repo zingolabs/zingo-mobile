@@ -112,19 +112,19 @@ fi
 
 case "$abi" in
     x86_64)
-        api_level_default="29"
+        api_level_default="28"
         api_target_default="default"
         ;;
     x86) 
-        api_level_default="29"
+        api_level_default="28"
         api_target_default="default"
         ;;
     arm64-v8a)
-        api_level_default="29"
+        api_level_default="28"
         api_target_default="default"
         ;;
     armeabi-v7a)
-        api_level_default="29"
+        api_level_default="28"
         api_target_default="default"
         ;;
     *)
