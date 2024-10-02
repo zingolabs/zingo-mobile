@@ -129,23 +129,23 @@ network in a docker container. Before running tests, pull the latest Regchest im
 1. Create quick-boot snapshots to speed up AVD launch times. From the root directory, run: <br />
    `./scripts/integration_tests.sh -a x86_64 -s` <br />
    `./scripts/integration_tests.sh -a x86 -s` <br />
-   By default, this uses Google Playstore API 30 system images. Other images may be used for testing
+   By default, this uses default API 29 system images. Other images may be used for testing
    by specifying the api level and target. However, using other images with the cargo test runner
    is still under development.
 2. To run the integration tests. From the `rust` directory, run: <br />
-   `cargo nextest run -E 'not test(e2e)'` <br />
+   `cargo nextest run integration` <br />
    Specify to run specific ABI: <br />
-   `cargo nextest run x86_64` <br />
-   `cargo nextest run x86_32` <br />
-   `cargo nextest run arm64` <br />
-   `cargo nextest run arm32` <br />
+   `cargo nextest run integration::x86_64` <br />
+   `cargo nextest run integration::x86_32` <br />
+   `cargo nextest run integration::arm64` <br />
+   `cargo nextest run integration::arm32` <br />
    Specify to run a specific test on all ABIs: <br />
    `cargo nextest run test_name` <br />
    Specify to run a specific ABI and test: <br />
-   `cargo nextest run x86_64::test_name`
+   `cargo nextest run integration::x86_64::test_name`
 
 To run tests with Regchest, add the `--features regchest` flag, for example: <br />
-`cargo nextest run --features regchest -E 'not test(e2e)'`
+`cargo nextest run integration --features regchest`
 
 For more information on running integration tests on non-default AVDs, run: <br />
 `./scripts/integration_tests.sh -h` <br />
@@ -159,13 +159,24 @@ lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Tests
    details.
 2. In a terminal, run: <br />
    `yarn start`
-3. In a separate terminal, from the `rust` directory, run all tests: <br />
+3. Create quick-boot snapshots to speed up AVD launch times. From the root directory, run: <br />
+   `./scripts/e2e_tests.sh -a x86_64 -s` <br />
+   `./scripts/e2e_tests.sh -a x86 -s` <br />
+   By default, this uses default API 29 system images. Other images may be used for testing
+   by specifying the api level and target. However, using other images with the cargo test runner
+   is still under development.
+4. In a separate terminal, from the `rust` directory, run all tests: <br />
    `cargo nextest run e2e`
-   or run a specific test: <br />
-   `cargo nextest run e2e::test_name`
+   Specify to run specific ABI: <br />
+   `cargo nextest run e2e::x86_64` <br />
+   `cargo nextest run e2e::x86_32` <br />
+   `cargo nextest run e2e::arm64` <br />
+   `cargo nextest run e2e::arm32` <br />
+   Specify to run a specific ABI and test: <br />
+   `cargo nextest run e2e::x86_64::test_name`
 
 Regchest is still under development and currently not able to run darkside end-to-end tests: <br />
-`cargo nextest run --features regchest -E 'test(e2e) and not test(darkside)'`
+`cargo nextest run e2e --features regchest -E 'not test(darkside)'`
 
 # Troubleshooting
 For notes on known issues and problems, see the [trouble-shooting notes](./TROUBLESHOOTING.md).
