@@ -327,8 +327,6 @@ mod e2e {
         }
 
         mod darkside {
-            //const ABI: &str = "x86";
-
             #[tokio::test]
             async fn darkside_simple_sync() {
                 crate::darkside_simple_sync(super::ABI).await;
@@ -395,8 +393,6 @@ mod e2e {
         }
 
         mod darkside {
-            //const ABI: &str = "x86_64";
-
             #[tokio::test]
             async fn darkside_simple_sync() {
                 crate::darkside_simple_sync(super::ABI).await;
@@ -463,8 +459,6 @@ mod e2e {
         }
 
         mod darkside {
-            //const ABI: &str = "armeabi-v7a";
-
             #[tokio::test]
             async fn darkside_simple_sync() {
                 crate::darkside_simple_sync(super::ABI).await;
@@ -531,8 +525,6 @@ mod e2e {
         }
 
         mod darkside {
-            //const ABI: &str = "arm64-v8a";
-
             #[tokio::test]
             async fn darkside_simple_sync() {
                 crate::darkside_simple_sync(super::ABI).await;
