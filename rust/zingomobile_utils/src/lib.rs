@@ -48,7 +48,7 @@ pub fn android_integration_test(abi: &str, test_name: &str) -> (i32, String, Str
     (exit_code, stdout, stderr)
 }
 
-pub fn android_integration_test_actions(abi: &str, test_name: &str) -> (i32, String, String) {
+pub fn android_integration_test_ci(abi: &str, test_name: &str) -> (i32, String, String) {
     let command: String;
     let arg: String;
     #[cfg(unix)]
@@ -69,7 +69,7 @@ pub fn android_integration_test_actions(abi: &str, test_name: &str) -> (i32, Str
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
-            ./scripts/ci/integration_tests_actions.sh -a {} -e {}
+            ./scripts/ci/integration_tests_ci.sh -a {} -e {}
             "#,
             abi, test_name
         ))
@@ -82,7 +82,7 @@ pub fn android_integration_test_actions(abi: &str, test_name: &str) -> (i32, Str
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
-            ./scripts/ci/integration_tests_actions.sh -a {} -e {} -A
+            ./scripts/ci/integration_tests_ci.sh -a {} -e {} -A
             "#,
             abi, test_name
         ))
@@ -144,7 +144,7 @@ pub fn android_e2e_test(abi: &str, test_name: &str) -> (i32, String, String) {
     (exit_code, stdout, stderr)
 }
 
-pub fn android_e2e_test_actions(abi: &str, test_name: &str) -> (i32, String, String) {
+pub fn android_e2e_test_ci(abi: &str, test_name: &str) -> (i32, String, String) {
     let command: String;
     let arg: String;
     #[cfg(unix)]
@@ -165,7 +165,7 @@ pub fn android_e2e_test_actions(abi: &str, test_name: &str) -> (i32, String, Str
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
-            ./scripts/ci/e2e_tests_actions.sh -a {} -e {}
+            ./scripts/ci/e2e_tests_ci.sh -a {} -e {}
             "#,
             abi, test_name
         ))
@@ -178,7 +178,7 @@ pub fn android_e2e_test_actions(abi: &str, test_name: &str) -> (i32, String, Str
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
-            ./scripts/ci/e2e_tests_actions.sh -a {} -e {} -A
+            ./scripts/ci/e2e_tests_ci.sh -a {} -e {} -A
             "#,
             abi, test_name
         ))

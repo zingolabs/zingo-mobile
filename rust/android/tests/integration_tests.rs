@@ -11,12 +11,12 @@ const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
 const UNIX_SOCKET: Option<&str> = None;
 
 async fn offline_testsuite(abi: &str) {
-    #[cfg(not(feature = "actions"))]
+    #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test(abi, "OfflineTestSuite");
-    #[cfg(feature = "actions")]
+    #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_actions(abi, "OfflineTestSuite");
+        zingomobile_utils::android_integration_test_ci(abi, "OfflineTestSuite");
     
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -36,12 +36,12 @@ async fn execute_sync_from_seed(abi: &str) {
             Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
         };
 
-    #[cfg(not(feature = "actions"))]
+    #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test(abi, "ExecuteSyncFromSeed");
-    #[cfg(feature = "actions")]
+    #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_actions(abi, "ExecuteSyncFromSeed");
+        zingomobile_utils::android_integration_test_ci(abi, "ExecuteSyncFromSeed");
     
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -67,12 +67,12 @@ async fn execute_send_from_orchard(abi: &str) {
             Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
         };
 
-    #[cfg(not(feature = "actions"))]
+    #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
-    #[cfg(feature = "actions")]
+    #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_actions(abi, "ExecuteSendFromOrchard");
+        zingomobile_utils::android_integration_test_ci(abi, "ExecuteSendFromOrchard");
     
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -100,12 +100,12 @@ async fn execute_currentprice_and_value_transfers_from_seed(abi: &str) {
             Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
         };
 
-    #[cfg(not(feature = "actions"))]
+    #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test(abi, "UpdateCurrentPriceAndValueTransfersFromSeed");
-    #[cfg(feature = "actions")]
+    #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_actions(abi, "UpdateCurrentPriceAndValueTransfersFromSeed");
+        zingomobile_utils::android_integration_test_ci(abi, "UpdateCurrentPriceAndValueTransfersFromSeed");
     
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -135,12 +135,12 @@ async fn execute_sapling_balance_from_seed(abi: &str) {
         Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
     };
 
-    #[cfg(not(feature = "actions"))]
+    #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test(abi, "ExecuteSaplingBalanceFromSeed");
-    #[cfg(feature = "actions")]
+    #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_actions(abi, "ExecuteSaplingBalanceFromSeed");
+        zingomobile_utils::android_integration_test_ci(abi, "ExecuteSaplingBalanceFromSeed");
     
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {

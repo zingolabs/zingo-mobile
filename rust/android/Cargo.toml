@@ -7,7 +7,6 @@ edition = "2021"
 [features]
 ci = []
 regchest = []
-actions = []
 
 [dev-dependencies]
 zingolib = { workspace = true }

@@ -26,11 +26,11 @@ jobs:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       arch: ${{ matrix.arch }}
 
-  android-ubuntu-integration-test-actions:
+  android-ubuntu-integration-test-ci:
     strategy:
       matrix:
         abi: [ x86_64, x86 ]
-    uses: ./.github/workflows/android-ubuntu-integration-test-actions.yaml
+    uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
     needs: [create-timestamp, android-build]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
@@ -38,11 +38,11 @@ jobs:
       abi: ${{ matrix.abi }}
       api-level: 29
 
-  android-ubuntu-e2e-test-actions:
+  android-ubuntu-e2e-test-ci:
     strategy:
       matrix:
         abi: [ x86_64, x86 ]
-    uses: ./.github/workflows/android-ubuntu-e2e-test-actions.yaml
+    uses: ./.github/workflows/android-ubuntu-e2e-test-ci.yaml
     needs: [create-timestamp, android-build]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
