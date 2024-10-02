@@ -257,8 +257,7 @@ jobs:
         run: export _JAVA_OPTIONS="-Xmx4g"
 
       - name: Monitor memory usage
-        run: |
-          top -b -n1 | head -n 20
+        run: top -b -n1 | head -n 20
 
       - name: Run e2e Test
         uses: reactivecircus/android-emulator-runner@v2
@@ -273,6 +272,7 @@ jobs:
           ram-size: 4096M
           heap-size: 512M
           disk-size: 4096M
+          pre-emulator-launch-script: top -b -n1 | head -n 20
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
