@@ -253,13 +253,16 @@ jobs:
           echo "Disk space after post-build cleanup:"
           df -h
 
+      - name: JVM Heap Size
+        run: export _JAVA_OPTIONS="-Xmx4096m"
+
       - name: Run e2e Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ env.API-LEVEL }}
           arch: ${{ env.AVD-ARCH }}
           force-avd-creation: true
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 4096 -partition-size 2048
           disable-animations: true
           script: cargo nextest run e2e::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci regchest actions" --verbose --release
           working-directory: ./rust
