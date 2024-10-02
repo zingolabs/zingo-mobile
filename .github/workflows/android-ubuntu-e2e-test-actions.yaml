@@ -254,7 +254,11 @@ jobs:
           df -h
 
       - name: JVM Heap Size
-        run: export _JAVA_OPTIONS="-Xmx4096m"
+        run: export _JAVA_OPTIONS="-Xmx4g"
+
+      - name: Monitor memory usage
+        run: |
+          top -b -n1 | head -n 20
 
       - name: Run e2e Test
         uses: reactivecircus/android-emulator-runner@v2
@@ -262,10 +266,13 @@ jobs:
           api-level: ${{ env.API-LEVEL }}
           arch: ${{ env.AVD-ARCH }}
           force-avd-creation: true
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 4096 -partition-size 2048
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: cargo nextest run e2e::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci regchest actions" --verbose --release
           working-directory: ./rust
+          ram-size: 4096M
+          heap-size: 512M
+          disk-size: 4096M
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
