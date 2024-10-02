@@ -168,7 +168,7 @@ jobs:
       - name: Grant permissions
         run: |
           sudo chmod 777 /var/run/docker.sock
-          sudo chmod 777 ./scripts/e2e_tests_actions.sh
+          sudo chmod 777 ./scripts/ci/e2e_tests_actions.sh
 
       - name: Enable KVM
         run: |

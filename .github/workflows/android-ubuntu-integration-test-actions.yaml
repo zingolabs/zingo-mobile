@@ -162,7 +162,7 @@ jobs:
       - name: Grant permissions
         run: |
           sudo chmod 777 /var/run/docker.sock
-          sudo chmod 777 ./scripts/integration_tests_actions.sh
+          sudo chmod 777 ./scripts/ci/integration_tests_actions.sh
 
       - name: Enable KVM
         run: |
