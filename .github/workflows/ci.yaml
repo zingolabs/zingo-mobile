@@ -44,7 +44,7 @@ jobs:
     strategy:
       matrix:
         config:
-          - { abi: x86_64, api-level: 34 }
+          - { abi: x86_64, api-level: 33 }
           - { abi: x86, api-level: 28 }
     uses: ./.github/workflows/android-ubuntu-e2e-test-ci.yaml
     needs: [create-timestamp, android-build]
