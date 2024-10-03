@@ -20,6 +20,8 @@ class ZingoMobileTests: XCTestCase {
 
   func testCorruptWalletBug_ServerOKNewWallet() throws {
     let rpcmodule = RPCModule()
+    
+    let _ = setCryptoDefaultProviderToRing()
 
     // delete the wallet file, clean scenario
     do {
@@ -49,6 +51,8 @@ class ZingoMobileTests: XCTestCase {
 
   func testCorruptWalletBug_ServerKONewWallet() throws {
     let rpcmodule = RPCModule()
+    
+    let _ = setCryptoDefaultProviderToRing()
 
     // delete the wallet file, clean scenario
     do {

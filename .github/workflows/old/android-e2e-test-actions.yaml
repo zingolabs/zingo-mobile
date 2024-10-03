@@ -14,7 +14,7 @@ env:
   REPO-OWNER: ${{ github.repository_owner }}
 
 jobs:
-  android-e2e-test-actions:
+  android-e2e-test-ci:
     name: End-to-end test
     runs-on: ubuntu-22.04
     strategy:

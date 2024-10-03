@@ -1,4 +1,4 @@
-name: Android Ubuntu e2e tests
+name: Android Ubuntu Integration tests
 
 on:
   workflow_call:
@@ -23,8 +23,8 @@ env:
   TIMESTAMP: ${{ inputs.timestamp }}
 
 jobs:
-  android-ubuntu-e2e-test-actions-avd-cache:
-    name: Avd Cache e2e
+  android-ubuntu-integration-test-ci-avd-cache:
+    name: Avd Cache Integration
     runs-on: ubuntu-22.04
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
@@ -71,7 +71,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-e2e
+          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
           lookup-only: true
 
       - name: Create AVD and generate snapshot for caching
@@ -93,27 +93,21 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-e2e
+          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
 
-  android-ubuntu-e2e-test-actions:
-    name: Android Ubuntu e2e test
-    needs: android-ubuntu-e2e-test-actions-avd-cache
+  android-ubuntu-integration-test-ci:
+    name: Android Ubuntu Integration test
+    needs: android-ubuntu-integration-test-ci-avd-cache
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
         test: [
-          "tex_send_address", 
-          "reload_while_tx_pending", 
-          "change_custom_server", 
-          "change_custom_regtest_server", 
-          "change_custom_testnet_server", 
-          "change_server_from_list", 
-          "new_wallet", 
-          "screen_awake", 
-          "send", 
-          "sync_report", 
-          "transaction_history"
+          "offline_testsuite", 
+          "execute_sync_from_seed", 
+          "execute_send_from_orchard", 
+          "execute_currentprice_and_value_transfers_from_seed", 
+          "execute_sapling_balance_from_seed"
         ]
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
@@ -168,7 +162,7 @@ jobs:
       - name: Grant permissions
         run: |
           sudo chmod 777 /var/run/docker.sock
-          sudo chmod 777 ./scripts/e2e_tests_actions.sh
+          sudo chmod 777 ./scripts/ci/integration_tests_ci.sh
 
       - name: Enable KVM
         run: |
@@ -179,7 +173,8 @@ jobs:
       - name: Install protoc
         run: sudo apt install protobuf-compiler
 
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
 
@@ -229,7 +224,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-e2e
+          key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
           fail-on-cache-miss: true
 
       - name: Yarn install
@@ -253,7 +248,7 @@ jobs:
           echo "Disk space after post-build cleanup:"
           df -h
 
-      - name: Run e2e Test
+      - name: Run Integration Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ env.API-LEVEL }}
@@ -261,12 +256,12 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: cargo nextest run e2e::${{ matrix.test }} --features "ci regchest actions" --verbose --release
+          script: cargo nextest run integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci regchest" --verbose --release
           working-directory: ./rust
 
       - name: Upload test reports
         if: ${{ ! cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-e2e-reports-${{ env.ABI }}-${{ matrix.test }}-${{ env.TIMESTAMP }}
-          path: android/app/build/outputs/e2e_test_reports
+          name: test-integration-reports-${{ env.ABI }}-${{ matrix.test }}-${{ env.TIMESTAMP }}
+          path: android/app/build/outputs/integration_test_reports
