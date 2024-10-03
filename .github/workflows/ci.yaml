@@ -38,7 +38,7 @@ jobs:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: ${{ matrix.config.abi }}
-      api-level: ${{ matrix.config.['api-level'] }}
+      api-level: ${{ matrix.config['api-level'] }}
 
   android-ubuntu-e2e-test-ci:
     strategy:
@@ -52,7 +52,7 @@ jobs:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
       abi: ${{ matrix.config.abi }}
-      api-level: ${{ matrix.config.['api-level'] }}
+      api-level: ${{ matrix.config['api-level'] }}
 
   ios-build:
     uses: ./.github/workflows/ios-build.yaml
