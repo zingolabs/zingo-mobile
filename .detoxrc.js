@@ -13,12 +13,12 @@ module.exports = {
   apps: {
     'ios.debug': {
       type: 'ios.app',
-      binaryPath: 'ios/build/Build/Products/Debug-iphonesimulator/ZingoMobile.app',
+      binaryPath: 'ios/build/Build/Products/Debug-iphonesimulator/Zingo.app',
       build: 'xcodebuild -project ios/ZingoMobile.xcodeproj -scheme ZingoMobile -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build'
     },
     'ios.release': {
       type: 'ios.app',
-      binaryPath: 'ios/build/Build/Products/Release-iphonesimulator/ZingoMobile.app',
+      binaryPath: 'ios/build/Build/Products/Release-iphonesimulator/Zingo.app',
       build: 'xcodebuild -project ios/ZingoMobile.xcodeproj -scheme ZingoMobile -configuration Release -sdk iphonesimulator -derivedDataPath ios/build'
     },
     'android.debug': {
@@ -71,7 +71,7 @@ module.exports = {
     simulator: {
       type: 'ios.simulator',
       device: {
-        type: 'iPhone 12'
+        type: 'iPhone 15'
       }
     },
     attached: {
