@@ -31,7 +31,7 @@ jobs:
       matrix:
         config:
           - { abi: x86_64, api-level: 34 }
-          - { abi: x86, api-level: 30 }
+          - { abi: x86, api-level: 29 }
     uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
     needs: [create-timestamp, android-build]
     with:
