@@ -112,7 +112,7 @@ fi
 
 case "$abi" in
     x86_64)
-        api_level_default="28"
+        api_level_default="34"
         api_target_default="default"
         ;;
     x86) 
