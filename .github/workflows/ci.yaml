@@ -29,13 +29,13 @@ jobs:
   android-ubuntu-integration-test-ci:
     strategy:
       matrix:
-      abi: [ x86_64, x86 ]
-      api-level: [ 34, 30 ]
-    exclude:
-      - abi: x86_64
-        api-level: 30
-      - abi: x86
-        api-level: 34
+        abi: [ x86_64, x86 ]
+        api-level: [ 34, 30 ]
+      exclude:
+        - abi: x86_64
+          api-level: 30
+        - abi: x86
+          api-level: 34
     uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
     needs: [create-timestamp, android-build]
     with:
@@ -46,14 +46,14 @@ jobs:
 
   android-ubuntu-e2e-test-ci:
     strategy:
-    matrix:
-      abi: [ x86_64, x86 ]
-      api-level: [ 34, 28 ]
-    exclude:
-      - abi: x86_64
-        api-level: 28
-      - abi: x86
-        api-level: 34    
+      matrix:
+        abi: [ x86_64, x86 ]
+        api-level: [ 34, 28 ]
+      exclude:
+        - abi: x86_64
+          api-level: 28
+        - abi: x86
+          api-level: 34    
     uses: ./.github/workflows/android-ubuntu-e2e-test-ci.yaml
     needs: [create-timestamp, android-build]
     with:
