@@ -89,15 +89,20 @@ jobs:
             cd ios
             yarn detox build --configuration ios.sim.debug
 
+      - name: Start Simulator Logs
+        run: |
+          SIMULATOR_UID=$(applesimutils --list | grep -m 1 "iPhone 14" | awk '{print $2}')
+          xcrun simctl spawn $SIMULATOR_UID log stream --level debug --style compact --predicate 'process == "Zingo"' > simulator.log &
+
       - name: Run IOS e2e test
         uses: nick-fields/retry@v3
+        continue-on-error: true
         with:
           timeout_minutes: 60
           max_attempts: 3
           command: |
             cd ios
             yarn detox test --configuration ios.sim.debug ${{ matrix.test }} --record-logs all
-          continue-on-error: true
 
       - name: Upload Detox Logs as artifact
         if: always()
@@ -107,4 +112,5 @@ jobs:
           path: |
             ./detox/runner.log
             ./detox/artifacts
+            ./simulator.log
           retention-days: 5
