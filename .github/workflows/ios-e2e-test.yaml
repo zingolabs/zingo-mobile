@@ -92,6 +92,8 @@ jobs:
       - name: Start Simulator Logs
         run: |
           SIMULATOR_UID=$(xcrun simctl list devices | grep -m 1 "iPhone 14" | awk -F '[()]' '{print $2}' | tr -d '[:space:]')
+          xcrun simctl boot $SIMULATOR_UID
+          xcrun simctl bootstatus $SIMULATOR_UID
           xcrun simctl spawn $SIMULATOR_UID log stream --level debug --style compact --predicate 'process == "Zingo"' > simulator.log &
 
       - name: Run IOS e2e test
