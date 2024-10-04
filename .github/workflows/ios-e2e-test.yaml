@@ -96,4 +96,15 @@ jobs:
           max_attempts: 3
           command: |
             cd ios
-            yarn detox test --configuration ios.sim.debug ${{ matrix.test }}
+            yarn detox test --configuration ios.sim.debug ${{ matrix.test }} --record-logs all
+          continue-on-error: true
+
+      - name: Upload Detox Logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios-e2e-detox-logs-${{ matrix.test }}
+          path: |
+            ./detox/runner.log
+            ./detox/artifacts
+          retention-days: 5
