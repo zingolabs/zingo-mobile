@@ -113,4 +113,3 @@ jobs:
             ./detox/runner.log
             ./detox/artifacts
             ./simulator.log
-          retention-days: 5
