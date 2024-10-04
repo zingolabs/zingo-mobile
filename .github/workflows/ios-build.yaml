@@ -88,12 +88,12 @@ jobs:
         run: sudo cargo install cargo-lipo
 
       - name: Install rust Target
-        run: sudo rustup target add x86_64-apple-ios
+        run: sudo rustup target add aarch64-apple-ios-sim x86_64-apple-ios 
       
       - name: Cargo lipo universal library
         working-directory: rust/lib
         run: |
-          sudo cargo lipo --release --targets x86_64-apple-ios
+          sudo cargo lipo --release --targets aarch64-apple-ios-sim x86_64-apple-ios
 
       - name: Copy libraries to ios folder
         working-directory: rust/lib
