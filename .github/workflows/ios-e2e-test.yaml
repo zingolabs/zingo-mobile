@@ -67,7 +67,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          xcode-select --install
           brew tap wix/brew
           brew install applesimutils
 
