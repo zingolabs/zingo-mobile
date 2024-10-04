@@ -1,0 +1,97 @@
+name: IOS e2e test
+
+on:
+  workflow_call:
+    inputs:
+      timestamp:
+        required: true
+        type: string
+      cache-key:
+        required: true
+        type: string
+    
+env:
+  CACHE-KEY: ${{ inputs.cache-key }}
+  TIMESTAMP: ${{ inputs.timestamp }}
+  REPO-OWNER: ${{ github.repository_owner }}
+
+jobs:
+  ios-e2e-test:
+    name: IOS e2e test
+    runs-on: macos-13
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [
+          "tex_send_address", 
+          "reload_while_tx_pending", 
+          "change_custom_server", 
+          "change_custom_regtest_server", 
+          "change_custom_testnet_server", 
+          "change_server_from_list", 
+          "new_wallet", 
+          "screen_awake", 
+          "send", 
+          "sync_report", 
+          "transaction_history"
+        ]
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+            
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+
+      - name: Install nvm with node 20.9.0
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+          nvm install 20.9.0
+          nvm use 20.9.0
+
+      - name: Native rust cache
+        uses: actions/cache/restore@v4
+        with:
+          path: rust/lib/Generated
+          key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Copy libs to ios folder
+        working-directory: rust/lib/Generated
+        run: cp ./*.* ../../../ios
+
+      - name: Install dependencies
+        run: |
+          xcode-select --install
+          brew tap wix/brew
+          brew install applesimutils
+
+      - name: Yarn
+        run: yarn
+
+      - name: Pod Install
+        working-directory: ios
+        run: pod install
+
+      - name: Run IOS e2e build
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          command: |
+            cd ios
+            yarn detox build --configuration ios.sim.debug
+
+      - name: Run IOS e2e test
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          command: |
+            cd ios
+            yarn detox test --configuration ios.sim.debug ${{ matrix.test }}

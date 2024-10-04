@@ -66,3 +66,10 @@ jobs:
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+
+  ios-integration-test:
+    uses: ./.github/workflows/ios-e2e-test.yaml
+    needs: [create-timestamp, ios-build]
+    with:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
