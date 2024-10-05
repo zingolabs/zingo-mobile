@@ -102,7 +102,7 @@ jobs:
             fi
 
       - name: Start Simulator Logs
-        run: xcrun simctl spawn booted log stream --level debug --style compact > simulator.log &
+        run: xcrun simctl spawn booted log stream --level debug --style compact --predicate 'process == "Zingo"' > simulator.log &
 
       - name: Run IOS e2e test
         uses: nick-fields/retry@v3
