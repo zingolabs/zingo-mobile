@@ -87,15 +87,34 @@ jobs:
           max_attempts: 3
           command: yarn detox build --configuration ios.sim.debug
 
+      - name: Boot Simulator
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          command: |
+            SIMULATOR_UID=$(xcrun simctl list devices | grep -m 1 "iPhone 14" | awk -F '[()]' '{print $2}' | tr -d '[:space:]')
+            xcrun simctl boot $SIMULATOR_UID
+            xcrun simctl bootstatus $SIMULATOR_UID
+            SIMULATOR_STATUS=$(xcrun simctl list | grep "$SIMULATOR_UID" | grep "Booted")
+            if [ -z "$SIMULATOR_STATUS" ]; then
+              exit 1
+            fi
+
       - name: Start Simulator Logs
-        run: |
-          SIMULATOR_UID=$(xcrun simctl list devices | grep -m 1 "iPhone 14" | awk -F '[()]' '{print $2}' | tr -d '[:space:]')
-          xcrun simctl boot $SIMULATOR_UID
-          xcrun simctl bootstatus $SIMULATOR_UID
-          xcrun simctl spawn $SIMULATOR_UID log stream --level debug --style compact --predicate 'process == "Zingo"' > simulator.log &
+        run: xcrun simctl spawn $SIMULATOR_UID log stream --level debug --style compact --predicate 'process == "Zingo"' > simulator.log &
 
       - name: Run IOS e2e test
-        run: yarn detox test --configuration ios.sim.debug ${{ matrix.test }} --no-relaunch --record-logs all
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 60
+          max_attempts: 1
+          command: |
+            yarn detox test --configuration ios.sim.debug ${{ matrix.test }} --no-relaunch --reuse --record-logs all
+            success_status=$?
+            if [ $success_status -ne 0 ]; then
+              exit 1
+            fi
 
       - name: Upload Detox Logs as artifact
         if: always()
