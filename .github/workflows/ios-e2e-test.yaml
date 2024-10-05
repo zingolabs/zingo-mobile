@@ -102,7 +102,7 @@ jobs:
             fi
 
       - name: Start Simulator Logs
-        run: xcrun simctl spawn $SIMULATOR_UID log stream --level debug --style compact > simulator.log &
+        run: xcrun simctl log stream --level debug --style compact > simulator.log &
 
       - name: Run IOS e2e test
         uses: nick-fields/retry@v3
@@ -118,7 +118,7 @@ jobs:
 
       - name: Upload Detox Logs as artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ios-e2e-detox-logs-${{ matrix.test }}
           path: |
