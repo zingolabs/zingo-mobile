@@ -95,7 +95,7 @@ jobs:
           xcrun simctl spawn $SIMULATOR_UID log stream --level debug --style compact --predicate 'process == "Zingo"' > simulator.log &
 
       - name: Run IOS e2e test
-        run: yarn detox test --configuration ios.sim.debug ${{ matrix.test }} --record-logs all
+        run: yarn detox test --configuration ios.sim.debug ${{ matrix.test }} --no-relaunch --record-logs all
 
       - name: Upload Detox Logs as artifact
         if: always()
