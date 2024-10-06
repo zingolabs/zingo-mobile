@@ -18,25 +18,22 @@ env:
 jobs:
   ios-e2e-test:
     name: IOS e2e test
-    runs-on: macos-13
+    runs-on: macos-14
     strategy:
       fail-fast: false
       matrix:
-        #test: [
-        #  "tex_send_address", 
-        #  "reload_while_tx_pending", 
-        #  "change_custom_server", 
-        #  "change_custom_regtest_server", 
-        #  "change_custom_testnet_server", 
-        #  "change_server_from_list", 
-        #  "new_wallet", 
-        #  "screen_awake", 
-        #  "send", 
-        #  "sync_report", 
-        #  "transaction_history"
-        #]
         test: [
           "tex_send_address", 
+          "reload_while_tx_pending", 
+          "change_custom_server", 
+          "change_custom_regtest_server", 
+          "change_custom_testnet_server", 
+          "change_server_from_list", 
+          "new_wallet", 
+          "screen_awake", 
+          "send", 
+          "sync_report", 
+          "transaction_history"
         ]
     steps:
       - name: Set envs for zingolib CI
