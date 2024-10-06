@@ -88,6 +88,9 @@ jobs:
           max_attempts: 3
           command: yarn detox build --configuration ios.sim.debug
 
+      - name: Check system services
+        run: sudo systemctl restart
+
       - name: Boot Simulator
         uses: nick-fields/retry@v3
         with:
