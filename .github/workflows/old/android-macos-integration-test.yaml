@@ -204,7 +204,7 @@ jobs:
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
 
       - name: Gradle cache
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.2
           build-root-directory: ./android

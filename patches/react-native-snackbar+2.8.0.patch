@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-snackbar/android/build.gradle b/node_modules/react-native-snackbar/android/build.gradle
-index 8b05ea4..d69f1e2 100644
+index 57a263b..2308655 100644
 --- a/node_modules/react-native-snackbar/android/build.gradle
 +++ b/node_modules/react-native-snackbar/android/build.gradle
 @@ -20,6 +20,7 @@ def _minSdkVersion = _ext.has('minSdkVersion') ? _ext.minSdkVersion : 16
