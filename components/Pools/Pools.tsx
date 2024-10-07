@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
@@ -18,7 +18,9 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
+import { ButtonTypeEnum, CommandEnum, GlobalConst } from '../../app/AppState';
+import RPCModule from '../../app/RPCModule';
+import { RPCWalletKindType } from '../../app/rpc/types/RPCWalletKindType';
 
 type PoolsProps = {
   closeModal: () => void;
@@ -29,11 +31,25 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOpti
   const context = useContext(ContextAppLoaded);
   const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
+  const [orchardPool, setOrchardPool] = useState<boolean>(true);
+  const [saplingPool, setSaplingPool] = useState<boolean>(true);
+  const [transparentPool, setTransparentPool] = useState<boolean>(true);
   moment.locale(language);
 
-  // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
+    (async () => {
+      // because this screen is fired from more places than the menu.
+      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
+      // checking the pools of this wallet
+      const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
+      try {
+        const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
+        console.log(walletKindJSON);
+        setOrchardPool(walletKindJSON.orchard);
+        setSaplingPool(walletKindJSON.sapling);
+        setTransparentPool(walletKindJSON.transparent);
+      } catch (e) {}
+    })();
   }, []);
 
   //console.log('render pools. Balance:', totalBalance);
@@ -64,94 +80,113 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOpti
           justifyContent: 'flex-start',
         }}>
         <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
-          <BoldText>{translate('pools.orchard-title') as string}</BoldText>
-
           {totalBalance && (
             <>
-              <View style={{ display: 'flex', marginLeft: 25 }}>
-                <DetailLine label={translate('pools.orchard-balance') as string}>
-                  <ZecAmount
-                    testID="orchard-total-balance"
-                    amtZec={totalBalance.orchardBal}
-                    size={18}
-                    currencyName={info.currencyName}
-                    style={{
-                      opacity:
-                        totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
-                          ? 1
-                          : 0.5,
-                    }}
-                    privacy={privacy}
+              {orchardPool && (
+                <>
+                  <BoldText>{translate('pools.orchard-title') as string}</BoldText>
+
+                  <View style={{ display: 'flex', marginLeft: 25 }}>
+                    <DetailLine label={translate('pools.orchard-balance') as string}>
+                      <ZecAmount
+                        testID="orchard-total-balance"
+                        amtZec={totalBalance.orchardBal}
+                        size={18}
+                        currencyName={info.currencyName}
+                        style={{
+                          opacity:
+                            totalBalance.spendableOrchard > 0 &&
+                            totalBalance.spendableOrchard === totalBalance.orchardBal
+                              ? 1
+                              : 0.5,
+                        }}
+                        privacy={privacy}
+                      />
+                    </DetailLine>
+                    <DetailLine label={translate('pools.orchard-spendable-balance') as string}>
+                      <ZecAmount
+                        testID="orchard-spendable-balance"
+                        amtZec={totalBalance.spendableOrchard}
+                        size={18}
+                        currencyName={info.currencyName}
+                        color={
+                          totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
+                            ? colors.primary
+                            : 'red'
+                        }
+                        privacy={privacy}
+                      />
+                    </DetailLine>
+                  </View>
+
+                  <View
+                    style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }}
                   />
-                </DetailLine>
-                <DetailLine label={translate('pools.orchard-spendable-balance') as string}>
-                  <ZecAmount
-                    testID="orchard-spendable-balance"
-                    amtZec={totalBalance.spendableOrchard}
-                    size={18}
-                    currencyName={info.currencyName}
-                    color={
-                      totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
-                        ? colors.primary
-                        : 'red'
-                    }
-                    privacy={privacy}
+                </>
+              )}
+
+              {saplingPool && (
+                <>
+                  <BoldText>{translate('pools.sapling-title') as string}</BoldText>
+
+                  <View style={{ display: 'flex', marginLeft: 25 }}>
+                    <DetailLine label={translate('pools.sapling-balance') as string}>
+                      <ZecAmount
+                        testID="sapling-total-balance"
+                        amtZec={totalBalance.privateBal}
+                        size={18}
+                        currencyName={info.currencyName}
+                        style={{
+                          opacity:
+                            totalBalance.spendablePrivate > 0 &&
+                            totalBalance.spendablePrivate === totalBalance.privateBal
+                              ? 1
+                              : 0.5,
+                        }}
+                        privacy={privacy}
+                      />
+                    </DetailLine>
+                    <DetailLine label={translate('pools.sapling-spendable-balance') as string}>
+                      <ZecAmount
+                        testID="sapling-spendable-balance"
+                        amtZec={totalBalance.spendablePrivate}
+                        size={18}
+                        currencyName={info.currencyName}
+                        color={
+                          totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
+                            ? colors.syncing
+                            : 'red'
+                        }
+                        privacy={privacy}
+                      />
+                    </DetailLine>
+                  </View>
+
+                  <View
+                    style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }}
                   />
-                </DetailLine>
-              </View>
+                </>
+              )}
 
-              <View style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
+              {transparentPool && (
+                <>
+                  <BoldText>{translate('pools.transparent-title') as string}</BoldText>
 
-              <BoldText>{translate('pools.sapling-title') as string}</BoldText>
+                  <View style={{ display: 'flex', marginLeft: 25 }}>
+                    <DetailLine label={translate('pools.transparent-balance') as string}>
+                      <ZecAmount
+                        testID="transparent-balance"
+                        amtZec={totalBalance.transparentBal}
+                        size={18}
+                        currencyName={info.currencyName}
+                        color={'red'}
+                        privacy={privacy}
+                      />
+                    </DetailLine>
+                  </View>
+                </>
+              )}
 
-              <View style={{ display: 'flex', marginLeft: 25 }}>
-                <DetailLine label={translate('pools.sapling-balance') as string}>
-                  <ZecAmount
-                    testID="sapling-total-balance"
-                    amtZec={totalBalance.privateBal}
-                    size={18}
-                    currencyName={info.currencyName}
-                    style={{
-                      opacity:
-                        totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
-                          ? 1
-                          : 0.5,
-                    }}
-                    privacy={privacy}
-                  />
-                </DetailLine>
-                <DetailLine label={translate('pools.sapling-spendable-balance') as string}>
-                  <ZecAmount
-                    testID="sapling-spendable-balance"
-                    amtZec={totalBalance.spendablePrivate}
-                    size={18}
-                    currencyName={info.currencyName}
-                    color={
-                      totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
-                        ? colors.syncing
-                        : 'red'
-                    }
-                    privacy={privacy}
-                  />
-                </DetailLine>
-              </View>
-
-              <View style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
-
-              <BoldText>{translate('pools.transparent-title') as string}</BoldText>
-
-              <View style={{ display: 'flex', marginLeft: 25 }}>
-                <DetailLine label={translate('pools.transparent-balance') as string}>
-                  <ZecAmount
-                    testID="transparent-balance"
-                    amtZec={totalBalance.transparentBal}
-                    size={18}
-                    currencyName={info.currencyName}
-                    color={'red'}
-                    privacy={privacy}
-                  />
-                </DetailLine>
-              </View>
               {somePending && (
                 <View
                   style={{
