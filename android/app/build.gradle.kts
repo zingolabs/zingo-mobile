@@ -1,3 +1,5 @@
+import groovy.lang.Closure
+
 plugins {
     id("com.android.application")
     id("com.facebook.react")
@@ -127,11 +129,17 @@ android {
     }
 
     signingConfigs {
-        create("debug") {
+        getByName("debug") {
             storeFile = file("debug.keystore")
-            storePassword = "android"
+            storePassword = "androisigningConfigsd"
             keyAlias = "androiddebugkey"
             keyPassword = "android"
+        }
+        create("release") {
+            storeFile = file("release.keystore")
+            storePassword = "androisigningConfigsd"
+            keyAlias = "androiddebugkey"
+            keyPassword = "androiddebugkey"
         }
     }
 
@@ -212,6 +220,10 @@ extra.set(
 )
 //ext.abiCodes = [armeabi-v7a':1, 'x86':2, 'arm64-v8a': 3, 'x86_64':4]
 
+val FLIPPER_VERSION: String by project
+val hermesEnabled: String by project
+val kotlinVersion: String by project
+
 // For each APK output variant, override versionCode with a combination of
 // ext.abiCodes * 10000 + variant.versionCode. 
 // variant.versionCode is equal to defaultConfig.versionCode.
@@ -225,7 +237,14 @@ android {
                 val abiCodes: Map<String, Int> by project.extra
                 val baseAbiVersionCode = abiCodes[output.filters.find { it.filterType == "ABI" }?.identifier]
 
+                // Because abiCodes.get() returns null for ABIs that are not mapped by ext.abiCodes,
+                // the following code doesn't override the version code for universal APKs.
+                // However, because you want universal APKs to have the lowest version code,
+                // this outcome is desirable.
                 baseAbiVersionCode?.let { baseCode ->
+                    // Assigns the new version code to versionCodeOverride, which changes the
+                    // version code for only the output APK, not for the variant itself. Skipping
+                    // this step causes Gradle to use the value of variant.versionCode for the APK.
                     output.versionCodeOverride = baseCode * 10000 + (variant.versionCode ?: 0)
                 }
             }
@@ -236,28 +255,32 @@ android {
 android {
     applicationVariants.all {
         val variant = this
-        val taskName = "generate${variant.name.capitalize()}UniFFIBindings"
+        // val taskName = "generate${variant.name.capitalize()}UniFFIBindings"
         
-        val task = tasks.register<Exec>(taskName) {
-            workingDir("${rootProject.projectDir}/../rust")
-            commandLine(
-                "cargo", "run", "--release", "--features=uniffi/cli", "--bin", "uniffi-bindgen",
-                "generate", "../rust/lib/src/zingo.udl", "--language", "kotlin",
-                "--out-dir", "${buildDir}/generated/source/uniffi/${variant.name}/java"
-            )
-        }
-
-        variant.javaCompileProvider.get().dependsOn(task)
-
-        variant.sourceSets.find { it.name == variant.name }?.let { sourceSet ->
-            sourceSet.java.srcDirs(sourceSet.java.srcDirs + File(buildDirs, "generated/source/uniffi/$variant.name/java"))
-        }
-
-        // Note: The following line is commented out as it wasn't working in the original code
-        // project.extensions.getByType<org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension>().sourceSets.getByName(variant.name) {
-        //     kotlin.srcDir("${buildDir}/generated/source/uniffi/${variant.name}/java")
+        // val task = tasks.register<Exec>(taskName) {
+        //     workingDir("${rootProject.projectDir}/../rust")
+        //     commandLine(
+        //         "cargo", "run", "--release", "--features=uniffi/cli", "--bin", "uniffi-bindgen",
+        //         "generate", "../rust/lib/src/zingo.udl", "--language", "kotlin",
+        //         "--out-dir", "${buildDir}/generated/source/uniffi/${variant.name}/java"
+        //     )
         // }
-    }
+        // variant.javaCompileProvider.get().dependsOn(task)
+
+        val sourceSet = variant.sourceSets.find { it.name == name }
+        val uniffiGeneratedPath = "generated/source/uniffi/${variant.name}/java"
+        //sourceSets["main"].java.srcDir(File(buildDir, uniffiGeneratedPath))
+
+        // sourceSets.getByName(variant.name) {
+        //     java.srcDir(File(buildDir, uniffiGeneratedPath))
+        // }
+
+        sourceSets {
+            getByName("main") {
+                java.srcDir(File(buildDir, uniffiGeneratedPath))
+            }
+        }
+    }       
 }
             
 dependencies {
@@ -329,6 +352,7 @@ dependencies {
     implementation("net.java.dev.jna:jna:5.9.0@aar")
 }
 
-//apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
 apply(from = file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"))
-project.extra.applyNativeModulesAppBuildGradle(project)
+
+val applyNativeModulesAppBuildGradle = extra.get("applyNativeModulesAppBuildGradle") as Closure<*>
+applyNativeModulesAppBuildGradle(project)
