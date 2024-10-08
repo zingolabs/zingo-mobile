@@ -774,9 +774,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         // if the user salected a `custom` server, then we cannot change it.
         if (!customError && selectServer !== SelectServerEnum.custom) {
           // try send again with a working server
-          const serverChecked = await selectingServer(
-            serverUris(translate).filter((s: ServerUrisType) => !s.obsolete && s.uri !== server.uri),
-          );
+          const serverChecked = await selectingServer(serverUris(translate).filter((s: ServerUrisType) => !s.obsolete));
           let fasterServer: ServerType = {} as ServerType;
           if (serverChecked && serverChecked.latency) {
             fasterServer = { uri: serverChecked.uri, chainName: serverChecked.chainName };
