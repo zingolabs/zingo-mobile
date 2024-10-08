@@ -779,7 +779,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           );
           let fasterServer: ServerType = {} as ServerType;
           if (serverChecked && serverChecked.latency) {
-            fasterServer = { uri: server.uri, chainName: server.chainName };
+            fasterServer = { uri: serverChecked.uri, chainName: serverChecked.chainName };
           } else {
             fasterServer = server;
             // likely here there is a internet conection problem
@@ -790,9 +790,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           console.log(fasterServer);
           if (fasterServer.uri !== server.uri) {
             setServerOption(fasterServer, false, true);
+            // first interrupt syncing Just in case...
+            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
           }
-          // first interrupt syncing Just in case...
-          await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
 
           try {
             const txid = await sendTransaction(setLocalSendProgress);
