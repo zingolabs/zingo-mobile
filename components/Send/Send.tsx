@@ -763,7 +763,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         // the app send successfully on the first attemp.
         return;
       } catch (err) {
-        const error = err as string;
+        let error = err as string;
 
         let customError = interceptCustomError(error);
 
@@ -820,9 +820,9 @@ const Send: React.FunctionComponent<SendProps> = ({
             // the app send successfully on the second attemp.
             return;
           } catch (err2) {
-            const error2 = err as string;
+            error = err2 as string;
 
-            customError = interceptCustomError(error2);
+            customError = interceptCustomError(error);
           }
         }
 
