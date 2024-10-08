@@ -653,12 +653,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
   selectTheBestServer = async (aDifferentOne: boolean) => {
     // avoiding obsolete ones
     let withMessage: boolean = true;
+    const actualServer = this.state.server;
     const server = await selectingServer(
       serverUris(this.state.translate).filter(
         (s: ServerUrisType) => !s.obsolete && s.uri !== (aDifferentOne ? actualServer.uri : ''),
       ),
     );
-    const actualServer = this.state.server;
     let fasterServer: ServerType = {} as ServerType;
     if (server && server.latency) {
       fasterServer = { uri: server.uri, chainName: server.chainName };
