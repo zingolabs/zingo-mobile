@@ -9,6 +9,7 @@ export type RPCParseAddressType = {
   address_kind?:
     | RPCAdressKindEnum.unifiedAddressKind
     | RPCAdressKindEnum.saplingAddressKind
-    | RPCAdressKindEnum.transparentAddressKind;
+    | RPCAdressKindEnum.transparentAddressKind
+    | RPCAdressKindEnum.texAddressKind;
   receivers_available?: RPCReceiversEnum[];
 };

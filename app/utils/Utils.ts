@@ -350,6 +350,7 @@ export default class Utils {
     return (
       resultJSON.status === RPCParseStatusEnum.successParse &&
       resultJSON.address_kind !== RPCAdressKindEnum.transparentAddressKind &&
+      resultJSON.address_kind !== RPCAdressKindEnum.texAddressKind &&
       resultJSON.chain_name === serverChainName
     );
   }
