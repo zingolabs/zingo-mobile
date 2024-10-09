@@ -75,7 +75,12 @@ import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
 import { RestoreFromTypeEnum } from '../AppState';
-import { createUpdateRecoveryWalletInfo, getRecoveryWalletInfo, hasRecoveryWalletInfo } from '../recoveryWalletInfo';
+import {
+  createUpdateRecoveryWalletInfo,
+  getRecoveryWalletInfo,
+  hasRecoveryWalletInfo,
+  removeRecoveryWalletInfo,
+} from '../recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
 import BoldText from '../../components/Components/BoldText';
@@ -85,7 +90,6 @@ import ImportUfvk from '../../components/Ufvk/ImportUfvk';
 import ChainTypeToggle from '../../components/Components/ChainTypeToggle';
 import { sendEmail } from '../sendEmail';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
-import { RPCAdressKindEnum } from '../rpc/enums/RPCAddressKindEnum';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -468,7 +472,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
       // First, if it's server automatic
       // here I need to check the servers and select the best one
-      // likely only when the user install or update the new version with this feature.
+      // likely only when the user install or update the new version with this feature or
+      // select automatic in settings.
       if (this.state.selectServer === SelectServerEnum.auto) {
         setTimeout(() => {
           this.addLastSnackbar({
@@ -497,6 +502,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
           //console.log('Load Wallet Exists result', result);
           let error = false;
+          let errorText = '';
           if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
             try {
               // here result can have an `error` field for watch-only which is actually OK.
@@ -516,10 +522,16 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
                   // if the seed & birthday are not stored in Keychain/Keystore, do it now.
                   if (this.state.recoveryWalletInfoOnDevice) {
-                    if (walletKindJSON.kind === RPCWalletKindEnum.LoadedFromSeedPhrase ||  walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedSpendingKey) {
+                    if (
+                      walletKindJSON.kind === RPCWalletKindEnum.LoadedFromSeedPhrase ||
+                      walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedSpendingKey
+                    ) {
                       const wallet: WalletType = await RPC.rpcFetchWallet(false);
                       await createUpdateRecoveryWalletInfo(wallet);
                     }
+                  } else {
+                    // needs to delete the seed from the Keychain/Keystore, do it now.
+                    await removeRecoveryWalletInfo();
                   }
                   this.setState({
                     readOnly:
@@ -541,16 +553,19 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 //console.log('navigate to LoadedApp');
               } else {
                 error = true;
+                errorText = resultJson.error;
               }
             } catch (e) {
               error = true;
+              errorText = JSON.stringify(e);
             }
           } else {
             error = true;
+            errorText = result;
           }
           if (error) {
             await this.walletErrorHandle(
-              result,
+              errorText,
               this.state.translate('loadingapp.readingwallet-label') as string,
               1,
               true,
@@ -564,29 +579,30 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         }
       } else {
         //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
-        // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
         if (this.state.mode === ModeEnum.basic) {
-          // but first we need to check if exists some seed stored in the device from a previous installation
+          // setting the prop basicFirstViewSeed to false.
+          // this means when the user have funds, the seed screen will show up.
+          await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, false);
           if (this.state.hasRecoveryWalletInfoSaved) {
-            this.recoverRecoveryWalletInfo(false);
-            await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, false);
+            // but first we need to check if exists some seed stored in the device from a previous installation (IOS)
+            await this.recoverRecoveryWalletInfo(false);
+            // go to the initial menu, giving the opportunity to the user
+            // to use the seed & birthday recovered from the device.
             this.setState({
               screen: 1,
               walletExists: false,
               actionButtonsDisabled: false,
             });
           } else {
-            // setting the prop basicFirstViewSeed to false.
-            // this means when the user have funds, the seed screen will show up.
-            await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, false);
-            // do not go to seed screen
+            // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
+            // no seed screen.
             this.createNewWallet(false);
             this.setState({ actionButtonsDisabled: false });
             this.navigateToLoadedApp();
             //console.log('navigate to LoadedApp');
           }
         } else {
-          // for advanced mode
+          // if no wallet file & advanced mode -> go to the initial menu.
           await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
           this.setState(state => ({
             screen: state.screen === 3 ? 3 : 1,
@@ -904,13 +920,27 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         let seedJSON = {} as RPCSeedType;
         try {
           seedJSON = JSON.parse(seed);
+          if (seedJSON.error) {
+            this.setState({ actionButtonsDisabled: false });
+            createAlert(
+              this.setBackgroundError,
+              this.addLastSnackbar,
+              this.state.translate('loadingapp.creatingwallet-label') as string,
+              seedJSON.error,
+              false,
+              this.state.translate,
+              sendEmail,
+              this.state.info.zingolib,
+            );
+            return;
+          }
         } catch (e) {
           this.setState({ actionButtonsDisabled: false });
           createAlert(
             this.setBackgroundError,
             this.addLastSnackbar,
             this.state.translate('loadingapp.creatingwallet-label') as string,
-            seed,
+            JSON.stringify(e),
             false,
             this.state.translate,
             sendEmail,
@@ -918,12 +948,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           );
           return;
         }
-        const wallet: WalletType = { seed: seedJSON.seed, birthday: seedJSON.birthday || 0 };
+        const wallet: WalletType = { seed: seedJSON.seed || '', birthday: seedJSON.birthday || 0 };
         // default values for wallet options
         this.setWalletOption(WalletOptionEnum.downloadMemos, DownloadMemosEnum.walletMemos);
         // storing the seed & birthday in KeyChain/KeyStore
         if (this.state.recoveryWalletInfoOnDevice) {
           await createUpdateRecoveryWalletInfo(wallet);
+        } else {
+          await removeRecoveryWalletInfo();
         }
         // basic mode -> same screen.
         this.setState(state => ({
@@ -994,7 +1026,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         type = RestoreFromTypeEnum.ufvkRestoreFrom;
       }
 
-      let wallet: WalletType;
       let result: string;
       if (type === RestoreFromTypeEnum.seedRestoreFrom) {
         result = await RPCModule.restoreWalletFromSeed(
@@ -1003,7 +1034,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.state.server.uri,
           this.state.server.chainName,
         );
-        wallet = { seed: seedUfvk.toLowerCase(), birthday: Number(walletBirthday) };
       } else {
         result = await RPCModule.restoreWalletFromUfvk(
           seedUfvk.toLowerCase(),
@@ -1011,12 +1041,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.state.server.uri,
           this.state.server.chainName,
         );
-        wallet = {} as WalletType;
       }
 
       //console.log(seedUfvk);
       //console.log(result);
       let error = false;
+      let errorText = '';
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
           // here result can have an `error` field for watch-only which is actually OK.
@@ -1024,9 +1054,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
             // storing the seed/ufvk & birthday in KeyChain/KeyStore
             if (this.state.recoveryWalletInfoOnDevice) {
-              if (wallet.seed) {
+              if (type === RestoreFromTypeEnum.seedRestoreFrom) {
+                const wallet: WalletType = { seed: seedUfvk.toLowerCase(), birthday: Number(walletBirthday) };
                 await createUpdateRecoveryWalletInfo(wallet);
               }
+            } else {
+              await removeRecoveryWalletInfo();
             }
             // when restore a wallet never the user needs that the seed screen shows up with the first funds received.
             await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
@@ -1037,15 +1070,18 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             this.navigateToLoadedApp();
           } else {
             error = true;
+            errorText = resultJson.error;
           }
         } catch (e) {
           error = true;
+          errorText = JSON.stringify(e);
         }
       } else {
         error = true;
+        errorText = result;
       }
       if (error) {
-        this.walletErrorHandle(result, this.state.translate('loadingapp.readingwallet-label') as string, 3, false);
+        this.walletErrorHandle(errorText, this.state.translate('loadingapp.readingwallet-label') as string, 3, false);
       }
     });
   };
