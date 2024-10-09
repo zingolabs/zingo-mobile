@@ -31,7 +31,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
       return;
     }
 
-    const validAddress: boolean = await Utils.isValidAdress(scannedAddress, server.chainName);
+    const validAddress: boolean = await Utils.isValidAddress(scannedAddress, server.chainName);
 
     if (validAddress) {
       setAddress(scannedAddress);

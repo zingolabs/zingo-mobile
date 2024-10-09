@@ -26,7 +26,7 @@ const parseZcashURI = async (
   //console.log(address);
 
   if (address) {
-    const validAddress: boolean = await Utils.isValidAdress(address, server.chainName);
+    const validAddress: boolean = await Utils.isValidAddress(address, server.chainName);
 
     if (!validAddress) {
       return `"${address || ''}" ${translate('uris.notvalid')}`;
@@ -69,7 +69,7 @@ const parseZcashURI = async (
         if (typeof target.address !== 'undefined') {
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
-        const validAddress: boolean = await Utils.isValidAdress(value, server.chainName);
+        const validAddress: boolean = await Utils.isValidAddress(value, server.chainName);
 
         if (!validAddress) {
           return `"${value}" ${translate('uris.notvalid')}`;

@@ -555,7 +555,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
         return false;
       }
-      return await Utils.isValidAdress(address, serverChainName);
+      return await Utils.isValidAddress(address, serverChainName);
     };
 
     var to = sendPageState.toaddr;
