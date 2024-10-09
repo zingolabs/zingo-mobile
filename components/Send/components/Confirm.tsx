@@ -25,7 +25,7 @@ import RPC from '../../../app/rpc';
 import Utils from '../../../app/utils';
 import { ButtonTypeEnum, CommandEnum, PrivacyLevelFromEnum, GlobalConst } from '../../../app/AppState';
 import { CurrencyEnum } from '../../../app/AppState';
-import { RPCAdressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
+import { RPCAddressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
 import { RPCParseStatusEnum } from '../../../app/rpc/enums/RPCParseStatusEnum';
 
@@ -146,7 +146,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Private -> orchard to orchard (UA with orchard receiver)
     if (
       from === PrivacyLevelFromEnum.orchardPrivacyLevel &&
-      resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+      resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
       resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)
     ) {
       return translate('send.private') as string;
@@ -155,8 +155,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Private -> sapling to sapling (ZA or UA with sapling receiver and NO orchard receiver)
     if (
       from === PrivacyLevelFromEnum.saplingPrivacyLevel &&
-      (resultJSON.address_kind === RPCAdressKindEnum.saplingAddressKind ||
-        (resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+      (resultJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
+        (resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
           resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver) &&
           !resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)))
     ) {
@@ -166,8 +166,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Amount Revealed -> orchard to sapling (ZA or UA with sapling receiver)
     if (
       from === PrivacyLevelFromEnum.orchardPrivacyLevel &&
-      (resultJSON.address_kind === RPCAdressKindEnum.saplingAddressKind ||
-        (resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+      (resultJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
+        (resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
           resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver)))
     ) {
       return translate('send.amountrevealed') as string;
@@ -176,7 +176,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Amount Revealed -> sapling to orchard (UA with orchard receiver)
     if (
       from === PrivacyLevelFromEnum.saplingPrivacyLevel &&
-      resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+      resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
       resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)
     ) {
       return translate('send.amountrevealed') as string;
@@ -186,8 +186,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // UA with sapling receiver)
     if (
       from === PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel &&
-      (resultJSON.address_kind === RPCAdressKindEnum.saplingAddressKind ||
-        (resultJSON.address_kind === RPCAdressKindEnum.unifiedAddressKind &&
+      (resultJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
+        (resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
           (resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver) ||
             resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver))))
     ) {
@@ -199,7 +199,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       (from === PrivacyLevelFromEnum.orchardPrivacyLevel ||
         from === PrivacyLevelFromEnum.saplingPrivacyLevel ||
         from === PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel) &&
-      resultJSON.address_kind === RPCAdressKindEnum.transparentAddressKind
+      resultJSON.address_kind === RPCAddressKindEnum.transparentAddressKind
     ) {
       return translate('send.deshielded') as string;
     }
