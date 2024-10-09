@@ -73,7 +73,6 @@ import Launching from './Launching';
 import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
-import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
 import { RestoreFromTypeEnum } from '../AppState';
 
 // no lazy load because slowing down screens.
@@ -83,6 +82,7 @@ import Seed from '../../components/Seed';
 import ImportUfvk from '../../components/Ufvk/ImportUfvk';
 import ChainTypeToggle from '../../components/Components/ChainTypeToggle';
 import { sendEmail } from '../sendEmail';
+import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -489,8 +489,18 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 //console.log(walletKindStr);
                 try {
                   const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
+                  console.log(walletKindJSON);
+                  // there are 4 kinds:
+                  // 1. seed
+                  // 2. USK
+                  // 3. UFVK - watch-only wallet
+                  // 4. No keys - watch-only wallet (possibly an error)
                   this.setState({
-                    readOnly: walletKindJSON.kind === RPCWalletKindEnum.Seeded ? false : true,
+                    readOnly:
+                      walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
+                      walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
+                        ? true
+                        : false,
                     actionButtonsDisabled: false,
                   });
                 } catch (e) {

@@ -1,4 +1,10 @@
 export enum RPCWalletKindEnum {
-  Seeded = 'Seeded',
-  LoadedFromKey = 'Loaded from key',
+  LoadedFromSeedPhrase = 'Loaded from seed phrase',
+  LoadedFromUnifiedSpendingKey = 'Loaded from unified spending key',
+  LoadedFromUnifiedFullViewingKey = 'Loaded from unified full viewing key',
+  NoKeysFound = 'No keys found',
+
+  // obsolete
+  //Seeded = 'Seeded',
+  //LoadedFromKey = 'Loaded from key',
 }
