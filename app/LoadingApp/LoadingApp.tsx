@@ -797,13 +797,32 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     const chainName = this.state.customServerChainName;
     if (uri.toLowerCase().startsWith(GlobalConst.error)) {
       this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string });
-    } else {
+      this.setState({ actionButtonsDisabled: false });
+      return;
+    }
+
+    this.state.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string });
+
+    const cs = {
+      uri: uri,
+      chainName: chainName,
+      region: '',
+      default: false,
+      latency: null,
+      obsolete: false,
+    } as ServerUrisType;
+    const serverChecked = await selectingServer([cs]);
+    if (serverChecked && serverChecked.latency) {
       await SettingsFileImpl.writeSettings(SettingsNameEnum.server, { uri, chainName });
       this.setState({
         server: { uri, chainName },
         customServerShow: false,
         customServerUri: '',
         customServerChainName: ChainNameEnum.mainChainName,
+      });
+    } else {
+      this.state.addLastSnackbar({
+        message: (this.state.translate('loadedapp.changeservernew-error') as string) + uri,
       });
     }
     this.setState({ actionButtonsDisabled: false });
