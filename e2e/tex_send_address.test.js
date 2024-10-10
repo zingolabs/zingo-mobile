@@ -13,7 +13,7 @@ describe('Renders wallet data correctly.', () => {
     await element(by.text('SEND')).tap();
 
     // Address taken from the reference implementation
-    await element(by.id('send.addressplaceholder')).replaceText('tex1s2rt77ggv6q989lr49rkgzmh5slsksa9khdgte');
+    await element(by.id('send.addressplaceholder')).replaceText('texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v');
 
     await waitFor(element(by.id('send.address.check')))
       .toExist()
