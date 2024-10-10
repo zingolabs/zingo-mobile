@@ -306,7 +306,7 @@ export default class Utils {
     return [...jsonFlat, ...donationTransaction];
   }
 
-  static async isValidAdress(address: string, serverChainName: string): Promise<boolean> {
+  static async isValidAddress(address: string, serverChainName: string): Promise<boolean> {
     const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
     //console.log(result);
     if (result) {

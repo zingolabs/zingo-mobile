@@ -653,12 +653,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
   selectTheBestServer = async (aDifferentOne: boolean) => {
     // avoiding obsolete ones
     let withMessage: boolean = true;
+    const actualServer = this.state.server;
     const server = await selectingServer(
       serverUris(this.state.translate).filter(
         (s: ServerUrisType) => !s.obsolete && s.uri !== (aDifferentOne ? actualServer.uri : ''),
       ),
     );
-    const actualServer = this.state.server;
     let fasterServer: ServerType = {} as ServerType;
     if (server && server.latency) {
       fasterServer = { uri: server.uri, chainName: server.chainName };
@@ -797,13 +797,32 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     const chainName = this.state.customServerChainName;
     if (uri.toLowerCase().startsWith(GlobalConst.error)) {
       this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string });
-    } else {
+      this.setState({ actionButtonsDisabled: false });
+      return;
+    }
+
+    this.state.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string });
+
+    const cs = {
+      uri: uri,
+      chainName: chainName,
+      region: '',
+      default: false,
+      latency: null,
+      obsolete: false,
+    } as ServerUrisType;
+    const serverChecked = await selectingServer([cs]);
+    if (serverChecked && serverChecked.latency) {
       await SettingsFileImpl.writeSettings(SettingsNameEnum.server, { uri, chainName });
       this.setState({
         server: { uri, chainName },
         customServerShow: false,
         customServerUri: '',
         customServerChainName: ChainNameEnum.mainChainName,
+      });
+    } else {
+      this.state.addLastSnackbar({
+        message: (this.state.translate('loadedapp.changeservernew-error') as string) + uri,
       });
     }
     this.setState({ actionButtonsDisabled: false });

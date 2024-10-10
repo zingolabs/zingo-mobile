@@ -43,7 +43,7 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
         return false;
       }
-      return await Utils.isValidAdress(addr, server.chainName);
+      return await Utils.isValidAddress(addr, server.chainName);
     };
 
     if (address) {

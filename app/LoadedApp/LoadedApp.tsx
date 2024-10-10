@@ -1184,7 +1184,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         });
       }
 
-      // we need to restore the old server because the new doesn't have the seed of the current wallet.
+      // we need to restore the old server because the new one doesn't have the seed of the current wallet.
       const oldSettings = await SettingsFileImpl.readSettings();
       await RPCModule.execute(CommandEnum.changeserver, oldSettings.server.uri);
 
@@ -1911,6 +1911,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                         setShieldingAmount={this.setShieldingAmount}
                         setScrollToTop={this.setScrollToTop}
                         setScrollToBottom={this.setScrollToBottom}
+                        setServerOption={this.setServerOption}
                       />
                     )}
                   </Tab.Screen>

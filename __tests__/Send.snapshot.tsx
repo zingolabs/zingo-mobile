@@ -99,6 +99,7 @@ describe('Component Send - test', () => {
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           setScrollToBottom={onFunction}
+          setServerOption={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
@@ -128,6 +129,7 @@ describe('Component Send - test', () => {
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           setScrollToBottom={onFunction}
+          setServerOption={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

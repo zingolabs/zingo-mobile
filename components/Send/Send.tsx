@@ -35,8 +35,11 @@ import {
   ButtonTypeEnum,
   GlobalConst,
   AddressClass,
+  ServerUrisType,
+  ServerType,
+  SelectServerEnum,
 } from '../../app/AppState';
-import { parseZcashURI, ZcashURITargetClass } from '../../app/uris';
+import { parseZcashURI, serverUris, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
 import Utils from '../../app/utils';
 import ScannerAddress from './components/ScannerAddress';
@@ -59,6 +62,7 @@ import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
 import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
 import { RPCSendallProposeType } from '../../app/rpc/types/RPCSendallProposeType';
 import { sendEmail } from '../../app/sendEmail';
+import selectingServer from '../../app/selectingServer';
 
 type SendProps = {
   setSendPageState: (sendPageState: SendPageStateClass) => void;
@@ -74,6 +78,7 @@ type SendProps = {
   setShieldingAmount: (value: number) => void;
   setScrollToTop: (value: boolean) => void;
   setScrollToBottom: (value: boolean) => void;
+  setServerOption: (value: ServerType, toast: boolean, sameServerChainName: boolean) => Promise<void>;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -90,6 +95,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setShieldingAmount,
   setScrollToTop,
   setScrollToBottom,
+  setServerOption,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -113,6 +119,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     addresses,
     uaAddress,
     shieldingAmount,
+    selectServer,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
@@ -548,7 +555,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
         return false;
       }
-      return await Utils.isValidAdress(address, serverChainName);
+      return await Utils.isValidAddress(address, serverChainName);
     };
 
     var to = sendPageState.toaddr;
@@ -753,20 +760,68 @@ const Send: React.FunctionComponent<SendProps> = ({
           translate,
         );
         setComputingModalVisible(false);
+        // the app send successfully on the first attemp.
+        return;
       } catch (err) {
-        const error = err as string;
+        let error = err as string;
 
-        let customError = '';
-        if (
-          error.includes('18: bad-txns-sapling-duplicate-nullifier') ||
-          error.includes('18: bad-txns-sprout-duplicate-nullifier') ||
-          error.includes('18: bad-txns-orchard-duplicate-nullifier')
-        ) {
-          // bad-txns-xxxxxxxxx-duplicate-nullifier (3 errors)
-          customError = translate('send.duplicate-nullifier-error') as string;
-        } else if (error.includes('64: dust')) {
-          // dust
-          customError = translate('send.dust-error') as string;
+        let customError = interceptCustomError(error);
+
+        // in this point the App is failing, there is two possibilities:
+        // 1. Server Error
+        // 2. Another type of Error
+        // here is worth it to try again with the best working server...
+        // if the user salected a `custom` server, then we cannot change it.
+        if (!customError && selectServer !== SelectServerEnum.custom) {
+          // try send again with a working server
+          const serverChecked = await selectingServer(serverUris(translate).filter((s: ServerUrisType) => !s.obsolete));
+          let fasterServer: ServerType = {} as ServerType;
+          if (serverChecked && serverChecked.latency) {
+            fasterServer = { uri: serverChecked.uri, chainName: serverChecked.chainName };
+          } else {
+            fasterServer = server;
+            // likely here there is a internet conection problem
+            // all of the servers return an error because they are unreachable probably.
+            // the 30 seconds timout was fired.
+          }
+          console.log(serverChecked);
+          console.log(fasterServer);
+          if (fasterServer.uri !== server.uri) {
+            setServerOption(fasterServer, false, true);
+            // first interrupt syncing Just in case...
+            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
+          }
+
+          try {
+            const txid = await sendTransaction(setLocalSendProgress);
+
+            // Clear the fields
+            clearToAddr();
+
+            if (navigation) {
+              navigation.navigate(translate('loadedapp.history-menu') as string);
+            }
+
+            // scroll to top in history, just in case.
+            setScrollToTop(true);
+            setScrollToBottom(true);
+
+            createAlert(
+              setBackgroundError,
+              addLastSnackbar,
+              translate('send.confirm-title') as string,
+              `${translate('send.Broadcast')} ${txid}`,
+              true,
+              translate,
+            );
+            setComputingModalVisible(false);
+            // the app send successfully on the second attemp.
+            return;
+          } catch (err2) {
+            error = err2 as string;
+
+            customError = interceptCustomError(error);
+          }
         }
 
         setTimeout(() => {
@@ -787,6 +842,21 @@ const Send: React.FunctionComponent<SendProps> = ({
         setComputingModalVisible(false);
       }
     });
+  };
+
+  const interceptCustomError = (error: string) => {
+    // these error are not server related.
+    if (
+      error.includes('18: bad-txns-sapling-duplicate-nullifier') ||
+      error.includes('18: bad-txns-sprout-duplicate-nullifier') ||
+      error.includes('18: bad-txns-orchard-duplicate-nullifier')
+    ) {
+      // bad-txns-xxxxxxxxx-duplicate-nullifier (3 errors)
+      return translate('send.duplicate-nullifier-error') as string;
+    } else if (error.includes('64: dust')) {
+      // dust
+      return translate('send.dust-error') as string;
+    }
   };
 
   const countMemoBytes = (memo: string, includeUAMemo: boolean) => {
