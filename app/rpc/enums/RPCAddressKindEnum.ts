@@ -3,4 +3,5 @@ export enum RPCAddressKindEnum {
   saplingAddressKind = 'sapling',
   transparentAddressKind = 'transparent',
   ufvkAddressKind = 'ufvk',
+  texAddressKind = 'tex',
 }

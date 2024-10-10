@@ -79,6 +79,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     sendPageState.toaddr.includeUAMemo ? '\nReply to: \n' + uaAddress : ''
   }`;
 
+  /**
+   * Returns the privacy level for the transaction.
+   * It will try to parse the address and determine the privacy level
+   * based on the address kind and the senders balance.
+   * @returns {string} The privacy level.
+   */
   const getPrivacyLevel = useCallback(async () => {
     if (!netInfo.isConnected) {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
@@ -199,7 +205,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       (from === PrivacyLevelFromEnum.orchardPrivacyLevel ||
         from === PrivacyLevelFromEnum.saplingPrivacyLevel ||
         from === PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel) &&
-      resultJSON.address_kind === RPCAddressKindEnum.transparentAddressKind
+      (resultJSON.address_kind === RPCAddressKindEnum.transparentAddressKind ||
+        resultJSON.address_kind === RPCAddressKindEnum.texAddressKind)
     ) {
       return translate('send.deshielded') as string;
     }
