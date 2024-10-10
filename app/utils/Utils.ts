@@ -18,7 +18,7 @@ import RPCModule from '../RPCModule';
 import { Buffer } from 'buffer';
 import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 import { RPCParseStatusEnum } from '../rpc/enums/RPCParseStatusEnum';
-import { RPCAdressKindEnum } from '../rpc/enums/RPCAddressKindEnum';
+import { RPCAddressKindEnum } from '../rpc/enums/RPCAddressKindEnum';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
@@ -349,7 +349,8 @@ export default class Utils {
 
     return (
       resultJSON.status === RPCParseStatusEnum.successParse &&
-      resultJSON.address_kind !== RPCAdressKindEnum.transparentAddressKind &&
+      resultJSON.address_kind !== RPCAddressKindEnum.transparentAddressKind &&
+      resultJSON.address_kind !== RPCAddressKindEnum.texAddressKind &&
       resultJSON.chain_name === serverChainName
     );
   }
