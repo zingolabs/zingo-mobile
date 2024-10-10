@@ -902,21 +902,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         </View>
       </Animated.View>
 
-      {validAddress === 1 && !memoEnabled && (
-        <FadeText
-          style={{
-            textAlign: 'center',
-            marginHorizontal: 5,
-            marginTop: 5,
-            color: colors.background,
-            opacity: 1,
-            fontWeight: '700',
-            backgroundColor: colors.primaryDisabled,
-          }}>
-          {translate('warning-binance') as string}
-        </FadeText>
-      )}
-
       <ScrollView
         ref={scrollViewRef}
         onContentSizeChange={(_, height) => setContentHeight(height)}
