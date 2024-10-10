@@ -7554,10 +7554,10 @@ react-native@*:
     ws "^6.2.2"
     yargs "^17.6.2"
 
-react-native@0.72.15:
-  version "0.72.15"
-  resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.72.15.tgz#9b74b0c39ec42befb70d494b535f863c4229ef55"
-  integrity sha512-UDxOZwCxhwb0dGuvcB/04uWzhDJ8etqW3fMOq6bv35WwEXMgKXXqZpshhMo64UVWm/m2ZmM32ckn5sf1EIqD9Q==
+react-native@0.72.17:
+  version "0.72.17"
+  resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.72.17.tgz#54d6de38adf6e56fdde1a6b83ef9b138abae7384"
+  integrity sha512-k3dNe0XqoYCGGWTenbupWSj+ljW3GIfmYS5P4s3if4j0csx2YbenKgH1aJNWLp+UP7ONwfId6G+uBoUJfyMxXg==
   dependencies:
     "@jest/create-cache-key-function" "^29.2.1"
     "@react-native-community/cli" "^11.4.1"
@@ -7624,10 +7624,10 @@ react-test-renderer@^18.2.0:
     react-shallow-renderer "^16.15.0"
     scheduler "^0.23.2"
 
-react@^18.2.0:
-  version "18.3.1"
-  resolved "https://registry.yarnpkg.com/react/-/react-18.3.1.tgz#49ab892009c53933625bd16b2533fc754cab2891"
-  integrity sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==
+react@18.2.0:
+  version "18.2.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
+  integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
   dependencies:
     loose-envify "^1.1.0"
 
