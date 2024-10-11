@@ -447,3 +447,41 @@ class ExecuteSaplingBalanceFromSeed {
         assertThat(balance.transparent_balance).isEqualTo(0)
     }
 }
+
+class ParseTexAddress {
+
+    @Test
+    fun parseTexAddress() {
+        val mapper = jacksonObjectMapper()
+
+        val server = "http://10.0.2.2:20000"
+        val chainhint = "regtest"
+        val seed = Seeds.HOSPITAL
+        val birthday:ULong = 1u
+        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val monitorMempool = false
+
+        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+        println(setCrytoProvider)
+
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        println("\nInit from seed:")
+        println(initFromSeedJson)
+        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+        assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
+        assertThat(initFromSeed.birthday).isEqualTo(1)
+
+        val result: String = uniffi.zingo.executeCommand("parse_address", "texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
+        println("\nParsed Address:")
+        println(result)
+
+        assertThat(result).isNotEmpty()
+        assertThat(result).isNotNull()
+
+
+        val wrongResult: String = uniffi.zingo.executeCommand("parse_address", "thiswontwork")
+        println("\nParsed Address (wrong):")
+        println(wrongResult)
+        assertThat(wrongResult).isEqualTo(null.toString())
+    }
+}
