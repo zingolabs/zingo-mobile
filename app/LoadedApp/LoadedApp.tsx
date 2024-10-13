@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faList, faUpload, faDownload, faCog, faComments } from '@fortawesome/free-solid-svg-icons';
+import { faList, faUpload, faDownload, faCog, faComments, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
 import SideMenu from 'react-native-side-menu-updated';
 import { I18n } from 'i18n-js';
@@ -855,7 +855,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               );
             }
           });
-      this.setState({ valueTransfers, somePending: pending > 0 });
+      // if some tx is confirmed the UI needs some time to
+      // acomodate the bottom tabs.
+      setTimeout(
+        () => {
+          this.setState({ valueTransfers, somePending: pending > 0 });
+        },
+        pending === 0 ? 250 : 0,
+      );
     }
   };
 
@@ -1519,6 +1526,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       scrollToTop,
       scrollToBottom,
       addresses,
+      somePending,
     } = this.state;
     const { colors } = this.props.theme;
 
@@ -1574,7 +1582,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       if (route.name === translate('loadedapp.history-menu')) {
         iconName = faList;
       } else if (route.name === translate('loadedapp.send-menu')) {
-        iconName = faUpload;
+        if (
+          mode === ModeEnum.basic &&
+          !!totalBalance &&
+          totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
+          somePending
+        ) {
+          iconName = faRefresh;
+        } else {
+          iconName = faUpload;
+        }
       } else if (route.name === translate('loadedapp.receive-menu')) {
         iconName = faDownload;
       } else if (route.name === translate('loadedapp.messages-menu')) {
@@ -1894,8 +1911,24 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               </Tab.Screen>
               {!readOnly &&
                 (mode === ModeEnum.advanced ||
-                  (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0)) && (
-                  <Tab.Screen name={translate('loadedapp.send-menu') as string}>
+                  (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ||
+                  (!!totalBalance &&
+                    totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
+                    somePending)) && (
+                  <Tab.Screen
+                    name={translate('loadedapp.send-menu') as string}
+                    listeners={{
+                      tabPress: e => {
+                        if (
+                          mode === ModeEnum.basic &&
+                          !!totalBalance &&
+                          totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
+                          somePending
+                        ) {
+                          e.preventDefault();
+                        }
+                      },
+                    }}>
                     {() => (
                       <Send
                         setSendPageState={this.setSendPageState}
