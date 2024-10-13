@@ -67,9 +67,11 @@ jobs:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
 
-  ios-e2e-test:
-    uses: ./.github/workflows/ios-e2e-test.yaml
-    needs: [create-timestamp, ios-build]
-    with:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+  # deactivating these for now, until we fix how
+  # detox run in MACOS.
+  #ios-e2e-test:
+  #  uses: ./.github/workflows/ios-e2e-test.yaml
+  #  needs: [create-timestamp, ios-build]
+  #  with:
+  #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+  #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
