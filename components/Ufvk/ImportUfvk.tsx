@@ -20,7 +20,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { ButtonTypeEnum, CommandEnum, GlobalConst } from '../../app/AppState';
-import { RPCParseStatusEnum } from '../../app/rpc/enums/RPCParseStatusEnum';
+import { RPCParseViewKeyStatusEnum } from '../../app/rpc/enums/RPCParseViewKeyStatusEnum';
 
 type ImportUfvkProps = {
   onClickCancel: () => void;
@@ -103,7 +103,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
 
     //console.log('parse ufvk', scannedKey, resultJSON);
 
-    const valid = resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === server.chainName;
+    const valid =
+      resultJSON.status === RPCParseViewKeyStatusEnum.successViewKeyParse && resultJSON.chain_name === server.chainName;
 
     if (valid) {
       return true;
