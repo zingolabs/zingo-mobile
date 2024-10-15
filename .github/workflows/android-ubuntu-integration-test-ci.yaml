@@ -107,7 +107,8 @@ jobs:
           "execute_sync_from_seed", 
           "execute_send_from_orchard", 
           "execute_currentprice_and_value_transfers_from_seed", 
-          "execute_sapling_balance_from_seed"
+          "execute_sapling_balance_from_seed",
+          "execute_parse_address_for_tex"
         ]
     env:
       CACHE-KEY: ${{ inputs.cache-key }}

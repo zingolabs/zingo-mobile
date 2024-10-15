@@ -454,10 +454,10 @@ class ExecuteSaplingBalanceFromSeed {
     }
 }
 
-class ParseTexAddress {
+class ExecuteParseAddressForTex {
 
     @Test
-    fun parseTexAddress() {
+    fun ExecuteParseAddressForTex() {
         val mapper = jacksonObjectMapper()
 
         val server = "http://10.0.2.2:20000"

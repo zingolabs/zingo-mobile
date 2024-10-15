@@ -176,10 +176,10 @@ async fn execute_parse_address_for_tex(abi: &str) {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ParseTexAddress");
+        zingomobile_utils::android_integration_test(abi, "ExecuteParseAddressForTex");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ParseTexAddress");
+        zingomobile_utils::android_integration_test_ci(abi, "ExecuteParseAddressForTex");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
