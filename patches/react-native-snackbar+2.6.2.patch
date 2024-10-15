@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-snackbar/android/build.gradle b/node_modules/react-native-snackbar/android/build.gradle
-index 57a263b..2308655 100644
+index 8b05ea4..d69f1e2 100644
 --- a/node_modules/react-native-snackbar/android/build.gradle
 +++ b/node_modules/react-native-snackbar/android/build.gradle
 @@ -20,6 +20,7 @@ def _minSdkVersion = _ext.has('minSdkVersion') ? _ext.minSdkVersion : 16
@@ -39,7 +39,7 @@ index 0000000..776557e
 +minAndroidGradlePluginVersion=1.0.0
 diff --git a/node_modules/react-native-snackbar/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json b/node_modules/react-native-snackbar/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json
 new file mode 100644
-index 0000000..9e26dfe
+index 0000000..8372b41
 --- /dev/null
 +++ b/node_modules/react-native-snackbar/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json
 @@ -0,0 +1 @@
@@ -54,7 +54,7 @@ index 0000000..dae2fc4
 +#Mon May 27 11:26:54 MDT 2024
 diff --git a/node_modules/react-native-snackbar/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml b/node_modules/react-native-snackbar/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
 new file mode 100644
-index 0000000..51d7eea
+index 0000000..fd93a55
 --- /dev/null
 +++ b/node_modules/react-native-snackbar/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
 @@ -0,0 +1,2 @@
@@ -63,7 +63,7 @@ index 0000000..51d7eea
 \ No newline at end of file
 diff --git a/node_modules/react-native-snackbar/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml b/node_modules/react-native-snackbar/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
 new file mode 100644
-index 0000000..345260f
+index 0000000..f4b5456
 --- /dev/null
 +++ b/node_modules/react-native-snackbar/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
 @@ -0,0 +1,2 @@
@@ -72,7 +72,7 @@ index 0000000..345260f
 \ No newline at end of file
 diff --git a/node_modules/react-native-snackbar/android/build/intermediates/incremental/mergeDebugShaders/merger.xml b/node_modules/react-native-snackbar/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
 new file mode 100644
-index 0000000..cef3bdf
+index 0000000..c8915f6
 --- /dev/null
 +++ b/node_modules/react-native-snackbar/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
 @@ -0,0 +1,2 @@
@@ -81,7 +81,7 @@ index 0000000..cef3bdf
 \ No newline at end of file
 diff --git a/node_modules/react-native-snackbar/android/build/intermediates/incremental/packageDebugAssets/merger.xml b/node_modules/react-native-snackbar/android/build/intermediates/incremental/packageDebugAssets/merger.xml
 new file mode 100644
-index 0000000..f75fdd2
+index 0000000..b0884b7
 --- /dev/null
 +++ b/node_modules/react-native-snackbar/android/build/intermediates/incremental/packageDebugAssets/merger.xml
 @@ -0,0 +1,2 @@
@@ -98,7 +98,7 @@ index 0000000..78ac5b8
 +local
 diff --git a/node_modules/react-native-snackbar/android/build/intermediates/navigation_json/debug/navigation.json b/node_modules/react-native-snackbar/android/build/intermediates/navigation_json/debug/navigation.json
 new file mode 100644
-index 0000000..0637a08
+index 0000000..8d3f940
 --- /dev/null
 +++ b/node_modules/react-native-snackbar/android/build/intermediates/navigation_json/debug/navigation.json
 @@ -0,0 +1 @@
