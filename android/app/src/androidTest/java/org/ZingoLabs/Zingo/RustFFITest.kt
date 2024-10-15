@@ -105,6 +105,12 @@ data class ValueTransfers (
     val value_transfers : List<ValueTransfer>,
 )
 
+data class ParseResult (
+    val status: String,
+    val chain_name: String,
+    val address_kind: String
+)
+
 @Category(OfflineTest::class)
 class ExecuteAddressesFromSeed {
     @Test
@@ -468,16 +474,27 @@ class ParseTexAddress {
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
-        assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val result: String = uniffi.zingo.executeCommand("parse_address", "texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
+        val seedResult = initFromSeed.seed
+        val birthdayResult = initFromSeed.birthday
+
+        assertThat(seedResult).isEqualTo(Seeds.HOSPITAL)
+        assertThat(birthdayResult).isEqualTo(1)
+
+        val resultJson: String = uniffi.zingo.executeCommand("parse_address", "texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
+        val result: ParseResult = mapper.readValue(resultJson)
         println("\nParsed Address:")
         println(result)
 
-        assertThat(result).isNotEmpty()
         assertThat(result).isNotNull()
 
+        val expectedResult = object {
+            val status = "success"
+            val chain_name = "regtest"
+            val address_kind = "tex"
+        }
+
+        assertThat(result).isEqualTo(expectedResult)
 
         val wrongResult: String = uniffi.zingo.executeCommand("parse_address", "thiswontwork")
         println("\nParsed Address (wrong):")
