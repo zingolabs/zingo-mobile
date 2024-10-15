@@ -27,7 +27,7 @@ import { ButtonTypeEnum, CommandEnum, PrivacyLevelFromEnum, GlobalConst } from '
 import { CurrencyEnum } from '../../../app/AppState';
 import { RPCAddressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
-import { RPCParseStatusEnum } from '../../../app/rpc/enums/RPCParseStatusEnum';
+import { RPCParseAddressStatusEnum } from '../../../app/rpc/enums/RPCParseAddressStatusEnum';
 
 type ConfirmProps = {
   calculatedFee: number;
@@ -127,7 +127,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
     const result: string = await RPCModule.execute(CommandEnum.parseAddress, sendPageState.toaddr.to);
     if (result) {
-      if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
+      if (result.toLowerCase().startsWith(GlobalConst.error)) {
         return '-';
       }
     } else {
@@ -143,7 +143,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
     //console.log('parse-address', sendPageState.toaddr.to, resultJSON.status === RPCParseStatusEnum.successParse);
 
-    if (resultJSON.status !== RPCParseStatusEnum.successParse || resultJSON.chain_name !== server.chainName) {
+    if (
+      resultJSON.status !== RPCParseAddressStatusEnum.successAddressParse ||
+      resultJSON.chain_name !== server.chainName
+    ) {
       return '-';
     }
 

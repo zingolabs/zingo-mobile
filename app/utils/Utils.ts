@@ -17,7 +17,7 @@ import randomColor from 'randomcolor';
 import RPCModule from '../RPCModule';
 import { Buffer } from 'buffer';
 import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
-import { RPCParseStatusEnum } from '../rpc/enums/RPCParseStatusEnum';
+import { RPCParseAddressStatusEnum } from '../rpc/enums/RPCParseAddressStatusEnum';
 import { RPCAddressKindEnum } from '../rpc/enums/RPCAddressKindEnum';
 
 export default class Utils {
@@ -310,7 +310,7 @@ export default class Utils {
     const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
     //console.log(result);
     if (result) {
-      if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
+      if (result.toLowerCase().startsWith(GlobalConst.error)) {
         return false;
       }
     } else {
@@ -325,14 +325,16 @@ export default class Utils {
 
     //console.log('parse-address', address, resultJSON, resultJSON.status === RPCParseStatusEnum.successParse);
 
-    return resultJSON.status === RPCParseStatusEnum.successParse && resultJSON.chain_name === serverChainName;
+    return (
+      resultJSON.status === RPCParseAddressStatusEnum.successAddressParse && resultJSON.chain_name === serverChainName
+    );
   }
 
   static async isValidOrchardOrSaplingAddress(address: string, serverChainName: string): Promise<boolean> {
     const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
     //console.log(result);
     if (result) {
-      if (result.toLowerCase().startsWith(GlobalConst.error) || result.toLowerCase() === 'null') {
+      if (result.toLowerCase().startsWith(GlobalConst.error)) {
         return false;
       }
     } else {
@@ -348,7 +350,7 @@ export default class Utils {
     //console.log('parse-memo', address, resultJSON);
 
     return (
-      resultJSON.status === RPCParseStatusEnum.successParse &&
+      resultJSON.status === RPCParseAddressStatusEnum.successAddressParse &&
       resultJSON.address_kind !== RPCAddressKindEnum.transparentAddressKind &&
       resultJSON.address_kind !== RPCAddressKindEnum.texAddressKind &&
       resultJSON.chain_name === serverChainName

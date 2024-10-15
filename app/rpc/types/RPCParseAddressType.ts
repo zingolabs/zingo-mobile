@@ -1,10 +1,10 @@
 import { ChainNameEnum } from '../../AppState';
 import { RPCAddressKindEnum } from '../enums/RPCAddressKindEnum';
-import { RPCParseStatusEnum } from '../enums/RPCParseStatusEnum';
+import { RPCParseAddressStatusEnum } from '../enums/RPCParseAddressStatusEnum';
 import { RPCReceiversEnum } from '../enums/RPCReceiversEnum';
 
 export type RPCParseAddressType = {
-  status: RPCParseStatusEnum;
+  status: RPCParseAddressStatusEnum;
   chain_name?: ChainNameEnum;
   address_kind?:
     | RPCAddressKindEnum.unifiedAddressKind
