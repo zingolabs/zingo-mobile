@@ -107,8 +107,8 @@ data class ValueTransfers (
 
 data class ParseResult (
     val status: String,
-    val chain_name: String,
-    val address_kind: String
+    val chain_name: String?,
+    val address_kind: String?
 )
 
 @Category(OfflineTest::class)
@@ -454,7 +454,7 @@ class ExecuteSaplingBalanceFromSeed {
     }
 }
 
-class ExecuteParseAddressForTex {
+class ExecuteParseAddress {
 
     @Test
     fun ExecuteParseAddressForTex() {
@@ -488,7 +488,6 @@ class ExecuteParseAddressForTex {
 
         assertThat(result).isNotNull()
 
-
         val expectedResult = ParseResult(
             status = "success",
             chain_name = "regtest",
@@ -496,21 +495,43 @@ class ExecuteParseAddressForTex {
         )
 
         assertThat(result).isEqualTo(expectedResult)
+    }
+
+    @Test
+    fun ExecuteParseAddresInvalid() {
+        val mapper = jacksonObjectMapper()
+
+        val server = "http://10.0.2.2:20000"
+        val chainhint = "regtest"
+        val seed = Seeds.HOSPITAL
+        val birthday:ULong = 1u
+        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val monitorMempool = false
+
+        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+        println(setCrytoProvider)
+
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        println("\nInit from seed:")
+        println(initFromSeedJson)
+        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+
+        val seedResult = initFromSeed.seed
+        val birthdayResult = initFromSeed.birthday
+
+        assertThat(seedResult).isEqualTo(Seeds.HOSPITAL)
+        assertThat(birthdayResult).isEqualTo(1)
 
         val wrongResultJson: String = uniffi.zingo.executeCommand("parse_address", "thiswontwork")
-
         val wrongResult: ParseResult = mapper.readValue(wrongResultJson)
-
         val expectedWrongResult = ParseResult(
             status = "Invalid address",
-            chain_name = "null",
-            address_kind = "null"
+            chain_name = null,
+            address_kind = null
         )
-        println("\nWrong Result (JSON):")
-        println(wrongResultJson)
 
         println("\nWrong Result:")
         println(wrongResult)
-        // assertThat(wrongResult).isEqualTo(expectedWrongResult)
+        assertThat(wrongResult).isEqualTo(expectedWrongResult)
     }
 }
