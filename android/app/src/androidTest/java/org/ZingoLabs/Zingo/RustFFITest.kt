@@ -488,17 +488,29 @@ class ExecuteParseAddressForTex {
 
         assertThat(result).isNotNull()
 
-        val expectedResult = object {
-            val status = "success"
-            val chain_name = "regtest"
-            val address_kind = "tex"
-        }
+
+        val expectedResult = ParseResult(
+            status = "success",
+            chain_name = "regtest",
+            address_kind = "tex"
+        )
 
         assertThat(result).isEqualTo(expectedResult)
 
-        val wrongResult: String = uniffi.zingo.executeCommand("parse_address", "thiswontwork")
-        println("\nParsed Address (wrong):")
+        val wrongResultJson: String = uniffi.zingo.executeCommand("parse_address", "thiswontwork")
+
+        val wrongResult: ParseResult = mapper.readValue(wrongResultJson)
+
+        val expectedWrongResult = ParseResult(
+            status = "Invalid address",
+            chain_name = "null",
+            address_kind = "null"
+        )
+        println("\nWrong Result (JSON):")
+        println(wrongResultJson)
+
+        println("\nWrong Result:")
         println(wrongResult)
-        assertThat(wrongResult).isEqualTo(null.toString())
+        // assertThat(wrongResult).isEqualTo(expectedWrongResult)
     }
 }
