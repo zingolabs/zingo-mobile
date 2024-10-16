@@ -159,7 +159,7 @@ async fn execute_sapling_balance_from_seed(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
-async fn execute_parse_address_for_tex(abi: &str) {
+async fn execute_parse_addresses(abi: &str) {
     #[cfg(not(feature = "regchest"))]
     let (_regtest_manager, _child_process_handler) =
         scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
@@ -176,10 +176,10 @@ async fn execute_parse_address_for_tex(abi: &str) {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteParseAddress");
+        zingomobile_utils::android_integration_test(abi, "ExecuteParseAddresses");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ExecuteParseAddress");
+        zingomobile_utils::android_integration_test_ci(abi, "ExecuteParseAddresses");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -224,8 +224,8 @@ mod integration {
         }
 
         #[tokio::test]
-        async fn execute_parse_address_for_tex() {
-            crate::execute_parse_address_for_tex(ABI).await;
+        async fn execute_parse_addresses() {
+            crate::execute_parse_addresses(ABI).await;
         }
     }
 
@@ -258,8 +258,8 @@ mod integration {
         }
 
         #[tokio::test]
-        async fn execute_parse_address_for_tex() {
-            crate::execute_parse_address_for_tex(ABI).await;
+        async fn execute_parse_addresses() {
+            crate::execute_parse_addresses(ABI).await;
         }
     }
 
@@ -292,8 +292,8 @@ mod integration {
         }
 
         #[tokio::test]
-        async fn execute_parse_address_for_tex() {
-            crate::execute_parse_address_for_tex(ABI).await;
+        async fn execute_parse_addresses() {
+            crate::execute_parse_addresses(ABI).await;
         }
     }
 
@@ -326,8 +326,8 @@ mod integration {
         }
 
         #[tokio::test]
-        async fn execute_parse_address_for_tex() {
-            crate::execute_parse_address_for_tex(ABI).await;
+        async fn execute_parse_addresses() {
+            crate::execute_parse_addresses(ABI).await;
         }
     }
 }

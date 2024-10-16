@@ -454,7 +454,7 @@ class ExecuteSaplingBalanceFromSeed {
     }
 }
 
-class ExecuteParseAddress {
+class ExecuteParseAddresses {
 
     @Test
     fun ExecuteParseAddressForTex() {
@@ -478,8 +478,8 @@ class ExecuteParseAddress {
         val seedResult = initFromSeed.seed
         val birthdayResult = initFromSeed.birthday
 
-        assertThat(seedResult).isEqualTo(Seeds.HOSPITAL)
-        assertThat(birthdayResult).isEqualTo(1)
+        assertThat(seedResult).isEqualTo(seed)
+        assertThat(birthdayResult).isEqualTo(birthday)
 
         val resultJson: String = uniffi.zingo.executeCommand("parse_address", "texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
         val result: ParseResult = mapper.readValue(resultJson)
@@ -519,8 +519,8 @@ class ExecuteParseAddress {
         val seedResult = initFromSeed.seed
         val birthdayResult = initFromSeed.birthday
 
-        assertThat(seedResult).isEqualTo(Seeds.HOSPITAL)
-        assertThat(birthdayResult).isEqualTo(1)
+        assertThat(seedResult).isEqualTo(seed)
+        assertThat(birthdayResult).isEqualTo(birthday)
 
         val wrongResultJson: String = uniffi.zingo.executeCommand("parse_address", "thiswontwork")
         val wrongResult: ParseResult = mapper.readValue(wrongResultJson)
