@@ -1001,7 +1001,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                       <FontAwesomeIcon icon={faCheck} color={colors.primary} />
                     </View>
                   )}
-                  {validAddress === -1 && <ErrorText>{translate('send.invalidaddress') as string}</ErrorText>}
+                  {validAddress === -1 && (
+                    <ErrorText testID="send.address.error">{translate('send.invalidaddress') as string}</ErrorText>
+                  )}
                 </View>
                 <View
                   style={{
