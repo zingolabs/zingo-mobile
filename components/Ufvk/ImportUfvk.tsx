@@ -73,7 +73,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   useEffect(() => {
     if (seedufvkText) {
       const seedufvkTextArray: string[] = seedufvkText.replaceAll('\n', ' ').replaceAll('  ', ' ').split(' ');
-      console.log(seedufvkTextArray);
+      //console.log(seedufvkTextArray);
       // if the seed have 25 -> means it is a copy/paste from the stored seed in the device.
       if (seedufvkTextArray.length === 25) {
         // if the last word is a number -> move it to the birthday field
@@ -81,7 +81,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
         const possibleBirthday: number | null = isNaN(Number(lastWord)) ? null : Number(lastWord);
         if (possibleBirthday && !birthday) {
           setBirthday(possibleBirthday.toString());
-          setSeedufvkText(seedufvkTextArray.slice(0, 23).join(' '));
+          setSeedufvkText(seedufvkTextArray.slice(0, 24).join(' '));
         }
       }
     }

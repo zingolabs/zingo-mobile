@@ -937,12 +937,26 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
             {hasRecoveryWalletInfoSaved && (
               <View style={{ display: 'flex' }}>
-                <FadeText style={{ color: colors.primary, textAlign: 'center', marginVertical: 10, padding: 5 }}>
+                <FadeText style={{ color: colors.primary, textAlign: 'center', marginTop: 10, padding: 5 }}>
                   {(translate('settings.walletkeyssaved') as string) +
                     (storageRecoveryWalletInfo ? ' [' + storageRecoveryWalletInfo + ']' : '')}
                 </FadeText>
               </View>
             )}
+
+            <View style={{ display: 'flex', margin: 10 }}>
+              <FadeText
+                style={{
+                  color: colors.primary,
+                  textAlign: 'center',
+                  marginVertical: 10,
+                  padding: 5,
+                  borderColor: 'red',
+                  borderWidth: 1,
+                }}>
+                {translate('settings.walletkeyswarning') as string}
+              </FadeText>
+            </View>
           </>
         )}
       </ScrollView>

@@ -260,7 +260,7 @@
     "recoverywalletinfoondevices": [
       {
         "value": true,
-        "text": "Faça backup da carteira Seed/Birthday no dispositivo."
+        "text": "Faça backup da carteira Seed Phrase no dispositivo."
       },
       {
         "value": false,
@@ -342,7 +342,8 @@
     "uk": "Reino Unido",
     "select-placeholder": "Escolha um Servidor...",
     "value-language-ru": "Russo",
-    "walletkeyssaved" : "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo."
+    "walletkeyssaved" : "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo.",
+    "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!"
   },
   "info": {
     "version": "Versão",

@@ -260,7 +260,7 @@
     "recoverywalletinfoondevices": [
       {
         "value": true,
-        "text": "Hacer copia de seguridad de la Semilla/Cumpleaños del monedero en el dispositivo."
+        "text": "Hacer copia de seguridad de la Frase Semilla del monedero en el dispositivo."
       },
       {
         "value": false,
@@ -342,7 +342,8 @@
     "uk": "Reino Unido",
     "select-placeholder": "Elige un Servidor...",
     "value-language-ru": "Ruso",
-    "walletkeyssaved": "La ultima información de recuperacion del Monedero almacenada de forma segura en el dispositivo."
+    "walletkeyssaved": "La ultima información de recuperacion del Monedero almacenada de forma segura en el dispositivo.",
+    "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!"
   },
   "info": {
     "version": "Versión",

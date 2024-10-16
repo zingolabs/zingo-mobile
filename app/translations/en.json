@@ -260,7 +260,7 @@
     "recoverywalletinfoondevices": [
       {
         "value": true,
-        "text": "Backup wallet Seed/Birthday to device."
+        "text": "Backup wallet Seed Phrase to device."
       },
       {
         "value": false,
@@ -342,7 +342,8 @@
     "uk": "UK",
     "select-placeholder": "Choose a Server...",
     "value-language-ru": "Russian",
-    "walletkeyssaved" : "The last Wallet Recovery Info stored safely in the device."
+    "walletkeyssaved" : "The last Wallet Recovery Info stored safely in the device.",
+    "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!"
   },
   "info": {
     "version": "Version",

@@ -135,7 +135,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
   const [donationAlert, setDonationAlert] = useState<boolean>(false);
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
-  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(true);
+  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
   const file = useMemo(
     () => ({
       en: en,

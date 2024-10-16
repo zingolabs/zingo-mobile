@@ -71,7 +71,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
   rescanMenu: false,
-  recoveryWalletInfoOnDevice: true,
+  recoveryWalletInfoOnDevice: false,
   shieldingAmount: 0,
 };
 

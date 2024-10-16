@@ -183,8 +183,8 @@ export default class SettingsFileImpl {
         }
       }
       if (!settings.hasOwnProperty(SettingsNameEnum.recoveryWalletInfoOnDevice)) {
-        // doing backup of seed & birthday in the device -> true by default.
-        settings.recoveryWalletInfoOnDevice = true;
+        // doing backup of seed & birthday in the device -> false by default.
+        settings.recoveryWalletInfoOnDevice = false;
       }
       return settings;
     } catch (err) {
