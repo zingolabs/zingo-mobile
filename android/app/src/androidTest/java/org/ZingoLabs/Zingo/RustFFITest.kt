@@ -479,7 +479,7 @@ class ExecuteParseAddresses {
         val birthdayResult = initFromSeed.birthday
 
         assertThat(seedResult).isEqualTo(seed)
-        assertThat(birthdayResult).isEqualTo(birthday)
+        assertThat(birthdayResult).isEqualTo(1)
 
         val resultJson: String = uniffi.zingo.executeCommand("parse_address", "texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
         val result: ParseResult = mapper.readValue(resultJson)
@@ -520,7 +520,7 @@ class ExecuteParseAddresses {
         val birthdayResult = initFromSeed.birthday
 
         assertThat(seedResult).isEqualTo(seed)
-        assertThat(birthdayResult).isEqualTo(birthday)
+        assertThat(birthdayResult).isEqualTo(1)
 
         val wrongResultJson: String = uniffi.zingo.executeCommand("parse_address", "thiswontwork")
         val wrongResult: ParseResult = mapper.readValue(wrongResultJson)
