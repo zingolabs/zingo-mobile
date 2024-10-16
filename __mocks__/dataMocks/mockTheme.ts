@@ -15,5 +15,6 @@ export const mockTheme: ThemeType = {
     money: '#ffffff',
     syncing: '#ebff5a',
     notification: '',
+    sideMenuBackground: '#040C17',
   },
 };
