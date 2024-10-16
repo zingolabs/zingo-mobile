@@ -524,14 +524,17 @@ class ExecuteParseAddresses {
 
         val wrongResultJson: String = uniffi.zingo.executeCommand("parse_address", "thiswontwork")
         val wrongResult: ParseResult = mapper.readValue(wrongResultJson)
+        println("\nWrong Address:")
+        println(wrongResult)
+
+        assertThat(wrongResult).isNotNull()
+
         val expectedWrongResult = ParseResult(
             status = "Invalid address",
             chain_name = null,
             address_kind = null
         )
 
-        println("\nWrong Result:")
-        println(wrongResult)
         assertThat(wrongResult).isEqualTo(expectedWrongResult)
     }
 }
