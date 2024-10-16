@@ -105,6 +105,12 @@ data class ValueTransfers (
     val value_transfers : List<ValueTransfer>,
 )
 
+data class ParseResult (
+    val status: String,
+    val chain_name: String?,
+    val address_kind: String?
+)
+
 @Category(OfflineTest::class)
 class ExecuteAddressesFromSeed {
     @Test
@@ -445,5 +451,90 @@ class ExecuteSaplingBalanceFromSeed {
         assertThat(balance.verified_sapling_balance).isEqualTo(100000)
         assertThat(balance.spendable_sapling_balance).isEqualTo(100000)
         assertThat(balance.transparent_balance).isEqualTo(0)
+    }
+}
+
+class ExecuteParseAddresses {
+
+    @Test
+    fun ExecuteParseAddressForTex() {
+        val mapper = jacksonObjectMapper()
+
+        val server = "http://10.0.2.2:20000"
+        val chainhint = "regtest"
+        val seed = Seeds.HOSPITAL
+        val birthday:ULong = 1u
+        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val monitorMempool = false
+
+        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+        println(setCrytoProvider)
+
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        println("\nInit from seed:")
+        println(initFromSeedJson)
+        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+
+        val seedResult = initFromSeed.seed
+        val birthdayResult = initFromSeed.birthday
+
+        assertThat(seedResult).isEqualTo(seed)
+        assertThat(birthdayResult).isEqualTo(1)
+
+        val resultJson: String = uniffi.zingo.executeCommand("parse_address", "texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
+        val result: ParseResult = mapper.readValue(resultJson)
+        println("\nParsed Address:")
+        println(result)
+
+        assertThat(result).isNotNull()
+
+        val expectedResult = ParseResult(
+            status = "success",
+            chain_name = "regtest",
+            address_kind = "tex"
+        )
+
+        assertThat(result).isEqualTo(expectedResult)
+    }
+
+    @Test
+    fun ExecuteParseAddresInvalid() {
+        val mapper = jacksonObjectMapper()
+
+        val server = "http://10.0.2.2:20000"
+        val chainhint = "regtest"
+        val seed = Seeds.HOSPITAL
+        val birthday:ULong = 1u
+        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val monitorMempool = false
+
+        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+        println(setCrytoProvider)
+
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        println("\nInit from seed:")
+        println(initFromSeedJson)
+        val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+
+        val seedResult = initFromSeed.seed
+        val birthdayResult = initFromSeed.birthday
+
+        assertThat(seedResult).isEqualTo(seed)
+        assertThat(birthdayResult).isEqualTo(1)
+
+        val wrongResultJson: String = uniffi.zingo.executeCommand("parse_address", "thiswontwork")
+        val wrongResult: ParseResult = mapper.readValue(wrongResultJson)
+        println("\nWrong Address:")
+        println(wrongResult)
+
+        assertThat(wrongResult).isNotNull()
+
+        val expectedWrongResult = ParseResult(
+            status = "Invalid address",
+            chain_name = null,
+            address_kind = null
+        )
+
+        assertThat(wrongResult).isEqualTo(expectedWrongResult)
     }
 }
