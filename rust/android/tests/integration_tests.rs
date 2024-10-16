@@ -1,5 +1,5 @@
 #[cfg(not(feature = "regchest"))]
-use zingolib::testutils::{scenarios};
+use zingolib::testutils::scenarios;
 
 // ubuntu ci runner
 #[cfg(feature = "ci")]
@@ -17,7 +17,7 @@ async fn offline_testsuite(abi: &str) {
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test_ci(abi, "OfflineTestSuite");
-    
+
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
     println!("Error: {}", error);
@@ -42,7 +42,7 @@ async fn execute_sync_from_seed(abi: &str) {
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test_ci(abi, "ExecuteSyncFromSeed");
-    
+
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
         Ok(_) => (),
@@ -73,7 +73,7 @@ async fn execute_send_from_orchard(abi: &str) {
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test_ci(abi, "ExecuteSendFromOrchard");
-    
+
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
         Ok(_) => (),
@@ -101,12 +101,16 @@ async fn execute_currentprice_and_value_transfers_from_seed(abi: &str) {
         };
 
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "UpdateCurrentPriceAndValueTransfersFromSeed");
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
+        abi,
+        "UpdateCurrentPriceAndValueTransfersFromSeed",
+    );
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "UpdateCurrentPriceAndValueTransfersFromSeed");
-    
+    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
+        abi,
+        "UpdateCurrentPriceAndValueTransfersFromSeed",
+    );
+
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
         Ok(_) => (),
@@ -141,7 +145,42 @@ async fn execute_sapling_balance_from_seed(abi: &str) {
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
         zingomobile_utils::android_integration_test_ci(abi, "ExecuteSaplingBalanceFromSeed");
-    
+
+    #[cfg(feature = "regchest")]
+    match regchest_utils::close(&docker).await {
+        Ok(_) => (),
+        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
+    }
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
+
+async fn execute_parse_addresses(abi: &str) {
+    #[cfg(not(feature = "regchest"))]
+    let (_regtest_manager, _child_process_handler) =
+        scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
+    #[cfg(feature = "regchest")]
+    let docker = match regchest_utils::launch(
+        UNIX_SOCKET,
+        Some("funded_orchard_sapling_transparent_shielded_mobileclient"),
+    )
+    .await
+    {
+        Ok(d) => d,
+        Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+    };
+
+    #[cfg(not(feature = "ci"))]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test(abi, "ExecuteParseAddresses");
+    #[cfg(feature = "ci")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_integration_test_ci(abi, "ExecuteParseAddresses");
+
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
         Ok(_) => (),
@@ -183,6 +222,11 @@ mod integration {
         async fn execute_sapling_balance_from_seed() {
             crate::execute_sapling_balance_from_seed(ABI).await;
         }
+
+        #[tokio::test]
+        async fn execute_parse_addresses() {
+            crate::execute_parse_addresses(ABI).await;
+        }
     }
 
     mod x86_64 {
@@ -211,6 +255,11 @@ mod integration {
         #[tokio::test]
         async fn execute_sapling_balance_from_seed() {
             crate::execute_sapling_balance_from_seed(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_parse_addresses() {
+            crate::execute_parse_addresses(ABI).await;
         }
     }
 
@@ -241,6 +290,11 @@ mod integration {
         async fn execute_sapling_balance_from_seed() {
             crate::execute_sapling_balance_from_seed(ABI).await;
         }
+
+        #[tokio::test]
+        async fn execute_parse_addresses() {
+            crate::execute_parse_addresses(ABI).await;
+        }
     }
 
     mod arm64 {
@@ -269,6 +323,11 @@ mod integration {
         #[tokio::test]
         async fn execute_sapling_balance_from_seed() {
             crate::execute_sapling_balance_from_seed(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn execute_parse_addresses() {
+            crate::execute_parse_addresses(ABI).await;
         }
     }
 }
