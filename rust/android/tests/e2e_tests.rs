@@ -1,5 +1,5 @@
 #[cfg(not(feature = "regchest"))]
-use zingolib::testutils::{scenarios};
+use zingolib::testutils::scenarios;
 
 use darkside_tests::utils::{prepare_darksidewalletd, DarksideHandler};
 
@@ -24,12 +24,42 @@ async fn tex_send_address(abi: &str) {
         };
 
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "tex_send_address");
+    let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "tex_send_address");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test_ci(abi, "tex_send_address");
-    
+
+    #[cfg(feature = "regchest")]
+    match regchest_utils::close(&docker).await {
+        Ok(_) => (),
+        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
+    }
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
+
+async fn parse_invalid_address(abi: &str) {
+    #[cfg(not(feature = "regchest"))]
+    let (_regtest_manager, _child_process_handler) =
+        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    #[cfg(feature = "regchest")]
+    let docker =
+        match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
+            Ok(d) => d,
+            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+        };
+
+    #[cfg(not(feature = "ci"))]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test(abi, "parse_invalid_address");
+    #[cfg(feature = "ci")]
+    let (exit_code, output, error) =
+        zingomobile_utils::android_e2e_test_ci(abi, "parse_invalid_address");
+
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
         Ok(_) => (),
@@ -60,7 +90,7 @@ async fn reload_while_tx_pending(abi: &str) {
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test_ci(abi, "reload_while_tx_pending");
-    
+
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
         Ok(_) => (),
@@ -106,13 +136,13 @@ async fn change_custom_regtest_server(abi: &str) {
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test_ci(abi, "change_custom_regtest_server");
-    
+
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
         Ok(_) => (),
         Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
     }
-    
+
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
     println!("Error: {}", error);
@@ -152,11 +182,9 @@ async fn change_server_from_list(abi: &str) {
 
 async fn new_wallet(abi: &str) {
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "new_wallet");
+    let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "new_wallet");
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test_ci(abi, "new_wallet");
+    let (exit_code, output, error) = zingomobile_utils::android_e2e_test_ci(abi, "new_wallet");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -167,11 +195,9 @@ async fn new_wallet(abi: &str) {
 
 async fn screen_awake(abi: &str) {
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "screen_awake");
+    let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "screen_awake");
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test_ci(abi, "screen_awake");
+    let (exit_code, output, error) = zingomobile_utils::android_e2e_test_ci(abi, "screen_awake");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -192,11 +218,9 @@ async fn send(abi: &str) {
         };
 
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "send");
+    let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "send");
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test_ci(abi, "send");
+    let (exit_code, output, error) = zingomobile_utils::android_e2e_test_ci(abi, "send");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -213,11 +237,9 @@ async fn send(abi: &str) {
 
 async fn sync_report(abi: &str) {
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "sync_report");
+    let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "sync_report");
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test_ci(abi, "sync_report");
+    let (exit_code, output, error) = zingomobile_utils::android_e2e_test_ci(abi, "sync_report");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -259,7 +281,7 @@ async fn darkside_simple_sync(abi: &str) {
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
         zingomobile_utils::android_e2e_test_ci(abi, "darkside_simple_sync");
-    
+
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
     println!("Error: {}", error);
@@ -274,6 +296,11 @@ mod e2e {
         #[tokio::test]
         async fn tex_send_address() {
             crate::tex_send_address(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn parse_invalid_address() {
+            crate::parse_invalid_address(ABI).await;
         }
 
         #[tokio::test]
@@ -343,6 +370,11 @@ mod e2e {
         }
 
         #[tokio::test]
+        async fn parse_invalid_address() {
+            crate::parse_invalid_address(ABI).await;
+        }
+
+        #[tokio::test]
         async fn reload_while_tx_pending() {
             crate::reload_while_tx_pending(ABI).await;
         }
@@ -409,6 +441,11 @@ mod e2e {
         }
 
         #[tokio::test]
+        async fn parse_invalid_address() {
+            crate::parse_invalid_address(ABI).await;
+        }
+
+        #[tokio::test]
         async fn reload_while_tx_pending() {
             crate::reload_while_tx_pending(ABI).await;
         }
@@ -472,6 +509,11 @@ mod e2e {
         #[tokio::test]
         async fn tex_send_address() {
             crate::tex_send_address(ABI).await;
+        }
+
+        #[tokio::test]
+        async fn parse_invalid_address() {
+            crate::parse_invalid_address(ABI).await;
         }
 
         #[tokio::test]
