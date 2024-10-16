@@ -94,7 +94,8 @@
     "serverfirsttry": "Se produjo un error al intentar conectarse al servidor activo, actualmente verificando los servidores en la lista.",
     "serversecondtry": "No parece haber ningún problema con el servidor. Ocurre algo diferente.",
     "alert-donation-title": "APOYAR A ZINGOLABS",
-    "alert-donation-body": "¿Quieres ayudar a ZingoLabs a que Zcash sea más útil? Opta por dar una propina de un Zenny (0.01 ZEC) a ZingoLabs con cada transacción! Si es así, presione confirmar, de lo contrario presione Cancelar."
+    "alert-donation-body": "¿Quieres ayudar a ZingoLabs a que Zcash sea más útil? Opta por dar una propina de un Zenny (0.01 ZEC) a ZingoLabs con cada transacción! Si es así, presione confirmar, de lo contrario presione Cancelar.",
+    "noservers": "Ninguno de los servidores de la lista esta disponible, probablemente se trata de un error de conexion."
   },
   "loadedapp": {
     "about": "Sobre Zingo",

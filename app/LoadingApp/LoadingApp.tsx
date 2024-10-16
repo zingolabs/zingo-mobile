@@ -460,7 +460,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           });
         }, 1000);
         // not a different one, can be the same.
-        await this.selectTheBestServer(false);
+        const someServerIsWorking = await this.selectTheBestServer(false);
+        console.log('some server is working?', someServerIsWorking);
       }
 
       // Second, check if a wallet exists. Do it async so the basic screen has time to render
@@ -650,9 +651,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     });
   };
 
-  selectTheBestServer = async (aDifferentOne: boolean) => {
+  selectTheBestServer = async (aDifferentOne: boolean): Promise<boolean> => {
     // avoiding obsolete ones
-    let withMessage: boolean = true;
+    let someServerIsWorking: boolean = true;
     const actualServer = this.state.server;
     const server = await selectingServer(
       serverUris(this.state.translate).filter(
@@ -664,10 +665,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       fasterServer = { uri: server.uri, chainName: server.chainName };
     } else {
       fasterServer = actualServer;
-      // likely here there is a internet conection problem
+      // likely here there is a internet/wifi conection problem
       // all of the servers return an error because they are unreachable probably.
       // the 30 seconds timout was fired.
-      withMessage = false;
+      someServerIsWorking = false;
     }
     console.log(server);
     console.log(fasterServer);
@@ -678,7 +679,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     await SettingsFileImpl.writeSettings(SettingsNameEnum.server, fasterServer);
     await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, SelectServerEnum.list);
     // message with the result only for advanced users
-    if (this.state.mode === ModeEnum.advanced && withMessage) {
+    if (this.state.mode === ModeEnum.advanced && someServerIsWorking) {
       if (isEqual(actualServer, fasterServer)) {
         this.addLastSnackbar({
           message: this.state.translate('loadedapp.selectingserversame') as string,
@@ -691,13 +692,20 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         });
       }
     }
+    return someServerIsWorking;
   };
 
   checkServer: (s: ServerType) => Promise<boolean> = async (server: ServerType) => {
-    const resp: string = await RPCModule.getLatestBlock(server.uri);
-    //console.log('check server', resp);
-
-    if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
+    const s = {
+      uri: server.uri,
+      chainName: server.chainName,
+      region: '',
+      default: false,
+      latency: null,
+      obsolete: false,
+    } as ServerUrisType;
+    const serverChecked = await selectingServer([s]);
+    if (serverChecked && serverChecked.latency) {
       return true;
     } else {
       return false;
@@ -737,20 +745,34 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           duration: SnackbarDurationEnum.longer,
         });
         // a different server.
-        await this.selectTheBestServer(true);
-        if (start) {
-          this.setState({
-            startingApp: false,
-            serverErrorTries: 1,
-            screen,
-          });
-          this.componentDidMount();
+        const someServerIsWorking = await this.selectTheBestServer(true);
+        if (someServerIsWorking) {
+          if (start) {
+            this.setState({
+              startingApp: false,
+              serverErrorTries: 1,
+              screen,
+            });
+            this.componentDidMount();
+          } else {
+            createAlert(
+              this.setBackgroundError,
+              this.addLastSnackbar,
+              title,
+              result,
+              false,
+              this.state.translate,
+              sendEmail,
+              this.state.info.zingolib,
+            );
+            this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
+          }
         } else {
           createAlert(
             this.setBackgroundError,
             this.addLastSnackbar,
             title,
-            result,
+            this.state.translate('loadingapp.noservers') as string,
             false,
             this.state.translate,
             sendEmail,
@@ -1336,7 +1358,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                         this.setState({
                           startingApp: false,
                         });
-                        this.componentDidMount;
+                        this.componentDidMount();
                       }}
                       style={{ marginBottom: 10 }}
                     />
