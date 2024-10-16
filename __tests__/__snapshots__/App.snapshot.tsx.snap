@@ -4,7 +4,7 @@ exports[`Component App - test App - snapshot 1`] = `
 <RCTSafeAreaView
   style={
     {
-      "backgroundColor": "#011401",
+      "backgroundColor": "#06172d",
       "flex": 1,
       "justifyContent": "center",
     }

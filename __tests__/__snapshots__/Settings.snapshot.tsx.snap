@@ -3168,6 +3168,30 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           </Text>
         </View>
       </View>
+      <View
+        style={
+          {
+            "display": "flex",
+            "margin": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "borderColor": "red",
+              "borderWidth": 1,
+              "color": "rgb(0, 122, 255)",
+              "marginVertical": 10,
+              "opacity": 0.65,
+              "padding": 5,
+              "textAlign": "center",
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
     </View>
   </RCTScrollView>
   <View
