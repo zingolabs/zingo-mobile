@@ -165,7 +165,6 @@ jobs:
         run: |
           echo "Disk space before post-build cleanup:"
           df -h
-          sudo rm -rf /usr/local/lib/android
           sudo rm -rf /usr/local/.ghcup
           sudo rm -rf /opt/hostedtoolcache/CodeQL
           sudo rm -rf /usr/local/lib/android/sdk/ndk
