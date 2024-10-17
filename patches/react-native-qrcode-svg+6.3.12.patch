@@ -1,0 +1,11 @@
+diff --git a/node_modules/react-native-qrcode-svg/src/LogoSVG/index.native.js b/node_modules/react-native-qrcode-svg/src/LogoSVG/index.native.js
+index 6c5b14a..3827574 100644
+--- a/node_modules/react-native-qrcode-svg/src/LogoSVG/index.native.js
++++ b/node_modules/react-native-qrcode-svg/src/LogoSVG/index.native.js
+@@ -1,5 +1,5 @@
+ import React from "react";
+-import { LocalSvg } from "react-native-svg/css";
++import { LocalSvg } from "react-native-svg";
+ import { SvgUri, SvgXml } from "react-native-svg";
+ import { isString, isUrlString } from "../utils";
+ 
