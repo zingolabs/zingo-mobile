@@ -446,6 +446,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       somePending: false,
       scrollToTop: false,
       scrollToBottom: false,
+      showSwipeableIcons: true,
     };
 
     this.rpc = new RPC(
@@ -741,6 +742,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
   setShieldingAmount = (value: number) => {
     this.setState({ shieldingAmount: value });
+  };
+
+  setShowSwipeableIcons = (value: boolean) => {
+    this.setState({ showSwipeableIcons: value });
   };
 
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
@@ -1117,7 +1122,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         initial: false,
       });
     } else if (item === MenuItemEnum.Support) {
-      sendEmail(this.state.translate, this.state.info.zingolib);
+      this.setShowSwipeableIcons(false);
+      await sendEmail(this.state.translate, this.state.info.zingolib);
+      this.setShowSwipeableIcons(true);
     }
   };
 
@@ -1587,6 +1594,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       shieldingAmount: this.state.shieldingAmount,
       restartApp: this.state.restartApp,
       somePending: this.state.somePending,
+      showSwipeableIcons: this.state.showSwipeableIcons,
 
       // context settings
       server: this.state.server,

@@ -61,7 +61,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   setMessagesAddressModalShowing,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, privacy, info, navigation, server } = context;
+  const { translate, language, privacy, info, navigation, server, showSwipeableIcons } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -137,34 +137,36 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
 
     return (
       <>
-        <Animated.View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            transform: [{ translateX: trans }],
-          }}>
-          {messagesAddress && (
-            <View
-              style={{
-                width: 50,
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginLeft: 20,
-              }}>
-              <TouchableOpacity
-                style={{ zIndex: 999, padding: 10 }}
-                onPress={() => {
-                  setValueTransferDetail(vt);
-                  setValueTransferDetailIndex(index);
-                  setMessagesAddressModalShowing(true);
-                  swipeable.reset();
+        {showSwipeableIcons && (
+          <Animated.View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              transform: [{ translateX: trans }],
+            }}>
+            {messagesAddress && (
+              <View
+                style={{
+                  width: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginLeft: 20,
                 }}>
-                <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faComments} color={colors.money} />
-              </TouchableOpacity>
-            </View>
-          )}
-        </Animated.View>
+                <TouchableOpacity
+                  style={{ zIndex: 999, padding: 10 }}
+                  onPress={() => {
+                    setValueTransferDetail(vt);
+                    setValueTransferDetailIndex(index);
+                    setMessagesAddressModalShowing(true);
+                    swipeable.reset();
+                  }}>
+                  <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faComments} color={colors.money} />
+                </TouchableOpacity>
+              </View>
+            )}
+          </Animated.View>
+        )}
       </>
     );
   };
@@ -182,51 +184,53 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
 
     return (
       <>
-        <Animated.View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            transform: [{ translateX: trans }],
-            marginRight: 20,
-          }}>
-          <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-            <TouchableOpacity
-              style={{ zIndex: 999, padding: 10 }}
-              onPress={() => {
-                setValueTransferDetail(vt);
-                setValueTransferDetailIndex(index);
-                setValueTransferDetailModalShowing(true);
-                swipeable.reset();
-              }}>
-              <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faFileLines} color={colors.money} />
-            </TouchableOpacity>
-          </View>
-          {!!vt.address && (
-            <View
-              style={{
-                width: 50,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
+        {showSwipeableIcons && (
+          <Animated.View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              transform: [{ translateX: trans }],
+              marginRight: 20,
+            }}>
+            <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
               <TouchableOpacity
                 style={{ zIndex: 999, padding: 10 }}
                 onPress={() => {
-                  // enviar
-                  const sendPageState = new SendPageStateClass(new ToAddrClass(0));
-                  sendPageState.toaddr.to = vt.address ? vt.address : '';
-                  setSendPageState(sendPageState);
-                  navigation.navigate(RouteEnums.LoadedApp, {
-                    screen: translate('loadedapp.send-menu'),
-                    initial: false,
-                  });
+                  setValueTransferDetail(vt);
+                  setValueTransferDetailIndex(index);
+                  setValueTransferDetailModalShowing(true);
                   swipeable.reset();
                 }}>
-                <FontAwesomeIcon size={27} icon={faPaperPlane} color={colors.primary} />
+                <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faFileLines} color={colors.money} />
               </TouchableOpacity>
             </View>
-          )}
-        </Animated.View>
+            {!!vt.address && (
+              <View
+                style={{
+                  width: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <TouchableOpacity
+                  style={{ zIndex: 999, padding: 10 }}
+                  onPress={() => {
+                    // enviar
+                    const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+                    sendPageState.toaddr.to = vt.address ? vt.address : '';
+                    setSendPageState(sendPageState);
+                    navigation.navigate(RouteEnums.LoadedApp, {
+                      screen: translate('loadedapp.send-menu'),
+                      initial: false,
+                    });
+                    swipeable.reset();
+                  }}>
+                  <FontAwesomeIcon size={27} icon={faPaperPlane} color={colors.primary} />
+                </TouchableOpacity>
+              </View>
+            )}
+          </Animated.View>
+        )}
       </>
     );
   };
