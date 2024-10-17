@@ -284,7 +284,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
               <View
                 style={
                   {
-                    "backgroundColor": "rgb(216, 216, 216)",
+                    "backgroundColor": "rgb(28, 28, 30)",
                     "marginHorizontal": 20,
                     "marginTop": 20,
                     "padding": 10,
