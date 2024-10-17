@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.4.3 (187)",
+  "version": "zingo-1.5.0 (190)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -18,6 +18,7 @@
   "close": "Fechar",
   "cancel": "Cancelar",
   "save": "Salvar",
+  "copy": "Cópia de",
   "confirm": "Confirmar",
   "support": "Enviar E-mail",
   "menudrawer-acc": "Abrir Menu Lateral",
@@ -95,6 +96,8 @@
     "serversecondtry": "Não parece haver nenhum problema com o servidor. Algo mais está acontecendo.",
     "alert-donation-title": "APOIAR A ZINGOLABS",
     "alert-donation-body": "Você quer ajudar o ZingoLabs a tornar o Zcash mais útil? Opte por dar uma gorjeta de um Zenny (0.01 ZEC) para ZingoLabs em cada transação! Se sim, pressione confirmar, caso contrário, pressione Cancelar.",
+    "recoverseed": "Recuperar a última Frases de Recuperação usada",
+    "recoverseedinstall": "Recuperou a última Frases de Recuperação usada neste dispositivo:",
     "noservers": "Nenhum dos servidores da lista está disponível, provavelmente é um erro de conexão."
   },
   "loadedapp": {
@@ -254,6 +257,16 @@
         "text": "Desativar/ocultar a opção de menu para reescanear a carteira."
       }
     ],
+    "recoverywalletinfoondevices": [
+      {
+        "value": true,
+        "text": "Faça backup da carteira Seed Phrase no dispositivo."
+      },
+      {
+        "value": false,
+        "text": "Não salve nada relacionado à carteira no dispositivo."
+      }
+    ],
     "nochanges": "Nenhuma alteração registrada.",
     "ismemo": "Você precisa escolher a opção MEMO para salvar.",
     "isthreshold": "Você precisa escolher a opção Limite para salvar.",
@@ -284,6 +297,7 @@
     "privacy-title": "Alterar entre Privacidade Alta ou Normal",
     "mode-title": "Alterar entre o modo Básico ou Avançado",
     "rescanmenu-title": "A OPÇÃO DE MENU RESCAN",
+    "recoverywalletinfoondevice-title": "Armazene informações de recuperação da carteira no dispositivo",
     "value-currency-": "Sem Saldo",
     "value-currency-USD": "US Dólares",
     "value-language-en": "Inglês",
@@ -304,6 +318,8 @@
     "value-chainname-regtest": "Regtest",
     "value-rescanmenu-true": "Habilitar",
     "value-rescanmenu-false": "Desabilitar",
+    "value-recoverywalletinfoondevice-true": "Habilitar",
+    "value-recoverywalletinfoondevice-false": "Desabilitar",
     "security-title": "APLICAR SEGURANÇA DO DISPOSITIVO PARA AS TELAS/OPÇÕES",
     "security-startapp": "Quando o App inicia",
     "security-foregroundapp": "Quando o aplicativo vai para o primeiro plano",
@@ -325,7 +341,9 @@
     "netherlands": "Holanda",
     "uk": "Reino Unido",
     "select-placeholder": "Escolha um Servidor...",
-    "value-language-ru": "Russo"
+    "value-language-ru": "Russo",
+    "walletkeyssaved" : "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo.",
+    "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!"
   },
   "info": {
     "version": "Versão",

@@ -72,7 +72,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
         ]}>
         {!!address && address !== (translate('receive.noaddress') as string) ? (
           <>
-            <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.border }}>
+            <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.text }}>
               <TouchableOpacity
                 onPress={() => {
                   doCopy();
@@ -90,10 +90,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                         value={address}
                         size={200}
                         ecl="L"
-                        backgroundColor={colors.border}
+                        backgroundColor={colors.text}
                         logo={require('../../assets/img/logobig-zingo.png')}
                         logoSize={30}
-                        logoBackgroundColor={colors.border}
+                        logoBackgroundColor={colors.text}
                         logoBorderRadius={5} /* android not soported */
                         logoMargin={3}
                       />
@@ -122,16 +122,16 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                 ) : (
                   <>
                     {privacy ? (
-                      <QRCode value={address} size={200} ecl="L" backgroundColor={colors.border} />
+                      <QRCode value={address} size={200} ecl="L" backgroundColor={colors.text} />
                     ) : (
                       <QRCode
                         value={address}
                         size={200}
                         ecl="L"
-                        backgroundColor={colors.border}
+                        backgroundColor={colors.text}
                         logo={require('../../assets/img/logobig-zingo.png')}
                         logoSize={30}
-                        logoBackgroundColor={colors.border}
+                        logoBackgroundColor={colors.text}
                         logoBorderRadius={5} /* android not soported */
                         logoMargin={3}
                       />

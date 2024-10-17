@@ -11,4 +11,5 @@ export type ColorsType = {
   money: string;
   syncing: string;
   notification: string;
+  sideMenuBackground: string;
 };

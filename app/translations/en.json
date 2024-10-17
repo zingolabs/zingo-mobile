@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.4.3 (187)",
+  "version": "zingo-1.5.0 (190)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
@@ -18,6 +18,7 @@
   "close": "Close",
   "cancel": "Cancel",
   "save": "Save",
+  "copy": "Copy",
   "confirm": "Confirm",
   "support": "Send Email",
   "menudrawer-acc": "Open Menu Drawer",
@@ -95,6 +96,8 @@
     "serversecondtry": "It doesn't seem to be a problem with the server. Someting else is happening.",
     "alert-donation-title": "TIP ZINGOLABS",
     "alert-donation-body": "Do you want to help ZingoLabs make Zcash more useful? Opt in to tip one Zenny (0.01 ZEC) to ZingoLabs with each transaction! If so, press confirm, otherwise press Cancel.",
+    "recoverseed": "Recover last Seed Phrase used",
+    "recoverseedinstall": "Recovered the last Seed Phrase used in this device:",
     "noservers": "None of the servers on the list are available, it is probably a connection error."
   },
   "loadedapp": {
@@ -254,6 +257,16 @@
         "text": "Disable/Hide the menu option to rescan the wallet."
       }
     ],
+    "recoverywalletinfoondevices": [
+      {
+        "value": true,
+        "text": "Backup wallet Seed Phrase to device."
+      },
+      {
+        "value": false,
+        "text": "Do not save anything related to the wallet on the device."
+      }
+    ],
     "nochanges": "No changes registered.",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
@@ -284,6 +297,7 @@
     "privacy-title": "Switch between High or Normal Privacy",
     "mode-title": "Switch between Basic or Advanced Mode",
     "rescanmenu-title": "THE RESCAN MENU OPTION",
+    "recoverywalletinfoondevice-title": "Store Wallet Recovery Info in the Device",
     "value-currency-": "No currency",
     "value-currency-USD": "US Dollar",
     "value-language-en": "English",
@@ -304,6 +318,8 @@
     "value-chainname-regtest": "Regtest",
     "value-rescanmenu-true": "Enable",
     "value-rescanmenu-false": "Disable",
+    "value-recoverywalletinfoondevice-true": "Enable",
+    "value-recoverywalletinfoondevice-false": "Disable",
     "security-title": "APPLY DEVICE SECURITY TO SCREENS/OPTIONS",
     "security-startapp": "When the App starts",
     "security-foregroundapp": "When the App go to the Foreground",
@@ -325,7 +341,9 @@
     "netherlands": "Netherlands",
     "uk": "UK",
     "select-placeholder": "Choose a Server...",
-    "value-language-ru": "Russian"
+    "value-language-ru": "Russian",
+    "walletkeyssaved" : "The last Wallet Recovery Info stored safely in the device.",
+    "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!"
   },
   "info": {
     "version": "Version",

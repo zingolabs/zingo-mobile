@@ -19,4 +19,6 @@ export const GlobalConst = {
   yes: 'yes',
   no: 'no',
   background: '@background',
+  keyKeyChain: 'ZINGO_SEED_BIRTHDAY',
+  serviceKeyChain: 'ZINGO',
 };

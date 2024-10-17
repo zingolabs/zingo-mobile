@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.4.3 (187)",
+  "version": "zingo-1.5.0 (190)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -18,6 +18,7 @@
   "close": "Cerrar",
   "cancel": "Cancelar",
   "save": "Guardar",
+  "copy": "Copiar",
   "confirm": "Confirmar",
   "support": "Enviar Email",
   "menudrawer-acc": "Abrir Menú Lateral",
@@ -95,6 +96,8 @@
     "serversecondtry": "No parece haber ningún problema con el servidor. Ocurre algo diferente.",
     "alert-donation-title": "APOYAR A ZINGOLABS",
     "alert-donation-body": "¿Quieres ayudar a ZingoLabs a que Zcash sea más útil? Opta por dar una propina de un Zenny (0.01 ZEC) a ZingoLabs con cada transacción! Si es así, presione confirmar, de lo contrario presione Cancelar.",
+    "recoverseed": "Recuperar la última semilla usada",
+    "recoverseedinstall": "Se recuperó la última semilla usada en este dispositivo:",
     "noservers": "Ninguno de los servidores de la lista esta disponible, probablemente se trata de un error de conexion."
   },
   "loadedapp": {
@@ -254,6 +257,16 @@
         "text": "Desactivar/Ocultar la opción de menú para re-escanear el monedero."
       }
     ],
+    "recoverywalletinfoondevices": [
+      {
+        "value": true,
+        "text": "Hacer copia de seguridad de la Frase Semilla del monedero en el dispositivo."
+      },
+      {
+        "value": false,
+        "text": "No guardar absolutamente nada en el dispositivo referente al monedero."
+      }
+    ],
     "nochanges": "No se han registrado cambios.",
     "ismemo": "Necesitas escoger una opción de Memos para poder guardar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder guardar.",
@@ -284,6 +297,7 @@
     "privacy-title": "Cambiar entre Alta Privacidad o Normal",
     "mode-title": "Cambiar entre Modo Básico o Avanzado",
     "rescanmenu-title": "LA OPCIÓN DE MENU RE-ESCANEAR",
+    "recoverywalletinfoondevice-title": "Almacenar la información de recuperacion del monedero en el dispositivo",
     "value-currency-": "Sin moneda",
     "value-currency-USD": "US Dólares",
     "value-language-en": "Inglés",
@@ -304,6 +318,8 @@
     "value-chainname-regtest": "Regtest",
     "value-rescanmenu-true": "Activar",
     "value-rescanmenu-false": "Desactivar",
+    "value-recoverywalletinfoondevice-true": "Activar",
+    "value-recoverywalletinfoondevice-false": "Desactivar",
     "security-title": "USAR LA SEGURIDAD DEL DISPOSITIVO",
     "security-startapp": "Al inicar la aplicación",
     "security-foregroundapp": "Aplicación va a Primer Plano",
@@ -325,7 +341,9 @@
     "netherlands": "Paises Bajos",
     "uk": "Reino Unido",
     "select-placeholder": "Elige un Servidor...",
-    "value-language-ru": "Ruso"
+    "value-language-ru": "Ruso",
+    "walletkeyssaved": "La ultima información de recuperacion del Monedero almacenada de forma segura en el dispositivo.",
+    "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!"
   },
   "info": {
     "version": "Versión",

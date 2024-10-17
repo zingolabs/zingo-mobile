@@ -2620,7 +2620,6 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         style={
           {
             "display": "flex",
-            "marginBottom": 30,
             "marginLeft": 25,
           }
         }
@@ -2935,6 +2934,263 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             text all
           </Text>
         </View>
+      </View>
+      <View
+        style={
+          {
+            "display": "flex",
+            "margin": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 18,
+              "fontWeight": "bold",
+              "opacity": 0.87,
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "display": "flex",
+            "marginLeft": 25,
+          }
+        }
+      >
+        <View>
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "marginBottom": 5,
+                "marginRight": 10,
+                "maxHeight": 50,
+                "minHeight": 48,
+                "opacity": 1,
+              }
+            }
+            testID="settings.recoverywalletinfoondevice-true"
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "display": "flex",
+                  "flexDirection": "row",
+                  "marginTop": 10,
+                }
+              }
+            >
+              <
+                color="rgb(216, 216, 216)"
+                icon={
+                  {
+                    "icon": [
+                      512,
+                      512,
+                      [
+                        128280,
+                        "dot-circle",
+                      ],
+                      "f192",
+                      "M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-352a96 96 0 1 1 0 192 96 96 0 1 1 0-192z",
+                    ],
+                    "iconName": "circle-dot",
+                    "prefix": "fas",
+                  }
+                }
+                size={20}
+              />
+              <Text
+                style={
+                  {
+                    "color": "rgb(28, 28, 30)",
+                    "fontSize": 18,
+                    "fontWeight": "600",
+                    "marginLeft": 10,
+                    "opacity": 1,
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
+          </View>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "opacity": 0.65,
+              }
+            }
+          >
+            text true
+          </Text>
+        </View>
+        <View>
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "marginBottom": 5,
+                "marginRight": 10,
+                "maxHeight": 50,
+                "minHeight": 48,
+                "opacity": 1,
+              }
+            }
+            testID="settings.recoverywalletinfoondevice-false"
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "display": "flex",
+                  "flexDirection": "row",
+                  "marginTop": 10,
+                }
+              }
+            >
+              <
+                color="rgb(216, 216, 216)"
+                icon={
+                  {
+                    "icon": [
+                      512,
+                      512,
+                      [
+                        128308,
+                        128309,
+                        128992,
+                        128993,
+                        128994,
+                        128995,
+                        128996,
+                        9679,
+                        9898,
+                        9899,
+                        11044,
+                        61708,
+                        61915,
+                      ],
+                      "f111",
+                      "M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z",
+                    ],
+                    "iconName": "circle",
+                    "prefix": "far",
+                  }
+                }
+                size={20}
+              />
+              <Text
+                style={
+                  {
+                    "color": "rgb(28, 28, 30)",
+                    "fontSize": 18,
+                    "fontWeight": "600",
+                    "marginLeft": 10,
+                    "opacity": 1,
+                  }
+                }
+              >
+                text translated
+              </Text>
+            </View>
+          </View>
+          <Text
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "opacity": 0.65,
+              }
+            }
+          >
+            text false
+          </Text>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "display": "flex",
+            "margin": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "borderColor": "red",
+              "borderWidth": 1,
+              "color": "rgb(0, 122, 255)",
+              "marginVertical": 10,
+              "opacity": 0.65,
+              "padding": 5,
+              "textAlign": "center",
+            }
+          }
+        >
+          text translated
+        </Text>
       </View>
     </View>
   </RCTScrollView>

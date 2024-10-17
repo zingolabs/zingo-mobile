@@ -42,6 +42,7 @@ export default interface AppContextLoading {
   security: SecurityType;
   selectServer: SelectServerEnum;
   rescanMenu: boolean;
+  recoveryWalletInfoOnDevice: boolean;
 
   // eslint-disable-next-line semi
 }

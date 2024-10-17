@@ -91,6 +91,7 @@ export default interface AppContextLoaded {
   security: SecurityType;
   selectServer: SelectServerEnum;
   rescanMenu: boolean;
+  recoveryWalletInfoOnDevice: boolean;
 
   // snackbar queue
   snackbars: SnackbarType[];
@@ -112,6 +113,9 @@ export default interface AppContextLoaded {
 
   // is calculated in the header & needed in the send screen
   shieldingAmount: number;
+
+  // indicate if the swipeable icons are visible or not.
+  showSwipeableIcons: boolean;
 
   // eslint-disable-next-line semi
 }

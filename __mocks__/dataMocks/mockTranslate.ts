@@ -101,6 +101,17 @@ export const mockTranslate = (p: string) => {
         text: 'text false',
       },
     ];
+  } else if (p === 'settings.recoverywalletinfoondevices') {
+    return [
+      {
+        value: true,
+        text: 'text true',
+      },
+      {
+        value: false,
+        text: 'text false',
+      },
+    ];
   } else {
     return 'text translated';
   }

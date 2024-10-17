@@ -229,13 +229,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         }}>
         {route.title ? route.title : ''}
       </RegText>
-      {route.key === 'uaddr' && (
+      {route.key === 'uaddr' && mode === ModeEnum.basic && (
         <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. zingo)</RegText>
       )}
-      {route.key === 'zaddr' && (
+      {route.key === 'zaddr' && mode === ModeEnum.basic && (
         <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. ledger, old wallets)</RegText>
       )}
-      {route.key === 'taddr' && (
+      {route.key === 'taddr' && mode === ModeEnum.basic && (
         <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. coinbase, gemini)</RegText>
       )}
     </View>

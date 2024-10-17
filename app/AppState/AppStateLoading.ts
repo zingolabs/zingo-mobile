@@ -15,6 +15,7 @@ export default interface AppStateLoading {
   serverErrorTries: number;
   donationAlert: boolean;
   firstLaunchingMessage: boolean;
+  hasRecoveryWalletInfoSaved: boolean;
 
   // eslint-disable-next-line semi
 }

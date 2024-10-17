@@ -76,7 +76,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
           flex: 1,
           width: dimensions.width,
           height: dimensions.height,
-          backgroundColor: '#010101',
+          backgroundColor: colors.sideMenuBackground,
         }}
         contentContainerStyle={{ display: 'flex' }}>
         <RegText color={colors.money} style={{ marginVertical: 10, marginLeft: 30 }}>
@@ -200,7 +200,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
           position: 'absolute',
           bottom: 5,
           flexDirection: 'row',
-          backgroundColor: '#010101',
+          backgroundColor: colors.sideMenuBackground,
         }}>
         <Text style={{ fontSize: 8, color: colors.border }}>Version : </Text>
         <Text style={{ fontSize: 8, color: colors.primaryDisabled }}>{translate('version') as string}</Text>

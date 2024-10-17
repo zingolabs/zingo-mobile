@@ -97,6 +97,29 @@ jest.mock('react-native-gesture-handler', () => {
     RNGestureHandlerModule: RN,
   };
 });
+jest.mock('react-native-keychain', () => ({
+  ACCESS_CONTROL: {
+    BIOMETRY_CURRENT_SET: 'biometryCurrentSet',
+  },
+  ACCESSIBLE: {
+    WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'whenUnlockedThisDeviceOnly',
+  },
+  AUTHENTICATION_TYPE: {
+    BIOMETRICS: 'biometrics',
+  },
+  SECURITY_LEVEL: {
+    SECURE_SOFTWARE: 'secureSoftware',
+  },
+  SECURITY_RULES: {
+    NONE: 'none',
+  },
+  STORAGE_TYPE: {
+    AES: 'AES',
+  },
+  setGenericPassword: jest.fn(),
+  getGenericPassword: jest.fn(),
+  resetGenericPassword: jest.fn(),
+}));
 
 // test suite
 describe('Component LoadedApp - test', () => {
@@ -106,6 +129,7 @@ describe('Component LoadedApp - test', () => {
     const currency = CurrencyEnum.noCurrency;
     const sendAll = false;
     const rescanMenu = false;
+    const recoveryWalletInfoOnDevice = true;
     const donation = false;
     const privacy = false;
     const mode = ModeEnum.basic;
@@ -132,6 +156,7 @@ describe('Component LoadedApp - test', () => {
         security={mockSecurity}
         selectServer={selectServer}
         rescanMenu={rescanMenu}
+        recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
       />,
     );
     expect(loadedapp.toJSON()).toMatchSnapshot();
