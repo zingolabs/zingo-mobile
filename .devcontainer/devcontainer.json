@@ -1,0 +1,15 @@
+{
+  "name": "React Native + Rust + Android CLI",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "extensions": ["msjsdiag.vscode-react-native", "rust-lang.rust-analyzer"],
+  "postCreateCommand": "rustup component add rustfmt && cargo install cargo-watch",
+  "forwardPorts": [8081],
+  "mounts": ["source=/path/to/your/local/sdk,target=/usr/local/android-sdk,type=bind"],
+  "remoteUser": "vscode"
+}
