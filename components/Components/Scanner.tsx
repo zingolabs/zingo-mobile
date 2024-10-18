@@ -27,6 +27,9 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead, doCancel, titl
       }}>
       <QRCodeScanner
         showMarker={true}
+        markerStyle={{
+          borderColor: colors.primary,
+        }}
         onRead={onRead}
         reactivate={true}
         containerStyle={{
