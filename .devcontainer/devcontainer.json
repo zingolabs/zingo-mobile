@@ -1,0 +1,9 @@
+{
+  "name": "React Native + Rust + Android CLI",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "forwardPorts": [8081],
+  "remoteUser": "root"
+}
