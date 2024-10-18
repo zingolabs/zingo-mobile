@@ -24,7 +24,6 @@ import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
 import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
-import deepDiff from 'deep-diff';
 
 import RPC from '../rpc';
 import RPCModule from '../RPCModule';
@@ -638,7 +637,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     await this.rpc.clearTimers();
     this.appstate && typeof this.appstate.remove === 'function' && this.appstate.remove();
     this.linking && typeof this.linking === 'function' && this.linking.remove();
-    this.unsubscribeNetInfo && this.unsubscribeNetInfo();
+    this.unsubscribeNetInfo && typeof this.unsubscribeNetInfo === 'function' && this.unsubscribeNetInfo();
   };
 
   keepAwake = (keep: boolean): void => {
@@ -783,7 +782,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
       }
     }
-    if (deepDiff(this.state.valueTransfers, valueTransfers)) {
+    if (!isEqual(this.state.valueTransfers, valueTransfers)) {
       //console.log('fetch ValueTransfers');
       // set somePending as well here when I know there is something new in ValueTransfers
       const pending: number =
@@ -882,7 +881,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setAllAddresses = (addresses: AddressClass[]) => {
-    if (deepDiff(this.state.addresses, addresses)) {
+    if (!isEqual(this.state.addresses, addresses)) {
       //console.log('fetch addresses');
       this.setState({ addresses });
     }
@@ -1644,7 +1643,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       );
     };
 
-    //console.log('render LoadedAppClass - 3');
+    console.log('render LoadedAppClass - 3', this.state.netInfo);
     //console.log('vt', valueTransfers);
     //console.log('ad', addresses);
     //console.log('ba', totalBalance);

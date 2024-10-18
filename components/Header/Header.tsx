@@ -436,7 +436,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     </TouchableOpacity>
   );
 
-  //console.log('render header', shieldingFee);
+  console.log('render header &&&&&&&&&&&&&&&&&&&&& netinfo', netInfo);
 
   return (
     <View

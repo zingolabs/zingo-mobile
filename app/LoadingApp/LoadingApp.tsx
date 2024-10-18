@@ -465,153 +465,151 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         .catch(() => {});
     }
 
-    (async () => {
-      // has the device the Wallet Keys stored?
-      const has = await hasRecoveryWalletInfo();
-      this.setState({ hasRecoveryWalletInfoSaved: has });
+    // has the device the Wallet Keys stored?
+    const has = await hasRecoveryWalletInfo();
+    this.setState({ hasRecoveryWalletInfoSaved: has });
 
-      // First, if it's server automatic
-      // here I need to check the servers and select the best one
-      // likely only when the user install or update the new version with this feature or
-      // select automatic in settings.
-      if (this.state.selectServer === SelectServerEnum.auto) {
-        setTimeout(() => {
-          this.addLastSnackbar({
-            message: this.state.translate('loadedapp.selectingserver') as string,
-            duration: SnackbarDurationEnum.longer,
-          });
-        }, 1000);
-        // not a different one, can be the same.
-        const someServerIsWorking = await this.selectTheBestServer(false);
-        console.log('some server is working?', someServerIsWorking);
-      }
+    // First, if it's server automatic
+    // here I need to check the servers and select the best one
+    // likely only when the user install or update the new version with this feature or
+    // select automatic in settings.
+    if (this.state.selectServer === SelectServerEnum.auto) {
+      setTimeout(() => {
+        this.addLastSnackbar({
+          message: this.state.translate('loadedapp.selectingserver') as string,
+          duration: SnackbarDurationEnum.longer,
+        });
+      }, 1000);
+      // not a different one, can be the same.
+      const someServerIsWorking = await this.selectTheBestServer(false);
+      console.log('some server is working?', someServerIsWorking);
+    }
 
-      // Second, check if a wallet exists. Do it async so the basic screen has time to render
-      await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-      const exists = await RPCModule.walletExists();
-      //console.log('Wallet Exists result', this.state.screen, exists);
+    // Second, check if a wallet exists. Do it async so the basic screen has time to render
+    await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+    const exists = await RPCModule.walletExists();
+    //console.log('Wallet Exists result', this.state.screen, exists);
 
-      if (exists && exists !== GlobalConst.false) {
-        this.setState({ walletExists: true });
-        const networkState = await NetInfo.fetch();
-        if (networkState.isConnected) {
-          let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chainName);
+    if (exists && exists !== GlobalConst.false) {
+      this.setState({ walletExists: true });
+      const networkState = await NetInfo.fetch();
+      if (networkState.isConnected) {
+        let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chainName);
 
-          // for testing
-          //await delay(5000);
+        // for testing
+        //await delay(5000);
 
-          //console.log('Load Wallet Exists result', result);
-          let error = false;
-          let errorText = '';
-          if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
-            try {
-              // here result can have an `error` field for watch-only which is actually OK.
-              const resultJson: RPCSeedType = await JSON.parse(result);
-              if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
-                // Load the wallet and navigate to the ValueTransfers screen
-                const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
-                //console.log(walletKindStr);
-                try {
-                  const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
-                  console.log(walletKindJSON);
-                  // there are 4 kinds:
-                  // 1. seed
-                  // 2. USK
-                  // 3. UFVK - watch-only wallet
-                  // 4. No keys - watch-only wallet (possibly an error)
+        //console.log('Load Wallet Exists result', result);
+        let error = false;
+        let errorText = '';
+        if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
+          try {
+            // here result can have an `error` field for watch-only which is actually OK.
+            const resultJson: RPCSeedType = await JSON.parse(result);
+            if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
+              // Load the wallet and navigate to the ValueTransfers screen
+              const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
+              //console.log(walletKindStr);
+              try {
+                const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
+                console.log(walletKindJSON);
+                // there are 4 kinds:
+                // 1. seed
+                // 2. USK
+                // 3. UFVK - watch-only wallet
+                // 4. No keys - watch-only wallet (possibly an error)
 
-                  // if the seed & birthday are not stored in Keychain/Keystore, do it now.
-                  if (this.state.recoveryWalletInfoOnDevice) {
-                    if (
-                      walletKindJSON.kind === RPCWalletKindEnum.LoadedFromSeedPhrase ||
-                      walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedSpendingKey
-                    ) {
-                      const wallet: WalletType = await RPC.rpcFetchWallet(false);
-                      await createUpdateRecoveryWalletInfo(wallet);
-                    }
-                  } else {
-                    // needs to delete the seed from the Keychain/Keystore, do it now.
-                    await removeRecoveryWalletInfo();
+                // if the seed & birthday are not stored in Keychain/Keystore, do it now.
+                if (this.state.recoveryWalletInfoOnDevice) {
+                  if (
+                    walletKindJSON.kind === RPCWalletKindEnum.LoadedFromSeedPhrase ||
+                    walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedSpendingKey
+                  ) {
+                    const wallet: WalletType = await RPC.rpcFetchWallet(false);
+                    await createUpdateRecoveryWalletInfo(wallet);
                   }
-                  this.setState({
-                    readOnly:
-                      walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
-                      walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
-                        ? true
-                        : false,
-                    actionButtonsDisabled: false,
-                  });
-                } catch (e) {
-                  //console.log(walletKindStr);
-                  this.setState({
-                    readOnly: false,
-                    actionButtonsDisabled: false,
-                  });
-                  this.addLastSnackbar({ message: walletKindStr });
+                } else {
+                  // needs to delete the seed from the Keychain/Keystore, do it now.
+                  await removeRecoveryWalletInfo();
                 }
-                this.navigateToLoadedApp();
-                //console.log('navigate to LoadedApp');
-              } else {
-                error = true;
-                errorText = resultJson.error;
+                this.setState({
+                  readOnly:
+                    walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
+                    walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
+                      ? true
+                      : false,
+                  actionButtonsDisabled: false,
+                });
+              } catch (e) {
+                //console.log(walletKindStr);
+                this.setState({
+                  readOnly: false,
+                  actionButtonsDisabled: false,
+                });
+                this.addLastSnackbar({ message: walletKindStr });
               }
-            } catch (e) {
+              this.navigateToLoadedApp();
+              //console.log('navigate to LoadedApp');
+            } else {
               error = true;
-              errorText = JSON.stringify(e);
+              errorText = resultJson.error;
             }
-          } else {
+          } catch (e) {
             error = true;
-            errorText = result;
-          }
-          if (error) {
-            await this.walletErrorHandle(
-              errorText,
-              this.state.translate('loadingapp.readingwallet-label') as string,
-              1,
-              true,
-            );
+            errorText = JSON.stringify(e);
           }
         } else {
-          this.setState({ screen: 1, actionButtonsDisabled: false });
-          this.addLastSnackbar({
-            message: this.state.translate('loadedapp.connection-error') as string,
-          });
+          error = true;
+          errorText = result;
+        }
+        if (error) {
+          await this.walletErrorHandle(
+            errorText,
+            this.state.translate('loadingapp.readingwallet-label') as string,
+            1,
+            true,
+          );
         }
       } else {
-        //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
-        if (this.state.mode === ModeEnum.basic) {
-          // setting the prop basicFirstViewSeed to false.
-          // this means when the user have funds, the seed screen will show up.
-          await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, false);
-          if (this.state.hasRecoveryWalletInfoSaved) {
-            // but first we need to check if exists some seed stored in the device from a previous installation (IOS)
-            await this.recoverRecoveryWalletInfo(false);
-            // go to the initial menu, giving the opportunity to the user
-            // to use the seed & birthday recovered from the device.
-            this.setState({
-              screen: 1,
-              walletExists: false,
-              actionButtonsDisabled: false,
-            });
-          } else {
-            // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
-            // no seed screen.
-            this.createNewWallet(false);
-            this.setState({ actionButtonsDisabled: false });
-            this.navigateToLoadedApp();
-            //console.log('navigate to LoadedApp');
-          }
-        } else {
-          // if no wallet file & advanced mode -> go to the initial menu.
-          await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
-          this.setState(state => ({
-            screen: state.screen === 3 ? 3 : 1,
+        this.setState({ screen: 1, actionButtonsDisabled: false });
+        this.addLastSnackbar({
+          message: this.state.translate('loadedapp.connection-error') as string,
+        });
+      }
+    } else {
+      //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
+      if (this.state.mode === ModeEnum.basic) {
+        // setting the prop basicFirstViewSeed to false.
+        // this means when the user have funds, the seed screen will show up.
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, false);
+        if (this.state.hasRecoveryWalletInfoSaved) {
+          // but first we need to check if exists some seed stored in the device from a previous installation (IOS)
+          await this.recoverRecoveryWalletInfo(false);
+          // go to the initial menu, giving the opportunity to the user
+          // to use the seed & birthday recovered from the device.
+          this.setState({
+            screen: 1,
             walletExists: false,
             actionButtonsDisabled: false,
-          }));
+          });
+        } else {
+          // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
+          // no seed screen.
+          this.createNewWallet(false);
+          this.setState({ actionButtonsDisabled: false });
+          this.navigateToLoadedApp();
+          //console.log('navigate to LoadedApp');
         }
+      } else {
+        // if no wallet file & advanced mode -> go to the initial menu.
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
+        this.setState(state => ({
+          screen: state.screen === 3 ? 3 : 1,
+          walletExists: false,
+          actionButtonsDisabled: false,
+        }));
       }
-    })();
+    }
 
     this.appstate = AppState.addEventListener(EventListenerEnum.change, async nextAppState => {
       //console.log('LOADING', 'next', nextAppState, 'prior', this.state.appState);
