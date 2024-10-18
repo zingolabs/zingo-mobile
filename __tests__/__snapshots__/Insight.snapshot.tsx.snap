@@ -87,26 +87,18 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
             style={
               {
                 "alignItems": "center",
-                "borderColor": undefined,
-                "borderRadius": 5,
-                "borderWidth": 1,
+                "backgroundColor": "rgb(255, 255, 255)",
+                "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "center",
-                "paddingHorizontal": 5,
+                "margin": 0,
+                "marginHorizontal": 5,
+                "minHeight": 25,
+                "minWidth": 25,
+                "padding": 0,
               }
             }
           >
-            <Text
-              style={
-                {
-                  "color": "rgb(216, 216, 216)",
-                  "fontSize": 13,
-                  "marginRight": 5,
-                }
-              }
-            >
-              text translated
-            </Text>
             <
               icon={
                 {
@@ -121,7 +113,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
                   "prefix": "fas",
                 }
               }
-              size={14}
+              size={25}
             />
           </View>
         </View>
