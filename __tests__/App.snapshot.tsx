@@ -68,6 +68,29 @@ jest.mock('react-native-gesture-handler', () => {
     RNGestureHandlerModule: RN,
   };
 });
+jest.mock('react-native-keychain', () => ({
+  ACCESS_CONTROL: {
+    BIOMETRY_CURRENT_SET: 'biometryCurrentSet',
+  },
+  ACCESSIBLE: {
+    WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'whenUnlockedThisDeviceOnly',
+  },
+  AUTHENTICATION_TYPE: {
+    BIOMETRICS: 'biometrics',
+  },
+  SECURITY_LEVEL: {
+    SECURE_SOFTWARE: 'secureSoftware',
+  },
+  SECURITY_RULES: {
+    NONE: 'none',
+  },
+  STORAGE_TYPE: {
+    AES: 'AES',
+  },
+  setGenericPassword: jest.fn(),
+  getGenericPassword: jest.fn(),
+  resetGenericPassword: jest.fn(),
+}));
 
 // test suite
 describe('Component App - test', () => {

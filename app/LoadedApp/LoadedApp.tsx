@@ -24,7 +24,6 @@ import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
 import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
-import deepDiff from 'deep-diff';
 
 import RPC from '../rpc';
 import RPCModule from '../RPCModule';
@@ -83,6 +82,7 @@ import { AddressBook } from '../../components/AddressBook';
 import { AddressBookFileImpl } from '../../components/AddressBook';
 import simpleBiometrics from '../simpleBiometrics';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
+import { createUpdateRecoveryWalletInfo, removeRecoveryWalletInfo } from '../recoveryWalletInfo';
 
 import History from '../../components/History';
 import Send from '../../components/Send';
@@ -146,6 +146,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   });
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
+  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
   const file = useMemo(
     () => ({
       en: en,
@@ -257,6 +258,11 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenu, rescanMenu);
       }
+      if (settings.recoveryWalletInfoOnDevice === true || settings.recoveryWalletInfoOnDevice === false) {
+        setRecoveryWalletInfoOnDevice(settings.recoveryWalletInfoOnDevice);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.recoveryWalletInfoOnDevice, recoveryWalletInfoOnDevice);
+      }
 
       // reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
@@ -309,6 +315,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         security={security}
         selectServer={selectServer}
         rescanMenu={rescanMenu}
+        recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
       />
     );
   }
@@ -353,6 +360,7 @@ type LoadedAppClassProps = {
   security: SecurityType;
   selectServer: SelectServerEnum;
   rescanMenu: boolean;
+  recoveryWalletInfoOnDevice: boolean;
 };
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
@@ -410,6 +418,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       security: props.security,
       selectServer: props.selectServer,
       rescanMenu: props.rescanMenu,
+      recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
 
       // state
       appStateStatus: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
@@ -436,6 +445,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       somePending: false,
       scrollToTop: false,
       scrollToBottom: false,
+      showSwipeableIcons: true,
     };
 
     this.rpc = new RPC(
@@ -627,7 +637,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     await this.rpc.clearTimers();
     this.appstate && typeof this.appstate.remove === 'function' && this.appstate.remove();
     this.linking && typeof this.linking === 'function' && this.linking.remove();
-    this.unsubscribeNetInfo && this.unsubscribeNetInfo();
+    this.unsubscribeNetInfo && typeof this.unsubscribeNetInfo === 'function' && this.unsubscribeNetInfo();
   };
 
   keepAwake = (keep: boolean): void => {
@@ -733,6 +743,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({ shieldingAmount: value });
   };
 
+  setShowSwipeableIcons = (value: boolean) => {
+    this.setState({ showSwipeableIcons: value });
+  };
+
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
       //console.log('fetch total balance');
@@ -768,7 +782,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
       }
     }
-    if (deepDiff(this.state.valueTransfers, valueTransfers)) {
+    if (!isEqual(this.state.valueTransfers, valueTransfers)) {
       //console.log('fetch ValueTransfers');
       // set somePending as well here when I know there is something new in ValueTransfers
       const pending: number =
@@ -867,7 +881,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setAllAddresses = (addresses: AddressClass[]) => {
-    if (deepDiff(this.state.addresses, addresses)) {
+    if (!isEqual(this.state.addresses, addresses)) {
       //console.log('fetch addresses');
       this.setState({ addresses });
     }
@@ -1107,7 +1121,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         initial: false,
       });
     } else if (item === MenuItemEnum.Support) {
-      sendEmail(this.state.translate, this.state.info.zingolib);
+      this.setShowSwipeableIcons(false);
+      await sendEmail(this.state.translate, this.state.info.zingolib);
+      this.setShowSwipeableIcons(true);
     }
   };
 
@@ -1294,6 +1310,23 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       rescanMenu: value as boolean,
     });
+
+    // Refetch the settings to update
+    this.rpc.fetchWalletSettings();
+  };
+
+  setRecoveryWalletInfoOnDeviceOption = async (value: boolean): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.recoveryWalletInfoOnDevice, value);
+    this.setState({
+      recoveryWalletInfoOnDevice: value as boolean,
+    });
+
+    if (!value) {
+      await removeRecoveryWalletInfo();
+    } else {
+      const wallet: WalletType = await RPC.rpcFetchWallet(this.state.readOnly);
+      await createUpdateRecoveryWalletInfo(wallet);
+    }
 
     // Refetch the settings to update
     this.rpc.fetchWalletSettings();
@@ -1560,6 +1593,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       shieldingAmount: this.state.shieldingAmount,
       restartApp: this.state.restartApp,
       somePending: this.state.somePending,
+      showSwipeableIcons: this.state.showSwipeableIcons,
 
       // context settings
       server: this.state.server,
@@ -1572,6 +1606,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       security: this.state.security,
       selectServer: this.state.selectServer,
       rescanMenu: this.state.rescanMenu,
+      recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
     };
 
     const menu = <Menu onItemSelected={this.onMenuItemSelected} updateMenuState={this.updateMenuState} />;
@@ -1608,7 +1643,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       );
     };
 
-    //console.log('render LoadedAppClass - 3');
+    console.log('render LoadedAppClass - 3', this.state.netInfo);
     //console.log('vt', valueTransfers);
     //console.log('ad', addresses);
     //console.log('ba', totalBalance);
@@ -1700,6 +1735,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setSecurityOption={this.setSecurityOption}
               setSelectServerOption={this.setSelectServerOption}
               setRescanMenuOption={this.setRescanMenuOption}
+              setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
             />
           </Modal>
 

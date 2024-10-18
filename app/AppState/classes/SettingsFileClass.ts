@@ -24,6 +24,7 @@ export default class SettingsFileClass {
   selectServer: SelectServerEnum;
   firstUpdateWithDonation: boolean;
   rescanMenu: boolean;
+  recoveryWalletInfoOnDevice: boolean;
 
   constructor(
     server: ServerType,
@@ -40,6 +41,7 @@ export default class SettingsFileClass {
     selectServer: SelectServerEnum,
     firstUpdateWithDonation: boolean,
     rescanMenu: boolean,
+    recoveryWalletInfoOnDevice: boolean,
   ) {
     this.server = server;
     this.currency = currency;
@@ -55,5 +57,6 @@ export default class SettingsFileClass {
     this.selectServer = selectServer;
     this.firstUpdateWithDonation = firstUpdateWithDonation;
     this.rescanMenu = rescanMenu;
+    this.recoveryWalletInfoOnDevice = recoveryWalletInfoOnDevice;
   }
 }

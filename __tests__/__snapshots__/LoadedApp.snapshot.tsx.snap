@@ -42,7 +42,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
         scrollsToTop={false}
         style={
           {
-            "backgroundColor": "#010101",
+            "backgroundColor": undefined,
             "flex": 1,
             "height": 1334,
             "width": 750,
@@ -190,7 +190,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
       <View
         style={
           {
-            "backgroundColor": "#010101",
+            "backgroundColor": undefined,
             "bottom": 5,
             "flexDirection": "row",
             "padding": 10,

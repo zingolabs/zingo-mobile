@@ -318,7 +318,7 @@ export default class RPC {
         return {} as WalletType;
       }
     } else {
-      // seed & viewing key & birthday
+      // only seed & birthday
       try {
         const seedStr: string = await RPCModule.execute(CommandEnum.seed, '');
         if (seedStr) {
@@ -332,31 +332,12 @@ export default class RPC {
         }
         const RPCseed: RPCSeedType = await JSON.parse(seedStr);
 
-        const ufvkStr: string = await RPCModule.execute(CommandEnum.exportufvk, '');
-        if (ufvkStr) {
-          if (ufvkStr.toLowerCase().startsWith(GlobalConst.error)) {
-            console.log(`Error ufvk ${ufvkStr}`);
-            return {} as WalletType;
-          }
-        } else {
-          console.log('Internal Error ufvk');
-          return {} as WalletType;
-        }
-        const RPCufvk: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
-
         const wallet: WalletType = {} as WalletType;
         if (RPCseed.seed) {
           wallet.seed = RPCseed.seed;
         }
         if (RPCseed.birthday) {
           wallet.birthday = RPCseed.birthday;
-        }
-        if (RPCufvk.ufvk) {
-          wallet.ufvk = RPCufvk.ufvk;
-        }
-
-        if (RPCseed.birthday !== RPCufvk.birthday) {
-          console.log('seed birthday', RPCseed.birthday, 'ufvk birthday', RPCufvk.birthday);
         }
 
         return wallet;
@@ -381,7 +362,7 @@ export default class RPC {
     // every 15 seconds the App try to Sync the new blocks.
     if (!this.refreshTimerID) {
       this.refreshTimerID = setInterval(() => {
-        //console.log('interval refresh');
+        console.log('++++++++++ interval try refresh 15 secs');
         this.refresh(false);
       }, 15 * 1000); // 15 seconds
       //console.log('create refresh timer', this.refreshTimerID);
@@ -391,7 +372,7 @@ export default class RPC {
     // every 5 seconds the App update all data
     if (!this.updateTimerID) {
       this.updateTimerID = setInterval(() => {
-        //console.log('interval update', this.timers);
+        console.log('++++++++++ interval update 5 secs', this.timers);
         this.sanitizeTimers();
         this.updateData();
       }, 5 * 1000); // 5 secs
@@ -413,12 +394,7 @@ export default class RPC {
       this.timers.splice(deleted[i], 1);
     }
 
-    await this.fetchWalletHeight();
-    await this.fetchWalletBirthday();
-    //await this.fetchInfoAndServerHeight();
-
-    // Load the current wallet data
-    await this.loadWalletData();
+    await this.updateData();
 
     // Call the refresh after configure to update the UI. Do it in a timeout
     // to allow the UI to render first
@@ -612,16 +588,21 @@ export default class RPC {
 
   async loadWalletData() {
     await this.fetchTandZandOValueTransfers();
+    console.log('RPC - 3.1 - fetch value transfers');
     await this.fetchAddresses();
+    console.log('RPC - 3.2 - fetch addresses');
     await this.fetchTotalBalance();
+    console.log('RPC - 3.3 - fetch total balance');
     await this.fetchInfoAndServerHeight();
+    console.log('RPC - 3.4 - fetch info & server height');
     await this.fetchWalletSettings();
+    console.log('RPC - 3.5 - fetch wallet settings');
   }
 
   async updateData() {
     //console.log('Update data triggered');
     if (this.updateDataLock) {
-      //console.log('Update lock, returning');
+      console.log('RPC - Update Data lock, returning *****************************');
       return;
     }
 
@@ -631,11 +612,13 @@ export default class RPC {
       this.updateDataLock = true;
 
       await this.fetchWalletHeight();
+      console.log('RPC - 1 - fetch wallet height');
       await this.fetchWalletBirthday();
-      //await this.fetchInfoAndServerHeight();
+      console.log('RPC - 2 - fetch wallet birthday');
 
       // And fetch the rest of the data.
       await this.loadWalletData();
+      console.log('RPC - 3 - fetch wallet Data');
 
       //console.log(`Finished update data at ${lastServerBlockHeight}`);
       this.updateDataLock = false;
@@ -659,12 +642,7 @@ export default class RPC {
       return;
     }
 
-    await this.fetchWalletHeight();
-    await this.fetchWalletBirthday();
-    //await this.fetchInfoAndServerHeight();
-
-    // And fetch the rest of the data.
-    await this.loadWalletData();
+    await this.updateData();
 
     if (!this.lastServerBlockHeight) {
       //console.log('the last server block is zero');
@@ -729,6 +707,7 @@ export default class RPC {
 
       // We need to wait for the sync to finish. The sync is done when
       this.syncStatusTimerID = setInterval(async () => {
+        console.log('++++++++++ interval syncing 5 secs');
         const returnStatus = await this.doSyncStatus();
         if (returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
           return;
@@ -774,12 +753,7 @@ export default class RPC {
         // if the syncId change then reset the %
         if (this.prevSyncId !== this.syncId) {
           if (this.prevSyncId !== -1) {
-            await this.fetchWalletHeight();
-            await this.fetchWalletBirthday();
-            //await this.fetchInfoAndServerHeight();
-
-            // And fetch the rest of the data.
-            await this.loadWalletData();
+            await this.updateData();
 
             await RPCModule.doSave();
 
@@ -907,12 +881,7 @@ export default class RPC {
           // here we can release the screen...
           this.keepAwake(false);
 
-          await this.fetchWalletHeight();
-          await this.fetchWalletBirthday();
-          //await this.fetchInfoAndServerHeight();
-
-          // And fetch the rest of the data.
-          await this.loadWalletData();
+          await this.updateData();
 
           await RPCModule.doSave();
 
@@ -939,12 +908,7 @@ export default class RPC {
           if (this.prevBatchNum !== batchNum) {
             // if finished batches really fast, the App have to save the wallet delayed.
             if (this.prevBatchNum !== -1 && this.batches >= 1) {
-              await this.fetchWalletHeight();
-              await this.fetchWalletBirthday();
-              //await this.fetchInfoAndServerHeight();
-
-              // And fetch the rest of the data.
-              await this.loadWalletData();
+              await this.updateData();
 
               await RPCModule.doSave();
               this.batches = 0;

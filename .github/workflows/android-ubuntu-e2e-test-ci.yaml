@@ -108,7 +108,7 @@ jobs:
   android-ubuntu-e2e-test-ci:
     name: Android Ubuntu e2e test
     needs: android-ubuntu-e2e-test-ci-avd-cache
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -166,6 +166,8 @@ jobs:
         run: |
           echo "Disk space before post-build cleanup:"
           df -h
+          sudo docker builder prune -f
+          sudo docker system prune -a -f
           sudo rm -rf /usr/local/.ghcup
           sudo rm -rf /opt/hostedtoolcache/CodeQL
           sudo rm -rf /usr/local/lib/android/sdk/ndk

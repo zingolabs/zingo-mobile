@@ -71,7 +71,9 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
   rescanMenu: false,
+  recoveryWalletInfoOnDevice: false,
   shieldingAmount: 0,
+  showSwipeableIcons: true,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

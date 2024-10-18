@@ -46,6 +46,29 @@ jest.mock('react-native', () => {
   return RN;
 });
 jest.mock('react-native-picker-select', () => 'RNPickerSelect');
+jest.mock('react-native-keychain', () => ({
+  ACCESS_CONTROL: {
+    BIOMETRY_CURRENT_SET: 'biometryCurrentSet',
+  },
+  ACCESSIBLE: {
+    WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'whenUnlockedThisDeviceOnly',
+  },
+  AUTHENTICATION_TYPE: {
+    BIOMETRICS: 'biometrics',
+  },
+  SECURITY_LEVEL: {
+    SECURE_SOFTWARE: 'secureSoftware',
+  },
+  SECURITY_RULES: {
+    NONE: 'none',
+  },
+  STORAGE_TYPE: {
+    AES: 'AES',
+  },
+  setGenericPassword: jest.fn(),
+  getGenericPassword: jest.fn(),
+  resetGenericPassword: jest.fn(),
+}));
 jest.useFakeTimers();
 
 // test suite
@@ -60,6 +83,7 @@ describe('Component Settings - test', () => {
   state.language = LanguageEnum.en;
   state.sendAll = false;
   state.rescanMenu = false;
+  state.recoveryWalletInfoOnDevice = true;
   state.donation = false;
   state.walletSettings = mockWalletSettings;
   const onClose = jest.fn();
@@ -80,6 +104,7 @@ describe('Component Settings - test', () => {
           setSecurityOption={onSetOption}
           setSelectServerOption={onSetOption}
           setRescanMenuOption={onSetOption}
+          setRecoveryWalletInfoOnDeviceOption={onSetOption}
         />
       </ContextAppLoadedProvider>,
     );

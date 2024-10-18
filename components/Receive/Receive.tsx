@@ -219,27 +219,39 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       focused: boolean;
       color: string;
     },
-  ) => ReactNode = ({ route, focused, color }) => (
-    <View style={{ width: (dimensions.width - 20) / (mode === ModeEnum.basic ? 1 : 3), alignItems: 'center' }}>
-      <RegText
+  ) => ReactNode = ({ route, focused, color }) => {
+    const w = (dimensions.width - 50) / (mode === ModeEnum.basic ? 1 : 3);
+    //const w = route.key === 'uaddr' ? '40%' : '30%';
+    return (
+      <View
         style={{
-          fontWeight: mode === ModeEnum.basic ? 'normal' : focused ? 'bold' : 'normal',
-          fontSize: mode === ModeEnum.basic ? 14 : focused ? 15 : 14,
-          color: color,
+          width: w,
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: 50,
         }}>
-        {route.title ? route.title : ''}
-      </RegText>
-      {route.key === 'uaddr' && (
-        <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. zingo)</RegText>
-      )}
-      {route.key === 'zaddr' && (
-        <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. ledger, old wallets)</RegText>
-      )}
-      {route.key === 'taddr' && (
-        <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. coinbase, gemini)</RegText>
-      )}
-    </View>
-  );
+        <RegText
+          style={{
+            fontWeight: mode === ModeEnum.basic ? 'normal' : focused ? 'bold' : 'normal',
+            fontSize: mode === ModeEnum.basic ? 14 : focused ? 15 : 14,
+            color: color,
+          }}>
+          {route.title ? route.title : ''}
+        </RegText>
+        {route.key === 'uaddr' && mode === ModeEnum.basic && (
+          <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. zingo)</RegText>
+        )}
+        {route.key === 'zaddr' && mode === ModeEnum.basic && (
+          <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>
+            (e.g. ledger, old wallets)
+          </RegText>
+        )}
+        {route.key === 'taddr' && mode === ModeEnum.basic && (
+          <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. coinbase, gemini)</RegText>
+        )}
+      </View>
+    );
+  };
 
   const renderTabBarPage: (
     props: SceneRendererProps & {

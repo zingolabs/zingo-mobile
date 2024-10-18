@@ -182,6 +182,10 @@ export default class SettingsFileImpl {
           settings.security = sec;
         }
       }
+      if (!settings.hasOwnProperty(SettingsNameEnum.recoveryWalletInfoOnDevice)) {
+        // doing backup of seed & birthday in the device -> false by default.
+        settings.recoveryWalletInfoOnDevice = false;
+      }
       return settings;
     } catch (err) {
       // The File doesn't exist, so return nothing

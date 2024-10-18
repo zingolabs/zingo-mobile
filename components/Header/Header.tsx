@@ -15,7 +15,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, TouchableOpacity, View } from 'react-native';
 import {
   NetInfoType,
   TranslateType,
@@ -392,7 +392,51 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     }
   };
 
-  //console.log('render header', shieldingFee);
+  const privacyComponent = () => (
+    <TouchableOpacity
+      style={{ marginHorizontal: 5 }}
+      onPress={() => {
+        addLastSnackbar &&
+          addLastSnackbar({
+            message: `${translate('change-privacy')} ${
+              privacy
+                ? translate('settings.value-privacy-false')
+                : (((translate('settings.value-privacy-true') as string) +
+                    translate('change-privacy-legend')) as string)
+            }`,
+          });
+        setPrivacyOption && setPrivacyOption(!privacy);
+      }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: colors.card,
+            margin: 0,
+            marginHorizontal: 5,
+            padding: 0,
+            minWidth: 25,
+            minHeight: 25,
+          }}>
+          {privacy ? (
+            <FontAwesomeIcon icon={faLock} size={25} color={colors.primary} />
+          ) : (
+            <FontAwesomeIcon icon={faLockOpen} size={25} color={colors.primaryDisabled} />
+          )}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  console.log('render header &&&&&&&&&&&&&&&&&&&&& netinfo', netInfo);
 
   return (
     <View
@@ -537,53 +581,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             )}
           </>
         )}
-        {mode !== ModeEnum.basic && !noPrivacy && setPrivacyOption && addLastSnackbar && (
-          <TouchableOpacity
-            style={{ marginHorizontal: 5 }}
-            onPress={() => {
-              addLastSnackbar({
-                message: `${translate('change-privacy')} ${
-                  privacy
-                    ? translate('settings.value-privacy-false')
-                    : (((translate('settings.value-privacy-true') as string) +
-                        translate('change-privacy-legend')) as string)
-                }`,
-              });
-              setPrivacyOption(!privacy);
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderWidth: privacy ? 2 : 1,
-                  borderColor: privacy ? colors.primary : colors.primaryDisabled,
-                  borderRadius: 5,
-                  paddingHorizontal: 5,
-                }}>
-                <Text
-                  style={{
-                    fontSize: 13,
-                    color: colors.border,
-                    marginRight: 5,
-                  }}>
-                  {`${privacy ? translate('settings.value-privacy-true') : translate('settings.value-privacy-false')}`}
-                </Text>
-                {privacy ? (
-                  <FontAwesomeIcon icon={faLock} size={14} color={colors.primary} />
-                ) : (
-                  <FontAwesomeIcon icon={faLockOpen} size={14} color={colors.primaryDisabled} />
-                )}
-              </View>
-            </View>
-          </TouchableOpacity>
-        )}
+        {mode !== ModeEnum.basic &&
+          !noPrivacy &&
+          setPrivacyOption &&
+          addLastSnackbar &&
+          noBalance &&
+          privacyComponent()}
       </View>
 
       {noBalance && !receivedLegend && <View style={{ height: 20 }} />}
@@ -596,6 +599,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             margin: 0,
             marginTop: readOnly ? 15 : 0,
           }}>
+          {mode !== ModeEnum.basic && !noPrivacy && setPrivacyOption && addLastSnackbar && privacyComponent()}
           <ZecAmount
             currencyName={info.currencyName}
             color={colors.text}

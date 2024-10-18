@@ -37,6 +37,7 @@ import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import CheckBox from '@react-native-community/checkbox';
 import RNPickerSelect from 'react-native-picker-select';
+import { getStorageRecoveryWalletInfo, hasRecoveryWalletInfo } from '../../app/recoveryWalletInfo';
 
 type SettingsProps = {
   closeModal: () => void;
@@ -51,6 +52,7 @@ type SettingsProps = {
   setSecurityOption: (value: SecurityType) => Promise<void>;
   setSelectServerOption: (value: string) => Promise<void>;
   setRescanMenuOption: (value: boolean) => Promise<void>;
+  setRecoveryWalletInfoOnDeviceOption: (value: boolean) => Promise<void>;
 };
 
 type Options = {
@@ -70,6 +72,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setSecurityOption,
   setSelectServerOption,
   setRescanMenuOption,
+  setRecoveryWalletInfoOnDeviceOption,
   closeModal,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -88,6 +91,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     security: securityContext,
     selectServer: selectServerContext,
     rescanMenu: rescanMenuContext,
+    recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     readOnly,
   } = context;
 
@@ -140,6 +144,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     RESCANMENU = rescanMenusArray as Options[];
   }
 
+  const recoveryWalletInfoOnDevicesArray = translate('settings.recoverywalletinfoondevices');
+  let RECOVERYWALLETINFOONDEVICE: Options[] = [];
+  if (typeof recoveryWalletInfoOnDevicesArray === 'object') {
+    RECOVERYWALLETINFOONDEVICE = recoveryWalletInfoOnDevicesArray as Options[];
+  }
+
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(languageContext);
 
@@ -171,14 +181,28 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   );
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(selectServerContext);
   const [rescanMenu, setRescanMenu] = useState<boolean>(rescanMenuContext);
+  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(
+    recoveryWalletInfoOnDeviceContext,
+  );
 
   const [customIcon, setCustomIcon] = useState<IconDefinition>(farCircle);
   const [autoIcon, setAutoIcon] = useState<IconDefinition>(farCircle);
   const [listIcon, setListIcon] = useState<IconDefinition>(farCircle);
   const [disabled, setDisabled] = useState<boolean>();
   const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
+  const [hasRecoveryWalletInfoSaved, setHasRecoveryWalletInfoSaved] = useState<boolean>(false);
+  const [storageRecoveryWalletInfo, setStorageRecoveryWalletInfo] = useState<string>('');
 
   const slideAnim = useSharedValue(0);
+
+  useEffect(() => {
+    (async () => {
+      if (await hasRecoveryWalletInfo()) {
+        setHasRecoveryWalletInfoSaved(true);
+        setStorageRecoveryWalletInfo(await getStorageRecoveryWalletInfo());
+      }
+    })();
+  }, [translate]);
 
   useEffect(() => {
     if (selectServerContext === SelectServerEnum.auto) {
@@ -271,7 +295,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       modeContext === mode &&
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer &&
-      rescanMenuContext === rescanMenu
+      rescanMenuContext === rescanMenu &&
+      recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice
     ) {
       addLastSnackbar({ message: translate('settings.nochanges') as string });
       return;
@@ -377,6 +402,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
     if (rescanMenuContext !== rescanMenu) {
       await setRescanMenuOption(rescanMenu);
+    }
+    if (recoveryWalletInfoOnDeviceContext !== recoveryWalletInfoOnDevice) {
+      await setRecoveryWalletInfoOnDeviceOption(recoveryWalletInfoOnDevice);
     }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
@@ -883,7 +911,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               <BoldText>{translate('settings.memo-title') as string}</BoldText>
             </View>
 
-            <View style={{ display: 'flex', marginLeft: 25, marginBottom: 30 }}>
+            <View style={{ display: 'flex', marginLeft: 25 }}>
               {optionsRadio(
                 MEMOS,
                 setMemos as React.Dispatch<React.SetStateAction<string | boolean>>,
@@ -891,6 +919,43 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 memos,
                 'memo',
               )}
+            </View>
+
+            <View style={{ display: 'flex', margin: 10 }}>
+              <BoldText>{translate('settings.recoverywalletinfoondevice-title') as string}</BoldText>
+            </View>
+
+            <View style={{ display: 'flex', marginLeft: 25 }}>
+              {optionsRadio(
+                RECOVERYWALLETINFOONDEVICE,
+                setRecoveryWalletInfoOnDevice as React.Dispatch<React.SetStateAction<string | boolean>>,
+                Boolean,
+                recoveryWalletInfoOnDevice,
+                'recoverywalletinfoondevice',
+              )}
+            </View>
+
+            {hasRecoveryWalletInfoSaved && (
+              <View style={{ display: 'flex' }}>
+                <FadeText style={{ color: colors.primary, textAlign: 'center', marginTop: 10, padding: 5 }}>
+                  {(translate('settings.walletkeyssaved') as string) +
+                    (storageRecoveryWalletInfo ? ' [' + storageRecoveryWalletInfo + ']' : '')}
+                </FadeText>
+              </View>
+            )}
+
+            <View style={{ display: 'flex', margin: 10 }}>
+              <FadeText
+                style={{
+                  color: colors.primary,
+                  textAlign: 'center',
+                  marginVertical: 10,
+                  padding: 5,
+                  borderColor: 'red',
+                  borderWidth: 1,
+                }}>
+                {translate('settings.walletkeyswarning') as string}
+              </FadeText>
             </View>
           </>
         )}

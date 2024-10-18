@@ -15,7 +15,6 @@ import {
   AddressBookFileClass,
   AddressClass,
   SnackbarDurationEnum,
-  ModeEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
@@ -45,7 +44,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   setValueTransferDetailModalShowing,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, privacy, info, addressBook, addresses, addLastSnackbar, mode } = context;
+  const { translate, language, privacy, info, addressBook, addresses, addLastSnackbar } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -141,14 +140,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       duration: SnackbarDurationEnum.short,
                     });
                   }}>
-                  <RegText
-                    color={
-                      mode === ModeEnum.basic && vt.kind === ValueTransferKindEnum.Received
-                        ? colors.background
-                        : undefined
-                    }>
-                    {memo}
-                  </RegText>
+                  <RegText>{memo}</RegText>
                 </TouchableOpacity>
               )}
               {!!memoUA && (
@@ -166,62 +158,22 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       duration: SnackbarDurationEnum.short,
                     });
                   }}>
-                  <RegText
-                    color={
-                      mode === ModeEnum.basic && vt.kind === ValueTransferKindEnum.Received
-                        ? colors.background
-                        : undefined
-                    }>
-                    {'\nReply to:'}
-                  </RegText>
+                  <RegText>{'\nReply to:'}</RegText>
                   {!thisWalletAddress(memoUA) && (
                     <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
                   )}
-                  <RegText
-                    color={
-                      mode === ModeEnum.basic && vt.kind === ValueTransferKindEnum.Received
-                        ? colors.background
-                        : undefined
-                    }
-                    style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}>
-                    {memoUA}
-                  </RegText>
+                  <RegText style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}>{memoUA}</RegText>
                   {contactFound(memoUA) && (
                     <View style={{ flexDirection: 'row' }}>
                       {!thisWalletAddress(memoUA) && (
-                        <RegText
-                          color={
-                            mode === ModeEnum.basic && vt.kind === ValueTransferKindEnum.Received
-                              ? colors.background
-                              : undefined
-                          }
-                          style={{ opacity: 0.6 }}>
-                          {translate('addressbook.likely') as string}
-                        </RegText>
+                        <RegText style={{ opacity: 0.6 }}>{translate('addressbook.likely') as string}</RegText>
                       )}
-                      <AddressItem
-                        color={
-                          mode === ModeEnum.basic && vt.kind === ValueTransferKindEnum.Received
-                            ? colors.background
-                            : undefined
-                        }
-                        address={memoUA}
-                        onlyContact={true}
-                        closeModal={() => {}}
-                        openModal={() => {}}
-                      />
+                      <AddressItem address={memoUA} onlyContact={true} closeModal={() => {}} openModal={() => {}} />
                     </View>
                   )}
                   {!contactFound(memoUA) && thisWalletAddress(memoUA) && (
                     <View style={{ flexDirection: 'row' }}>
-                      <RegText
-                        color={
-                          mode === ModeEnum.basic && vt.kind === ValueTransferKindEnum.Received
-                            ? colors.background
-                            : colors.primaryDisabled
-                        }>
-                        {translate('addressbook.thiswalletaddress') as string}
-                      </RegText>
+                      <RegText>{translate('addressbook.thiswalletaddress') as string}</RegText>
                     </View>
                   )}
                 </TouchableOpacity>

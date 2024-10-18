@@ -15,6 +15,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native';
+import Clipboard from '@react-native-community/clipboard';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
@@ -74,6 +75,12 @@ import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
 import { RestoreFromTypeEnum } from '../AppState';
+import {
+  createUpdateRecoveryWalletInfo,
+  getRecoveryWalletInfo,
+  hasRecoveryWalletInfo,
+  removeRecoveryWalletInfo,
+} from '../recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
 import BoldText from '../../components/Components/BoldText';
@@ -128,6 +135,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
   const [donationAlert, setDonationAlert] = useState<boolean>(false);
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
+  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
   const file = useMemo(
     () => ({
       en: en,
@@ -255,6 +263,11 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.rescanMenu, rescanMenu);
       }
+      if (settings.recoveryWalletInfoOnDevice === true || settings.recoveryWalletInfoOnDevice === false) {
+        setRecoveryWalletInfoOnDevice(settings.recoveryWalletInfoOnDevice);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.recoveryWalletInfoOnDevice, recoveryWalletInfoOnDevice);
+      }
 
       // for testing
       //await delay(5000);
@@ -302,6 +315,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         selectServer={selectServer}
         donationAlert={donationAlert}
         rescanMenu={rescanMenu}
+        recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
       />
     );
   }
@@ -326,6 +340,7 @@ type LoadingAppClassProps = {
   selectServer: SelectServerEnum;
   donationAlert: boolean;
   rescanMenu: boolean;
+  recoveryWalletInfoOnDevice: boolean;
 };
 
 type LoadingAppClassState = AppStateLoading & AppContextLoading;
@@ -374,6 +389,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       security: props.security,
       selectServer: props.selectServer,
       rescanMenu: props.rescanMenu,
+      recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
 
       // state
       appStateStatus: AppState.currentState,
@@ -395,6 +411,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       serverErrorTries: 0,
       donationAlert: props.donationAlert,
       firstLaunchingMessage: props.firstLaunchingMessage,
+      hasRecoveryWalletInfoSaved: false,
     };
 
     this.dim = {} as EmitterSubscription;
@@ -448,117 +465,151 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         .catch(() => {});
     }
 
-    (async () => {
-      // First, if it's server automatic
-      // here I need to check the servers and select the best one
-      // likely only when the user install or update the new version with this feature.
-      if (this.state.selectServer === SelectServerEnum.auto) {
-        setTimeout(() => {
-          this.addLastSnackbar({
-            message: this.state.translate('loadedapp.selectingserver') as string,
-            duration: SnackbarDurationEnum.longer,
-          });
-        }, 1000);
-        // not a different one, can be the same.
-        const someServerIsWorking = await this.selectTheBestServer(false);
-        console.log('some server is working?', someServerIsWorking);
-      }
+    // has the device the Wallet Keys stored?
+    const has = await hasRecoveryWalletInfo();
+    this.setState({ hasRecoveryWalletInfoSaved: has });
 
-      // Second, check if a wallet exists. Do it async so the basic screen has time to render
-      await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-      const exists = await RPCModule.walletExists();
-      //console.log('Wallet Exists result', this.state.screen, exists);
+    // First, if it's server automatic
+    // here I need to check the servers and select the best one
+    // likely only when the user install or update the new version with this feature or
+    // select automatic in settings.
+    if (this.state.selectServer === SelectServerEnum.auto) {
+      setTimeout(() => {
+        this.addLastSnackbar({
+          message: this.state.translate('loadedapp.selectingserver') as string,
+          duration: SnackbarDurationEnum.longer,
+        });
+      }, 1000);
+      // not a different one, can be the same.
+      const someServerIsWorking = await this.selectTheBestServer(false);
+      console.log('some server is working?', someServerIsWorking);
+    }
 
-      if (exists && exists !== GlobalConst.false) {
-        this.setState({ walletExists: true });
-        const networkState = await NetInfo.fetch();
-        if (networkState.isConnected) {
-          let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chainName);
+    // Second, check if a wallet exists. Do it async so the basic screen has time to render
+    await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+    const exists = await RPCModule.walletExists();
+    //console.log('Wallet Exists result', this.state.screen, exists);
 
-          // for testing
-          //await delay(5000);
+    if (exists && exists !== GlobalConst.false) {
+      this.setState({ walletExists: true });
+      const networkState = await NetInfo.fetch();
+      if (networkState.isConnected) {
+        let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chainName);
 
-          //console.log('Load Wallet Exists result', result);
-          let error = false;
-          if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
-            try {
-              // here result can have an `error` field for watch-only which is actually OK.
-              const resultJson: RPCSeedType = await JSON.parse(result);
-              if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
-                // Load the wallet and navigate to the ValueTransfers screen
-                const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
-                //console.log(walletKindStr);
-                try {
-                  const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
-                  console.log(walletKindJSON);
-                  // there are 4 kinds:
-                  // 1. seed
-                  // 2. USK
-                  // 3. UFVK - watch-only wallet
-                  // 4. No keys - watch-only wallet (possibly an error)
-                  this.setState({
-                    readOnly:
-                      walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
-                      walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
-                        ? true
-                        : false,
-                    actionButtonsDisabled: false,
-                  });
-                } catch (e) {
-                  //console.log(walletKindStr);
-                  this.setState({
-                    readOnly: false,
-                    actionButtonsDisabled: false,
-                  });
-                  this.state.addLastSnackbar({ message: walletKindStr });
+        // for testing
+        //await delay(5000);
+
+        //console.log('Load Wallet Exists result', result);
+        let error = false;
+        let errorText = '';
+        if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
+          try {
+            // here result can have an `error` field for watch-only which is actually OK.
+            const resultJson: RPCSeedType = await JSON.parse(result);
+            if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
+              // Load the wallet and navigate to the ValueTransfers screen
+              const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
+              //console.log(walletKindStr);
+              try {
+                const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
+                console.log(walletKindJSON);
+                // there are 4 kinds:
+                // 1. seed
+                // 2. USK
+                // 3. UFVK - watch-only wallet
+                // 4. No keys - watch-only wallet (possibly an error)
+
+                // if the seed & birthday are not stored in Keychain/Keystore, do it now.
+                if (this.state.recoveryWalletInfoOnDevice) {
+                  if (
+                    walletKindJSON.kind === RPCWalletKindEnum.LoadedFromSeedPhrase ||
+                    walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedSpendingKey
+                  ) {
+                    const wallet: WalletType = await RPC.rpcFetchWallet(false);
+                    await createUpdateRecoveryWalletInfo(wallet);
+                  }
+                } else {
+                  // needs to delete the seed from the Keychain/Keystore, do it now.
+                  await removeRecoveryWalletInfo();
                 }
-                this.navigateToLoadedApp();
-                //console.log('navigate to LoadedApp');
-              } else {
-                error = true;
+                this.setState({
+                  readOnly:
+                    walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
+                    walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
+                      ? true
+                      : false,
+                  actionButtonsDisabled: false,
+                });
+              } catch (e) {
+                //console.log(walletKindStr);
+                this.setState({
+                  readOnly: false,
+                  actionButtonsDisabled: false,
+                });
+                this.addLastSnackbar({ message: walletKindStr });
               }
-            } catch (e) {
+              this.navigateToLoadedApp();
+              //console.log('navigate to LoadedApp');
+            } else {
               error = true;
+              errorText = resultJson.error;
             }
-          } else {
+          } catch (e) {
             error = true;
-          }
-          if (error) {
-            await this.walletErrorHandle(
-              result,
-              this.state.translate('loadingapp.readingwallet-label') as string,
-              1,
-              true,
-            );
+            errorText = JSON.stringify(e);
           }
         } else {
-          this.setState({ screen: 1, actionButtonsDisabled: false });
-          this.addLastSnackbar({
-            message: this.state.translate('loadedapp.connection-error') as string,
-          });
+          error = true;
+          errorText = result;
+        }
+        if (error) {
+          await this.walletErrorHandle(
+            errorText,
+            this.state.translate('loadingapp.readingwallet-label') as string,
+            1,
+            true,
+          );
         }
       } else {
-        //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
-        // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
-        if (this.state.mode === ModeEnum.basic) {
-          // setting the prop basicFirstViewSeed to false.
-          // this means when the user have funds, the seed screen will show up.
-          await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, false);
-          this.createNewWallet();
+        this.setState({ screen: 1, actionButtonsDisabled: false });
+        this.addLastSnackbar({
+          message: this.state.translate('loadedapp.connection-error') as string,
+        });
+      }
+    } else {
+      //console.log('Loading new wallet', this.state.screen, this.state.walletExists);
+      if (this.state.mode === ModeEnum.basic) {
+        // setting the prop basicFirstViewSeed to false.
+        // this means when the user have funds, the seed screen will show up.
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, false);
+        if (this.state.hasRecoveryWalletInfoSaved) {
+          // but first we need to check if exists some seed stored in the device from a previous installation (IOS)
+          await this.recoverRecoveryWalletInfo(false);
+          // go to the initial menu, giving the opportunity to the user
+          // to use the seed & birthday recovered from the device.
+          this.setState({
+            screen: 1,
+            walletExists: false,
+            actionButtonsDisabled: false,
+          });
+        } else {
+          // if no wallet file & basic mode -> create a new wallet & go directly to history screen.
+          // no seed screen.
+          this.createNewWallet(false);
           this.setState({ actionButtonsDisabled: false });
           this.navigateToLoadedApp();
           //console.log('navigate to LoadedApp');
-        } else {
-          // for advanced mode
-          await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
-          this.setState(state => ({
-            screen: state.screen === 3 ? 3 : 1,
-            walletExists: false,
-            actionButtonsDisabled: false,
-          }));
         }
+      } else {
+        // if no wallet file & advanced mode -> go to the initial menu.
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
+        this.setState(state => ({
+          screen: state.screen === 3 ? 3 : 1,
+          walletExists: false,
+          actionButtonsDisabled: false,
+        }));
       }
-    })();
+    }
 
     this.appstate = AppState.addEventListener(EventListenerEnum.change, async nextAppState => {
       //console.log('LOADING', 'next', nextAppState, 'prior', this.state.appState);
@@ -858,22 +909,36 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     });
   };
 
-  createNewWallet = () => {
+  createNewWallet = (goSeedScreen: boolean = true) => {
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
       let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chainName);
 
       if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
-        let wallet = {} as WalletType;
+        let seedJSON = {} as RPCSeedType;
         try {
-          wallet = JSON.parse(seed);
+          seedJSON = JSON.parse(seed);
+          if (seedJSON.error) {
+            this.setState({ actionButtonsDisabled: false });
+            createAlert(
+              this.setBackgroundError,
+              this.addLastSnackbar,
+              this.state.translate('loadingapp.creatingwallet-label') as string,
+              seedJSON.error,
+              false,
+              this.state.translate,
+              sendEmail,
+              this.state.info.zingolib,
+            );
+            return;
+          }
         } catch (e) {
           this.setState({ actionButtonsDisabled: false });
           createAlert(
             this.setBackgroundError,
             this.addLastSnackbar,
             this.state.translate('loadingapp.creatingwallet-label') as string,
-            seed,
+            JSON.stringify(e),
             false,
             this.state.translate,
             sendEmail,
@@ -881,12 +946,19 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           );
           return;
         }
+        const wallet: WalletType = { seed: seedJSON.seed || '', birthday: seedJSON.birthday || 0 };
         // default values for wallet options
         this.setWalletOption(WalletOptionEnum.downloadMemos, DownloadMemosEnum.walletMemos);
+        // storing the seed & birthday in KeyChain/KeyStore
+        if (this.state.recoveryWalletInfoOnDevice) {
+          await createUpdateRecoveryWalletInfo(wallet);
+        } else {
+          await removeRecoveryWalletInfo();
+        }
         // basic mode -> same screen.
         this.setState(state => ({
           wallet,
-          screen: state.mode === ModeEnum.basic ? state.screen : 2,
+          screen: goSeedScreen ? 2 : state.screen,
           actionButtonsDisabled: false,
           walletExists: true,
         }));
@@ -972,11 +1044,23 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       //console.log(seedUfvk);
       //console.log(result);
       let error = false;
+      let errorText = '';
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
           // here result can have an `error` field for watch-only which is actually OK.
           const resultJson: RPCSeedType = await JSON.parse(result);
           if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
+            // storing the seed/ufvk & birthday in KeyChain/KeyStore
+            if (this.state.recoveryWalletInfoOnDevice) {
+              if (type === RestoreFromTypeEnum.seedRestoreFrom) {
+                const wallet: WalletType = { seed: seedUfvk.toLowerCase(), birthday: Number(walletBirthday) };
+                await createUpdateRecoveryWalletInfo(wallet);
+              }
+            } else {
+              await removeRecoveryWalletInfo();
+            }
+            // when restore a wallet never the user needs that the seed screen shows up with the first funds received.
+            await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
             this.setState({
               actionButtonsDisabled: false,
               readOnly: type === RestoreFromTypeEnum.seedRestoreFrom ? false : true,
@@ -984,15 +1068,18 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             this.navigateToLoadedApp();
           } else {
             error = true;
+            errorText = resultJson.error;
           }
         } catch (e) {
           error = true;
+          errorText = JSON.stringify(e);
         }
       } else {
         error = true;
+        errorText = result;
       }
       if (error) {
-        this.walletErrorHandle(result, this.state.translate('loadingapp.readingwallet-label') as string, 3, false);
+        this.walletErrorHandle(errorText, this.state.translate('loadingapp.readingwallet-label') as string, 3, false);
       }
     });
   };
@@ -1050,6 +1137,41 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.componentDidMount();
   };
 
+  recoverRecoveryWalletInfo = async (security: boolean) => {
+    const resultBio = security ? await simpleBiometrics({ translate: this.props.translate }) : true;
+    // can be:
+    // - true      -> the user do pass the authentication
+    // - false     -> the user do NOT pass the authentication
+    // - undefined -> no biometric authentication available -> Passcode.
+    //console.log('BIOMETRIC --------> ', resultBio);
+    if (resultBio === false) {
+      // snack with Error & closing the menu.
+      this.addLastSnackbar({ message: this.props.translate('biometrics-error') as string });
+    } else {
+      // recover the wallet keys from the device
+      const wallet = await getRecoveryWalletInfo();
+      const txt = wallet.seed + '\n\n' + wallet.birthday;
+      Alert.alert(
+        this.props.translate('loadedapp.walletseed-basic') as string,
+        (security ? '' : ((this.props.translate('loadingapp.recoverseedinstall') + '\n\n') as string)) + txt,
+        [
+          {
+            text: this.props.translate('copy') as string,
+            onPress: () => {
+              Clipboard.setString(txt);
+              this.addLastSnackbar({
+                message: this.props.translate('txtcopied') as string,
+                duration: SnackbarDurationEnum.short,
+              });
+            },
+          },
+          { text: this.props.translate('cancel') as string, style: 'cancel' },
+        ],
+        { cancelable: false, userInterfaceStyle: 'light' },
+      );
+    }
+  };
+
   render() {
     const {
       screen,
@@ -1066,6 +1188,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       firstLaunchingMessage,
       biometricsFailed,
       translate,
+      hasRecoveryWalletInfoSaved,
     } = this.state;
     const { colors } = this.props.theme;
 
@@ -1097,6 +1220,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       security: this.state.security,
       selectServer: this.state.selectServer,
       rescanMenu: this.state.rescanMenu,
+      recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
     };
 
     return (
@@ -1139,16 +1263,36 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                         customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
                         buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
-                        options={[translate('loadingapp.advancedmode'), translate('cancel')]}
-                        actions={[() => this.changeMode(ModeEnum.advanced)]}
+                        options={
+                          hasRecoveryWalletInfoSaved
+                            ? [
+                                translate('loadingapp.recoverseed'),
+                                translate('loadingapp.advancedmode'),
+                                translate('cancel'),
+                              ]
+                            : [translate('loadingapp.advancedmode'), translate('cancel')]
+                        }
+                        actions={
+                          hasRecoveryWalletInfoSaved
+                            ? [() => this.recoverRecoveryWalletInfo(true), () => this.changeMode(ModeEnum.advanced)]
+                            : [() => this.changeMode(ModeEnum.advanced)]
+                        }
                       />
                     ) : (
                       <OptionsMenu
                         customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
                         buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
                         destructiveIndex={5}
-                        options={[translate('loadingapp.custom'), translate('cancel')]}
-                        actions={[this.customServer]}
+                        options={
+                          hasRecoveryWalletInfoSaved
+                            ? [translate('loadingapp.recoverseed'), translate('loadingapp.custom'), translate('cancel')]
+                            : [translate('loadingapp.custom'), translate('cancel')]
+                        }
+                        actions={
+                          hasRecoveryWalletInfoSaved
+                            ? [() => this.recoverRecoveryWalletInfo(true), this.customServer]
+                            : [this.customServer]
+                        }
                       />
                     )}
                   </>

@@ -186,6 +186,18 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
           size={20}
         />
       </View>
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "margin": 0,
+          "marginTop": 0,
+        }
+      }
+    >
       <View
         accessibilityState={
           {
@@ -234,26 +246,18 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
             style={
               {
                 "alignItems": "center",
-                "borderColor": "#18bd18",
-                "borderRadius": 5,
-                "borderWidth": 2,
+                "backgroundColor": "#011401",
+                "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "center",
-                "paddingHorizontal": 5,
+                "margin": 0,
+                "marginHorizontal": 5,
+                "minHeight": 25,
+                "minWidth": 25,
+                "padding": 0,
               }
             }
           >
-            <Text
-              style={
-                {
-                  "color": "#ffffff",
-                  "fontSize": 13,
-                  "marginRight": 5,
-                }
-              }
-            >
-              text translated
-            </Text>
             <
               color="#18bd18"
               icon={
@@ -271,23 +275,11 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
                   "prefix": "fas",
                 }
               }
-              size={14}
+              size={25}
             />
           </View>
         </View>
       </View>
-    </View>
-    <View
-      style={
-        {
-          "alignItems": "center",
-          "flexDirection": "row",
-          "justifyContent": "center",
-          "margin": 0,
-          "marginTop": 0,
-        }
-      }
-    >
       <View
         style={
           {
@@ -2440,7 +2432,7 @@ sapling memo
                 <Text
                   style={
                     {
-                      "color": "#011401",
+                      "color": "#c3c3c3",
                       "fontSize": 18,
                       "fontWeight": "600",
                       "opacity": 1,

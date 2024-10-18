@@ -114,15 +114,15 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             }}>
             <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
               {!expandContact && numLinesContact > 1 && (
-                <RegText color={color ? color : colors.primaryDisabled}>{Utils.trimToSmall(contact, 7)}</RegText>
+                <RegText color={color ? color : colors.primary}>{Utils.trimToSmall(contact, 7)}</RegText>
               )}
               {!expandContact && numLinesContact === 1 && (
-                <RegText color={color ? color : colors.primaryDisabled}>{contact}</RegText>
+                <RegText color={color ? color : colors.primary}>{contact}</RegText>
               )}
               {expandContact &&
                 Utils.splitStringIntoChunks(contact, Number(numLinesContact.toFixed(0))).map(
                   (c: string, idx: number) => (
-                    <RegText color={color ? color : colors.primaryDisabled} key={idx}>
+                    <RegText color={color ? color : colors.primary} key={idx}>
                       {c}
                     </RegText>
                   ),
