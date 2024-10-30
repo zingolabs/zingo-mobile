@@ -1035,6 +1035,7 @@ export default class RPC {
       const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr);
 
       const balanceStr: string = await RPCModule.execute(CommandEnum.balance, '');
+      console.log(balanceStr);
       if (balanceStr) {
         if (balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error balance ${balanceStr}`);
