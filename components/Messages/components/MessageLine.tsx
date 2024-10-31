@@ -183,6 +183,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
             display: 'flex',
             flexDirection: vt.kind === ValueTransferKindEnum.Received ? 'row' : 'row-reverse',
             alignItems: 'center',
+            marginBottom: 5,
           }}>
           {vt.amount >= Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount()) && (
             <ZecAmount

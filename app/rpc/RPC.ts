@@ -1300,9 +1300,11 @@ export default class RPC {
         }
         if (vt.status === RPCValueTransfersStatusEnum.calculated) {
           console.log('CALCULATED ))))))))))))))))))))))))))))))))))');
+          console.log(vt);
         }
         if (vt.status === RPCValueTransfersStatusEnum.transmitted) {
           console.log('TRANSMITTED ))))))))))))))))))))))))))))))))))');
+          console.log(vt);
         }
 
         //console.log(currentValueTransferList);

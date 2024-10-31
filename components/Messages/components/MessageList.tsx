@@ -120,6 +120,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   }, [addressFilter, loading, messages, fetchMessagesFiltered]);
 
   useEffect(() => {
+    setLoadMoreButton(numVt < messagesFiltered.length);
     setMessagesSliced(messagesFiltered.slice(-numVt));
   }, [numVt, messagesFiltered]);
 
@@ -236,7 +237,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             noBalance={true}
             noSyncingStatus={true}
             noDrawMenu={true}
-            noPrivacy={true}
+            setPrivacyOption={setPrivacyOption}
+            addLastSnackbar={addLastSnackbar}
           />
           <View
             style={{
@@ -261,8 +263,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
           title={translate('messages.title') as string}
           noBalance={true}
-          noPrivacy={true}
           setUfvkViewModalVisible={setUfvkViewModalVisible}
+          setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
         />
       )}
