@@ -88,3 +88,6 @@ buck-out/
 # firebase
 /**/google-services.json
 /**/GoogleService-Info.plist
+
+# Binaries
+/rust/test_binaries/bins/

@@ -29,5 +29,8 @@ describe('Renders wallet data correctly.', () => {
     await expect(element(by.id('send.confirm.scroll-view'))).toExist();
     await expect(element(by.id('send.confirm.scroll-view'))).toBeVisible(20);
     await element(by.id('send.confirm.scroll-view')).scrollTo('bottom');
+
+    await expect(by.text('Deshielded')).toExist();
+    await expect(by.text('0,0002')).toExist();
   });
 });

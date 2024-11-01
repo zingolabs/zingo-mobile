@@ -172,9 +172,6 @@ if [ ! -d "./android/app" ]; then
     exit 1
 fi
 
-echo -e "\nRemoving node_modules before yarn..."
-rm -rf ./node_modules
-
 echo -e "\nRunning yarn..."
 yarn
 
