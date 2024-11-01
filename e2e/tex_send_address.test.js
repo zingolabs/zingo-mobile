@@ -32,7 +32,7 @@ describe('Renders wallet data correctly.', () => {
 
     sleep(2000);
 
-    await expect(by.text('Deshielded')).toExist();
-    await expect(by.text('0,0002')).toExist();
+    await expect(element(by.text('Deshielded'))).toExist();
+    await expect(element(by.text('0,0002'))).toExist();
   });
 });
