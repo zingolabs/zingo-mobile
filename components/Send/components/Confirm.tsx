@@ -325,13 +325,19 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           <CurrencyAmount amtZec={sendingTotal} price={zecPrice.zecPrice} currency={currency} privacy={false} />
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <View style={{ marginHorizontal: 10 }}>
-            <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-privacy-level') as string}</FadeText>
-            <RegText>{privacyLevel}</RegText>
+          <View style={{ margin: 10 }}>
+            <FadeText>{translate('send.confirm-privacy-level') as string}</FadeText>
+            <RegText testID="send.confirm.privacy-level">{privacyLevel}</RegText>
           </View>
           <View style={{ margin: 10 }}>
             <FadeText>{translate('send.fee') as string}</FadeText>
-            <ZecAmount currencyName={info.currencyName} size={18} amtZec={calculatedFee} privacy={privacy} />
+            <ZecAmount
+              testID="send.confirm.fee"
+              currencyName={info.currencyName}
+              size={18}
+              amtZec={calculatedFee}
+              privacy={privacy}
+            />
           </View>
           {currency === CurrencyEnum.USDCurrency && (
             <View style={{ margin: 10, alignItems: 'flex-end' }}>
@@ -362,7 +368,13 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                       flexDirection: 'row',
                       justifyContent: 'space-between',
                     }}>
-                    <ZecAmount currencyName={info.currencyName} size={18} amtZec={donationAmount} privacy={privacy} />
+                    <ZecAmount
+                      testID="send.confirm.donation"
+                      currencyName={info.currencyName}
+                      size={18}
+                      amtZec={donationAmount}
+                      privacy={privacy}
+                    />
                     <CurrencyAmount
                       style={{ fontSize: 18 }}
                       amtZec={donationAmount}
@@ -382,6 +394,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   justifyContent: 'space-between',
                 }}>
                 <ZecAmount
+                  testID="send.confirm.amount"
                   currencyName={info.currencyName}
                   size={18}
                   amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
@@ -398,7 +411,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
               {!!to.memo && (
                 <>
                   <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo') as string}</FadeText>
-                  <RegText testID="send.confirm-memo">{memoTotal}</RegText>
+                  <RegText testID="send.confirm.memo">{memoTotal}</RegText>
                 </>
               )}
             </View>
@@ -416,11 +429,13 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         }}>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <Button
+            testID="send.confirm.button-confirm"
             type={ButtonTypeEnum.Primary}
             title={sendAllAmount ? (translate('send.confirm-button-all') as string) : (translate('confirm') as string)}
             onPress={() => confirmSendBiometrics()}
           />
           <Button
+            testID="send.confirm.button-cancel"
             type={ButtonTypeEnum.Secondary}
             style={{ marginLeft: 20 }}
             title={translate('cancel') as string}

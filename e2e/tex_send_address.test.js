@@ -33,6 +33,35 @@ describe('Renders wallet data correctly.', () => {
     sleep(2000);
 
     await expect(element(by.text('Deshielded'))).toExist();
-    await expect(element(by.text('0,0002'))).toExist();
+    await expect(element(by.text('0.0002'))).toExist();
+  });
+  it('sends to TEX address, restart the App and check about the refund address', async () => {
+    await element(by.id('send.confirm.button-confirm')).tap();
+
+    await waitFor(element(by.id('vt-1')))
+      .toExist()
+      .withTimeout(30000);
+    await waitFor(element(by.id('vt-2')))
+      .toExist()
+      .withTimeout(30000);
+    await waitFor(element(by.id('vt-3')))
+      .toExist()
+      .withTimeout(30000);
+    
+    // restart the app
+    await device.sendToHome();
+    await sleep(1000);
+    await device.launchApp({ newInstance: true });
+
+    await waitFor(element(by.id('vt-1')))
+      .toExist()
+      .withTimeout(30000);
+    await waitFor(element(by.id('vt-2')))
+      .toExist()
+      .withTimeout(30000);
+    await waitFor(element(by.id('vt-3')))
+      .toExist()
+      .withTimeout(30000);
+    
   });
 });
