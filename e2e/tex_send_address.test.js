@@ -32,8 +32,8 @@ describe('Renders wallet data correctly.', () => {
 
     sleep(2000);
 
-    await expect(element(by.text('Deshielded'))).toExist();
-    await expect(element(by.text('0.0002'))).toExist();
+    await expect(element(by.id('send.confirm.privacy-level'))).toHaveText('Deshielded');
+    await expect(element(by.id('send.confirm.amount.big-part'))).toHaveText(' 0.0002');
   });
   it('sends to TEX address, restart the App and check about the refund address', async () => {
     await element(by.id('send.confirm.button-confirm')).tap();

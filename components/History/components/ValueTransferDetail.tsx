@@ -196,6 +196,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
         </View>
       )}
       <ScrollView
+        testID="history.detail.scroll-view"
         showsVerticalScrollIndicator={true}
         persistentScrollbar={true}
         indicatorStyle={'white'}
@@ -215,7 +216,9 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             borderRadius: 10,
             borderColor: colors.border,
           }}>
-          <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
+          <BoldText
+            testID="history.detail.kind"
+            style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
             {vt.kind === ValueTransferKindEnum.Sent && vt.confirmations === 0
               ? (translate('history.sending') as string)
               : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations > 0
@@ -243,6 +246,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               : ''}
           </BoldText>
           <ZecAmount
+            testID="history.detail.amount-title"
             currencyName={info.currencyName}
             size={36}
             amtZec={vt.amount}
@@ -295,11 +299,13 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
             <View style={{ display: 'flex' }}>
               <FadeText>{translate('history.time') as string}</FadeText>
-              <RegText>{vt.time ? moment((vt.time || 0) * 1000).format('YYYY MMM D h:mm a') : '--'}</RegText>
+              <RegText testID="history.detail.time">
+                {vt.time ? moment((vt.time || 0) * 1000).format('YYYY MMM D h:mm a') : '--'}
+              </RegText>
             </View>
             <View style={{ display: 'flex', alignItems: 'flex-end' }}>
               <FadeText>{translate('history.confirmations') as string}</FadeText>
-              <RegText>{vt.confirmations.toString()}</RegText>
+              <RegText testID="history.detail.confirmations">{vt.confirmations.toString()}</RegText>
             </View>
           </View>
 
@@ -337,7 +343,13 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             <View style={{ display: 'flex', marginTop: 10 }}>
               <FadeText>{translate('history.txfee') as string}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ZecAmount amtZec={vt.fee} size={18} currencyName={info.currencyName} privacy={privacy} />
+                <ZecAmount
+                  testID="history.detail.fee"
+                  amtZec={vt.fee}
+                  size={18}
+                  currencyName={info.currencyName}
+                  privacy={privacy}
+                />
               </View>
             </View>
           )}
@@ -360,14 +372,20 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
           {!!vt.poolType && (
             <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
               <FadeText>{translate('history.pool') as string}</FadeText>
-              <RegText>{vt.poolType}</RegText>
+              <RegText testID="history.detail.pool-type">{vt.poolType}</RegText>
             </View>
           )}
 
           <View style={{ marginTop: 10 }}>
             <FadeText>{translate('history.amount') as string}</FadeText>
             <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <ZecAmount amtZec={vt.amount} size={18} currencyName={info.currencyName} privacy={privacy} />
+              <ZecAmount
+                testID="history.detail.amount"
+                amtZec={vt.amount}
+                size={18}
+                currencyName={info.currencyName}
+                privacy={privacy}
+              />
               {!!vt.zecPrice && vt.zecPrice > 0 && (
                 <CurrencyAmount price={vt.zecPrice} amtZec={vt.amount} currency={currency} privacy={privacy} />
               )}
@@ -386,7 +404,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                       duration: SnackbarDurationEnum.short,
                     });
                   }}>
-                  <RegText>{memo}</RegText>
+                  <RegText testID="history.detail.memo">{memo}</RegText>
                 </TouchableOpacity>
               )}
               {!!memoUA && (
@@ -408,7 +426,9 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                   {!thisWalletAddress(memoUA) && (
                     <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
                   )}
-                  <RegText style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}>{memoUA}</RegText>
+                  <RegText testID="history.detail.memo-ua" style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}>
+                    {memoUA}
+                  </RegText>
                   {contactFound(memoUA) && (
                     <View style={{ flexDirection: 'row' }}>
                       {!thisWalletAddress(memoUA) && (
