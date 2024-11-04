@@ -35,7 +35,7 @@ describe('Renders wallet data correctly.', () => {
     await expect(element(by.id('send.confirm.privacy-level'))).toHaveText('Deshielded');
     await expect(element(by.id('send.confirm.amount.big-part'))).toHaveText(' 0.0002');
   });
-  it('sends to TEX address, restart the App and check about the refund address', async () => {
+  it('sends to TEX address, restart the App and check about the two new transactions', async () => {
     await element(by.id('send.confirm.button-confirm')).tap();
 
     await waitFor(element(by.id('vt-1')))
@@ -59,6 +59,8 @@ describe('Renders wallet data correctly.', () => {
     await waitFor(element(by.id('vt-2')))
       .toExist()
       .withTimeout(30000);
+    // now this test is going to fail here, because when the App is re-started
+    // the second transaction vanished.
     await waitFor(element(by.id('vt-3')))
       .toExist()
       .withTimeout(30000);
