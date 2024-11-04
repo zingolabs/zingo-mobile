@@ -27,9 +27,14 @@ lazy_static! {
         Mutex::new(RefCell::new(None));
 }
 
-fn lock_client_return_seed(lightclient: LightClient) -> String {
+fn lock_client_return_seed(
+    lightclient: LightClient, 
+    monitor_mempool: bool,
+) -> String {
     let lc = Arc::new(lightclient);
-    let _ = LightClient::start_mempool_monitor(lc.clone());
+    if monitor_mempool {
+        let _ = LightClient::start_mempool_monitor(lc.clone());
+    }
 
     LIGHTCLIENT.lock().unwrap().replace(Some(lc));
 
@@ -103,7 +108,7 @@ pub fn init_new(
             return format!("Error: {}", e);
         }
     };
-    lock_client_return_seed(lightclient)
+    lock_client_return_seed(lightclient, monitor_mempool)
 }
 
 pub fn init_from_seed(
@@ -130,7 +135,7 @@ pub fn init_from_seed(
             return format!("Error: {}", e);
         }
     };
-    lock_client_return_seed(lightclient)
+    lock_client_return_seed(lightclient, monitor_mempool)
 }
 
 pub fn init_from_ufvk(
@@ -157,7 +162,7 @@ pub fn init_from_ufvk(
             return format!("Error: {}", e);
         }
     };
-    lock_client_return_seed(lightclient)
+    lock_client_return_seed(lightclient, monitor_mempool)
 }
 
 pub fn init_from_b64(
@@ -191,7 +196,7 @@ pub fn init_from_b64(
                 return format!("Error: {}", e);
             }
         };
-    lock_client_return_seed(lightclient)
+    lock_client_return_seed(lightclient, monitor_mempool)
 }
 
 pub fn save_to_b64() -> String {
