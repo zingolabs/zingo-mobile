@@ -33,7 +33,8 @@
   "subject": "Suporte Zingo...",
   "body": "Preciso de ajuda com...",
   "messages": {
-    "title": "Mensagens"
+    "title": "Mensagens",
+    "empty": "Nenhuma mensagem ainda."
   },
   "addressbook": {
     "title": "Address Book",

@@ -34,7 +34,8 @@ jobs:
           "screen_awake", 
           "send", 
           "sync_report", 
-          "transaction_history"
+          "transaction_history",
+          "shielding"
         ]
     steps:
       - name: Set envs for zingolib CI

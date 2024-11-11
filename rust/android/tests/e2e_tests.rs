@@ -42,6 +42,35 @@ async fn tex_send_address(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
+async fn shielding(abi: &str) {
+    #[cfg(not(feature = "regchest"))]
+    let (_regtest_manager, _child_process_handler) =
+        scenarios::funded_transparent_mobileclient(1_000_000).await;
+    #[cfg(feature = "regchest")]
+    let docker =
+        match regchest_utils::launch(UNIX_SOCKET, Some("funded_transparent_mobileclient")).await {
+            Ok(d) => d,
+            Err(e) => panic!("Failed to launch regchest docker container: {:?}", e),
+        };
+
+    #[cfg(not(feature = "ci"))]
+    let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "shielding");
+    #[cfg(feature = "ci")]
+    let (exit_code, output, error) = zingomobile_utils::android_e2e_test_ci(abi, "shielding");
+
+    #[cfg(feature = "regchest")]
+    match regchest_utils::close(&docker).await {
+        Ok(_) => (),
+        Err(e) => panic!("Failed to close regchest docker container: {:?}", e),
+    }
+
+    println!("Exit Code: {}", exit_code);
+    println!("Output: {}", output);
+    println!("Error: {}", error);
+
+    assert_eq!(exit_code, 0);
+}
+
 async fn parse_invalid_address(abi: &str) {
     #[cfg(not(feature = "regchest"))]
     let (_regtest_manager, _child_process_handler) =
@@ -294,6 +323,11 @@ mod e2e {
         const ABI: &str = "x86";
 
         #[tokio::test]
+        async fn shielding() {
+            crate::shielding(ABI).await;
+        }
+
+        #[tokio::test]
         async fn tex_send_address() {
             crate::tex_send_address(ABI).await;
         }
@@ -363,6 +397,11 @@ mod e2e {
 
     mod x86_64 {
         const ABI: &str = "x86_64";
+
+        #[tokio::test]
+        async fn shielding() {
+            crate::shielding(ABI).await;
+        }
 
         #[tokio::test]
         async fn tex_send_address() {
@@ -436,6 +475,11 @@ mod e2e {
         const ABI: &str = "armeabi-v7a";
 
         #[tokio::test]
+        async fn shielding() {
+            crate::shielding(ABI).await;
+        }
+
+        #[tokio::test]
         async fn tex_send_address() {
             crate::tex_send_address(ABI).await;
         }
@@ -505,6 +549,11 @@ mod e2e {
 
     mod arm64 {
         const ABI: &str = "arm64-v8a";
+
+        #[tokio::test]
+        async fn shielding() {
+            crate::shielding(ABI).await;
+        }
 
         #[tokio::test]
         async fn tex_send_address() {

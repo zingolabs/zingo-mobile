@@ -33,7 +33,8 @@
   "subject": "Zingo Support...",
   "body": "I need help with...",
   "messages": {
-    "title": "Messages"
+    "title": "Messages",
+    "empty": "No Messages yet."
   },
   "addressbook": {
     "title": "Address Book",

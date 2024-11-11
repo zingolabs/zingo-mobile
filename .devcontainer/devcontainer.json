@@ -1,0 +1,35 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+{
+	"name": "Zingo",
+	"image": "mcr.microsoft.com/devcontainers/base:jammy",
+  "runArgs": [
+    "--network=host"
+  ],
+	"features": {
+		"ghcr.io/devcontainers/features/java:1": {
+			"installGradle": true,
+			"version": "17",
+			"jdkDistro": "open",
+			"gradleVersion": "latest",
+			"mavenVersion": "latest",
+			"antVersion": "latest",
+			"groovyVersion": "latest"
+		},
+		"ghcr.io/devcontainers/features/node:1": {
+			"nodeGypDependencies": true,
+			"installYarnUsingApt": true,
+			"version": "lts",
+			"pnpmVersion": "latest",
+			"nvmVersion": "latest"
+		},
+		"ghcr.io/devcontainers/features/rust:1": {
+			"version": "latest",
+			"profile": "complete",
+			"targets": "aarch64-unknown-linux-gnu"
+		},
+		"ghcr.io/nordcominc/devcontainer-features/android-sdk:1": {},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
+
+	}
+}

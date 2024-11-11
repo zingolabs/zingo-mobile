@@ -453,6 +453,28 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
       <View
         style={
           {
+            "alignItems": "center",
+            "display": "flex",
+            "justifyContent": "flex-start",
+            "marginBottom": 10,
+            "marginTop": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "opacity": 0.65,
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
+      <View
+        style={
+          {
             "marginBottom": 30,
           }
         }
@@ -690,6 +712,28 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
   >
     <RCTRefreshControl />
     <View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "display": "flex",
+            "justifyContent": "flex-start",
+            "marginBottom": 10,
+            "marginTop": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#18bd18",
+              "opacity": 0.65,
+            }
+          }
+        >
+          text translated
+        </Text>
+      </View>
       <View
         style={
           {

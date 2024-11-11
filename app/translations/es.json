@@ -33,7 +33,8 @@
   "subject": "Soporte Zingo...",
   "body": "Necesito ayuda con...",
   "messages": {
-    "title": "Mensajes"
+    "title": "Mensajes",
+    "empty": "Todavía no hay mensajes."
   },
   "addressbook": {
     "title": "Libreta de Direcciones",

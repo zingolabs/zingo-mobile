@@ -358,6 +358,9 @@ export default class Utils {
   }
 
   static isMessagesAddress(vt: ValueTransferType): boolean {
+    // we can't check here in this VT if the memo is empty
+    // because this address/contact could have memos in another
+    // VT in the list.
     // only for orchard or sapling
     if (vt.address) {
       // the performance in the list is really bad if here I asked properly

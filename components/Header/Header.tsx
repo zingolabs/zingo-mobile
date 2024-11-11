@@ -685,6 +685,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           </FadeText>
           <View style={{ margin: 5, flexDirection: 'row' }}>
             <Button
+              testID="header.shield"
               type={ButtonTypeEnum.Primary}
               title={translate(`history.shield-${calculatePoolsToShield()}`) as string}
               onPress={onPressShieldFunds}

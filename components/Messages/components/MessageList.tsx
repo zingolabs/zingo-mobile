@@ -80,10 +80,15 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
 
   const addressFilter = useMemo(
     () => (addr: string | undefined, memos: string[]) => {
+      // if no memo -> ignore this VT.
+      const memoTotal = memos && memos.length > 0 && memos.join('') ? memos.join('\n') : '';
+      if (!memoTotal) {
+        return false;
+      }
+      // if general mode (no address) -> include this VT.
       if (!address) {
         return true;
       }
-      const memoTotal = memos && memos.length > 0 ? memos.join('\n') : '';
       let memoAddress;
       if (memoTotal.includes('\nReply to: \n')) {
         let memoArray = memoTotal.split('\nReply to: \n');
@@ -189,17 +194,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     }
   };
 
-  //f (address) {
-  //console.log(
-  //    'render History - 4',
-  //    messagesSliced.length,
-  //    'loading',
-  //    loading,
-  //    'first scroll done',
-  //    firstScrollToBottomDone,
-  //    'scrollable',
-  //    scrollable,
-  //  );
+  //if (address) {
+  //  console.log('render Messages - 4', messagesSliced);
   //}
 
   return (
@@ -318,7 +314,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           </View>
         ) : (
           <>
-            {!!messagesSliced && !!messagesSliced.length && (
+            {!!messagesSliced && !!messagesSliced.length ? (
               <View
                 style={{
                   display: 'flex',
@@ -328,6 +324,17 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   marginBottom: 10,
                 }}>
                 <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
+              </View>
+            ) : (
+              <View
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  marginTop: 10,
+                  marginBottom: 10,
+                }}>
+                <FadeText style={{ color: colors.primary }}>{translate('messages.empty') as string}</FadeText>
               </View>
             )}
           </>
