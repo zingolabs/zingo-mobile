@@ -206,7 +206,7 @@ describe('Component History ValueTransferDetail - test', () => {
     screen.getByText('0.0001');
   });
 
-  test('History ValueTransferDetail - ephemeral-32-tex ValueTransfer', () => {
+  test('History ValueTransferDetail - Rejection ValueTransfer', () => {
     render(
       <ContextAppLoadedProvider value={state}>
         <ValueTransferDetail

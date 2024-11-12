@@ -343,10 +343,10 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                       ? (translate('history.shielding') as string)
                       : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations > 0
                       ? (translate('history.shield') as string)
-                      : vt.kind === ValueTransferKindEnum.Ephemeral320Tex && vt.confirmations === 0
+                      : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations === 0
                       ? (translate('history.sending') as string)
-                      : vt.kind === ValueTransferKindEnum.Ephemeral320Tex && vt.confirmations > 0
-                      ? (translate('history.ephemeral320tex') as string)
+                      : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations > 0
+                      ? (translate('history.rejection') as string)
                       : ''}
                   </FadeText>
                   <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>

@@ -4,7 +4,7 @@ export enum RPCValueTransfersKindEnum {
   shield = 'shield',
   received = 'received',
   basic = 'basic',
-  ephemeral320Tex = 'ephemeral-320-tex',
+  rejection = 'rejection',
 
   // obsolete -> same as `basic`.
   //sendToSelf = 'send-to-self',

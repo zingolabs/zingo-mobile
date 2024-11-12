@@ -1267,8 +1267,8 @@ export default class RPC {
             ? ValueTransferKindEnum.Sent
             : vt.kind === RPCValueTransfersKindEnum.shield
             ? ValueTransferKindEnum.Shield
-            : vt.kind === RPCValueTransfersKindEnum.ephemeral320Tex
-            ? ValueTransferKindEnum.Ephemeral320Tex
+            : vt.kind === RPCValueTransfersKindEnum.rejection
+            ? ValueTransferKindEnum.Rejection
             : undefined;
         currentValueTransferList.fee = (!vt.transaction_fee ? 0 : vt.transaction_fee) / 10 ** 8;
         currentValueTransferList.zecPrice = !vt.zec_price ? 0 : vt.zec_price;
@@ -1279,9 +1279,10 @@ export default class RPC {
         ) {
           currentValueTransferList.confirmations = 0;
         } else if (vt.status === RPCValueTransfersStatusEnum.confirmed) {
-          currentValueTransferList.confirmations = this.lastServerBlockHeight
-            ? this.lastServerBlockHeight - vt.blockheight + 1
-            : this.lastWalletBlockHeight - vt.blockheight + 1;
+          currentValueTransferList.confirmations =
+            this.lastServerBlockHeight && this.lastServerBlockHeight >= this.lastWalletBlockHeight
+              ? this.lastServerBlockHeight - vt.blockheight + 1
+              : this.lastWalletBlockHeight - vt.blockheight + 1;
         } else {
           // impossible case... I guess.
           currentValueTransferList.confirmations = 0;

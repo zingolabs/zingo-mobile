@@ -57,11 +57,11 @@ export const mockValueTransfers: ValueTransferType[] = [
     amount: 0.0009,
   },
   {
-    kind: ValueTransferKindEnum.Ephemeral320Tex,
+    kind: ValueTransferKindEnum.Rejection,
     fee: 0.0001,
     confirmations: 12,
     status: RPCValueTransfersStatusEnum.confirmed,
-    txid: 'ephemeral-320-tex-txid-1234567890',
+    txid: 'rejection-320-tex-txid-1234567890',
     time: Date.now(),
     zecPrice: 33.33,
     amount: 0.0009,

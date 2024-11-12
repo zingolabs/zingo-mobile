@@ -534,7 +534,7 @@
     "receiving": "...Receiving... ",
     "sendingtoself": "...Sending-to-Self... ",
     "shielding": "...Shielding...",
-    "ephemeral320tex": "Ephemeral-320-Tex",
+    "rejection": "Rejection",
     "time": "Time",
     "confirmations": "Confirmations",
     "txid": "Transaction ID",

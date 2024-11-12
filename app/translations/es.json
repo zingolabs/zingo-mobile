@@ -534,7 +534,7 @@
     "receiving": "...Recibiendo... ",
     "sendingtoself": "...Auto-Enviando... ",
     "shielding":"...Blindando...",
-    "ephemeral320tex": "Efímera-320-Tex",
+    "rejection": "Rechazo",
     "time": "Hora",
     "confirmations": "Confirmaciones",
     "txid": "Transacción ID",

@@ -4,5 +4,5 @@ export enum ValueTransferKindEnum {
   MemoToSelf = 'MemoToSelf',
   SendToSelf = 'SendToSelf', // like 'basic` in zingolib
   Shield = 'Shield',
-  Ephemeral320Tex = 'Ephemeral320Tex',
+  Rejection = 'Rejection',
 }

@@ -849,11 +849,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                       this.state.info.currencyName
                     : '');
                 title = this.state.translate('loadedapp.send-menu') as string;
-              } else if (vtNew[0].kind === ValueTransferKindEnum.Ephemeral320Tex) {
+              } else if (vtNew[0].kind === ValueTransferKindEnum.Rejection) {
                 // not so sure about this `kind`... this is enough for now.
                 message =
                   (this.state.translate('loadedapp.valuetransfer-confirmed') as string) +
-                  (this.state.translate('history.ephemeral320tex') as string) +
+                  (this.state.translate('history.rejection') as string) +
                   (vtNew[0].fee
                     ? ((' ' + this.state.translate('send.fee')) as string) +
                       ' ' +
