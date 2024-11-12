@@ -272,9 +272,6 @@ exports[`Component Messages Address - test Messages Address - snapshot 1`] = `
             style={
               {
                 "alignItems": "center",
-                "borderColor": "#18bd18",
-                "borderRadius": 5,
-                "borderWidth": 1,
                 "flexDirection": "row",
                 "justifyContent": "center",
                 "paddingBottom": 2,
@@ -282,36 +279,22 @@ exports[`Component Messages Address - test Messages Address - snapshot 1`] = `
               }
             }
           >
-            <Text
-              style={
-                {
-                  "color": "#ffffff",
-                  "fontSize": 13,
-                }
-              }
-            >
-              text translated
-            </Text>
             <
               color="#18bd18"
               icon={
                 {
                   "icon": [
-                    576,
+                    640,
                     512,
-                    [
-                      62140,
-                      "contact-card",
-                      "vcard",
-                    ],
-                    "f2bb",
-                    "M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l448 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32zm80 256l64 0c44.2 0 80 35.8 80 80c0 8.8-7.2 16-16 16L80 384c-8.8 0-16-7.2-16-16c0-44.2 35.8-80 80-80zm-32-96a64 64 0 1 1 128 0 64 64 0 1 1 -128 0zm256-32l128 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-128 0c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64l128 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-128 0c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64l128 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-128 0c-8.8 0-16-7.2-16-16s7.2-16 16-16z",
+                    [],
+                    "f234",
+                    "M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304l91.4 0C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7L29.7 512C13.3 512 0 498.7 0 482.3zM504 312l0-64-64 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l64 0 0-64c0-13.3 10.7-24 24-24s24 10.7 24 24l0 64 64 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-64 0 0 64c0 13.3-10.7 24-24 24s-24-10.7-24-24z",
                   ],
-                  "iconName": "address-card",
+                  "iconName": "user-plus",
                   "prefix": "fas",
                 }
               }
-              size={20}
+              size={25}
               style={
                 {
                   "marginTop": 3,
