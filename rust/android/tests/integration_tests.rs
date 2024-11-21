@@ -4,10 +4,12 @@ use zingolib::testutils::scenarios;
 // ubuntu ci runner
 #[cfg(feature = "ci")]
 const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
-// macos ci runner
-//const UNIX_SOCKET: Option<&str> = Some("`/Users/runner/.colima/default/docker.sock`");
 
-#[cfg(all(not(feature = "ci"), feature = "regchest"))]
+// macos ci runner
+#[cfg(target_os = "macos")]
+const UNIX_SOCKET: Option<&str> = Some("unix:///Users/runner/.colima/default/docker.sock");
+
+#[cfg(all(not(feature = "ci"), feature = "regchest", not(target_os = "macos")))]
 const UNIX_SOCKET: Option<&str> = None;
 
 async fn offline_testsuite(abi: &str) {

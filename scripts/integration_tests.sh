@@ -8,11 +8,49 @@ set_api_target=false
 intel_host_os=true
 create_snapshot=false
 test_name_default="OfflineTestSuite"
-valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33" "34" "35")
+valid_api_levels=("23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33" "34")
 valid_api_targets=("default" "google_apis" "google_apis_playstore" "google_atd" "google-tv" \
     "aosp_atd" "android-tv" "android-desktop" "android-wear" "android-wear-cn")
 timeout_seconds=1800  # default timeout set to 30 minutes
-device="pixel_7"
+
+function check_launch() {
+    emulator_status=$(adb devices | grep "emulator-5554" | cut -f1)
+    if [ "${emulator_status}" = "emulator-5554" ]; then
+        return 0;
+    else
+        return 1;
+    fi
+}
+
+function check_boot() {
+    boot_status=$(adb -s emulator-5554 shell getprop sys.boot_completed)
+    if [ "${boot_status}" = "1" ]; then
+        return 0;
+    else
+        return 1;
+    fi
+}
+
+function check_device_online() {
+    device_status=$(adb devices | grep emulator-5554 | cut -f2)
+    if [ "${device_status}" = "offline" ]; then
+        return 1;
+    fi
+    return 0;
+}
+
+function wait_for() {
+    timeout_seconds=$1
+    shift 1
+    until [ $timeout_seconds -le 0 ] || ("$@" &> /dev/null); do
+        sleep 1
+        timeout_seconds=$(( timeout_seconds - 1 ))
+    done
+    if [ $timeout_seconds -le 0 ]; then
+        echo -e "\nError: Timeout" >&2
+        exit 1
+    fi
+}
 
 while getopts 'a:Al:e:t:sx:h' OPTION; do
     case "$OPTION" in
@@ -172,11 +210,12 @@ if [ ! -d "./android/app" ]; then
     exit 1
 fi
 
-echo -e "\nRemoving node_modules before yarn..."
+echo -e "\nYarn install directory removed..."
 rm -rf ./node_modules
 
-echo -e "\nRunning yarn..."
-yarn
+echo -e "\nRunning yarn install..."
+yarn global add node-gyp
+yarn install
 
 cd android
 
@@ -199,19 +238,18 @@ if [[ $create_snapshot == true ]]; then
     echo -e "\nCreating AVD..."
     echo no | avdmanager create avd --force --name "${avd_name}" --package "${sdk}"
 
-    echo -e "\n\nWaiting for emulator to launch & boot..."
+    echo -e "\n\nWaiting for emulator to launch..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-load -port 5554 &> /dev/null &
-
-    echo -e "\n\nWaiting more..."
-    adb wait-for-device \
-        shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
-
+    wait_for $timeout_seconds check_launch
+    wait_for $timeout_seconds check_device_online
     echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
+    echo -e "\nWaiting for AVD to boot..."
+    wait_for $timeout_seconds check_boot
     echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Boot completed" 
-    sleep 5
+    sleep 1
     echo -e "\nSnapshot saved"
 else
     echo -e "\nChecking for AVD..."
@@ -226,26 +264,28 @@ else
     fi
 
     echo -e "\nBuilding APKs..."
-    ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug -PsplitApk=true
+    ./gradlew assembleDebug assembleAndroidTest -PsplitApk=true
 
     # Create integration test report directory
     test_report_dir="app/build/outputs/integration_test_reports/${abi}"
     rm -rf "${test_report_dir}"
     mkdir -p "${test_report_dir}"
 
-    echo -e "\n\nWaiting for emulator to launch & boot..."
+    echo -e "\n\nWaiting for emulator to launch..."
     nohup emulator -avd "${avd_name}" -netdelay none -netspeed full -no-window -no-audio -gpu swiftshader_indirect -no-boot-anim \
         -no-snapshot-save -read-only -port 5554 &> "${test_report_dir}/emulator.txt" &
-    adb wait-for-device \
-        shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
-    #echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
+    wait_for $timeout_seconds check_launch
+    echo "$(adb devices | grep "emulator-5554" | cut -f1) launch successful"
 
-    #echo $(adb -s emulator-5554 emu avd name | head -1)
+    echo -e "\nWaiting for AVD to boot..."
+    wait_for $timeout_seconds check_boot
+    wait_for $timeout_seconds check_device_online
+    echo $(adb -s emulator-5554 emu avd name | head -1)
     echo "Device online"
-    sleep 5
+    sleep 1
 
     # Disable animations
-    #adb shell input keyevent 82
+    adb shell input keyevent 82
     adb shell settings put global window_animation_scale 0.0
     adb shell settings put global transition_animation_scale 0.0
     adb shell settings put global animator_duration_scale 0.0
@@ -276,19 +316,19 @@ else
     nohup adb -s emulator-5554 shell logcat -v threadtime -b main &> "${test_report_dir}/logcat.txt" &
 
     # Create additional test output directory
-    adb -s emulator-5554 shell rm -rf "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output"
-    adb -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output"
+    adb -s emulator-5554 shell rm -rf "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output"
+    adb -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output"
 
     echo -e "\nRunning integration tests..."
     adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.$test_name \
-        -e additionalTestOutputDir /sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output \
+        -e additionalTestOutputDir /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output \
         -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner \
         | tee "${test_report_dir}/test_results.txt"
 
     # Store additional test outputs
-    if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output 2>/dev/null)" ]; then
-        adb -s emulator-5554 shell cat /sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output/* \
-            &> "${test_report_dir}/additional_integration_test_output.txt"
+    if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output 2>/dev/null)" ]; then
+        adb -s emulator-5554 shell cat /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output/* \
+            &> "${test_report_dir}/additional_test_output.txt"
     fi
 
     echo -e "\nTest reports saved: android/${test_report_dir}"

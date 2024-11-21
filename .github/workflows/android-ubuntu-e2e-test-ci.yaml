@@ -15,11 +15,15 @@ on:
       api-level:
         required: true
         type: string
+      target:
+        required: true
+        type: string
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
   ABI: ${{ inputs.abi }}
   API-LEVEL: ${{ inputs.api-level }}
+  TARGET: ${{ inputs.target }}
   TIMESTAMP: ${{ inputs.timestamp }}
 
 jobs:
@@ -86,6 +90,7 @@ jobs:
         with:
           api-level: ${{ env.API-LEVEL }}
           arch: ${{ env.AVD-ARCH }}
+          target: ${{ env.TARGET }}
           force-avd-creation: true
           emulator-options: -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
@@ -278,6 +283,7 @@ jobs:
         with:
           api-level: ${{ env.API-LEVEL }}
           arch: ${{ env.AVD-ARCH }}
+          target: ${{ env.TARGET }}
           force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true

@@ -1,0 +1,196 @@
+name: Android Integration test
+
+on:
+  workflow_call:
+    inputs:
+      timestamp:
+        required: true
+        type: string
+      cache-key:
+        required: true
+        type: string
+      abi:
+        required: true
+        type: string
+    
+env:
+  CACHE-KEY: ${{ inputs.cache-key }}
+  TIMESTAMP: ${{ inputs.timestamp }}
+  ABI: ${{ inputs.abi }}
+  REPO-OWNER: ${{ github.repository_owner }}
+  RUSTFLAGS: -D warnings
+
+jobs:
+  android-build-test-artifacts:
+    name: Android Build test artifacts
+    runs-on: macos-13
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+
+      - name: Install protoc
+        run: brew install protobuf
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
+
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Build and archive tests
+        working-directory: ./rust
+        run: cargo nextest archive --verbose --features "regchest" --archive-file nextest-archive-${{ env.ABI }}.tar.zst
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextest-archive-${{ env.ABI }}
+          path: ./rust/nextest-archive-${{ env.ABI }}.tar.zst
+
+  android-integration-test:
+    name: Android Integration test
+    runs-on: macos-13
+    needs: android-build-test-artifacts
+    strategy:
+      fail-fast: false
+      matrix:
+        partition: [1, 2, 3, 4, 5, 6]
+    steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+            
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+        
+      - name: Set envs for x86_64
+        if: ${{ env.ABI == 'x86_64' }}
+        run: |
+          echo "AVD-ARCH=x86_64" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=x86_64" >> $GITHUB_ENV
+
+      - name: Set envs for x86
+        if: ${{ env.ABI == 'x86' }}
+        run: |
+          echo "AVD-ARCH=x86" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=x86_32" >> $GITHUB_ENV
+
+      - name: Set envs for arm64-v8a
+        if: ${{ env.ABI == 'arm64-v8a' }}
+        run: |
+          echo "AVD-ARCH=x86_64" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=arm64" >> $GITHUB_ENV
+
+      - name: Set envs for armeabi-v7a
+        if: ${{ env.ABI == 'armeabi-v7a' }}
+        run: |
+          echo "AVD-ARCH=x86" >> $GITHUB_ENV
+          echo "NEXTEST-ABI=arm32" >> $GITHUB_ENV
+
+      - name: Install docker
+        run: |
+          brew install --head colima
+          brew install --formula docker
+          colima start
+
+      - name: Colima status
+        run: colima status
+
+      - name: Pull regchest docker image
+        run: docker pull zingodevops/regchest:008
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
+
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Native rust cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/src/main/jniLibs/${{ env.ABI }}
+          key: native-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Kotlin uniffi cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
+          key: kotlin-android-uniffi-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      
+      - name: Add emulator to PATH
+        run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
+            
+      - name: Gradle cache
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.2
+          build-root-directory: ./android
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
+      
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with: 
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.AVD-ARCH }}-integ
+          
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
+
+      - name: Download archive
+        uses: actions/download-artifact@v4
+        with:
+          name: nextest-archive-${{ env.ABI }}
+          path: ./rust
+
+      - name: Run integration tests
+        working-directory: ./rust
+        run: |
+          cargo nextest run integration::${{ env.NEXTEST-ABI }} --verbose --profile ci \
+            --archive-file nextest-archive-${{ env.ABI }}.tar.zst \
+            --partition count:${{ matrix.partition}}/6
+
+      - name: Upload test reports
+        if: ${{ ! cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-${{ env.ABI }}-${{ matrix.partition}}-${{ env.TIMESTAMP }}
+          path: android/app/build/outputs/integration_test_reports
