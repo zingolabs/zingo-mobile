@@ -592,8 +592,10 @@ export default class RPC {
   }
 
   async loadWalletData() {
-    await this.fetchTandZandOValueTransfersAndMessages();
-    //console.log('RPC - 4.1 - fetch value transfers');
+    await this.fetchTandZandOValueTransfers();
+    //console.log('RPC - 4.0 - fetch value transfers');
+    await this.fetchTandZandOMessages();
+    //console.log('RPC - 4.1 - fetch value transfers messages');
     await this.fetchAddresses();
     //console.log('RPC - 4.2 - fetch addresses');
     await this.fetchTotalBalance();
@@ -1230,7 +1232,7 @@ export default class RPC {
   }
 
   // Fetch all T and Z and O ValueTransfers
-  async fetchTandZandOValueTransfersAndMessages() {
+  async fetchTandZandOValueTransfers() {
     try {
       const valueTransfersStr: string = await RPCModule.getValueTransfersList();
       //console.log(valueTransfersStr);
@@ -1313,85 +1315,102 @@ export default class RPC {
 
       //console.log(vtlist);
 
-      // to sort the data here can be better
-      // we need to sort the array properly.
-      // by:
-      // - time
-      // - txid
-      // - address
-      // - pool
-      const vtListSorted = [...vtList].sort((a: ValueTransferType, b: ValueTransferType) => {
-        const timeComparison = b.time - a.time;
-        if (timeComparison === 0) {
-          // same time
-          const txidComparison = a.txid.localeCompare(b.txid);
-          if (txidComparison === 0) {
-            // same txid
-            const aAddress = a.address?.toString() || '';
-            const bAddress = b.address?.toString() || '';
-            const addressComparison = aAddress.localeCompare(bAddress);
-            if (addressComparison === 0) {
-              // same address
-              const aPoolType = a.poolType?.toString() || '';
-              const bPoolType = b.poolType?.toString() || '';
-              // last one sort criteria - poolType.
-              return aPoolType.localeCompare(bPoolType);
-            } else {
-              // different address
-              return addressComparison;
-            }
-          } else {
-            // different txid
-            return txidComparison;
-          }
-        } else {
-          // different time
-          return timeComparison;
-        }
-      });
-
-      this.fnSetValueTransfersList(vtListSorted);
-
-      // to sort the data here can be better
-      // we need to sort the array properly.
-      // by:
-      // - time (reverse)
-      // - txid
-      // - address
-      // - pool
-      const mListSorted = [...vtList].sort((a: ValueTransferType, b: ValueTransferType) => {
-        const timeComparison = a.time - b.time; // reverse
-        if (timeComparison === 0) {
-          // same time
-          const txidComparison = a.txid.localeCompare(b.txid);
-          if (txidComparison === 0) {
-            // same txid
-            const aAddress = a.address?.toString() || '';
-            const bAddress = b.address?.toString() || '';
-            const addressComparison = aAddress.localeCompare(bAddress);
-            if (addressComparison === 0) {
-              // same address
-              const aPoolType = a.poolType?.toString() || '';
-              const bPoolType = b.poolType?.toString() || '';
-              // last one sort criteria - poolType.
-              return aPoolType.localeCompare(bPoolType);
-            } else {
-              // different address
-              return addressComparison;
-            }
-          } else {
-            // different txid
-            return txidComparison;
-          }
-        } else {
-          // different time
-          return timeComparison;
-        }
-      });
-
-      this.fnSetMessagesList(mListSorted);
+      this.fnSetValueTransfersList(vtList);
     } catch (error) {
       console.log(`Critical Error txs list value transfers ${error}`);
+      // relaunch the interval tasks just in case they are aborted.
+      this.configure();
+      return;
+    }
+  }
+
+  // Fetch all T and Z and O ValueTransfers as a Messages
+  async fetchTandZandOMessages() {
+    try {
+      const messagesStr: string = await RPCModule.execute(CommandEnum.messages, '');
+      //console.log(messagesStr);
+      if (messagesStr) {
+        if (messagesStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error value transfers messages ${messagesStr}`);
+          return;
+        }
+      } else {
+        console.log('Internal Error value transfers messages');
+        return;
+      }
+      const messagesJSON: RPCValueTransfersType = await JSON.parse(messagesStr);
+
+      //console.log(valueTransfersJSON);
+
+      let mList: ValueTransferType[] = [];
+
+      // oscar idea and I think it is the correct way to build the history of
+      // value transfers.
+      messagesJSON.value_transfers.forEach((m: RPCValueTransferType) => {
+        const currentMessageList: ValueTransferType = {} as ValueTransferType;
+
+        currentMessageList.txid = m.txid;
+        currentMessageList.time = m.datetime;
+        currentMessageList.kind =
+          m.kind === RPCValueTransfersKindEnum.memoToSelf
+            ? ValueTransferKindEnum.MemoToSelf
+            : m.kind === RPCValueTransfersKindEnum.basic
+            ? ValueTransferKindEnum.SendToSelf
+            : m.kind === RPCValueTransfersKindEnum.received
+            ? ValueTransferKindEnum.Received
+            : m.kind === RPCValueTransfersKindEnum.sent
+            ? ValueTransferKindEnum.Sent
+            : m.kind === RPCValueTransfersKindEnum.shield
+            ? ValueTransferKindEnum.Shield
+            : m.kind === RPCValueTransfersKindEnum.rejection
+            ? ValueTransferKindEnum.Rejection
+            : undefined;
+        currentMessageList.fee = (!m.transaction_fee ? 0 : m.transaction_fee) / 10 ** 8;
+        currentMessageList.zecPrice = !m.zec_price ? 0 : m.zec_price;
+        if (
+          m.status === RPCValueTransfersStatusEnum.calculated ||
+          m.status === RPCValueTransfersStatusEnum.transmitted ||
+          m.status === RPCValueTransfersStatusEnum.mempool
+        ) {
+          currentMessageList.confirmations = 0;
+        } else if (m.status === RPCValueTransfersStatusEnum.confirmed) {
+          currentMessageList.confirmations =
+            this.lastServerBlockHeight && this.lastServerBlockHeight >= this.lastWalletBlockHeight
+              ? this.lastServerBlockHeight - m.blockheight + 1
+              : this.lastWalletBlockHeight - m.blockheight + 1;
+        } else {
+          // impossible case... I guess.
+          currentMessageList.confirmations = 0;
+        }
+        currentMessageList.status = m.status;
+        currentMessageList.address = !m.recipient_address ? undefined : m.recipient_address;
+        currentMessageList.amount = (!m.value ? 0 : m.value) / 10 ** 8;
+        currentMessageList.memos = !m.memos || m.memos.length === 0 ? undefined : m.memos;
+        currentMessageList.poolType = !m.pool_received ? undefined : m.pool_received;
+
+        if (m.txid.startsWith('xxxxxxxxx')) {
+          console.log('valuetransfer messages zingolib: ', m);
+          console.log('valuetransfer messages zingo', currentMessageList);
+          console.log('--------------------------------------------------');
+        }
+        if (m.status === RPCValueTransfersStatusEnum.calculated) {
+          console.log('CALCULATED ))))))))))))))))))))))))))))))))))');
+          console.log(m);
+        }
+        if (m.status === RPCValueTransfersStatusEnum.transmitted) {
+          console.log('TRANSMITTED ))))))))))))))))))))))))))))))))))');
+          console.log(m);
+        }
+
+        //console.log(currentValueTransferList);
+        mList.push(currentMessageList);
+      });
+
+      //console.log(mlist);
+
+      this.fnSetMessagesList(mList);
+    } catch (error) {
+      console.log(`Critical Error txs list value transfers messages ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       this.configure();
       return;
@@ -1422,7 +1441,7 @@ export default class RPC {
 
     // sometimes we need the result of send as well
     let sendError: string = '';
-    let sendTxid: string = '';
+    let sendTxids: string = '';
 
     // This is async, so fire and forget
     this.doSend(JSON.stringify(sendJson))
@@ -1431,8 +1450,8 @@ export default class RPC {
           const rJson: RPCSendType = JSON.parse(r);
           if (rJson.error) {
             sendError = rJson.error;
-          } else if (rJson.txids) {
-            sendTxid = rJson.txids.join(', ');
+          } else if (rJson.txids && rJson.txids.length > 0) {
+            sendTxids = rJson.txids.join(', ');
           }
         } catch (e) {
           sendError = r;
@@ -1463,7 +1482,7 @@ export default class RPC {
       const intervalID = setInterval(async () => {
         const pro: string = await this.doSendProgress();
         console.log('send progress', pro);
-        if (pro && pro.toLowerCase().startsWith(GlobalConst.error) && !sendTxid && !sendError) {
+        if (pro && pro.toLowerCase().startsWith(GlobalConst.error) && !sendTxids && !sendError) {
           return;
         }
         let progress = {} as RPCSendProgressType;
@@ -1473,7 +1492,7 @@ export default class RPC {
           sendId = progress.id;
         } catch (e) {
           console.log('Error parsing status send progress', e);
-          if (!sendTxid && !sendError) {
+          if (!sendTxids && !sendError) {
             return;
           }
         }
@@ -1487,7 +1506,7 @@ export default class RPC {
         const updatedProgress = new SendProgressClass(0, 0, 0);
         // if the send command fails really fast then the sendID never change.
         // In this case I need to finish this promise right away.
-        if (sendId === prevSendId && !sendTxid && !sendError) {
+        if (sendId === prevSendId && !sendTxids && !sendError) {
           console.log('progress id', sendId);
           // Still not started, so wait for more time
           return;
@@ -1527,7 +1546,7 @@ export default class RPC {
         // sometimes the progress.sending is false and txid and error are null
         // in this moment I can use the values from the command send
 
-        if (!progress.txid && !progress.error && !sendTxid && !sendError) {
+        if ((!progress.txids || progress.txids.length === 0) && !progress.error && !sendTxids && !sendError) {
           // Still processing
           setSendProgress(updatedProgress);
           return;
@@ -1537,15 +1556,14 @@ export default class RPC {
         clearInterval(intervalID);
         setSendProgress({} as SendProgressClass);
 
-        if (progress.txid) {
+        if (progress.txids && progress.txids.length > 0) {
           // And refresh data (full refresh)
           this.refresh(true);
           // send process is about to finish - reactivate the syncing flag
           if (progress.sync_interrupt) {
             await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
           }
-          // convert txid -> txids temporarely, I hope.
-          const progressTxids = progress.txid.replaceAll('created txid: ', '').split(' & ').join(', ');
+          const progressTxids = progress.txids.join(', ');
           resolve(progressTxids);
         }
 
@@ -1557,14 +1575,14 @@ export default class RPC {
           reject(progress.error);
         }
 
-        if (sendTxid) {
+        if (sendTxids) {
           // And refresh data (full refresh)
           this.refresh(true);
           // send process is about to finish - reactivate the syncing flag
           if (progress.sync_interrupt) {
             await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
           }
-          resolve(sendTxid);
+          resolve(sendTxids);
         }
 
         if (sendError) {

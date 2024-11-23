@@ -79,16 +79,11 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   var lastMonth = '';
 
   const addressFilter = useMemo(
-    () => (addr: string | undefined, memos: string[]) => {
-      // if no memo -> ignore this VT.
-      const memoTotal = memos && memos.length > 0 && memos.join('') ? memos.join('\n') : '';
-      if (!memoTotal) {
+    () => (addr: string | undefined, memos: string[] | undefined) => {
+      if (!memos) {
         return false;
       }
-      // if general mode (no address) -> include this VT.
-      if (!address) {
-        return true;
-      }
+      const memoTotal = memos.join('\n');
       let memoAddress;
       if (memoTotal.includes('\nReply to: \n')) {
         let memoArray = memoTotal.split('\nReply to: \n');
@@ -103,10 +98,13 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     if (!messages) {
       return [] as ValueTransferType[];
     }
-    return messages.filter(
-      (a: ValueTransferType) => a.memos && a.memos.length > 0 && addressFilter(a.address, a.memos),
-    );
-  }, [messages, addressFilter]);
+    if (address) {
+      // filtering for this address
+      return messages.filter((a: ValueTransferType) => addressFilter(a.address, a.memos));
+    } else {
+      return messages;
+    }
+  }, [messages, address, addressFilter]);
 
   useEffect(() => {
     if (messages !== null) {

@@ -34,4 +34,5 @@ export enum CommandEnum {
   shield = 'shield',
   // this works for all: send, sendall & shield
   confirm = 'confirm',
+  messages = 'messages',
 }

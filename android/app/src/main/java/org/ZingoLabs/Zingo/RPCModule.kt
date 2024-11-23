@@ -10,6 +10,8 @@ import com.facebook.react.bridge.Promise
 
 //import android.util.Log
 import java.io.File
+import java.io.FileNotFoundException
+import java.io.IOException
 import kotlin.concurrent.thread
 import org.ZingoLabs.Zingo.Constants.*
 
@@ -90,13 +92,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     private fun saveWalletBackupFile(): Boolean {
         // Get the encoded wallet file
-        // Read the file
-        val fileBytes = readFile(WalletFileName.value)
-        // Log.i("MAIN", b64encoded)
+        val fileBytes: ByteArray
+        try {
+            // Intentar leer el archivo
+            fileBytes = readFile(WalletFileName.value)
+        } catch (e: FileNotFoundException) {
+            Log.e("MAIN", "Error: Wallet file not found", e)
+            return false
+        } catch (e: IOException) {
+            Log.e("MAIN", "Error: Couldn't read the wallet file", e)
+            return false
+        }
 
         try {
-            // Log.i("MAIN", "file size${fileBytes.size}")
-
             // Save file to disk
             writeFile(WalletBackupFileName.value, fileBytes)
         } catch (e: IllegalArgumentException) {
@@ -345,11 +353,34 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun restoreExistingWalletBackup(promise: Promise) {
+        val fileBytesBackup: ByteArray
+        val fileBytesWallet: ByteArray
+
         // Read the file backup
-        val fileBytesBackup = readFile(WalletBackupFileName.value)
+        try {
+            fileBytesBackup = readFile(WalletBackupFileName.value)
+        } catch (e: FileNotFoundException) {
+            Log.e("MAIN", "Error: Backup file not found", e)
+            promise.resolve(false)
+            return
+        } catch (e: IOException) {
+            Log.e("MAIN", "Error reading the backup file", e)
+            promise.resolve(false)
+            return
+        }
 
         // Read the file wallet
-        val fileBytesWallet = readFile(WalletFileName.value)
+        try {
+            fileBytesWallet = readFile(WalletFileName.value)
+        } catch (e: FileNotFoundException) {
+            Log.e("MAIN", "Error: Wallet file not found", e)
+            promise.resolve(false)
+            return
+        } catch (e: IOException) {
+            Log.e("MAIN", "Error reading the wallet file", e)
+            promise.resolve(false)
+            return
+        }
 
         try {
             // Save file to disk wallet (with the backup)
@@ -357,6 +388,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the wallet with the backup")
             promise.resolve(false)
+            return
         }
 
         try {
@@ -365,6 +397,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the backup with the wallet")
             promise.resolve(false)
+            return
         }
 
         promise.resolve(true)

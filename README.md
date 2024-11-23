@@ -119,7 +119,7 @@ From the `rust/android/lightwalletd_bin` directory run: <br />
 Alternatively, integration tests and end-to-end tests can be run on non-linux hosts with Regchest
 (https://github.com/zingolabs/zingo-regchest). Regchest manages the zcash/lightwalletd regtest 
 network in a docker container. Before running tests, pull the latest Regchest image from docker: <br />
-`docker pull zingodevops/regchest:008`
+`docker pull zingodevops/regchest:009`
 
 ### Yarn Tests
 1. From the root directory, run: <br />

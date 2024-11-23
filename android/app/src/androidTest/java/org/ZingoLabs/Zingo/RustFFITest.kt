@@ -376,22 +376,22 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         // 2. Sent - 110_000 - uregtest1zkuzfv5m3... (1 item)
         // 3. memoToSelf - 10_000 (1 item)
         assertThat(valueTranfers.value_transfers.size).isEqualTo(3)
-        // first item have to be a `Received`
-        assertThat(valueTranfers.value_transfers[0].kind).isEqualTo("received")
-        assertThat(valueTranfers.value_transfers[0].pool_received).isEqualTo("Orchard")
+        // third item have to be a `fee` from the last `Sent` with the same txid
+        assertThat(valueTranfers.value_transfers[0].kind).isEqualTo("memo-to-self")
         assertThat(valueTranfers.value_transfers[0].status).isEqualTo("confirmed")
-        assertThat(valueTranfers.value_transfers[0].value).isEqualTo(1000000)
+        assertThat(valueTranfers.value_transfers[0].value).isEqualTo(0)
+        assertThat(valueTranfers.value_transfers[0].transaction_fee).isEqualTo(20000)
         // second item have to be a `Sent`
         assertThat(valueTranfers.value_transfers[1].kind).isEqualTo("sent")
         assertThat(valueTranfers.value_transfers[1].recipient_address).isEqualTo("uregtest1zkuzfv5m3yhv2j4fmvq5rjurkxenxyq8r7h4daun2zkznrjaa8ra8asgdm8wwgwjvlwwrxx7347r8w0ee6dqyw4rufw4wg9djwcr6frzkezmdw6dud3wsm99eany5r8wgsctlxquu009nzd6hsme2tcsk0v3sgjvxa70er7h27z5epr67p5q767s2z5gt88paru56mxpm6pwz0cu35m")
         assertThat(valueTranfers.value_transfers[1].status).isEqualTo("confirmed")
         assertThat(valueTranfers.value_transfers[1].value).isEqualTo(100000)
         assertThat(valueTranfers.value_transfers[1].transaction_fee).isEqualTo(10000)
-        // third item have to be a `fee` from the last `Sent` with the same txid
-        assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("memo-to-self")
+        // first item have to be a `Received`
+        assertThat(valueTranfers.value_transfers[2].kind).isEqualTo("received")
+        assertThat(valueTranfers.value_transfers[2].pool_received).isEqualTo("Orchard")
         assertThat(valueTranfers.value_transfers[2].status).isEqualTo("confirmed")
-        assertThat(valueTranfers.value_transfers[2].value).isEqualTo(0)
-        assertThat(valueTranfers.value_transfers[2].transaction_fee).isEqualTo(20000)
+        assertThat(valueTranfers.value_transfers[2].value).isEqualTo(1000000)
     }
 }
 
