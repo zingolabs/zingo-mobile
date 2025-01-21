@@ -73,14 +73,17 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
       : colors.text;
   };
 
-  const contactFound: (add: string) => boolean = (add: string) => {
+  const contactFound = (add: string) => {
     if (!add) {
-      return false;
+      return { found: false, uOrchardAddress: '' };
     }
     const contact: AddressBookFileClass[] = addressBook.filter(
       (ab: AddressBookFileClass) => ab.address === add || ab.uOrchardAddress === add,
     );
-    return contact.length >= 1;
+    return {
+      found: contact.length >= 1,
+      uOrchardAddress: contact.length >= 1 && contact[0].uOrchardAddress ? contact[0].uOrchardAddress : '',
+    };
   };
 
   const thisWalletAddress: (add: string) => boolean = (add: string) => {
@@ -165,21 +168,28 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       duration: SnackbarDurationEnum.short,
                     });
                   }}>
-                  {!thisWalletAddress(memoUA) && memoUA !== messageAddress && (
-                    <>
-                      <RegText>{GlobalConst.replyTo}</RegText>
-                      <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
-                      <RegText style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}>{memoUA}</RegText>
-                      {contactFound(memoUA) && (
-                        <View style={{ flexDirection: 'row' }}>
-                          {!thisWalletAddress(memoUA) && (
-                            <RegText style={{ opacity: 0.6 }}>{translate('addressbook.likely') as string}</RegText>
-                          )}
-                          <AddressItem address={memoUA} onlyContact={true} closeModal={() => {}} openModal={() => {}} />
-                        </View>
-                      )}
-                    </>
-                  )}
+                  {!thisWalletAddress(memoUA) &&
+                    memoUA !== messageAddress &&
+                    memoUA !== contactFound(memoUA).uOrchardAddress && (
+                      <>
+                        <RegText>{GlobalConst.replyTo}</RegText>
+                        <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
+                        <RegText style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}>{memoUA}</RegText>
+                        {contactFound(memoUA).found && (
+                          <View style={{ flexDirection: 'row' }}>
+                            {!thisWalletAddress(memoUA) && (
+                              <RegText style={{ opacity: 0.6 }}>{translate('addressbook.likely') as string}</RegText>
+                            )}
+                            <AddressItem
+                              address={memoUA}
+                              onlyContact={true}
+                              closeModal={() => {}}
+                              openModal={() => {}}
+                            />
+                          </View>
+                        )}
+                      </>
+                    )}
                 </TouchableOpacity>
               )}
             </View>

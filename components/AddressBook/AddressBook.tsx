@@ -8,6 +8,7 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -54,6 +55,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   const [currentItem, setCurrentItem] = useState<number | null>(null);
   const [action, setAction] = useState<AddressBookActionEnum | null>(null);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -106,6 +108,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
         }
         setCurrentItem(index);
       }
+      setLoading(false);
     })();
   }, [addressBookCurrentAddress, fetchAddressBookProtected, fetchAddressBookSorted, numAb]);
 
@@ -210,7 +213,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
             doAction={doAction}
           />
         )}
-        {!addressBookCurrentAddress && addressBookSorted.length === 0 && currentItem !== -1 && (
+        {!addressBookCurrentAddress && addressBookSorted.length === 0 && currentItem !== -1 && !loading && (
           <View
             style={{
               height: 150,
@@ -221,6 +224,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
             }}>
             <FadeText style={{ color: colors.primary }}>{translate('addressbook.empty') as string}</FadeText>
           </View>
+        )}
+        {loading && (
+          <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
         )}
         {!addressBookCurrentAddress &&
           addressBookSorted.flatMap((aBItem, index) => {
