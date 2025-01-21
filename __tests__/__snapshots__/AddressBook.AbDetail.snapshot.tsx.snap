@@ -1230,7 +1230,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
         {
           "alignItems": "center",
           "backgroundColor": "#18bd18",
-          "borderColor": "#c3c3c3",
+          "borderColor": "#18bd18",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",

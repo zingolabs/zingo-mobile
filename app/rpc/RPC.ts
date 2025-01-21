@@ -1247,42 +1247,42 @@ export default class RPC {
         valueTransfersJSON.value_transfers.forEach((vt: RPCValueTransferType) => {
           const currentValueTransferList: ValueTransferType = {} as ValueTransferType;
 
-        currentValueTransferList.txid = vt.txid;
-        currentValueTransferList.time = vt.datetime;
-        currentValueTransferList.kind =
-          vt.kind === RPCValueTransfersKindEnum.memoToSelf
-            ? ValueTransferKindEnum.MemoToSelf
-            : vt.kind === RPCValueTransfersKindEnum.basic
-            ? ValueTransferKindEnum.SendToSelf
-            : vt.kind === RPCValueTransfersKindEnum.received
-            ? ValueTransferKindEnum.Received
-            : vt.kind === RPCValueTransfersKindEnum.sent
-            ? ValueTransferKindEnum.Sent
-            : vt.kind === RPCValueTransfersKindEnum.shield
-            ? ValueTransferKindEnum.Shield
-            : ValueTransferKindEnum.Rejection;
-        currentValueTransferList.fee = (!vt.transaction_fee ? 0 : vt.transaction_fee) / 10 ** 8;
-        currentValueTransferList.zecPrice = !vt.zec_price ? 0 : vt.zec_price;
-        if (
-          vt.status === RPCValueTransfersStatusEnum.calculated ||
-          vt.status === RPCValueTransfersStatusEnum.transmitted ||
-          vt.status === RPCValueTransfersStatusEnum.mempool
-        ) {
-          currentValueTransferList.confirmations = 0;
-        } else if (vt.status === RPCValueTransfersStatusEnum.confirmed) {
-          currentValueTransferList.confirmations =
-            this.lastServerBlockHeight && this.lastServerBlockHeight >= this.lastWalletBlockHeight
-              ? this.lastServerBlockHeight - vt.blockheight + 1
-              : this.lastWalletBlockHeight - vt.blockheight + 1;
-        } else {
-          // impossible case... I guess.
-          currentValueTransferList.confirmations = 0;
-        }
-        currentValueTransferList.status = vt.status;
-        currentValueTransferList.address = !vt.recipient_address ? undefined : vt.recipient_address;
-        currentValueTransferList.amount = (!vt.value ? 0 : vt.value) / 10 ** 8;
-        currentValueTransferList.memos = !vt.memos || vt.memos.length === 0 ? undefined : vt.memos;
-        currentValueTransferList.poolType = !vt.pool_received ? undefined : vt.pool_received;
+          currentValueTransferList.txid = vt.txid;
+          currentValueTransferList.time = vt.datetime;
+          currentValueTransferList.kind =
+            vt.kind === RPCValueTransfersKindEnum.memoToSelf
+              ? ValueTransferKindEnum.MemoToSelf
+              : vt.kind === RPCValueTransfersKindEnum.basic
+              ? ValueTransferKindEnum.SendToSelf
+              : vt.kind === RPCValueTransfersKindEnum.received
+              ? ValueTransferKindEnum.Received
+              : vt.kind === RPCValueTransfersKindEnum.sent
+              ? ValueTransferKindEnum.Sent
+              : vt.kind === RPCValueTransfersKindEnum.shield
+              ? ValueTransferKindEnum.Shield
+              : ValueTransferKindEnum.Rejection;
+          currentValueTransferList.fee = (!vt.transaction_fee ? 0 : vt.transaction_fee) / 10 ** 8;
+          currentValueTransferList.zecPrice = !vt.zec_price ? 0 : vt.zec_price;
+          if (
+            vt.status === RPCValueTransfersStatusEnum.calculated ||
+            vt.status === RPCValueTransfersStatusEnum.transmitted ||
+            vt.status === RPCValueTransfersStatusEnum.mempool
+          ) {
+            currentValueTransferList.confirmations = 0;
+          } else if (vt.status === RPCValueTransfersStatusEnum.confirmed) {
+            currentValueTransferList.confirmations =
+              this.lastServerBlockHeight && this.lastServerBlockHeight >= this.lastWalletBlockHeight
+                ? this.lastServerBlockHeight - vt.blockheight + 1
+                : this.lastWalletBlockHeight - vt.blockheight + 1;
+          } else {
+            // impossible case... I guess.
+            currentValueTransferList.confirmations = 0;
+          }
+          currentValueTransferList.status = vt.status;
+          currentValueTransferList.address = !vt.recipient_address ? undefined : vt.recipient_address;
+          currentValueTransferList.amount = (!vt.value ? 0 : vt.value) / 10 ** 8;
+          currentValueTransferList.memos = !vt.memos || vt.memos.length === 0 ? undefined : vt.memos;
+          currentValueTransferList.poolType = !vt.pool_received ? undefined : vt.pool_received;
 
           if (vt.txid.startsWith('xxxxxxxxx')) {
             console.log('valuetransfer zingolib: ', vt);
@@ -1340,42 +1340,42 @@ export default class RPC {
         messagesJSON.value_transfers.forEach((m: RPCValueTransferType) => {
           const currentMessageList: ValueTransferType = {} as ValueTransferType;
 
-        currentMessageList.txid = m.txid;
-        currentMessageList.time = m.datetime;
-        currentMessageList.kind =
-          m.kind === RPCValueTransfersKindEnum.memoToSelf
-            ? ValueTransferKindEnum.MemoToSelf
-            : m.kind === RPCValueTransfersKindEnum.basic
-            ? ValueTransferKindEnum.SendToSelf
-            : m.kind === RPCValueTransfersKindEnum.received
-            ? ValueTransferKindEnum.Received
-            : m.kind === RPCValueTransfersKindEnum.sent
-            ? ValueTransferKindEnum.Sent
-            : m.kind === RPCValueTransfersKindEnum.shield
-            ? ValueTransferKindEnum.Shield
-            : ValueTransferKindEnum.Rejection;
-        currentMessageList.fee = (!m.transaction_fee ? 0 : m.transaction_fee) / 10 ** 8;
-        currentMessageList.zecPrice = !m.zec_price ? 0 : m.zec_price;
-        if (
-          m.status === RPCValueTransfersStatusEnum.calculated ||
-          m.status === RPCValueTransfersStatusEnum.transmitted ||
-          m.status === RPCValueTransfersStatusEnum.mempool
-        ) {
-          currentMessageList.confirmations = 0;
-        } else if (m.status === RPCValueTransfersStatusEnum.confirmed) {
-          currentMessageList.confirmations =
-            this.lastServerBlockHeight && this.lastServerBlockHeight >= this.lastWalletBlockHeight
-              ? this.lastServerBlockHeight - m.blockheight + 1
-              : this.lastWalletBlockHeight - m.blockheight + 1;
-        } else {
-          // impossible case... I guess.
-          currentMessageList.confirmations = 0;
-        }
-        currentMessageList.status = m.status;
-        currentMessageList.address = !m.recipient_address ? undefined : m.recipient_address;
-        currentMessageList.amount = (!m.value ? 0 : m.value) / 10 ** 8;
-        currentMessageList.memos = !m.memos || m.memos.length === 0 ? undefined : m.memos;
-        currentMessageList.poolType = !m.pool_received ? undefined : m.pool_received;
+          currentMessageList.txid = m.txid;
+          currentMessageList.time = m.datetime;
+          currentMessageList.kind =
+            m.kind === RPCValueTransfersKindEnum.memoToSelf
+              ? ValueTransferKindEnum.MemoToSelf
+              : m.kind === RPCValueTransfersKindEnum.basic
+              ? ValueTransferKindEnum.SendToSelf
+              : m.kind === RPCValueTransfersKindEnum.received
+              ? ValueTransferKindEnum.Received
+              : m.kind === RPCValueTransfersKindEnum.sent
+              ? ValueTransferKindEnum.Sent
+              : m.kind === RPCValueTransfersKindEnum.shield
+              ? ValueTransferKindEnum.Shield
+              : ValueTransferKindEnum.Rejection;
+          currentMessageList.fee = (!m.transaction_fee ? 0 : m.transaction_fee) / 10 ** 8;
+          currentMessageList.zecPrice = !m.zec_price ? 0 : m.zec_price;
+          if (
+            m.status === RPCValueTransfersStatusEnum.calculated ||
+            m.status === RPCValueTransfersStatusEnum.transmitted ||
+            m.status === RPCValueTransfersStatusEnum.mempool
+          ) {
+            currentMessageList.confirmations = 0;
+          } else if (m.status === RPCValueTransfersStatusEnum.confirmed) {
+            currentMessageList.confirmations =
+              this.lastServerBlockHeight && this.lastServerBlockHeight >= this.lastWalletBlockHeight
+                ? this.lastServerBlockHeight - m.blockheight + 1
+                : this.lastWalletBlockHeight - m.blockheight + 1;
+          } else {
+            // impossible case... I guess.
+            currentMessageList.confirmations = 0;
+          }
+          currentMessageList.status = m.status;
+          currentMessageList.address = !m.recipient_address ? undefined : m.recipient_address;
+          currentMessageList.amount = (!m.value ? 0 : m.value) / 10 ** 8;
+          currentMessageList.memos = !m.memos || m.memos.length === 0 ? undefined : m.memos;
+          currentMessageList.poolType = !m.pool_received ? undefined : m.pool_received;
 
           if (m.txid.startsWith('xxxxxxxxx')) {
             console.log('valuetransfer messages zingolib: ', m);

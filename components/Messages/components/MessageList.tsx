@@ -98,7 +98,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     addLastSnackbar,
     addressBook,
     sendPageState,
-    uaAddress,
+    uOrchardAddress,
     selectServer,
     netInfo,
     info,
@@ -130,6 +130,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   const [memoFieldHeight, setMemoFieldHeight] = useState<number>(48 + 30);
   const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
   const [spendable, setSpendable] = useState<number>(0);
+  const [uOrchardAddressContact, setUOrchardAddressContact] = useState<string>('');
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -175,11 +176,11 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       return (
         addr === address ||
         memoAddress === address ||
-        (uOrchardAddress && addr === uOrchardAddress) ||
-        (uOrchardAddress && memoAddress === uOrchardAddress)
+        (uOrchardAddressContact && addr === uOrchardAddressContact) ||
+        (uOrchardAddressContact && memoAddress === uOrchardAddressContact)
       );
     },
-    [address, uOrchardAddress],
+    [address, uOrchardAddressContact],
   );
 
   const anonymousFilter = useMemo(
@@ -198,27 +199,11 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       return (
         addr === address ||
         memoAddress === address ||
-        (uOrchardAddress && addr === uOrchardAddress) ||
-        (uOrchardAddress && memoAddress === uOrchardAddress)
+        (uOrchardAddressContact && addr === uOrchardAddressContact) ||
+        (uOrchardAddressContact && memoAddress === uOrchardAddressContact)
       );
     },
-    [address, uOrchardAddress],
-  );
-
-  const anonymousFilter = useMemo(
-    () => (addr: string | undefined, memos: string[] | undefined) => {
-      if (!memos) {
-        return false;
-      }
-      const memoTotal = memos.join('\n');
-      let memoAddress;
-      if (memoTotal.includes('\nReply to: \n')) {
-        let memoArray = memoTotal.split('\nReply to: \n');
-        memoAddress = memoArray.pop();
-      }
-      return !addr && !memoAddress;
-    },
-    [],
+    [address, uOrchardAddressContact],
   );
 
   const fetchMessagesFiltered = useMemo(() => {
@@ -250,11 +235,11 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       // separately in one UA (only orchard), and all the messages in the another UA (full)
       let contact = addressBook.filter((ab: AddressBookFileClass) => ab.address === address);
       if (contact.length === 1) {
-        setUOrchardAddress(contact[0].uOrchardAddress ? contact[0].uOrchardAddress : '');
+        setUOrchardAddressContact(contact[0].uOrchardAddress ? contact[0].uOrchardAddress : '');
       } else {
         contact = addressBook.filter((ab: AddressBookFileClass) => ab.uOrchardAddress === address);
         if (contact.length === 1) {
-          setUOrchardAddress(contact[0].address);
+          setUOrchardAddressContact(contact[0].address);
         }
       }
       const vtf = fetchMessagesFiltered;
@@ -325,7 +310,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   }, []);
 
   const countMemoBytes = (memo: string, includeUAMemo: boolean) => {
-    const len = Buffer.byteLength(memoTotal(memo, includeUAMemo, uaAddress), 'utf8');
+    const len = Buffer.byteLength(memoTotal(memo, includeUAMemo, uOrchardAddress), 'utf8');
     return len;
   };
 
@@ -336,7 +321,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   useEffect(() => {
     if (sendPageState.toaddr.memo) {
       const len = Buffer.byteLength(
-        memoTotal(sendPageState.toaddr.memo, sendPageState.toaddr.includeUAMemo, uaAddress),
+        memoTotal(sendPageState.toaddr.memo, sendPageState.toaddr.includeUAMemo, uOrchardAddress),
         'utf8',
       );
       if (len > GlobalConst.memoMaxLength) {
@@ -347,7 +332,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     } else {
       setValidMemo(0);
     }
-  }, [memoTotal, sendPageState.toaddr.includeUAMemo, sendPageState.toaddr.memo, uaAddress]);
+  }, [memoTotal, sendPageState.toaddr.includeUAMemo, sendPageState.toaddr.memo, uOrchardAddress]);
 
   const loadMoreClicked = useCallback(() => {
     setNumVt(numVt + 50);
