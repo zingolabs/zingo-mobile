@@ -127,14 +127,15 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
       }
       let amounts: { value: number; address: string; tag: string }[] = [];
       const resultJSONEntries: [string, number][] = Object.entries(resultJSON) as [string, number][];
-      resultJSONEntries.forEach(([key, value]) => {
-        if (!(tab !== 'sent' && key === 'fee')) {
-          // excluding the fee for `sends` and `memobytes`.
-          if (value > 0) {
-            amounts.push({ value: tab === 'sent' ? value / 10 ** 8 : value, address: key, tag: '' });
+      resultJSONEntries &&
+        resultJSONEntries.forEach(([key, value]) => {
+          if (!(tab !== 'sent' && key === 'fee')) {
+            // excluding the fee for `sends` and `memobytes`.
+            if (value > 0) {
+              amounts.push({ value: tab === 'sent' ? value / 10 ** 8 : value, address: key, tag: '' });
+            }
           }
-        }
-      });
+        });
       const randomColors = Utils.generateColorList(amounts.length);
       const newPieAmounts: DataType[] = amounts
         .sort((a, b) => b.value - a.value)

@@ -116,7 +116,7 @@ describe('Component History - test', () => {
   //snapshot test
   const state = defaultAppContextLoaded;
   state.valueTransfers = mockValueTransfers;
-  state.uaAddress = mockAddresses[0].uaAddress;
+  state.uOrchardAddress = mockAddresses[0].uOrchardAddress;
   state.addresses = mockAddresses;
   state.translate = mockTranslate;
   state.info = mockInfo;

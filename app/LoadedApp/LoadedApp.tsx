@@ -272,10 +272,35 @@ export default function LoadedApp(props: LoadedAppProps) {
       }
 
       // adding `Zenny Tips` address always.
-      const ab = await AddressBookFileImpl.writeAddressBookItem(
+      let ab = await AddressBookFileImpl.writeAddressBookItem(
         translate('zenny-tips-ab') as string,
         await Utils.getZenniesDonationAddress(server.chainName),
+        '',
       );
+
+      // reply-to change, from full UA to only orchard UA.
+      // we need to calculate the only orchard UA for all the
+      // contacts with a full UA stored in the Address Book.
+      // We need to identify the old transaction memos (with full UA)
+      // and we need to idenfify the new transaction memos (with only orchard UA)
+
+      // if some contact don't have the new field: `uOrchardAddress` then
+      // the App have to create and calculate it if needed.
+      const toUpdate = ab.filter((a: AddressBookFileClass) => !a.hasOwnProperty('uOrchardAddress'));
+      console.log('Address Book -> TO UPDATE', toUpdate);
+      if (toUpdate.length > 0) {
+        for (let i = 0; i < toUpdate.length; i++) {
+          const a = toUpdate[i];
+          const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
+            a.address,
+            server.chainName,
+          );
+          if (validAddress.isValid) {
+            //ab = await AddressBookFileImpl.removeAddressBookItem(a.label, a.address);
+            ab = await AddressBookFileImpl.writeAddressBookItem(a.label, a.address, validAddress.onlyOrchardUA);
+          }
+        }
+      }
       setAddressBook(ab);
 
       setLoading(false);
@@ -391,7 +416,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         zecPrice: 0,
         date: 0,
       } as ZecPriceType,
-      uaAddress: '',
+      uOrchardAddress: '',
       sendPageState: new SendPageStateClass(new ToAddrClass(Utils.getNextToAddrID())),
       receivePageState: {} as ReceivePageStateClass,
       background: props.background,
@@ -913,11 +938,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setState({ addresses });
     }
     if (addresses.length > 0) {
-      if (this.state.uaAddress !== addresses[0].uaAddress) {
-        this.setState({ uaAddress: addresses[0].uaAddress });
+      if (this.state.uOrchardAddress !== addresses[0].uOrchardAddress) {
+        this.setState({ uOrchardAddress: addresses[0].uOrchardAddress });
       }
     } else {
-      this.setState({ uaAddress: '' });
+      this.setState({ uOrchardAddress: '' });
     }
   };
 
@@ -987,10 +1012,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   sendTransaction = async (): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
-      const { sendPageState, uaAddress, addresses, server, donation } = this.state;
+      const { sendPageState, uOrchardAddress, addresses, server, donation } = this.state;
       const sendJson = await Utils.getSendManyJSON(
         sendPageState,
-        uaAddress,
+        uOrchardAddress,
         addresses ? addresses : ([] as AddressClass[]),
         server,
         donation,
@@ -1523,10 +1548,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setUaAddress = (uaAddress: string) => {
-    this.setState({ uaAddress });
-  };
-
   syncingStatusMoreInfoOnClick = async () => {
     await this.fetchWallet();
     this.setState({ syncReportModalVisible: true });
@@ -1633,7 +1654,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       syncingStatus: this.state.syncingStatus,
       info: this.state.info,
       zecPrice: this.state.zecPrice,
-      uaAddress: this.state.uaAddress,
+      uOrchardAddress: this.state.uOrchardAddress,
       sendPageState: this.state.sendPageState,
       receivePageState: this.state.receivePageState,
       background: this.state.background,
@@ -2048,10 +2069,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Tab.Screen name={translate('loadedapp.receive-menu') as string}>
                 {() => (
                   <Receive
-                    setUaAddress={this.setUaAddress}
                     toggleMenuDrawer={this.toggleMenuDrawer}
                     syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                     setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                    alone={false}
                   />
                 )}
               </Tab.Screen>
@@ -2093,10 +2114,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   <Tab.Screen name={translate('loadedapp.history-menu') as string}>
                     {() => (
                       <Receive
-                        setUaAddress={this.setUaAddress}
                         toggleMenuDrawer={this.toggleMenuDrawer}
                         syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible}
+                        alone={true}
                       />
                     )}
                   </Tab.Screen>

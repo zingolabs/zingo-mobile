@@ -31,7 +31,7 @@ type MemoProps = {
 };
 const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, memoUpdateToField }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, sendPageState, language, uaAddress } = context;
+  const { translate, sendPageState, language, uOrchardAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -51,9 +51,9 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, memoUpdateToFiel
 
   const memoTotal = useCallback(
     (memoStr: string, includeUAMemoBoo: boolean) => {
-      return `${memoStr || ''}${includeUAMemoBoo ? '\nReply to: \n' + uaAddress : ''}`;
+      return `${memoStr || ''}${includeUAMemoBoo ? GlobalConst.replyTo + uOrchardAddress : ''}`;
     },
-    [uaAddress],
+    [uOrchardAddress],
   );
 
   const countMemoBytes = (memoStr: string, includeUAMemoBoo: boolean) => {

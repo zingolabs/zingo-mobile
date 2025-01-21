@@ -22,7 +22,7 @@ describe('Component SingleAddress - test', () => {
     const onPrev = jest.fn();
     const onNext = jest.fn();
     const single = render(
-      <SingleAddress address={mockAddresses[0].uaAddress} index={0} total={1} prev={onPrev} next={onNext} />,
+      <SingleAddress address={mockAddresses[0].uOrchardAddress} index={0} total={1} prev={onPrev} next={onNext} />,
     );
     expect(single.toJSON()).toMatchSnapshot();
   });

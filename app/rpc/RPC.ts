@@ -32,6 +32,7 @@ import { RPCValueTransfersKindEnum } from './enums/RPCValueTransfersKindEnum';
 import { RPCValueTransferType } from './types/RPCValueTransferType';
 import { ValueTransferKindEnum } from '../AppState/enums/ValueTransferKindEnum';
 import { RPCValueTransfersStatusEnum } from './enums/RPCValueTransfersStatusEnum';
+import { CommandAddressesEnum } from '../AppState/enums/CommandAddressesEnum';
 import { RPCSendProposeType } from './types/RPCSendProposeType';
 
 export default class RPC {
@@ -601,7 +602,7 @@ export default class RPC {
   }
 
   async loadWalletVTData() {
-    //const start: number = Date.now();
+    const start: number = Date.now();
     await this.fetchTandZandOValueTransfers();
     console.log('@@@@@@@@@@@@@@@ VT time', Date.now() - start);
     //console.log('RPC - 4.0 - fetch value transfers');
@@ -1123,7 +1124,7 @@ export default class RPC {
   // This method will get the total balances
   async fetchAddresses() {
     try {
-      const addressesStr: string = await RPCModule.execute(CommandEnum.addresses, '');
+      const addressesStr: string = await RPCModule.execute(CommandEnum.addresses, CommandAddressesEnum.full);
       if (addressesStr) {
         if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error addresses ${addressesStr}`);
@@ -1135,27 +1136,42 @@ export default class RPC {
       }
       const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr);
 
+      const orchardAddressesStr: string = await RPCModule.execute(CommandEnum.addresses, CommandAddressesEnum.orchard);
+      if (addressesStr) {
+        if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error addresses ${addressesStr}`);
+          return;
+        }
+      } else {
+        console.log('Internal Error addresses');
+        return;
+      }
+      const orchardAddressesJSON: RPCAddressType[] = await JSON.parse(orchardAddressesStr);
+      const uOrchardAddress: string =
+        orchardAddressesJSON && orchardAddressesJSON.length > 0 ? orchardAddressesJSON[0].address : '';
+
       let allAddresses: AddressClass[] = [];
 
-      addressesJSON.forEach((u: RPCAddressType) => {
-        // If this has any pending txns, show that in the UI
-        const receivers: string =
-          (u.receivers.orchard_exists ? ReceiverEnum.o : '') +
-          (u.receivers.sapling ? ReceiverEnum.z : '') +
-          (u.receivers.transparent ? ReceiverEnum.t : '');
-        if (u.address) {
-          const abu = new AddressClass(u.address, u.address, AddressKindEnum.u, receivers);
-          allAddresses.push(abu);
-        }
-        if (u.address && u.receivers.sapling) {
-          const abz = new AddressClass(u.address, u.receivers.sapling, AddressKindEnum.z, receivers);
-          allAddresses.push(abz);
-        }
-        if (u.address && u.receivers.transparent) {
-          const abt = new AddressClass(u.address, u.receivers.transparent, AddressKindEnum.t, receivers);
-          allAddresses.push(abt);
-        }
-      });
+      (addressesJSON || orchardAddressesJSON) &&
+        [...addressesJSON, ...orchardAddressesJSON].forEach((u: RPCAddressType) => {
+          // If this has any pending txns, show that in the UI
+          const receivers: string =
+            (u.receivers.orchard_exists ? ReceiverEnum.o : '') +
+            (u.receivers.sapling ? ReceiverEnum.z : '') +
+            (u.receivers.transparent ? ReceiverEnum.t : '');
+          if (u.address) {
+            const abu = new AddressClass(uOrchardAddress, u.address, AddressKindEnum.u, receivers);
+            allAddresses.push(abu);
+          }
+          if (u.address && u.receivers.sapling) {
+            const abz = new AddressClass(uOrchardAddress, u.receivers.sapling, AddressKindEnum.z, ReceiverEnum.z);
+            allAddresses.push(abz);
+          }
+          if (u.address && u.receivers.transparent) {
+            const abt = new AddressClass(uOrchardAddress, u.receivers.transparent, AddressKindEnum.t, ReceiverEnum.t);
+            allAddresses.push(abt);
+          }
+        });
 
       this.fnSetAllAddresses(allAddresses);
     } catch (error) {
@@ -1226,8 +1242,10 @@ export default class RPC {
 
       // oscar idea and I think it is the correct way to build the history of
       // value transfers.
-      valueTransfersJSON.value_transfers.forEach((vt: RPCValueTransferType) => {
-        const currentValueTransferList: ValueTransferType = {} as ValueTransferType;
+      valueTransfersJSON &&
+        valueTransfersJSON.value_transfers &&
+        valueTransfersJSON.value_transfers.forEach((vt: RPCValueTransferType) => {
+          const currentValueTransferList: ValueTransferType = {} as ValueTransferType;
 
         currentValueTransferList.txid = vt.txid;
         currentValueTransferList.time = vt.datetime;
@@ -1266,23 +1284,23 @@ export default class RPC {
         currentValueTransferList.memos = !vt.memos || vt.memos.length === 0 ? undefined : vt.memos;
         currentValueTransferList.poolType = !vt.pool_received ? undefined : vt.pool_received;
 
-        if (vt.txid.startsWith('xxxxxxxxx')) {
-          console.log('valuetransfer zingolib: ', vt);
-          console.log('valuetransfer zingo', currentValueTransferList);
-          console.log('--------------------------------------------------');
-        }
-        //if (vt.status === RPCValueTransfersStatusEnum.calculated) {
-        //  console.log('CALCULATED ))))))))))))))))))))))))))))))))))');
-        //  console.log(vt);
-        //}
-        //if (vt.status === RPCValueTransfersStatusEnum.transmitted) {
-        //  console.log('TRANSMITTED ))))))))))))))))))))))))))))))))))');
-        //  console.log(vt);
-        //}
+          if (vt.txid.startsWith('xxxxxxxxx')) {
+            console.log('valuetransfer zingolib: ', vt);
+            console.log('valuetransfer zingo', currentValueTransferList);
+            console.log('--------------------------------------------------');
+          }
+          //if (vt.status === RPCValueTransfersStatusEnum.calculated) {
+          //  console.log('CALCULATED ))))))))))))))))))))))))))))))))))');
+          //  console.log(vt);
+          //}
+          //if (vt.status === RPCValueTransfersStatusEnum.transmitted) {
+          //  console.log('TRANSMITTED ))))))))))))))))))))))))))))))))))');
+          //  console.log(vt);
+          //}
 
-        //console.log(currentValueTransferList);
-        vtList.push(currentValueTransferList);
-      });
+          //console.log(currentValueTransferList);
+          vtList.push(currentValueTransferList);
+        });
 
       //console.log(vtlist);
 
@@ -1317,8 +1335,10 @@ export default class RPC {
 
       // oscar idea and I think it is the correct way to build the history of
       // value transfers.
-      messagesJSON.value_transfers.forEach((m: RPCValueTransferType) => {
-        const currentMessageList: ValueTransferType = {} as ValueTransferType;
+      messagesJSON &&
+        messagesJSON.value_transfers &&
+        messagesJSON.value_transfers.forEach((m: RPCValueTransferType) => {
+          const currentMessageList: ValueTransferType = {} as ValueTransferType;
 
         currentMessageList.txid = m.txid;
         currentMessageList.time = m.datetime;
@@ -1357,23 +1377,23 @@ export default class RPC {
         currentMessageList.memos = !m.memos || m.memos.length === 0 ? undefined : m.memos;
         currentMessageList.poolType = !m.pool_received ? undefined : m.pool_received;
 
-        if (m.txid.startsWith('xxxxxxxxx')) {
-          console.log('valuetransfer messages zingolib: ', m);
-          console.log('valuetransfer messages zingo', currentMessageList);
-          console.log('--------------------------------------------------');
-        }
-        //if (m.status === RPCValueTransfersStatusEnum.calculated) {
-        //  console.log('CALCULATED ))))))))))))))))))))))))))))))))))');
-        //  console.log(m);
-        //}
-        //if (m.status === RPCValueTransfersStatusEnum.transmitted) {
-        //  console.log('TRANSMITTED ))))))))))))))))))))))))))))))))))');
-        //  console.log(m);
-        //}
+          if (m.txid.startsWith('xxxxxxxxx')) {
+            console.log('valuetransfer messages zingolib: ', m);
+            console.log('valuetransfer messages zingo', currentMessageList);
+            console.log('--------------------------------------------------');
+          }
+          //if (m.status === RPCValueTransfersStatusEnum.calculated) {
+          //  console.log('CALCULATED ))))))))))))))))))))))))))))))))))');
+          //  console.log(m);
+          //}
+          //if (m.status === RPCValueTransfersStatusEnum.transmitted) {
+          //  console.log('TRANSMITTED ))))))))))))))))))))))))))))))))))');
+          //  console.log(m);
+          //}
 
-        //console.log(currentValueTransferList);
-        mList.push(currentMessageList);
-      });
+          //console.log(currentValueTransferList);
+          mList.push(currentMessageList);
+        });
 
       //console.log(mlist);
 

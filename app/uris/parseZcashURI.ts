@@ -26,9 +26,12 @@ const parseZcashURI = async (
   //console.log(address);
 
   if (address) {
-    const validAddress: boolean = await Utils.isValidAddress(address, server.chainName);
+    const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
+      address,
+      server.chainName,
+    );
 
-    if (!validAddress) {
+    if (!validAddress.isValid) {
       return `"${address || ''}" ${translate('uris.notvalid')}`;
     }
   }
@@ -69,9 +72,12 @@ const parseZcashURI = async (
         if (typeof target.address !== 'undefined') {
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
-        const validAddress: boolean = await Utils.isValidAddress(value, server.chainName);
+        const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
+          value,
+          server.chainName,
+        );
 
-        if (!validAddress) {
+        if (!validAddress.isValid) {
           return `"${value}" ${translate('uris.notvalid')}`;
         }
         target.address = value;
@@ -142,9 +148,10 @@ const parseZcashURI = async (
 
   // Convert to plain array
   const ans: ZcashURITargetClass[] = new Array(targets.size);
-  targets.forEach((tgt, idx) => {
-    ans[idx] = tgt;
-  });
+  targets &&
+    targets.forEach((tgt, idx) => {
+      ans[idx] = tgt;
+    });
 
   // Make sure no elements were skipped
   //const testAns: ZcashURITarget[] = ans;

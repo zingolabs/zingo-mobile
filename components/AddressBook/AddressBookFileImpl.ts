@@ -8,18 +8,30 @@ export default class AddressBookFileImpl {
   }
 
   // Write only one item
-  static async writeAddressBookItem(label: string, address: string): Promise<AddressBookFileClass[]> {
+  static async writeAddressBookItem(
+    label: string,
+    address: string,
+    uOrchardAddress: string,
+  ): Promise<AddressBookFileClass[]> {
     const fileName = await this.getFileName();
     const addressBook = await this.readAddressBook();
 
-    if (addressBook.filter(item => item.label === label && item.address === address).length > 0) {
-      // already exists the combination of label & address -> do nothing
+    if (
+      addressBook.filter(
+        item => item.label === label && item.address === address && item.uOrchardAddress === uOrchardAddress,
+      ).length > 0
+    ) {
+      // already exists the combination of label & address & orchard address -> do nothing
       return addressBook;
     }
 
     let newAddressBook: AddressBookFileClass[];
-    const newItem: AddressBookFileClass = { label, address };
-    if (addressBook.filter(item => item.label === label).length > 0) {
+    const newItem: AddressBookFileClass = { label, address, uOrchardAddress };
+
+    if (addressBook.filter(item => item.label === label && item.address === address).length > 0) {
+      // already exists the label & the address -> update the orchard address
+      newAddressBook = [...addressBook.filter(item => item.label !== label && item.address !== address), newItem];
+    } else if (addressBook.filter(item => item.label === label).length > 0) {
       // already exists the label -> update the address
       newAddressBook = [...addressBook.filter(item => item.label !== label), newItem];
     } else if (addressBook.filter(item => item.address === address).length > 0) {

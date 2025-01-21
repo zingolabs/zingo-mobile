@@ -31,7 +31,7 @@ type AbSummaryLineProps = {
   setSendPageState: (s: SendPageStateClass) => void;
   closeModal: () => void;
   handleScrollToTop: () => void;
-  doAction: (action: AddressBookActionEnum, label: string, address: string) => void;
+  doAction: (action: AddressBookActionEnum, label: string, address: string, uOrchardAddress: string) => void;
   addressProtected?: boolean;
 };
 const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
@@ -64,7 +64,13 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
       [
         {
           text: translate('confirm') as string,
-          onPress: () => doAction(AddressBookActionEnum.Delete, item.label, item.address),
+          onPress: () =>
+            doAction(
+              AddressBookActionEnum.Delete,
+              item.label,
+              item.address,
+              item.uOrchardAddress ? item.uOrchardAddress : '',
+            ),
         },
         { text: translate('cancel') as string, style: 'cancel' },
       ],

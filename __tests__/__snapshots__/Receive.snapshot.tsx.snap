@@ -7,11 +7,7 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
       "index": 0,
       "routes": [
         {
-          "key": "uaddr",
-          "title": "text translated",
-        },
-        {
-          "key": "zaddr",
+          "key": "uorchardaddr",
           "title": "text translated",
         },
         {

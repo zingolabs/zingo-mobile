@@ -56,8 +56,8 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
   let memo = '';
   let memoUA = '';
-  if (memoTotal.includes('\nReply to: \n')) {
-    let memoArray = memoTotal.split('\nReply to: \n');
+  if (memoTotal.includes(GlobalConst.replyTo)) {
+    let memoArray = memoTotal.split(GlobalConst.replyTo);
     const memoPoped = memoArray.pop();
     memoUA = memoPoped ? memoPoped : '';
     memo = memoArray.join('');
@@ -74,7 +74,12 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   };
 
   const contactFound: (add: string) => boolean = (add: string) => {
-    const contact: AddressBookFileClass[] = addressBook.filter((ab: AddressBookFileClass) => ab.address === add);
+    if (!add) {
+      return false;
+    }
+    const contact: AddressBookFileClass[] = addressBook.filter(
+      (ab: AddressBookFileClass) => ab.address === add || ab.uOrchardAddress === add,
+    );
     return contact.length >= 1;
   };
 
@@ -162,7 +167,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                   }}>
                   {!thisWalletAddress(memoUA) && memoUA !== messageAddress && (
                     <>
-                      <RegText>{'\nReply to:'}</RegText>
+                      <RegText>{GlobalConst.replyTo}</RegText>
                       <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
                       <RegText style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}>{memoUA}</RegText>
                       {contactFound(memoUA) && (

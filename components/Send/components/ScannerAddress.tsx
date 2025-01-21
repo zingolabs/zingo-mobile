@@ -33,9 +33,12 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
       return;
     }
 
-    const validAddress: boolean = await Utils.isValidAddress(scannedAddress, server.chainName);
+    const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
+      scannedAddress,
+      server.chainName,
+    );
 
-    if (validAddress) {
+    if (validAddress.isValid) {
       setAddress(scannedAddress);
       closeModal();
     }

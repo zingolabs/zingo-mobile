@@ -119,7 +119,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     language,
     donation,
     addresses,
-    uaAddress,
+    uOrchardAddress,
     shieldingAmount,
     selectServer,
   } = context;
@@ -246,7 +246,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
         sendJson = await Utils.getSendManyJSON(
           sendPageStateCalculateFee,
-          uaAddress,
+          uOrchardAddress,
           addresses ? addresses : ([] as AddressClass[]),
           server,
           donation,
@@ -317,7 +317,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setFee(proposeFee);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [addresses, donation, server, translate, uaAddress, validAddress, validAmount, validMemo],
+    [addresses, donation, server, translate, uOrchardAddress, validAddress, validAmount, validMemo],
   );
 
   const calculateSpendableBalance = useCallback(
@@ -395,8 +395,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     ],
   );
 
-  const memoTotal = useCallback((memoPar: string, includeUAMemoPar: boolean, uaAddressPar: string) => {
-    return `${memoPar || ''}${includeUAMemoPar ? '\nReply to: \n' + uaAddressPar : ''}`;
+  const memoTotal = useCallback((memoPar: string, includeUAMemoPar: boolean, uOrchardAddressPar: string) => {
+    return `${memoPar || ''}${includeUAMemoPar ? GlobalConst.replyTo + uOrchardAddressPar : ''}`;
   }, []);
 
   const memoUpdateToField = (memo: string | null) => {
@@ -552,7 +552,10 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [server.chainName, sendPageState.toaddr.to]);
 
   useEffect(() => {
-    const parseAddress = async (address: string, serverChainName: string): Promise<boolean> => {
+    const parseAddress = async (
+      address: string,
+      serverChainName: string,
+    ): Promise<{ isValid: boolean; onlyOrchardUA: string }> => {
       return await Utils.isValidAddress(address, serverChainName);
     };
 
@@ -560,14 +563,14 @@ const Send: React.FunctionComponent<SendProps> = ({
 
     if (to.to) {
       parseAddress(to.to, server.chainName).then(r => {
-        setValidAddress(r ? 1 : -1);
+        setValidAddress(r.isValid ? 1 : -1);
       });
     } else {
       setValidAddress(0);
     }
 
     if (to.memo || to.includeUAMemo) {
-      const len = Buffer.byteLength(memoTotal(to.memo, to.includeUAMemo, uaAddress), 'utf8');
+      const len = Buffer.byteLength(memoTotal(to.memo, to.includeUAMemo, uOrchardAddress), 'utf8');
       if (len > GlobalConst.memoMaxLength) {
         setValidMemo(-1);
       } else {
@@ -617,7 +620,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     spendable,
     fee,
     maxAmount,
-    uaAddress,
+    uOrchardAddress,
     memoTotal,
   ]);
 
@@ -856,7 +859,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const countMemoBytes = (memo: string, includeUAMemo: boolean) => {
-    const len = Buffer.byteLength(memoTotal(memo, includeUAMemo, uaAddress), 'utf8');
+    const len = Buffer.byteLength(memoTotal(memo, includeUAMemo, uOrchardAddress), 'utf8');
     return len;
   };
 
