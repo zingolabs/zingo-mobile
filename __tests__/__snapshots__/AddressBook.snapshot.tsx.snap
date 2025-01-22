@@ -212,28 +212,16 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
     testID="addressbook.scroll-view"
   >
     <View>
-      <View
+      <ActivityIndicator
+        color="#5a8c5a"
+        size={25}
         style={
           {
-            "alignItems": "center",
-            "display": "flex",
-            "height": 150,
-            "justifyContent": "flex-start",
-            "marginTop": 30,
+            "marginRight": 7,
+            "marginTop": 7,
           }
         }
-      >
-        <Text
-          style={
-            {
-              "color": "#18bd18",
-              "opacity": 0.65,
-            }
-          }
-        >
-          text translated
-        </Text>
-      </View>
+      />
     </View>
   </RCTScrollView>
   <View
