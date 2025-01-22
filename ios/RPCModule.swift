@@ -517,9 +517,9 @@ class RPCModule: NSObject {
   }
 
   func fnGetValueTransfersList(_ dict: [AnyHashable: Any]) {
-      if let server = dict["items"] as? String,
+      if let items = dict["items"] as? String,
          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = getValueTransfers(items: items)
+          let resp = getValueTransfers(recentVtsToRetrive: items)
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
@@ -535,7 +535,7 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(getValueTransfersList:reject:)
+  @objc(getValueTransfersList:resolve:reject:)
   func getValueTransfersList(_ items: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let dict: [String: Any] = ["items": items, "resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
