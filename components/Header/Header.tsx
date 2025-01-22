@@ -111,7 +111,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     zecPrice,
     privacy,
     readOnly,
-    valueTransfers,
+    valueTransfersTotal,
     wallet,
     restartApp,
     somePending,
@@ -763,7 +763,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           {showShieldButton &&
             !calculateDisableButtonToShield() &&
             setComputingModalVisible &&
-            valueTransfers !== null && (
+            valueTransfersTotal !== null && (
               <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <FadeText style={{ fontSize: 8 }}>
                   {(translate(`history.shield-legend-${calculatePoolsToShield()}`) as string) +
@@ -805,7 +805,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             {readOnly && (
               <>
                 {setUfvkViewModalVisible &&
-                !(mode === ModeEnum.basic && valueTransfers !== null && valueTransfers.length <= 0) &&
+                !(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal <= 0) &&
                 !(mode === ModeEnum.basic && totalBalance && totalBalance.total <= 0) ? (
                   <TouchableOpacity onPress={() => ufvkShowModal()}>
                     <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />

@@ -38,8 +38,8 @@ import { RPCSendProposeType } from './types/RPCSendProposeType';
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
-  fnSetValueTransfersList: (vtList: ValueTransferType[]) => void;
-  fnSetMessagesList: (mList: ValueTransferType[]) => void;
+  fnSetValueTransfersList: (vtList: ValueTransferType[], total: number) => void;
+  fnSetMessagesList: (mList: ValueTransferType[], total: number) => void;
   fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
   fnSetSyncingStatus: (syncingStatus: SyncingStatusClass) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
@@ -77,8 +77,8 @@ export default class RPC {
 
   constructor(
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
-    fnSetValueTransfersList: (vtlist: ValueTransferType[]) => void,
-    fnSetMessagesList: (mlist: ValueTransferType[]) => void,
+    fnSetValueTransfersList: (vtlist: ValueTransferType[], total: number) => void,
+    fnSetMessagesList: (mlist: ValueTransferType[], total: number) => void,
     fnSetAllAddresses: (addresses: AddressClass[]) => void,
     fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
@@ -731,8 +731,8 @@ export default class RPC {
       // This is async, so when it is done, we finish the refresh.
       if (fullRescan) {
         // clean the ValueTransfer list before.
-        this.fnSetValueTransfersList([]);
-        this.fnSetMessagesList([]);
+        this.fnSetValueTransfersList([], 0);
+        this.fnSetMessagesList([], 0);
         this.fnSetTotalBalance({
           orchardBal: 0,
           privateBal: 0,
@@ -1223,7 +1223,7 @@ export default class RPC {
   // Fetch all T and Z and O ValueTransfers
   async fetchTandZandOValueTransfers() {
     try {
-      const valueTransfersStr: string = await RPCModule.getValueTransfersList();
+      const valueTransfersStr: string = await RPCModule.getValueTransfersList('100000000');
       //console.log(valueTransfersStr);
       if (valueTransfersStr) {
         if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1304,7 +1304,7 @@ export default class RPC {
 
       //console.log(vtlist);
 
-      this.fnSetValueTransfersList(vtList);
+      this.fnSetValueTransfersList(vtList, vtList.length);
     } catch (error) {
       console.log(`Critical Error txs list value transfers ${error}`);
       // relaunch the interval tasks just in case they are aborted.
@@ -1397,7 +1397,7 @@ export default class RPC {
 
       //console.log(mlist);
 
-      this.fnSetMessagesList(mList);
+      this.fnSetMessagesList(mList, mList.length);
     } catch (error) {
       console.log(`Critical Error txs list value transfers messages ${error}`);
       // relaunch the interval tasks just in case they are aborted.

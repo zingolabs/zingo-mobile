@@ -408,7 +408,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       totalBalance: null,
       addresses: null,
       valueTransfers: null,
+      valueTransfersFetchItems: 50,
+      valueTransfersTotal: null,
       messages: null,
+      messagesFetchItems: 50,
+      messagesTotal: null,
       walletSettings: {} as WalletSettingsClass,
       syncingStatus: {} as SyncingStatusClass,
       info: {} as InfoType,
@@ -793,7 +797,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setValueTransfersList = async (valueTransfers: ValueTransferType[]) => {
+  setValueTransfersList = async (valueTransfers: ValueTransferType[], valueTransfersTotal: number) => {
     const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
     // only for basic mode
     if (this.state.mode === ModeEnum.basic) {
@@ -814,7 +818,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
       }
     }
-    if (!isEqual(this.state.valueTransfers, valueTransfers)) {
+    if (!isEqual(this.state.valueTransfers, valueTransfers) || this.state.valueTransfersTotal !== valueTransfersTotal) {
       //console.log('fetch ValueTransfers');
       // set somePending as well here when I know there is something new in ValueTransfers
       const pending: number =
@@ -918,18 +922,34 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       // acomodate the bottom tabs.
       setTimeout(
         () => {
-          this.setState({ valueTransfers, somePending: pending > 0 });
+          this.setState({
+            valueTransfers,
+            somePending: pending > 0,
+            valueTransfersTotal,
+          });
         },
         pending === 0 ? 250 : 0,
       );
     }
   };
 
-  setMessagesList = (messages: ValueTransferType[]) => {
-    if (!isEqual(this.state.messages, messages)) {
+  setValueTransfersFetchItems = (items: number) => {
+    this.setState({
+      valueTransfersFetchItems: items,
+    });
+  };
+
+  setMessagesList = (messages: ValueTransferType[], messagesTotal: number) => {
+    if (!isEqual(this.state.messages, messages) || this.state.messagesTotal !== messagesTotal) {
       //console.log('fetch messages');
-      this.setState({ messages });
+      this.setState({ messages, messagesTotal });
     }
+  };
+
+  setMessagesFetchItems = (items: number) => {
+    this.setState({
+      messagesFetchItems: items,
+    });
   };
 
   setAllAddresses = (addresses: AddressClass[]) => {
@@ -1629,7 +1649,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       snackbars,
       isMenuDrawerOpen,
       mode,
-      valueTransfers,
+      valueTransfersTotal,
       readOnly,
       totalBalance,
       translate,
@@ -1649,7 +1669,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       totalBalance: this.state.totalBalance,
       addresses: this.state.addresses,
       valueTransfers: this.state.valueTransfers,
+      valueTransfersTotal: this.state.valueTransfersTotal,
+      valueTransfersFetchItems: this.state.valueTransfersFetchItems,
       messages: this.state.messages,
+      messagesTotal: this.state.messagesTotal,
+      messagesFetchItems: this.state.messagesFetchItems,
       walletSettings: this.state.walletSettings,
       syncingStatus: this.state.syncingStatus,
       info: this.state.info,
@@ -1985,7 +2009,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
           {mode === ModeEnum.advanced ||
-          (!!valueTransfers && valueTransfers.length > 0) ||
+          (!!valueTransfersTotal && valueTransfersTotal > 0) ||
           (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
             <Tab.Navigator
               initialRouteName={translate('loadedapp.history-menu') as string}
@@ -2098,7 +2122,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             </Tab.Navigator>
           ) : (
             <>
-              {valueTransfers === null || addresses === null || totalBalance === null ? (
+              {valueTransfersTotal === null || addresses === null || totalBalance === null ? (
                 <Loading backgroundColor={colors.background} spinColor={colors.primary} />
               ) : (
                 <Tab.Navigator

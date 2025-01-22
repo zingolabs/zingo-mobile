@@ -95,12 +95,15 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
 
   const getMemo = (_c: ContactType) => {
     const memoTotal = _c.memos.join('\n');
+    let foundReplyTo: boolean = false;
     let memoNoAddress;
-    if (memoTotal.includes('\nReply to: \n')) {
-      let memoArray = memoTotal.split('\nReply to: \n');
-      memoNoAddress = memoArray.shift();
+    if (memoTotal.includes(GlobalConst.replyTo)) {
+      foundReplyTo = true;
+      let memoArray = memoTotal.split(GlobalConst.replyTo);
+      memoArray.pop();
+      memoNoAddress = memoArray.join('');
     }
-    return memoNoAddress || memoTotal;
+    return foundReplyTo ? memoNoAddress : memoTotal;
   };
 
   useEffect(() => {

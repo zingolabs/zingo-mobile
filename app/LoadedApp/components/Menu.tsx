@@ -26,7 +26,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
     translate,
     readOnly,
     mode,
-    valueTransfers,
+    valueTransfersTotal,
     addLastSnackbar,
     security,
     language,
@@ -120,7 +120,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
             {translate('loadedapp.addressbook') as string}
           </RegText>
 
-          {!(mode === ModeEnum.basic && valueTransfers && valueTransfers.length <= 0) && (
+          {!(mode === ModeEnum.basic && valueTransfersTotal && valueTransfersTotal <= 0) && (
             <RegText
               testID="menu.walletseedufvk"
               onPress={() => onItemSelectedWrapper(MenuItemEnum.WalletSeedUfvk)}
@@ -156,7 +156,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
             </RegText>
           )}
 
-          {!(mode === ModeEnum.basic && valueTransfers && valueTransfers.length <= 0) && (
+          {!(mode === ModeEnum.basic && valueTransfersTotal && valueTransfersTotal <= 0) && (
             <RegText testID="menu.insight" onPress={() => onItemSelectedWrapper(MenuItemEnum.Insight)} style={item}>
               {translate('loadedapp.insight') as string}
             </RegText>
@@ -180,8 +180,8 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
             </RegText>
           )}
           {mode === ModeEnum.basic &&
-            valueTransfers &&
-            valueTransfers.length === 0 &&
+            valueTransfersTotal &&
+            valueTransfersTotal === 0 &&
             netInfo.isConnected &&
             selectServer !== SelectServerEnum.offline && (
               <RegText

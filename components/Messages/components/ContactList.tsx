@@ -24,6 +24,7 @@ import {
   AddressBookFileClass,
   ContactType,
   FilterEnum,
+  GlobalConst,
   SelectServerEnum,
   SendPageStateClass,
   ServerType,
@@ -107,8 +108,8 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         if (vt.memos) {
           const memoTotal = vt.memos.join('\n');
           let memoAddress;
-          if (memoTotal.includes('\nReply to: \n')) {
-            let memoArray = memoTotal.split('\nReply to: \n');
+          if (memoTotal.includes(GlobalConst.replyTo)) {
+            let memoArray = memoTotal.split(GlobalConst.replyTo);
             memoAddress = memoArray.pop();
           }
           const contactAddress = vt.address || memoAddress || '';

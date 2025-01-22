@@ -104,6 +104,7 @@ data class ValueTransfer (
 
 data class ValueTransfers (
     val value_transfers : List<ValueTransfer>,
+    val total : Long,
 )
 
 data class ParseResult (
@@ -367,7 +368,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         println("\nSync:")
         println(syncJson)
 
-        val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
+        val valueTranfersJson: String = uniffi.zingo.getValueTransfers("50")
         println("\nValue Transfers:")
         println(valueTranfersJson)
         val valueTranfers: ValueTransfers = mapper.readValue(valueTranfersJson)
@@ -421,7 +422,7 @@ class ExecuteSaplingBalanceFromSeed {
         println("\nSync:")
         println(syncJson)
         
-        val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
+        val valueTranfersJson: String = uniffi.zingo.getValueTransfers("50")
         println("\nValue Transfers:")
         println(valueTranfersJson)
 

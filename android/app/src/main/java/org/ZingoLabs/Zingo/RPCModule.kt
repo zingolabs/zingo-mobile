@@ -549,11 +549,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun getValueTransfersList(promise: Promise) {
+    fun getValueTransfersList(items: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getValueTransfers()
+                val resp = uniffi.zingo.getValueTransfers(items)
 
                 withContext(Dispatchers.Main) {
                     promise.resolve(resp)
