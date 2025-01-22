@@ -46,17 +46,22 @@ export default class RPC {
   translate: (key: string) => TranslateType;
   keepAwake: (keep: boolean) => void;
 
-  refreshTimerID?: NodeJS.Timeout;
-  updateVTTimerID?: NodeJS.Timeout;
-  updateMTimerID?: NodeJS.Timeout;
-  syncStatusTimerID?: NodeJS.Timeout;
-
-  updateVTDataLock: boolean;
-  updateMDataLock: boolean;
+  updateTimerID?: NodeJS.Timeout;
 
   lastWalletBlockHeight: number;
   lastServerBlockHeight: number;
   walletBirthday: number;
+
+  fetchWalletHeightLock: boolean;
+  fetchWalletBirthdayLock: boolean;
+  fetchInfoAndServerHeightLock: boolean;
+  fetchTandZandOValueTransfersLock: boolean;
+  fetchTandZandOMessagesLock: boolean;
+  fetchTotalBalanceLock: boolean;
+  fetchWalletSettingsLock: boolean;
+  fetchAddressesLock: boolean;
+  refreshSyncLock: boolean;
+  fetchSyncStatusLock: boolean;
 
   inRefresh: boolean;
   inSend: boolean;
@@ -97,11 +102,20 @@ export default class RPC {
     this.translate = translate;
     this.keepAwake = keepAwake;
 
-    this.updateVTDataLock = false;
-    this.updateMDataLock = false;
     this.lastWalletBlockHeight = 0;
     this.lastServerBlockHeight = 0;
     this.walletBirthday = 0;
+
+    this.fetchWalletHeightLock = false;
+    this.fetchWalletBirthdayLock = false;
+    this.fetchInfoAndServerHeightLock = false;
+    this.fetchTandZandOValueTransfersLock = false;
+    this.fetchTandZandOMessagesLock = false;
+    this.fetchTotalBalanceLock = false;
+    this.fetchWalletSettingsLock = false;
+    this.fetchAddressesLock = false;
+    this.refreshSyncLock = false;
+    this.fetchSyncStatusLock = false;
 
     this.inRefresh = false;
     this.inSend = false;
@@ -348,6 +362,102 @@ export default class RPC {
     }
   }
 
+  runTaskPromises(): void {
+    console.log('++++++++++ interval update 5 secs ALL', this.timers);
+    this.sanitizeTimers();
+
+    const taskPromises: Promise<void>[] = [];
+
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        const s = Date.now();
+        await this.fetchWalletHeight();
+        console.log('wh - ', Date.now() - s);
+        resolve();
+      }),
+    );
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        const s = Date.now();
+        await this.fetchWalletBirthday();
+        console.log('wb - ', Date.now() - s);
+        resolve();
+      }),
+    );
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        const s = Date.now();
+        await this.fetchInfoAndServerHeight();
+        console.log('info - ', Date.now() - s);
+        resolve();
+      }),
+    );
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        const s = Date.now();
+        await this.fetchTandZandOValueTransfers();
+        console.log('vt - ', Date.now() - s);
+        resolve();
+      }),
+    );
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        const s = Date.now();
+        await this.fetchTandZandOMessages();
+        console.log('m - ', Date.now() - s);
+        resolve();
+      }),
+    );
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        const s = Date.now();
+        await this.fetchTotalBalance();
+        console.log('b - ', Date.now() - s);
+        resolve();
+      }),
+    );
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        const s = Date.now();
+        await this.fetchWalletSettings();
+        console.log('ws - ', Date.now() - s);
+        resolve();
+      }),
+    );
+    if (!this.inRefresh) {
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          const s = Date.now();
+          await this.fetchAddresses();
+          console.log('a - ', Date.now() - s);
+          resolve();
+        }),
+      );
+      // try to sync, don't wait to finish.
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          const s = Date.now();
+          this.refreshSync(false);
+          console.log('sync - ', Date.now() - s);
+          resolve();
+        }),
+      );
+    }
+    // only if the wallet is syncing...
+    if (this.inRefresh) {
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          const s = Date.now();
+          await this.fetchSyncStatus();
+          console.log('sync status - ', Date.now() - s);
+          resolve();
+        }),
+      );
+    }
+
+    Promise.allSettled(taskPromises);
+  }
+
   // this is only for the first time when the App is booting, but
   // there are more cases:
   // - LoadedApp mounting component.
@@ -359,53 +469,22 @@ export default class RPC {
     // clean start.
     await this.stopSyncProcess();
 
-    // don't wait for this... it's faster.
-    this.updateVTData();
-    this.updateMData();
+    this.runTaskPromises();
 
-    // every 15 seconds the App try to Sync the new blocks.
-    if (!this.refreshTimerID) {
-      this.refreshTimerID = setInterval(() => {
-        console.log('++++++++++ interval try refresh 15 secs', this.timers);
-        this.sanitizeTimers();
-        this.refresh(false);
-      }, 15 * 1000); // 15 seconds
-      //console.log('create refresh timer', this.refreshTimerID);
-      this.timers.push(this.refreshTimerID);
-    }
-
-    // every 5 seconds the App update part of the data (VT)
-    if (!this.updateVTTimerID) {
-      this.updateVTTimerID = setInterval(() => {
-        //console.log('++++++++++ interval update 5 secs VT', this.timers);
-        this.sanitizeTimers();
-        this.updateVTData();
-      }, 5 * 1000); // 5 secs
+    // every 5 seconds the App update part of the data
+    if (!this.updateTimerID) {
+      this.updateTimerID = setInterval(() => this.runTaskPromises(), 5 * 1000); // 5 secs
       //console.log('create update timer', this.updateVTTimerID);
-      this.timers.push(this.updateVTTimerID);
+      this.timers.push(this.updateTimerID);
     }
 
-    // to avoid two update data process run together.
-    await this.sleep(2 * 1000);
-
-    // every 5 seconds the App update part of the data (M)
-    if (!this.updateMTimerID) {
-      this.updateMTimerID = setInterval(() => {
-        //console.log('++++++++++ interval update 5 secs M', this.timers);
-        this.sanitizeTimers();
-        this.updateMData();
-      }, 5 * 1000); // 5 secs
-      //console.log('create update timer', this.updateMTimerID);
-      this.timers.push(this.updateMTimerID);
-    }
-
-    this.sanitizeTimers();
+    await this.sanitizeTimers();
 
     // Call the refresh after configure to update the UI. Do it in a timeout
     // to allow the UI to render first
     setTimeout(() => {
       //console.log('FIRST sync run');
-      this.refresh(true);
+      this.refreshSync(true);
     }, 1000);
   }
 
@@ -447,28 +526,10 @@ export default class RPC {
   }
 
   async clearTimers(): Promise<void> {
-    if (this.refreshTimerID) {
-      clearInterval(this.refreshTimerID);
-      this.refreshTimerID = undefined;
-      //console.log('kill refresh timer', this.refreshTimerID);
-    }
-
-    if (this.updateVTTimerID) {
-      clearInterval(this.updateVTTimerID);
-      this.updateVTTimerID = undefined;
+    if (this.updateTimerID) {
+      clearInterval(this.updateTimerID);
+      this.updateTimerID = undefined;
       //console.log('kill update timer', this.updateVTTimerID);
-    }
-
-    if (this.updateMTimerID) {
-      clearInterval(this.updateMTimerID);
-      this.updateMTimerID = undefined;
-      //console.log('kill update timer', this.updateMTimerID);
-    }
-
-    if (this.syncStatusTimerID) {
-      clearInterval(this.syncStatusTimerID);
-      this.syncStatusTimerID = undefined;
-      //console.log('kill syncstatus timer', this.syncStatusTimerID);
     }
 
     // and now the array of timers...
@@ -483,12 +544,7 @@ export default class RPC {
     // and now the array of timers...
     let deleted: number[] = [];
     for (var i = 0; i < this.timers.length; i++) {
-      if (
-        (this.refreshTimerID && this.timers[i] === this.refreshTimerID) ||
-        (this.updateVTTimerID && this.timers[i] === this.updateVTTimerID) ||
-        (this.updateMTimerID && this.timers[i] === this.updateMTimerID) ||
-        (this.syncStatusTimerID && this.timers[i] === this.syncStatusTimerID)
-      ) {
+      if (this.updateTimerID && this.timers[i] === this.updateTimerID) {
         // do nothing
       } else {
         clearInterval(this.timers[i]);
@@ -601,111 +657,22 @@ export default class RPC {
     }
   }
 
-  async loadWalletVTData() {
-    const start: number = Date.now();
-    await this.fetchTandZandOValueTransfers();
-    console.log('@@@@@@@@@@@@@@@ VT time', Date.now() - start);
-    //console.log('RPC - 4.0 - fetch value transfers');
-    const start2: number = Date.now();
-    await this.fetchAddresses();
-    console.log('@@@@@@@@@@@@@@@ VT-ADDRS time', Date.now() - start2);
-    //console.log('RPC - 4.1 - fetch addresses');
-  }
-
-  async loadWalletMData() {
-    //const start: number = Date.now();
-    await this.fetchTandZandOMessages();
-    //console.log('@@@@@@@@@@@@@@@ M time', Date.now() - start);
-    //console.log('RPC - 4.2 - fetch value transfers messages');
-    //const start2: number = Date.now();
-    await this.fetchTotalBalance();
-    //console.log('@@@@@@@@@@@@@@@ M-BAL time', Date.now() - start2);
-    //console.log('RPC - 4.3 - fetch total balance');
-    //const start3: number = Date.now();
-    await this.fetchWalletSettings();
-    //console.log('@@@@@@@@@@@@@@@ M-WALLET time', Date.now() - start3);
-    //console.log('RPC - 4.4 - fetch wallet settings');
-  }
-
-  async updateVTData() {
-    //console.log('Update data triggered');
-    if (this.updateVTDataLock) {
-      console.log('RPC - Update Data VT lock, returning *****************************');
+  async refreshSync(fullRefresh: boolean, fullRescan?: boolean) {
+    if (this.refreshSyncLock) {
+      console.log('REFRESH ----> in execution already');
       return;
     }
-
-    // if the App have an error here
-    // this try-catch prevent to have true in updateDataLock.
-    try {
-      this.updateVTDataLock = true;
-
-      await this.fetchWalletHeight();
-      //console.log('RPC - 1 - fetch wallet height');
-      await this.fetchWalletBirthday();
-      //console.log('RPC - 2 - fetch wallet birthday');
-      await this.fetchInfoAndServerHeight();
-      //console.log('RPC - 3 - fetch info & server height');
-
-      // And fetch the rest of the data.
-      await this.loadWalletVTData();
-      //console.log('RPC - 4 - fetch wallet Data');
-
-      //console.log(`Finished update data at ${lastServerBlockHeight}`);
-      this.updateVTDataLock = false;
-    } catch (error) {
-      console.log('Internal error update data', error);
-      this.updateVTDataLock = false;
-      // relaunch the interval tasks just in case they are aborted.
-      await this.configure();
-    }
-  }
-
-  async updateMData() {
-    //console.log('Update data triggered');
-    if (this.updateMDataLock) {
-      console.log('RPC - Update Data M lock, returning *****************************');
-      return;
-    }
-
-    // if the App have an error here
-    // this try-catch prevent to have true in updateDataLock.
-    try {
-      this.updateMDataLock = true;
-
-      // And fetch the rest of the data.
-      await this.loadWalletMData();
-      //console.log('RPC - 4 - fetch wallet Data messages');
-
-      //console.log(`Finished update data at ${lastServerBlockHeight}`);
-      this.updateMDataLock = false;
-    } catch (error) {
-      console.log('Internal error update data', error);
-      this.updateMDataLock = false;
-      // relaunch the interval tasks just in case they are aborted.
-      await this.configure();
-    }
-  }
-
-  async refresh(fullRefresh: boolean, fullRescan?: boolean) {
+    this.refreshSyncLock = true;
     // If we're in refresh, we don't overlap
     if (this.inRefresh) {
       console.log('REFRESH ----> in refresh is true');
+      this.refreshSyncLock = false;
       return;
     }
-
-    if (this.syncStatusTimerID) {
-      console.log('REFRESH ----> syncStatusTimerID exists already');
-      clearInterval(this.syncStatusTimerID);
-      this.syncStatusTimerID = undefined;
-      return;
-    }
-
-    await this.fetchWalletHeight();
-    await this.fetchWalletBirthday();
-    await this.fetchInfoAndServerHeight();
 
     if (!this.lastServerBlockHeight) {
       console.log('REFRESH ----> the last server block is zero');
+      this.refreshSyncLock = false;
       return;
     }
 
@@ -749,10 +716,31 @@ export default class RPC {
                 const resultJSON: RPCSyncRescan = JSON.parse(result);
                 if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
                   this.latestBlock = resultJSON.latest_block;
+                  // Already finished
+                  console.log('REFRESH ----> Already Rescan Finished');
+                  // Here I know the sync process is over, I need to inform to the UI.
+                  this.fnSetSyncingStatus({
+                    syncID: this.syncId < 0 ? 0 : this.syncId,
+                    totalBatches: 0,
+                    currentBatch: 0,
+                    lastBlockWallet: this.lastWalletBlockHeight,
+                    currentBlock: this.lastWalletBlockHeight,
+                    inProgress: false,
+                    lastError: '',
+                    blocksPerBatch: this.blocksPerBatch,
+                    secondsPerBatch: 0,
+                    processEndBlock: this.lastServerBlockHeight,
+                    lastBlockServer: this.lastServerBlockHeight,
+                    syncProcessStalled: false,
+                  } as SyncingStatusClass);
                 }
               }
             })
-            .catch(error => console.log('rescan error', error));
+            .catch(error => console.log('rescan error', error))
+            .finally(() => {
+              this.setInRefresh(false);
+              this.keepAwake(false);
+            });
         }, 1);
       } else {
         setTimeout(() => {
@@ -763,18 +751,33 @@ export default class RPC {
                 const resultJSON: RPCSyncRescan = JSON.parse(result);
                 if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
                   this.latestBlock = resultJSON.latest_block;
+                  // Already finished
+                  console.log('REFRESH ----> Already Sync Finished');
+                  // Here I know the sync process is over, I need to inform to the UI.
+                  this.fnSetSyncingStatus({
+                    syncID: this.syncId < 0 ? 0 : this.syncId,
+                    totalBatches: 0,
+                    currentBatch: 0,
+                    lastBlockWallet: this.lastWalletBlockHeight,
+                    currentBlock: this.lastWalletBlockHeight,
+                    inProgress: false,
+                    lastError: '',
+                    blocksPerBatch: this.blocksPerBatch,
+                    secondsPerBatch: 0,
+                    processEndBlock: this.lastServerBlockHeight,
+                    lastBlockServer: this.lastServerBlockHeight,
+                    syncProcessStalled: false,
+                  } as SyncingStatusClass);
                 }
               }
             })
-            .catch(error => console.log('sync error', error));
+            .catch(error => console.log('sync error', error))
+            .finally(() => {
+              this.setInRefresh(false);
+              this.keepAwake(false);
+            });
         }, 1);
       }
-
-      // We need to wait for the sync to finish. The sync is done when
-      this.syncStatusTimerID = setInterval(() => this.fetchSyncStatus(), 5 * 1000);
-
-      //console.log('create sync/rescan timer', this.syncStatusTimerID);
-      this.timers.push(this.syncStatusTimerID);
     } else {
       // Already at the latest block
       console.log('REFRESH ----> Already have latest block, waiting for next refresh');
@@ -794,21 +797,25 @@ export default class RPC {
         syncProcessStalled: false,
       } as SyncingStatusClass);
     }
+    this.refreshSyncLock = false;
   }
 
   async fetchSyncStatus(): Promise<void> {
-    console.log('++++++++++ interval syncing 5 secs');
-    const start = Date.now();
+    if (this.fetchSyncStatusLock) {
+      return;
+    }
+    this.fetchSyncStatusLock = true;
     const returnStatus = await this.doSyncStatus();
-    console.log('@@@@@@@@@@@@@@@ SS time', Date.now() - start);
     if (returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC STATUS ERROR', returnStatus);
+      this.fetchSyncStatusLock = false;
       return;
     }
     let ss = {} as RPCSyncStatusType;
     try {
       ss = await JSON.parse(returnStatus);
     } catch (e) {
+      this.fetchSyncStatusLock = false;
       return;
     }
 
@@ -839,19 +846,13 @@ export default class RPC {
     //console.log('--------------------------------------');
 
     // synchronize status
-    if (this.syncStatusTimerID) {
-      this.setInRefresh(ss.in_progress);
-    }
+    this.setInRefresh(ss.in_progress);
 
     this.syncId = ss.sync_id;
 
     // if the syncId change then reset the %
     if (this.prevSyncId !== this.syncId) {
       if (this.prevSyncId !== -1) {
-        await this.fetchWalletHeight();
-        await this.fetchWalletBirthday();
-        await this.fetchInfoAndServerHeight();
-
         await RPCModule.doSave();
 
         //console.log('sync status', ss);
@@ -969,18 +970,8 @@ export default class RPC {
 
     // Close the poll timer if the sync finished(checked via promise above)
     if (!this.inRefresh) {
-      // We are synced. Cancel the poll timer
-      if (this.syncStatusTimerID) {
-        clearInterval(this.syncStatusTimerID);
-        this.syncStatusTimerID = undefined;
-      }
-
       // here we can release the screen...
       this.keepAwake(false);
-
-      await this.fetchWalletHeight();
-      await this.fetchWalletBirthday();
-      await this.fetchInfoAndServerHeight();
 
       await RPCModule.doSave();
 
@@ -1007,10 +998,6 @@ export default class RPC {
       if (this.prevBatchNum !== batchNum) {
         // if finished batches really fast, the App have to save the wallet delayed.
         if (this.prevBatchNum !== -1 && this.batches >= 1) {
-          await this.fetchWalletHeight();
-          await this.fetchWalletBirthday();
-          await this.fetchInfoAndServerHeight();
-
           await RPCModule.doSave();
           this.batches = 0;
 
@@ -1024,18 +1011,25 @@ export default class RPC {
         this.secondsBatch = 0;
       }
     }
+    this.fetchSyncStatusLock = false;
   }
 
   async fetchWalletSettings(): Promise<void> {
     try {
+      if (this.fetchWalletSettingsLock) {
+        return;
+      }
+      this.fetchWalletSettingsLock = true;
       const downloadMemosStr: string = await RPCModule.execute(CommandEnum.getoption, WalletOptionEnum.downloadMemos);
       if (downloadMemosStr) {
         if (downloadMemosStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error download memos ${downloadMemosStr}`);
+          this.fetchWalletSettingsLock = false;
           return;
         }
       } else {
         console.log('Internal Error download memos');
+        this.fetchWalletSettingsLock = false;
         return;
       }
       const downloadMemosJson: RPCGetOptionType = await JSON.parse(downloadMemosStr);
@@ -1047,10 +1041,12 @@ export default class RPC {
       if (transactionFilterThresholdStr) {
         if (transactionFilterThresholdStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error transaction filter threshold ${transactionFilterThresholdStr}`);
+          this.fetchWalletSettingsLock = false;
           return;
         }
       } else {
         console.log('Internal Error transaction filter threshold');
+        this.fetchWalletSettingsLock = false;
         return;
       }
       const transactionFilterThresholdJson: RPCGetOptionType = await JSON.parse(transactionFilterThresholdStr);
@@ -1060,24 +1056,32 @@ export default class RPC {
       walletSettings.transactionFilterThreshold = transactionFilterThresholdJson.transaction_filter_threshold || '';
 
       this.fnSetWalletSettings(walletSettings);
+      this.fetchWalletSettingsLock = false;
     } catch (error) {
       console.log(`Critical Error wallet settings ${error}`);
+      this.fetchWalletSettingsLock = false;
       return;
     }
   }
 
   async fetchInfoAndServerHeight(): Promise<void> {
     try {
+      if (this.fetchInfoAndServerHeightLock) {
+        return;
+      }
+      this.fetchInfoAndServerHeightLock = true;
       const info = await RPC.rpcGetInfoObject();
 
       if (info) {
         this.fnSetInfo(info);
         this.lastServerBlockHeight = info.latestBlock;
       }
+      this.fetchInfoAndServerHeightLock = false;
     } catch (error) {
       console.log(`Critical Error info & server block height ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.configure();
+      this.fetchInfoAndServerHeightLock = false;
       return;
     }
   }
@@ -1085,14 +1089,20 @@ export default class RPC {
   // This method will get the total balances
   async fetchTotalBalance() {
     try {
+      if (this.fetchTotalBalanceLock) {
+        return;
+      }
+      this.fetchTotalBalanceLock = true;
       const balanceStr: string = await RPCModule.execute(CommandEnum.balance, '');
       if (balanceStr) {
         if (balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error balance ${balanceStr}`);
+          this.fetchTotalBalanceLock = false;
           return;
         }
       } else {
         console.log('Internal Error balance');
+        this.fetchTotalBalanceLock = false;
         return;
       }
       const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
@@ -1113,10 +1123,12 @@ export default class RPC {
         total: total / 10 ** 8,
       };
       this.fnSetTotalBalance(balance);
+      this.fetchTotalBalanceLock = false;
     } catch (error) {
       console.log(`Critical Error addresses balances notes ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.configure();
+      this.fetchTotalBalanceLock = false;
       return;
     }
   }
@@ -1124,14 +1136,20 @@ export default class RPC {
   // This method will get the total balances
   async fetchAddresses() {
     try {
+      if (this.fetchAddressesLock) {
+        return;
+      }
+      this.fetchAddressesLock = true;
       const addressesStr: string = await RPCModule.execute(CommandEnum.addresses, CommandAddressesEnum.full);
       if (addressesStr) {
         if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error addresses ${addressesStr}`);
+          this.fetchAddressesLock = false;
           return;
         }
       } else {
         console.log('Internal Error addresses');
+        this.fetchAddressesLock = false;
         return;
       }
       const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr);
@@ -1140,10 +1158,12 @@ export default class RPC {
       if (addressesStr) {
         if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error addresses ${addressesStr}`);
+          this.fetchAddressesLock = false;
           return;
         }
       } else {
         console.log('Internal Error addresses');
+        this.fetchAddressesLock = false;
         return;
       }
       const orchardAddressesJSON: RPCAddressType[] = await JSON.parse(orchardAddressesStr);
@@ -1174,48 +1194,64 @@ export default class RPC {
         });
 
       this.fnSetAllAddresses(allAddresses);
+      this.fetchAddressesLock = false;
     } catch (error) {
       console.log(`Critical Error addresses ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.configure();
+      this.fetchAddressesLock = false;
       return;
     }
   }
 
   async fetchWalletHeight(): Promise<void> {
     try {
+      if (this.fetchWalletHeightLock) {
+        return;
+      }
+      this.fetchWalletHeightLock = true;
       const heightStr: string = await RPCModule.execute(CommandEnum.height, '');
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error wallet height ${heightStr}`);
+          this.fetchWalletHeightLock = false;
           return;
         }
       } else {
         console.log('Internal Error wallet height');
+        this.fetchWalletHeightLock = false;
         return;
       }
       const heightJSON: RPCWalletHeight = await JSON.parse(heightStr);
 
       this.lastWalletBlockHeight = heightJSON.height;
+      this.fetchWalletHeightLock = false;
     } catch (error) {
       console.log(`Critical Error wallet height ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.configure();
+      this.fetchWalletHeightLock = false;
       return;
     }
   }
 
   async fetchWalletBirthday(): Promise<void> {
     try {
+      if (this.fetchWalletBirthdayLock) {
+        return;
+      }
+      this.fetchWalletBirthdayLock = true;
       const wallet = await RPC.rpcFetchWallet(this.readOnly);
 
       if (wallet) {
         this.walletBirthday = wallet.birthday;
       }
+      this.fetchWalletBirthdayLock = false;
     } catch (error) {
       console.log(`Critical Error wallet birthday ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.configure();
+      this.fetchWalletBirthdayLock = false;
       return;
     }
   }
@@ -1223,15 +1259,21 @@ export default class RPC {
   // Fetch all T and Z and O ValueTransfers
   async fetchTandZandOValueTransfers() {
     try {
+      if (this.fetchTandZandOValueTransfersLock) {
+        return;
+      }
+      this.fetchTandZandOValueTransfersLock = true;
       const valueTransfersStr: string = await RPCModule.getValueTransfersList('100000000');
       //console.log(valueTransfersStr);
       if (valueTransfersStr) {
         if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error value transfers ${valueTransfersStr}`);
+          this.fetchTandZandOValueTransfersLock = false;
           return;
         }
       } else {
         console.log('Internal Error value transfers');
+        this.fetchTandZandOValueTransfersLock = false;
         return;
       }
       const valueTransfersJSON: RPCValueTransfersType = await JSON.parse(valueTransfersStr);
@@ -1305,10 +1347,12 @@ export default class RPC {
       //console.log(vtlist);
 
       this.fnSetValueTransfersList(vtList, vtList.length);
+      this.fetchTandZandOValueTransfersLock = false;
     } catch (error) {
       console.log(`Critical Error txs list value transfers ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.configure();
+      this.fetchTandZandOValueTransfersLock = false;
       return;
     }
   }
@@ -1316,15 +1360,21 @@ export default class RPC {
   // Fetch all T and Z and O ValueTransfers as a Messages
   async fetchTandZandOMessages() {
     try {
+      if (this.fetchTandZandOMessagesLock) {
+        return;
+      }
+      this.fetchTandZandOMessagesLock = true;
       const messagesStr: string = await RPCModule.execute(CommandEnum.messages, '');
       //console.log(messagesStr);
       if (messagesStr) {
         if (messagesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error value transfers messages ${messagesStr}`);
+          this.fetchTandZandOMessagesLock = false;
           return;
         }
       } else {
         console.log('Internal Error value transfers messages');
+        this.fetchTandZandOMessagesLock = false;
         return;
       }
       const messagesJSON: RPCValueTransfersType = await JSON.parse(messagesStr);
@@ -1398,10 +1448,12 @@ export default class RPC {
       //console.log(mlist);
 
       this.fnSetMessagesList(mList, mList.length);
+      this.fetchTandZandOMessagesLock = false;
     } catch (error) {
       console.log(`Critical Error txs list value transfers messages ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.configure();
+      this.fetchTandZandOMessagesLock = false;
       return;
     }
   }
@@ -1457,7 +1509,7 @@ export default class RPC {
     const sendTxPromise = new Promise<string>((resolve, reject) => {
       if (sendTxids) {
         // And refresh data (full refresh)
-        this.refresh(true);
+        this.refreshSync(true);
         console.log('00000000 RESOLVE send');
         resolve(sendTxids);
         return;

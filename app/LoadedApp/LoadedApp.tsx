@@ -1051,13 +1051,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  doRefresh = async () => {
-    await this.rpc.refresh(false);
+  doRefresh = () => {
+    this.rpc.refreshSync(false);
   };
 
   doRescan = async () => {
     await this.rpc.stopSyncProcess();
-    this.rpc.refresh(false, true);
+    this.rpc.refreshSync(false, true);
   };
 
   toggleMenuDrawer = () => {
