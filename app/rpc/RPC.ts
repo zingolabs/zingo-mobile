@@ -372,7 +372,7 @@ export default class RPC {
       new Promise<void>(async resolve => {
         const s = Date.now();
         await this.fetchWalletHeight();
-        console.log('wh - ', Date.now() - s);
+        console.log('wallet height - ', Date.now() - s);
         resolve();
       }),
     );
@@ -380,7 +380,7 @@ export default class RPC {
       new Promise<void>(async resolve => {
         const s = Date.now();
         await this.fetchWalletBirthday();
-        console.log('wb - ', Date.now() - s);
+        console.log('wallet birthday - ', Date.now() - s);
         resolve();
       }),
     );
@@ -388,7 +388,7 @@ export default class RPC {
       new Promise<void>(async resolve => {
         const s = Date.now();
         await this.fetchInfoAndServerHeight();
-        console.log('info - ', Date.now() - s);
+        console.log('info & server height - ', Date.now() - s);
         resolve();
       }),
     );
@@ -396,7 +396,7 @@ export default class RPC {
       new Promise<void>(async resolve => {
         const s = Date.now();
         await this.fetchTandZandOValueTransfers();
-        console.log('vt - ', Date.now() - s);
+        console.log('value transfers - ', Date.now() - s);
         resolve();
       }),
     );
@@ -404,7 +404,7 @@ export default class RPC {
       new Promise<void>(async resolve => {
         const s = Date.now();
         await this.fetchTandZandOMessages();
-        console.log('m - ', Date.now() - s);
+        console.log('messages - ', Date.now() - s);
         resolve();
       }),
     );
@@ -412,7 +412,7 @@ export default class RPC {
       new Promise<void>(async resolve => {
         const s = Date.now();
         await this.fetchTotalBalance();
-        console.log('b - ', Date.now() - s);
+        console.log('balance - ', Date.now() - s);
         resolve();
       }),
     );
@@ -420,7 +420,7 @@ export default class RPC {
       new Promise<void>(async resolve => {
         const s = Date.now();
         await this.fetchWalletSettings();
-        console.log('ws - ', Date.now() - s);
+        console.log('wallet settings - ', Date.now() - s);
         resolve();
       }),
     );
@@ -429,15 +429,15 @@ export default class RPC {
         new Promise<void>(async resolve => {
           const s = Date.now();
           await this.fetchAddresses();
-          console.log('a - ', Date.now() - s);
+          console.log('addresses - ', Date.now() - s);
           resolve();
         }),
       );
-      // try to sync, don't wait to finish.
+      // try to sync.
       taskPromises.push(
         new Promise<void>(async resolve => {
           const s = Date.now();
-          this.refreshSync(false);
+          await this.refreshSync(false);
           console.log('sync - ', Date.now() - s);
           resolve();
         }),
@@ -491,14 +491,16 @@ export default class RPC {
   sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
   async stopSyncProcess(): Promise<void> {
-    let returnStatus = await this.doSyncStatus();
-    if (returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
+    let returnStatus: string = await RPCModule.execute(CommandEnum.syncstatus, '');
+    if (!returnStatus || returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
+      console.log('STOP - SYNC STATUS ERROR', returnStatus);
       return;
     }
     let ss = {} as RPCSyncStatusType;
     try {
       ss = await JSON.parse(returnStatus);
     } catch (e) {
+      console.log('SYNC STATUS ERROR - PARSE JSON', returnStatus);
       return;
     }
 
@@ -511,8 +513,17 @@ export default class RPC {
       // sleep for half second
       await this.sleep(500);
 
-      returnStatus = await this.doSyncStatus();
-      ss = await JSON.parse(returnStatus);
+      returnStatus = await RPCModule.execute(CommandEnum.syncstatus, '');
+      if (!returnStatus || returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log('STOP - SYNC STATUS ERROR', returnStatus);
+        return;
+      }
+      try {
+        ss = await JSON.parse(returnStatus);
+      } catch (e) {
+        console.log('SYNC STATUS ERROR - PARSE JSON', returnStatus);
+        return;
+      }
 
       //console.log('stop sync process. in progress', ss.in_progress);
     }
@@ -558,66 +569,6 @@ export default class RPC {
     }
   }
 
-  async doRescan(): Promise<string> {
-    try {
-      const rescanStr: string = await RPCModule.execute(CommandEnum.rescan, '');
-      if (rescanStr) {
-        if (rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error rescan ${rescanStr}`);
-          return rescanStr;
-        }
-      } else {
-        console.log('Internal Error rescan');
-        return 'Error: Internal RPC Error: rescan';
-      }
-
-      return rescanStr;
-    } catch (error) {
-      console.log(`Critical Error rescan ${error}`);
-      return `Error: rescan ${error}`;
-    }
-  }
-
-  async doSync(): Promise<string> {
-    try {
-      const syncStr: string = await RPCModule.execute(CommandEnum.sync, '');
-      if (syncStr) {
-        if (syncStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error sync ${syncStr}`);
-          return syncStr;
-        }
-      } else {
-        console.log('Internal Error sync');
-        return 'Error: Internal RPC Error: sync';
-      }
-
-      return syncStr;
-    } catch (error) {
-      console.log(`Critical Error sync ${error}`);
-      return `Error: sync ${error}`;
-    }
-  }
-
-  async doSyncStatus(): Promise<string> {
-    try {
-      const syncStatusStr: string = await RPCModule.execute(CommandEnum.syncstatus, '');
-      if (syncStatusStr) {
-        if (syncStatusStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error sync status ${syncStatusStr}`);
-          return syncStatusStr;
-        }
-      } else {
-        console.log('Internal Error sync status');
-        return 'Error: Internal RPC Error: sync status';
-      }
-
-      return syncStatusStr;
-    } catch (error) {
-      console.log(`Critical Error sync status ${error}`);
-      return `Error: sync status ${error}`;
-    }
-  }
-
   async doSend(sendJSON: string): Promise<string> {
     try {
       console.log('send JSON', sendJSON);
@@ -657,7 +608,7 @@ export default class RPC {
     }
   }
 
-  async refreshSync(fullRefresh: boolean, fullRescan?: boolean) {
+  refreshSync(fullRefresh: boolean, fullRescan?: boolean) {
     if (this.refreshSyncLock) {
       console.log('REFRESH ----> in execution already');
       return;
@@ -696,88 +647,82 @@ export default class RPC {
       this.prevCurrentBlock = -1;
 
       // This is async, so when it is done, we finish the refresh.
+      let promise: Promise<void>;
       if (fullRescan) {
-        // clean the ValueTransfer list before.
-        this.fnSetValueTransfersList([], 0);
-        this.fnSetMessagesList([], 0);
-        this.fnSetTotalBalance({
-          orchardBal: 0,
-          privateBal: 0,
-          transparentBal: 0,
-          spendableOrchard: 0,
-          spendablePrivate: 0,
-          total: 0,
-        } as TotalBalanceClass);
-        setTimeout(() => {
-          this.doRescan()
-            .then(result => {
-              console.log('rescan finished', result);
-              if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
-                const resultJSON: RPCSyncRescan = JSON.parse(result);
-                if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
-                  this.latestBlock = resultJSON.latest_block;
-                  // Already finished
-                  console.log('REFRESH ----> Already Rescan Finished');
-                  // Here I know the sync process is over, I need to inform to the UI.
-                  this.fnSetSyncingStatus({
-                    syncID: this.syncId < 0 ? 0 : this.syncId,
-                    totalBatches: 0,
-                    currentBatch: 0,
-                    lastBlockWallet: this.lastWalletBlockHeight,
-                    currentBlock: this.lastWalletBlockHeight,
-                    inProgress: false,
-                    lastError: '',
-                    blocksPerBatch: this.blocksPerBatch,
-                    secondsPerBatch: 0,
-                    processEndBlock: this.lastServerBlockHeight,
-                    lastBlockServer: this.lastServerBlockHeight,
-                    syncProcessStalled: false,
-                  } as SyncingStatusClass);
-                }
-              }
-            })
-            .catch(error => console.log('rescan error', error))
-            .finally(() => {
-              this.setInRefresh(false);
-              this.keepAwake(false);
-            });
-        }, 1);
+        promise = new Promise<void>(async resolve => {
+          // clean the ValueTransfer list before.
+          this.fnSetValueTransfersList([], 0);
+          this.fnSetMessagesList([], 0);
+          this.fnSetTotalBalance({
+            orchardBal: 0,
+            privateBal: 0,
+            transparentBal: 0,
+            spendableOrchard: 0,
+            spendablePrivate: 0,
+            total: 0,
+          } as TotalBalanceClass);
+          const rescanStr: string = await RPCModule.execute(CommandEnum.rescan, '');
+          console.log('rescan finished', rescanStr);
+          if (rescanStr && !rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
+            const resultJSON: RPCSyncRescan = JSON.parse(rescanStr);
+            if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
+              this.latestBlock = resultJSON.latest_block;
+              // Already finished
+              console.log('REFRESH ----> Already Rescan Finished');
+              // Here I know the sync process is over, I need to inform to the UI.
+              this.fnSetSyncingStatus({
+                syncID: this.syncId < 0 ? 0 : this.syncId,
+                totalBatches: 0,
+                currentBatch: 0,
+                lastBlockWallet: this.lastWalletBlockHeight,
+                currentBlock: this.lastWalletBlockHeight,
+                inProgress: false,
+                lastError: '',
+                blocksPerBatch: this.blocksPerBatch,
+                secondsPerBatch: 0,
+                processEndBlock: this.lastServerBlockHeight,
+                lastBlockServer: this.lastServerBlockHeight,
+                syncProcessStalled: false,
+              } as SyncingStatusClass);
+            }
+          }
+          this.setInRefresh(false);
+          this.keepAwake(false);
+          resolve();
+        });
       } else {
-        setTimeout(() => {
-          this.doSync()
-            .then(result => {
-              console.log('sync finished', result);
-              if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
-                const resultJSON: RPCSyncRescan = JSON.parse(result);
-                if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
-                  this.latestBlock = resultJSON.latest_block;
-                  // Already finished
-                  console.log('REFRESH ----> Already Sync Finished');
-                  // Here I know the sync process is over, I need to inform to the UI.
-                  this.fnSetSyncingStatus({
-                    syncID: this.syncId < 0 ? 0 : this.syncId,
-                    totalBatches: 0,
-                    currentBatch: 0,
-                    lastBlockWallet: this.lastWalletBlockHeight,
-                    currentBlock: this.lastWalletBlockHeight,
-                    inProgress: false,
-                    lastError: '',
-                    blocksPerBatch: this.blocksPerBatch,
-                    secondsPerBatch: 0,
-                    processEndBlock: this.lastServerBlockHeight,
-                    lastBlockServer: this.lastServerBlockHeight,
-                    syncProcessStalled: false,
-                  } as SyncingStatusClass);
-                }
-              }
-            })
-            .catch(error => console.log('sync error', error))
-            .finally(() => {
-              this.setInRefresh(false);
-              this.keepAwake(false);
-            });
-        }, 1);
+        promise = new Promise<void>(async resolve => {
+          const syncStr: string = await RPCModule.execute(CommandEnum.sync, '');
+          console.log('sync finished', syncStr);
+          if (syncStr && !syncStr.toLowerCase().startsWith(GlobalConst.error)) {
+            const resultJSON: RPCSyncRescan = JSON.parse(syncStr);
+            if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
+              this.latestBlock = resultJSON.latest_block;
+              // Already finished
+              console.log('REFRESH ----> Already Sync Finished');
+              // Here I know the sync process is over, I need to inform to the UI.
+              this.fnSetSyncingStatus({
+                syncID: this.syncId < 0 ? 0 : this.syncId,
+                totalBatches: 0,
+                currentBatch: 0,
+                lastBlockWallet: this.lastWalletBlockHeight,
+                currentBlock: this.lastWalletBlockHeight,
+                inProgress: false,
+                lastError: '',
+                blocksPerBatch: this.blocksPerBatch,
+                secondsPerBatch: 0,
+                processEndBlock: this.lastServerBlockHeight,
+                lastBlockServer: this.lastServerBlockHeight,
+                syncProcessStalled: false,
+              } as SyncingStatusClass);
+            }
+          }
+          this.setInRefresh(false);
+          this.keepAwake(false);
+          resolve();
+        });
       }
+      Promise.allSettled([promise]);
     } else {
       // Already at the latest block
       console.log('REFRESH ----> Already have latest block, waiting for next refresh');
@@ -805,8 +750,8 @@ export default class RPC {
       return;
     }
     this.fetchSyncStatusLock = true;
-    const returnStatus = await this.doSyncStatus();
-    if (returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
+    const returnStatus: string = await RPCModule.execute(CommandEnum.syncstatus, '');
+    if (!returnStatus || returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC STATUS ERROR', returnStatus);
       this.fetchSyncStatusLock = false;
       return;
@@ -815,6 +760,7 @@ export default class RPC {
     try {
       ss = await JSON.parse(returnStatus);
     } catch (e) {
+      console.log('SYNC STATUS ERROR - PARSE JSON', returnStatus);
       this.fetchSyncStatusLock = false;
       return;
     }
