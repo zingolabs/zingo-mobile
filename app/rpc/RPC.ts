@@ -569,45 +569,6 @@ export default class RPC {
     }
   }
 
-  async doSend(sendJSON: string): Promise<string> {
-    try {
-      console.log('send JSON', sendJSON);
-      // creating the propose
-      const proposeStr: string = await RPCModule.execute(CommandEnum.send, sendJSON);
-      if (proposeStr) {
-        if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error send ${proposeStr}`);
-          return proposeStr;
-        }
-      } else {
-        console.log('Internal Error send');
-        return 'Error: Internal RPC Error: send';
-      }
-      const proposeJSON: RPCSendProposeType = await JSON.parse(proposeStr);
-      if (proposeJSON.error) {
-        console.log(`Error send ${proposeStr}`);
-        return proposeStr;
-      }
-
-      // creating the transaction
-      const sendStr: string = await RPCModule.execute(CommandEnum.confirm, '');
-      if (sendStr) {
-        if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error send ${sendStr}`);
-          return sendStr;
-        }
-      } else {
-        console.log('Internal Error send');
-        return 'Error: Internal RPC Error: send';
-      }
-
-      return sendStr;
-    } catch (error) {
-      console.log(`Critical Error send ${error}`);
-      return `Error: send ${error}`;
-    }
-  }
-
   refreshSync(fullRefresh: boolean, fullRescan?: boolean) {
     if (this.refreshSyncLock) {
       console.log('REFRESH ----> in execution already');
@@ -722,7 +683,8 @@ export default class RPC {
           resolve();
         });
       }
-      Promise.allSettled([promise]);
+      // run the Promise directly
+      promise;
     } else {
       // Already at the latest block
       console.log('REFRESH ----> Already have latest block, waiting for next refresh');
@@ -1406,53 +1368,71 @@ export default class RPC {
 
   // Send a transaction using the already constructed sendJson structure
   async sendTransaction(sendJson: Array<SendJsonToTypeType>): Promise<string> {
-    // clear the timers - Tasks.
-    await this.clearTimers();
-    // sending
-    this.setInSend(true);
-    // keep awake the screen/device while sending.
-    this.keepAwake(true);
-    // sometimes we need the result of send as well
-    let sendError: string = '';
-    let sendTxids: string = '';
-
-    // I need to wait until the send process finished
-    await this.doSend(JSON.stringify(sendJson))
-      .then(r => {
-        try {
-          const rJson: RPCSendType = JSON.parse(r);
-          if (rJson.error) {
-            sendError = rJson.error;
-          } else if (rJson.txids && rJson.txids.length > 0) {
-            sendTxids = rJson.txids.join(', ');
+    const sendTxPromise = new Promise<string>(async (resolve, reject) => {
+      // clear the timers - Tasks.
+      await this.clearTimers();
+      // sending
+      this.setInSend(true);
+      // keep awake the screen/device while sending.
+      this.keepAwake(true);
+      // sometimes we need the result of send as well
+      let sendError: string = '';
+      let sendTxids: string = '';
+      try {
+        console.log('send JSON', sendJson);
+        // creating the propose
+        const proposeStr: string = await RPCModule.execute(CommandEnum.send, JSON.stringify(sendJson));
+        if (proposeStr) {
+          if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+            console.log(`Error propose ${proposeStr}`);
+            sendError = proposeStr;
           }
-        } catch (e) {
-          sendError = r;
-        }
-        console.log('End Send OK: ' + r);
-      })
-      .catch(e => {
-        if (e && e.message) {
-          sendError = e.message;
-        }
-        console.log('End Send ERROR: ' + e);
-      })
-      .finally(async () => {
-        // send process is about to finish - reactivate the syncing flag
-        await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
-        // create the tasks
-        await this.configure();
-        this.setInSend(false);
-        if (!this.inRefresh) {
-          // if not syncing, then not keep awake the screen/device when the send is finished.
-          this.keepAwake(false);
         } else {
-          this.keepAwake(true);
+          console.log('Internal Error propose');
+          sendError = 'Error: Internal RPC Error: propose';
         }
-      });
+        const proposeJSON: RPCSendProposeType = await JSON.parse(proposeStr);
+        if (proposeJSON.error) {
+          console.log(`Error propose ${proposeJSON.error}`);
+          sendError = proposeJSON.error;
+        }
+        if (!sendError) {
+          // creating the transaction
+          const sendStr: string = await RPCModule.execute(CommandEnum.confirm, '');
+          if (sendStr) {
+            if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
+              console.log(`Error confirm ${sendStr}`);
+              sendError = sendStr;
+            }
+          } else {
+            console.log('Internal Error confirm');
+            sendError = 'Error: Internal RPC Error: confirm';
+          }
+          const sendJSON: RPCSendType = await JSON.parse(sendStr);
+          if (sendJSON.error) {
+            console.log(`Error confirm ${sendJSON.error}`);
+            sendError = sendJSON.error;
+          } else if (sendJSON.txids && sendJSON.txids.length > 0) {
+            sendTxids = sendJSON.txids.join(', ');
+          }
+        }
+      } catch (error) {
+        console.log(`Critical Error send ${error}`);
+        sendError = `Error: send ${error}`;
+      }
 
-    // The send command is async, so we need to poll to get the status
-    const sendTxPromise = new Promise<string>((resolve, reject) => {
+      // send process is about to finish - reactivate the syncing flag
+      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
+      // create the tasks
+      await this.configure();
+      this.setInSend(false);
+      if (!this.inRefresh) {
+        // if not syncing, then not keep awake the screen/device when the send is finished.
+        this.keepAwake(false);
+      } else {
+        this.keepAwake(true);
+      }
+
       if (sendTxids) {
         // And refresh data (full refresh)
         this.refreshSync(true);
