@@ -201,7 +201,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
 
     if (valueTransfers !== null) {
       fetchZennyTips();
-      const c = fetchContacts;
+      const c = fetchContacts();
       setContacts(c);
       setTimeout(() => {
         setLoading(false);

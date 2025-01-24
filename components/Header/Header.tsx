@@ -492,7 +492,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               marginHorizontal: 5,
             }}>
             {!noSyncingStatus && selectServer !== SelectServerEnum.offline && (
-              <>
+              <View style={{ minHeight: 25 }}>
                 {netInfo.isConnected && !!syncingStatus.lastBlockServer && syncingStatus.syncID >= 0 ? (
                   <>
                     {!syncingStatus.inProgress && syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet && (
@@ -641,7 +641,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     )}
                   </View>
                 )}
-              </>
+              </View>
             )}
             {selectServer === SelectServerEnum.offline && (
               <View
