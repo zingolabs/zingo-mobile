@@ -20,6 +20,7 @@ import { Buffer } from 'buffer';
 import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 import { RPCParseAddressStatusEnum } from '../rpc/enums/RPCParseAddressStatusEnum';
 import { RPCAddressKindEnum } from '../rpc/enums/RPCAddressKindEnum';
+import { RPCReceiversEnum } from '../rpc/enums/RPCReceiversEnum';
 
 export default class Utils {
   static trimToSmall(addr?: string, numChars?: number): string {
@@ -292,6 +293,7 @@ export default class Utils {
     const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
     //console.log(result);
     let isValid: boolean = false;
+    let isFullUA: boolean = false;
     let onlyOrchardUA: string = '';
 
     if (result) {
@@ -311,7 +313,16 @@ export default class Utils {
     isValid =
       resultJSON.status === RPCParseAddressStatusEnum.successAddressParse && resultJSON.chain_name === serverChainName;
     if (isValid) {
-      onlyOrchardUA = resultJSON.only_orchard_ua ? resultJSON.only_orchard_ua : '';
+      isFullUA =
+        resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
+        !!resultJSON.receivers_available &&
+        resultJSON.receivers_available.includes(RPCReceiversEnum.orchardRPCReceiver) &&
+        resultJSON.receivers_available.includes(RPCReceiversEnum.saplingRPCReceiver) &&
+        resultJSON.receivers_available.includes(RPCReceiversEnum.transparentRPCReceiver);
+      if (isFullUA) {
+        // the only use case for this is: if the UA is full (3 receivers)
+        onlyOrchardUA = resultJSON.only_orchard_ua ? resultJSON.only_orchard_ua : '';
+      }
     }
 
     return { isValid, onlyOrchardUA };
