@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from './RegText';
 import Utils from '../../app/utils';

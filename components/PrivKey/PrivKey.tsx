@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView, TouchableOpacity, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 
 import FadeText from '../Components/FadeText';

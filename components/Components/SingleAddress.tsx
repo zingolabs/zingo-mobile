@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect } from 'react';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@react-navigation/native';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';

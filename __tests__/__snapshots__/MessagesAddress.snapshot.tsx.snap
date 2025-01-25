@@ -32,20 +32,6 @@ exports[`Component Messages Address - test Messages Address - snapshot 1`] = `
         }
       }
     >
-      <Modal
-        animationType="slide"
-        hardwareAccelerated={false}
-        onRequestClose={[Function]}
-        transparent={false}
-        visible={false}
-      />
-      <Modal
-        animationType="slide"
-        hardwareAccelerated={false}
-        onRequestClose={[Function]}
-        transparent={false}
-        visible={false}
-      />
       <View>
         <View
           style={

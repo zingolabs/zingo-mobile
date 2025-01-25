@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, SafeAreaView, Linking, Text } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';

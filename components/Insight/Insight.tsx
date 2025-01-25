@@ -6,7 +6,7 @@ import { PieChart } from 'react-native-svg-charts';
 import { Circle, G, Line, Text } from 'react-native-svg';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';

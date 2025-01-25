@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTriangleExclamation, faCircleCheck as faCircleCheckSolid } from '@fortawesome/free-solid-svg-icons';
 import { faCircleCheck as faCircleCheckRegular } from '@fortawesome/free-regular-svg-icons';
 
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';

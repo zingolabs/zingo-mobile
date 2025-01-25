@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.facebook.react'
-apply plugin: 'kotlin-android'
-
+apply plugin: "org.jetbrains.kotlin.android"
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -85,21 +84,22 @@ ext.includeUniversalApk = project.properties['includeUniversalApk'] ?: false
 android {
     ndkVersion rootProject.ext.ndkVersion
 
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdk rootProject.ext.compileSdkVersion
 
     namespace 'org.ZingoLabs.Zingo'
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_18
-        targetCompatibility = JavaVersion.VERSION_18
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '18'
+        jvmTarget = '17'
     }
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(18)
+            languageVersion = JavaLanguageVersion.of(17)
         }
     }
 
@@ -225,6 +225,7 @@ android.applicationVariants.configureEach { variant ->
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    implementation("com.facebook.react:flipper-integration")
 
     androidTestImplementation('com.wix:detox:20.27.2')
     implementation 'androidx.appcompat:appcompat:1.7.0'
@@ -235,13 +236,6 @@ dependencies {
     
     // Detox tests getAttributes() needs this
     debugImplementation('com.google.android.material:material:1.12.0')
-
-    debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
-    debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
-        exclude group:'com.squareup.okhttp3', module:'okhttp'
-    }
-
-    debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

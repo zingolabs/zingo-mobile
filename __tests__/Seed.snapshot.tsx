@@ -50,6 +50,10 @@ jest.mock('react-native', () => {
 
   return RN;
 });
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
+}));
 
 // test suite
 describe('Component Seed - test', () => {

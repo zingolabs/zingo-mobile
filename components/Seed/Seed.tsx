@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, SafeAreaView, ScrollView, TouchableOpacity, Text, Alert } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';

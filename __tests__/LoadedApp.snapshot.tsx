@@ -122,6 +122,10 @@ jest.mock('react-native-keychain', () => ({
   getGenericPassword: jest.fn(),
   resetGenericPassword: jest.fn(),
 }));
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
+}));
 
 // test suite
 describe('Component LoadedApp - test', () => {

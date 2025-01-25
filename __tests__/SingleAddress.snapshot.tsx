@@ -14,6 +14,10 @@ jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
 }));
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
+}));
 
 // test suite
 describe('Component SingleAddress - test', () => {

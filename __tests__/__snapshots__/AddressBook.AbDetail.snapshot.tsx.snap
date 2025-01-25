@@ -80,13 +80,6 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
       }
     }
   >
-    <Modal
-      animationType="slide"
-      hardwareAccelerated={false}
-      onRequestClose={[Function]}
-      transparent={false}
-      visible={false}
-    />
     <View
       style={
         {
@@ -487,13 +480,6 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
       }
     }
   >
-    <Modal
-      animationType="slide"
-      hardwareAccelerated={false}
-      onRequestClose={[Function]}
-      transparent={false}
-      visible={false}
-    />
     <View
       style={
         {
@@ -962,13 +948,6 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
       }
     }
   >
-    <Modal
-      animationType="slide"
-      hardwareAccelerated={false}
-      onRequestClose={[Function]}
-      transparent={false}
-      visible={false}
-    />
     <View
       style={
         {

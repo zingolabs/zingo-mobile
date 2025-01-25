@@ -13,13 +13,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
     }
   }
 >
-  <Modal
-    animationType="slide"
-    hardwareAccelerated={false}
-    onRequestClose={[Function]}
-    transparent={false}
-    visible={false}
-  />
   <View>
     <View
       style={
@@ -780,13 +773,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
     }
   }
 >
-  <Modal
-    animationType="slide"
-    hardwareAccelerated={false}
-    onRequestClose={[Function]}
-    transparent={false}
-    visible={false}
-  />
   <View>
     <View
       style={

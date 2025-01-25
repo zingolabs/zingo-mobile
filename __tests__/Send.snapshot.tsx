@@ -61,6 +61,10 @@ jest.mock('react-native-device-info', () => ({
   getManufacturer: jest.fn(() => 'Mocked Manufacturer'),
   getModel: jest.fn(() => 'Mocked Model'),
 }));
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
+}));
 
 // test suite
 describe('Component Send - test', () => {

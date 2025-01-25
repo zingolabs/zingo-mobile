@@ -110,6 +110,10 @@ jest.mock('@react-navigation/native', () => ({
   useScrollToTop: jest.fn(),
   useTheme: () => mockTheme,
 }));
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
+}));
 
 // test suite
 describe('Component History - test', () => {
