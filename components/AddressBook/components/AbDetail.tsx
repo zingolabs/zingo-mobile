@@ -187,7 +187,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         setUOrchardAddress={setUOrchardAddress}
       />
       {mode === ModeEnum.advanced && uOrchardAddress && (
-        <FadeText style={{ marginLeft: 10, marginTop: 0, color: colors.primaryDisabled }}>
+        <FadeText style={{ marginLeft: 10, marginTop: 0, color: colors.primary }}>
           {translate('addressbook.uorchardaddress') + uOrchardAddress}
         </FadeText>
       )}

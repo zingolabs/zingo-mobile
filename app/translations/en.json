@@ -72,7 +72,7 @@
     "likely": "Likely: ",
     "thiswalletaddress": "This Wallet's Address",
     "addto": "Add to ",
-    "uorchardaddress": "Additional calculated address:\n"
+    "uorchardaddress": "Orchard UA:\n"
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",
