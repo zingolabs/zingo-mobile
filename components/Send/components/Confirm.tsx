@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView } from 'react-native';
+import { View, ScrollView, SafeAreaView, ActivityIndicator, Platform } from 'react-native';
 
 import FadeText from '../../Components/FadeText';
 import BoldText from '../../Components/BoldText';
@@ -71,7 +71,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [privacyLevel, setPrivacyLevel] = useState<string>('-');
+  const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
   const [sendingTotal, setSendingTotal] = useState<number>(0);
 
   const memoTotal: string = `${sendPageState.toaddr.memo || ''}${
@@ -321,7 +321,14 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <View style={{ margin: 10 }}>
             <FadeText>{translate('send.confirm-privacy-level') as string}</FadeText>
-            <RegText>{privacyLevel}</RegText>
+            {!privacyLevel ? (
+              <ActivityIndicator
+                size={Platform.OS === GlobalConst.platformOSios ? 'small' : 12}
+                color={colors.primary}
+              />
+            ) : (
+              <RegText>{privacyLevel}</RegText>
+            )}
           </View>
           <View style={{ margin: 10 }}>
             <FadeText>{translate('send.fee') as string}</FadeText>
