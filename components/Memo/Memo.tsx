@@ -123,6 +123,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, memoUpdateToFiel
               }}
               value={memo}
               onChangeText={(text: string) => setMemo(text)}
+              onEndEditing={(e: any) => setMemo(e.nativeEvent.text)}
               maxLength={GlobalConst.memoMaxLength}
             />
             {memo && (

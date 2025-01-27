@@ -131,6 +131,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
   const [spendable, setSpendable] = useState<number>(0);
   const [uOrchardAddressContact, setUOrchardAddressContact] = useState<string>('');
+  const [memo, setMemo] = useState<string>(sendPageState.toaddr.memo);
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -196,14 +197,9 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       }
       // checking address & uOrchardAddress (if any value) as addresses
       // from the same contact in the Address Book.
-      return (
-        addr === address ||
-        memoAddress === address ||
-        (uOrchardAddressContact && addr === uOrchardAddressContact) ||
-        (uOrchardAddressContact && memoAddress === uOrchardAddressContact)
-      );
+      return !addr && !memoAddress;
     },
-    [address, uOrchardAddressContact],
+    [],
   );
 
   const fetchMessagesFiltered = useMemo(() => {
@@ -309,21 +305,22 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     };
   }, []);
 
-  const countMemoBytes = (memo: string, includeUAMemo: boolean) => {
-    const len = Buffer.byteLength(memoTotal(memo, includeUAMemo, uOrchardAddress), 'utf8');
-    return len;
-  };
-
   const memoTotal = useCallback((memoPar: string, includeUAMemoPar: boolean, uaAddressPar: string) => {
     return `${memoPar || ''}${includeUAMemoPar ? GlobalConst.replyTo + uaAddressPar : ''}`;
   }, []);
 
+  const countMemoBytes = useCallback(
+    (memoPar: string, includeUAMemo: boolean, uaAddressPar: string) => {
+      const len = Buffer.byteLength(memoTotal(memoPar, includeUAMemo, uaAddressPar), 'utf8');
+      return len;
+    },
+    [memoTotal],
+  );
+
   useEffect(() => {
-    if (sendPageState.toaddr.memo) {
-      const len = Buffer.byteLength(
-        memoTotal(sendPageState.toaddr.memo, sendPageState.toaddr.includeUAMemo, uOrchardAddress),
-        'utf8',
-      );
+    if (memo) {
+      setMemo(memo);
+      const len = countMemoBytes(memo, true, uOrchardAddress);
       if (len > GlobalConst.memoMaxLength) {
         setValidMemo(-1);
       } else {
@@ -332,7 +329,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     } else {
       setValidMemo(0);
     }
-  }, [memoTotal, sendPageState.toaddr.includeUAMemo, sendPageState.toaddr.memo, uOrchardAddress]);
+  }, [countMemoBytes, memoTotal, memo, uOrchardAddress]);
 
   const loadMoreClicked = useCallback(() => {
     setNumVt(numVt + 50);
@@ -365,7 +362,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     }
   };
 
-  const updateToField = async (memo: string | null) => {
+  const updateToField = (memoPar: string | null) => {
     // Create the new state object
     const newState = new SendPageStateClass(new ToAddrClass(0));
 
@@ -378,8 +375,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     toAddr.amountCurrency = '0';
     toAddr.includeUAMemo = true;
 
-    if (memo !== null) {
-      toAddr.memo = memo;
+    if (memoPar !== null) {
+      toAddr.memo = memoPar;
     }
 
     newState.toaddr = newToAddr;
@@ -403,6 +400,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   };
 
   const confirmSend = async () => {
+    if (!memo) {
+      return;
+    }
+    updateToField(memo);
     if (!sendTransaction || !clearToAddr || !setServerOption) {
       return;
     }
@@ -419,6 +420,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         await sendTransaction();
 
         // Clear the fields
+        setMemo('');
         clearToAddr();
 
         // scroll to top in history, just in case.
@@ -461,6 +463,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             await sendTransaction();
 
             // Clear the fields
+            setMemo('');
             clearToAddr();
 
             // scroll to top in history, just in case.
@@ -506,13 +509,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   }, [totalBalance, totalBalance?.spendableOrchard, totalBalance?.spendablePrivate]);
 
   if (address) {
-    console.log(
-      'render Messages',
-      dimensions.height,
-      dimensions.height - memoFieldHeight,
-      memoFieldHeight,
-      keyboardVisible,
-    );
+    console.log('render Messages', validMemo, 'memo context', sendPageState.toaddr.memo, 'memo local:', memo);
   }
 
   return (
@@ -841,14 +838,15 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   backgroundColor: 'transparent',
                   textAlignVertical: 'top',
                 }}
-                value={sendPageState.toaddr.memo}
+                value={memo}
                 onChangeText={(text: string) => {
-                  if (text !== sendPageState.toaddr.memo) {
-                    updateToField(text);
+                  if (text !== memo) {
+                    setMemo(text);
                   }
                 }}
                 onEndEditing={(e: any) => {
-                  if (e.nativeEvent.text !== sendPageState.toaddr.memo) {
+                  if (e.nativeEvent.text !== memo) {
+                    setMemo(e.nativeEvent.text);
                     updateToField(e.nativeEvent.text);
                   }
                 }}
@@ -880,9 +878,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               {disableSend && (
                 <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
               )}
-              {sendPageState.toaddr.memo && !disableSend && (
+              {!!memo && !disableSend && (
                 <TouchableOpacity
                   onPress={() => {
+                    setMemo('');
                     updateToField('');
                   }}>
                   <FontAwesomeIcon
@@ -893,7 +892,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   />
                 </TouchableOpacity>
               )}
-              {memoIcon && !disableSend && (
+              {!!memoIcon && !disableSend && (
                 <TouchableOpacity
                   onPress={() => {
                     setMemoModalVisible(true);
@@ -932,7 +931,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   fontWeight: 'bold',
                   fontSize: 12.5,
                   color: validMemo === -1 ? 'red' : colors.text,
-                }}>{`${countMemoBytes(sendPageState.toaddr.memo, sendPageState.toaddr.includeUAMemo)} `}</FadeText>
+                }}>{`${countMemoBytes(memo, true, uOrchardAddress)} `}</FadeText>
               <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>{translate('loadedapp.of') as string}</FadeText>
               <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
                 {' ' + GlobalConst.memoMaxLength.toString() + ' '}
