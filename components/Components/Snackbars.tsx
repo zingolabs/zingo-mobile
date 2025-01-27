@@ -49,7 +49,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
         backgroundColor: colors.secondaryDisabled,
         textColor: colors.money,
         action: {
-          text: translate('cancel') as string,
+          text: translate('close') as string,
           textColor: colors.primary,
           onPress: () => handleSnackbarClose(),
         },

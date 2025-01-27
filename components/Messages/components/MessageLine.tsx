@@ -80,9 +80,15 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
     const contact: AddressBookFileClass[] = addressBook.filter(
       (ab: AddressBookFileClass) => ab.address === add || ab.uOrchardAddress === add,
     );
+    let uOrchAdd: string = '';
+    if (contact.length === 1) {
+      uOrchAdd = contact[0].uOrchardAddress || '';
+    } else if (contact.length === 2) {
+      uOrchAdd = contact[0].uOrchardAddress || contact[1].uOrchardAddress || '';
+    }
     return {
       found: contact.length >= 1,
-      uOrchardAddress: contact.length >= 1 && contact[0].uOrchardAddress ? contact[0].uOrchardAddress : '',
+      uOrchardAddress: uOrchAdd,
     };
   };
 

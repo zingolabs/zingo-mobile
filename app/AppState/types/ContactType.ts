@@ -3,6 +3,10 @@ import { ValueTransferKindEnum } from '../enums/ValueTransferKindEnum';
 
 export default interface ContactType {
   address: string;
+  uOrchardAddress: string;
+
+  // for searching
+  label: string;
 
   // last message
   time: number;

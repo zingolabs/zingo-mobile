@@ -22,6 +22,7 @@ import { faAnglesUp, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-
 
 import {
   AddressBookFileClass,
+  AddressClass,
   ContactType,
   FilterEnum,
   GlobalConst,
@@ -76,7 +77,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   setServerOption,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, valueTransfers, language, addLastSnackbar, server, addressBook } = context;
+  const { translate, valueTransfers, language, addLastSnackbar, server, addressBook, addresses } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -97,6 +98,11 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
 
   var lastMonth = '';
 
+  const thisWalletAddress: (add: string) => boolean = (add: string) => {
+    const address: AddressClass[] = addresses ? addresses.filter((a: AddressClass) => a.address === add) : [];
+    return address.length >= 1;
+  };
+
   const fetchContacts = () => {
     if (!valueTransfers) {
       return [] as ContactType[];
@@ -112,47 +118,77 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             let memoArray = memoTotal.split(GlobalConst.replyTo);
             memoAddress = memoArray.pop();
           }
-          const contactAddress = vt.address || memoAddress || '';
-          if (contactAddress) {
-            const exists = cont.filter((c: ContactType) => c.address === contactAddress);
-            const isContact = addressBook.filter((ab: AddressBookFileClass) => ab.address === contactAddress);
-            //console.log(contactAddress, exists);
-            let pushAddress = false;
-            if (exists.length === 0) {
-              if (filter === FilterEnum.all) {
-                pushAddress = true;
-              } else {
-                if (filter === FilterEnum.contacts && isContact.length === 1) {
-                  pushAddress = true;
-                } else if (filter === FilterEnum.noContacts && isContact.length === 0) {
-                  pushAddress = true;
-                }
-              }
-            }
-            if (pushAddress) {
-              // search if needed
-              let found = false;
-              if (searchText) {
-                if (
-                  contactAddress.toLowerCase().includes(searchText.toLowerCase()) ||
-                  (isContact.length === 1 && isContact[0].label.toLowerCase().includes(searchText.toLowerCase()))
-                ) {
-                  found = true;
-                }
-              } else {
-                found = true;
-              }
-              if (found) {
-                cont.push({
-                  address: contactAddress,
+          let contactAddress = vt.address || memoAddress || '';
+          // ignore contacts with this wallet addresses
+          if (contactAddress && !thisWalletAddress(contactAddress)) {
+            // here can be different, the only orchard UA can be part of one contact and
+            // also be other contact address. Some messages will be in two different chats
+            // of the same external wallet/contact.
+            const chatsToAdd = [] as ContactType[];
+            const isContact = addressBook.filter(
+              (ab: AddressBookFileClass) => ab.address === contactAddress || ab.uOrchardAddress === contactAddress,
+            );
+            if (isContact.length === 0) {
+              chatsToAdd.push({
+                address: contactAddress,
+                uOrchardAddress: '',
+                label: '',
+                time: vt.time,
+                memos: vt.memos,
+                confirmations: vt.confirmations,
+                status: vt.status,
+                kind: vt.kind,
+              });
+            } else if (isContact.length > 0) {
+              isContact.forEach((ab: AddressBookFileClass) => {
+                chatsToAdd.push({
+                  address: ab.address,
+                  uOrchardAddress: ab.uOrchardAddress ? ab.uOrchardAddress : '',
+                  label: ab.label,
                   time: vt.time,
-                  memos: vt.memos,
+                  memos: vt.memos ? vt.memos : [],
                   confirmations: vt.confirmations,
                   status: vt.status,
                   kind: vt.kind,
                 });
-              }
+              });
             }
+            chatsToAdd.forEach((c: ContactType) => {
+              const exists = cont.filter(
+                (ch: ContactType) => ch.address === c.address && ch.uOrchardAddress === c.uOrchardAddress,
+              );
+              //console.log(contactAddress, exists);
+              let pushAddress = false;
+              if (exists.length === 0) {
+                if (filter === FilterEnum.all) {
+                  pushAddress = true;
+                } else {
+                  if (filter === FilterEnum.contacts && isContact.length > 0) {
+                    pushAddress = true;
+                  } else if (filter === FilterEnum.noContacts && isContact.length === 0) {
+                    pushAddress = true;
+                  }
+                }
+              }
+              if (pushAddress) {
+                // search if needed
+                let found = false;
+                if (searchText) {
+                  if (
+                    c.address.toLowerCase().includes(searchText.toLowerCase()) ||
+                    c.uOrchardAddress.toLowerCase().includes(searchText.toLowerCase()) ||
+                    c.label.toLowerCase().includes(searchText.toLowerCase())
+                  ) {
+                    found = true;
+                  }
+                } else {
+                  found = true;
+                }
+                if (found) {
+                  cont.push(c);
+                }
+              }
+            });
           }
         }
       });
@@ -165,8 +201,12 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             ab.address !== zennyTips && Utils.isMessagesAddress({ address: ab.address } as ContactType),
         )
         .forEach((ab: AddressBookFileClass) => {
-          const exists = cont.filter((c: ContactType) => c.address === ab.address);
-          if (exists.length === 0) {
+          // must match the two addresses: full UA & only orchard UA.
+          const exists = cont.filter(
+            (c: ContactType) => c.address === ab.address && c.uOrchardAddress === ab.uOrchardAddress,
+          );
+          // ignore contacts with this wallet addresses
+          if (exists.length === 0 && !thisWalletAddress(ab.address)) {
             let found = false;
             if (searchText) {
               if (
@@ -181,6 +221,8 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             if (found) {
               cont.push({
                 address: ab.address,
+                uOrchardAddress: ab.uOrchardAddress || '',
+                label: ab.label,
                 time: 0,
                 memos: [],
                 confirmations: 0,
