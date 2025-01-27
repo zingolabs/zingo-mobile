@@ -220,7 +220,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                     </FadeText>
                   </View>
                 </TouchableOpacity>
-                {false && sapling && (
+                {sapling && (
                   <TouchableOpacity
                     onPress={() => {
                       setShielded(ShieldedEnum.sapling);
