@@ -151,6 +151,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
   const [contentHeight, setContentHeight] = useState<number>(0);
   const [pickerTempSelectedAddress, setPickerTempSelectedAddress] = useState<string>('');
+  const [memo, setMemo] = useState<string>(sendPageState.toaddr.memo);
   const isFocused = useIsFocused();
 
   const slideAnim = useSharedValue(0);
@@ -217,7 +218,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     async (
       amount: string,
       address: string,
-      memo: string,
+      memoPar: string,
       includeUAMemo: boolean,
       command: CommandEnum.send | CommandEnum.sendall,
     ): Promise<void> => {
@@ -240,7 +241,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       if (command === CommandEnum.send) {
         const sendPageStateCalculateFee = new SendPageStateClass(new ToAddrClass(0));
         sendPageStateCalculateFee.toaddr.to = address;
-        sendPageStateCalculateFee.toaddr.memo = memo;
+        sendPageStateCalculateFee.toaddr.memo = memoPar;
         sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemo;
         sendPageStateCalculateFee.toaddr.amount = amount;
 
@@ -258,8 +259,8 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       if (command === CommandEnum.sendall) {
         let zenniesForZingo = donationAddress ? false : donation;
-        if (memo) {
-          sendallJson = { address, memo, zennies_for_zingo: zenniesForZingo };
+        if (memoPar) {
+          sendallJson = { address, memoPar, zennies_for_zingo: zenniesForZingo };
         } else {
           sendallJson = { address, zennies_for_zingo: zenniesForZingo };
         }
@@ -399,15 +400,15 @@ const Send: React.FunctionComponent<SendProps> = ({
     return `${memoPar || ''}${includeUAMemoPar ? GlobalConst.replyTo + uOrchardAddressPar : ''}`;
   }, []);
 
-  const memoUpdateToField = (memo: string | null) => {
-    updateToField(null, null, null, memo, null);
+  const memoUpdateToField = (memoPar: string | null) => {
+    updateToField(null, null, null, memoPar, null);
   };
 
   const updateToField = async (
     address: string | null,
     amount: string | null,
     amountCurrency: string | null,
-    memo: string | null,
+    memoPar: string | null,
     includeUAMemo: boolean | null,
   ) => {
     // Create the new state object
@@ -473,8 +474,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       //console.log('update field 2', toAddr.amount, toAddr.amountCurrency);
     }
 
-    if (memo !== null) {
-      toAddr.memo = memo;
+    if (memoPar !== null) {
+      toAddr.memo = memoPar;
     }
 
     if (includeUAMemo !== null) {
@@ -510,7 +511,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     calculateFeeWithPropose(
       sendPageState.toaddr.amount,
       sendPageState.toaddr.to,
-      sendPageState.toaddr.memo,
+      memo,
       sendPageState.toaddr.includeUAMemo,
       CommandEnum.send,
     );
@@ -521,7 +522,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendPageState.toaddr.amountCurrency,
     sendPageState.toaddr.includeUAMemo,
     // don't have to recalculate the fee if the memo change.
-    //sendPageState.toaddr.memo,
+    // memo,
     sendPageState.toaddr.to,
   ]);
 
@@ -541,15 +542,25 @@ const Send: React.FunctionComponent<SendProps> = ({
       getMemoEnabled(address, server.chainName).then(r => {
         setMemoEnabled(r);
         if (!r) {
+          setMemo('');
           updateToField(null, null, null, '', false);
         }
       });
     } else {
       setMemoEnabled(false);
+      setMemo('');
       updateToField(null, null, null, '', false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [server.chainName, sendPageState.toaddr.to]);
+
+  const countMemoBytes = useCallback(
+    (memoPar: string, includeUAMemo: boolean, uaAddressPar: string) => {
+      const len = Buffer.byteLength(memoTotal(memoPar, includeUAMemo, uaAddressPar), 'utf8');
+      return len;
+    },
+    [memoTotal],
+  );
 
   useEffect(() => {
     const parseAddress = async (
@@ -569,8 +580,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       setValidAddress(0);
     }
 
-    if (to.memo || to.includeUAMemo) {
-      const len = Buffer.byteLength(memoTotal(to.memo, to.includeUAMemo, uOrchardAddress), 'utf8');
+    if (memo || to.includeUAMemo) {
+      const len = countMemoBytes(memo, to.includeUAMemo, uOrchardAddress);
       if (len > GlobalConst.memoMaxLength) {
         setValidMemo(-1);
       } else {
@@ -615,13 +626,14 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendPageState.toaddr.to,
     sendPageState.toaddr.amountCurrency,
     sendPageState.toaddr.amount,
-    sendPageState.toaddr.memo,
+    memo,
     sendPageState.toaddr.includeUAMemo,
     spendable,
     fee,
     maxAmount,
     uOrchardAddress,
     memoTotal,
+    countMemoBytes,
   ]);
 
   useEffect(() => {
@@ -721,6 +733,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [addresses, sendPageState.toaddr.to, server.chainName]);
 
   const confirmSend = async () => {
+    // no need this because this value is perfectly stored
+    // when the App goes to the confirm screen.
+    //memoUpdateToField(memo);
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
       setConfirmModalVisible(false);
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
@@ -740,6 +755,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         const txid = await sendTransaction();
 
         // Clear the fields
+        setMemo('');
         clearToAddr();
 
         if (navigation) {
@@ -795,6 +811,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             const txid = await sendTransaction();
 
             // Clear the fields
+            setMemo('');
             clearToAddr();
 
             if (navigation) {
@@ -856,11 +873,6 @@ const Send: React.FunctionComponent<SendProps> = ({
       // dust
       return translate('send.dust-error') as string;
     }
-  };
-
-  const countMemoBytes = (memo: string, includeUAMemo: boolean) => {
-    const len = Buffer.byteLength(memoTotal(memo, includeUAMemo, uOrchardAddress), 'utf8');
-    return len;
   };
 
   const scrollToEnd = () => {
@@ -1174,7 +1186,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           calculateFeeWithPropose(
                             Utils.parseNumberFloatToStringLocale(maxAmount, 8),
                             sendPageState.toaddr.to,
-                            sendPageState.toaddr.memo,
+                            memo,
                             sendPageState.toaddr.includeUAMemo,
                             CommandEnum.sendall,
                           );
@@ -1257,7 +1269,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             calculateFeeWithPropose(
                               e.nativeEvent.text.substring(0, 20),
                               ta.to,
-                              ta.memo,
+                              memo,
                               ta.includeUAMemo,
                               CommandEnum.send,
                             );
@@ -1504,7 +1516,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             onEndEditing={(e: any) => {
                               updateToField(null, null, e.nativeEvent.text.substring(0, 15), null, null);
                               // re-calculate the fee with the zec amount in the other field
-                              calculateFeeWithPropose(ta.amount, ta.to, ta.memo, ta.includeUAMemo, CommandEnum.send);
+                              calculateFeeWithPropose(ta.amount, ta.to, memo, ta.includeUAMemo, CommandEnum.send);
                             }}
                             editable={true}
                             maxLength={15}
@@ -1579,6 +1591,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                         }}>
                         <TextInput
                           testID="send.memo-field"
+                          placeholder={translate('messages.message-placeholder') as string}
+                          placeholderTextColor={colors.placeholder}
                           multiline
                           style={{
                             flex: 1,
@@ -1591,11 +1605,15 @@ const Send: React.FunctionComponent<SendProps> = ({
                             backgroundColor: 'transparent',
                             textAlignVertical: 'top',
                           }}
-                          value={ta.memo}
-                          onChangeText={(text: string) =>
-                            updateToField(null, !ta.amount && !!text ? '0' : null, null, text, null)
-                          }
+                          value={memo}
+                          onChangeText={(text: string) => {
+                            setMemo(text);
+                            if (!ta.amount && !!text) {
+                              updateToField(null, '0', null, text, null);
+                            }
+                          }}
                           onEndEditing={(e: any) => {
+                            setMemo(e.nativeEvent.text);
                             updateToField(
                               null,
                               !ta.amount && !!e.nativeEvent.text ? '0' : null,
@@ -1641,9 +1659,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                             }
                           }}
                         />
-                        {ta.memo && (
+                        {memo && (
                           <TouchableOpacity
                             onPress={() => {
+                              setMemo('');
                               updateToField(null, null, null, '', null);
                             }}>
                             <FontAwesomeIcon
@@ -1669,26 +1688,28 @@ const Send: React.FunctionComponent<SendProps> = ({
                         )}
                       </View>
                     </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-end',
-                        alignItems: 'center',
-                      }}>
-                      <FadeText
+                    {validMemo === -1 && (
+                      <View
                         style={{
-                          marginTop: 0,
-                          fontWeight: 'bold',
-                          fontSize: 12.5,
-                          color: validMemo === -1 ? 'red' : colors.text,
-                        }}>{`${countMemoBytes(ta.memo, ta.includeUAMemo)} `}</FadeText>
-                      <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
-                        {translate('loadedapp.of') as string}
-                      </FadeText>
-                      <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
-                        {' ' + GlobalConst.memoMaxLength.toString() + ' '}
-                      </FadeText>
-                    </View>
+                          flexDirection: 'row',
+                          justifyContent: 'flex-end',
+                          alignItems: 'center',
+                        }}>
+                        <FadeText
+                          style={{
+                            marginTop: 0,
+                            fontWeight: 'bold',
+                            fontSize: 12.5,
+                            color: 'red',
+                          }}>{`${countMemoBytes(memo, ta.includeUAMemo, uOrchardAddress)} `}</FadeText>
+                        <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
+                          {translate('loadedapp.of') as string}
+                        </FadeText>
+                        <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
+                          {' ' + GlobalConst.memoMaxLength.toString() + ' '}
+                        </FadeText>
+                      </View>
+                    )}
                   </>
                 )}
               </View>
@@ -1726,6 +1747,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 }
                 disabled={!sendButtonEnabled}
                 onPress={() => {
+                  updateToField(null, null, null, memo, null);
                   // donation - a Zenny is the minimum
                   if (
                     server.chainName === ChainNameEnum.mainChainName &&
@@ -1752,6 +1774,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   }
                   // if the address is transparent - clean the memo field Just in Case.
                   if (!memoEnabled) {
+                    setMemo('');
                     updateToField(null, null, null, '', false);
                   }
                   // waiting while closing the keyboard, just in case.
@@ -1768,6 +1791,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 onPress={() => {
                   defaultValueFee();
                   defaultValuesSpendableMaxAmount();
+                  setMemo('');
                   clearToAddr();
                   setPickerTempSelectedAddress('');
                 }}
@@ -1809,6 +1833,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         update = true;
                       }
                       if (update) {
+                        setMemo(Utils.getDonationMemo(translate));
                         updateToField(
                           await Utils.getDonationAddress(server.chainName),
                           Utils.getDonationAmount(),

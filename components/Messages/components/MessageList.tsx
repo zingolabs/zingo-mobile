@@ -930,7 +930,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   marginTop: 0,
                   fontWeight: 'bold',
                   fontSize: 12.5,
-                  color: validMemo === -1 ? 'red' : colors.text,
+                  color: 'red',
                 }}>{`${countMemoBytes(memo, true, uOrchardAddress)} `}</FadeText>
               <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>{translate('loadedapp.of') as string}</FadeText>
               <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
