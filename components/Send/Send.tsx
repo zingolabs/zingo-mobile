@@ -726,8 +726,8 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const clearState = () => {
     setAddressText('');
-    setAmountText('0');
-    setAmountCurrencyText('0');
+    setAmountText('');
+    setAmountCurrencyText('');
     setMemoText('');
     setIncludeUAMemoBoolean(false);
     clearToAddr();
