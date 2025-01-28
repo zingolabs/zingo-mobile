@@ -36,6 +36,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   messagesFetchItems: 50,
   messagesTotal: null,
   sendPageState: new SendPageStateClass(new ToAddrClass(0)),
+  setSendPageState: () => {},
   info: {} as InfoType,
   walletSettings: new WalletSettingsClass(),
   wallet: {} as WalletType,

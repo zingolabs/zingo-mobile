@@ -39,7 +39,6 @@ type ContactLineProps = {
   month: string;
   c: ContactType;
   setContactDetail: (c: ContactType) => void;
-  setSendPageState: (s: SendPageStateClass) => void;
   setMessagesAddressModalShowing: (b: boolean) => void;
   addressProtected?: boolean;
 };
@@ -48,12 +47,12 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   c,
   month,
   setContactDetail,
-  setSendPageState,
   setMessagesAddressModalShowing,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, navigation, showSwipeableIcons, readOnly, selectServer, addressBook } = context;
+  const { translate, language, navigation, showSwipeableIcons, readOnly, selectServer, addressBook, setSendPageState } =
+    context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 

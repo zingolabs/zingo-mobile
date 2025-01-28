@@ -1,6 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { SendPageStateClass } from '../../app/AppState';
 import MessageList from './components/MessageList';
 import { SafeAreaView } from 'react-native';
 import { ContextAppLoaded } from '../../app/context';
@@ -11,7 +10,6 @@ import moment from 'moment';
 type MessagesAllProps = {
   doRefresh: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
-  setSendPageState: (s: SendPageStateClass) => void;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
   closeModal: () => void;
@@ -21,7 +19,6 @@ type MessagesAllProps = {
 const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
   doRefresh,
   setPrivacyOption,
-  setSendPageState,
   setScrollToBottom,
   scrollToBottom,
   closeModal,
@@ -44,7 +41,6 @@ const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
       <MessageList
         doRefresh={doRefresh}
         setPrivacyOption={setPrivacyOption}
-        setSendPageState={setSendPageState}
         setScrollToBottom={setScrollToBottom}
         scrollToBottom={scrollToBottom}
         closeModal={closeModal}

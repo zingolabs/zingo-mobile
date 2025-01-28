@@ -61,7 +61,6 @@ import { serverUris } from '../../../app/uris';
 type MessageListProps = {
   doRefresh: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
-  setSendPageState: (s: SendPageStateClass) => void;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
   address?: string;
@@ -79,7 +78,6 @@ type MessageListProps = {
 const MessageList: React.FunctionComponent<MessageListProps> = ({
   doRefresh,
   setPrivacyOption,
-  setSendPageState,
   setScrollToBottom,
   scrollToBottom,
   address,
@@ -526,7 +524,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             closeModal={() => setValueTransferDetailModalShowing(false)}
             openModal={() => setValueTransferDetailModalShowing(true)}
             setPrivacyOption={setPrivacyOption}
-            setSendPageState={setSendPageState}
             moveValueTransferDetail={moveValueTransferDetail}
           />
         </Modal>

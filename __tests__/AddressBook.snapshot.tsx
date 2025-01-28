@@ -59,7 +59,7 @@ describe('Component Address Book - test', () => {
     const onSet = jest.fn();
     const ab: any = render(
       <ContextAppLoadedProvider value={state}>
-        <AddressBook closeModal={onClose} setAddressBook={onSet} setSendPageState={onSet} />
+        <AddressBook closeModal={onClose} setAddressBook={onSet} />
       </ContextAppLoadedProvider>,
     );
     expect(ab.toJSON()).toMatchSnapshot();

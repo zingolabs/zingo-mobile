@@ -28,7 +28,6 @@ type AbSummaryLineProps = {
   item: AddressBookFileClass;
   setCurrentItem: (b: number) => void;
   setAction: (action: AddressBookActionEnum) => void;
-  setSendPageState: (s: SendPageStateClass) => void;
   closeModal: () => void;
   handleScrollToTop: () => void;
   doAction: (action: AddressBookActionEnum, label: string, address: string, uOrchardAddress: string) => void;
@@ -39,14 +38,13 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   item,
   setCurrentItem,
   setAction,
-  setSendPageState,
   closeModal,
   handleScrollToTop,
   doAction,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, navigation, readOnly, mode, totalBalance, language, selectServer } = context;
+  const { translate, navigation, readOnly, mode, totalBalance, language, selectServer, setSendPageState } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 

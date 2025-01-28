@@ -110,7 +110,6 @@ describe('Component History ValueTransferDetail - test', () => {
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
-          setSendPageState={onClose}
           moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
@@ -134,7 +133,6 @@ describe('Component History ValueTransferDetail - test', () => {
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
-          setSendPageState={onClose}
           moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
@@ -156,7 +154,6 @@ describe('Component History ValueTransferDetail - test', () => {
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
-          setSendPageState={onClose}
           moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
@@ -177,7 +174,6 @@ describe('Component History ValueTransferDetail - test', () => {
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
-          setSendPageState={onClose}
           moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
@@ -200,7 +196,6 @@ describe('Component History ValueTransferDetail - test', () => {
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
-          setSendPageState={onClose}
           moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
@@ -221,7 +216,6 @@ describe('Component History ValueTransferDetail - test', () => {
           closeModal={onClose}
           openModal={onClose}
           setPrivacyOption={onSetOption}
-          setSendPageState={onClose}
           moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,

@@ -45,7 +45,6 @@ type HistoryProps = {
   setComputingModalVisible: (visible: boolean) => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setUfvkViewModalVisible?: (v: boolean) => void;
-  setSendPageState: (s: SendPageStateClass) => void;
   setShieldingAmount: (value: number) => void;
   setScrollToTop: (value: boolean) => void;
   scrollToTop: boolean;
@@ -69,7 +68,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   setComputingModalVisible,
   setPrivacyOption,
   setUfvkViewModalVisible,
-  setSendPageState,
   setShieldingAmount,
   setScrollToTop,
   scrollToTop,
@@ -180,7 +178,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
           closeModal={() => setValueTransferDetailModalShowing(false)}
           openModal={() => setValueTransferDetailModalShowing(true)}
           setPrivacyOption={setPrivacyOption}
-          setSendPageState={setSendPageState}
           moveValueTransferDetail={moveValueTransferDetail}
         />
       </Modal>
@@ -194,7 +191,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
           <MessagesAddress
             doRefresh={doRefresh}
             setPrivacyOption={setPrivacyOption}
-            setSendPageState={setSendPageState}
             setScrollToBottom={setScrollToBottom}
             scrollToBottom={scrollToBottom}
             address={Utils.messagesAddress(valueTransferDetail)}
@@ -268,7 +264,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
                         ? false
                         : valueTransfersSliced[index + 1].txid === vt.txid
                     }
-                    setSendPageState={setSendPageState}
                     setMessagesAddressModalShowing={(bbb: boolean) => setMessagesAddressModalShowing(bbb)}
                     addressProtected={vt.address === zennyTips}
                   />

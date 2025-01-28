@@ -47,6 +47,7 @@ export default interface AppContextLoaded {
 
   // The state of the send page
   sendPageState: SendPageStateClass;
+  setSendPageState: (s: SendPageStateClass) => void;
 
   // getinfo and getblockchaininfo result
   info: InfoType;

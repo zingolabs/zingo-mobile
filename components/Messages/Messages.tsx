@@ -8,7 +8,6 @@ type MessagesProps = {
   syncingStatusMoreInfoOnClick: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setUfvkViewModalVisible?: (v: boolean) => void;
-  setSendPageState: (s: SendPageStateClass) => void;
   setScrollToTop: (value: boolean) => void;
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
@@ -28,7 +27,6 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
   syncingStatusMoreInfoOnClick,
   setPrivacyOption,
   setUfvkViewModalVisible,
-  setSendPageState,
   setScrollToTop,
   scrollToTop,
   setScrollToBottom,
@@ -43,7 +41,6 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
       syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
       setPrivacyOption={setPrivacyOption}
       setUfvkViewModalVisible={setUfvkViewModalVisible}
-      setSendPageState={setSendPageState}
       setScrollToTop={setScrollToTop}
       scrollToTop={scrollToTop}
       setScrollToBottom={setScrollToBottom}

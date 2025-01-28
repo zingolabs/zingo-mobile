@@ -15,13 +15,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import {
-  AddressBookActionEnum,
-  AddressBookFileClass,
-  ButtonTypeEnum,
-  GlobalConst,
-  SendPageStateClass,
-} from '../../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, GlobalConst } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -38,10 +32,9 @@ import Utils from '../../app/utils';
 type AddressBookProps = {
   closeModal: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
-  setSendPageState: (s: SendPageStateClass) => void;
 };
 
-const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, setAddressBook, setSendPageState }) => {
+const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, setAddressBook }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, addressBook, addressBookCurrentAddress, addressBookOpenPriorModal, server } = context;
   const { colors } = useTheme() as unknown as ThemeType;
@@ -226,7 +219,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                     item={aBItem}
                     setCurrentItem={setCurrentItem}
                     setAction={setAction}
-                    setSendPageState={setSendPageState}
                     closeModal={closeModal}
                     handleScrollToTop={handleScrollToTop}
                     doAction={doAction}
@@ -246,7 +238,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                     item={aBItem}
                     setCurrentItem={setCurrentItem}
                     setAction={setAction}
-                    setSendPageState={setSendPageState}
                     closeModal={closeModal}
                     handleScrollToTop={handleScrollToTop}
                     doAction={doAction}
@@ -265,7 +256,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                   item={aBItem}
                   setCurrentItem={setCurrentItem}
                   setAction={setAction}
-                  setSendPageState={setSendPageState}
                   closeModal={closeModal}
                   handleScrollToTop={handleScrollToTop}
                   doAction={doAction}

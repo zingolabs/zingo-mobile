@@ -427,6 +427,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       } as ZecPriceType,
       uOrchardAddress: '',
       sendPageState: new SendPageStateClass(new ToAddrClass(0)),
+      setSendPageState: this.setSendPageState,
       background: props.background,
       translate: props.translate,
       backgroundError: {} as BackgroundErrorType,
@@ -1684,6 +1685,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       zecPrice: this.state.zecPrice,
       uOrchardAddress: this.state.uOrchardAddress,
       sendPageState: this.state.sendPageState,
+      setSendPageState: this.state.setSendPageState,
       background: this.state.background,
       translate: this.state.translate,
       backgroundError: this.state.backgroundError,
@@ -2004,7 +2006,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   })
                 }
                 setAddressBook={this.setAddressBook}
-                setSendPageState={this.setSendPageState}
               />
             </Suspense>
           </Modal>
@@ -2041,7 +2042,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     setComputingModalVisible={this.setComputingModalVisible}
                     setPrivacyOption={this.setPrivacyOption}
                     setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                    setSendPageState={this.setSendPageState}
                     setShieldingAmount={this.setShieldingAmount}
                     setScrollToTop={this.setScrollToTop}
                     scrollToTop={scrollToTop}
@@ -2109,7 +2109,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
                     setPrivacyOption={this.setPrivacyOption}
                     setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                    setSendPageState={this.setSendPageState}
                     setScrollToTop={this.setScrollToTop}
                     scrollToTop={scrollToTop}
                     setScrollToBottom={this.setScrollToBottom}

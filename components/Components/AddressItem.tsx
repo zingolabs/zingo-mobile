@@ -31,7 +31,6 @@ type AddressItemProps = {
   onlyContact?: boolean;
   withIcon?: boolean;
   withSendIcon?: boolean;
-  setSendPageState?: (s: SendPageStateClass) => void;
   addressProtected?: boolean;
 };
 
@@ -43,7 +42,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   withSendIcon,
   closeModal,
   openModal,
-  setSendPageState,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -59,6 +57,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     totalBalance,
     language,
     selectServer,
+    setSendPageState,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
@@ -177,7 +176,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         </TouchableOpacity>
       )}
       {withSendIcon &&
-        setSendPageState &&
         !addressProtected &&
         contact &&
         !readOnly &&

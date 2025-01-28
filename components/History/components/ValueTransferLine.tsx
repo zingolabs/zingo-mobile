@@ -45,7 +45,6 @@ type ValueTransferLineProps = {
   setValueTransferDetailIndex: (i: number) => void;
   setValueTransferDetailModalShowing: (b: boolean) => void;
   nextLineWithSameTxid: boolean;
-  setSendPageState: (s: SendPageStateClass) => void;
   setMessagesAddressModalShowing: (b: boolean) => void;
   addressProtected?: boolean;
 };
@@ -57,12 +56,21 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   setValueTransferDetailIndex,
   setValueTransferDetailModalShowing,
   nextLineWithSameTxid,
-  setSendPageState,
   setMessagesAddressModalShowing,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, privacy, info, navigation, showSwipeableIcons, readOnly, selectServer } = context;
+  const {
+    translate,
+    language,
+    privacy,
+    info,
+    navigation,
+    showSwipeableIcons,
+    readOnly,
+    selectServer,
+    setSendPageState,
+  } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 

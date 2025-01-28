@@ -13,7 +13,6 @@ import {
   AddressBookFileClass,
   AddressClass,
   ChainNameEnum,
-  SendPageStateClass,
   SnackbarDurationEnum,
   ValueTransferType,
   ValueTransferKindEnum,
@@ -44,7 +43,6 @@ type ValueTransferDetailProps = {
   closeModal: () => void;
   openModal: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
-  setSendPageState: (s: SendPageStateClass) => void;
   moveValueTransferDetail: (index: number, type: number) => void;
 };
 
@@ -56,7 +54,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   closeModal,
   setPrivacyOption,
   openModal,
-  setSendPageState,
   moveValueTransferDetail,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -354,7 +351,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                 address={vt.address}
                 withIcon={true}
                 withSendIcon={true}
-                setSendPageState={setSendPageState}
                 closeModal={closeModal}
                 openModal={openModal}
                 addressProtected={addressProtected}

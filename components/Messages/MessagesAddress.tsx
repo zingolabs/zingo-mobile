@@ -14,7 +14,6 @@ import 'moment/locale/ru';
 type MessagesAddressProps = {
   doRefresh: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
-  setSendPageState: (s: SendPageStateClass) => void;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
   address: string;
@@ -32,7 +31,6 @@ type MessagesAddressProps = {
 const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
   doRefresh,
   setPrivacyOption,
-  setSendPageState,
   setScrollToBottom,
   scrollToBottom,
   address,
@@ -58,7 +56,6 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
       <MessageList
         doRefresh={doRefresh}
         setPrivacyOption={setPrivacyOption}
-        setSendPageState={setSendPageState}
         setScrollToBottom={setScrollToBottom}
         scrollToBottom={scrollToBottom}
         address={address}

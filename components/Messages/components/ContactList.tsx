@@ -46,7 +46,6 @@ type ContactListProps = {
   syncingStatusMoreInfoOnClick: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setUfvkViewModalVisible?: (v: boolean) => void;
-  setSendPageState: (s: SendPageStateClass) => void;
   setScrollToTop: (value: boolean) => void;
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
@@ -66,7 +65,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   syncingStatusMoreInfoOnClick,
   setPrivacyOption,
   setUfvkViewModalVisible,
-  setSendPageState,
   setScrollToTop,
   scrollToTop,
   setScrollToBottom,
@@ -291,7 +289,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
           <MessagesAddress
             doRefresh={doRefresh}
             setPrivacyOption={setPrivacyOption}
-            setSendPageState={setSendPageState}
             setScrollToBottom={setScrollToBottom}
             scrollToBottom={scrollToBottom}
             address={Utils.messagesAddress(contactDetail)}
@@ -312,7 +309,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
           <MessagesAll
             doRefresh={doRefresh}
             setPrivacyOption={setPrivacyOption}
-            setSendPageState={setSendPageState}
             setScrollToBottom={setScrollToBottom}
             scrollToBottom={scrollToBottom}
             closeModal={() => setMessagesAllModalShowing(false)}
@@ -588,7 +584,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                     c={c}
                     month={month}
                     setContactDetail={(ttt: ContactType) => setContactDetail(ttt)}
-                    setSendPageState={setSendPageState}
                     setMessagesAddressModalShowing={(bbb: boolean) => setMessagesAddressModalShowing(bbb)}
                     addressProtected={c.address === zennyTips}
                   />
