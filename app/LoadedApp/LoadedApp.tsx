@@ -295,12 +295,18 @@ export default function LoadedApp(props: LoadedAppProps) {
             server.chainName,
           );
           if (validAddress.isValid) {
-            //ab = await AddressBookFileImpl.removeAddressBookItem(a.label, a.address);
             ab = await AddressBookFileImpl.writeAddressBookItem(a.label, a.address, validAddress.onlyOrchardUA);
           }
         }
       }
-      setAddressBook(ab);
+      // this is a good place to sort properly the data
+      setAddressBook(
+        ab.sort((a, b) => {
+          const aLabel = a.label;
+          const bLabel = b.label;
+          return aLabel.localeCompare(bLabel);
+        }),
+      );
 
       setLoading(false);
     })();

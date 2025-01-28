@@ -64,26 +64,13 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   const fetchAddressBookSorted = useMemo(async () => {
     // excluding this address from the list
     const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
-    return addressBook
-      .filter((ab: AddressBookFileClass) => ab.address !== zennyTips)
-      .sort((a, b) => {
-        const aLabel = a.label;
-        const bLabel = b.label;
-        return aLabel.localeCompare(bLabel);
-      })
-      .slice(0, numAb);
+    return addressBook.filter((ab: AddressBookFileClass) => ab.address !== zennyTips).slice(0, numAb);
   }, [addressBook, numAb, server.chainName]);
 
   const fetchAddressBookProtected = useMemo(async () => {
     // only protected address to use internally ZingoLabs.
     const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
-    return addressBook
-      .filter((ab: AddressBookFileClass) => ab.address === zennyTips)
-      .sort((a, b) => {
-        const aLabel = a.label;
-        const bLabel = b.label;
-        return aLabel.localeCompare(bLabel);
-      });
+    return addressBook.filter((ab: AddressBookFileClass) => ab.address === zennyTips);
   }, [addressBook, server.chainName]);
 
   // because this screen is fired from more places than the menu.
