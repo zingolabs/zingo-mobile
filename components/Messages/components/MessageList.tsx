@@ -95,7 +95,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     language,
     addLastSnackbar,
     addressBook,
-    sendPageState,
     uOrchardAddress,
     selectServer,
     netInfo,
@@ -493,7 +492,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   }, [totalBalance, totalBalance?.spendableOrchard, totalBalance?.spendablePrivate]);
 
   if (address) {
-    console.log('render Messages', validMemo, 'memo context', sendPageState.toaddr.memo, 'memo local:', memo);
+    console.log('render Messages', validMemo, 'memo local:', memo);
   }
 
   return (
