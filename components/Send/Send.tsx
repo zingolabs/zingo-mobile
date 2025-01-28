@@ -328,6 +328,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       // if no address -> make no sense to run the propose
       if (!addressPar || validAddress !== 1) {
         defaultValuesSpendableMaxAmount();
+        setSpendableBalanceLastError('');
         return;
       }
       // spendable
@@ -507,7 +508,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   ]);
 
   useEffect(() => {
-    // transparent is not spendable.
     calculateSpendableBalance(addressText);
   }, [calculateSpendableBalance, addressText]);
 
@@ -548,6 +548,9 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (addressText) {
       parseAddress(addressText, server.chainName).then(r => {
         setValidAddress(r.isValid ? 1 : -1);
+        if (!r.isValid) {
+          setSpendableBalanceLastError('');
+        }
       });
     } else {
       setValidAddress(0);
