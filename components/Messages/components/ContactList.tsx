@@ -51,8 +51,7 @@ type ContactListProps = {
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
-  sendTransaction: () => Promise<String>;
-  clearToAddr: () => void;
+  sendTransaction: (s: SendPageStateClass) => Promise<String>;
   setServerOption: (
     value: ServerType,
     selectServer: SelectServerEnum,
@@ -73,7 +72,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   setScrollToBottom,
   scrollToBottom,
   sendTransaction,
-  clearToAddr,
   setServerOption,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -300,7 +298,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             closeModal={() => setMessagesAddressModalShowing(false)}
             openModal={() => setMessagesAddressModalShowing(true)}
             sendTransaction={sendTransaction}
-            clearToAddr={clearToAddr}
             setServerOption={setServerOption}
           />
         </Modal>

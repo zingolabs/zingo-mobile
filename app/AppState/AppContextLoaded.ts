@@ -3,7 +3,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import AddressClass from './classes/AddressClass';
 import SendPageStateClass from './classes/SendPageStateClass';
-import ReceivePageStateClass from './classes/ReceivePageStateClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
 import SyncingStatusClass from './classes/SyncingStatusClass';
@@ -48,9 +47,6 @@ export default interface AppContextLoaded {
 
   // The state of the send page
   sendPageState: SendPageStateClass;
-
-  // Any state for the receive page
-  receivePageState: ReceivePageStateClass;
 
   // getinfo and getblockchaininfo result
   info: InfoType;

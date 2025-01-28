@@ -67,8 +67,7 @@ type MessageListProps = {
   address?: string;
   closeModal?: () => void;
   openModal?: () => void;
-  sendTransaction?: () => Promise<String>;
-  clearToAddr?: () => void;
+  sendTransaction?: (s: SendPageStateClass) => Promise<String>;
   setServerOption?: (
     value: ServerType,
     selectServer: SelectServerEnum,
@@ -87,7 +86,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   closeModal,
   openModal,
   sendTransaction,
-  clearToAddr,
   setServerOption,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -131,7 +129,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
   const [spendable, setSpendable] = useState<number>(0);
   const [uOrchardAddressContact, setUOrchardAddressContact] = useState<string>('');
-  const [memo, setMemo] = useState<string>(sendPageState.toaddr.memo);
+  const [memo, setMemo] = useState<string>('');
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -216,12 +214,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       return messages;
     }
   }, [messages, address, anonymous, addressFilter, anonymousFilter]);
-
-  useEffect(() => {
-    // need to reset this info because is shared
-    // with all the App.
-    setSendPageState(new SendPageStateClass(new ToAddrClass(0)));
-  }, [setSendPageState]);
 
   useEffect(() => {
     if (messages !== null) {
@@ -310,8 +302,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   }, []);
 
   const countMemoBytes = useCallback(
-    (memoPar: string, includeUAMemo: boolean, uaAddressPar: string) => {
-      const len = Buffer.byteLength(memoTotal(memoPar, includeUAMemo, uaAddressPar), 'utf8');
+    (memoPar: string, includeUAMemoPar: boolean, uaAddressPar: string) => {
+      const len = Buffer.byteLength(memoTotal(memoPar, includeUAMemoPar, uaAddressPar), 'utf8');
       return len;
     },
     [memoTotal],
@@ -362,11 +354,11 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     }
   };
 
-  const updateToField = (memoPar: string | null) => {
+  const buildSendState = (memoPar: string) => {
     // Create the new state object
     const newState = new SendPageStateClass(new ToAddrClass(0));
-
-    const newToAddr = sendPageState.toaddr;
+    // EMPTY
+    const newToAddr = newState.toaddr;
     // Find the correct toAddr
     const toAddr = newToAddr;
 
@@ -374,14 +366,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     toAddr.amount = '0';
     toAddr.amountCurrency = '0';
     toAddr.includeUAMemo = true;
-
-    if (memoPar !== null) {
-      toAddr.memo = memoPar;
-    }
+    toAddr.memo = memoPar;
 
     newState.toaddr = newToAddr;
-    setSendPageState(newState);
-    console.log('Updating', newState);
+    return newState;
   };
 
   const interceptCustomError = (error: string) => {
@@ -403,8 +391,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     if (!memo) {
       return;
     }
-    updateToField(memo);
-    if (!sendTransaction || !clearToAddr || !setServerOption) {
+    if (!sendTransaction || !setServerOption) {
       return;
     }
     setDisableSend(true);
@@ -417,11 +404,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       let error = '';
       let customError: string | undefined;
       try {
-        await sendTransaction();
+        await sendTransaction(buildSendState(memo));
 
         // Clear the fields
         setMemo('');
-        clearToAddr();
 
         // scroll to top in history, just in case.
         setScrollToBottom(true);
@@ -460,11 +446,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           }
 
           try {
-            await sendTransaction();
+            await sendTransaction(buildSendState(memo));
 
             // Clear the fields
             setMemo('');
-            clearToAddr();
 
             // scroll to top in history, just in case.
             setScrollToBottom(true);
@@ -498,7 +483,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   };
 
   const closeModalAndClean = () => {
-    setSendPageState(new SendPageStateClass(new ToAddrClass(0)));
     if (closeModal) {
       closeModal();
     }
@@ -557,7 +541,9 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             closeModal={() => {
               setMemoModalVisible(false);
             }}
-            memoUpdateToField={updateToField}
+            message={memo}
+            includeUAMessage={true}
+            setMessage={setMemo}
           />
         </Modal>
 
@@ -847,7 +833,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                 onEndEditing={(e: any) => {
                   if (e.nativeEvent.text !== memo) {
                     setMemo(e.nativeEvent.text);
-                    updateToField(e.nativeEvent.text);
                   }
                 }}
                 editable={!disableSend && spendable > 0}
@@ -882,7 +867,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                 <TouchableOpacity
                   onPress={() => {
                     setMemo('');
-                    updateToField('');
                   }}>
                   <FontAwesomeIcon
                     style={{ marginTop: 7, marginRight: memoIcon ? 0 : 7 }}

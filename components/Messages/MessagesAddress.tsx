@@ -20,8 +20,7 @@ type MessagesAddressProps = {
   address: string;
   closeModal: () => void;
   openModal: () => void;
-  sendTransaction: () => Promise<String>;
-  clearToAddr: () => void;
+  sendTransaction: (s: SendPageStateClass) => Promise<String>;
   setServerOption: (
     value: ServerType,
     selectServer: SelectServerEnum,
@@ -40,7 +39,6 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
   closeModal,
   openModal,
   sendTransaction,
-  clearToAddr,
   setServerOption,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -67,7 +65,6 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
         closeModal={closeModal}
         openModal={openModal}
         sendTransaction={sendTransaction}
-        clearToAddr={clearToAddr}
         setServerOption={setServerOption}
       />
     </SafeAreaView>

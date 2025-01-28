@@ -23,7 +23,13 @@ import 'moment/locale/ru';
 import { ThemeType } from '../../../app/types';
 import RPC from '../../../app/rpc';
 import Utils from '../../../app/utils';
-import { ButtonTypeEnum, CommandEnum, PrivacyLevelFromEnum, GlobalConst } from '../../../app/AppState';
+import {
+  ButtonTypeEnum,
+  CommandEnum,
+  PrivacyLevelFromEnum,
+  GlobalConst,
+  SendPageStateClass,
+} from '../../../app/AppState';
 import { CurrencyEnum } from '../../../app/AppState';
 import { RPCAddressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
@@ -34,7 +40,7 @@ type ConfirmProps = {
   donationAmount: number;
   closeModal: () => void;
   openModal: () => void;
-  confirmSend: () => void;
+  confirmSend: (s: SendPageStateClass) => void;
   sendAllAmount: boolean;
   calculateFeeWithPropose: (
     amount: string,
@@ -43,6 +49,7 @@ type ConfirmProps = {
     includeUAMemo: boolean,
     command: CommandEnum.send | CommandEnum.sendall,
   ) => Promise<void>;
+  sendPageState: SendPageStateClass;
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
   closeModal,
@@ -52,10 +59,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   sendAllAmount,
   openModal,
   calculateFeeWithPropose,
+  sendPageState,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
-    sendPageState,
     info,
     translate,
     currency,
@@ -233,7 +240,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       // snack with Error
       addLastSnackbar({ message: translate('biometrics-error') as string });
     } else {
-      confirmSend();
+      confirmSend(sendPageState);
     }
   };
 
@@ -350,7 +357,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
         {[sendPageState.toaddr].map(to => {
           return (
-            <View key={to.id} style={{ margin: 10 }}>
+            <View key={`${to.id}-${to.to}`} style={{ margin: 10 }}>
               <FadeText>{translate('send.to') as string}</FadeText>
               <AddressItem address={to.to} withIcon={true} closeModal={closeModal} openModal={openModal} />
 

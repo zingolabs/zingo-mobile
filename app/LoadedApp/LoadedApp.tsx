@@ -61,7 +61,6 @@ import {
   NetInfoType,
   WalletType,
   BackgroundErrorType,
-  ReceivePageStateClass,
   ValueTransferType,
   ValueTransferKindEnum,
   CurrencyNameEnum,
@@ -421,8 +420,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         date: 0,
       } as ZecPriceType,
       uOrchardAddress: '',
-      sendPageState: new SendPageStateClass(new ToAddrClass(Utils.getNextToAddrID())),
-      receivePageState: {} as ReceivePageStateClass,
+      sendPageState: new SendPageStateClass(new ToAddrClass(0)),
       background: props.background,
       translate: props.translate,
       backgroundError: {} as BackgroundErrorType,
@@ -714,7 +712,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           const newSendPageState = new SendPageStateClass(new ToAddrClass(0));
           let uriToAddr: ToAddrClass = new ToAddrClass(0);
           [target].forEach(tgt => {
-            const to = new ToAddrClass(Utils.getNextToAddrID());
+            const to = new ToAddrClass(0);
 
             to.to = tgt.address || '';
             to.amount = Utils.parseNumberFloatToStringLocale(tgt.amount || 0, 8);
@@ -979,7 +977,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   clearToAddr = () => {
-    const newToAddr = new ToAddrClass(Utils.getNextToAddrID());
+    const newToAddr = new ToAddrClass(0);
 
     // Create the new state object
     const newState = new SendPageStateClass(new ToAddrClass(0));
@@ -1029,10 +1027,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  sendTransaction = async (): Promise<String> => {
+  sendTransaction = async (sendPageState: SendPageStateClass): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
-      const { sendPageState, uOrchardAddress, addresses, server, donation } = this.state;
+      const { uOrchardAddress, addresses, server, donation } = this.state;
       const sendJson = await Utils.getSendManyJSON(
         sendPageState,
         uOrchardAddress,
@@ -1179,7 +1177,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       if (update) {
         const newSendPageState = new SendPageStateClass(new ToAddrClass(0));
         let uriToAddr: ToAddrClass = new ToAddrClass(0);
-        const to = new ToAddrClass(Utils.getNextToAddrID());
+        const to = new ToAddrClass(0);
 
         to.to = await Utils.getNymDonationAddress(this.state.server.chainName);
         to.amount = Utils.getNymDonationAmount();
@@ -1680,7 +1678,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       zecPrice: this.state.zecPrice,
       uOrchardAddress: this.state.uOrchardAddress,
       sendPageState: this.state.sendPageState,
-      receivePageState: this.state.receivePageState,
       background: this.state.background,
       translate: this.state.translate,
       backgroundError: this.state.backgroundError,
@@ -2045,7 +2042,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     setScrollToBottom={this.setScrollToBottom}
                     scrollToBottom={scrollToBottom}
                     sendTransaction={this.sendTransaction}
-                    clearToAddr={this.clearToAddr}
                     setServerOption={this.setServerOption}
                   />
                 )}
@@ -2073,7 +2069,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     }}>
                     {() => (
                       <Send
-                        setSendPageState={this.setSendPageState}
                         sendTransaction={this.sendTransaction}
                         clearToAddr={this.clearToAddr}
                         toggleMenuDrawer={this.toggleMenuDrawer}
@@ -2114,7 +2109,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     setScrollToBottom={this.setScrollToBottom}
                     scrollToBottom={scrollToBottom}
                     sendTransaction={this.sendTransaction}
-                    clearToAddr={this.clearToAddr}
                     setServerOption={this.setServerOption}
                   />
                 )}

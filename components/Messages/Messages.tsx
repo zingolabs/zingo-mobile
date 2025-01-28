@@ -13,8 +13,7 @@ type MessagesProps = {
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
-  sendTransaction: () => Promise<String>;
-  clearToAddr: () => void;
+  sendTransaction: (s: SendPageStateClass) => Promise<String>;
   setServerOption: (
     value: ServerType,
     selectServer: SelectServerEnum,
@@ -35,7 +34,6 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
   setScrollToBottom,
   scrollToBottom,
   sendTransaction,
-  clearToAddr,
   setServerOption,
 }) => {
   return (
@@ -51,7 +49,6 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
       setScrollToBottom={setScrollToBottom}
       scrollToBottom={scrollToBottom}
       sendTransaction={sendTransaction}
-      clearToAddr={clearToAddr}
       setServerOption={setServerOption}
     />
   );

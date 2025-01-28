@@ -90,7 +90,6 @@ describe('Component Send - test', () => {
     const send = render(
       <ContextAppLoadedProvider value={state}>
         <Send
-          setSendPageState={onFunction}
           sendTransaction={onFunction}
           clearToAddr={onFunction}
           toggleMenuDrawer={onFunction}
@@ -119,7 +118,6 @@ describe('Component Send - test', () => {
     const send = render(
       <ContextAppLoadedProvider value={state}>
         <Send
-          setSendPageState={onFunction}
           sendTransaction={onFunction}
           clearToAddr={onFunction}
           toggleMenuDrawer={onFunction}

@@ -1,7 +1,6 @@
 import { SendPageStateClass, ToAddrClass } from '../../app/AppState';
-import Utils from '../../app/utils';
 
-const mockSendPageState: SendPageStateClass = new SendPageStateClass(new ToAddrClass(Utils.getNextToAddrID()));
+const mockSendPageState: SendPageStateClass = new SendPageStateClass(new ToAddrClass(0));
 
 mockSendPageState.toaddr.id = 1234567890;
 mockSendPageState.toaddr.to = 'UA-12345678901234567890';

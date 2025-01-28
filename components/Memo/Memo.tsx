@@ -27,17 +27,17 @@ import { Buffer } from 'buffer';
 
 type MemoProps = {
   closeModal: () => void;
-  memoUpdateToField: (memo: string | null) => void;
+  message: string;
+  includeUAMessage: boolean;
+  setMessage: (m: string) => void;
 };
-const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, memoUpdateToField }) => {
+const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, message, includeUAMessage, setMessage }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, sendPageState, language, uOrchardAddress } = context;
+  const { translate, language, uOrchardAddress } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [memo, setMemo] = useState<string>(sendPageState.toaddr.memo);
-
-  const includeUAMemo = sendPageState.toaddr.includeUAMemo;
+  const [memo, setMemo] = useState<string>(message);
 
   const dimensions = {
     width: Dimensions.get('window').width,
@@ -45,7 +45,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, memoUpdateToFiel
   };
 
   const doSaveAndClose = () => {
-    memoUpdateToField(memo);
+    setMessage(memo);
     closeModal();
   };
 
@@ -145,8 +145,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, memoUpdateToFiel
               style={{
                 marginTop: 0,
                 fontWeight: 'bold',
-                color: countMemoBytes(memo, includeUAMemo) > GlobalConst.memoMaxLength ? 'red' : colors.text,
-              }}>{`${countMemoBytes(memo, includeUAMemo)} `}</FadeText>
+                color: countMemoBytes(memo, includeUAMessage) > GlobalConst.memoMaxLength ? 'red' : colors.text,
+              }}>{`${countMemoBytes(memo, includeUAMessage)} `}</FadeText>
             <FadeText style={{ marginTop: 0 }}>{translate('loadedapp.of') as string}</FadeText>
             <FadeText style={{ marginTop: 0 }}>{' ' + GlobalConst.memoMaxLength.toString() + ' '}</FadeText>
           </View>
@@ -163,7 +163,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, memoUpdateToFiel
             type={ButtonTypeEnum.Primary}
             title={translate('save') as string}
             onPress={doSaveAndClose}
-            disabled={countMemoBytes(memo, includeUAMemo) > GlobalConst.memoMaxLength}
+            disabled={countMemoBytes(memo, includeUAMessage) > GlobalConst.memoMaxLength}
           />
         </View>
       </SafeAreaView>

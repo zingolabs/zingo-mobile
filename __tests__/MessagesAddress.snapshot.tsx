@@ -125,7 +125,6 @@ describe('Component Messages Address - test', () => {
           closeModal={onFunction}
           openModal={onFunction}
           sendTransaction={onFunction}
-          clearToAddr={onFunction}
           setServerOption={onFunction}
         />
       </ContextAppLoadedProvider>,

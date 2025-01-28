@@ -3,7 +3,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 
 import {
   SyncingStatusClass,
-  ReceivePageStateClass,
   WalletSettingsClass,
   InfoType,
   WalletType,
@@ -37,7 +36,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   messagesFetchItems: 50,
   messagesTotal: null,
   sendPageState: new SendPageStateClass(new ToAddrClass(0)),
-  receivePageState: new ReceivePageStateClass(''),
   info: {} as InfoType,
   walletSettings: new WalletSettingsClass(),
   wallet: {} as WalletType,

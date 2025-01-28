@@ -86,12 +86,6 @@ export default class Utils {
     return chunks;
   }
 
-  static nextToAddrID: number = 0;
-
-  static getNextToAddrID(): number {
-    return Utils.nextToAddrID++;
-  }
-
   // DONATION TO ZINGOLABS
   static async getDonationAddress(chainName: ChainNameEnum): Promise<string> {
     // donations only for mainnet.

@@ -51,8 +51,7 @@ type HistoryProps = {
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
-  sendTransaction: () => Promise<String>;
-  clearToAddr: () => void;
+  sendTransaction: (s: SendPageStateClass) => Promise<String>;
   setServerOption: (
     value: ServerType,
     selectServer: SelectServerEnum,
@@ -77,7 +76,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   setScrollToBottom,
   scrollToBottom,
   sendTransaction,
-  clearToAddr,
   setServerOption,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -203,7 +201,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
             closeModal={() => setMessagesAddressModalShowing(false)}
             openModal={() => setMessagesAddressModalShowing(true)}
             sendTransaction={sendTransaction}
-            clearToAddr={clearToAddr}
             setServerOption={setServerOption}
           />
         </Modal>
