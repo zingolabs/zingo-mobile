@@ -3,9 +3,9 @@ import React from 'react';
 import { SafeAreaView, Text, View, ActivityIndicator } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { ThemeType } from '../types';
-import { ButtonTypeEnum, TranslateType } from '../AppState';
-import Button from '../../components/Components/Button';
+import { ThemeType } from '../../types';
+import { ButtonTypeEnum, TranslateType } from '../../AppState';
+import Button from '../../../components/Components/Button';
 
 type LaunchingProps = {
   translate: (key: string) => TranslateType;
