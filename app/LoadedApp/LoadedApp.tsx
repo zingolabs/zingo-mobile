@@ -64,6 +64,7 @@ import {
   ValueTransferType,
   ValueTransferKindEnum,
   CurrencyNameEnum,
+  RefreshScreenEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -1057,8 +1058,15 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  doRefresh = () => {
-    this.rpc.refreshSync(false);
+  doRefresh = (screen: RefreshScreenEnum) => {
+    console.log('================== MANUAL REFRESH ================== ', screen);
+    if (screen === RefreshScreenEnum.History || screen === RefreshScreenEnum.ContactList) {
+      // Value Transfers
+      this.rpc.fetchTandZandOValueTransfers();
+    } else {
+      // Messeges
+      this.rpc.fetchTandZandOMessages();
+    }
   };
 
   doRescan = async () => {

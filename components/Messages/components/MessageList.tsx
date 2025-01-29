@@ -35,6 +35,7 @@ import {
   AddressBookFileClass,
   ButtonTypeEnum,
   GlobalConst,
+  RefreshScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
   ServerType,
@@ -683,7 +684,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           refreshControl={
             <RefreshControl
               refreshing={false}
-              onRefresh={doRefresh}
+              onRefresh={() => doRefresh(RefreshScreenEnum.MessageList)}
               tintColor={colors.text}
               title={translate('history.refreshing') as string}
             />

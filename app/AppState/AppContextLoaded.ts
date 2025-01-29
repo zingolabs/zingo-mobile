@@ -23,6 +23,7 @@ import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import ValueTransferType from './types/ValueTransferType';
+import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
 
 export default interface AppContextLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -118,7 +119,7 @@ export default interface AppContextLoaded {
   showSwipeableIcons: boolean;
 
   // refresh the different list in the App: history & messages
-  doRefresh: () => void;
+  doRefresh: (s: RefreshScreenEnum) => void;
 
   // eslint-disable-next-line semi
 }

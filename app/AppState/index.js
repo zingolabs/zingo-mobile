@@ -51,6 +51,7 @@ import { SecurityTypeEnum } from './enums/SecurityTypeEnum';
 import { EventListenerEnum } from './enums/EventListenerEnum';
 import { ValueTransferKindEnum } from './enums/ValueTransferKindEnum';
 import { FilterEnum } from './enums/FilterEnum';
+import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
 
 import { GlobalConst } from './const/GlobalConst';
 
@@ -115,5 +116,6 @@ export {
   EventListenerEnum,
   ValueTransferKindEnum,
   FilterEnum,
+  RefreshScreenEnum,
   GlobalConst,
 };
