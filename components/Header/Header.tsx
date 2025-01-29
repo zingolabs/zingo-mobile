@@ -64,6 +64,7 @@ type HeaderProps = {
   translate?: (key: string) => TranslateType;
   netInfo?: NetInfoType;
   mode?: ModeEnum;
+  privacy?: boolean;
   setComputingModalVisible?: (visible: boolean) => void;
   setBackgroundError?: (title: string, error: string) => void;
   noPrivacy?: boolean;
@@ -90,6 +91,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   translate: translateProp,
   netInfo: netInfoProp,
   mode: modeProp,
+  privacy: privacyProp,
   setComputingModalVisible,
   setBackgroundError,
   noPrivacy,
@@ -109,7 +111,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     syncingStatus,
     currency,
     zecPrice,
-    privacy,
     readOnly,
     valueTransfersTotal,
     wallet,
@@ -122,7 +123,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     selectServer,
   } = context;
 
-  let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum;
+  let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum, privacy: boolean;
   if (translateProp) {
     translate = translateProp;
   } else {
@@ -137,6 +138,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     mode = modeProp;
   } else {
     mode = context.mode;
+  }
+  if (privacyProp) {
+    privacy = privacyProp;
+  } else {
+    privacy = context.privacy;
   }
 
   const { colors } = useTheme() as unknown as ThemeType;
@@ -465,7 +471,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     </TouchableOpacity>
   );
 
-  //console.log('render header &&&&&&&&&&&&&&&&&&&&& syncstatus', syncingStatus);
+  //console.log('render header &&&&&&&&&&&&&&&&&&&&&', privacy);
 
   return (
     <>

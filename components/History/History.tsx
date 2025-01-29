@@ -203,18 +203,19 @@ const History: React.FunctionComponent<HistoryProps> = ({
       )}
       <Header
         testID="valuetransfer text"
-        poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-        syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
-        toggleMenuDrawer={toggleMenuDrawer}
-        setZecPrice={setZecPrice}
         title={translate('history.title') as string}
+        setBackgroundError={setBackgroundError /* context */}
+        addLastSnackbar={addLastSnackbar /* context */}
+        toggleMenuDrawer={toggleMenuDrawer}
+        syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
+        poolsMoreInfoOnClick={poolsMoreInfoOnClick}
+        setZecPrice={setZecPrice}
         setComputingModalVisible={setComputingModalVisible}
-        setBackgroundError={setBackgroundError}
         setPrivacyOption={setPrivacyOption}
         setUfvkViewModalVisible={setUfvkViewModalVisible}
-        addLastSnackbar={addLastSnackbar}
         setShieldingAmount={setShieldingAmount}
         setScrollToTop={setScrollToTop}
+        setScrollToBottom={setScrollToBottom}
       />
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />

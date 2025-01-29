@@ -1271,7 +1271,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     } = this.state;
     const { colors } = this.props.theme;
 
-    //console.log('render loadingAppClass - 3', this.state.netInfo);
+    //console.log('render loadingAppClass - 3', this.state.privacy);
 
     const context = {
       // context
@@ -1642,7 +1642,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                   )}
 
                   {netInfo.isConnected && selectServer !== SelectServerEnum.offline && (
-                    <View style={{ marginTop: 10, display: 'flex', alignItems: 'center' }}>
+                    <View style={{ marginTop: 10, display: 'flex', alignItems: 'center', width: '100%' }}>
                       <Button
                         testID="loadingapp.restorewalletseedufvk"
                         type={ButtonTypeEnum.Secondary}

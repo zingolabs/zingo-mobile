@@ -33,7 +33,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   alone,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addresses, uOrchardAddress, mode, addLastSnackbar, language } = context;
+  const { translate, addresses, uOrchardAddress, mode, language } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -316,8 +316,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           width: '100%',
         }}>
         <Header
-          toggleMenuDrawer={toggleMenuDrawer}
-          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
           title={
             alone
               ? (translate('receive.title-basic-alone') as string)
@@ -325,10 +323,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               ? (translate('receive.title-basic') as string)
               : (translate('receive.title-advanced') as string)
           }
+          toggleMenuDrawer={toggleMenuDrawer}
+          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
+          setUfvkViewModalVisible={setUfvkViewModalVisible}
           noBalance={true}
           noPrivacy={true}
-          setUfvkViewModalVisible={setUfvkViewModalVisible}
-          addLastSnackbar={addLastSnackbar}
         />
 
         <TabBar

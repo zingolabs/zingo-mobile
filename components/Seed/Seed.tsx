@@ -180,7 +180,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
   //console.log('=================================');
   //console.log(wallet.seed, wallet.birthday);
-  //console.log(seedPhrase, birthdayNumber);
+  //console.log('render seed', privacy);
 
   return (
     <SafeAreaView
@@ -197,10 +197,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         noSyncingStatus={true}
         noDrawMenu={true}
         setPrivacyOption={setPrivacyOption}
+        addLastSnackbar={addLastSnackbar}
         translate={translate}
         netInfo={netInfo}
         mode={mode}
-        addLastSnackbar={addLastSnackbar}
+        privacy={privacy}
         receivedLegend={action === SeedActionEnum.view ? !basicFirstViewSeed : false}
         closeScreen={onClickCancel}
       />

@@ -2034,21 +2034,21 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Tab.Screen name={translate('loadedapp.history-menu') as string}>
                 {() => (
                   <History
-                    doRefresh={this.doRefresh}
-                    toggleMenuDrawer={this.toggleMenuDrawer}
-                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                    poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                    setZecPrice={this.setZecPrice}
-                    setComputingModalVisible={this.setComputingModalVisible}
-                    setPrivacyOption={this.setPrivacyOption}
-                    setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                    setShieldingAmount={this.setShieldingAmount}
-                    setScrollToTop={this.setScrollToTop}
-                    scrollToTop={scrollToTop}
-                    setScrollToBottom={this.setScrollToBottom}
-                    scrollToBottom={scrollToBottom}
-                    sendTransaction={this.sendTransaction}
-                    setServerOption={this.setServerOption}
+                    toggleMenuDrawer={this.toggleMenuDrawer /* header */}
+                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
+                    poolsMoreInfoOnClick={this.poolsMoreInfoOnClick /* header */}
+                    setZecPrice={this.setZecPrice /* header */}
+                    setComputingModalVisible={this.setComputingModalVisible /* header */}
+                    setPrivacyOption={this.setPrivacyOption /* header */}
+                    setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
+                    setShieldingAmount={this.setShieldingAmount /* header */}
+                    setScrollToTop={this.setScrollToTop /* header & history */}
+                    scrollToTop={scrollToTop /* history */}
+                    setScrollToBottom={this.setScrollToBottom /* header & messages */}
+                    scrollToBottom={scrollToBottom /* messages */}
+                    setServerOption={this.setServerOption /* messages */}
+                    sendTransaction={this.sendTransaction /* messages */}
+                    doRefresh={this.doRefresh /* history & messages */}
                   />
                 )}
               </Tab.Screen>
@@ -2075,18 +2075,19 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     }}>
                     {() => (
                       <Send
-                        sendTransaction={this.sendTransaction}
-                        clearToAddr={this.clearToAddr}
-                        toggleMenuDrawer={this.toggleMenuDrawer}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick}
-                        setZecPrice={this.setZecPrice}
-                        setComputingModalVisible={this.setComputingModalVisible}
-                        setPrivacyOption={this.setPrivacyOption}
-                        setShieldingAmount={this.setShieldingAmount}
-                        setScrollToTop={this.setScrollToTop}
-                        setScrollToBottom={this.setScrollToBottom}
-                        setServerOption={this.setServerOption}
+                        toggleMenuDrawer={this.toggleMenuDrawer /* header */}
+                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
+                        poolsMoreInfoOnClick={this.poolsMoreInfoOnClick /* header */}
+                        setZecPrice={this.setZecPrice /* header */}
+                        setComputingModalVisible={this.setComputingModalVisible /* header & send */}
+                        setPrivacyOption={this.setPrivacyOption /* header */}
+                        setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
+                        setShieldingAmount={this.setShieldingAmount /* header */}
+                        setScrollToTop={this.setScrollToTop /* header & send */}
+                        setScrollToBottom={this.setScrollToBottom /* header & send */}
+                        setServerOption={this.setServerOption /* send */}
+                        sendTransaction={this.sendTransaction /* send */}
+                        clearToAddr={this.clearToAddr /* send */}
                       />
                     )}
                   </Tab.Screen>
@@ -2094,27 +2095,27 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Tab.Screen name={translate('loadedapp.receive-menu') as string}>
                 {() => (
                   <Receive
-                    toggleMenuDrawer={this.toggleMenuDrawer}
-                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                    setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                    alone={false}
+                    toggleMenuDrawer={this.toggleMenuDrawer /* header */}
+                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
+                    setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
+                    alone={false /* receive */}
                   />
                 )}
               </Tab.Screen>
               <Tab.Screen name={translate('loadedapp.messages-menu') as string}>
                 {() => (
                   <Messages
-                    doRefresh={this.doRefresh}
-                    toggleMenuDrawer={this.toggleMenuDrawer}
-                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                    setPrivacyOption={this.setPrivacyOption}
-                    setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                    setScrollToTop={this.setScrollToTop}
-                    scrollToTop={scrollToTop}
-                    setScrollToBottom={this.setScrollToBottom}
-                    scrollToBottom={scrollToBottom}
-                    sendTransaction={this.sendTransaction}
-                    setServerOption={this.setServerOption}
+                    toggleMenuDrawer={this.toggleMenuDrawer /* header */}
+                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
+                    setPrivacyOption={this.setPrivacyOption /* header */}
+                    setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
+                    setScrollToTop={this.setScrollToTop /* chats */}
+                    scrollToTop={scrollToTop /* chats */}
+                    setScrollToBottom={this.setScrollToBottom /* messages */}
+                    scrollToBottom={scrollToBottom /* messages */}
+                    sendTransaction={this.sendTransaction /* messages */}
+                    setServerOption={this.setServerOption /* messages */}
+                    doRefresh={this.doRefresh /* chats & messages */}
                   />
                 )}
               </Tab.Screen>
@@ -2137,10 +2138,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   <Tab.Screen name={translate('loadedapp.history-menu') as string}>
                     {() => (
                       <Receive
-                        toggleMenuDrawer={this.toggleMenuDrawer}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick}
-                        setUfvkViewModalVisible={this.setUfvkViewModalVisible}
-                        alone={true}
+                        toggleMenuDrawer={this.toggleMenuDrawer /* header */}
+                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
+                        setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
+                        alone={true /* receive */}
                       />
                     )}
                   </Tab.Screen>

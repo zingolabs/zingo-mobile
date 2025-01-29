@@ -73,7 +73,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   setServerOption,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, valueTransfers, language, addLastSnackbar, server, addressBook, addresses } = context;
+  const { translate, valueTransfers, language, server, addressBook, addresses } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -287,7 +287,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
           visible={isMessagesAddressModalShowing}
           onRequestClose={() => setMessagesAddressModalShowing(false)}>
           <MessagesAddress
-            doRefresh={doRefresh}
             setPrivacyOption={setPrivacyOption}
             setScrollToBottom={setScrollToBottom}
             scrollToBottom={scrollToBottom}
@@ -296,6 +295,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             openModal={() => setMessagesAddressModalShowing(true)}
             sendTransaction={sendTransaction}
             setServerOption={setServerOption}
+            doRefresh={doRefresh}
           />
         </Modal>
       )}
@@ -307,23 +307,22 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
           visible={isMessagesAllModalShowing}
           onRequestClose={() => setMessagesAllModalShowing(false)}>
           <MessagesAll
-            doRefresh={doRefresh}
             setPrivacyOption={setPrivacyOption}
             setScrollToBottom={setScrollToBottom}
             scrollToBottom={scrollToBottom}
             closeModal={() => setMessagesAllModalShowing(false)}
             openModal={() => setMessagesAllModalShowing(true)}
+            doRefresh={doRefresh}
           />
         </Modal>
       )}
       <Header
+        title={translate('messages.title-chats') as string}
         toggleMenuDrawer={toggleMenuDrawer}
         syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
-        title={translate('messages.title-chats') as string}
-        noBalance={true}
         setUfvkViewModalVisible={setUfvkViewModalVisible}
-        setPrivacyOption={setPrivacyOption}
-        addLastSnackbar={addLastSnackbar}
+        noPrivacy={true}
+        noBalance={true}
       />
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />

@@ -72,6 +72,7 @@ type SendProps = {
   poolsMoreInfoOnClick: () => void;
   setZecPrice: (p: number, d: number) => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
+  setUfvkViewModalVisible?: (v: boolean) => void;
   setShieldingAmount: (value: number) => void;
   setScrollToTop: (value: boolean) => void;
   setScrollToBottom: (value: boolean) => void;
@@ -92,6 +93,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   poolsMoreInfoOnClick,
   setZecPrice,
   setPrivacyOption,
+  setUfvkViewModalVisible,
   setShieldingAmount,
   setScrollToTop,
   setScrollToBottom,
@@ -969,15 +971,16 @@ const Send: React.FunctionComponent<SendProps> = ({
             setTitleViewHeight(height);
           }}>
           <Header
-            poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-            syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
-            toggleMenuDrawer={toggleMenuDrawer}
-            setZecPrice={setZecPrice}
             title={translate('send.title') as string}
+            setBackgroundError={setBackgroundError /* context */}
+            addLastSnackbar={addLastSnackbar /* context */}
+            toggleMenuDrawer={toggleMenuDrawer}
+            syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
+            poolsMoreInfoOnClick={poolsMoreInfoOnClick}
+            setZecPrice={setZecPrice}
             setComputingModalVisible={setComputingModalVisible}
-            setBackgroundError={setBackgroundError}
             setPrivacyOption={setPrivacyOption}
-            addLastSnackbar={addLastSnackbar}
+            setUfvkViewModalVisible={setUfvkViewModalVisible}
             setShieldingAmount={setShieldingAmount}
             setScrollToTop={setScrollToTop}
             setScrollToBottom={setScrollToBottom}
