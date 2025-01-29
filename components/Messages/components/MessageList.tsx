@@ -59,7 +59,6 @@ import selectingServer from '../../../app/selectingServer';
 import { serverUris } from '../../../app/uris';
 
 type MessageListProps = {
-  doRefresh: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
@@ -76,7 +75,6 @@ type MessageListProps = {
 };
 
 const MessageList: React.FunctionComponent<MessageListProps> = ({
-  doRefresh,
   setPrivacyOption,
   setScrollToBottom,
   scrollToBottom,
@@ -100,6 +98,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     setBackgroundError,
     server,
     totalBalance,
+    doRefresh,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);

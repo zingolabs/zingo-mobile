@@ -441,6 +441,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       addressBookOpenPriorModal: () => {},
       shieldingAmount: 0,
       restartApp: this.navigateToLoadingApp,
+      showSwipeableIcons: true,
+      doRefresh: this.doRefresh,
 
       // context settings
       server: props.server,
@@ -481,7 +483,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       somePending: false,
       scrollToTop: false,
       scrollToBottom: false,
-      showSwipeableIcons: true,
     };
 
     this.rpc = new RPC(
@@ -1701,6 +1702,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       restartApp: this.state.restartApp,
       somePending: this.state.somePending,
       showSwipeableIcons: this.state.showSwipeableIcons,
+      doRefresh: this.state.doRefresh,
 
       // context settings
       server: this.state.server,
@@ -2048,7 +2050,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     scrollToBottom={scrollToBottom /* messages */}
                     setServerOption={this.setServerOption /* messages */}
                     sendTransaction={this.sendTransaction /* messages */}
-                    doRefresh={this.doRefresh /* history & messages */}
                   />
                 )}
               </Tab.Screen>
@@ -2115,7 +2116,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     scrollToBottom={scrollToBottom /* messages */}
                     sendTransaction={this.sendTransaction /* messages */}
                     setServerOption={this.setServerOption /* messages */}
-                    doRefresh={this.doRefresh /* chats & messages */}
                   />
                 )}
               </Tab.Screen>

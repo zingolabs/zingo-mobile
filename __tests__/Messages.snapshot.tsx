@@ -116,7 +116,6 @@ describe('Component Messages - test', () => {
     const messages = render(
       <ContextAppLoadedProvider value={state}>
         <Messages
-          doRefresh={onFunction}
           toggleMenuDrawer={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
           setPrivacyOption={onFunction}
@@ -142,7 +141,6 @@ describe('Component Messages - test', () => {
     const messages = render(
       <ContextAppLoadedProvider value={state}>
         <Messages
-          doRefresh={onFunction}
           toggleMenuDrawer={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
           setPrivacyOption={onFunction}

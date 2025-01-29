@@ -41,7 +41,6 @@ import ContactLine from './ContactLine';
 import RegText from '../../Components/RegText';
 
 type ContactListProps = {
-  doRefresh: () => void;
   toggleMenuDrawer: () => void;
   syncingStatusMoreInfoOnClick: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -60,7 +59,6 @@ type ContactListProps = {
 };
 
 const ContactList: React.FunctionComponent<ContactListProps> = ({
-  doRefresh,
   toggleMenuDrawer,
   syncingStatusMoreInfoOnClick,
   setPrivacyOption,
@@ -73,7 +71,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   setServerOption,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, valueTransfers, language, server, addressBook, addresses } = context;
+  const { translate, valueTransfers, language, server, addressBook, addresses, doRefresh } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -295,7 +293,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             openModal={() => setMessagesAddressModalShowing(true)}
             sendTransaction={sendTransaction}
             setServerOption={setServerOption}
-            doRefresh={doRefresh}
           />
         </Modal>
       )}
@@ -312,7 +309,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             scrollToBottom={scrollToBottom}
             closeModal={() => setMessagesAllModalShowing(false)}
             openModal={() => setMessagesAllModalShowing(true)}
-            doRefresh={doRefresh}
           />
         </Modal>
       )}

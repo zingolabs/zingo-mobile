@@ -116,7 +116,6 @@ describe('Component Messages Address - test', () => {
     const messages = render(
       <ContextAppLoadedProvider value={state}>
         <MessagesAddress
-          doRefresh={onFunction}
           setPrivacyOption={onFunction}
           setScrollToBottom={onFunction}
           scrollToBottom={false}

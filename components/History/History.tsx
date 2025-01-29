@@ -37,7 +37,6 @@ import { MessagesAddress } from '../Messages';
 import Utils from '../../app/utils';
 
 type HistoryProps = {
-  doRefresh: () => void;
   toggleMenuDrawer: () => void;
   poolsMoreInfoOnClick: () => void;
   syncingStatusMoreInfoOnClick: () => void;
@@ -60,7 +59,6 @@ type HistoryProps = {
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
-  doRefresh,
   toggleMenuDrawer,
   poolsMoreInfoOnClick,
   syncingStatusMoreInfoOnClick,
@@ -77,7 +75,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   setServerOption,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, valueTransfers, language, setBackgroundError, addLastSnackbar, server } = context;
+  const { translate, valueTransfers, language, setBackgroundError, addLastSnackbar, server, doRefresh } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -189,7 +187,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
           visible={isMessagesAddressModalShowing}
           onRequestClose={() => setMessagesAddressModalShowing(false)}>
           <MessagesAddress
-            doRefresh={doRefresh}
             setPrivacyOption={setPrivacyOption}
             setScrollToBottom={setScrollToBottom}
             scrollToBottom={scrollToBottom}

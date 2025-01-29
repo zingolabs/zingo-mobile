@@ -426,7 +426,7 @@ exports[`Component Messages Address - test Messages Address - snapshot 1`] = `
         onScroll={[Function]}
         refreshControl={
           <RefreshControlMock
-            onRefresh={[MockFunction]}
+            onRefresh={[Function]}
             refreshing={false}
             tintColor="#c3c3c3"
             title="text translated"

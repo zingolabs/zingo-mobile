@@ -8,7 +8,6 @@ import { ThemeType } from '../../app/types';
 import moment from 'moment';
 
 type MessagesAllProps = {
-  doRefresh: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
@@ -17,7 +16,6 @@ type MessagesAllProps = {
 };
 
 const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
-  doRefresh,
   setPrivacyOption,
   setScrollToBottom,
   scrollToBottom,
@@ -39,7 +37,6 @@ const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
         backgroundColor: colors.background,
       }}>
       <MessageList
-        doRefresh={doRefresh}
         setPrivacyOption={setPrivacyOption}
         setScrollToBottom={setScrollToBottom}
         scrollToBottom={scrollToBottom}

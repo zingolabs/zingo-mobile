@@ -76,6 +76,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   recoveryWalletInfoOnDevice: false,
   shieldingAmount: 0,
   showSwipeableIcons: true,
+  doRefresh: () => {},
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

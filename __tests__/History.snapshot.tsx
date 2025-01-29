@@ -137,7 +137,6 @@ describe('Component History - test', () => {
     const history = render(
       <ContextAppLoadedProvider value={state}>
         <History
-          doRefresh={onFunction}
           toggleMenuDrawer={onFunction}
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
@@ -167,7 +166,6 @@ describe('Component History - test', () => {
     const history = render(
       <ContextAppLoadedProvider value={state}>
         <History
-          doRefresh={onFunction}
           toggleMenuDrawer={onFunction}
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}

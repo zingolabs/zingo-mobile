@@ -12,7 +12,6 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 
 type MessagesAddressProps = {
-  doRefresh: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
@@ -29,7 +28,6 @@ type MessagesAddressProps = {
 };
 
 const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
-  doRefresh,
   setPrivacyOption,
   setScrollToBottom,
   scrollToBottom,
@@ -54,7 +52,6 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
         backgroundColor: colors.background,
       }}>
       <MessageList
-        doRefresh={doRefresh}
         setPrivacyOption={setPrivacyOption}
         setScrollToBottom={setScrollToBottom}
         scrollToBottom={scrollToBottom}

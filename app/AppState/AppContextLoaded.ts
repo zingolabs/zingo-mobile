@@ -117,5 +117,8 @@ export default interface AppContextLoaded {
   // indicate if the swipeable icons are visible or not.
   showSwipeableIcons: boolean;
 
+  // refresh the different list in the App: history & messages
+  doRefresh: () => void;
+
   // eslint-disable-next-line semi
 }

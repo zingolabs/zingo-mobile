@@ -3,7 +3,6 @@ import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppS
 import ContactList from './components/ContactList';
 
 type MessagesProps = {
-  doRefresh: () => void;
   toggleMenuDrawer: () => void;
   syncingStatusMoreInfoOnClick: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -22,7 +21,6 @@ type MessagesProps = {
 };
 
 const Messages: React.FunctionComponent<MessagesProps> = ({
-  doRefresh,
   toggleMenuDrawer,
   syncingStatusMoreInfoOnClick,
   setPrivacyOption,
@@ -36,7 +34,6 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
 }) => {
   return (
     <ContactList
-      doRefresh={doRefresh}
       toggleMenuDrawer={toggleMenuDrawer}
       syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
       setPrivacyOption={setPrivacyOption}
