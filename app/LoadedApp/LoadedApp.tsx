@@ -445,6 +445,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       shieldingAmount: 0,
       showSwipeableIcons: true,
       doRefresh: this.doRefresh,
+      setZecPrice: this.setZecPrice,
 
       // context settings
       server: props.server,
@@ -773,10 +774,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  getFullState = (): AppStateLoaded => {
-    return this.state;
-  };
-
   setUfvkViewModalVisible = async (value: boolean) => {
     await this.fetchWallet();
     this.setState({ ufvkViewModalVisible: value });
@@ -940,23 +937,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setValueTransfersFetchItems = (items: number) => {
-    this.setState({
-      valueTransfersFetchItems: items,
-    });
-  };
-
   setMessagesList = (messages: ValueTransferType[], messagesTotal: number) => {
     if (!isEqual(this.state.messages, messages) || this.state.messagesTotal !== messagesTotal) {
       //console.log('fetch messages');
       this.setState({ messages, messagesTotal });
     }
-  };
-
-  setMessagesFetchItems = (items: number) => {
-    this.setState({
-      messagesFetchItems: items,
-    });
   };
 
   setAllAddresses = (addresses: AddressClass[]) => {
@@ -1135,7 +1120,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.setState({ seedBackupModalVisible: true });
       }
     } else if (item === MenuItemEnum.LoadWalletFromSeed) {
-      // change to the screen 3 directly.
       const { translate } = this.state;
       Alert.alert(
         translate('loadedapp.restorewallet-title') as string,
@@ -1150,7 +1134,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         { cancelable: false, userInterfaceStyle: 'light' },
       );
     } else if (item === MenuItemEnum.TipZingoLabs) {
-      // change to the screen 3 directly.
       const { translate } = this.state;
       Alert.alert(
         translate('loadingapp.alert-donation-title') as string,
@@ -1711,6 +1694,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       somePending: this.state.somePending,
       showSwipeableIcons: this.state.showSwipeableIcons,
       doRefresh: this.state.doRefresh,
+      setZecPrice: this.state.setZecPrice,
 
       // context settings
       server: this.state.server,
@@ -1784,7 +1768,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             visible={infoModalVisible}
             onRequestClose={() => this.setState({ infoModalVisible: false })}>
             <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
-              <Info closeModal={() => this.setState({ infoModalVisible: false })} setZecPrice={this.setZecPrice} />
+              <Info closeModal={() => this.setState({ infoModalVisible: false })} />
             </Suspense>
           </Modal>
 
@@ -2047,7 +2031,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     toggleMenuDrawer={this.toggleMenuDrawer /* header */}
                     syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
                     poolsMoreInfoOnClick={this.poolsMoreInfoOnClick /* header */}
-                    setZecPrice={this.setZecPrice /* header */}
                     setComputingModalVisible={this.setComputingModalVisible /* header */}
                     setPrivacyOption={this.setPrivacyOption /* header */}
                     setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
@@ -2087,7 +2070,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                         toggleMenuDrawer={this.toggleMenuDrawer /* header */}
                         syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
                         poolsMoreInfoOnClick={this.poolsMoreInfoOnClick /* header */}
-                        setZecPrice={this.setZecPrice /* header */}
                         setComputingModalVisible={this.setComputingModalVisible /* header & send */}
                         setPrivacyOption={this.setPrivacyOption /* header */}
                         setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}

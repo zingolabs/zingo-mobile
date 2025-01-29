@@ -13,7 +13,7 @@ import { ThemeType } from '../../app/types';
 import { ModeEnum } from '../../app/AppState';
 
 type PriceFetcherProps = {
-  setZecPrice?: (p: number, d: number) => void;
+  setZecPrice: (p: number, d: number) => void;
   textBefore?: string;
 };
 
@@ -50,28 +50,26 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
   };
 
   const onPressFetch = async () => {
-    if (setZecPrice) {
-      setLoading(true);
-      const price = await RPC.rpcGetZecPrice();
-      // values:
-      // 0   - initial/default value
-      // -1  - error in Gemini/zingolib.
-      // -2  - error in RPCModule, likely.
-      // > 0 - real value
-      if (price === -1) {
-        addLastSnackbar({ message: translate('info.errorgemini') as string });
-      }
-      if (price === -2) {
-        addLastSnackbar({ message: translate('info.errorrpcmodule') as string });
-      }
-      if (price <= 0) {
-        setZecPrice(price, 0);
-      } else {
-        setZecPrice(price, Date.now());
-      }
-      setRefreshMinutes(0);
-      setLoading(false);
+    setLoading(true);
+    const price = await RPC.rpcGetZecPrice();
+    // values:
+    // 0   - initial/default value
+    // -1  - error in Gemini/zingolib.
+    // -2  - error in RPCModule, likely.
+    // > 0 - real value
+    if (price === -1) {
+      addLastSnackbar({ message: translate('info.errorgemini') as string });
     }
+    if (price === -2) {
+      addLastSnackbar({ message: translate('info.errorrpcmodule') as string });
+    }
+    if (price <= 0) {
+      setZecPrice(price, 0);
+    } else {
+      setZecPrice(price, Date.now());
+    }
+    setRefreshMinutes(0);
+    setLoading(false);
   };
 
   const onPressFetchAlert = () => {

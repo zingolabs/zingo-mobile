@@ -70,7 +70,6 @@ describe('Component Header - test', () => {
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
           toggleMenuDrawer={onFunction}
-          setZecPrice={onFunction}
           title="title"
           setComputingModalVisible={onFunction}
           setBackgroundError={onFunction}

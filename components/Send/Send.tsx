@@ -70,7 +70,6 @@ type SendProps = {
   setComputingModalVisible: (visible: boolean) => void;
   syncingStatusMoreInfoOnClick: () => void;
   poolsMoreInfoOnClick: () => void;
-  setZecPrice: (p: number, d: number) => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setUfvkViewModalVisible?: (v: boolean) => void;
   setShieldingAmount: (value: number) => void;
@@ -91,7 +90,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   setComputingModalVisible,
   syncingStatusMoreInfoOnClick,
   poolsMoreInfoOnClick,
-  setZecPrice,
   setPrivacyOption,
   setUfvkViewModalVisible,
   setShieldingAmount,
@@ -122,6 +120,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     uOrchardAddress,
     shieldingAmount,
     selectServer,
+    setZecPrice,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
@@ -977,7 +976,6 @@ const Send: React.FunctionComponent<SendProps> = ({
             toggleMenuDrawer={toggleMenuDrawer}
             syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
             poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-            setZecPrice={setZecPrice}
             setComputingModalVisible={setComputingModalVisible}
             setPrivacyOption={setPrivacyOption}
             setUfvkViewModalVisible={setUfvkViewModalVisible}

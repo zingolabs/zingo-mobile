@@ -18,12 +18,11 @@ import { ChainNameEnum, CurrencyEnum } from '../../app/AppState';
 
 type InfoProps = {
   closeModal: () => void;
-  setZecPrice: (p: number, d: number) => void;
 };
 
-const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) => {
+const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, currency, zecPrice, privacy, language } = context;
+  const { info, translate, currency, zecPrice, privacy, language, setZecPrice } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 

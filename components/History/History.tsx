@@ -41,7 +41,6 @@ type HistoryProps = {
   toggleMenuDrawer: () => void;
   poolsMoreInfoOnClick: () => void;
   syncingStatusMoreInfoOnClick: () => void;
-  setZecPrice: (p: number, d: number) => void;
   setComputingModalVisible: (visible: boolean) => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setUfvkViewModalVisible?: (v: boolean) => void;
@@ -63,7 +62,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   toggleMenuDrawer,
   poolsMoreInfoOnClick,
   syncingStatusMoreInfoOnClick,
-  setZecPrice,
   setComputingModalVisible,
   setPrivacyOption,
   setUfvkViewModalVisible,
@@ -207,7 +205,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
         toggleMenuDrawer={toggleMenuDrawer}
         syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
         poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-        setZecPrice={setZecPrice}
         setComputingModalVisible={setComputingModalVisible}
         setPrivacyOption={setPrivacyOption}
         setUfvkViewModalVisible={setUfvkViewModalVisible}

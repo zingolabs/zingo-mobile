@@ -55,7 +55,6 @@ type HeaderProps = {
   poolsMoreInfoOnClick?: () => void;
   syncingStatusMoreInfoOnClick?: () => void;
   toggleMenuDrawer?: () => void;
-  setZecPrice?: (p: number, d: number) => void;
   title: string;
   noBalance?: boolean;
   noSyncingStatus?: boolean;
@@ -82,7 +81,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   poolsMoreInfoOnClick,
   syncingStatusMoreInfoOnClick,
   toggleMenuDrawer,
-  setZecPrice,
   title,
   noBalance,
   noSyncingStatus,
@@ -121,6 +119,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     shieldingAmount,
     navigation,
     selectServer,
+    setZecPrice,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum, privacy: boolean;

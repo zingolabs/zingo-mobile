@@ -77,6 +77,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   shieldingAmount: 0,
   showSwipeableIcons: true,
   doRefresh: () => {},
+  setZecPrice: () => {},
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

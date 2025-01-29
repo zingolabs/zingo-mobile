@@ -108,6 +108,9 @@ export default interface AppContextLoaded {
   // refresh the different list in the App: history & messages
   doRefresh: (s: RefreshScreenEnum) => void;
 
+  // fetch the ZEC price in USD
+  setZecPrice: (p: number, d: number) => void;
+
   // settings
   server: ServerType;
   currency: CurrencyEnum;

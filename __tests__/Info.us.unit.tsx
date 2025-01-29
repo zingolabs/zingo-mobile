@@ -57,10 +57,9 @@ describe('Component Info - test', () => {
     state.zecPrice = mockZecPrice;
     state.currency = CurrencyEnum.USDCurrency;
     const onClose = jest.fn();
-    const onSet = jest.fn();
     render(
       <ContextAppLoadedProvider value={state}>
-        <Info closeModal={onClose} setZecPrice={onSet} />
+        <Info closeModal={onClose} />
       </ContextAppLoadedProvider>,
     );
     screen.getByText('$ 33.33');
