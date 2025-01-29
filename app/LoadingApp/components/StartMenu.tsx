@@ -140,7 +140,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             </Text>
             <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version') as string}</Text>
             <Image
-              source={require('../../assets/img/logobig-zingo.png')}
+              source={require('../../../assets/img/logobig-zingo.png')}
               style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10, borderRadius: 10 }}
             />
           </View>
