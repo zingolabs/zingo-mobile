@@ -81,19 +81,6 @@ export default interface AppContextLoaded {
   // this wallet is watch-only (Readonly)
   readOnly: boolean;
 
-  // settings
-  server: ServerType;
-  currency: CurrencyEnum;
-  language: LanguageEnum;
-  sendAll: boolean;
-  donation: boolean;
-  privacy: boolean;
-  mode: ModeEnum;
-  security: SecurityType;
-  selectServer: SelectServerEnum;
-  rescanMenu: boolean;
-  recoveryWalletInfoOnDevice: boolean;
-
   // snackbar queue
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
@@ -120,6 +107,19 @@ export default interface AppContextLoaded {
 
   // refresh the different list in the App: history & messages
   doRefresh: (s: RefreshScreenEnum) => void;
+
+  // settings
+  server: ServerType;
+  currency: CurrencyEnum;
+  language: LanguageEnum;
+  sendAll: boolean;
+  donation: boolean;
+  privacy: boolean;
+  mode: ModeEnum;
+  security: SecurityType;
+  selectServer: SelectServerEnum;
+  rescanMenu: boolean;
+  recoveryWalletInfoOnDevice: boolean;
 
   // eslint-disable-next-line semi
 }
