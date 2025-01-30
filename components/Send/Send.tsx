@@ -64,23 +64,31 @@ import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
 
 type SendProps = {
-  sendTransaction: (s: SendPageStateClass) => Promise<String>;
-  clearToAddr: () => void;
+  // side menu
   toggleMenuDrawer: () => void;
-  setComputingModalVisible: (visible: boolean) => void;
-  syncingStatusMoreInfoOnClick: () => void;
+  // balance
   poolsMoreInfoOnClick: () => void;
+  // syncing
+  syncingStatusMoreInfoOnClick: () => void;
+  // privacy
   setPrivacyOption: (value: boolean) => Promise<void>;
-  setUfvkViewModalVisible?: (v: boolean) => void;
+  // addLastSnackbar from context
+  // shielding
   setShieldingAmount: (value: number) => void;
+  setComputingModalVisible: (visible: boolean) => void;
   setScrollToTop: (value: boolean) => void;
   setScrollToBottom: (value: boolean) => void;
+  // read-only wallet
+  setUfvkViewModalVisible?: (v: boolean) => void;
+  // for send
+  sendTransaction: (s: SendPageStateClass) => Promise<String>;
   setServerOption: (
     value: ServerType,
     selectServer: SelectServerEnum,
     toast: boolean,
     sameServerChainName: boolean,
   ) => Promise<void>;
+  clearToAddr: () => void;
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
@@ -971,17 +979,17 @@ const Send: React.FunctionComponent<SendProps> = ({
           }}>
           <Header
             title={translate('send.title') as string}
-            setBackgroundError={setBackgroundError /* context */}
-            addLastSnackbar={addLastSnackbar /* context */}
             toggleMenuDrawer={toggleMenuDrawer}
-            syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
             poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-            setComputingModalVisible={setComputingModalVisible}
+            syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
             setPrivacyOption={setPrivacyOption}
-            setUfvkViewModalVisible={setUfvkViewModalVisible}
+            addLastSnackbar={addLastSnackbar /* context */}
             setShieldingAmount={setShieldingAmount}
+            setComputingModalVisible={setComputingModalVisible}
             setScrollToTop={setScrollToTop}
             setScrollToBottom={setScrollToBottom}
+            setBackgroundError={setBackgroundError /* context */}
+            setUfvkViewModalVisible={setUfvkViewModalVisible}
           />
         </View>
       </Animated.View>

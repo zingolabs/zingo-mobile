@@ -2029,18 +2029,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 {() => (
                   <History
                     toggleMenuDrawer={this.toggleMenuDrawer /* header */}
-                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
                     poolsMoreInfoOnClick={this.poolsMoreInfoOnClick /* header */}
-                    setComputingModalVisible={this.setComputingModalVisible /* header */}
+                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
                     setPrivacyOption={this.setPrivacyOption /* header */}
-                    setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
                     setShieldingAmount={this.setShieldingAmount /* header */}
+                    setComputingModalVisible={this.setComputingModalVisible /* header */}
                     setScrollToTop={this.setScrollToTop /* header & history */}
                     scrollToTop={scrollToTop /* history */}
                     setScrollToBottom={this.setScrollToBottom /* header & messages */}
                     scrollToBottom={scrollToBottom /* messages */}
-                    setServerOption={this.setServerOption /* messages */}
+                    setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
                     sendTransaction={this.sendTransaction /* messages */}
+                    setServerOption={this.setServerOption /* messages */}
                   />
                 )}
               </Tab.Screen>
@@ -2068,16 +2068,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     {() => (
                       <Send
                         toggleMenuDrawer={this.toggleMenuDrawer /* header */}
-                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
                         poolsMoreInfoOnClick={this.poolsMoreInfoOnClick /* header */}
-                        setComputingModalVisible={this.setComputingModalVisible /* header & send */}
+                        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
                         setPrivacyOption={this.setPrivacyOption /* header */}
-                        setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
                         setShieldingAmount={this.setShieldingAmount /* header */}
+                        setComputingModalVisible={this.setComputingModalVisible /* header & send */}
                         setScrollToTop={this.setScrollToTop /* header & send */}
                         setScrollToBottom={this.setScrollToBottom /* header & send */}
-                        setServerOption={this.setServerOption /* send */}
+                        setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
                         sendTransaction={this.sendTransaction /* send */}
+                        setServerOption={this.setServerOption /* send */}
                         clearToAddr={this.clearToAddr /* send */}
                       />
                     )}
@@ -2099,11 +2099,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     toggleMenuDrawer={this.toggleMenuDrawer /* header */}
                     syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
                     setPrivacyOption={this.setPrivacyOption /* header */}
-                    setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
                     setScrollToTop={this.setScrollToTop /* chats */}
                     scrollToTop={scrollToTop /* chats */}
                     setScrollToBottom={this.setScrollToBottom /* messages */}
                     scrollToBottom={scrollToBottom /* messages */}
+                    setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
                     sendTransaction={this.sendTransaction /* messages */}
                     setServerOption={this.setServerOption /* messages */}
                   />

@@ -689,14 +689,64 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
       }
     >
       <View
-        style={
+        accessibilityState={
           {
-            "height": 30,
-            "marginHorizontal": 10,
-            "width": 30,
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
           }
         }
-      />
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "opacity": 1,
+          }
+        }
+      >
+        <
+          color="rgb(0, 122, 255)"
+          icon={
+            {
+              "icon": [
+                320,
+                512,
+                [
+                  9001,
+                ],
+                "f053",
+                "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
+              ],
+              "iconName": "chevron-left",
+              "prefix": "fas",
+            }
+          }
+          size={30}
+          style={
+            {
+              "marginHorizontal": 10,
+            }
+          }
+        />
+      </View>
       <Text
         style={
           {
@@ -705,7 +755,6 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
             "fontWeight": "600",
             "opacity": 1,
             "paddingHorizontal": 5,
-            "textAlign": "center",
           }
         }
       >

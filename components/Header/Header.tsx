@@ -52,29 +52,39 @@ import { RPCShieldProposeType } from '../../app/rpc/types/RPCShieldProposeType';
 import RPCModule from '../../app/RPCModule';
 
 type HeaderProps = {
-  poolsMoreInfoOnClick?: () => void;
-  syncingStatusMoreInfoOnClick?: () => void;
-  toggleMenuDrawer?: () => void;
-  title: string;
-  noBalance?: boolean;
-  noSyncingStatus?: boolean;
-  noDrawMenu?: boolean;
+  // general
   testID?: string;
+  title: string;
+  // side menu
+  noDrawMenu?: boolean;
+  toggleMenuDrawer?: () => void;
+  closeScreen?: () => void;
+  // balance
+  noBalance?: boolean;
+  poolsMoreInfoOnClick?: () => void;
+  // syncing icons
+  noSyncingStatus?: boolean;
+  syncingStatusMoreInfoOnClick?: () => void;
+  // privacy
+  noPrivacy?: boolean;
+  setPrivacyOption?: (value: boolean) => Promise<void>;
+  addLastSnackbar?: (snackbar: SnackbarType) => void;
+  // shielding
+  setShieldingAmount?: (value: number) => void;
+  setComputingModalVisible?: (visible: boolean) => void;
+  setScrollToTop?: (value: boolean) => void;
+  setScrollToBottom?: (value: boolean) => void;
+  // seed screen - shared between AppLoading & AppLoadad - different contexts
   translate?: (key: string) => TranslateType;
   netInfo?: NetInfoType;
   mode?: ModeEnum;
   privacy?: boolean;
-  setComputingModalVisible?: (visible: boolean) => void;
+  // store the error if the App is in background
   setBackgroundError?: (title: string, error: string) => void;
-  noPrivacy?: boolean;
-  setPrivacyOption?: (value: boolean) => Promise<void>;
+  // read-only wallet
   setUfvkViewModalVisible?: (v: boolean) => void;
-  addLastSnackbar?: (snackbar: SnackbarType) => void;
+  // first funds received legend for the Seed screen
   receivedLegend?: boolean;
-  setShieldingAmount?: (value: number) => void;
-  setScrollToTop?: (value: boolean) => void;
-  setScrollToBottom?: (value: boolean) => void;
-  closeScreen?: () => void;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({

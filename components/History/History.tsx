@@ -38,17 +38,25 @@ import { MessagesAddress } from '../Messages';
 import Utils from '../../app/utils';
 
 type HistoryProps = {
+  // side menu
   toggleMenuDrawer: () => void;
+  // balance
   poolsMoreInfoOnClick: () => void;
+  // syncing
   syncingStatusMoreInfoOnClick: () => void;
-  setComputingModalVisible: (visible: boolean) => void;
+  // privacy
   setPrivacyOption: (value: boolean) => Promise<void>;
-  setUfvkViewModalVisible?: (v: boolean) => void;
+  // addLastSnackbar from context
+  // shielding / sending
   setShieldingAmount: (value: number) => void;
+  setComputingModalVisible: (visible: boolean) => void;
   setScrollToTop: (value: boolean) => void;
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
+  // read-only wallet
+  setUfvkViewModalVisible?: (v: boolean) => void;
+  // for messages
   sendTransaction: (s: SendPageStateClass) => Promise<String>;
   setServerOption: (
     value: ServerType,
@@ -200,17 +208,17 @@ const History: React.FunctionComponent<HistoryProps> = ({
       <Header
         testID="valuetransfer text"
         title={translate('history.title') as string}
-        setBackgroundError={setBackgroundError /* context */}
-        addLastSnackbar={addLastSnackbar /* context */}
         toggleMenuDrawer={toggleMenuDrawer}
-        syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
         poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-        setComputingModalVisible={setComputingModalVisible}
+        syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
         setPrivacyOption={setPrivacyOption}
-        setUfvkViewModalVisible={setUfvkViewModalVisible}
+        addLastSnackbar={addLastSnackbar /* context */}
         setShieldingAmount={setShieldingAmount}
+        setComputingModalVisible={setComputingModalVisible}
         setScrollToTop={setScrollToTop}
         setScrollToBottom={setScrollToBottom}
+        setBackgroundError={setBackgroundError /* context */}
+        setUfvkViewModalVisible={setUfvkViewModalVisible}
       />
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />

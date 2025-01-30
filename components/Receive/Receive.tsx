@@ -27,9 +27,16 @@ type ReceiveProps = {
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
+  // side menu
   toggleMenuDrawer,
+  // balance
+  // syncing
   syncingStatusMoreInfoOnClick,
+  // privacy
+  // shielding
+  // read-only wallet
   setUfvkViewModalVisible,
+  // for receive
   alone,
 }) => {
   const context = useContext(ContextAppLoaded);

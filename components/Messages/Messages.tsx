@@ -3,14 +3,22 @@ import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppS
 import ContactList from './components/ContactList';
 
 type MessagesProps = {
+  // side menu
   toggleMenuDrawer: () => void;
+  // balance
+  // syncing
   syncingStatusMoreInfoOnClick: () => void;
+  // privacy
   setPrivacyOption: (value: boolean) => Promise<void>;
-  setUfvkViewModalVisible?: (v: boolean) => void;
+  // addLastSnackbar from context
+  // shielding / sending
   setScrollToTop: (value: boolean) => void;
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
+  // read-only wallet
+  setUfvkViewModalVisible?: (v: boolean) => void;
+  // for messages
   sendTransaction: (s: SendPageStateClass) => Promise<String>;
   setServerOption: (
     value: ServerType,

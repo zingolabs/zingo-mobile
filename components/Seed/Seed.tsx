@@ -98,14 +98,16 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const [basicFirstViewSeed, setBasicFirstViewSeed] = useState<boolean>(true);
 
   useEffect(() => {
-    (async () => {
-      const bfvs: boolean = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
-      setBasicFirstViewSeed(bfvs);
-      if (!bfvs && keepAwake) {
-        // keep the screen awake while the user is writting the seed
-        keepAwake(true);
-      }
-    })();
+    if (keepAwake) {
+      (async () => {
+        const bfvs: boolean = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
+        setBasicFirstViewSeed(bfvs);
+        if (!bfvs) {
+          // keep the screen awake while the user is writting the seed
+          keepAwake(true);
+        }
+      })();
+    }
   }, [keepAwake]);
 
   useEffect(() => {
