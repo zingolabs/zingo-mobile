@@ -1231,7 +1231,8 @@ export default class RPC {
           currentValueTransferList.status = vt.status;
           currentValueTransferList.address = !vt.recipient_address ? undefined : vt.recipient_address;
           currentValueTransferList.amount = (!vt.value ? 0 : vt.value) / 10 ** 8;
-          currentValueTransferList.memos = !vt.memos || vt.memos.length === 0 ? undefined : vt.memos;
+          currentValueTransferList.memos =
+            !vt.memos || vt.memos.length === 0 || !vt.memos.join('') ? undefined : vt.memos;
           currentValueTransferList.poolType = !vt.pool_received ? undefined : vt.pool_received;
 
           if (vt.txid.startsWith('xxxxxxxxx')) {
@@ -1332,7 +1333,7 @@ export default class RPC {
           currentMessageList.status = m.status;
           currentMessageList.address = !m.recipient_address ? undefined : m.recipient_address;
           currentMessageList.amount = (!m.value ? 0 : m.value) / 10 ** 8;
-          currentMessageList.memos = !m.memos || m.memos.length === 0 ? undefined : m.memos;
+          currentMessageList.memos = !m.memos || m.memos.length === 0 || !m.memos.join('') ? undefined : m.memos;
           currentMessageList.poolType = !m.pool_received ? undefined : m.pool_received;
 
           if (m.txid.startsWith('xxxxxxxxx')) {

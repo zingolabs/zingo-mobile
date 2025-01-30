@@ -220,7 +220,7 @@ export default class Utils {
     let donationAddress: boolean = false;
     const json: Promise<SendJsonToTypeType[][]> = Promise.all(
       [sendPageState.toaddr].flatMap(async (to: ToAddrClass) => {
-        const memo = `${to.memo || ''}${to.includeUAMemo ? GlobalConst.replyTo + uOrchardAddress : ''}`;
+        const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uOrchardAddress);
         const amount = parseInt((Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(0), 10);
 
         donationAddress =
@@ -237,7 +237,7 @@ export default class Utils {
           // Each memo will be `(xx/yy)memo part`. The prefix "(xx/yy)" is 7 bytes long, so
           // we'll split the memo into 511-7 = 505 bytes length
           // this make sense if we make long memos... in the future.
-          const splits = Utils.utf16Split(memo, 511 - 7);
+          const splits = Utils.utf16Split(memo, GlobalConst.memoMaxLength - 7);
           const tos = [];
 
           // The first one contains all the tx value
@@ -359,29 +359,44 @@ export default class Utils {
       // to zingolib (parse_address command) about the type of the address.
       return !vt.address.startsWith('t');
     } else {
-      const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
-      if (memoTotal.includes(GlobalConst.replyTo)) {
-        let memoArray = memoTotal.split(GlobalConst.replyTo);
-        const memoPoped = memoArray.pop();
-        return !!memoPoped;
-      }
+      const { memoUA } = Utils.splitMemo(vt.memos);
+      return !!memoUA;
     }
-    return false;
   }
 
-  static messagesAddress = (vt: ValueTransferType | ContactType) => {
+  static messagesAddress = (vt: ValueTransferType | ContactType): string => {
+    // we can't check here in this VT if the memo is empty
+    // because this address/contact could have memos in another
+    // VT in the list.
+    // only for orchard or sapling
     if (vt.address) {
-      return vt.address;
+      // the performance in the list is really bad if here I asked properly
+      // to zingolib (parse_address command) about the type of the address.
+      return !vt.address.startsWith('t') ? vt.address : '';
     } else {
-      const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
-      if (memoTotal.includes(GlobalConst.replyTo)) {
-        let memoArray = memoTotal.split(GlobalConst.replyTo);
-        const memoPoped = memoArray.pop();
-        if (memoPoped) {
-          return memoPoped;
-        }
-      }
+      const { memoUA } = Utils.splitMemo(vt.memos);
+      return memoUA ? memoUA : '';
     }
-    return '';
+  };
+
+  static splitMemo = (memos: string[] | undefined): { memo: string; memoUA: string } => {
+    const memoTotal = memos && memos.length > 0 ? memos.join('\n') : '';
+    if (memoTotal.includes(GlobalConst.replyTo)) {
+      let memoArray = memoTotal.split(GlobalConst.replyTo);
+      const memoUA = memoArray.pop();
+      const memo = memoArray.join('');
+      return { memo, memoUA: memoUA ? memoUA : '' };
+    }
+    return { memo: memoTotal, memoUA: '' };
+  };
+
+  static buildMemo = (memo: string | undefined, includeUAMemo: boolean, uOrchardAddress: string): string => {
+    return `${memo || ''}${includeUAMemo ? GlobalConst.replyTo + uOrchardAddress : ''}`;
+  };
+
+  static countMemoBytes = (memo: string | undefined, includeUAMemo: boolean, uOrchardAddress: string): number => {
+    const memoTotal = Utils.buildMemo(memo, includeUAMemo, uOrchardAddress);
+    const len = Buffer.byteLength(memoTotal, 'utf8');
+    return len;
   };
 }

@@ -67,17 +67,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const [addressProtected, setAddressProtected] = useState<boolean>(true);
   const isTheFirstMount = useRef(true);
 
-  const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
-  let memo = '';
-  let memoUA = '';
-  if (memoTotal.includes(GlobalConst.replyTo)) {
-    let memoArray = memoTotal.split(GlobalConst.replyTo);
-    const memoPoped = memoArray.pop();
-    memoUA = memoPoped ? memoPoped : '';
-    memo = memoArray.join('');
-  } else {
-    memo = memoTotal;
-  }
+  const { memo, memoUA } = Utils.splitMemo(vt.memos);
 
   useEffect(() => {
     const spendCo =

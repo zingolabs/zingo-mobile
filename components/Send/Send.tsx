@@ -56,7 +56,6 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
-import { Buffer } from 'buffer';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
 import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
 import { RPCSendallProposeType } from '../../app/rpc/types/RPCSendallProposeType';
@@ -408,10 +407,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     ],
   );
 
-  const memoTotal = useCallback((memoPar: string, includeUAMemoPar: boolean, uOrchardAddressPar: string) => {
-    return `${memoPar || ''}${includeUAMemoPar ? GlobalConst.replyTo + uOrchardAddressPar : ''}`;
-  }, []);
-
   const updateToField = async (
     addressPar: string | null,
     amountPar: string | null,
@@ -538,14 +533,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   }, [server.chainName, addressText]);
 
-  const countMemoBytes = useCallback(
-    (memoPar: string, includeUAMemoPar: boolean, uaAddressPar: string) => {
-      const len = Buffer.byteLength(memoTotal(memoPar, includeUAMemoPar, uaAddressPar), 'utf8');
-      return len;
-    },
-    [memoTotal],
-  );
-
   useEffect(() => {
     const parseAddress = async (
       address: string,
@@ -566,7 +553,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     if (memoText || includeUAMemoBoolean) {
-      const len = countMemoBytes(memoText, includeUAMemoBoolean, uOrchardAddress);
+      const len = Utils.countMemoBytes(memoText, includeUAMemoBoolean, uOrchardAddress);
       if (len > GlobalConst.memoMaxLength) {
         setValidMemo(-1);
       } else {
@@ -616,8 +603,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     fee,
     maxAmount,
     uOrchardAddress,
-    memoTotal,
-    countMemoBytes,
   ]);
 
   useEffect(() => {
@@ -1703,7 +1688,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         fontWeight: 'bold',
                         fontSize: 12.5,
                         color: 'red',
-                      }}>{`${countMemoBytes(memoText, includeUAMemoBoolean, uOrchardAddress)} `}</FadeText>
+                      }}>{`${Utils.countMemoBytes(memoText, includeUAMemoBoolean, uOrchardAddress)} `}</FadeText>
                     <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>{translate('loadedapp.of') as string}</FadeText>
                     <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
                       {' ' + GlobalConst.memoMaxLength.toString() + ' '}

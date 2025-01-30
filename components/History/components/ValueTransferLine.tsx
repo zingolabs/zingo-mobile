@@ -101,8 +101,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
 
   const getHaveMemo = (_vt: ValueTransferType) => {
     // if have any memo
-    const memos: string[] = _vt.memos ? _vt.memos.filter(m => !!m) : [];
-    return memos.length > 0;
+    return _vt.memos && _vt.memos.length > 0 && !!_vt.memos.join('');
   };
 
   useEffect(() => {

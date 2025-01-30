@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -23,7 +23,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
 import FadeText from '../Components/FadeText';
-import { Buffer } from 'buffer';
+import Utils from '../../app/utils';
 
 type MemoProps = {
   closeModal: () => void;
@@ -47,18 +47,6 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, message, include
   const doSaveAndClose = () => {
     setMessage(memo);
     closeModal();
-  };
-
-  const memoTotal = useCallback(
-    (memoStr: string, includeUAMemoBoo: boolean) => {
-      return `${memoStr || ''}${includeUAMemoBoo ? GlobalConst.replyTo + uOrchardAddress : ''}`;
-    },
-    [uOrchardAddress],
-  );
-
-  const countMemoBytes = (memoStr: string, includeUAMemoBoo: boolean) => {
-    const len = Buffer.byteLength(memoTotal(memoStr, includeUAMemoBoo), 'utf8');
-    return len;
   };
 
   return (
@@ -145,8 +133,11 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, message, include
               style={{
                 marginTop: 0,
                 fontWeight: 'bold',
-                color: countMemoBytes(memo, includeUAMessage) > GlobalConst.memoMaxLength ? 'red' : colors.text,
-              }}>{`${countMemoBytes(memo, includeUAMessage)} `}</FadeText>
+                color:
+                  Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress) > GlobalConst.memoMaxLength
+                    ? 'red'
+                    : colors.text,
+              }}>{`${Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress)} `}</FadeText>
             <FadeText style={{ marginTop: 0 }}>{translate('loadedapp.of') as string}</FadeText>
             <FadeText style={{ marginTop: 0 }}>{' ' + GlobalConst.memoMaxLength.toString() + ' '}</FadeText>
           </View>
@@ -163,7 +154,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, message, include
             type={ButtonTypeEnum.Primary}
             title={translate('save') as string}
             onPress={doSaveAndClose}
-            disabled={countMemoBytes(memo, includeUAMessage) > GlobalConst.memoMaxLength}
+            disabled={Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress) > GlobalConst.memoMaxLength}
           />
         </View>
       </SafeAreaView>

@@ -81,9 +81,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
   const [sendingTotal, setSendingTotal] = useState<number>(0);
 
-  const memoTotal: string = `${sendPageState.toaddr.memo || ''}${
-    sendPageState.toaddr.includeUAMemo ? GlobalConst.replyTo + uOrchardAddress : ''
-  }`;
+  const memoTotal: string = Utils.buildMemo(
+    sendPageState.toaddr.memo,
+    sendPageState.toaddr.includeUAMemo,
+    uOrchardAddress,
+  );
 
   /**
    * Returns the privacy level for the transaction.
@@ -401,7 +403,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   privacy={privacy}
                 />
               </View>
-              {!!to.memo && (
+              {!!memoTotal && (
                 <>
                   <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo') as string}</FadeText>
                   <RegText testID="send.confirm-memo" selectable={true}>

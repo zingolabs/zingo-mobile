@@ -25,7 +25,6 @@ import {
   AddressClass,
   ContactType,
   FilterEnum,
-  GlobalConst,
   RefreshScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
@@ -104,16 +103,11 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
     }
     const cont: ContactType[] = [];
     valueTransfers
-      .filter((vt: ValueTransferType) => !!vt.memos && vt.memos.length > 0 && !!vt.memos.join(''))
+      .filter((vt: ValueTransferType) => vt.memos && vt.memos.length > 0)
       .forEach((vt: ValueTransferType) => {
         if (vt.memos) {
-          const memoTotal = vt.memos.join('\n');
-          let memoAddress;
-          if (memoTotal.includes(GlobalConst.replyTo)) {
-            let memoArray = memoTotal.split(GlobalConst.replyTo);
-            memoAddress = memoArray.pop();
-          }
-          let contactAddress = vt.address || memoAddress || '';
+          const { memoUA } = Utils.splitMemo(vt.memos);
+          let contactAddress = vt.address || memoUA || '';
           // ignore contacts with this wallet addresses
           if (contactAddress && !thisWalletAddress(contactAddress)) {
             // here can be different, the only orchard UA can be part of one contact and
@@ -129,7 +123,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 uOrchardAddress: '',
                 label: '',
                 time: vt.time,
-                memos: vt.memos,
+                memos: vt.memos && vt.memos.length > 0 ? vt.memos : [],
                 confirmations: vt.confirmations,
                 status: vt.status,
                 kind: vt.kind,
@@ -141,7 +135,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                   uOrchardAddress: ab.uOrchardAddress ? ab.uOrchardAddress : '',
                   label: ab.label,
                   time: vt.time,
-                  memos: vt.memos ? vt.memos : [],
+                  memos: vt.memos && vt.memos.length > 0 ? vt.memos : [],
                   confirmations: vt.confirmations,
                   status: vt.status,
                   kind: vt.kind,

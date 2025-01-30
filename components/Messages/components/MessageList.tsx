@@ -52,12 +52,12 @@ import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import AddressItem from '../../Components/AddressItem';
 import Memo from '../../Memo';
-import { Buffer } from 'buffer';
 import RPC from '../../../app/rpc';
 import { sendEmail } from '../../../app/sendEmail';
 import { createAlert } from '../../../app/createAlert';
 import selectingServer from '../../../app/selectingServer';
 import { serverUris } from '../../../app/uris';
+import Utils from '../../../app/utils';
 
 type MessageListProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -158,22 +158,17 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
 
   const addressFilter = useMemo(
     () => (addr: string | undefined, memos: string[] | undefined) => {
-      if (!memos) {
+      if (!memos || memos.length === 0) {
         return false;
       }
-      const memoTotal = memos.join('\n');
-      let memoAddress;
-      if (memoTotal.includes(GlobalConst.replyTo)) {
-        let memoArray = memoTotal.split(GlobalConst.replyTo);
-        memoAddress = memoArray.pop();
-      }
+      const { memoUA } = Utils.splitMemo(memos);
       // checking address & uOrchardAddress (if any value) as addresses
       // from the same contact in the Address Book.
       return (
         addr === address ||
-        memoAddress === address ||
+        memoUA === address ||
         (uOrchardAddressContact && addr === uOrchardAddressContact) ||
-        (uOrchardAddressContact && memoAddress === uOrchardAddressContact)
+        (uOrchardAddressContact && memoUA === uOrchardAddressContact)
       );
     },
     [address, uOrchardAddressContact],
@@ -181,18 +176,13 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
 
   const anonymousFilter = useMemo(
     () => (addr: string | undefined, memos: string[] | undefined) => {
-      if (!memos) {
+      if (!memos || memos.length === 0) {
         return false;
       }
-      const memoTotal = memos.join('\n');
-      let memoAddress;
-      if (memoTotal.includes(GlobalConst.replyTo)) {
-        let memoArray = memoTotal.split(GlobalConst.replyTo);
-        memoAddress = memoArray.pop();
-      }
+      const { memoUA } = Utils.splitMemo(memos);
       // checking address & uOrchardAddress (if any value) as addresses
       // from the same contact in the Address Book.
-      return !addr && !memoAddress;
+      return !addr && !memoUA;
     },
     [],
   );
@@ -294,22 +284,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     };
   }, []);
 
-  const memoTotal = useCallback((memoPar: string, includeUAMemoPar: boolean, uaAddressPar: string) => {
-    return `${memoPar || ''}${includeUAMemoPar ? GlobalConst.replyTo + uaAddressPar : ''}`;
-  }, []);
-
-  const countMemoBytes = useCallback(
-    (memoPar: string, includeUAMemoPar: boolean, uaAddressPar: string) => {
-      const len = Buffer.byteLength(memoTotal(memoPar, includeUAMemoPar, uaAddressPar), 'utf8');
-      return len;
-    },
-    [memoTotal],
-  );
-
   useEffect(() => {
     if (memo) {
       setMemo(memo);
-      const len = countMemoBytes(memo, true, uOrchardAddress);
+      const len = Utils.countMemoBytes(memo, true, uOrchardAddress);
       if (len > GlobalConst.memoMaxLength) {
         setValidMemo(-1);
       } else {
@@ -318,7 +296,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     } else {
       setValidMemo(0);
     }
-  }, [countMemoBytes, memoTotal, memo, uOrchardAddress]);
+  }, [memo, uOrchardAddress]);
 
   const loadMoreClicked = useCallback(() => {
     setNumVt(numVt + 50);
@@ -911,7 +889,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   fontWeight: 'bold',
                   fontSize: 12.5,
                   color: 'red',
-                }}>{`${countMemoBytes(memo, true, uOrchardAddress)} `}</FadeText>
+                }}>{`${Utils.countMemoBytes(memo, true, uOrchardAddress)} `}</FadeText>
               <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>{translate('loadedapp.of') as string}</FadeText>
               <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
                 {' ' + GlobalConst.memoMaxLength.toString() + ' '}

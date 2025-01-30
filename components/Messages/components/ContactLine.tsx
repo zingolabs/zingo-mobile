@@ -93,16 +93,9 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   };
 
   const getMemo = (_c: ContactType) => {
-    const memoTotal = _c.memos.join('\n');
-    let foundReplyTo: boolean = false;
-    let memoNoAddress;
-    if (memoTotal.includes(GlobalConst.replyTo)) {
-      foundReplyTo = true;
-      let memoArray = memoTotal.split(GlobalConst.replyTo);
-      memoArray.pop();
-      memoNoAddress = memoArray.join('');
-    }
-    return foundReplyTo ? memoNoAddress : memoTotal;
+    // ignoring memoUA if exists
+    const { memo } = Utils.splitMemo(_c.memos);
+    return memo;
   };
 
   useEffect(() => {

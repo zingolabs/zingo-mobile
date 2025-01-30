@@ -53,17 +53,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
-  let memo = '';
-  let memoUA = '';
-  if (memoTotal.includes(GlobalConst.replyTo)) {
-    let memoArray = memoTotal.split(GlobalConst.replyTo);
-    const memoPoped = memoArray.pop();
-    memoUA = memoPoped ? memoPoped : '';
-    memo = memoArray.join('');
-  } else {
-    memo = memoTotal;
-  }
+  const { memo, memoUA } = Utils.splitMemo(vt.memos);
 
   const getAmountColor = (_vt: ValueTransferType) => {
     return vt.confirmations === 0
