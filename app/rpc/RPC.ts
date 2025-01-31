@@ -553,18 +553,18 @@ export default class RPC {
       // This is async, so when it is done, we finish the refresh.
       let promise: Promise<void>;
       if (fullRescan) {
+        // clean the ValueTransfer list before.
+        this.fnSetValueTransfersList([], 0);
+        this.fnSetMessagesList([], 0);
+        this.fnSetTotalBalance({
+          orchardBal: 0,
+          privateBal: 0,
+          transparentBal: 0,
+          spendableOrchard: 0,
+          spendablePrivate: 0,
+          total: 0,
+        } as TotalBalanceClass);
         promise = new Promise<void>(async resolve => {
-          // clean the ValueTransfer list before.
-          this.fnSetValueTransfersList([], 0);
-          this.fnSetMessagesList([], 0);
-          this.fnSetTotalBalance({
-            orchardBal: 0,
-            privateBal: 0,
-            transparentBal: 0,
-            spendableOrchard: 0,
-            spendablePrivate: 0,
-            total: 0,
-          } as TotalBalanceClass);
           const rescanStr: string = await RPCModule.execute(CommandEnum.rescan, '');
           console.log('rescan finished', rescanStr);
           if (rescanStr && !rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1455,29 +1455,33 @@ export default class RPC {
           console.log('Internal Error propose');
           sendError = 'Error: Internal RPC Error: propose';
         }
-        const proposeJSON: RPCSendProposeType = await JSON.parse(proposeStr);
-        if (proposeJSON.error) {
-          console.log(`Error propose ${proposeJSON.error}`);
-          sendError = proposeJSON.error;
-        }
         if (!sendError) {
-          // creating the transaction
-          const sendStr: string = await RPCModule.execute(CommandEnum.confirm, '');
-          if (sendStr) {
-            if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
-              console.log(`Error confirm ${sendStr}`);
-              sendError = sendStr;
-            }
-          } else {
-            console.log('Internal Error confirm');
-            sendError = 'Error: Internal RPC Error: confirm';
+          const proposeJSON: RPCSendProposeType = await JSON.parse(proposeStr);
+          if (proposeJSON.error) {
+            console.log(`Error propose ${proposeJSON.error}`);
+            sendError = proposeJSON.error;
           }
-          const sendJSON: RPCSendType = await JSON.parse(sendStr);
-          if (sendJSON.error) {
-            console.log(`Error confirm ${sendJSON.error}`);
-            sendError = sendJSON.error;
-          } else if (sendJSON.txids && sendJSON.txids.length > 0) {
-            sendTxids = sendJSON.txids.join(', ');
+          if (!sendError) {
+            // creating the transaction
+            const sendStr: string = await RPCModule.execute(CommandEnum.confirm, '');
+            if (sendStr) {
+              if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
+                console.log(`Error confirm ${sendStr}`);
+                sendError = sendStr;
+              }
+            } else {
+              console.log('Internal Error confirm');
+              sendError = 'Error: Internal RPC Error: confirm';
+            }
+            if (!sendError) {
+              const sendJSON: RPCSendType = await JSON.parse(sendStr);
+              if (sendJSON.error) {
+                console.log(`Error confirm ${sendJSON.error}`);
+                sendError = sendJSON.error;
+              } else if (sendJSON.txids && sendJSON.txids.length > 0) {
+                sendTxids = sendJSON.txids.join(', ');
+              }
+            }
           }
         }
       } catch (error) {
