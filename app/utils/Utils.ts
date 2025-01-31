@@ -91,7 +91,9 @@ export default class Utils {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
+      const start = Date.now();
       const ua: string = await RPCModule.getDonationAddress();
+      console.log('=========================================== > get donation address - ', Date.now() - start);
       return ua;
     }
     return '';
@@ -112,7 +114,9 @@ export default class Utils {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
+      const start = Date.now();
       const ua: string = await RPCModule.getZenniesDonationAddress();
+      console.log('=========================================== > get zennies donation address - ', Date.now() - start);
       return ua;
     }
     return '';
@@ -129,7 +133,9 @@ export default class Utils {
     // donations only for mainnet.
     if (chainName === ChainNameEnum.mainChainName) {
       // UA -> we need a fresh one.
+      const start = Date.now();
       const ua: string = await RPCModule.getDonationAddress();
+      console.log('=========================================== > get nym donation address - ', Date.now() - start);
       return ua;
     }
     return '';
@@ -284,7 +290,9 @@ export default class Utils {
     address: string,
     serverChainName: string,
   ): Promise<{ isValid: boolean; onlyOrchardUA: string }> {
+    const start = Date.now();
     const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
+    console.log('=========================================== > parse address - ', Date.now() - start);
     //console.log(result);
     let isValid: boolean = false;
     let isFullUA: boolean = false;
@@ -323,7 +331,9 @@ export default class Utils {
   }
 
   static async isValidOrchardOrSaplingAddress(address: string, serverChainName: string): Promise<boolean> {
+    const start = Date.now();
     const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
+    console.log('=========================================== > parse address - ', Date.now() - start);
     //console.log(result);
     if (result) {
       if (result.toLowerCase().startsWith(GlobalConst.error)) {

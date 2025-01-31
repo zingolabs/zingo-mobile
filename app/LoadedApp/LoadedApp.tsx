@@ -497,6 +497,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setSyncingStatus,
       props.translate,
       this.keepAwake,
+      this.setZingolibVersion,
       props.readOnly,
     );
 
@@ -1017,6 +1018,17 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       if (!newInfo.serverUri) {
         newInfo.serverUri = this.state.server.uri;
       }
+      if (!newInfo.zingolib) {
+        newInfo.zingolib = this.state.info.zingolib;
+      }
+      this.setState({ info: newInfo });
+    }
+  };
+
+  setZingolibVersion = (zingolib: string) => {
+    if (!this.state.info.zingolib) {
+      let newInfo = this.state.info;
+      newInfo.zingolib = zingolib;
       this.setState({ info: newInfo });
     }
   };
@@ -1255,8 +1267,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             });
             // the server is changed, the App needs to restart the timeout tasks from the beginning
             await this.rpc.configure();
-            // Refetch the settings to update
-            await this.rpc.fetchWalletSettings();
             return;
           } else {
             error = true;

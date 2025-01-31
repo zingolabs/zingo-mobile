@@ -45,6 +45,7 @@ export default class RPC {
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string) => TranslateType;
   keepAwake: (keep: boolean) => void;
+  fnSetZingolib: (zingolib: string) => void;
 
   updateTimerID?: NodeJS.Timeout;
 
@@ -62,6 +63,7 @@ export default class RPC {
   fetchAddressesLock: boolean;
   refreshSyncLock: boolean;
   fetchSyncStatusLock: boolean;
+  fetchZingolibVersionLock: boolean;
 
   inRefresh: boolean;
   inSend: boolean;
@@ -90,6 +92,7 @@ export default class RPC {
     fnSetSyncingStatus: (syncingStatus: SyncingStatusClass) => void,
     translate: (key: string) => TranslateType,
     keepAwake: (keep: boolean) => void,
+    fnSetZingolib: (zingolib: string) => void,
     readOnly: boolean,
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
@@ -101,6 +104,7 @@ export default class RPC {
     this.fnSetSyncingStatus = fnSetSyncingStatus;
     this.translate = translate;
     this.keepAwake = keepAwake;
+    this.fnSetZingolib = fnSetZingolib;
 
     this.lastWalletBlockHeight = 0;
     this.lastServerBlockHeight = 0;
@@ -116,6 +120,7 @@ export default class RPC {
     this.fetchAddressesLock = false;
     this.refreshSyncLock = false;
     this.fetchSyncStatusLock = false;
+    this.fetchZingolibVersionLock = false;
 
     this.inRefresh = false;
     this.inSend = false;
@@ -137,7 +142,9 @@ export default class RPC {
 
   static async rpcSetInterruptSyncAfterBatch(value: string): Promise<void> {
     try {
+      const start = Date.now();
       const resultStr: string = await RPCModule.execute(CommandEnum.interruptSyncAfterBatch, value);
+      console.log('=========================================== > sync flag - ', Date.now() - start);
 
       if (resultStr) {
         if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -158,7 +165,9 @@ export default class RPC {
       // -1  - error in Gemini/zingolib.
       // -2  - error in RPCModule, likely.
       // > 0 - real value
+      const start = Date.now();
       const resultStr: string = await RPCModule.execute(CommandEnum.updatecurrentprice, '');
+      console.log('=========================================== > get ZEC price - ', Date.now() - start);
       //console.log(resultStr);
 
       if (resultStr) {
@@ -180,14 +189,18 @@ export default class RPC {
 
   static async rpcSetWalletSettingOption(name: string, value: string): Promise<string> {
     try {
+      const start = Date.now();
       const resultStr: string = await RPCModule.execute(CommandEnum.setoption, `${name}=${value}`);
+      console.log('=========================================== > set wallet setting - ', Date.now() - start);
 
       if (resultStr) {
         if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error setting option ${resultStr}`);
           return resultStr;
         }
+        const start2 = Date.now();
         await RPCModule.doSave();
+        console.log('=========================================== > save wallet - ', Date.now() - start2);
         return resultStr;
       } else {
         console.log('Internal Error setting option');
@@ -196,88 +209,6 @@ export default class RPC {
     } catch (error) {
       console.log(`Critical Error setting option ${error}`);
       return '';
-    }
-  }
-
-  // Special method to get the Info object. This is used both internally and by the Loading screen
-  static async rpcGetInfoObject(): Promise<InfoType> {
-    try {
-      let infoError: boolean = false;
-      const infoStr: string = await RPCModule.execute(CommandEnum.info, '');
-      if (infoStr) {
-        if (infoStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error info ${infoStr}`);
-          infoError = true;
-        }
-      } else {
-        console.log('Internal Error info');
-        infoError = true;
-      }
-
-      let zingolibStr: string = await RPCModule.execute(CommandEnum.version, '');
-      if (zingolibStr) {
-        if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error zingolib version ${zingolibStr}`);
-          zingolibStr = '<error>';
-        }
-      } else {
-        console.log('Internal Error zingolib version');
-        zingolibStr = '<none>';
-      }
-
-      if (infoError) {
-        return {
-          latestBlock: 0,
-          zingolib: zingolibStr,
-          serverUri: '',
-          connections: 1,
-          solps: 0,
-          verificationProgress: 1,
-          version: '',
-        } as InfoType;
-      }
-
-      const infoJSON: RPCInfoType = await JSON.parse(infoStr);
-
-      const info: InfoType = {
-        chainName: infoJSON.chain_name,
-        latestBlock: infoJSON.latest_block_height,
-        serverUri: infoJSON.server_uri || '',
-        connections: 1,
-        version: `${infoJSON.vendor}/${infoJSON.git_commit ? infoJSON.git_commit.substring(0, 6) : ''}/${
-          infoJSON.version
-        }`,
-        verificationProgress: 1,
-        currencyName: infoJSON.chain_name === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.TAZ,
-        solps: 0,
-        zingolib: zingolibStr,
-      };
-
-      return info;
-    } catch (error) {
-      console.log(`Critical Error info ${error}`);
-      return {} as InfoType;
-    }
-  }
-
-  static async rpcFetchWalletHeight(): Promise<number> {
-    try {
-      const heightStr: string = await RPCModule.execute(CommandEnum.height, '');
-      if (heightStr) {
-        if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error wallet height ${heightStr}`);
-          return 0;
-        }
-      } else {
-        console.log('Internal Error wallet height');
-        return 0;
-      }
-      const heightJSON: RPCWalletHeight = await JSON.parse(heightStr);
-
-      return heightJSON.height;
-    } catch (error) {
-      console.log(`Critical Error wallet height ${error}`);
-      return 0;
     }
   }
 
@@ -306,7 +237,9 @@ export default class RPC {
     if (readOnly) {
       // only viewing key & birthday
       try {
+        const start = Date.now();
         const ufvkStr: string = await RPCModule.execute(CommandEnum.exportufvk, '');
+        console.log('=========================================== > get ufvk - ', Date.now() - start);
         if (ufvkStr) {
           if (ufvkStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error ufvk ${ufvkStr}`);
@@ -334,7 +267,9 @@ export default class RPC {
     } else {
       // only seed & birthday
       try {
+        const start2 = Date.now();
         const seedStr: string = await RPCModule.execute(CommandEnum.seed, '');
+        console.log('=========================================== > get seed - ', Date.now() - start2);
         if (seedStr) {
           if (seedStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error seed ${seedStr}`);
@@ -416,6 +351,7 @@ export default class RPC {
         resolve();
       }),
     );
+    /* put this in the app's launch & when some wallet setting changed
     taskPromises.push(
       new Promise<void>(async resolve => {
         const s = Date.now();
@@ -424,7 +360,9 @@ export default class RPC {
         resolve();
       }),
     );
+    */
     if (!this.inRefresh) {
+      /* put this in the app's launch.
       taskPromises.push(
         new Promise<void>(async resolve => {
           const s = Date.now();
@@ -433,11 +371,12 @@ export default class RPC {
           resolve();
         }),
       );
+      */
       // try to sync.
       taskPromises.push(
         new Promise<void>(async resolve => {
           const s = Date.now();
-          await this.refreshSync(false);
+          this.refreshSync(false);
           console.log('sync - ', Date.now() - s);
           resolve();
         }),
@@ -465,9 +404,14 @@ export default class RPC {
   // - Internet from Not Connected to Connected.
   // - Cambio de Servidor.
   async configure(): Promise<void> {
+    // I need to fetch this quickly.
+    this.fetchZingolibVersion();
     // First things first, I need to stop an existing sync process (if any)
     // clean start.
     await this.stopSyncProcess();
+
+    await this.fetchAddresses();
+    await this.fetchWalletSettings();
 
     this.runTaskPromises();
 
@@ -761,7 +705,9 @@ export default class RPC {
     // if the syncId change then reset the %
     if (this.prevSyncId !== this.syncId) {
       if (this.prevSyncId !== -1) {
+        const start = Date.now();
         await RPCModule.doSave();
+        console.log('=========================================== > save wallet - ', Date.now() - start);
 
         //console.log('sync status', ss);
         //console.log(`new sync process id: ${this.syncId}. Save the wallet.`);
@@ -881,7 +827,9 @@ export default class RPC {
       // here we can release the screen...
       this.keepAwake(false);
 
+      const start = Date.now();
       await RPCModule.doSave();
+      console.log('=========================================== > save wallet - ', Date.now() - start);
 
       // store SyncStatus object for a new screen
       this.fnSetSyncingStatus({
@@ -906,7 +854,10 @@ export default class RPC {
       if (this.prevBatchNum !== batchNum) {
         // if finished batches really fast, the App have to save the wallet delayed.
         if (this.prevBatchNum !== -1 && this.batches >= 1) {
+          const start = Date.now();
           await RPCModule.doSave();
+          console.log('=========================================== > save wallet - ', Date.now() - start);
+
           this.batches = 0;
 
           //console.log('sync status', ss);
@@ -978,12 +929,50 @@ export default class RPC {
         return;
       }
       this.fetchInfoAndServerHeightLock = true;
-      const info = await RPC.rpcGetInfoObject();
-
-      if (info) {
-        this.fnSetInfo(info);
-        this.lastServerBlockHeight = info.latestBlock;
+      let infoError: boolean = false;
+      const infoStr: string = await RPCModule.execute(CommandEnum.info, '');
+      if (infoStr) {
+        if (infoStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error info & server block height ${infoStr}`);
+          infoError = true;
+        }
+      } else {
+        console.log('Internal Error info & server block height');
+        infoError = true;
       }
+
+      if (infoError) {
+        this.fnSetInfo({
+          latestBlock: 0,
+          serverUri: '',
+          connections: 1,
+          solps: 0,
+          verificationProgress: 1,
+          version: '',
+        } as InfoType);
+        this.lastServerBlockHeight = 0;
+        this.fetchInfoAndServerHeightLock = false;
+        return;
+      }
+
+      const infoJSON: RPCInfoType = await JSON.parse(infoStr);
+
+      const info: InfoType = {
+        chainName: infoJSON.chain_name,
+        latestBlock: infoJSON.latest_block_height,
+        serverUri: infoJSON.server_uri || '',
+        connections: 1,
+        version: `${infoJSON.vendor}/${infoJSON.git_commit ? infoJSON.git_commit.substring(0, 6) : ''}/${
+          infoJSON.version
+        }`,
+        verificationProgress: 1,
+        currencyName: infoJSON.chain_name === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.TAZ,
+        solps: 0,
+        zingolib: '',
+      };
+
+      this.fnSetInfo(info);
+      this.lastServerBlockHeight = info.latestBlock;
       this.fetchInfoAndServerHeightLock = false;
     } catch (error) {
       console.log(`Critical Error info & server block height ${error}`);
@@ -991,6 +980,55 @@ export default class RPC {
       await this.configure();
       this.fetchInfoAndServerHeightLock = false;
       return;
+    }
+  }
+
+  async fetchZingolibVersion(): Promise<void> {
+    try {
+      if (this.fetchZingolibVersionLock) {
+        return;
+      }
+      this.fetchZingolibVersionLock = true;
+      const start = Date.now();
+      let zingolibStr: string = await RPCModule.execute(CommandEnum.version, '');
+      console.log('=========================================== > zingolib version - ', Date.now() - start);
+      if (zingolibStr) {
+        if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error zingolib version ${zingolibStr}`);
+          zingolibStr = '<error>';
+        }
+      } else {
+        console.log('Internal Error zingolib version');
+        zingolibStr = '<none>';
+      }
+
+      this.fnSetZingolib(zingolibStr);
+      this.fetchZingolibVersionLock = false;
+    } catch (error) {
+      console.log(`Critical Error info ${error}`);
+      this.fetchZingolibVersionLock = false;
+      return;
+    }
+  }
+
+  static async rpcFetchWalletHeight(): Promise<number> {
+    try {
+      const heightStr: string = await RPCModule.execute(CommandEnum.height, '');
+      if (heightStr) {
+        if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error wallet height ${heightStr}`);
+          return 0;
+        }
+      } else {
+        console.log('Internal Error wallet height');
+        return 0;
+      }
+      const heightJSON: RPCWalletHeight = await JSON.parse(heightStr);
+
+      return heightJSON.height;
+    } catch (error) {
+      console.log(`Critical Error wallet height ${error}`);
+      return 0;
     }
   }
 
