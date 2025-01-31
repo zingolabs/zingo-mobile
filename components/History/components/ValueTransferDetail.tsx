@@ -57,7 +57,18 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   moveValueTransferDetail,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language, privacy, addLastSnackbar, server, currency, addressBook, addresses } = context;
+  const {
+    info,
+    translate,
+    language,
+    privacy,
+    addLastSnackbar,
+    server,
+    currency,
+    addressBook,
+    addresses,
+    zenniesDonationAddress,
+  } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -131,8 +142,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   };
 
   const isAddressProtected: (add: string) => Promise<boolean> = async (add: string) => {
-    const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
-    return zennyTips === add;
+    return zenniesDonationAddress === add;
   };
 
   //console.log('vt', index, totalLength, isTheFirstMount);

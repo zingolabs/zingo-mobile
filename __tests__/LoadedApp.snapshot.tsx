@@ -142,6 +142,7 @@ describe('Component LoadedApp - test', () => {
     const readOnly = false;
     const toggleTheme = jest.fn();
     const selectServer = SelectServerEnum.auto;
+    const zenniesDonationAddress = 'xxxxxxxxxxxxxxxxx';
     const loadedapp = render(
       <LoadedAppClass
         navigation={mockNavigation}
@@ -163,6 +164,7 @@ describe('Component LoadedApp - test', () => {
         selectServer={selectServer}
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
+        zenniesDonationAddress={zenniesDonationAddress}
       />,
     );
     expect(loadedapp.toJSON()).toMatchSnapshot();

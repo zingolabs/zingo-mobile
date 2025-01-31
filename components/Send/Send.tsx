@@ -33,7 +33,6 @@ import {
   ChainNameEnum,
   ButtonTypeEnum,
   GlobalConst,
-  AddressClass,
   ServerUrisType,
   ServerType,
   SelectServerEnum,
@@ -128,6 +127,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     shieldingAmount,
     selectServer,
     setZecPrice,
+    zenniesDonationAddress,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
@@ -255,13 +255,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemoPar;
         sendPageStateCalculateFee.toaddr.amount = amountPar;
 
-        sendJson = await Utils.getSendManyJSON(
-          sendPageStateCalculateFee,
-          uOrchardAddress,
-          addresses ? addresses : ([] as AddressClass[]),
-          server,
-          donation,
-        );
+        sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, uOrchardAddress, server, donation);
         console.log('SEND', sendJson);
       }
 
@@ -660,16 +654,15 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     (async () => {
-      const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
       const items = addressBook
-        .filter((item: AddressBookFileClass) => item.address !== zennyTips)
+        .filter((item: AddressBookFileClass) => item.address !== zenniesDonationAddress)
         .map((item: AddressBookFileClass) => ({
           label: item.label,
           value: item.address,
         }));
       setItemsPicker(items);
     })();
-  }, [addressBook, server.chainName]);
+  }, [addressBook, zenniesDonationAddress]);
 
   useEffect(() => {
     (async () => {
@@ -686,14 +679,14 @@ const Send: React.FunctionComponent<SendProps> = ({
       (async () => {
         const donationA =
           addressText === (await Utils.getDonationAddress(server.chainName)) ||
-          addressText === (await Utils.getZenniesDonationAddress(server.chainName)) ||
+          addressText === zenniesDonationAddress ||
           addressText === (await Utils.getNymDonationAddress(server.chainName));
         setDonationAddress(donationA);
       })();
     } else {
       setDonationAddress(false);
     }
-  }, [addresses, addressText, server.chainName]);
+  }, [addresses, addressText, server.chainName, zenniesDonationAddress]);
 
   useEffect(() => {
     setAddressText(sendPageState.toaddr.to);

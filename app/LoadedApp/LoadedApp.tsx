@@ -20,7 +20,7 @@ import { useTheme } from '@react-navigation/native';
 import SideMenu from 'react-native-side-menu-updated';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
-import { isEqual } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
 import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
@@ -147,6 +147,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
+  const [zenniesDonationAddress, setZenniesDonationAddress] = useState<string>('');
   const file = useMemo(
     () => ({
       en: en,
@@ -272,11 +273,9 @@ export default function LoadedApp(props: LoadedAppProps) {
       }
 
       // adding `Zenny Tips` address always.
-      let ab = await AddressBookFileImpl.writeAddressBookItem(
-        translate('zenny-tips-ab') as string,
-        await Utils.getZenniesDonationAddress(server.chainName),
-        '',
-      );
+      const zenniesAddress = await Utils.getZenniesDonationAddress(server.chainName);
+      let ab = await AddressBookFileImpl.writeAddressBookItem(translate('zenny-tips-ab') as string, zenniesAddress, '');
+      setZenniesDonationAddress(zenniesAddress);
 
       // reply-to change, from full UA to only orchard UA.
       // we need to calculate the only orchard UA for all the
@@ -348,6 +347,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         selectServer={selectServer}
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
+        zenniesDonationAddress={zenniesDonationAddress}
       />
     );
   }
@@ -393,6 +393,7 @@ type LoadedAppClassProps = {
   selectServer: SelectServerEnum;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
+  zenniesDonationAddress: string;
 };
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
@@ -446,6 +447,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       showSwipeableIcons: true,
       doRefresh: this.doRefresh,
       setZecPrice: this.setZecPrice,
+      zenniesDonationAddress: props.zenniesDonationAddress,
 
       // context settings
       server: props.server,
@@ -521,6 +523,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.clearToAddr();
 
     // Configure the RPC to start doing refreshes
+    this.rpc.setInRefresh(false);
+    await this.rpc.clearTimers();
     await this.rpc.configure();
 
     this.appstate = AppState.addEventListener(EventListenerEnum.change, async nextAppState => {
@@ -588,6 +592,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
           //console.log('background no in storage');
+          this.rpc.setInRefresh(false);
+          await this.rpc.clearTimers();
           await this.rpc.configure();
           //console.log('configure start timers Android & IOS');
           if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
@@ -670,6 +676,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               this.navigateToLoadingApp({ startingApp: false });
             } else {
               // restart the interval process again if it is not syncing...
+              this.rpc.setInRefresh(false);
+              await this.rpc.clearTimers();
               await this.rpc.configure();
             }
           }
@@ -679,6 +687,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   componentWillUnmount = async () => {
+    this.rpc.setInRefresh(false);
     await this.rpc.clearTimers();
     this.appstate && typeof this.appstate.remove === 'function' && this.appstate.remove();
     this.linking && typeof this.linking === 'function' && this.linking.remove();
@@ -781,7 +790,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setShieldingAmount = (value: number) => {
+    const start = Date.now();
     this.setState({ shieldingAmount: value });
+    console.log('=========================================== > SH AMOUNT STORED SETSTATE - ', Date.now() - start);
   };
 
   setShowSwipeableIcons = (value: boolean) => {
@@ -791,14 +802,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
       //console.log('fetch total balance');
+      const start = Date.now();
       this.setState({ totalBalance });
+      console.log('=========================================== > BALANCE STORED SETSTATE - ', Date.now() - start);
     }
   };
 
   setSyncingStatus = (syncingStatus: SyncingStatusClass) => {
     if (!isEqual(this.state.syncingStatus, syncingStatus)) {
       //console.log('fetch syncing status report');
+      const start = Date.now();
       this.setState({ syncingStatus });
+      console.log('=========================================== > SYNC STATUS STORED SETSTATE - ', Date.now() - start);
     }
   };
 
@@ -811,7 +826,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         // only if the App are in foreground
         const background = await AsyncStorage.getItem(GlobalConst.background);
         // only if the wallet have some ValueTransfers
-        if (background === GlobalConst.no && valueTransfers.length > 0) {
+        if (background === GlobalConst.no && valueTransfersTotal > 0) {
           // I need to check this out in the seed screen.
           await this.fetchWallet();
           this.setState({ seedViewModalVisible: true });
@@ -824,13 +839,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
     }
     if (!isEqual(this.state.valueTransfers, valueTransfers) || this.state.valueTransfersTotal !== valueTransfersTotal) {
-      //console.log('fetch ValueTransfers');
       // set somePending as well here when I know there is something new in ValueTransfers
       const pending: number =
-        valueTransfers.length > 0 ? valueTransfers.filter((vt: ValueTransferType) => vt.confirmations === 0).length : 0;
+        valueTransfersTotal > 0 ? valueTransfers.filter((vt: ValueTransferType) => vt.confirmations === 0).length : 0;
       // if a ValueTransfer go from 0 confirmations to > 0 -> Show a message about a ValueTransfer is confirmed
       this.state.valueTransfers &&
-        this.state.valueTransfers.length > 0 &&
+        this.state.valueTransfersTotal &&
+        this.state.valueTransfersTotal > 0 &&
         this.state.valueTransfers
           .filter((vtOld: ValueTransferType) => !vtOld.confirmations || vtOld.confirmations === 0)
           .forEach((vtOld: ValueTransferType) => {
@@ -925,6 +940,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           });
       // if some tx is confirmed the UI needs some time to
       // acomodate the bottom tabs.
+      const start = Date.now();
       setTimeout(
         () => {
           this.setState({
@@ -935,20 +951,28 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         },
         pending === 0 ? 250 : 0,
       );
+      console.log(
+        '=========================================== > VALUE TRANSFERS STORED SETSTATE - ',
+        Date.now() - start,
+      );
     }
   };
 
   setMessagesList = (messages: ValueTransferType[], messagesTotal: number) => {
     if (!isEqual(this.state.messages, messages) || this.state.messagesTotal !== messagesTotal) {
       //console.log('fetch messages');
+      const start = Date.now();
       this.setState({ messages, messagesTotal });
+      console.log('=========================================== > MESSAGES STORED SETSTATE - ', Date.now() - start);
     }
   };
 
   setAllAddresses = (addresses: AddressClass[]) => {
     if (!isEqual(this.state.addresses, addresses)) {
       //console.log('fetch addresses');
+      const start = Date.now();
       this.setState({ addresses });
+      console.log('=========================================== > ADDRESSES STORED SETSTATE - ', Date.now() - start);
     }
     if (addresses.length > 0) {
       if (this.state.uOrchardAddress !== addresses[0].uOrchardAddress) {
@@ -962,13 +986,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   setWalletSettings = (walletSettings: WalletSettingsClass) => {
     if (!isEqual(this.state.walletSettings, walletSettings)) {
       //console.log('fetch wallet settings');
+      const start = Date.now();
       this.setState({ walletSettings });
+      console.log(
+        '=========================================== > WALLET SETTINGS STORED SETSTATE - ',
+        Date.now() - start,
+      );
     }
   };
 
   setSendPageState = (sendPageState: SendPageStateClass) => {
     //console.log('fetch send page state');
+    const start = Date.now();
     this.setState({ sendPageState });
+    console.log('=========================================== > SEND PAGE STORED SETSTATE - ', Date.now() - start);
   };
 
   clearToAddr = () => {
@@ -998,9 +1029,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setInfo = (info: InfoType) => {
-    if (!isEqual(this.state.info, info)) {
-      //console.log('fetch info');
-      let newInfo = info;
+    let newInfo = cloneDeep(info);
+    if (!newInfo.zingolib) {
+      newInfo.zingolib = this.state.info.zingolib;
+    }
+    if (!isEqual(this.state.info, newInfo)) {
       // if currencyName is empty,
       // I need to rescue the last value from the state,
       // or rescue the value from server.chainName.
@@ -1018,32 +1051,27 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       if (!newInfo.serverUri) {
         newInfo.serverUri = this.state.server.uri;
       }
-      if (!newInfo.zingolib) {
-        newInfo.zingolib = this.state.info.zingolib;
-      }
+      const start = Date.now();
       this.setState({ info: newInfo });
+      console.log('=========================================== > INFO STORED SETSTATE - ', Date.now() - start);
     }
   };
 
   setZingolibVersion = (zingolib: string) => {
     if (!this.state.info.zingolib) {
-      let newInfo = this.state.info;
+      let newInfo = cloneDeep(this.state.info);
       newInfo.zingolib = zingolib;
+      const start = Date.now();
       this.setState({ info: newInfo });
+      console.log('=========================================== > ZINGOLIB STORED SETSTATE - ', Date.now() - start);
     }
   };
 
   sendTransaction = async (sendPageState: SendPageStateClass): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
-      const { uOrchardAddress, addresses, server, donation } = this.state;
-      const sendJson = await Utils.getSendManyJSON(
-        sendPageState,
-        uOrchardAddress,
-        addresses ? addresses : ([] as AddressClass[]),
-        server,
-        donation,
-      );
+      const { uOrchardAddress, server, donation } = this.state;
+      const sendJson = await Utils.getSendManyJSON(sendPageState, uOrchardAddress, server, donation);
       //const start = Date.now();
       const txid = await this.rpc.sendTransaction(sendJson);
       //console.log('&&&&&&&&&&&&&& send tx', Date.now() - start);
@@ -1072,9 +1100,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   toggleMenuDrawer = () => {
+    const start = Date.now();
     this.setState({
       isMenuDrawerOpen: !this.state.isMenuDrawerOpen,
     });
+    console.log('=========================================== > TOGGLE MENU STORED SETSTATE - ', Date.now() - start);
   };
 
   updateMenuState = (isMenuDrawerOpen: boolean) => {
@@ -1227,6 +1257,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     sameServerChainName: boolean,
   ): Promise<void> => {
     // here I know the server was changed, clean all the tasks before anything.
+    this.rpc.setInRefresh(false);
     await this.rpc.clearTimers();
     this.setSyncingStatus(new SyncingStatusClass());
     this.rpc.setInRefresh(false);
@@ -1266,6 +1297,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               selectServer: selectServer,
             });
             // the server is changed, the App needs to restart the timeout tasks from the beginning
+            this.rpc.setInRefresh(false);
+            await this.rpc.clearTimers();
             await this.rpc.configure();
             return;
           } else {
@@ -1428,6 +1461,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   navigateToLoadingApp = async (state: any) => {
     const { navigation } = this.state;
 
+    this.rpc.setInRefresh(false);
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
       await this.setModeOption(ModeEnum.advanced);
@@ -1705,6 +1739,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       showSwipeableIcons: this.state.showSwipeableIcons,
       doRefresh: this.state.doRefresh,
       setZecPrice: this.state.setZecPrice,
+      zenniesDonationAddress: this.state.zenniesDonationAddress,
 
       // context settings
       server: this.state.server,
@@ -1906,6 +1941,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 onClickOK={async () => await this.onClickOKServerWallet()}
                 onClickCancel={async () => {
                   // restart all the tasks again, nothing happen.
+                  this.rpc.setInRefresh(false);
+                  await this.rpc.clearTimers();
                   await this.rpc.configure();
                   this.setState({ seedServerModalVisible: false });
                 }}
@@ -1970,6 +2007,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 onClickOK={async () => await this.onClickOKServerWallet()}
                 onClickCancel={async () => {
                   // restart all the tasks again, nothing happen.
+                  this.rpc.setInRefresh(false);
+                  await this.rpc.clearTimers();
                   await this.rpc.configure();
                   this.setState({ ufvkServerModalVisible: false });
                 }}

@@ -78,6 +78,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   showSwipeableIcons: true,
   doRefresh: () => {},
   setZecPrice: () => {},
+  zenniesDonationAddress: '',
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

@@ -27,7 +27,6 @@ import AddressBookFileImpl from './AddressBookFileImpl';
 import RPC from '../../app/rpc';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
-import Utils from '../../app/utils';
 
 type AddressBookProps = {
   closeModal: () => void;
@@ -36,7 +35,14 @@ type AddressBookProps = {
 
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, setAddressBook }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, addressBook, addressBookCurrentAddress, addressBookOpenPriorModal, server } = context;
+  const {
+    translate,
+    language,
+    addressBook,
+    addressBookCurrentAddress,
+    addressBookOpenPriorModal,
+    zenniesDonationAddress,
+  } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -56,15 +62,13 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
 
   const fetchAddressBookSorted = useMemo(async () => {
     // excluding this address from the list
-    const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
-    return addressBook.filter((ab: AddressBookFileClass) => ab.address !== zennyTips).slice(0, numAb);
-  }, [addressBook, numAb, server.chainName]);
+    return addressBook.filter((ab: AddressBookFileClass) => ab.address !== zenniesDonationAddress).slice(0, numAb);
+  }, [addressBook, numAb, zenniesDonationAddress]);
 
   const fetchAddressBookProtected = useMemo(async () => {
     // only protected address to use internally ZingoLabs.
-    const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
-    return addressBook.filter((ab: AddressBookFileClass) => ab.address === zennyTips);
-  }, [addressBook, server.chainName]);
+    return addressBook.filter((ab: AddressBookFileClass) => ab.address === zenniesDonationAddress);
+  }, [addressBook, zenniesDonationAddress]);
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {

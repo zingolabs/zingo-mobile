@@ -71,7 +71,8 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   setServerOption,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, valueTransfers, language, server, addressBook, addresses, doRefresh } = context;
+  const { translate, valueTransfers, language, server, addressBook, addresses, doRefresh, zenniesDonationAddress } =
+    context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -81,7 +82,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   const [contacts, setContacts] = useState<ContactType[]>([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
-  const [zennyTips, setZennyTips] = useState<string>('');
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
   const [searchMode, setSearchMode] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>('');
@@ -187,7 +187,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
       addressBook
         .filter(
           (ab: AddressBookFileClass) =>
-            ab.address !== zennyTips && Utils.isMessagesAddress({ address: ab.address } as ContactType),
+            ab.address !== zenniesDonationAddress && Utils.isMessagesAddress({ address: ab.address } as ContactType),
         )
         .forEach((ab: AddressBookFileClass) => {
           // must match the two addresses: full UA & only orchard UA.
@@ -225,13 +225,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   };
 
   useEffect(() => {
-    const fetchZennyTips = async () => {
-      const zt: string = await Utils.getZenniesDonationAddress(server.chainName);
-      setZennyTips(zt);
-    };
-
     if (valueTransfers !== null) {
-      fetchZennyTips();
       const c = fetchContacts();
       setContacts(c);
       setTimeout(() => {
@@ -575,7 +569,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                     month={month}
                     setContactDetail={(ttt: ContactType) => setContactDetail(ttt)}
                     setMessagesAddressModalShowing={(bbb: boolean) => setMessagesAddressModalShowing(bbb)}
-                    addressProtected={c.address === zennyTips}
+                    addressProtected={c.address === zenniesDonationAddress}
                   />
                 );
               })}

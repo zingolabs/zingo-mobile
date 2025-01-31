@@ -1,7 +1,6 @@
 import { getNumberFormatSettings } from 'react-native-localize';
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import {
-  AddressClass,
   ChainNameEnum,
   CommandEnum,
   ContactType,
@@ -219,7 +218,6 @@ export default class Utils {
   static async getSendManyJSON(
     sendPageState: SendPageStateClass,
     uOrchardAddress: string,
-    addresses: AddressClass[],
     server: ServerType,
     donation: boolean,
   ): Promise<SendJsonToTypeType[]> {

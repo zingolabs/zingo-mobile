@@ -111,6 +111,9 @@ export default interface AppContextLoaded {
   // fetch the ZEC price in USD
   setZecPrice: (p: number, d: number) => void;
 
+  // donation address
+  zenniesDonationAddress: string;
+
   // settings
   server: ServerType;
   currency: CurrencyEnum;
