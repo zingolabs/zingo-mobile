@@ -226,7 +226,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           //Alert.alert('Calculating the FEE', runProposeStr);
         } else {
           try {
-            const runProposeJson: RPCShieldProposeType = JSON.parse(runProposeStr);
+            const runProposeJson: RPCShieldProposeType = await JSON.parse(runProposeStr);
             if (runProposeJson.error) {
               // snack with error
               console.log('Error shield proposing', runProposeJson.error);

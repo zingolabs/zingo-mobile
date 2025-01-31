@@ -81,7 +81,7 @@ export default class AddressBookFileImpl {
     const fileName = await this.getFileName();
 
     try {
-      const addressBook: AddressBookFileClass[] = JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
+      const addressBook: AddressBookFileClass[] = await JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
       return addressBook;
     } catch (err) {
       // The File doesn't exist, so return nothing

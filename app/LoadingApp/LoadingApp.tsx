@@ -988,7 +988,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
         let seedJSON = {} as RPCSeedType;
         try {
-          seedJSON = JSON.parse(seed);
+          seedJSON = await JSON.parse(seed);
           if (seedJSON.error) {
             this.setState({ actionButtonsDisabled: false });
             createAlert(

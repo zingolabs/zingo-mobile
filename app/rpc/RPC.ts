@@ -569,7 +569,7 @@ export default class RPC {
           const rescanStr: string = await RPCModule.execute(CommandEnum.rescan, '');
           console.log('rescan finished', rescanStr);
           if (rescanStr && !rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
-            const resultJSON: RPCSyncRescan = JSON.parse(rescanStr);
+            const resultJSON: RPCSyncRescan = await JSON.parse(rescanStr);
             if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
               this.latestBlock = resultJSON.latest_block;
               // Already finished
@@ -600,7 +600,7 @@ export default class RPC {
           const syncStr: string = await RPCModule.execute(CommandEnum.sync, '');
           console.log('sync finished', syncStr);
           if (syncStr && !syncStr.toLowerCase().startsWith(GlobalConst.error)) {
-            const resultJSON: RPCSyncRescan = JSON.parse(syncStr);
+            const resultJSON: RPCSyncRescan = await JSON.parse(syncStr);
             if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
               this.latestBlock = resultJSON.latest_block;
               // Already finished
@@ -930,7 +930,9 @@ export default class RPC {
       }
       this.fetchInfoAndServerHeightLock = true;
       let infoError: boolean = false;
+      const start = Date.now();
       const infoStr: string = await RPCModule.execute(CommandEnum.info, '');
+      console.log('=========================================== > info - ', Date.now() - start);
       if (infoStr) {
         if (infoStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error info & server block height ${infoStr}`);

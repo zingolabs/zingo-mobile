@@ -292,9 +292,9 @@ const Send: React.FunctionComponent<SendProps> = ({
         try {
           let runProposeJson: RPCSendProposeType & RPCSendallProposeType;
           if (command === CommandEnum.send) {
-            runProposeJson = JSON.parse(runProposeStr);
+            runProposeJson = await JSON.parse(runProposeStr);
           } else {
-            runProposeJson = JSON.parse(runProposeStr);
+            runProposeJson = await JSON.parse(runProposeStr);
           }
           if (runProposeJson.error) {
             // snack with error
@@ -356,7 +356,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         //Alert.alert('Calculating the FEE', runProposeStr);
       } else {
         try {
-          const runSpendableBalanceJson: RPCSpendablebalanceType = JSON.parse(runSpendableBalanceStr);
+          const runSpendableBalanceJson: RPCSpendablebalanceType = await JSON.parse(runSpendableBalanceStr);
           if (runSpendableBalanceJson.error) {
             // snack with error
             console.log(runSpendableBalanceJson.error);
