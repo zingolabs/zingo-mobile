@@ -451,12 +451,10 @@ export default class RPC {
       return;
     }
 
-    //console.log('stop sync process. in progress', ss.in_progress);
+    // interrupting sync process
+    await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
 
     while (ss.in_progress) {
-      // interrupting sync process
-      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
-
       // sleep for half second
       await this.sleep(500);
 
@@ -471,8 +469,6 @@ export default class RPC {
         console.log('SYNC STATUS ERROR - PARSE JSON', returnStatus);
         return;
       }
-
-      //console.log('stop sync process. in progress', ss.in_progress);
     }
     console.log('stop sync process. STOPPED');
 
@@ -1489,8 +1485,6 @@ export default class RPC {
         sendError = `Error: send ${error}`;
       }
 
-      // send process is about to finish - reactivate the syncing flag
-      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
       // create the tasks
       await this.configure();
       this.setInSend(false);

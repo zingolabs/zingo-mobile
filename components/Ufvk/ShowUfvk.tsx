@@ -8,13 +8,12 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import SingleAddress from '../Components/SingleAddress';
-import RPC from '../../app/rpc';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import RegText from '../Components/RegText';
-import { ButtonTypeEnum, ChainNameEnum, GlobalConst, ModeEnum, UfvkActionEnum } from '../../app/AppState';
+import { ButtonTypeEnum, ChainNameEnum, ModeEnum, UfvkActionEnum } from '../../app/AppState';
 
 type TextsType = {
   new: string[];
@@ -51,11 +50,6 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
       action === UfvkActionEnum.change || action === UfvkActionEnum.backup || action === UfvkActionEnum.server ? 1 : 0,
     );
   }, [action, translate]);
-
-  // because this screen is fired from more places than the menu.
-  useEffect(() => {
-    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
-  }, []);
 
   const onPressOK = () => {
     Alert.alert(

@@ -543,8 +543,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         if (priorAppState === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.background) {
           //console.log('App LOADED IOS is gone to the background!');
           this.setState({ appStateStatus: nextAppState });
-          // re-activate the interruption sync flag
-          await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
           //console.log('background yes in storage');
@@ -606,8 +604,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         (nextAppState === AppStateStatusEnum.inactive || nextAppState === AppStateStatusEnum.background)
       ) {
         //console.log('App LOADED is gone to the background!');
-        // re-activate the interruption sync flag
-        await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
         //console.log('background yes in storage');

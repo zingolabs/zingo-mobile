@@ -11,7 +11,7 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { useTheme, useIsFocused } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
 import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 import CheckBox from '@react-native-community/checkbox';
@@ -162,7 +162,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [amountText, setAmountText] = useState<string>(sendPageState.toaddr.amount);
   const [amountCurrencyText, setAmountCurrencyText] = useState<string>(sendPageState.toaddr.amountCurrency);
   const [includeUAMemoBoolean, setIncludeUAMemoBoolean] = useState<boolean>(sendPageState.toaddr.includeUAMemo);
-  const isFocused = useIsFocused();
 
   const slideAnim = useSharedValue(0);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -665,16 +664,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [addressBook, zenniesDonationAddress]);
 
   useEffect(() => {
-    (async () => {
-      if (isFocused) {
-        await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
-      } else {
-        await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
-      }
-    })();
-  }, [isFocused]);
-
-  useEffect(() => {
     if (addressText) {
       (async () => {
         const donationA =
@@ -763,6 +752,9 @@ const Send: React.FunctionComponent<SendProps> = ({
         );
         setComputingModalVisible(false);
         // the app send successfully on the first attemp.
+
+        // the sync process can continue
+        await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
         return;
       } catch (err1) {
         error = err1 as string;
@@ -818,6 +810,9 @@ const Send: React.FunctionComponent<SendProps> = ({
             );
             setComputingModalVisible(false);
             // the app send successfully on the second attemp.
+
+            // the sync process can continue
+            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
             return;
           } catch (err2) {
             error = err2 as string;
@@ -826,6 +821,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           }
         }
       }
+
+      // the sync process can continue
+      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
 
       setTimeout(() => {
         //console.log('sendtx error', error);

@@ -11,14 +11,12 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import RPC from '../../app/rpc';
 import Header from '../Header';
 import { NetInfoStateType } from '@react-native-community/netinfo';
 import RegText from '../Components/RegText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../app/utils';
-import { GlobalConst } from '../../app/AppState';
 
 type SyncReportProps = {
   closeModal: () => void;
@@ -91,7 +89,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
     setTimeout(() => setShowBackgroundLegend(false), 10000); // 10 seconds only
   }, []);
 

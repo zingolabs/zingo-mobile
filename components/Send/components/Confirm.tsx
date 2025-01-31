@@ -21,7 +21,6 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 
 import { ThemeType } from '../../../app/types';
-import RPC from '../../../app/rpc';
 import Utils from '../../../app/utils';
 import {
   ButtonTypeEnum,
@@ -257,11 +256,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       setPrivacyLevel(await getPrivacyLevel());
     })();
   }, [getPrivacyLevel]);
-
-  // the App is about to send - activate the interrupt syncing flag
-  useEffect(() => {
-    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true))();
-  }, []);
 
   useEffect(() => {
     calculateFeeWithPropose(

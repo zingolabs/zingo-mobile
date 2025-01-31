@@ -24,7 +24,6 @@ import AbSummaryLine from './components/AbSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import AddressBookFileImpl from './AddressBookFileImpl';
-import RPC from '../../app/rpc';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 
@@ -69,11 +68,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     // only protected address to use internally ZingoLabs.
     return addressBook.filter((ab: AddressBookFileClass) => ab.address === zenniesDonationAddress);
   }, [addressBook, zenniesDonationAddress]);
-
-  // because this screen is fired from more places than the menu.
-  useEffect(() => {
-    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
-  }, []);
 
   useEffect(() => {
     (async () => {

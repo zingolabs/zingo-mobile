@@ -22,9 +22,7 @@ import {
   SettingsNameEnum,
   SnackbarType,
   ButtonTypeEnum,
-  GlobalConst,
 } from '../../app/AppState';
-import RPC from '../../app/rpc';
 import Header from '../Header';
 import Utils from '../../app/utils';
 import SettingsFileImpl from '../Settings/SettingsFileImpl';
@@ -145,13 +143,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     setSeedPhrase(wallet.seed || '');
     setBirthdayNumber((wallet.birthday && wallet.birthday.toString()) || '');
   }, [action, wallet.seed, wallet.birthday, wallet, translate]);
-
-  // because this screen is fired from more places than the menu.
-  useEffect(() => {
-    if (action !== SeedActionEnum.new) {
-      (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
-    }
-  }, [action]);
 
   const onPressOK = () => {
     Alert.alert(

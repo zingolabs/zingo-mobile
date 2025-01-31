@@ -389,6 +389,9 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
 
         // the app send successfully on the first attemp.
         setDisableSend(false);
+
+        // the sync process can continue
+        await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
         return;
       } catch (err1) {
         error = err1 as string;
@@ -431,6 +434,9 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
 
             // the app send successfully on the second attemp.
             setDisableSend(false);
+
+            // the sync process can continue
+            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
             return;
           } catch (err2) {
             error = err2 as string;
@@ -439,6 +445,9 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           }
         }
       }
+
+      // the sync process can continue
+      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
 
       //console.log('sendtx error', error);
       // if the App is in background I need to store the error
