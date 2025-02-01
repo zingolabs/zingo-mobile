@@ -550,7 +550,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         </View>
                       </View>
                     )}
-                    {syncingStatus.inProgress && blocksRemaining > 0 && (
+                    {syncingStatus.inProgress && (
                       <View
                         style={{
                           alignItems: 'center',
@@ -580,7 +580,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                   {translate('syncing') as string}
                                 </FadeText>
                               )}
-                              <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
+                              {blocksRemaining > 0 && (
+                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
+                              )}
                             </View>
                           ) : (
                             <TouchableOpacity
@@ -593,7 +595,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                     {translate('syncing') as string}
                                   </FadeText>
                                 )}
-                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
+                                {blocksRemaining > 0 && (
+                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
+                                )}
                               </View>
                             </TouchableOpacity>
                           )}
