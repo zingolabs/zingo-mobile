@@ -66,7 +66,6 @@ import {
   ValueTransferKindEnum,
   CurrencyNameEnum,
   RefreshScreenEnum,
-  SnackbarDurationEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -1093,10 +1092,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   doRescan = async () => {
-    this.addLastSnackbar({
-      message: this.state.translate('loadedapp.syncing') as string,
-      duration: SnackbarDurationEnum.longer,
-    });
     await this.rpc.stopSyncProcess();
     this.rpc.refreshSync(false, true);
   };
@@ -1110,7 +1105,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   updateMenuState = (isMenuDrawerOpen: boolean) => {
+    const start = Date.now();
     this.setState({ isMenuDrawerOpen });
+    console.log('=========================================== > UPDATE MENU STORED SETSTATE - ', Date.now() - start);
   };
 
   setWallet = async (wallet: WalletType) => {

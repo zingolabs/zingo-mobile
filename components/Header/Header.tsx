@@ -178,7 +178,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // if the syncing is still inProgress and this value is cero -> it is better for UX to see 1.
     // this use case is really rare.
     if (blocksRe <= 0) {
-      blocksRe = 1;
+      blocksRe = 0;
     }
     setBlocksRemaining(blocksRe);
   }, [syncingStatus.currentBlock, syncingStatus.lastBlockServer, wallet.birthday]);
@@ -195,22 +195,33 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }, [addLastSnackbar, restartApp, syncingStatus.syncProcessStalled, translate]);
 
   useEffect(() => {
+    // when the App is syncing this can fired a lot of times
+    // with no so much sense...
+    let runShieldProposeLock = false;
     const runShieldPropose = async (): Promise<string> => {
       try {
+        if (runShieldProposeLock) {
+          return 'Error: shield propose already running...';
+        }
+        runShieldProposeLock = true;
         const proposeStr: string = await RPCModule.execute(CommandEnum.shield, '');
         if (proposeStr) {
           if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error propose ${proposeStr}`);
+            runShieldProposeLock = false;
             return proposeStr;
           }
         } else {
           console.log('Internal Error propose');
+          runShieldProposeLock = false;
           return 'Error: Internal RPC Error: propose';
         }
 
+        runShieldProposeLock = false;
         return proposeStr;
       } catch (error) {
         console.log(`Critical Error propose ${error}`);
+        runShieldProposeLock = false;
         return `Error: ${error}`;
       }
     };

@@ -98,43 +98,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
   };
 
-  // zingolib interfase have no way to initialize a `lightclient` with no action associated...
-  // the validation of the ufvk will be when we try to `restore from ufvk'...
-  /*
-  const validateKey = async (scannedKey: string): Promise<boolean> => {
-    const result: string = await RPCModule.execute(CommandEnum.parseViewkey, scannedKey);
-    //console.log(result);
-    if (result) {
-      if (result.toLowerCase().startsWith(GlobalConst.error)) {
-        addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
-        return false;
-      }
-    } else {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
-      return false;
-    }
-    let resultJSON = {} as RPCParseViewKeyType;
-    try {
-      resultJSON = await JSON.parse(result);
-    } catch (e) {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
-      return false;
-    }
-
-    //console.log('parse ufvk', scannedKey, resultJSON);
-
-    const valid =
-      resultJSON.status === RPCParseViewKeyStatusEnum.successViewKeyParse && resultJSON.chain_name === server.chainName;
-
-    if (valid) {
-      return true;
-    } else {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
-      return false;
-    }
-  };
-  */
-
   return (
     <SafeAreaView
       style={{
