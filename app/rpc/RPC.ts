@@ -46,6 +46,7 @@ export default class RPC {
   translate: (key: string) => TranslateType;
   keepAwake: (keep: boolean) => void;
   fnSetZingolib: (zingolib: string) => void;
+  fnSetWallet: (wallet: WalletType) => void;
 
   updateTimerID?: NodeJS.Timeout;
 
@@ -93,6 +94,7 @@ export default class RPC {
     translate: (key: string) => TranslateType,
     keepAwake: (keep: boolean) => void,
     fnSetZingolib: (zingolib: string) => void,
+    fnSetWallet: (wallet: WalletType) => void,
     readOnly: boolean,
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
@@ -105,6 +107,7 @@ export default class RPC {
     this.translate = translate;
     this.keepAwake = keepAwake;
     this.fnSetZingolib = fnSetZingolib;
+    this.fnSetWallet = fnSetWallet;
 
     this.lastWalletBlockHeight = 0;
     this.lastServerBlockHeight = 0;
@@ -314,7 +317,7 @@ export default class RPC {
     taskPromises.push(
       new Promise<void>(async resolve => {
         const s = Date.now();
-        await this.fetchWalletBirthday();
+        await this.fetchWalletBirthdaySeedUfvk();
         console.log('wallet birthday - ', Date.now() - s);
         resolve();
       }),
@@ -1191,7 +1194,7 @@ export default class RPC {
     }
   }
 
-  async fetchWalletBirthday(): Promise<void> {
+  async fetchWalletBirthdaySeedUfvk(): Promise<void> {
     try {
       if (this.fetchWalletBirthdayLock) {
         return;
@@ -1201,6 +1204,7 @@ export default class RPC {
 
       if (wallet) {
         this.walletBirthday = wallet.birthday;
+        this.fnSetWallet(wallet);
       }
       this.fetchWalletBirthdayLock = false;
     } catch (error) {

@@ -12,6 +12,7 @@ import {
   SafeAreaView,
   Platform,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -90,6 +91,7 @@ import Receive from '../../components/Receive';
 import Settings from '../../components/Settings';
 import Menu from './components/Menu';
 import { Messages } from '../../components/Messages';
+import RegText from '../../components/Components/RegText';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -500,6 +502,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       props.translate,
       this.keepAwake,
       this.setZingolibVersion,
+      this.setWallet,
       props.readOnly,
     );
 
@@ -781,7 +784,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setUfvkViewModalVisible = async (value: boolean) => {
-    await this.fetchWallet();
     this.setState({ ufvkViewModalVisible: value });
   };
 
@@ -824,7 +826,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         // only if the wallet have some ValueTransfers
         if (background === GlobalConst.no && valueTransfersTotal > 0) {
           // I need to check this out in the seed screen.
-          await this.fetchWallet();
           this.setState({ seedViewModalVisible: true });
         }
       }
@@ -1107,23 +1108,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({ isMenuDrawerOpen });
   };
 
-  fetchWallet = async () => {
-    const wallet = await RPC.rpcFetchWallet(this.state.readOnly);
+  setWallet = async (wallet: WalletType) => {
     //console.log(wallet, this.state.readOnly);
     if (!isEqual(this.state.wallet, wallet)) {
-      //console.log('fetch wallet seed or Viewing Key & birthday');
+      const start = Date.now();
       this.setState({ wallet });
+      console.log('=========================================== > WALLET STORED SETSTATE - ', Date.now() - start);
     }
   };
 
   onMenuItemSelected = async (item: MenuItemEnum) => {
-    this.setState({
-      isMenuDrawerOpen: false,
-      selectedMenuDrawerItem: item,
-    });
-
-    await this.fetchWallet();
-
     // Depending on the menu item, open the appropriate modal
     if (item === MenuItemEnum.About) {
       this.setState({ aboutModalVisible: true });
@@ -1237,6 +1231,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       await sendEmail(this.state.translate, this.state.info.zingolib);
       this.setShowSwipeableIcons(true);
     }
+    this.setState({
+      isMenuDrawerOpen: false,
+      selectedMenuDrawerItem: item,
+    });
   };
 
   setWalletOption = async (walletOption: string, value: string): Promise<void> => {
@@ -1308,7 +1306,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
     }
 
-    // if the chainName id different between server or we cannot open the wallet...
+    // if the chainName is different between server or we cannot open the wallet...
     if (error) {
       // I need to open the modal ASAP.
       if (this.state.readOnly) {
@@ -1332,7 +1330,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       await RPCModule.execute(CommandEnum.changeserver, oldSettings.server.uri);
 
       // go to the seed screen for changing the wallet for another in the new server or cancel this action.
-      this.fetchWallet();
       this.setState({
         newServer: value as ServerType,
         newSelectServer: selectServer,
@@ -1606,7 +1603,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   syncingStatusMoreInfoOnClick = async () => {
-    await this.fetchWallet();
     this.setState({ syncReportModalVisible: true });
   };
 
@@ -1753,7 +1749,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     const menu = <Menu onItemSelected={this.onMenuItemSelected} updateMenuState={this.updateMenuState} />;
 
-    const fnTabBarIcon = (route: StackScreenProps<any>['route'], focused: boolean) => {
+    const fnTabBarIcon = (route: StackScreenProps<any>['route'], focused: boolean, navigation: any) => {
       var iconName;
 
       if (route.name === translate('loadedapp.history-menu')) {
@@ -1777,11 +1773,39 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         iconName = faCog;
       }
 
-      const iconColor = focused ? colors.background : colors.money;
-      return focused ? (
-        <FontAwesomeIcon icon={iconName} color={iconColor} size={30} style={{ transform: [{ translateY: 8 }] }} />
-      ) : (
-        <FontAwesomeIcon icon={iconName} color={iconColor} />
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(route.name);
+          }}>
+          {focused ? (
+            <FontAwesomeIcon
+              icon={iconName}
+              color={colors.background}
+              size={30}
+              style={{ transform: [{ translateY: 2 }] }}
+            />
+          ) : (
+            <FontAwesomeIcon icon={iconName} color={colors.money} />
+          )}
+        </TouchableOpacity>
+      );
+    };
+
+    const fnTabBarLabel = (route: StackScreenProps<any>['route'], focused: boolean, navigation: any) => {
+      return (
+        <>
+          {!focused && (
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate(route.name);
+              }}>
+              <RegText style={{ fontSize: 14 }} color={colors.money}>
+                {route.name}
+              </RegText>
+            </TouchableOpacity>
+          )}
+        </>
       );
     };
 
@@ -2056,12 +2080,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
             <Tab.Navigator
               initialRouteName={translate('loadedapp.history-menu') as string}
-              screenOptions={({ route }) => ({
-                tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
+              screenOptions={({ route, navigation }) => ({
+                tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused, navigation),
                 tabBarLabelPosition: 'below-icon',
                 tabBarActiveTintColor: 'transparent',
                 tabBarActiveBackgroundColor: colors.primaryDisabled,
                 tabBarInactiveTintColor: colors.money,
+                tabBarLabel: ({ focused }) => fnTabBarLabel(route, focused, navigation),
                 tabBarLabelStyle: { fontSize: 12 },
                 tabBarStyle: {
                   borderRadius: 0,
