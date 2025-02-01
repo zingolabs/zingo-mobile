@@ -152,7 +152,7 @@
     "send-menu": "ENVIAR",
     "receive-menu": "RECEBER",
     "messages-menu": "MENSAGENS",
-    "syncing": "Pausando a sincronização para concluir a transação.",
+    "syncing": "Parando a sincronização para poder redefinir a carteira.",
     "zcash-url": "Você já possui um endereço na tela de envio",
     "connection-error": "Esta opção requer uma conexão com a Internet para ser executada.",
     "tryingnewserver": "Tentando conectar-se ao novo servidor... Pode levar alguns segundos.",

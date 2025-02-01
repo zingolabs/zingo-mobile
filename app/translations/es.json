@@ -152,7 +152,7 @@
     "send-menu": "ENVIAR",
     "receive-menu": "RECIBIR",
     "messages-menu": "MENSAJES",
-    "syncing": "Pausando la Sincronización para poder Completar la Transacción.",
+    "syncing": "Deteniendo la Sincronización para poder resetear la billetera.",
     "zcash-url": "Ya tienes una dirección en la pantalla de envío",
     "connection-error": "Esta opción necesita conexión a internet para ser ejecutada.",
     "tryingnewserver": "Intentando conectar con el nuevo Servidor... Puede llevar varios segundos.",

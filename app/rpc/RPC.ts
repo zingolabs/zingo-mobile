@@ -354,27 +354,7 @@ export default class RPC {
         resolve();
       }),
     );
-    /* put this in the app's launch & when some wallet setting changed
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        const s = Date.now();
-        await this.fetchWalletSettings();
-        console.log('wallet settings - ', Date.now() - s);
-        resolve();
-      }),
-    );
-    */
     if (!this.inRefresh) {
-      /* put this in the app's launch.
-      taskPromises.push(
-        new Promise<void>(async resolve => {
-          const s = Date.now();
-          await this.fetchAddresses();
-          console.log('addresses - ', Date.now() - s);
-          resolve();
-        }),
-      );
-      */
       // try to sync.
       taskPromises.push(
         new Promise<void>(async resolve => {

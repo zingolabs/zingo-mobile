@@ -66,6 +66,7 @@ import {
   ValueTransferKindEnum,
   CurrencyNameEnum,
   RefreshScreenEnum,
+  SnackbarDurationEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -301,7 +302,7 @@ export default function LoadedApp(props: LoadedAppProps) {
           }
         }
       }
-      // this is a good place to sort properly the data
+      // this is a good place to sort properly these data
       setAddressBook(
         ab.sort((a, b) => {
           const aLabel = a.label;
@@ -1092,6 +1093,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   doRescan = async () => {
+    this.addLastSnackbar({
+      message: this.state.translate('loadedapp.syncing') as string,
+      duration: SnackbarDurationEnum.longer,
+    });
     await this.rpc.stopSyncProcess();
     this.rpc.refreshSync(false, true);
   };
