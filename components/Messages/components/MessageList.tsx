@@ -100,6 +100,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     server,
     totalBalance,
     doRefresh,
+    somePending,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
@@ -127,6 +128,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   const [spendable, setSpendable] = useState<number>(0);
   const [uOrchardAddressContact, setUOrchardAddressContact] = useState<string>('');
   const [memo, setMemo] = useState<string>('');
+  const [stillConfirming, setStillConfirming] = useState<boolean>(false);
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -473,12 +475,26 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   };
 
   useEffect(() => {
+    const stillConf =
+      (totalBalance ? totalBalance.orchardBal : 0) !== (totalBalance ? totalBalance.spendableOrchard : 0) ||
+      (totalBalance ? totalBalance.privateBal : 0) !== (totalBalance ? totalBalance.spendablePrivate : 0) ||
+      somePending;
+    //const showUpgrade =
+    //  (somePending ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
+    setStillConfirming(stillConf);
     setSpendable(totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0);
-  }, [totalBalance, totalBalance?.spendableOrchard, totalBalance?.spendablePrivate]);
+  }, [
+    somePending,
+    totalBalance,
+    totalBalance?.orchardBal,
+    totalBalance?.privateBal,
+    totalBalance?.spendableOrchard,
+    totalBalance?.spendablePrivate,
+  ]);
 
-  if (address) {
-    console.log('render Messages', validMemo, 'memo local:', memo);
-  }
+  //if (address) {
+  //  console.log('render Messages', validMemo, 'memo local:', memo);
+  //}
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}>
@@ -790,9 +806,11 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               }}>
               <TextInput
                 placeholder={
-                  spendable > 0
+                  stillConfirming
+                    ? (translate('send.somefunds') as string)
+                    : spendable > 0
                     ? (translate('messages.message-placeholder') as string)
-                    : (translate('send.somefunds') as string)
+                    : (translate('messages.message-placeholder-error') as string)
                 }
                 placeholderTextColor={spendable > 0 ? colors.placeholder : colors.primary}
                 multiline
