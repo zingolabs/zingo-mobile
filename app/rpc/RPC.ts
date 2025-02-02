@@ -132,7 +132,7 @@ export default class RPC {
     this.prevBatchNum = -1;
     this.prevSyncId = -1;
     this.prevCurrentBlock = -1;
-    this.secondsBatch = 0;
+    this.secondsBatch = -1;
     this.secondsBlock = 0;
     this.batches = 0;
     this.latestBlock = -1;
@@ -527,7 +527,7 @@ export default class RPC {
 
       this.prevBatchNum = -1;
       this.prevSyncId = -1;
-      this.secondsBatch = 0;
+      this.secondsBatch = -1;
       this.secondsBlock = 0;
       this.batches = 0;
       this.latestBlock = -1;
@@ -696,7 +696,7 @@ export default class RPC {
         //console.log('sync status', ss);
         //console.log(`new sync process id: ${this.syncId}. Save the wallet.`);
         this.prevBatchNum = -1;
-        this.secondsBatch = 0;
+        this.secondsBatch = -1;
         this.secondsBlock = 0;
         this.batches = 0;
       }
@@ -786,7 +786,11 @@ export default class RPC {
 
     this.prevCurrentBlock = currentBlock;
 
-    this.secondsBatch += 5;
+    if (this.secondsBatch === -1) {
+      this.secondsBatch = 0;
+    } else {
+      this.secondsBatch += 5;
+    }
 
     //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
 
@@ -855,7 +859,7 @@ export default class RPC {
         }
         this.batches += batchNum - this.prevBatchNum;
         this.prevBatchNum = batchNum;
-        this.secondsBatch = 0;
+        this.secondsBatch = -1;
       }
     }
     this.fetchSyncStatusLock = false;
