@@ -551,26 +551,30 @@ export default class RPC {
           const rescanStr: string = await RPCModule.execute(CommandEnum.rescan, '');
           console.log('rescan finished', rescanStr);
           if (rescanStr && !rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
-            const resultJSON: RPCSyncRescan = await JSON.parse(rescanStr);
-            if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
-              this.latestBlock = resultJSON.latest_block;
-              // Already finished
-              console.log('REFRESH ----> Already Rescan Finished');
-              // Here I know the sync process is over, I need to inform to the UI.
-              this.fnSetSyncingStatus({
-                syncID: this.syncId < 0 ? 0 : this.syncId,
-                totalBatches: 0,
-                currentBatch: 0,
-                lastBlockWallet: this.lastWalletBlockHeight,
-                currentBlock: this.lastWalletBlockHeight,
-                inProgress: false,
-                lastError: '',
-                blocksPerBatch: this.blocksPerBatch,
-                secondsPerBatch: 0,
-                processEndBlock: this.lastServerBlockHeight,
-                lastBlockServer: this.lastServerBlockHeight,
-                syncProcessStalled: false,
-              } as SyncingStatusClass);
+            try {
+              const resultJSON: RPCSyncRescan = await JSON.parse(rescanStr);
+              if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
+                this.latestBlock = resultJSON.latest_block;
+                // Already finished
+                console.log('REFRESH ----> Already Rescan Finished');
+                // Here I know the sync process is over, I need to inform to the UI.
+                this.fnSetSyncingStatus({
+                  syncID: this.syncId < 0 ? 0 : this.syncId,
+                  totalBatches: 0,
+                  currentBatch: 0,
+                  lastBlockWallet: this.lastWalletBlockHeight,
+                  currentBlock: this.lastWalletBlockHeight,
+                  inProgress: false,
+                  lastError: '',
+                  blocksPerBatch: this.blocksPerBatch,
+                  secondsPerBatch: 0,
+                  processEndBlock: this.lastServerBlockHeight,
+                  lastBlockServer: this.lastServerBlockHeight,
+                  syncProcessStalled: false,
+                } as SyncingStatusClass);
+              }  
+            } catch(error) {
+              console.log(`Critical Error rescan ${error}`);
             }
           }
           this.setInRefresh(false);
@@ -582,26 +586,30 @@ export default class RPC {
           const syncStr: string = await RPCModule.execute(CommandEnum.sync, '');
           console.log('sync finished', syncStr);
           if (syncStr && !syncStr.toLowerCase().startsWith(GlobalConst.error)) {
-            const resultJSON: RPCSyncRescan = await JSON.parse(syncStr);
-            if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
-              this.latestBlock = resultJSON.latest_block;
-              // Already finished
-              console.log('REFRESH ----> Already Sync Finished');
-              // Here I know the sync process is over, I need to inform to the UI.
-              this.fnSetSyncingStatus({
-                syncID: this.syncId < 0 ? 0 : this.syncId,
-                totalBatches: 0,
-                currentBatch: 0,
-                lastBlockWallet: this.lastWalletBlockHeight,
-                currentBlock: this.lastWalletBlockHeight,
-                inProgress: false,
-                lastError: '',
-                blocksPerBatch: this.blocksPerBatch,
-                secondsPerBatch: 0,
-                processEndBlock: this.lastServerBlockHeight,
-                lastBlockServer: this.lastServerBlockHeight,
-                syncProcessStalled: false,
-              } as SyncingStatusClass);
+            try {
+              const resultJSON: RPCSyncRescan = await JSON.parse(syncStr);
+              if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
+                this.latestBlock = resultJSON.latest_block;
+                // Already finished
+                console.log('REFRESH ----> Already Sync Finished');
+                // Here I know the sync process is over, I need to inform to the UI.
+                this.fnSetSyncingStatus({
+                  syncID: this.syncId < 0 ? 0 : this.syncId,
+                  totalBatches: 0,
+                  currentBatch: 0,
+                  lastBlockWallet: this.lastWalletBlockHeight,
+                  currentBlock: this.lastWalletBlockHeight,
+                  inProgress: false,
+                  lastError: '',
+                  blocksPerBatch: this.blocksPerBatch,
+                  secondsPerBatch: 0,
+                  processEndBlock: this.lastServerBlockHeight,
+                  lastBlockServer: this.lastServerBlockHeight,
+                  syncProcessStalled: false,
+                } as SyncingStatusClass);
+              }
+            } catch(error) {
+              console.log(`Critical Error sync ${error}`);
             }
           }
           this.setInRefresh(false);
