@@ -276,7 +276,12 @@ export default function LoadedApp(props: LoadedAppProps) {
 
       // adding `Zenny Tips` address always.
       const zenniesAddress = await Utils.getZenniesDonationAddress(server.chainName);
-      let ab = await AddressBookFileImpl.writeAddressBookItem(translate('zenny-tips-ab') as string, zenniesAddress, '');
+      let ab = await AddressBookFileImpl.writeAddressBookItem(
+        translate('zenny-tips-ab') as string,
+        zenniesAddress,
+        '',
+        '',
+      );
       setZenniesDonationAddress(zenniesAddress);
 
       // reply-to change, from full UA to only orchard UA.
@@ -287,17 +292,45 @@ export default function LoadedApp(props: LoadedAppProps) {
 
       // if some contact don't have the new field: `uOrchardAddress` then
       // the App have to create and calculate it if needed.
-      const toUpdate = ab.filter((a: AddressBookFileClass) => !a.hasOwnProperty('uOrchardAddress'));
+      // same thing with the color of the contact
+      const toUpdate = ab.filter(
+        (a: AddressBookFileClass) => !a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('color'),
+      );
       console.log('Address Book -> TO UPDATE', toUpdate);
       if (toUpdate.length > 0) {
+        const randomColors = Utils.generateColorList(toUpdate.length);
         for (let i = 0; i < toUpdate.length; i++) {
           const a = toUpdate[i];
-          const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
-            a.address,
-            server.chainName,
-          );
-          if (validAddress.isValid) {
-            ab = await AddressBookFileImpl.writeAddressBookItem(a.label, a.address, validAddress.onlyOrchardUA);
+          if (!a.hasOwnProperty('uOrchardAddress') && !a.hasOwnProperty('color')) {
+            // both
+            const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
+              a.address,
+              server.chainName,
+            );
+            ab = await AddressBookFileImpl.writeAddressBookItem(
+              a.label,
+              a.address,
+              validAddress.onlyOrchardUA,
+              randomColors[i],
+            );
+          } else if (!a.hasOwnProperty('uOrchardAddress')) {
+            const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
+              a.address,
+              server.chainName,
+            );
+            ab = await AddressBookFileImpl.writeAddressBookItem(
+              a.label,
+              a.address,
+              validAddress.onlyOrchardUA,
+              a.color ? a.color : '',
+            );
+          } else if (!a.hasOwnProperty('color')) {
+            ab = await AddressBookFileImpl.updateColorItem(
+              a.label,
+              a.address,
+              a.uOrchardAddress ? a.uOrchardAddress : '',
+              randomColors[i],
+            );
           }
         }
       }

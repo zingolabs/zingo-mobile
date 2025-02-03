@@ -143,9 +143,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     return faCircleUser;
   };
 
-  const getLabel = (addr: string) => {
+  const getLabelAndColor = (addr: string) => {
     const label = addressBook.filter((ab: AddressBookFileClass) => ab.address === addr);
     let initials = null;
+    let color = '';
     if (label.length === 1) {
       const words = label[0].label.split(' ');
       if (words[0]) {
@@ -154,8 +155,9 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       if (words[1]) {
         initials = initials + words[1].charAt(0).toUpperCase();
       }
+      color = label[0].color ? label[0].color : Utils.generateColorList(1)[0];
     }
-    return initials;
+    return { initials, color };
   };
 
   const addressFilter = useMemo(
@@ -568,7 +570,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                 marginBottom: 10,
               }}>
               <View style={{ minWidth: 50, marginRight: 5 }}>
-                {!getLabel(address) ? (
+                {!getLabelAndColor(address).initials ? (
                   <FontAwesomeIcon
                     style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
                     size={40}
@@ -582,15 +584,20 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                       justifyContent: 'center',
                       width: 40,
                       height: 40,
-                      backgroundColor: colors.primaryDisabled,
-                      borderColor: colors.primary,
+                      backgroundColor: getLabelAndColor(address).color,
+                      borderColor: colors.zingo,
                       borderWidth: 2,
                       borderRadius: 22,
                       marginLeft: 5,
                       marginRight: 5,
                       marginTop: 0,
                     }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{`${getLabel(address)}`}</Text>
+                    <Text
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: 20,
+                        color: Utils.getLabelColor(getLabelAndColor(address).color),
+                      }}>{`${getLabelAndColor(address).initials}`}</Text>
                   </View>
                 )}
               </View>

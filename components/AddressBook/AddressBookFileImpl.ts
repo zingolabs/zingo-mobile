@@ -7,11 +7,49 @@ export default class AddressBookFileImpl {
     return RNFS.DocumentDirectoryPath + '/addressbook.json';
   }
 
+  static async updateColorItem(
+    label: string,
+    address: string,
+    uOrchardAddress: string,
+    color: string,
+  ): Promise<AddressBookFileClass[]> {
+    const fileName = await this.getFileName();
+    const addressBook = await this.readAddressBook();
+
+    if (
+      addressBook.filter(
+        item => item.label === label && item.address === address && item.uOrchardAddress === uOrchardAddress,
+      ).length === 0
+    ) {
+      // no exists, do nothing
+      return addressBook;
+    } else {
+      let newAddressBook: AddressBookFileClass[];
+      const newItem: AddressBookFileClass = { label, address, uOrchardAddress, color };
+      newAddressBook = [
+        ...addressBook.filter(
+          item => item.label !== label && item.address !== address && item.uOrchardAddress !== uOrchardAddress,
+        ),
+        newItem,
+      ];
+
+      RNFS.writeFile(fileName, JSON.stringify(newAddressBook), 'utf8')
+        .then(() => {
+          //console.log('FILE WRITTEN!');
+        })
+        .catch(() => {
+          return [] as AddressBookFileClass[];
+        });
+      return newAddressBook;
+    }
+  }
+
   // Write only one item
   static async writeAddressBookItem(
     label: string,
     address: string,
     uOrchardAddress: string,
+    color: string,
   ): Promise<AddressBookFileClass[]> {
     const fileName = await this.getFileName();
     const addressBook = await this.readAddressBook();
@@ -26,7 +64,7 @@ export default class AddressBookFileImpl {
     }
 
     let newAddressBook: AddressBookFileClass[];
-    const newItem: AddressBookFileClass = { label, address, uOrchardAddress };
+    const newItem: AddressBookFileClass = { label, address, uOrchardAddress, color };
 
     if (addressBook.filter(item => item.label === label && item.address === address).length > 0) {
       // already exists the label & the address -> update the orchard address

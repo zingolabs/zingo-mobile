@@ -30,7 +30,13 @@ type AbSummaryLineProps = {
   setAction: (action: AddressBookActionEnum) => void;
   closeModal: () => void;
   handleScrollToTop: () => void;
-  doAction: (action: AddressBookActionEnum, label: string, address: string, uOrchardAddress: string) => void;
+  doAction: (
+    action: AddressBookActionEnum,
+    label: string,
+    address: string,
+    uOrchardAddress: string,
+    color: string,
+  ) => void;
   addressProtected?: boolean;
 };
 const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
@@ -68,6 +74,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
               item.label,
               item.address,
               item.uOrchardAddress ? item.uOrchardAddress : '',
+              item.color ? item.color : '',
             ),
         },
         { text: translate('cancel') as string, style: 'cancel' },
@@ -104,7 +111,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 style={{ marginHorizontal: 10 }}
                 size={24}
                 icon={faAddressCard}
-                color={addressProtected ? colors.zingo : colors.primaryDisabled}
+                color={addressProtected ? colors.zingo : item.color ? item.color : colors.primarydisabled}
               />
               <FadeText
                 style={{

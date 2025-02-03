@@ -8,6 +8,9 @@ export default interface ContactType {
   // for searching
   label: string;
 
+  // for wiewing
+  color: string;
+
   // last message
   time: number;
   memos: string[];

@@ -215,7 +215,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
     );
   };
 
-  //console.log('render ValueTransferLine - 5', index, messagesAddress);
+  //console.log('render contact line - 5', c);
 
   //if (index === 0) {
   //  vt.confirmations = 0;
@@ -294,15 +294,18 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                       justifyContent: 'center',
                       width: 40,
                       height: 40,
-                      backgroundColor: colors.primaryDisabled,
-                      borderColor: colors.primary,
+                      backgroundColor: c.color,
+                      borderColor: colors.zingo,
                       borderWidth: 2,
                       borderRadius: 22,
                       marginLeft: 5,
                       marginRight: 5,
                       marginTop: 0,
                     }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{`${getLabel(c)}`}</Text>
+                    <Text
+                      style={{ fontWeight: 'bold', fontSize: 20, color: Utils.getLabelColor(c.color) }}>{`${getLabel(
+                      c,
+                    )}`}</Text>
                   </View>
                 )}
               </View>

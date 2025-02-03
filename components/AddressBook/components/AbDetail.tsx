@@ -27,7 +27,13 @@ type AbDetailProps = {
   item: AddressBookFileClass;
   cancel: () => void;
   action: AddressBookActionEnum;
-  doAction: (action: AddressBookActionEnum, label: string, address: string, uOrchardAddress: string) => void;
+  doAction: (
+    action: AddressBookActionEnum,
+    label: string,
+    address: string,
+    uOrchardAddress: string,
+    color: string,
+  ) => void;
   addressBookCurrentAddress?: string;
 };
 const AbDetail: React.FunctionComponent<AbDetailProps> = ({
@@ -216,7 +222,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           type={ButtonTypeEnum.Primary}
           title={translate(`addressbook.${action.toLowerCase()}`) as string}
           onPress={() => {
-            doAction(action, label, address, uOrchardAddress);
+            doAction(action, label, address, uOrchardAddress, item.color ? item.color : '');
           }}
           disabled={
             action === AddressBookActionEnum.Delete ? false : error || errorAddress || !label || !address ? true : false

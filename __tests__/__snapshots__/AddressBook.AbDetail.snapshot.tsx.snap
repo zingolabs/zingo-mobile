@@ -1177,12 +1177,34 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
       }
     }
   >
+    <Text
+      style={
+        {
+          "color": "#18bd18",
+          "opacity": 0.65,
+        }
+      }
+    >
+      text translated
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "flexGrow": 1,
+        "justifyContent": "center",
+        "marginVertical": 5,
+      }
+    }
+  >
     <View
       accessibilityState={
         {
           "busy": undefined,
           "checked": undefined,
-          "disabled": false,
+          "disabled": true,
           "expanded": undefined,
           "selected": undefined,
         }
@@ -1208,8 +1230,8 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "#18bd18",
-          "borderColor": "#18bd18",
+          "backgroundColor": "#5a8c5a",
+          "borderColor": "#5a8c5a",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",

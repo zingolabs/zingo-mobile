@@ -572,8 +572,8 @@ export default class RPC {
                   lastBlockServer: this.lastServerBlockHeight,
                   syncProcessStalled: false,
                 } as SyncingStatusClass);
-              }  
-            } catch(error) {
+              }
+            } catch (error) {
               console.log(`Critical Error rescan ${error}`);
             }
           }
@@ -608,7 +608,7 @@ export default class RPC {
                   syncProcessStalled: false,
                 } as SyncingStatusClass);
               }
-            } catch(error) {
+            } catch (error) {
               console.log(`Critical Error sync ${error}`);
             }
           }

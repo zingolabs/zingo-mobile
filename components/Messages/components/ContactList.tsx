@@ -86,6 +86,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   const [searchMode, setSearchMode] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>('');
   const [searchTextField, setSearchTextField] = useState<string>('');
+  const [randomColors] = useState<string[]>(Utils.generateColorList(10));
   const scrollViewRef = useRef<ScrollView>(null);
 
   useScrollToTop(scrollViewRef);
@@ -97,11 +98,19 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
     return address.length >= 1;
   };
 
+  const addToIndex: (num: number) => number = (num: number) => {
+    if (num === 9) {
+      return 0;
+    }
+    return num + 1;
+  };
+
   const fetchContacts = () => {
     if (!valueTransfers) {
       return [] as ContactType[];
     }
     const cont: ContactType[] = [];
+    let randomColorIndex: number = 0;
     valueTransfers
       .filter((vt: ValueTransferType) => vt.memos && vt.memos.length > 0)
       .forEach((vt: ValueTransferType) => {
@@ -127,6 +136,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 confirmations: vt.confirmations,
                 status: vt.status,
                 kind: vt.kind,
+                color: '',
               });
             } else if (isContact.length > 0) {
               isContact.forEach((ab: AddressBookFileClass) => {
@@ -139,7 +149,9 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                   confirmations: vt.confirmations,
                   status: vt.status,
                   kind: vt.kind,
+                  color: ab.color ? ab.color : randomColors[randomColorIndex],
                 });
+                randomColorIndex = addToIndex(randomColorIndex);
               });
             }
             chatsToAdd.forEach((c: ContactType) => {
@@ -215,7 +227,9 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 time: 0,
                 memos: [],
                 confirmations: 0,
+                color: ab.color ? ab.color : randomColors[randomColorIndex],
               });
+              randomColorIndex = addToIndex(randomColorIndex);
             }
           }
         });

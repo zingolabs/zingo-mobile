@@ -215,6 +215,24 @@ export default class Utils {
     return colorList;
   }
 
+  static getLabelColor(bgColor: string): string {
+    // Remove the '#' if present.
+    if (bgColor.startsWith('#')) {
+      bgColor = bgColor.slice(1);
+    }
+
+    // Convert the hexadecimal color to its red, green, and blue components.
+    const r: number = parseInt(bgColor.substring(0, 2), 16);
+    const g: number = parseInt(bgColor.substring(2, 4), 16);
+    const b: number = parseInt(bgColor.substring(4, 6), 16);
+
+    // Calculate the brightness using the standard luminance formula.
+    const brightness: number = (r * 299 + g * 587 + b * 114) / 1000;
+
+    // If the brightness is greater than 128, return dark text (black); otherwise, return light text (white).
+    return brightness > 128 ? '#000000' : '#FFFFFF';
+  }
+
   static async getSendManyJSON(
     sendPageState: SendPageStateClass,
     uOrchardAddress: string,

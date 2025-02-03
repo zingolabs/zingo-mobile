@@ -26,6 +26,7 @@ import Header from '../Header';
 import AddressBookFileImpl from './AddressBookFileImpl';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
+import Utils from '../../app/utils';
 
 type AddressBookProps = {
   closeModal: () => void;
@@ -113,7 +114,13 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     }
   };
 
-  const doAction = async (a: AddressBookActionEnum, label: string, address: string, uOrchardAddress: string) => {
+  const doAction = async (
+    a: AddressBookActionEnum,
+    label: string,
+    address: string,
+    uOrchardAddress: string,
+    color: string,
+  ) => {
     if (!label || !address) {
       return;
     }
@@ -121,7 +128,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     if (a === AddressBookActionEnum.Delete) {
       ab = await AddressBookFileImpl.removeAddressBookItem(label, address);
     } else {
-      ab = await AddressBookFileImpl.writeAddressBookItem(label, address, uOrchardAddress);
+      ab = await AddressBookFileImpl.writeAddressBookItem(
+        label,
+        address,
+        uOrchardAddress,
+        color ? color : Utils.generateColorList(1)[0],
+      );
     }
     setAddressBook(ab);
     cancel();
