@@ -20,7 +20,7 @@ const simpleBiometrics = async (props: simpleBiometricsProps) => {
     // the App interpret that it is in background...
     // here we need to restore the correct value
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-    console.log('******* NOT available bio auth -> background NO')
+    console.log('******* NOT available bio auth -> background NO');
     return true;
   }
 
@@ -40,7 +40,7 @@ const simpleBiometrics = async (props: simpleBiometricsProps) => {
     // the App interpret that it is in background...
     // here we need to restore the correct value
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-    console.log('******* FINALLY bio auth -> background NO')
+    console.log('******* FINALLY bio auth -> background NO');
   }
 };
 
