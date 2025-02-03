@@ -145,9 +145,9 @@ export default class RPC {
 
   static async rpcSetInterruptSyncAfterBatch(value: string): Promise<void> {
     try {
-      const start = Date.now();
+      //const start = Date.now();
       const resultStr: string = await RPCModule.execute(CommandEnum.interruptSyncAfterBatch, value);
-      console.log('=========================================== > sync flag - ', Date.now() - start);
+      //console.log('=========================================== > sync flag - ', Date.now() - start);
 
       if (resultStr) {
         if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -168,9 +168,9 @@ export default class RPC {
       // -1  - error in Gemini/zingolib.
       // -2  - error in RPCModule, likely.
       // > 0 - real value
-      const start = Date.now();
+      //const start = Date.now();
       const resultStr: string = await RPCModule.execute(CommandEnum.updatecurrentprice, '');
-      console.log('=========================================== > get ZEC price - ', Date.now() - start);
+      //console.log('=========================================== > get ZEC price - ', Date.now() - start);
       //console.log(resultStr);
 
       if (resultStr) {
@@ -192,18 +192,18 @@ export default class RPC {
 
   static async rpcSetWalletSettingOption(name: string, value: string): Promise<string> {
     try {
-      const start = Date.now();
+      //const start = Date.now();
       const resultStr: string = await RPCModule.execute(CommandEnum.setoption, `${name}=${value}`);
-      console.log('=========================================== > set wallet setting - ', Date.now() - start);
+      //console.log('=========================================== > set wallet setting - ', Date.now() - start);
 
       if (resultStr) {
         if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error setting option ${resultStr}`);
           return resultStr;
         }
-        const start2 = Date.now();
+        //const start2 = Date.now();
         await RPCModule.doSave();
-        console.log('=========================================== > save wallet - ', Date.now() - start2);
+        //console.log('=========================================== > save wallet - ', Date.now() - start2);
         return resultStr;
       } else {
         console.log('Internal Error setting option');
@@ -240,9 +240,9 @@ export default class RPC {
     if (readOnly) {
       // only viewing key & birthday
       try {
-        const start = Date.now();
+        //const start = Date.now();
         const ufvkStr: string = await RPCModule.execute(CommandEnum.exportufvk, '');
-        console.log('=========================================== > get ufvk - ', Date.now() - start);
+        //console.log('=========================================== > get ufvk - ', Date.now() - start);
         if (ufvkStr) {
           if (ufvkStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error ufvk ${ufvkStr}`);
@@ -270,9 +270,9 @@ export default class RPC {
     } else {
       // only seed & birthday
       try {
-        const start2 = Date.now();
+        //const start2 = Date.now();
         const seedStr: string = await RPCModule.execute(CommandEnum.seed, '');
-        console.log('=========================================== > get seed - ', Date.now() - start2);
+        //console.log('=========================================== > get seed - ', Date.now() - start2);
         if (seedStr) {
           if (seedStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error seed ${seedStr}`);
@@ -623,7 +623,7 @@ export default class RPC {
       // Already at the latest block
       console.log('REFRESH ----> Already have latest block, waiting for next refresh');
       // Here I know the sync process is over, I need to inform to the UI.
-      const start = Date.now();
+      //const start = Date.now();
       this.fnSetSyncingStatus({
         syncID: this.syncId < 0 ? 0 : this.syncId,
         totalBatches: 0,
@@ -638,7 +638,7 @@ export default class RPC {
         lastBlockServer: this.lastServerBlockHeight,
         syncProcessStalled: false,
       } as SyncingStatusClass);
-      console.log('=========================================== > set sync status - ', Date.now() - start);
+      //console.log('=========================================== > set sync status - ', Date.now() - start);
     }
     this.refreshSyncLock = false;
   }
@@ -697,9 +697,9 @@ export default class RPC {
     // if the syncId change then reset the %
     if (this.prevSyncId !== this.syncId) {
       if (this.prevSyncId !== -1) {
-        const start = Date.now();
+        //const start = Date.now();
         await RPCModule.doSave();
-        console.log('=========================================== > save wallet - ', Date.now() - start);
+        //console.log('=========================================== > save wallet - ', Date.now() - start);
 
         //console.log('sync status', ss);
         //console.log(`new sync process id: ${this.syncId}. Save the wallet.`);
@@ -803,7 +803,7 @@ export default class RPC {
     //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
 
     // store SyncStatus object for a new screen
-    const start = Date.now();
+    //const start = Date.now();
     this.fnSetSyncingStatus({
       syncID: this.syncId,
       totalBatches: batchTotal,
@@ -818,19 +818,19 @@ export default class RPC {
       lastBlockServer: this.lastServerBlockHeight,
       syncProcessStalled: syncProcessStalled,
     } as SyncingStatusClass);
-    console.log('=========================================== > set sync status - ', Date.now() - start);
+    //console.log('=========================================== > set sync status - ', Date.now() - start);
 
     // Close the poll timer if the sync finished(checked via promise above)
     if (!this.inRefresh) {
       // here we can release the screen...
       this.keepAwake(false);
 
-      const start2 = Date.now();
+      //const start2 = Date.now();
       await RPCModule.doSave();
-      console.log('=========================================== > save wallet - ', Date.now() - start2);
+      //console.log('=========================================== > save wallet - ', Date.now() - start2);
 
       // store SyncStatus object for a new screen
-      const start3 = Date.now();
+      //const start3 = Date.now();
       this.fnSetSyncingStatus({
         syncID: this.syncId,
         totalBatches: 0,
@@ -845,7 +845,7 @@ export default class RPC {
         lastBlockServer: this.lastServerBlockHeight,
         syncProcessStalled: false,
       } as SyncingStatusClass);
-      console.log('=========================================== > set sync status - ', Date.now() - start3);
+      //console.log('=========================================== > set sync status - ', Date.now() - start3);
 
       //console.log('sync status', ss);
       //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${this.syncId}`);
@@ -854,9 +854,9 @@ export default class RPC {
       if (this.prevBatchNum !== batchNum) {
         // if finished batches really fast, the App have to save the wallet delayed.
         if (this.prevBatchNum !== -1 && this.batches >= 1) {
-          const start4 = Date.now();
+          //const start4 = Date.now();
           await RPCModule.doSave();
-          console.log('=========================================== > save wallet - ', Date.now() - start4);
+          //console.log('=========================================== > save wallet - ', Date.now() - start4);
 
           this.batches = 0;
 
@@ -879,9 +879,9 @@ export default class RPC {
         return;
       }
       this.fetchWalletSettingsLock = true;
-      const start = Date.now();
+      //const start = Date.now();
       const downloadMemosStr: string = await RPCModule.execute(CommandEnum.getoption, WalletOptionEnum.downloadMemos);
-      console.log('=========================================== > dowload memos - ', Date.now() - start);
+      //console.log('=========================================== > dowload memos - ', Date.now() - start);
       if (downloadMemosStr) {
         if (downloadMemosStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error download memos ${downloadMemosStr}`);
@@ -895,12 +895,12 @@ export default class RPC {
       }
       const downloadMemosJson: RPCGetOptionType = await JSON.parse(downloadMemosStr);
 
-      const start2 = Date.now();
+      //const start2 = Date.now();
       const transactionFilterThresholdStr: string = await RPCModule.execute(
         CommandEnum.getoption,
         WalletOptionEnum.transactionFilterThreshold,
       );
-      console.log('=========================================== > filter threshold - ', Date.now() - start2);
+      //console.log('=========================================== > filter threshold - ', Date.now() - start2);
       if (transactionFilterThresholdStr) {
         if (transactionFilterThresholdStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error transaction filter threshold ${transactionFilterThresholdStr}`);
@@ -918,9 +918,9 @@ export default class RPC {
       walletSettings.downloadMemos = downloadMemosJson.download_memos || '';
       walletSettings.transactionFilterThreshold = transactionFilterThresholdJson.transaction_filter_threshold || '';
 
-      const start3 = Date.now();
+      //const start3 = Date.now();
       this.fnSetWalletSettings(walletSettings);
-      console.log('=========================================== > set wallet settings - ', Date.now() - start3);
+      //console.log('=========================================== > set wallet settings - ', Date.now() - start3);
       this.fetchWalletSettingsLock = false;
     } catch (error) {
       console.log(`Critical Error wallet settings ${error}`);
@@ -936,9 +936,9 @@ export default class RPC {
       }
       this.fetchInfoAndServerHeightLock = true;
       let infoError: boolean = false;
-      const start = Date.now();
+      //const start = Date.now();
       const infoStr: string = await RPCModule.execute(CommandEnum.info, '');
-      console.log('=========================================== > info - ', Date.now() - start);
+      //console.log('=========================================== > info - ', Date.now() - start);
       if (infoStr) {
         if (infoStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error info & server block height ${infoStr}`);
@@ -973,9 +973,9 @@ export default class RPC {
         zingolib: '',
       };
 
-      const start3 = Date.now();
+      //const start3 = Date.now();
       this.fnSetInfo(info);
-      console.log('=========================================== > set info - ', Date.now() - start3);
+      //console.log('=========================================== > set info - ', Date.now() - start3);
       this.lastServerBlockHeight = info.latestBlock;
       this.fetchInfoAndServerHeightLock = false;
     } catch (error) {
@@ -995,9 +995,9 @@ export default class RPC {
         return;
       }
       this.fetchZingolibVersionLock = true;
-      const start = Date.now();
+      //const start = Date.now();
       let zingolibStr: string = await RPCModule.execute(CommandEnum.version, '');
-      console.log('=========================================== > zingolib version - ', Date.now() - start);
+      //console.log('=========================================== > zingolib version - ', Date.now() - start);
       if (zingolibStr) {
         if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error zingolib version ${zingolibStr}`);
@@ -1008,9 +1008,9 @@ export default class RPC {
         zingolibStr = '<none>';
       }
 
-      const start2 = Date.now();
+      //const start2 = Date.now();
       this.fnSetZingolib(zingolibStr);
-      console.log('=========================================== > set zingolib version - ', Date.now() - start2);
+      //console.log('=========================================== > set zingolib version - ', Date.now() - start2);
       this.fetchZingolibVersionLock = false;
     } catch (error) {
       console.log(`Critical Error info ${error}`);
@@ -1026,9 +1026,9 @@ export default class RPC {
         return;
       }
       this.fetchTotalBalanceLock = true;
-      const start = Date.now();
+      //const start = Date.now();
       const balanceStr: string = await RPCModule.execute(CommandEnum.balance, '');
-      console.log('=========================================== > balance - ', Date.now() - start);
+      //console.log('=========================================== > balance - ', Date.now() - start);
       if (balanceStr) {
         if (balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error balance ${balanceStr}`);
@@ -1057,9 +1057,9 @@ export default class RPC {
         spendablePrivate: (balanceJSON.spendable_sapling_balance || 0) / 10 ** 8,
         total: total / 10 ** 8,
       };
-      const start2 = Date.now();
+      //const start2 = Date.now();
       this.fnSetTotalBalance(balance);
-      console.log('=========================================== > set balance - ', Date.now() - start2);
+      //console.log('=========================================== > set balance - ', Date.now() - start2);
       this.fetchTotalBalanceLock = false;
     } catch (error) {
       console.log(`Critical Error addresses balances notes ${error}`);
@@ -1079,9 +1079,9 @@ export default class RPC {
         return;
       }
       this.fetchAddressesLock = true;
-      const start = Date.now();
+      //const start = Date.now();
       const addressesStr: string = await RPCModule.execute(CommandEnum.addresses, CommandAddressesEnum.full);
-      console.log('=========================================== > addresses full - ', Date.now() - start);
+      //console.log('=========================================== > addresses full - ', Date.now() - start);
       if (addressesStr) {
         if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error addresses ${addressesStr}`);
@@ -1095,9 +1095,9 @@ export default class RPC {
       }
       const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr);
 
-      const start2 = Date.now();
+      //const start2 = Date.now();
       const orchardAddressesStr: string = await RPCModule.execute(CommandEnum.addresses, CommandAddressesEnum.orchard);
-      console.log('=========================================== > addresses orchard - ', Date.now() - start2);
+      //console.log('=========================================== > addresses orchard - ', Date.now() - start2);
       if (addressesStr) {
         if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error addresses ${addressesStr}`);
@@ -1136,9 +1136,9 @@ export default class RPC {
           }
         });
 
-      const start3 = Date.now();
+      //const start3 = Date.now();
       this.fnSetAllAddresses(allAddresses);
-      console.log('=========================================== > set addresses - ', Date.now() - start3);
+      //console.log('=========================================== > set addresses - ', Date.now() - start3);
       this.fetchAddressesLock = false;
     } catch (error) {
       console.log(`Critical Error addresses ${error}`);
@@ -1157,9 +1157,9 @@ export default class RPC {
         return;
       }
       this.fetchWalletHeightLock = true;
-      const start = Date.now();
+      //const start = Date.now();
       const heightStr: string = await RPCModule.execute(CommandEnum.height, '');
-      console.log('=========================================== > wallet height - ', Date.now() - start);
+      //console.log('=========================================== > wallet height - ', Date.now() - start);
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error wallet height ${heightStr}`);
@@ -1217,9 +1217,9 @@ export default class RPC {
         return;
       }
       this.fetchTandZandOValueTransfersLock = true;
-      const start = Date.now();
+      //const start = Date.now();
       const valueTransfersStr: string = await RPCModule.getValueTransfersList('100000000');
-      console.log('=========================================== > value transfers - ', Date.now() - start);
+      //console.log('=========================================== > value transfers - ', Date.now() - start);
       //console.log(valueTransfersStr);
       if (valueTransfersStr) {
         if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1303,9 +1303,9 @@ export default class RPC {
 
       //console.log(vtlist);
 
-      const start2 = Date.now();
+      //const start2 = Date.now();
       this.fnSetValueTransfersList(vtList, vtList.length);
-      console.log('=========================================== > set value transfers - ', Date.now() - start2);
+      //console.log('=========================================== > set value transfers - ', Date.now() - start2);
       this.fetchTandZandOValueTransfersLock = false;
     } catch (error) {
       console.log(`Critical Error txs list value transfers ${error}`);
@@ -1325,9 +1325,9 @@ export default class RPC {
         return;
       }
       this.fetchTandZandOMessagesLock = true;
-      const start = Date.now();
+      //const start = Date.now();
       const messagesStr: string = await RPCModule.execute(CommandEnum.messages, '');
-      console.log('=========================================== > messages - ', Date.now() - start);
+      //console.log('=========================================== > messages - ', Date.now() - start);
       //console.log(messagesStr);
       if (messagesStr) {
         if (messagesStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1410,9 +1410,9 @@ export default class RPC {
 
       //console.log(mlist);
 
-      const start2 = Date.now();
+      //const start2 = Date.now();
       this.fnSetMessagesList(mList, mList.length);
-      console.log('=========================================== > set messages - ', Date.now() - start2);
+      //console.log('=========================================== > set messages - ', Date.now() - start2);
       this.fetchTandZandOMessagesLock = false;
     } catch (error) {
       console.log(`Critical Error txs list value transfers messages ${error}`);
@@ -1498,12 +1498,12 @@ export default class RPC {
       if (sendTxids) {
         // And refresh data (full refresh)
         this.refreshSync(true);
-        console.log('00000000 RESOLVE send');
+        //console.log('00000000 RESOLVE send');
         resolve(sendTxids);
         return;
       }
       if (sendError) {
-        console.log('00000000 REJECT send');
+        //console.log('00000000 REJECT send');
         reject(sendError);
         return;
       }

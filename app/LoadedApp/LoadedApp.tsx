@@ -577,11 +577,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           return;
         }
         if (priorAppState === AppStateStatusEnum.inactive && nextAppState === AppStateStatusEnum.background) {
-          //console.log('App LOADED IOS is gone to the background!');
+          console.log('App LOADED IOS is gone to the background!');
           this.setState({ appStateStatus: nextAppState });
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
-          //console.log('background yes in storage');
+          console.log('&&&&& background yes in storage &&&&&');
           this.rpc.setInRefresh(false);
           await this.rpc.clearTimers();
           //console.log('clear timers IOS');
@@ -625,7 +625,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           await this.fetchBackgroundSyncing();
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-          //console.log('background no in storage');
+          console.log('&&&&& background no in storage &&&&&');
           this.rpc.setInRefresh(false);
           await this.rpc.clearTimers();
           await this.rpc.configure();
@@ -639,10 +639,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         priorAppState === AppStateStatusEnum.active &&
         (nextAppState === AppStateStatusEnum.inactive || nextAppState === AppStateStatusEnum.background)
       ) {
-        //console.log('App LOADED is gone to the background!');
+        console.log('App LOADED is gone to the background!');
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
-        //console.log('background yes in storage');
+        console.log('&&&&& background yes in storage &&&&&');
         this.rpc.setInRefresh(false);
         await this.rpc.clearTimers();
         //console.log('clear timers');
@@ -821,9 +821,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setShieldingAmount = (value: number) => {
-    const start = Date.now();
+    //const start = Date.now();
     this.setState({ shieldingAmount: value });
-    console.log('=========================================== > SH AMOUNT STORED SETSTATE - ', Date.now() - start);
+    //console.log('=========================================== > SH AMOUNT STORED SETSTATE - ', Date.now() - start);
   };
 
   setShowSwipeableIcons = (value: boolean) => {
@@ -833,18 +833,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   setTotalBalance = (totalBalance: TotalBalanceClass) => {
     if (!isEqual(this.state.totalBalance, totalBalance)) {
       //console.log('fetch total balance');
-      const start = Date.now();
+      //const start = Date.now();
       this.setState({ totalBalance });
-      console.log('=========================================== > BALANCE STORED SETSTATE - ', Date.now() - start);
+      //console.log('=========================================== > BALANCE STORED SETSTATE - ', Date.now() - start);
     }
   };
 
   setSyncingStatus = (syncingStatus: SyncingStatusClass) => {
     if (!isEqual(this.state.syncingStatus, syncingStatus)) {
       //console.log('fetch syncing status report');
-      const start = Date.now();
+      //const start = Date.now();
       this.setState({ syncingStatus });
-      console.log('=========================================== > SYNC STATUS STORED SETSTATE - ', Date.now() - start);
+      //console.log('=========================================== > SYNC STATUS STORED SETSTATE - ', Date.now() - start);
     }
   };
 
@@ -970,7 +970,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           });
       // if some tx is confirmed the UI needs some time to
       // acomodate the bottom tabs.
-      const start = Date.now();
+      //const start = Date.now();
       setTimeout(
         () => {
           this.setState({
@@ -981,28 +981,28 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         },
         pending === 0 ? 250 : 0,
       );
-      console.log(
-        '=========================================== > VALUE TRANSFERS STORED SETSTATE - ',
-        Date.now() - start,
-      );
+      //console.log(
+      //  '=========================================== > VALUE TRANSFERS STORED SETSTATE - ',
+      //  Date.now() - start,
+      //);
     }
   };
 
   setMessagesList = (messages: ValueTransferType[], messagesTotal: number) => {
     if (!isEqual(this.state.messages, messages) || this.state.messagesTotal !== messagesTotal) {
       //console.log('fetch messages');
-      const start = Date.now();
+      //const start = Date.now();
       this.setState({ messages, messagesTotal });
-      console.log('=========================================== > MESSAGES STORED SETSTATE - ', Date.now() - start);
+      //console.log('=========================================== > MESSAGES STORED SETSTATE - ', Date.now() - start);
     }
   };
 
   setAllAddresses = (addresses: AddressClass[]) => {
     if (!isEqual(this.state.addresses, addresses)) {
       //console.log('fetch addresses');
-      const start = Date.now();
+      //const start = Date.now();
       this.setState({ addresses });
-      console.log('=========================================== > ADDRESSES STORED SETSTATE - ', Date.now() - start);
+      //console.log('=========================================== > ADDRESSES STORED SETSTATE - ', Date.now() - start);
     }
     if (addresses.length > 0) {
       if (this.state.uOrchardAddress !== addresses[0].uOrchardAddress) {
@@ -1016,20 +1016,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   setWalletSettings = (walletSettings: WalletSettingsClass) => {
     if (!isEqual(this.state.walletSettings, walletSettings)) {
       //console.log('fetch wallet settings');
-      const start = Date.now();
+      //const start = Date.now();
       this.setState({ walletSettings });
-      console.log(
-        '=========================================== > WALLET SETTINGS STORED SETSTATE - ',
-        Date.now() - start,
-      );
+      //console.log(
+      //  '=========================================== > WALLET SETTINGS STORED SETSTATE - ',
+      //  Date.now() - start,
+      //);
     }
   };
 
   setSendPageState = (sendPageState: SendPageStateClass) => {
     //console.log('fetch send page state');
-    const start = Date.now();
+    //const start = Date.now();
     this.setState({ sendPageState });
-    console.log('=========================================== > SEND PAGE STORED SETSTATE - ', Date.now() - start);
+    //console.log('=========================================== > SEND PAGE STORED SETSTATE - ', Date.now() - start);
   };
 
   clearToAddr = () => {
@@ -1081,9 +1081,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       if (!newInfo.serverUri) {
         newInfo.serverUri = this.state.server.uri;
       }
-      const start = Date.now();
+      //const start = Date.now();
       this.setState({ info: newInfo });
-      console.log('=========================================== > INFO STORED SETSTATE - ', Date.now() - start);
+      //console.log('=========================================== > INFO STORED SETSTATE - ', Date.now() - start);
     }
   };
 
@@ -1091,9 +1091,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (!this.state.info.zingolib) {
       let newInfo = cloneDeep(this.state.info);
       newInfo.zingolib = zingolib;
-      const start = Date.now();
+      //const start = Date.now();
       this.setState({ info: newInfo });
-      console.log('=========================================== > ZINGOLIB STORED SETSTATE - ', Date.now() - start);
+      //console.log('=========================================== > ZINGOLIB STORED SETSTATE - ', Date.now() - start);
     }
   };
 
@@ -1114,7 +1114,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   doRefresh = (screen: RefreshScreenEnum) => {
-    console.log('================== MANUAL REFRESH ================== ', screen);
+    //console.log('================== MANUAL REFRESH ================== ', screen);
     if (screen === RefreshScreenEnum.History || screen === RefreshScreenEnum.ContactList) {
       // Value Transfers
       this.rpc.fetchTandZandOValueTransfers();
@@ -1130,25 +1130,25 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   toggleMenuDrawer = () => {
-    const start = Date.now();
+    //const start = Date.now();
     this.setState({
       isMenuDrawerOpen: !this.state.isMenuDrawerOpen,
     });
-    console.log('=========================================== > TOGGLE MENU STORED SETSTATE - ', Date.now() - start);
+    //console.log('=========================================== > TOGGLE MENU STORED SETSTATE - ', Date.now() - start);
   };
 
   updateMenuState = (isMenuDrawerOpen: boolean) => {
-    const start = Date.now();
+    //const start = Date.now();
     this.setState({ isMenuDrawerOpen });
-    console.log('=========================================== > UPDATE MENU STORED SETSTATE - ', Date.now() - start);
+    //console.log('=========================================== > UPDATE MENU STORED SETSTATE - ', Date.now() - start);
   };
 
   setWallet = async (wallet: WalletType) => {
     //console.log(wallet, this.state.readOnly);
     if (!isEqual(this.state.wallet, wallet)) {
-      const start = Date.now();
+      //const start = Date.now();
       this.setState({ wallet });
-      console.log('=========================================== > WALLET STORED SETSTATE - ', Date.now() - start);
+      //console.log('=========================================== > WALLET STORED SETSTATE - ', Date.now() - start);
     }
   };
 

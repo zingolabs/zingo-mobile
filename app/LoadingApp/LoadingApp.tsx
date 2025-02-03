@@ -486,6 +486,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     // Second, check if a wallet exists. Do it async so the basic screen has time to render
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+    console.log('&&&&& background no in storage &&&&&');
     const exists = await RPCModule.walletExists();
     //console.log('Wallet Exists result', this.state.screen, exists);
 
@@ -627,6 +628,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         this.fetchBackgroundSyncing();
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+        console.log('&&&&& background no in storage &&&&&');
         if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
           Alert.alert(this.state.backgroundError.title, this.state.backgroundError.error);
           this.setBackgroundError('', '');
@@ -636,9 +638,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         (nextAppState === AppStateStatusEnum.inactive || nextAppState === AppStateStatusEnum.background) &&
         priorAppState === AppStateStatusEnum.active
       ) {
-        //console.log('App LOADING is gone to the background!');
+        console.log('App LOADING is gone to the background!');
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
+        console.log('&&&&& background yes in storage &&&&&');
       }
     });
 
