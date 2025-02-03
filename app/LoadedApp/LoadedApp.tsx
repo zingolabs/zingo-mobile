@@ -2114,7 +2114,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           (!!valueTransfersTotal && valueTransfersTotal > 0) ||
           (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
             <Tab.Navigator
-              initialRouteName={translate('loadedapp.history-menu') as string}
+              initialRouteName={translate('loadedapp.messages-menu') as string}
               screenOptions={({ route, navigation }) => ({
                 tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused, navigation),
                 tabBarLabelPosition: 'below-icon',
@@ -2130,6 +2130,22 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 },
                 headerShown: false,
               })}>
+              <Tab.Screen name={translate('loadedapp.messages-menu') as string}>
+                {() => (
+                  <Messages
+                    toggleMenuDrawer={this.toggleMenuDrawer /* header */}
+                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
+                    setPrivacyOption={this.setPrivacyOption /* header */}
+                    setScrollToTop={this.setScrollToTop /* chats */}
+                    scrollToTop={scrollToTop /* chats */}
+                    setScrollToBottom={this.setScrollToBottom /* messages */}
+                    scrollToBottom={scrollToBottom /* messages */}
+                    setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
+                    sendTransaction={this.sendTransaction /* messages */}
+                    setServerOption={this.setServerOption /* messages */}
+                  />
+                )}
+              </Tab.Screen>
               <Tab.Screen name={translate('loadedapp.history-menu') as string}>
                 {() => (
                   <History
@@ -2198,22 +2214,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   />
                 )}
               </Tab.Screen>
-              <Tab.Screen name={translate('loadedapp.messages-menu') as string}>
-                {() => (
-                  <Messages
-                    toggleMenuDrawer={this.toggleMenuDrawer /* header */}
-                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
-                    setPrivacyOption={this.setPrivacyOption /* header */}
-                    setScrollToTop={this.setScrollToTop /* chats */}
-                    scrollToTop={scrollToTop /* chats */}
-                    setScrollToBottom={this.setScrollToBottom /* messages */}
-                    scrollToBottom={scrollToBottom /* messages */}
-                    setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
-                    sendTransaction={this.sendTransaction /* messages */}
-                    setServerOption={this.setServerOption /* messages */}
-                  />
-                )}
-              </Tab.Screen>
             </Tab.Navigator>
           ) : (
             <>
@@ -2221,7 +2221,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 <Loading backgroundColor={colors.background} spinColor={colors.primary} />
               ) : (
                 <Tab.Navigator
-                  initialRouteName={translate('loadedapp.history-menu') as string}
+                  initialRouteName={translate('loadedapp.messages-menu') as string}
                   screenOptions={{
                     tabBarStyle: {
                       borderTopColor: colors.background,
@@ -2230,7 +2230,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     },
                     headerShown: false,
                   }}>
-                  <Tab.Screen name={translate('loadedapp.history-menu') as string}>
+                  <Tab.Screen name={translate('loadedapp.messages-menu') as string}>
                     {() => (
                       <Receive
                         toggleMenuDrawer={this.toggleMenuDrawer /* header */}
