@@ -301,56 +301,56 @@ export default class RPC {
   }
 
   runTaskPromises(): void {
-    console.log('++++++++++ interval update 5 secs ALL', this.timers);
+    //console.log('++++++++++ interval update 5 secs ALL', this.timers);
     this.sanitizeTimers();
 
     const taskPromises: Promise<void>[] = [];
 
     taskPromises.push(
       new Promise<void>(async resolve => {
-        const s = Date.now();
+        //const s = Date.now();
         await this.fetchWalletHeight();
-        console.log('wallet height - ', Date.now() - s);
+        //console.log('wallet height - ', Date.now() - s);
         resolve();
       }),
     );
     taskPromises.push(
       new Promise<void>(async resolve => {
-        const s = Date.now();
+        //const s = Date.now();
         await this.fetchWalletBirthdaySeedUfvk();
-        console.log('wallet birthday - ', Date.now() - s);
+        //console.log('wallet birthday - ', Date.now() - s);
         resolve();
       }),
     );
     taskPromises.push(
       new Promise<void>(async resolve => {
-        const s = Date.now();
+        //const s = Date.now();
         await this.fetchInfoAndServerHeight();
-        console.log('info & server height - ', Date.now() - s);
+        //console.log('info & server height - ', Date.now() - s);
         resolve();
       }),
     );
     taskPromises.push(
       new Promise<void>(async resolve => {
-        const s = Date.now();
+        //const s = Date.now();
         await this.fetchTandZandOValueTransfers();
-        console.log('value transfers - ', Date.now() - s);
+        //console.log('value transfers - ', Date.now() - s);
         resolve();
       }),
     );
     taskPromises.push(
       new Promise<void>(async resolve => {
-        const s = Date.now();
+        //const s = Date.now();
         await this.fetchTandZandOMessages();
-        console.log('messages - ', Date.now() - s);
+        //console.log('messages - ', Date.now() - s);
         resolve();
       }),
     );
     taskPromises.push(
       new Promise<void>(async resolve => {
-        const s = Date.now();
+        //const s = Date.now();
         await this.fetchTotalBalance();
-        console.log('balance - ', Date.now() - s);
+        //console.log('balance - ', Date.now() - s);
         resolve();
       }),
     );
@@ -358,9 +358,9 @@ export default class RPC {
       // try to sync.
       taskPromises.push(
         new Promise<void>(async resolve => {
-          const s = Date.now();
+          //const s = Date.now();
           this.refreshSync(false);
-          console.log('sync - ', Date.now() - s);
+          //console.log('sync - ', Date.now() - s);
           resolve();
         }),
       );
@@ -369,9 +369,9 @@ export default class RPC {
     if (this.inRefresh) {
       taskPromises.push(
         new Promise<void>(async resolve => {
-          const s = Date.now();
+          //const s = Date.now();
           await this.fetchSyncStatus();
-          console.log('sync status - ', Date.now() - s);
+          //console.log('sync status - ', Date.now() - s);
           resolve();
         }),
       );

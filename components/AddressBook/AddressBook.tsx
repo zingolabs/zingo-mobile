@@ -151,7 +151,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     setIsAtTop(isTop);
   };
 
-  console.log('render Address Book - 4', currentItem, action, addressBook);
+  //console.log('render Address Book - 4', currentItem, action, addressBook);
 
   return (
     <SafeAreaView

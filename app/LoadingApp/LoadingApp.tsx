@@ -744,7 +744,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       // the 30 seconds timout was fired.
       someServerIsWorking = false;
     }
-    console.log(server);
+    //console.log(server);
     console.log(fasterServer);
     this.setState({
       server: fasterServer,

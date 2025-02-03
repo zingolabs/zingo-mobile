@@ -45,7 +45,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
 
     if (address) {
       parseAddress(address).then(r => {
-        console.log(r);
+        //console.log(r);
         setValidAddress(r.isValid ? 1 : -1);
         setError(r.isValid ? '' : (translate('send.invalidaddress') as string));
         // calculate the orchard only UA if the addess is a full UA.
