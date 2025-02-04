@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext, useCallback, useRef } from 'react';
-import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Text, Alert, EmitterSubscription } from 'react-native';
+import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Text, Alert } from 'react-native';
 import {
   faQrcode,
   faCheck,
