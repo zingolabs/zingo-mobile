@@ -583,7 +583,8 @@
     "calculated": "Calculada",
     "transmitted": "Transmitida",
     "mempool": "Em Mempool",
-    "confirmed": "Confirmada"
+    "confirmed": "Confirmada",
+    "filter-withfunds": "Com fundos"
   },
   "report": {
     "title": "Relatório de Sincronização / Rescan",

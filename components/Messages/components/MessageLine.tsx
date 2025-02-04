@@ -56,9 +56,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   const { memo, memoUA } = Utils.splitMemo(vt.memos);
 
   const getAmountColor = (_vt: ValueTransferType) => {
-    return vt.confirmations === 0
-      ? colors.primaryDisabled
-      : _vt.kind === ValueTransferKindEnum.Received || _vt.kind === ValueTransferKindEnum.Shield
+    return _vt.kind === ValueTransferKindEnum.Received || _vt.kind === ValueTransferKindEnum.Shield
       ? colors.primary
       : colors.text;
   };

@@ -583,7 +583,8 @@
     "calculated": "Calculated",
     "transmitted": "Transmitted",
     "mempool": "In Mempool",
-    "confirmed": "Confirmed"
+    "confirmed": "Confirmed",
+    "filter-withfunds": "With funds"
   },
   "report": {
     "title": "Sync / Rescan Report",

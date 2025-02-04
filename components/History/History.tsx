@@ -21,6 +21,7 @@ import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 
 import {
   ButtonTypeEnum,
+  FilterEnum,
   RefreshScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
@@ -104,6 +105,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [valueTransfersSliced, setValueTransfersSliced] = useState<ValueTransferType[]>([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
+  const [filter, setFilter] = useState<FilterEnum>(FilterEnum.withFunds);
   const scrollViewRef = useRef<ScrollView>(null);
 
   useScrollToTop(scrollViewRef);
@@ -114,8 +116,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
     if (!valueTransfers) {
       return [] as ValueTransferType[];
     }
-    return valueTransfers.slice(0, numVt);
-  }, [valueTransfers, numVt]);
+    return valueTransfers
+      .filter((vt: ValueTransferType) =>
+        filter === FilterEnum.withFunds
+          ? vt.amount > Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
+          : true,
+      )
+      .slice(0, numVt);
+  }, [valueTransfers, numVt, filter]);
 
   useEffect(() => {
     if (valueTransfers !== null) {
@@ -222,6 +230,74 @@ const History: React.FunctionComponent<HistoryProps> = ({
         setBackgroundError={setBackgroundError /* context */}
         setUfvkViewModalVisible={setUfvkViewModalVisible}
       />
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+          marginHorizontal: 5,
+          marginBottom: 2,
+        }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            width: '100%',
+            marginTop: 10,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <TouchableOpacity
+            onPress={() => {
+              setFilter(FilterEnum.withFunds);
+              setLoading(true);
+            }}>
+            <View
+              style={{
+                backgroundColor: filter === FilterEnum.withFunds ? colors.primary : colors.sideMenuBackground,
+                borderRadius: 15,
+                borderColor: filter === FilterEnum.withFunds ? colors.primary : colors.zingo,
+                borderWidth: 1,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginHorizontal: 0,
+              }}>
+              <FadeText
+                style={{
+                  color: filter === FilterEnum.withFunds ? colors.sideMenuBackground : colors.zingo,
+                  fontWeight: 'bold',
+                }}>
+                {translate('history.filter-withfunds') as string}
+              </FadeText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setFilter(FilterEnum.all);
+              setLoading(true);
+            }}>
+            <View
+              style={{
+                backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
+                borderRadius: 15,
+                borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
+                borderWidth: 1,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginHorizontal: 10,
+              }}>
+              <FadeText
+                style={{
+                  color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
+                  fontWeight: 'bold',
+                }}>
+                {translate('messages.filter-all') as string}
+              </FadeText>
+            </View>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
       ) : (

@@ -583,7 +583,8 @@
     "calculated": "Рассчитано",
     "transmitted": "Передано",
     "mempool": "B Mempool",
-    "confirmed": "Подтвержденный"
+    "confirmed": "Подтвержденный",
+    "filter-withfunds": "С помощью средств"
   },
   "report": {
     "title": "Отчёт о синхронизации",
