@@ -1810,18 +1810,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
       return (
         <TouchableOpacity
+          style={{ width: 70, justifyContent: 'center', alignItems: 'center' }}
           onPress={() => {
             navigation.navigate(route.name);
           }}>
           {focused ? (
-            <FontAwesomeIcon
-              icon={iconName}
-              color={colors.background}
-              size={30}
-              style={{ transform: [{ translateY: 2 }] }}
-            />
+            <FontAwesomeIcon size={30} icon={iconName} color={colors.background} />
           ) : (
-            <FontAwesomeIcon icon={iconName} color={colors.money} />
+            <FontAwesomeIcon size={20} icon={iconName} color={colors.money} />
           )}
         </TouchableOpacity>
       );
@@ -2146,25 +2142,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   />
                 )}
               </Tab.Screen>
-              <Tab.Screen name={translate('loadedapp.history-menu') as string}>
-                {() => (
-                  <History
-                    toggleMenuDrawer={this.toggleMenuDrawer /* header */}
-                    poolsMoreInfoOnClick={this.poolsMoreInfoOnClick /* header */}
-                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
-                    setPrivacyOption={this.setPrivacyOption /* header */}
-                    setShieldingAmount={this.setShieldingAmount /* header */}
-                    setComputingModalVisible={this.setComputingModalVisible /* header */}
-                    setScrollToTop={this.setScrollToTop /* header & history */}
-                    scrollToTop={scrollToTop /* history */}
-                    setScrollToBottom={this.setScrollToBottom /* header & messages */}
-                    scrollToBottom={scrollToBottom /* messages */}
-                    setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
-                    sendTransaction={this.sendTransaction /* messages */}
-                    setServerOption={this.setServerOption /* messages */}
-                  />
-                )}
-              </Tab.Screen>
               {!readOnly &&
                 selectServer !== SelectServerEnum.offline &&
                 (mode === ModeEnum.advanced ||
@@ -2211,6 +2188,25 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
                     setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
                     alone={false /* receive */}
+                  />
+                )}
+              </Tab.Screen>
+              <Tab.Screen name={translate('loadedapp.history-menu') as string}>
+                {() => (
+                  <History
+                    toggleMenuDrawer={this.toggleMenuDrawer /* header */}
+                    poolsMoreInfoOnClick={this.poolsMoreInfoOnClick /* header */}
+                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
+                    setPrivacyOption={this.setPrivacyOption /* header */}
+                    setShieldingAmount={this.setShieldingAmount /* header */}
+                    setComputingModalVisible={this.setComputingModalVisible /* header */}
+                    setScrollToTop={this.setScrollToTop /* header & history */}
+                    scrollToTop={scrollToTop /* history */}
+                    setScrollToBottom={this.setScrollToBottom /* header & messages */}
+                    scrollToBottom={scrollToBottom /* messages */}
+                    setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
+                    sendTransaction={this.sendTransaction /* messages */}
+                    setServerOption={this.setServerOption /* messages */}
                   />
                 )}
               </Tab.Screen>

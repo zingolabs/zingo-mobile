@@ -323,6 +323,220 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         noPrivacy={true}
         noBalance={true}
       />
+      {searchMode && (
+        <View style={{ flexDirection: 'row', alignSelf: 'center', alignItems: 'center' }}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              marginHorizontal: 10,
+              marginTop: 10,
+            }}>
+            <View
+              accessible={true}
+              style={{
+                flexGrow: 1,
+                flexDirection: 'row',
+                width: '90%',
+                borderWidth: 2,
+                borderRadius: 15,
+                borderColor: colors.text,
+              }}>
+              <TextInput
+                placeholder={translate('messages.search-placeholder') as string}
+                placeholderTextColor={colors.placeholder}
+                style={{
+                  flex: 1,
+                  color: colors.text,
+                  fontWeight: '600',
+                  fontSize: 14,
+                  marginLeft: 5,
+                  backgroundColor: 'transparent',
+                  textAlignVertical: 'top',
+                }}
+                value={searchTextField}
+                onChangeText={(text: string) => setSearchTextField(text.trim())}
+                onEndEditing={(e: any) => {
+                  setSearchTextField(e.nativeEvent.text.trim());
+                }}
+                editable={true}
+                returnKeyLabel={translate('messages.search-placeholder') as string}
+                returnKeyType="done"
+                onSubmitEditing={() => {
+                  if (searchTextField) {
+                    setSearchText(searchTextField);
+                    setSearchMode(false);
+                    setLoading(true);
+                  }
+                }}
+              />
+              {loading && (
+                <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
+              )}
+              {!loading && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setSearchTextField('');
+                    setSearchMode(false);
+                  }}>
+                  <FontAwesomeIcon
+                    style={{ marginTop: 7, marginRight: 7 }}
+                    size={25}
+                    icon={faXmark}
+                    color={colors.primaryDisabled}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </View>
+      )}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 'auto',
+          marginHorizontal: 5,
+          marginBottom: 2,
+        }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            width: 'auto',
+            marginTop: 10,
+          }}>
+          <TouchableOpacity
+            onPress={() => {
+              // call the screen
+              setMessagesAllModalShowing(true);
+            }}>
+            <View
+              style={{
+                paddingHorizontal: 5,
+                marginHorizontal: 0,
+              }}>
+              <RegText
+                style={{
+                  color: colors.primary,
+                  textDecorationLine: 'underline',
+                  fontWeight: 'bold',
+                }}>
+                {translate('messages.link-all') as string}
+              </RegText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setFilter(FilterEnum.all);
+              setLoading(true);
+            }}>
+            <View
+              style={{
+                backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
+                borderRadius: 15,
+                borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
+                borderWidth: 1,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginHorizontal: 10,
+              }}>
+              <FadeText
+                style={{
+                  color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
+                  fontWeight: 'bold',
+                }}>
+                {translate('messages.filter-all') as string}
+              </FadeText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setFilter(FilterEnum.contacts);
+              setLoading(true);
+            }}>
+            <View
+              style={{
+                backgroundColor: filter === FilterEnum.contacts ? colors.primary : colors.sideMenuBackground,
+                borderRadius: 15,
+                borderColor: filter === FilterEnum.contacts ? colors.primary : colors.zingo,
+                borderWidth: 1,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginHorizontal: 0,
+              }}>
+              <FadeText
+                style={{
+                  color: filter === FilterEnum.contacts ? colors.sideMenuBackground : colors.zingo,
+                  fontWeight: 'bold',
+                }}>
+                {translate('messages.filter-contacts') as string}
+              </FadeText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setFilter(FilterEnum.noContacts);
+              setLoading(true);
+            }}>
+            <View
+              style={{
+                backgroundColor: filter === FilterEnum.noContacts ? colors.primary : colors.sideMenuBackground,
+                borderRadius: 15,
+                borderColor: filter === FilterEnum.noContacts ? colors.primary : colors.zingo,
+                borderWidth: 1,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginHorizontal: 10,
+              }}>
+              <FadeText
+                style={{
+                  color: filter === FilterEnum.noContacts ? colors.sideMenuBackground : colors.zingo,
+                  fontWeight: 'bold',
+                }}>
+                {translate('messages.filter-no-contacts') as string}
+              </FadeText>
+            </View>
+          </TouchableOpacity>
+          {!searchMode && !searchText && (
+            <TouchableOpacity
+              onPress={() => {
+                setSearchMode(true);
+              }}>
+              <FontAwesomeIcon style={{ margin: 0 }} size={30} icon={faMagnifyingGlass} color={colors.zingo} />
+            </TouchableOpacity>
+          )}
+          {!searchMode && searchText && (
+            <TouchableOpacity
+              onPress={() => {
+                setLoading(true);
+                setSearchText('');
+                setSearchTextField('');
+              }}>
+              <View
+                style={{
+                  backgroundColor: colors.zingo,
+                  borderRadius: 15,
+                  paddingHorizontal: 10,
+                  paddingVertical: 2,
+                  marginRight: 5,
+                }}>
+                <FadeText
+                  style={{
+                    color: colors.sideMenuBackground,
+                    fontWeight: 'bold',
+                  }}>
+                  {(translate('messages.clear-filter') as string) +
+                    ' ' +
+                    (searchText.length < 4 ? searchText : searchText.slice(0, 3) + '...')}
+                </FadeText>
+              </View>
+            </TouchableOpacity>
+          )}
+        </ScrollView>
+      </View>
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
       ) : (
@@ -347,223 +561,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               marginTop: 10,
               width: '100%',
             }}>
-            {searchMode && (
-              <View style={{ flexDirection: 'row', alignSelf: 'center', alignItems: 'center' }}>
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    marginHorizontal: 10,
-                    marginBottom: 10,
-                  }}>
-                  <View
-                    accessible={true}
-                    style={{
-                      flexGrow: 1,
-                      flexDirection: 'row',
-                      width: '90%',
-                      borderWidth: 2,
-                      borderRadius: 15,
-                      borderColor: colors.text,
-                    }}>
-                    <TextInput
-                      placeholder={translate('messages.search-placeholder') as string}
-                      placeholderTextColor={colors.placeholder}
-                      style={{
-                        flex: 1,
-                        color: colors.text,
-                        fontWeight: '600',
-                        fontSize: 14,
-                        marginLeft: 5,
-                        backgroundColor: 'transparent',
-                        textAlignVertical: 'top',
-                      }}
-                      value={searchTextField}
-                      onChangeText={(text: string) => setSearchTextField(text.trim())}
-                      onEndEditing={(e: any) => {
-                        setSearchTextField(e.nativeEvent.text.trim());
-                      }}
-                      editable={true}
-                      returnKeyLabel={translate('messages.search-placeholder') as string}
-                      returnKeyType="done"
-                      onSubmitEditing={() => {
-                        if (searchTextField) {
-                          setSearchText(searchTextField);
-                          setSearchMode(false);
-                          setLoading(true);
-                        }
-                      }}
-                    />
-                    {loading && (
-                      <ActivityIndicator
-                        style={{ marginTop: 7, marginRight: 7 }}
-                        size={25}
-                        color={colors.primaryDisabled}
-                      />
-                    )}
-                    {!loading && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          setSearchTextField('');
-                          setSearchMode(false);
-                        }}>
-                        <FontAwesomeIcon
-                          style={{ marginTop: 7, marginRight: 7 }}
-                          size={25}
-                          icon={faXmark}
-                          color={colors.primaryDisabled}
-                        />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                </View>
-              </View>
-            )}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{
-                width: 'auto',
-              }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 'auto',
-                  marginHorizontal: 5,
-                  marginBottom: 2,
-                }}>
-                <TouchableOpacity
-                  onPress={() => {
-                    // call the screen
-                    setMessagesAllModalShowing(true);
-                  }}>
-                  <View
-                    style={{
-                      paddingHorizontal: 5,
-                      marginHorizontal: 0,
-                    }}>
-                    <RegText
-                      style={{
-                        color: colors.primary,
-                        textDecorationLine: 'underline',
-                        fontWeight: 'bold',
-                      }}>
-                      {translate('messages.link-all') as string}
-                    </RegText>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    setFilter(FilterEnum.all);
-                    setLoading(true);
-                  }}>
-                  <View
-                    style={{
-                      backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
-                      borderRadius: 15,
-                      borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
-                      borderWidth: 1,
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
-                      marginHorizontal: 10,
-                    }}>
-                    <FadeText
-                      style={{
-                        color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
-                        fontWeight: 'bold',
-                      }}>
-                      {translate('messages.filter-all') as string}
-                    </FadeText>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    setFilter(FilterEnum.contacts);
-                    setLoading(true);
-                  }}>
-                  <View
-                    style={{
-                      backgroundColor: filter === FilterEnum.contacts ? colors.primary : colors.sideMenuBackground,
-                      borderRadius: 15,
-                      borderColor: filter === FilterEnum.contacts ? colors.primary : colors.zingo,
-                      borderWidth: 1,
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
-                      marginHorizontal: 0,
-                    }}>
-                    <FadeText
-                      style={{
-                        color: filter === FilterEnum.contacts ? colors.sideMenuBackground : colors.zingo,
-                        fontWeight: 'bold',
-                      }}>
-                      {translate('messages.filter-contacts') as string}
-                    </FadeText>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    setFilter(FilterEnum.noContacts);
-                    setLoading(true);
-                  }}>
-                  <View
-                    style={{
-                      backgroundColor: filter === FilterEnum.noContacts ? colors.primary : colors.sideMenuBackground,
-                      borderRadius: 15,
-                      borderColor: filter === FilterEnum.noContacts ? colors.primary : colors.zingo,
-                      borderWidth: 1,
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
-                      marginHorizontal: 10,
-                    }}>
-                    <FadeText
-                      style={{
-                        color: filter === FilterEnum.noContacts ? colors.sideMenuBackground : colors.zingo,
-                        fontWeight: 'bold',
-                      }}>
-                      {translate('messages.filter-no-contacts') as string}
-                    </FadeText>
-                  </View>
-                </TouchableOpacity>
-                {!searchMode && !searchText && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setSearchMode(true);
-                    }}>
-                    <FontAwesomeIcon style={{ margin: 0 }} size={30} icon={faMagnifyingGlass} color={colors.zingo} />
-                  </TouchableOpacity>
-                )}
-                {!searchMode && searchText && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setLoading(true);
-                      setSearchText('');
-                      setSearchTextField('');
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: colors.zingo,
-                        borderRadius: 15,
-                        paddingHorizontal: 10,
-                        paddingVertical: 2,
-                        marginRight: 5,
-                      }}>
-                      <FadeText
-                        style={{
-                          color: colors.sideMenuBackground,
-                          fontWeight: 'bold',
-                        }}>
-                        {(translate('messages.clear-filter') as string) +
-                          ' ' +
-                          (searchText.length < 4 ? searchText : searchText.slice(0, 3) + '...')}
-                      </FadeText>
-                    </View>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </ScrollView>
             {contacts &&
               contacts.length > 0 &&
               contacts.flatMap((c, index) => {
