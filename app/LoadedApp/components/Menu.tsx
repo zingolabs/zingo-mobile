@@ -16,10 +16,10 @@ import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../../AppState';
 
 type MenuProps = {
   onItemSelected: (item: MenuItemEnum) => Promise<void>;
-  updateMenuState: (isOpen: boolean) => void;
+  closeDrawer: () => void;
 };
 
-const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuState }) => {
+const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer }) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -63,7 +63,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
       //console.log('BIOMETRIC --------> ', resultBio);
       if (resultBio === false) {
         // snack with Error & closing the menu.
-        updateMenuState(false);
+        closeDrawer();
         addLastSnackbar({ message: translate('biometrics-error') as string });
       } else {
         onItemSelected(value);

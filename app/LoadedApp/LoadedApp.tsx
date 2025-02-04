@@ -13,12 +13,13 @@ import {
   Platform,
   ActivityIndicator,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog, faComments, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
-import SideMenu from 'react-native-side-menu-updated';
+import { DrawerLayout } from 'react-native-gesture-handler';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { cloneDeep, isEqual } from 'lodash';
@@ -438,6 +439,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
+  drawerRef: any;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -499,7 +501,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
       // state
       appStateStatus: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
-      isMenuDrawerOpen: false,
       selectedMenuDrawerItem: null,
       aboutModalVisible: false,
       computingModalVisible: false,
@@ -1131,16 +1132,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
   toggleMenuDrawer = () => {
     //const start = Date.now();
-    this.setState({
-      isMenuDrawerOpen: !this.state.isMenuDrawerOpen,
-    });
+    this.openDrawer();
     //console.log('=========================================== > TOGGLE MENU STORED SETSTATE - ', Date.now() - start);
-  };
-
-  updateMenuState = (isMenuDrawerOpen: boolean) => {
-    //const start = Date.now();
-    this.setState({ isMenuDrawerOpen });
-    //console.log('=========================================== > UPDATE MENU STORED SETSTATE - ', Date.now() - start);
   };
 
   setWallet = async (wallet: WalletType) => {
@@ -1266,8 +1259,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       await sendEmail(this.state.translate, this.state.info.zingolib);
       this.setShowSwipeableIcons(true);
     }
+    this.closeDrawer();
     this.setState({
-      isMenuDrawerOpen: false,
       selectedMenuDrawerItem: item,
     });
   };
@@ -1695,6 +1688,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
   };
 
+  closeDrawer = () => {
+    this.drawerRef.closeDrawer();
+  };
+
+  openDrawer = () => {
+    this.drawerRef.openDrawer();
+  };
+
   render() {
     const {
       aboutModalVisible,
@@ -1715,7 +1716,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       ufvkServerModalVisible,
       addressBookModalVisible,
       snackbars,
-      isMenuDrawerOpen,
       mode,
       valueTransfersTotal,
       readOnly,
@@ -1782,7 +1782,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
     };
 
-    const menu = <Menu onItemSelected={this.onMenuItemSelected} updateMenuState={this.updateMenuState} />;
+    const menu = <Menu onItemSelected={this.onMenuItemSelected} closeDrawer={this.closeDrawer} />;
 
     const fnTabBarIcon = (route: StackScreenProps<any>['route'], focused: boolean, navigation: any) => {
       var iconName;
@@ -1831,14 +1831,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       );
     };
 
-    //console.log('render LoadedAppClass - 3', this.state.selectServer, this.state.server);
+    //console.log('render LoadedAppClass - 3');
     //console.log('vt', valueTransfers);
     //console.log('ad', addresses);
     //console.log('ba', totalBalance);
 
     return (
       <ContextAppLoadedProvider value={context}>
-        <SideMenu menu={menu} isOpen={isMenuDrawerOpen} onChange={(isOpen: boolean) => this.updateMenuState(isOpen)}>
+        <DrawerLayout
+          ref={ref => (this.drawerRef = ref)}
+          renderNavigationView={() => menu}
+          drawerType="slide"
+          drawerWidth={Dimensions.get('window').width * 0.7}>
           <Modal
             animationType="slide"
             transparent={false}
@@ -2218,7 +2222,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               )}
             </>
           )}
-        </SideMenu>
+        </DrawerLayout>
       </ContextAppLoadedProvider>
     );
   }

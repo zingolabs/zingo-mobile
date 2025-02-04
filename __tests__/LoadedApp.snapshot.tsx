@@ -95,8 +95,12 @@ jest.mock('react-native-gesture-handler', () => {
     State: {},
     Directions: {},
   };
+
+  const DrawerLayout = jest.fn();
+
   return {
     RNGestureHandlerModule: RN,
+    DrawerLayout,
   };
 });
 jest.mock('react-native-keychain', () => ({
