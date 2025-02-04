@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext, useCallback, useRef } from 'react';
-import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Text, Alert } from 'react-native';
+import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Text, Alert, EmitterSubscription } from 'react-native';
 import {
   faQrcode,
   faCheck,
@@ -134,7 +134,6 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState<boolean>(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
-  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
   const [memoEnabled, setMemoEnabled] = useState<boolean>(false);
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
@@ -162,6 +161,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [amountText, setAmountText] = useState<string>(sendPageState.toaddr.amount);
   const [amountCurrencyText, setAmountCurrencyText] = useState<string>(sendPageState.toaddr.amountCurrency);
   const [includeUAMemoBoolean, setIncludeUAMemoBoolean] = useState<boolean>(sendPageState.toaddr.includeUAMemo);
+  const [keyboardListenersDone, setKeyboardListenersDone] = useState<boolean>(false);
 
   const slideAnim = useSharedValue(0);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -610,29 +610,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     );
   }, [memoEnabled, amountText, validAddress, validAmount, validMemo, fee]);
 
-  useEffect(
-    () => {
-      const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-        slideAnim.value = withTiming(0 - titleViewHeight + 30, { duration: 100, easing: Easing.linear });
-        setKeyboardVisible(true);
-        console.log('OPENNNNNNNNNN');
-      });
-      const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-        slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
-        setKeyboardVisible(false);
-        console.log('CLOSEEEEEEEEE');
-      });
-
-      return () => {
-        !!keyboardDidShowListener && keyboardDidShowListener.remove();
-        !!keyboardDidHideListener && keyboardDidHideListener.remove();
-        slideAnim.value = 0;
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    Platform.OS === GlobalConst.platformOSandroid ? [titleViewHeight] : [],
-  );
-
   useEffect(() => {
     (async () => {
       if (mode === ModeEnum.basic) {
@@ -690,6 +667,23 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendPageState.toaddr.memo,
     sendPageState.toaddr.to,
   ]);
+
+  const keyboardListeners = (titleViewHeightPar: number) => {
+    if (titleViewHeightPar > 0 && !keyboardListenersDone) {
+      //only the first time if the height is more than 0.
+      setKeyboardListenersDone(true);
+      Keyboard.addListener('keyboardDidShow', () => {
+        slideAnim.value = withTiming(0 - titleViewHeightPar + 30, { duration: 100, easing: Easing.linear });
+        setKeyboardVisible(true);
+        //console.log('OPENNNNNNNNNN', titleViewHeightPar, slideAnim.value);
+      });
+      Keyboard.addListener('keyboardDidHide', () => {
+        slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
+        setKeyboardVisible(false);
+        //console.log('CLOSEEEEEEEEE', titleViewHeightPar, slideAnim.value);
+      });
+    }
+  };
 
   const buildSendState = () => {
     return {
@@ -877,7 +871,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   //  contentHeight,
   //);
 
-  console.log(titleViewHeight, slideAnim.value);
+  //console.log(slideAnim.value);
 
   const returnPage = (
     <View
@@ -951,7 +945,8 @@ const Send: React.FunctionComponent<SendProps> = ({
         <View
           onLayout={e => {
             const { height } = e.nativeEvent.layout;
-            setTitleViewHeight(height);
+            keyboardListeners(height);
+            //console.log('LAYOUTTT', height);
           }}>
           <Header
             title={translate('send.title') as string}
