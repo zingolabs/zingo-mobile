@@ -2149,20 +2149,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   (!!totalBalance &&
                     totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
                     somePending)) && (
-                  <Tab.Screen
-                    name={translate('loadedapp.send-menu') as string}
-                    listeners={{
-                      tabPress: e => {
-                        if (
-                          mode === ModeEnum.basic &&
-                          !!totalBalance &&
-                          totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
-                          somePending
-                        ) {
-                          e.preventDefault();
-                        }
-                      },
-                    }}>
+                  <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                     {() => (
                       <Send
                         toggleMenuDrawer={this.toggleMenuDrawer /* header */}
