@@ -1793,6 +1793,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         if (
           mode === ModeEnum.basic &&
           !!totalBalance &&
+          totalBalance.orchardBal + totalBalance.privateBal > 0 &&
           totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
           somePending
         ) {
@@ -1809,33 +1810,23 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
 
       return (
-        <TouchableOpacity
-          style={{ width: 70, justifyContent: 'center', alignItems: 'center' }}
-          onPress={() => {
-            navigation.navigate(route.name);
-          }}>
-          {focused ? (
-            <FontAwesomeIcon size={30} icon={iconName} color={colors.background} />
-          ) : (
-            <FontAwesomeIcon size={20} icon={iconName} color={colors.money} />
-          )}
-        </TouchableOpacity>
-      );
-    };
-
-    const fnTabBarLabel = (route: StackScreenProps<any>['route'], focused: boolean, navigation: any) => {
-      return (
         <>
-          {!focused && (
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate(route.name);
-              }}>
-              <RegText style={{ fontSize: 14 }} color={colors.money}>
-                {route.name}
-              </RegText>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity
+            style={{ justifyContent: 'center', alignItems: 'center' }}
+            onPress={() => {
+              navigation.navigate(route.name);
+            }}>
+            {focused ? (
+              <FontAwesomeIcon size={30} icon={iconName} color={colors.background} />
+            ) : (
+              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <FontAwesomeIcon size={20} icon={iconName} color={colors.money} />
+                <RegText style={{ fontSize: 14 }} color={colors.money}>
+                  {route.name}
+                </RegText>
+              </View>
+            )}
+          </TouchableOpacity>
         </>
       );
     };
@@ -2117,8 +2108,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 tabBarActiveTintColor: 'transparent',
                 tabBarActiveBackgroundColor: colors.primaryDisabled,
                 tabBarInactiveTintColor: colors.money,
-                tabBarLabel: ({ focused }) => fnTabBarLabel(route, focused, navigation),
-                tabBarLabelStyle: { fontSize: 12 },
+                tabBarShowLabel: false,
                 tabBarStyle: {
                   borderRadius: 0,
                   borderTopColor: colors.primaryDisabled,
@@ -2147,6 +2137,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 (mode === ModeEnum.advanced ||
                   (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ||
                   (!!totalBalance &&
+                    totalBalance.orchardBal + totalBalance.privateBal > 0 &&
                     totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
                     somePending)) && (
                   <Tab.Screen name={translate('loadedapp.send-menu') as string}>

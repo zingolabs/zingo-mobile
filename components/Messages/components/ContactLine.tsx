@@ -33,6 +33,7 @@ import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
 import Utils from '../../../app/utils';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
+import RegText from '../../Components/RegText';
 
 type ContactLineProps = {
   index: number;
@@ -316,7 +317,11 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                     justifyContent: 'space-between',
                     alignItems: 'center',
                   }}>
-                  <AddressItem address={c.address} oneLine={true} closeModal={() => {}} openModal={() => {}} />
+                  {c.label ? (
+                    <RegText>{c.label}</RegText>
+                  ) : (
+                    <AddressItem address={c.address} oneLine={true} closeModal={() => {}} openModal={() => {}} />
+                  )}
                   <FadeText>{c.time ? moment((c.time || 0) * 1000).format('MMM D, h:mm a') : ''}</FadeText>
                 </View>
                 <View
