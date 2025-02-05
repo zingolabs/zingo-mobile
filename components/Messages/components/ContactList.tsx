@@ -338,6 +338,8 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               style={{
                 flexGrow: 1,
                 flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
                 width: '90%',
                 borderWidth: 2,
                 borderRadius: 15,
@@ -353,7 +355,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                   fontSize: 14,
                   marginLeft: 5,
                   backgroundColor: 'transparent',
-                  textAlignVertical: 'top',
                 }}
                 value={searchTextField}
                 onChangeText={(text: string) => setSearchTextField(text.trim())}
@@ -371,21 +372,14 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                   }
                 }}
               />
-              {loading && (
-                <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
-              )}
+              {loading && <ActivityIndicator style={{ marginRight: 7 }} size={25} color={colors.primaryDisabled} />}
               {!loading && (
                 <TouchableOpacity
                   onPress={() => {
                     setSearchTextField('');
                     setSearchMode(false);
                   }}>
-                  <FontAwesomeIcon
-                    style={{ marginTop: 7, marginRight: 7 }}
-                    size={25}
-                    icon={faXmark}
-                    color={colors.primaryDisabled}
-                  />
+                  <FontAwesomeIcon style={{ marginRight: 7 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
                 </TouchableOpacity>
               )}
             </View>
