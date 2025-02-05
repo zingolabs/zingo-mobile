@@ -520,7 +520,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                   backgroundColor: colors.zingo,
                   borderRadius: 15,
                   paddingHorizontal: 10,
-                  paddingVertical: 2,
+                  paddingVertical: 5,
                   marginRight: 5,
                 }}>
                 <FadeText
