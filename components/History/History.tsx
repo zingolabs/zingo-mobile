@@ -127,8 +127,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   useEffect(() => {
     if (valueTransfers !== null) {
-      setLoadMoreButton(numVt < (valueTransfers ? valueTransfers.length : 0));
       const vts = fetchValueTransfersSliced;
+      setLoadMoreButton(numVt < (vts ? vts.length : 0));
       setValueTransfersSliced(vts);
       setTimeout(() => {
         setLoading(false);
