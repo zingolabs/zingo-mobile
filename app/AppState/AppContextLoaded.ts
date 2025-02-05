@@ -38,12 +38,10 @@ export default interface AppContextLoaded {
 
   // List of all T and Z and O value transfers
   valueTransfers: ValueTransferType[] | null;
-  valueTransfersFetchItems: number;
   valueTransfersTotal: number | null;
 
   // List of messages
   messages: ValueTransferType[] | null;
-  messagesFetchItems: number;
   messagesTotal: number | null;
 
   // The state of the send page

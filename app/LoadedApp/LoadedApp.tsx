@@ -451,10 +451,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       totalBalance: null,
       addresses: null,
       valueTransfers: null,
-      valueTransfersFetchItems: 50,
       valueTransfersTotal: null,
       messages: null,
-      messagesFetchItems: 50,
       messagesTotal: null,
       sendPageState: new SendPageStateClass(new ToAddrClass(0)),
       setSendPageState: this.setSendPageState,
@@ -875,7 +873,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         valueTransfersTotal > 0 ? valueTransfers.filter((vt: ValueTransferType) => vt.confirmations === 0).length : 0;
       // if a ValueTransfer go from 0 confirmations to > 0 -> Show a message about a ValueTransfer is confirmed
       this.state.valueTransfers &&
-        this.state.valueTransfersTotal &&
+        this.state.valueTransfersTotal !== null &&
         this.state.valueTransfersTotal > 0 &&
         this.state.valueTransfers
           .filter((vtOld: ValueTransferType) => !vtOld.confirmations || vtOld.confirmations === 0)
@@ -1738,10 +1736,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       addresses: this.state.addresses,
       valueTransfers: this.state.valueTransfers,
       valueTransfersTotal: this.state.valueTransfersTotal,
-      valueTransfersFetchItems: this.state.valueTransfersFetchItems,
       messages: this.state.messages,
       messagesTotal: this.state.messagesTotal,
-      messagesFetchItems: this.state.messagesFetchItems,
       walletSettings: this.state.walletSettings,
       syncingStatus: this.state.syncingStatus,
       info: this.state.info,
@@ -2102,7 +2098,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
           {mode === ModeEnum.advanced ||
-          (!!valueTransfersTotal && valueTransfersTotal > 0) ||
+          (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
           (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
             <Tab.Navigator
               initialRouteName={translate('loadedapp.messages-menu') as string}

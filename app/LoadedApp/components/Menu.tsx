@@ -114,7 +114,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer 
             {translate('loadedapp.addressbook') as string}
           </RegText>
 
-          {!(mode === ModeEnum.basic && !!valueTransfersTotal && valueTransfersTotal <= 0) && (
+          {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal === 0) && (
             <RegText
               testID="menu.walletseedufvk"
               onPress={() => onItemSelectedWrapper(MenuItemEnum.WalletSeedUfvk)}
@@ -150,7 +150,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer 
             </RegText>
           )}
 
-          {!(mode === ModeEnum.basic && !!valueTransfersTotal && valueTransfersTotal <= 0) && (
+          {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal === 0) && (
             <RegText testID="menu.insight" onPress={() => onItemSelectedWrapper(MenuItemEnum.Insight)} style={item}>
               {translate('loadedapp.insight') as string}
             </RegText>
@@ -174,7 +174,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer 
             </RegText>
           )}
           {mode === ModeEnum.basic &&
-            !!valueTransfersTotal &&
+            valueTransfersTotal !== null &&
             valueTransfersTotal === 0 &&
             netInfo.isConnected &&
             selectServer !== SelectServerEnum.offline && (
