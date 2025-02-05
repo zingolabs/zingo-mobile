@@ -15,9 +15,14 @@ exports[`Component Messages Address - test Messages Address - snapshot 1`] = `
   <View
     onLayout={[Function]}
     style={
-      {
-        "paddingBottom": 0,
-      }
+      [
+        {
+          "backgroundColor": "#011401",
+        },
+        {
+          "paddingBottom": 0,
+        },
+      ]
     }
   >
     <View

@@ -499,7 +499,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   //}
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
+      style={{ backgroundColor: colors.background }}>
       <View
         accessible={true}
         accessibilityLabel={translate('history.title-acc') as string}
