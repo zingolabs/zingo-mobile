@@ -20,7 +20,6 @@ import {
   RouteEnums,
   SelectServerEnum,
   ContactType,
-  AddressBookFileClass,
   GlobalConst,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
@@ -52,8 +51,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, navigation, showSwipeableIcons, readOnly, selectServer, addressBook, setSendPageState } =
-    context;
+  const { translate, language, navigation, showSwipeableIcons, readOnly, selectServer, setSendPageState } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -79,10 +77,12 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   };
 
   const getLabel = (_c: ContactType) => {
-    const label = addressBook.filter((ab: AddressBookFileClass) => ab.address === _c.address);
     let initials = null;
-    if (label.length === 1) {
-      const words = label[0].label.split(' ');
+    if (_c.label) {
+      const words = _c.label
+        .trim()
+        .split(' ')
+        .filter((w: string) => !!w);
       if (words[0]) {
         initials = words[0].charAt(0).toUpperCase();
       }

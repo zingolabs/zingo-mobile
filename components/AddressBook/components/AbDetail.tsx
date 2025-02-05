@@ -222,10 +222,14 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           type={ButtonTypeEnum.Primary}
           title={translate(`addressbook.${action.toLowerCase()}`) as string}
           onPress={() => {
-            doAction(action, label, address, uOrchardAddress, item.color ? item.color : '');
+            doAction(action, label.trim(), address, uOrchardAddress, item.color ? item.color : '');
           }}
           disabled={
-            action === AddressBookActionEnum.Delete ? false : error || errorAddress || !label || !address ? true : false
+            action === AddressBookActionEnum.Delete
+              ? false
+              : error || errorAddress || !label || (label && !label.trim()) || !address
+              ? true
+              : false
           }
           twoButtons={true}
         />

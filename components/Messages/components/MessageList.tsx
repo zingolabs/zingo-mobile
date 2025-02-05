@@ -144,18 +144,22 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   };
 
   const getLabelAndColor = (addr: string) => {
-    const label = addressBook.filter((ab: AddressBookFileClass) => ab.address === addr);
+    const contacto = addressBook.filter((ab: AddressBookFileClass) => ab.address === addr);
     let initials = null;
     let color = '';
-    if (label.length === 1) {
-      const words = label[0].label.split(' ');
+    if (contacto.length === 1) {
+      const words = contacto[0].label
+        .trim()
+        .split(' ')
+        .filter((w: string) => !!w);
+      console.log(words);
       if (words[0]) {
         initials = words[0].charAt(0).toUpperCase();
       }
       if (words[1]) {
         initials = initials + words[1].charAt(0).toUpperCase();
       }
-      color = label[0].color ? label[0].color : Utils.generateColorList(1)[0];
+      color = contacto[0].color ? contacto[0].color : Utils.generateColorList(1)[0];
     }
     return { initials, color };
   };
