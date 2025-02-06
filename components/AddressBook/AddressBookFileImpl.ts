@@ -14,7 +14,7 @@ export default class AddressBookFileImpl {
     color: string,
   ): Promise<AddressBookFileClass[]> {
     const fileName = await this.getFileName();
-    const addressBook = await this.readAddressBook();
+    const addressBook = await this.readAddressBook(fileName);
 
     if (
       addressBook.filter(
@@ -52,7 +52,7 @@ export default class AddressBookFileImpl {
     color: string,
   ): Promise<AddressBookFileClass[]> {
     const fileName = await this.getFileName();
-    const addressBook = await this.readAddressBook();
+    const addressBook = await this.readAddressBook(fileName);
 
     if (
       addressBook.filter(
@@ -95,7 +95,7 @@ export default class AddressBookFileImpl {
   // remove one item
   static async removeAddressBookItem(label: string, address: string): Promise<AddressBookFileClass[]> {
     const fileName = await this.getFileName();
-    const addressBook = await this.readAddressBook();
+    const addressBook = await this.readAddressBook(fileName);
 
     // the rest of the items
     let newAddressBook: AddressBookFileClass[] = addressBook.filter(
@@ -115,9 +115,7 @@ export default class AddressBookFileImpl {
   }
 
   // Read the entire address book
-  static async readAddressBook(): Promise<AddressBookFileClass[]> {
-    const fileName = await this.getFileName();
-
+  static async readAddressBook(fileName: string): Promise<AddressBookFileClass[]> {
     try {
       const addressBook: AddressBookFileClass[] = await JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
       return addressBook;
