@@ -584,7 +584,8 @@
     "transmitted": "Передано",
     "mempool": "B Mempool",
     "confirmed": "Подтвержденный",
-    "filter-withfunds": "С помощью средств"
+    "filter-withfunds": "С помощью средств",
+    "empty": "Транзакций пока нет."
   },
   "report": {
     "title": "Отчёт о синхронизации",

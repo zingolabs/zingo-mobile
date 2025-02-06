@@ -368,7 +368,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
               </View>
             ) : (
               <>
-                {!!valueTransfersSliced && !!valueTransfersSliced.length && (
+                {!!valueTransfersSliced && !!valueTransfersSliced.length ? (
                   <View
                     style={{
                       display: 'flex',
@@ -378,6 +378,17 @@ const History: React.FunctionComponent<HistoryProps> = ({
                       marginBottom: 30,
                     }}>
                     <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                      marginTop: 10,
+                      marginBottom: 10,
+                    }}>
+                    <FadeText style={{ color: colors.primary }}>{translate('history.empty') as string}</FadeText>
                   </View>
                 )}
               </>

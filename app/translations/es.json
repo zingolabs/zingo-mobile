@@ -584,7 +584,8 @@
     "transmitted": "Transmitida",
     "mempool": "En Mempool",
     "confirmed": "Confirmada",
-    "filter-withfunds": "Con fondos"
+    "filter-withfunds": "Con fondos",
+    "empty": "Todavía no hay transacciones."
   },
   "report": {
     "title": "Informe de Sincronización",

@@ -584,7 +584,8 @@
     "transmitted": "Transmitted",
     "mempool": "In Mempool",
     "confirmed": "Confirmed",
-    "filter-withfunds": "With funds"
+    "filter-withfunds": "With funds",
+    "empty": "No Transactions yet."
   },
   "report": {
     "title": "Sync / Rescan Report",
