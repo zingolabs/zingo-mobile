@@ -89,13 +89,17 @@ jest.mock('@react-navigation/native', () => ({
   useScrollToTop: jest.fn(),
   useTheme: () => mockTheme,
 }));
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
+}));
 
 // test suite
 describe('Component Messages Address - test', () => {
   //snapshot test
   const state = defaultAppContextLoaded;
   state.valueTransfers = mockValueTransfers;
-  state.uaAddress = mockAddresses[0].uaAddress;
+  state.uOrchardAddress = mockAddresses[0].uOrchardAddress;
   state.addresses = mockAddresses;
   state.translate = mockTranslate;
   state.info = mockInfo;
@@ -112,16 +116,14 @@ describe('Component Messages Address - test', () => {
     const messages = render(
       <ContextAppLoadedProvider value={state}>
         <MessagesAddress
-          doRefresh={onFunction}
-          toggleMenuDrawer={onFunction}
-          syncingStatusMoreInfoOnClick={onFunction}
           setPrivacyOption={onFunction}
-          setSendPageState={onFunction}
           setScrollToBottom={onFunction}
           scrollToBottom={false}
-          address={mockAddresses[0].uaAddress}
+          address={mockAddresses[0].uOrchardAddress}
           closeModal={onFunction}
           openModal={onFunction}
+          sendTransaction={onFunction}
+          setServerOption={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

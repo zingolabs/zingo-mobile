@@ -3,8 +3,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import AddressClass from './classes/AddressClass';
 import SendPageStateClass from './classes/SendPageStateClass';
-import SendProgressClass from './classes/SendProgressClass';
-import ReceivePageStateClass from './classes/ReceivePageStateClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
 import SyncingStatusClass from './classes/SyncingStatusClass';
@@ -25,6 +23,7 @@ import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import ValueTransferType from './types/ValueTransferType';
+import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
 
 export default interface AppContextLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -39,15 +38,15 @@ export default interface AppContextLoaded {
 
   // List of all T and Z and O value transfers
   valueTransfers: ValueTransferType[] | null;
+  valueTransfersTotal: number | null;
 
   // List of messages
   messages: ValueTransferType[] | null;
+  messagesTotal: number | null;
 
   // The state of the send page
   sendPageState: SendPageStateClass;
-
-  // Any state for the receive page
-  receivePageState: ReceivePageStateClass;
+  setSendPageState: (s: SendPageStateClass) => void;
 
   // getinfo and getblockchaininfo result
   info: InfoType;
@@ -58,14 +57,11 @@ export default interface AppContextLoaded {
   // syncing Info about the status of the process
   syncingStatus: SyncingStatusClass;
 
-  // Build progress from Tx
-  sendProgress: SendProgressClass;
-
   // wallet recovery info
   wallet: WalletType;
 
   // active UA in the wallet
-  uaAddress: string;
+  uOrchardAddress: string;
 
   // zec price in USD from internet
   zecPrice: ZecPriceType;
@@ -82,19 +78,6 @@ export default interface AppContextLoaded {
 
   // this wallet is watch-only (Readonly)
   readOnly: boolean;
-
-  // settings
-  server: ServerType;
-  currency: CurrencyEnum;
-  language: LanguageEnum;
-  sendAll: boolean;
-  donation: boolean;
-  privacy: boolean;
-  mode: ModeEnum;
-  security: SecurityType;
-  selectServer: SelectServerEnum;
-  rescanMenu: boolean;
-  recoveryWalletInfoOnDevice: boolean;
 
   // snackbar queue
   snackbars: SnackbarType[];
@@ -119,6 +102,28 @@ export default interface AppContextLoaded {
 
   // indicate if the swipeable icons are visible or not.
   showSwipeableIcons: boolean;
+
+  // refresh the different list in the App: history & messages
+  doRefresh: (s: RefreshScreenEnum) => void;
+
+  // fetch the ZEC price in USD
+  setZecPrice: (p: number, d: number) => void;
+
+  // donation address
+  zenniesDonationAddress: string;
+
+  // settings
+  server: ServerType;
+  currency: CurrencyEnum;
+  language: LanguageEnum;
+  sendAll: boolean;
+  donation: boolean;
+  privacy: boolean;
+  mode: ModeEnum;
+  security: SecurityType;
+  selectServer: SelectServerEnum;
+  rescanMenu: boolean;
+  recoveryWalletInfoOnDevice: boolean;
 
   // eslint-disable-next-line semi
 }

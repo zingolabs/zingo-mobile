@@ -4,7 +4,6 @@ import { View, ScrollView, SafeAreaView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import FadeText from '../Components/FadeText';
-import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
@@ -13,7 +12,6 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { ButtonTypeEnum } from '../../app/AppState';
 
 type AboutProps = {
   closeModal: () => void;
@@ -45,10 +43,10 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
+        closeScreen={closeModal}
       />
-
       <ScrollView
-        style={{ maxHeight: '85%' }}
+        style={{ maxHeight: '90%' }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
@@ -65,16 +63,6 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
           ))}
         </View>
       </ScrollView>
-      <View
-        style={{
-          flexGrow: 1,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
-        }}>
-        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
-      </View>
     </SafeAreaView>
   );
 };

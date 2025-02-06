@@ -3,7 +3,6 @@ import React, { useContext } from 'react';
 import { View, ScrollView, SafeAreaView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import Button from '../Components/Button';
 import DetailLine from '../Components/DetailLine';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -15,16 +14,15 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { ButtonTypeEnum, ChainNameEnum, CurrencyEnum } from '../../app/AppState';
+import { ChainNameEnum, CurrencyEnum } from '../../app/AppState';
 
 type InfoProps = {
   closeModal: () => void;
-  setZecPrice: (p: number, d: number) => void;
 };
 
-const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) => {
+const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, currency, zecPrice, privacy, language } = context;
+  const { info, translate, currency, zecPrice, privacy, language, setZecPrice } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -43,10 +41,10 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
+        closeScreen={closeModal}
       />
-
       <ScrollView
-        style={{ maxHeight: '85%' }}
+        style={{ maxHeight: '90%' }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
@@ -95,17 +93,6 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal, setZecPrice }) =
           )}
         </View>
       </ScrollView>
-
-      <View
-        style={{
-          flexGrow: 1,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
-        }}>
-        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
-      </View>
     </SafeAreaView>
   );
 };

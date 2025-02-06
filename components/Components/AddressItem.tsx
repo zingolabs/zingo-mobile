@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from './RegText';
 import Utils from '../../app/utils';
@@ -31,7 +31,6 @@ type AddressItemProps = {
   onlyContact?: boolean;
   withIcon?: boolean;
   withSendIcon?: boolean;
-  setSendPageState?: (s: SendPageStateClass) => void;
   addressProtected?: boolean;
 };
 
@@ -43,7 +42,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   withSendIcon,
   closeModal,
   openModal,
-  setSendPageState,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -59,6 +57,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     totalBalance,
     language,
     selectServer,
+    setSendPageState,
   } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
@@ -71,10 +70,16 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
 
   useEffect(() => {
     const numLinesAdd = address ? (address.length < 50 ? 2 : address.length / 30) : 0;
-    const cont: string = addressBook
+    let cont: string = addressBook
       .filter((ab: AddressBookFileClass) => ab.address === address)
       .map((ab: AddressBookFileClass) => ab.label)
       .join(' ');
+    if (!cont) {
+      cont = addressBook
+        .filter((ab: AddressBookFileClass) => ab.uOrchardAddress === address)
+        .map((ab: AddressBookFileClass) => ab.label)
+        .join(' ');
+    }
     const numLinesCon = cont ? (cont.length < 20 ? 1 : cont.length / 20) : 0;
     setNumLinesAddress(numLinesAdd);
     setNumLinesContact(numLinesCon);
@@ -171,7 +176,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         </TouchableOpacity>
       )}
       {withSendIcon &&
-        setSendPageState &&
         !addressProtected &&
         contact &&
         !readOnly &&

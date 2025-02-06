@@ -10,11 +10,9 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
 >
   <RCTScrollView
     contentContainerStyle={
-      [
-        {
-          "alignItems": "center",
-        },
-      ]
+      {
+        "alignItems": "center",
+      }
     }
   >
     <View>

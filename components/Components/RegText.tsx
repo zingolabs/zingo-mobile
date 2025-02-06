@@ -9,15 +9,16 @@ type RegTextProps = {
   onPress?: () => void;
   testID?: string;
   children: string | string[];
+  selectable?: boolean;
 };
 
-const RegText: React.FunctionComponent<RegTextProps> = ({ style, color, onPress, testID, children }) => {
+const RegText: React.FunctionComponent<RegTextProps> = ({ style, color, onPress, testID, children, selectable }) => {
   const { colors } = useTheme() as unknown as ThemeType;
 
   const styleSum: TextStyle = { color: color || colors.text, fontSize: 18, fontWeight: '600', opacity: 1, ...style };
 
   return (
-    <Text testID={testID} style={styleSum} onPress={onPress}>
+    <Text testID={testID} style={styleSum} onPress={onPress} selectable={selectable}>
       {children}
     </Text>
   );

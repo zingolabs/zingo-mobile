@@ -32,14 +32,12 @@ describe('Component Components - test', () => {
       <CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} currency={CurrencyEnum.USDCurrency} privacy={true} />,
     ).toJSON();
     expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[0].children[0]).toBe('$');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' -.--');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('$ -.--');
   });
   test('CurrencyAmount - price undefined result $ -- USD', () => {
     const text: any = render(<CurrencyAmount amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />).toJSON();
     expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[0].children[0]).toBe('$');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' -.--');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('$ -.--');
   });
 
   test('CurrencyAmount - price 0 result $ -- USD', () => {
@@ -47,15 +45,13 @@ describe('Component Components - test', () => {
       <CurrencyAmount price={0} amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />,
     ).toJSON();
     expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[0].children[0]).toBe('$');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' -.--');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('$ -.--');
   });
 
   test('CurrencyAmount - amtZec undefined result $ -- USD', () => {
     const text: any = render(<CurrencyAmount price={1} style={{}} currency={CurrencyEnum.USDCurrency} />).toJSON();
     expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[0].children[0]).toBe('$');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' -.--');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('$ -.--');
   });
 
   test('CurrencyAmount - price * amtZec really tiny result $ < 0.01 USD', () => {
@@ -63,8 +59,7 @@ describe('Component Components - test', () => {
       <CurrencyAmount price={0.001} amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />,
     ).toJSON();
     expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[0].children[0]).toBe('$');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' < 0.01');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('$ < 0.01');
   });
 
   test('CurrencyAmount - price=2.9826 and amtZec=1.00098 result $ 2.99 USD', () => {
@@ -72,8 +67,7 @@ describe('Component Components - test', () => {
       <CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} currency={CurrencyEnum.USDCurrency} />,
     ).toJSON();
     expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[0].children[0]).toBe('$');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' 2.99');
+    expect(text.children[0].children[0].children[0].children[0]).toBe('$ 2.99');
   });
 
   test("CurrencyAmount - style={backgroundColor: 'red'} result same", () => {
@@ -87,7 +81,6 @@ describe('Component Components - test', () => {
     ).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].props.style.backgroundColor).toBe('red');
-    expect(text.children[0].children[0].children[1].props.style.backgroundColor).toBe('red');
   });
 
   test('ZecAmount - High Privacy - amtZec -1.123456789 rounded up result -.---- ZEC', () => {

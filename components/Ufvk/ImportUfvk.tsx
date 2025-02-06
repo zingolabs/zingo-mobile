@@ -1,11 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, TouchableOpacity, Modal, TextInput, Keyboard } from 'react-native';
+import {
+  View,
+  ScrollView,
+  SafeAreaView,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
-
 import FadeText from '../Components/FadeText';
 import RegText from '../Components/RegText';
 import Button from '../Components/Button';
@@ -33,25 +40,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   const [seedufvkText, setSeedufvkText] = useState<string>('');
   const [birthday, setBirthday] = useState<string>('');
   const [qrcodeModalVisible, setQrcodeModalVisible] = useState<boolean>(false);
-  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
   const [latestBlock, setLatestBlock] = useState<number>(0);
-
-  const slideAnim = useSharedValue(0);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      slideAnim.value = withTiming(0 - titleViewHeight + 25, { duration: 100, easing: Easing.linear });
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
-    });
-
-    return () => {
-      !!keyboardDidShowListener && keyboardDidShowListener.remove();
-      !!keyboardDidHideListener && keyboardDidHideListener.remove();
-      slideAnim.value = 0;
-    };
-  }, [slideAnim, titleViewHeight]);
 
   useEffect(() => {
     if (info.latestBlock) {
@@ -118,227 +107,177 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
   };
 
-  // zingolib interfase have no way to initialize a `lightclient` with no action associated...
-  // the validation of the ufvk will be when we try to `restore from ufvk'...
-  /*
-  const validateKey = async (scannedKey: string): Promise<boolean> => {
-    const result: string = await RPCModule.execute(CommandEnum.parseViewkey, scannedKey);
-    //console.log(result);
-    if (result) {
-      if (result.toLowerCase().startsWith(GlobalConst.error)) {
-        addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
-        return false;
-      }
-    } else {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
-      return false;
-    }
-    let resultJSON = {} as RPCParseViewKeyType;
-    try {
-      resultJSON = await JSON.parse(result);
-    } catch (e) {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
-      return false;
-    }
-
-    //console.log('parse ufvk', scannedKey, resultJSON);
-
-    const valid =
-      resultJSON.status === RPCParseViewKeyStatusEnum.successViewKeyParse && resultJSON.chain_name === server.chainName;
-
-    if (valid) {
-      return true;
-    } else {
-      addLastSnackbar({ message: `${translate('scanner.noviewkey-error')}` });
-      return false;
-    }
-  };
-  */
-
   return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={qrcodeModalVisible}
-        onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScannerUfvk setUfvkText={setSeedufvkText} closeModal={() => setQrcodeModalVisible(false)} />
-      </Modal>
-
-      <Animated.View style={{ marginTop: slideAnim }}>
-        <View
-          onLayout={e => {
-            const { height } = e.nativeEvent.layout;
-            setTitleViewHeight(height);
-          }}>
-          <Header
-            title={translate('import.title') as string}
-            noBalance={true}
-            noSyncingStatus={true}
-            noDrawMenu={true}
-            noPrivacy={true}
-            translate={translate}
-            netInfo={netInfo}
-            mode={mode}
-          />
-        </View>
-      </Animated.View>
-
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        style={{ maxHeight: '85%' }}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
+    <KeyboardAvoidingView
+      behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
+      style={{ backgroundColor: colors.background }}>
+      <SafeAreaView
+        style={{
+          display: 'flex',
           justifyContent: 'flex-start',
+          alignItems: 'stretch',
+          height: '100%',
+          backgroundColor: colors.background,
         }}>
-        <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
-          {translate('import.key-label') as string}
-        </FadeText>
-        <View
-          style={{
-            margin: 10,
-            padding: 10,
-            borderWidth: 1,
-            borderRadius: 10,
-            borderColor: colors.text,
-            maxHeight: '40%',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={qrcodeModalVisible}
+          onRequestClose={() => setQrcodeModalVisible(false)}>
+          <ScannerUfvk setUfvkText={setSeedufvkText} closeModal={() => setQrcodeModalVisible(false)} />
+        </Modal>
+        <Header
+          title={translate('import.title') as string}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          translate={translate}
+          netInfo={netInfo}
+          mode={mode}
+          closeScreen={onClickCancel}
+        />
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          style={{ height: '80%', maxHeight: '80%' }}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
           }}>
+          <FadeText style={{ marginTop: 0, padding: 20, textAlign: 'center' }}>
+            {translate('import.key-label') as string}
+          </FadeText>
           <View
-            accessible={true}
-            accessibilityLabel={translate('seed.seed-acc') as string}
-            style={{
-              marginRight: 5,
-              borderWidth: 1,
-              borderRadius: 10,
-              borderColor: colors.text,
-              width: 'auto',
-              flex: 1,
-              justifyContent: 'center',
-            }}>
-            <TextInput
-              testID="import.seedufvkinput"
-              multiline
-              style={{
-                color: colors.text,
-                fontWeight: '600',
-                fontSize: 16,
-                minHeight: 100,
-                marginHorizontal: 5,
-                backgroundColor: 'transparent',
-                textAlignVertical: 'top',
-              }}
-              value={seedufvkText}
-              onChangeText={setSeedufvkText}
-              editable={true}
-            />
-          </View>
-          {seedufvkText && (
-            <TouchableOpacity
-              onPress={() => {
-                setSeedufvkText('');
-              }}>
-              <FontAwesomeIcon style={{ margin: 0 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity
-            onPress={() => {
-              setQrcodeModalVisible(true);
-            }}>
-            <FontAwesomeIcon size={35} icon={faQrcode} color={colors.border} />
-          </TouchableOpacity>
-        </View>
-
-        <View style={{ marginTop: 10, alignItems: 'center' }}>
-          <FadeText>{translate('import.birthday') as string}</FadeText>
-          {selectServer !== SelectServerEnum.offline && (
-            <FadeText style={{ textAlign: 'center' }}>
-              {translate('seed.birthday-no-readonly') + ' (1, ' + (latestBlock ? latestBlock.toString() : '--') + ')'}
-            </FadeText>
-          )}
-          <View
-            accessible={true}
-            accessibilityLabel={translate('import.birthday-acc') as string}
             style={{
               margin: 10,
+              padding: 10,
               borderWidth: 1,
               borderRadius: 10,
               borderColor: colors.text,
-              width: '30%',
-              maxWidth: '40%',
-              maxHeight: 48,
-              minWidth: '20%',
-              minHeight: 48,
+              maxHeight: '40%',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
             }}>
-            <TextInput
-              testID="import.birthdayinput"
-              placeholder={'#'}
-              placeholderTextColor={colors.placeholder}
+            <View
+              accessible={true}
+              accessibilityLabel={translate('seed.seed-acc') as string}
               style={{
-                color: colors.text,
-                fontWeight: '600',
-                fontSize: 18,
-                minWidth: '20%',
-                minHeight: 48,
-                marginLeft: 5,
-                backgroundColor: 'transparent',
-              }}
-              value={birthday}
-              onChangeText={(text: string) => {
-                if (isNaN(Number(text))) {
-                  setBirthday('');
-                } else if (
-                  Number(text) <= 0 ||
-                  (Number(text) > latestBlock && selectServer !== SelectServerEnum.offline)
-                ) {
-                  setBirthday('');
-                } else {
-                  setBirthday(Number(text.replace('.', '').replace(',', '')).toFixed(0));
-                }
-              }}
-              editable={latestBlock ? true : selectServer !== SelectServerEnum.offline ? false : true}
-              keyboardType="numeric"
-            />
+                marginRight: 5,
+                borderWidth: 1,
+                borderRadius: 10,
+                borderColor: colors.text,
+                width: 'auto',
+                flex: 1,
+                justifyContent: 'center',
+              }}>
+              <TextInput
+                testID="import.seedufvkinput"
+                multiline
+                style={{
+                  color: colors.text,
+                  fontWeight: '600',
+                  fontSize: 16,
+                  minHeight: 100,
+                  marginHorizontal: 5,
+                  backgroundColor: 'transparent',
+                  textAlignVertical: 'top',
+                }}
+                value={seedufvkText}
+                onChangeText={setSeedufvkText}
+              />
+            </View>
+            {seedufvkText && (
+              <TouchableOpacity
+                onPress={() => {
+                  setSeedufvkText('');
+                }}>
+                <FontAwesomeIcon style={{ margin: 0 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              onPress={() => {
+                setQrcodeModalVisible(true);
+              }}>
+              <FontAwesomeIcon size={35} icon={faQrcode} color={colors.border} />
+            </TouchableOpacity>
           </View>
 
-          <RegText style={{ margin: 20, marginBottom: 30 }}>{translate('import.text') as string}</RegText>
+          <View style={{ marginTop: 10, alignItems: 'center' }}>
+            <FadeText>{translate('import.birthday') as string}</FadeText>
+            {selectServer !== SelectServerEnum.offline && (
+              <FadeText style={{ textAlign: 'center' }}>
+                {translate('seed.birthday-no-readonly') + ' (1, ' + (latestBlock ? latestBlock.toString() : '--') + ')'}
+              </FadeText>
+            )}
+            <View
+              accessible={true}
+              accessibilityLabel={translate('import.birthday-acc') as string}
+              style={{
+                margin: 10,
+                borderWidth: 1,
+                borderRadius: 10,
+                borderColor: colors.text,
+                width: '30%',
+                maxWidth: '40%',
+                maxHeight: 48,
+                minWidth: '20%',
+                minHeight: 48,
+              }}>
+              <TextInput
+                testID="import.birthdayinput"
+                placeholder={'#'}
+                placeholderTextColor={colors.placeholder}
+                style={{
+                  color: colors.text,
+                  fontWeight: '600',
+                  fontSize: 18,
+                  minWidth: '20%',
+                  minHeight: 48,
+                  marginLeft: 5,
+                  backgroundColor: 'transparent',
+                }}
+                value={birthday}
+                onChangeText={(text: string) => {
+                  if (isNaN(Number(text))) {
+                    setBirthday('');
+                  } else if (
+                    Number(text) <= 0 ||
+                    (Number(text) > latestBlock && selectServer !== SelectServerEnum.offline)
+                  ) {
+                    setBirthday('');
+                  } else {
+                    setBirthday(Number(text.replace('.', '').replace(',', '')).toFixed(0));
+                  }
+                }}
+                editable={latestBlock ? true : selectServer !== SelectServerEnum.offline ? false : true}
+                keyboardType="numeric"
+              />
+            </View>
+
+            <RegText style={{ margin: 20, marginBottom: 30 }}>{translate('import.text') as string}</RegText>
+          </View>
+        </ScrollView>
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 5,
+          }}>
+          <Button
+            testID="import.button.ok"
+            type={ButtonTypeEnum.Primary}
+            title={translate('import.button') as string}
+            onPress={() => {
+              okButton();
+            }}
+          />
         </View>
-      </ScrollView>
-      <View
-        style={{
-          flexGrow: 1,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
-        }}>
-        <Button
-          testID="import.button.ok"
-          type={ButtonTypeEnum.Primary}
-          title={translate('import.button') as string}
-          onPress={() => {
-            Keyboard.dismiss();
-            okButton();
-          }}
-        />
-        <Button
-          testID="import.button.cancel"
-          type={ButtonTypeEnum.Secondary}
-          title={translate('cancel') as string}
-          style={{ marginLeft: 10 }}
-          onPress={onClickCancel}
-        />
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 

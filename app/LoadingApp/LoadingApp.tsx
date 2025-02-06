@@ -1,32 +1,20 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
-  View,
   Alert,
   SafeAreaView,
-  Image,
-  Text,
   Modal,
-  ScrollView,
   I18nManager,
   EmitterSubscription,
   AppState,
   NativeEventSubscription,
-  TextInput,
-  ActivityIndicator,
-  TouchableOpacity,
 } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
-import NetInfo, { NetInfoStateType, NetInfoSubscription } from '@react-native-community/netinfo';
-
-import OptionsMenu from 'react-native-option-menu';
-
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faEllipsisV, faWifi } from '@fortawesome/free-solid-svg-icons';
+import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo';
 
 import RPCModule from '../RPCModule';
 import {
@@ -52,7 +40,6 @@ import {
   WalletOptionEnum,
   SnackbarType,
   AppStateStatusEnum,
-  ButtonTypeEnum,
   GlobalConst,
   EventListenerEnum,
   AppContextLoading,
@@ -71,7 +58,7 @@ import { createAlert } from '../createAlert';
 import { RPCWalletKindType } from '../rpc/types/RPCWalletKindType';
 import Snackbars from '../../components/Components/Snackbars';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
-import Launching from './Launching';
+import Launching from './components/Launching';
 import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
@@ -84,14 +71,11 @@ import {
 } from '../recoveryWalletInfo';
 
 // no lazy load because slowing down screens.
-import BoldText from '../../components/Components/BoldText';
-import Button from '../../components/Components/Button';
 import Seed from '../../components/Seed';
 import ImportUfvk from '../../components/Ufvk/ImportUfvk';
-import ChainTypeToggle from '../../components/Components/ChainTypeToggle';
 import { sendEmail } from '../sendEmail';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
-import FadeText from '../../components/Components/FadeText';
+import StartMenu from './components/StartMenu';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -502,6 +486,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     // Second, check if a wallet exists. Do it async so the basic screen has time to render
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+    console.log('&&&&& background no in storage &&&&&');
     const exists = await RPCModule.walletExists();
     //console.log('Wallet Exists result', this.state.screen, exists);
 
@@ -521,7 +506,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           // here result can have an `error` field for watch-only which is actually OK.
           const resultJson: RPCSeedType = await JSON.parse(result);
           if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
-            // Load the wallet and navigate to the ValueTransfers screen
+            // Load the wallet and navigate to the vts screen
             const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
             //console.log(walletKindStr);
             try {
@@ -638,11 +623,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         (priorAppState === AppStateStatusEnum.inactive || priorAppState === AppStateStatusEnum.background) &&
         nextAppState === AppStateStatusEnum.active
       ) {
-        console.log('App LOADING has come to the foreground!');
+        //console.log('App LOADING has come to the foreground!');
         // reading background task info
         this.fetchBackgroundSyncing();
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
+        console.log('&&&&& background no in storage &&&&&');
         if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
           Alert.alert(this.state.backgroundError.title, this.state.backgroundError.error);
           this.setBackgroundError('', '');
@@ -655,6 +641,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         console.log('App LOADING is gone to the background!');
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
+        console.log('&&&&& background yes in storage &&&&&');
       }
     });
 
@@ -757,7 +744,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       // the 30 seconds timout was fired.
       someServerIsWorking = false;
     }
-    console.log(server);
+    //console.log(server);
     console.log(fasterServer);
     this.setState({
       server: fasterServer,
@@ -913,6 +900,18 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     }
   };
 
+  setCustomServerUri = (customServerUri: string) => {
+    this.setState({
+      customServerUri,
+    });
+  };
+
+  setCustomServerShow = (customServerShow: boolean) => {
+    this.setState({
+      customServerShow,
+    });
+  };
+
   usingCustomServer = async () => {
     if (!this.state.customServerUri && !this.state.customServerOffline) {
       return;
@@ -992,7 +991,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
         let seedJSON = {} as RPCSeedType;
         try {
-          seedJSON = JSON.parse(seed);
+          seedJSON = await JSON.parse(seed);
           if (seedJSON.error) {
             this.setState({ actionButtonsDisabled: false });
             createAlert(
@@ -1249,29 +1248,33 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     }
   };
 
+  openCurrentWallet = () => {
+    // to avoid the biometric security
+    this.setState({
+      startingApp: false,
+    });
+    this.componentDidMount();
+  };
+
   render() {
     const {
       screen,
       wallet,
       actionButtonsDisabled,
       walletExists,
-      server,
-      netInfo,
       customServerShow,
       customServerUri,
       customServerChainName,
       customServerOffline,
       snackbars,
-      mode,
       firstLaunchingMessage,
       biometricsFailed,
       translate,
       hasRecoveryWalletInfoSaved,
-      selectServer,
     } = this.state;
     const { colors } = this.props.theme;
 
-    //console.log('render loadingAppClass - 3', this.state.netInfo);
+    //console.log('render loadingAppClass - 3', this.state.privacy);
 
     const context = {
       // context
@@ -1325,364 +1328,26 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             />
           )}
           {screen === 1 && (
-            <View style={{ width: '100%', height: '100%' }}>
-              <View
-                style={{
-                  backgroundColor: colors.card,
-                  padding: 10,
-                  position: 'absolute',
-                  top: 0,
-                  right: 0,
-                  zIndex: 999,
-                }}>
-                {netInfo.isConnected && !actionButtonsDisabled && (
-                  <>
-                    {mode === ModeEnum.basic ? (
-                      <OptionsMenu
-                        customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
-                        buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
-                        destructiveIndex={5}
-                        options={
-                          hasRecoveryWalletInfoSaved
-                            ? [
-                                translate('loadingapp.recoverkeys'),
-                                translate('loadingapp.advancedmode'),
-                                translate('cancel'),
-                              ]
-                            : [translate('loadingapp.advancedmode'), translate('cancel')]
-                        }
-                        actions={
-                          hasRecoveryWalletInfoSaved
-                            ? [() => this.recoverRecoveryWalletInfo(true), () => this.changeMode(ModeEnum.advanced)]
-                            : [() => this.changeMode(ModeEnum.advanced)]
-                        }
-                      />
-                    ) : (
-                      <OptionsMenu
-                        customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
-                        buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
-                        destructiveIndex={5}
-                        options={
-                          hasRecoveryWalletInfoSaved
-                            ? [translate('loadingapp.recoverkeys'), translate('loadingapp.custom'), translate('cancel')]
-                            : [translate('loadingapp.custom'), translate('cancel')]
-                        }
-                        actions={
-                          hasRecoveryWalletInfoSaved
-                            ? [() => this.recoverRecoveryWalletInfo(true), this.customServer]
-                            : [this.customServer]
-                        }
-                      />
-                    )}
-                  </>
-                )}
-                {!netInfo.isConnected && hasRecoveryWalletInfoSaved && !actionButtonsDisabled && (
-                  <OptionsMenu
-                    customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
-                    buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
-                    destructiveIndex={5}
-                    options={[translate('loadingapp.recoverkeys'), translate('cancel')]}
-                    actions={[() => this.recoverRecoveryWalletInfo(true)]}
-                  />
-                )}
-              </View>
-              <ScrollView
-                style={{ maxHeight: '100%' }}
-                contentContainerStyle={{
-                  flexDirection: 'column',
-                  alignItems: 'stretch',
-                  justifyContent: 'flex-start',
-                  padding: 20,
-                }}>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <View style={{ marginBottom: 30, display: 'flex', alignItems: 'center' }}>
-                    <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>
-                      {translate('zingo') as string}
-                    </Text>
-                    <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version') as string}</Text>
-                    <Image
-                      source={require('../../assets/img/logobig-zingo.png')}
-                      style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10, borderRadius: 10 }}
-                    />
-                  </View>
-
-                  {selectServer !== SelectServerEnum.offline && (
-                    <>
-                      <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                        {`${translate('loadingapp.actualserver') as string} [${
-                          translate(`settings.value-chainname-${server.chainName}`) as string
-                        }]`}
-                      </BoldText>
-                      <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{server.uri}</BoldText>
-                    </>
-                  )}
-                  {selectServer === SelectServerEnum.offline && (
-                    <View style={{ flexDirection: 'row' }}>
-                      <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                        {translate('loadingapp.actualserver') as string}
-                      </BoldText>
-                      <BoldText style={{ fontSize: 15, marginBottom: 3, color: 'red' }}>
-                        {' ' + (translate('settings.server-offline') as string)}
-                      </BoldText>
-                    </View>
-                  )}
-
-                  {customServerShow && (
-                    <View
-                      style={{
-                        borderColor: colors.primaryDisabled,
-                        borderWidth: 1,
-                        paddingTop: 10,
-                        paddingLeft: 10,
-                        paddingRight: 10,
-                        marginBottom: 5,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      {selectServer !== SelectServerEnum.offline && (
-                        <View
-                          style={{
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            margin: 0,
-                            marginBottom: 10,
-                            paddingHorizontal: 5,
-                            paddingVertical: 1,
-                            borderColor: customServerOffline ? colors.primary : colors.zingo,
-                            borderWidth: customServerOffline ? 2 : 1,
-                            borderRadius: 10,
-                            minWidth: 25,
-                            minHeight: 25,
-                          }}>
-                          <TouchableOpacity onPress={() => this.onPressServerOffline(!customServerOffline)}>
-                            <View style={{ flexDirection: 'row', margin: 0, padding: 0 }}>
-                              <FontAwesomeIcon
-                                icon={faWifi}
-                                color={customServerOffline ? 'red' : colors.zingo}
-                                size={18}
-                              />
-                              <FadeText style={{ marginLeft: 10, marginRight: 5 }}>
-                                {translate('settings.server-offline') as string}
-                              </FadeText>
-                            </View>
-                          </TouchableOpacity>
-                        </View>
-                      )}
-                      {!customServerOffline && (
-                        <>
-                          <ChainTypeToggle
-                            customServerChainName={customServerChainName}
-                            onPress={this.onPressServerChainName}
-                            translate={translate}
-                            disabled={actionButtonsDisabled}
-                          />
-                          <View
-                            style={{
-                              borderColor: colors.border,
-                              borderWidth: 1,
-                              marginBottom: 10,
-                              width: '100%',
-                              maxWidth: '100%',
-                              minWidth: '50%',
-                              minHeight: 48,
-                              alignItems: 'center',
-                            }}>
-                            <TextInput
-                              placeholder={GlobalConst.serverPlaceHolder}
-                              placeholderTextColor={colors.placeholder}
-                              style={{
-                                color: colors.text,
-                                fontWeight: '600',
-                                fontSize: 18,
-                                minWidth: '90%',
-                                minHeight: 48,
-                                marginLeft: 5,
-                                backgroundColor: 'transparent',
-                              }}
-                              value={customServerUri}
-                              onChangeText={(text: string) => this.setState({ customServerUri: text })}
-                              editable={!actionButtonsDisabled}
-                              maxLength={100}
-                            />
-                          </View>
-                        </>
-                      )}
-                      <View style={{ flexDirection: 'row' }}>
-                        <Button
-                          type={ButtonTypeEnum.Primary}
-                          title={translate('save') as string}
-                          disabled={actionButtonsDisabled}
-                          onPress={this.usingCustomServer}
-                          style={{ marginBottom: 10 }}
-                        />
-                        <Button
-                          type={ButtonTypeEnum.Secondary}
-                          title={translate('cancel') as string}
-                          disabled={actionButtonsDisabled}
-                          onPress={() => this.setState({ customServerShow: false })}
-                          style={{ marginBottom: 10, marginLeft: 10 }}
-                        />
-                      </View>
-                    </View>
-                  )}
-
-                  {(!netInfo.isConnected ||
-                    netInfo.type === NetInfoStateType.cellular ||
-                    netInfo.isConnectionExpensive) && (
-                    <>
-                      <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                        {translate('report.networkstatus') as string}
-                      </BoldText>
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'flex-end',
-                          marginHorizontal: 20,
-                        }}>
-                        <View style={{ display: 'flex', flexDirection: 'column', marginBottom: 10 }}>
-                          {!netInfo.isConnected && (
-                            <BoldText style={{ fontSize: 15, color: 'red' }}>
-                              {' '}
-                              {translate('report.nointernet') as string}{' '}
-                            </BoldText>
-                          )}
-                          {netInfo.type === NetInfoStateType.cellular && (
-                            <BoldText style={{ fontSize: 15, color: 'yellow' }}>
-                              {' '}
-                              {translate('report.cellulardata') as string}{' '}
-                            </BoldText>
-                          )}
-                          {netInfo.isConnectionExpensive && (
-                            <BoldText style={{ fontSize: 15, color: 'yellow' }}>
-                              {' '}
-                              {translate('report.connectionexpensive') as string}{' '}
-                            </BoldText>
-                          )}
-                        </View>
-                      </View>
-                    </>
-                  )}
-
-                  {walletExists && (
-                    <>
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'flex-end',
-                          marginHorizontal: 20,
-                          marginBottom: 20,
-                        }}>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            marginTop: 10,
-                            borderColor: colors.primary,
-                            borderWidth: 1,
-                            borderRadius: 5,
-                            padding: 5,
-                          }}>
-                          <BoldText style={{ fontSize: 15, color: colors.primaryDisabled }}>
-                            {translate('loadingapp.noopenwallet-message') as string}
-                          </BoldText>
-                        </View>
-                      </View>
-                      <Button
-                        type={ButtonTypeEnum.Primary}
-                        title={translate('loadingapp.opencurrentwallet') as string}
-                        disabled={actionButtonsDisabled}
-                        onPress={() => {
-                          // to avoid the biometric security
-                          this.setState({
-                            startingApp: false,
-                          });
-                          this.componentDidMount();
-                        }}
-                        style={{ marginBottom: 20 }}
-                      />
-                    </>
-                  )}
-
-                  {netInfo.isConnected && selectServer !== SelectServerEnum.offline && (
-                    <Button
-                      testID="loadingapp.createnewwallet"
-                      type={ButtonTypeEnum.Primary}
-                      title={translate('loadingapp.createnewwallet') as string}
-                      disabled={actionButtonsDisabled}
-                      onPress={() => {
-                        if (walletExists) {
-                          Alert.alert(
-                            translate('loadingapp.alert-newwallet-title') as string,
-                            translate('loadingapp.alert-newwallet-body') as string,
-                            [
-                              {
-                                text: translate('confirm') as string,
-                                onPress: () => this.createNewWallet(),
-                              },
-                              { text: translate('cancel') as string, style: 'cancel' },
-                            ],
-                            { cancelable: false, userInterfaceStyle: 'light' },
-                          );
-                        } else {
-                          this.createNewWallet();
-                        }
-                      }}
-                      style={{ marginBottom: 10, marginTop: 10 }}
-                    />
-                  )}
-
-                  {netInfo.isConnected && selectServer !== SelectServerEnum.offline && (
-                    <View style={{ marginTop: 10, display: 'flex', alignItems: 'center' }}>
-                      <Button
-                        testID="loadingapp.restorewalletseedufvk"
-                        type={ButtonTypeEnum.Secondary}
-                        title={translate('loadingapp.restorewalletseedufvk') as string}
-                        disabled={actionButtonsDisabled}
-                        onPress={() => this.getwalletToRestore()}
-                        style={{ marginBottom: 10 }}
-                      />
-                    </View>
-                  )}
-
-                  {(!netInfo.isConnected || selectServer === SelectServerEnum.offline) && !walletExists && (
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'flex-end',
-                        marginHorizontal: 20,
-                      }}>
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          marginTop: 20,
-                          borderColor: colors.primary,
-                          borderWidth: 1,
-                          borderRadius: 5,
-                          padding: 5,
-                        }}>
-                        <BoldText style={{ fontSize: 15, color: colors.primaryDisabled }}>
-                          {translate('loadingapp.nointernet-message') as string}
-                        </BoldText>
-                      </View>
-                    </View>
-                  )}
-
-                  {actionButtonsDisabled && (
-                    <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
-                  )}
-                </View>
-              </ScrollView>
-            </View>
+            <StartMenu
+              actionButtonsDisabled={actionButtonsDisabled}
+              hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
+              recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
+              changeMode={this.changeMode}
+              customServer={this.customServer}
+              customServerShow={customServerShow}
+              customServerOffline={customServerOffline}
+              onPressServerOffline={this.onPressServerOffline}
+              customServerChainName={customServerChainName}
+              onPressServerChainName={this.onPressServerChainName}
+              customServerUri={customServerUri}
+              setCustomServerUri={this.setCustomServerUri}
+              usingCustomServer={this.usingCustomServer}
+              setCustomServerShow={this.setCustomServerShow}
+              walletExists={walletExists}
+              openCurrentWallet={this.openCurrentWallet}
+              createNewWallet={this.createNewWallet}
+              getwalletToRestore={this.getwalletToRestore}
+            />
           )}
           {screen === 2 && wallet && (
             <Modal

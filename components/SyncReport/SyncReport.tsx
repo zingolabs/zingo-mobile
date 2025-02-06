@@ -4,7 +4,6 @@ import { View, ScrollView, SafeAreaView, Text, ActivityIndicator } from 'react-n
 import { useTheme } from '@react-navigation/native';
 
 import { ThemeType } from '../../app/types';
-import Button from '../Components/Button';
 import DetailLine from '../Components/DetailLine';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
@@ -12,14 +11,12 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import RPC from '../../app/rpc';
 import Header from '../Header';
 import { NetInfoStateType } from '@react-native-community/netinfo';
 import RegText from '../Components/RegText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../app/utils';
-import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
 
 type SyncReportProps = {
   closeModal: () => void;
@@ -92,7 +89,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
     setTimeout(() => setShowBackgroundLegend(false), 10000); // 10 seconds only
   }, []);
 
@@ -229,11 +225,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
+        closeScreen={closeModal}
       />
-
       <ScrollView
         testID="syncreport.scroll-view"
-        style={{ maxHeight: '85%' }}
+        style={{ maxHeight: '90%' }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
@@ -682,17 +678,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
           </View>
         )}
       </ScrollView>
-
-      <View
-        style={{
-          flexGrow: 1,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
-        }}>
-        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
-      </View>
     </SafeAreaView>
   );
 };

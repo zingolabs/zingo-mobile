@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
-import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 
 class MainActivity : ReactActivity() {
@@ -14,19 +14,19 @@ class MainActivity : ReactActivity() {
      */
 
     private var isStarting = true
-    override fun getMainComponentName(): String {
-        return "Zingo"
-    }
+
+    override fun getMainComponentName(): String = "Zingo"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("ON_CREATE", "Starting main activity")
         super.onCreate(null)
     }
 
-    override fun createReactActivityDelegate(): ReactActivityDelegate? {
+    override fun createReactActivityDelegate(): ReactActivityDelegate {
         return DefaultReactActivityDelegate(
             this,
             mainComponentName,  // If you opted-in for the New Architecture, we enable the Fabric Renderer.
-            DefaultNewArchitectureEntryPoint.fabricEnabled
+            fabricEnabled
         )
     }
     override fun onPause() {

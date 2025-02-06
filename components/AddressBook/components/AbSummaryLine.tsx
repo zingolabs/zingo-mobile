@@ -28,10 +28,15 @@ type AbSummaryLineProps = {
   item: AddressBookFileClass;
   setCurrentItem: (b: number) => void;
   setAction: (action: AddressBookActionEnum) => void;
-  setSendPageState: (s: SendPageStateClass) => void;
   closeModal: () => void;
   handleScrollToTop: () => void;
-  doAction: (action: AddressBookActionEnum, label: string, address: string) => void;
+  doAction: (
+    action: AddressBookActionEnum,
+    label: string,
+    address: string,
+    uOrchardAddress: string,
+    color: string,
+  ) => void;
   addressProtected?: boolean;
 };
 const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
@@ -39,14 +44,13 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   item,
   setCurrentItem,
   setAction,
-  setSendPageState,
   closeModal,
   handleScrollToTop,
   doAction,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, navigation, readOnly, mode, totalBalance, language, selectServer } = context;
+  const { translate, navigation, readOnly, mode, totalBalance, language, selectServer, setSendPageState } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -64,7 +68,14 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
       [
         {
           text: translate('confirm') as string,
-          onPress: () => doAction(AddressBookActionEnum.Delete, item.label, item.address),
+          onPress: () =>
+            doAction(
+              AddressBookActionEnum.Delete,
+              item.label,
+              item.address,
+              item.uOrchardAddress ? item.uOrchardAddress : '',
+              item.color ? item.color : '',
+            ),
         },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
@@ -100,7 +111,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 style={{ marginHorizontal: 10 }}
                 size={24}
                 icon={faAddressCard}
-                color={addressProtected ? colors.zingo : colors.primaryDisabled}
+                color={addressProtected ? colors.zingo : item.color ? item.color : colors.primarydisabled}
               />
               <FadeText
                 style={{

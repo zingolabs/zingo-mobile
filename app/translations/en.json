@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.10.3 (205)",
+  "version": "zingo-1.11.0 (217)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
@@ -32,9 +32,23 @@
   "email": "zingo@zingolabs.org",
   "subject": "Zingo Support...",
   "body": "I need help with...",
+  "connecting": "Connecting",
+  "syncing": "Syncing -",
+  "synced": "Synced",
   "messages": {
     "title": "Messages",
-    "empty": "No Messages yet."
+    "title-chats": "Chats",
+    "empty": "No Messages yet.",
+    "message-placeholder": "Message",
+    "message-placeholder-error": "No spendable funds available",
+    "search-placeholder": "Search",
+    "filter-all": "All",
+    "filter-contacts": "Contacts",
+    "filter-no-contacts": "No contacts",
+    "clear-filter": "Clear:",
+    "contacts-empty": "No Contacts or Addresses.",
+    "link-all": "Global",
+    "link-anonymous": "Anonymous"
   },
   "addressbook": {
     "title": "Address Book",
@@ -57,7 +71,8 @@
     "delete-alert": "Do you really want to delete this Contact/Nickname/Label/Tag?",
     "likely": "Likely: ",
     "thiswalletaddress": "This Wallet's Address",
-    "addto": "Add to "
+    "addto": "Add to ",
+    "uorchardaddress": "Orchard UA:\n"
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",
@@ -137,7 +152,7 @@
     "send-menu": "SEND",
     "receive-menu": "RECEIVE",
     "messages-menu": "MESSAGES",
-    "syncing": "Pausing the Synchronization to be able to Complete the Transaction.",
+    "syncing": "Stopping the Synchronization to be able to reset the wallet.",
     "zcash-url": "You already have an address in the send screen",
     "connection-error": "This option requires an internet connection to be executed.",
     "tryingnewserver": "Trying to connect to the new Server... Can take a few seconds.",
@@ -433,7 +448,6 @@
     "Broadcast": "Broadcasted and awaiting confirmation Tx:",
     "sending-error": "Error sending transaction",
     "title": "Send",
-    "title-syncing": "Send - Syncing",
     "more": "more...",
     "toaddress": "To Address",
     "invalidaddress": "Invalid Address!",
@@ -482,23 +496,28 @@
     "donation-minimum-message": "The minimum amount for donations is a Zenny (0.01 ZEC), Try again and Thanks."
   },
   "receive": {
-    "u-title": "Unified Address",
+    "u-title": "Shielded Unified",
+    "z-title": "Z-Sapling",
+    "t-title": "Exposed Transparent",
     "noaddress": "No Address",
     "unoprivkey": "No Unified address to import the Spending Key",
     "unoviewkey": "No Unified address to import the Full Viewing Key",
-    "title": "Receive",
-    "title-syncing": "Receive - Syncing",
+    "title-advanced": "My Addresses",
+    "title-basic": "My Address",
+    "title-basic-alone": "My Receiving Address",
     "more": "more...",
     "newu-option": "New Diversified Unified Address",
     "privkey-option": "Export Spending Key",
     "viewkey-option": "Export Full Viewing Key",
     "import-option": "Import Key...",
     "title-acc": "Receive Screen",
-    "z-title": "Z-Sapling",
-    "t-title": "Transparent",
     "of": " of ",
     "prev": "Prev",
-    "next": "Next"
+    "next": "Next",
+    "shielded-orchard": "Orchard",
+    "shielded-sapling": "Z-Sapling",
+    "shielded-orchard-sapling": "Orchard+Sapling",
+    "shielded-full": "Full"
   },
   "history": {
     "shield-all": "Shield All funds",
@@ -522,7 +541,6 @@
     "shield-alert-transparent": "Confirm to shield your funds to the latest Orchard shielded pool.",
     "shield-alert-sapling": "Confirm to upgrade your funds to the latest Orchard shielded pool",
     "title": "History",
-    "title-syncing": "History - Syncing",
     "more": "more...",
     "refreshing": "Refreshing",
     "end": "END",
@@ -564,7 +582,10 @@
     "not-confirmed": "Transaction not yet confirmed",
     "calculated": "Calculated",
     "transmitted": "Transmitted",
-    "mempool": "In Mempool"
+    "mempool": "In Mempool",
+    "confirmed": "Confirmed",
+    "filter-withfunds": "With funds",
+    "empty": "No Transactions yet."
   },
   "report": {
     "title": "Sync / Rescan Report",

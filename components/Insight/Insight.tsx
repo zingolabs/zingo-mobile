@@ -6,11 +6,10 @@ import { PieChart } from 'react-native-svg-charts';
 import { Circle, G, Line, Text } from 'react-native-svg';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
-import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Utils from '../../app/utils';
@@ -18,7 +17,7 @@ import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
-import { ButtonTypeEnum, CommandEnum, SnackbarDurationEnum } from '../../app/AppState';
+import { CommandEnum, SnackbarDurationEnum } from '../../app/AppState';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -95,8 +94,8 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
   const [loading, setLoading] = useState<boolean>(false);
   const [tab, setTab] = useState<'sent' | 'sends' | 'memobytes'>('sent');
   const dimensions = {
-    width: Dimensions.get('screen').width,
-    height: Dimensions.get('screen').height,
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
   };
 
   useEffect(() => {
@@ -123,19 +122,19 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
       try {
         resultJSON = await JSON.parse(resultStr);
       } catch (e) {
-        console.log('Error getting info from the server', e);
         resultJSON = {};
       }
       let amounts: { value: number; address: string; tag: string }[] = [];
       const resultJSONEntries: [string, number][] = Object.entries(resultJSON) as [string, number][];
-      resultJSONEntries.forEach(([key, value]) => {
-        if (!(tab !== 'sent' && key === 'fee')) {
-          // excluding the fee for `sends` and `memobytes`.
-          if (value > 0) {
-            amounts.push({ value: tab === 'sent' ? value / 10 ** 8 : value, address: key, tag: '' });
+      resultJSONEntries &&
+        resultJSONEntries.forEach(([key, value]) => {
+          if (!(tab !== 'sent' && key === 'fee')) {
+            // excluding the fee for `sends` and `memobytes`.
+            if (value > 0) {
+              amounts.push({ value: tab === 'sent' ? value / 10 ** 8 : value, address: key, tag: '' });
+            }
           }
-        }
-      });
+        });
       const randomColors = Utils.generateColorList(amounts.length);
       const newPieAmounts: DataType[] = amounts
         .sort((a, b) => b.value - a.value)
@@ -279,6 +278,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
         noDrawMenu={true}
         setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
+        closeScreen={closeModal}
       />
 
       <View style={{ width: '100%', flexDirection: 'row', marginTop: 10 }}>
@@ -349,12 +349,11 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
           </View>
         </TouchableOpacity>
       </View>
-
       <ScrollView
         showsVerticalScrollIndicator={true}
         persistentScrollbar={true}
         indicatorStyle={'white'}
-        style={{ maxHeight: '85%' }}
+        style={{ maxHeight: '90%' }}
         contentContainerStyle={{}}>
         <View style={{ display: 'flex', margin: 20 }}>
           {!loading && (!pieAmounts || !pieAmounts.length) && (
@@ -395,17 +394,6 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
           </View>
         </View>
       </ScrollView>
-
-      <View
-        style={{
-          flexGrow: 1,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
-        }}>
-        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
-      </View>
     </SafeAreaView>
   );
 };

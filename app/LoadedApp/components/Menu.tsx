@@ -1,32 +1,31 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { ScrollView, View, Text, Dimensions } from 'react-native';
+import { ScrollView, View, Text, Dimensions, SafeAreaView } from 'react-native';
 
 import RegText from '../../../components/Components/RegText';
 
 import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../context';
-import RPC from '../../rpc';
 import { ThemeType } from '../../types';
 import simpleBiometrics from '../../simpleBiometrics';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { GlobalConst, MenuItemEnum, ModeEnum, SelectServerEnum } from '../../AppState';
+import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../../AppState';
 
 type MenuProps = {
   onItemSelected: (item: MenuItemEnum) => Promise<void>;
-  updateMenuState: (isOpen: boolean) => void;
+  closeDrawer: () => void;
 };
 
-const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuState }) => {
+const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer }) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
     readOnly,
     mode,
-    valueTransfers,
+    valueTransfersTotal,
     addLastSnackbar,
     security,
     language,
@@ -38,8 +37,8 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
   moment.locale(language);
 
   const dimensions = {
-    width: Dimensions.get('screen').width,
-    height: Dimensions.get('screen').height,
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
   };
 
   const item = {
@@ -64,32 +63,30 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
       //console.log('BIOMETRIC --------> ', resultBio);
       if (resultBio === false) {
         // snack with Error & closing the menu.
-        updateMenuState(false);
+        closeDrawer();
         addLastSnackbar({ message: translate('biometrics-error') as string });
       } else {
-        // if the user click on a screen in the menu the sync is going to continue
-        (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
         onItemSelected(value);
       }
     } else {
-      // if the user click on a screen in the menu the sync is going to continue
-      // or if the security check of the screen is false in settings
-      (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
       onItemSelected(value);
     }
   };
 
   return (
-    <View style={{ height: '100%' }}>
+    <SafeAreaView
+      style={{
+        display: 'flex',
+        justifyContent: 'flex-start',
+        alignItems: 'stretch',
+        height: '100%',
+        backgroundColor: colors.background,
+      }}>
       <ScrollView
         scrollsToTop={false}
         style={{
-          flex: 1,
-          width: dimensions.width,
-          height: dimensions.height,
           backgroundColor: colors.sideMenuBackground,
-        }}
-        contentContainerStyle={{ display: 'flex' }}>
+        }}>
         <RegText color={colors.money} style={{ marginVertical: 10, marginLeft: 30 }}>
           {translate('loadedapp.options') as string}
         </RegText>
@@ -117,7 +114,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
             {translate('loadedapp.addressbook') as string}
           </RegText>
 
-          {!(mode === ModeEnum.basic && valueTransfers && valueTransfers.length <= 0) && (
+          {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal === 0) && (
             <RegText
               testID="menu.walletseedufvk"
               onPress={() => onItemSelectedWrapper(MenuItemEnum.WalletSeedUfvk)}
@@ -153,7 +150,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
             </RegText>
           )}
 
-          {!(mode === ModeEnum.basic && valueTransfers && valueTransfers.length <= 0) && (
+          {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal === 0) && (
             <RegText testID="menu.insight" onPress={() => onItemSelectedWrapper(MenuItemEnum.Insight)} style={item}>
               {translate('loadedapp.insight') as string}
             </RegText>
@@ -177,8 +174,8 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
             </RegText>
           )}
           {mode === ModeEnum.basic &&
-            valueTransfers &&
-            valueTransfers.length === 0 &&
+            valueTransfersTotal !== null &&
+            valueTransfersTotal === 0 &&
             netInfo.isConnected &&
             selectServer !== SelectServerEnum.offline && (
               <RegText
@@ -223,7 +220,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, updateMenuSt
           `settings.value-mode-${mode}`,
         )}`}</Text>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

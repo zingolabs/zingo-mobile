@@ -80,13 +80,6 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
       }
     }
   >
-    <Modal
-      animationType="slide"
-      hardwareAccelerated={false}
-      onRequestClose={[Function]}
-      transparent={false}
-      visible={false}
-    />
     <View
       style={
         {
@@ -291,6 +284,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
           "padding": 0,
           "paddingLeft": 20,
           "paddingRight": 20,
+          "width": "40%",
         }
       }
       testID="addressbook.button.action"
@@ -368,6 +362,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
           "padding": 0,
           "paddingLeft": 20,
           "paddingRight": 20,
+          "width": "40%",
         }
       }
     >
@@ -485,13 +480,6 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
       }
     }
   >
-    <Modal
-      animationType="slide"
-      hardwareAccelerated={false}
-      onRequestClose={[Function]}
-      transparent={false}
-      visible={false}
-    />
     <View
       style={
         {
@@ -753,7 +741,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
         {
           "alignItems": "center",
           "backgroundColor": "#18bd18",
-          "borderColor": "#c3c3c3",
+          "borderColor": "#18bd18",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -764,6 +752,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
           "padding": 0,
           "paddingLeft": 20,
           "paddingRight": 20,
+          "width": "40%",
         }
       }
       testID="addressbook.button.action"
@@ -841,6 +830,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
           "padding": 0,
           "paddingLeft": 20,
           "paddingRight": 20,
+          "width": "40%",
         }
       }
     >
@@ -958,13 +948,6 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
       }
     }
   >
-    <Modal
-      animationType="slide"
-      hardwareAccelerated={false}
-      onRequestClose={[Function]}
-      transparent={false}
-      visible={false}
-    />
     <View
       style={
         {
@@ -1259,6 +1242,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
           "padding": 0,
           "paddingLeft": 20,
           "paddingRight": 20,
+          "width": "40%",
         }
       }
       testID="addressbook.button.action"
@@ -1336,6 +1320,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
           "padding": 0,
           "paddingLeft": 20,
           "paddingRight": 20,
+          "width": "40%",
         }
       }
     >

@@ -16,17 +16,19 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import Utils from '../../app/utils';
 
-type InputTextAddressProps = {
+type TextInputAddressProps = {
   address: string;
   setAddress: (a: string) => void;
   setError: (e: string) => void;
   disabled: boolean;
+  setUOrchardAddress: (a: string) => void;
 };
-const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
+const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
   setAddress,
   setError,
   disabled,
+  setUOrchardAddress,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, language } = context;
@@ -37,20 +39,26 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
 
   useEffect(() => {
-    const parseAddress = async (addr: string): Promise<boolean> => {
+    const parseAddress = async (addr: string): Promise<{ isValid: boolean; onlyOrchardUA: string }> => {
       return await Utils.isValidAddress(addr, server.chainName);
     };
 
     if (address) {
       parseAddress(address).then(r => {
-        setValidAddress(r ? 1 : -1);
-        setError(r ? '' : (translate('send.invalidaddress') as string));
+        //console.log(r);
+        setValidAddress(r.isValid ? 1 : -1);
+        setError(r.isValid ? '' : (translate('send.invalidaddress') as string));
+        // calculate the orchard only UA if the addess is a full UA.
+        // if have value then use it.
+        if (r.onlyOrchardUA) {
+          setUOrchardAddress(r.onlyOrchardUA);
+        }
       });
     } else {
       setValidAddress(0);
       setError('');
     }
-  }, [address, server.chainName, setError, translate]);
+  }, [address, server.chainName, setError, setUOrchardAddress, translate]);
 
   //console.log('render input text address');
 
@@ -134,4 +142,4 @@ const InputTextAddress: React.FunctionComponent<InputTextAddressProps> = ({
   );
 };
 
-export default InputTextAddress;
+export default TextInputAddress;

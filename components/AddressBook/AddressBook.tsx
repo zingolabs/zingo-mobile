@@ -4,27 +4,18 @@ import {
   View,
   ScrollView,
   SafeAreaView,
-  Keyboard,
   Platform,
   NativeScrollEvent,
   NativeSyntheticEvent,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
-
-import {
-  AddressBookActionEnum,
-  AddressBookFileClass,
-  ButtonTypeEnum,
-  GlobalConst,
-  SendPageStateClass,
-} from '../../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, GlobalConst } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -33,7 +24,6 @@ import AbSummaryLine from './components/AbSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import AddressBookFileImpl from './AddressBookFileImpl';
-import RPC from '../../app/rpc';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../app/utils';
@@ -41,12 +31,18 @@ import Utils from '../../app/utils';
 type AddressBookProps = {
   closeModal: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
-  setSendPageState: (s: SendPageStateClass) => void;
 };
 
-const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, setAddressBook, setSendPageState }) => {
+const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, setAddressBook }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, addressBook, addressBookCurrentAddress, addressBookOpenPriorModal, server } = context;
+  const {
+    translate,
+    language,
+    addressBook,
+    addressBookCurrentAddress,
+    addressBookOpenPriorModal,
+    zenniesDonationAddress,
+  } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -56,44 +52,23 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
   const [addressBookProtected, setAddressBookProtected] = useState<AddressBookFileClass[]>([]);
 
   const [currentItem, setCurrentItem] = useState<number | null>(null);
-  const [titleViewHeight, setTitleViewHeight] = useState<number>(0);
   const [action, setAction] = useState<AddressBookActionEnum | null>(null);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const slideAnim = useSharedValue(0);
   const scrollViewRef = useRef<ScrollView>(null);
 
   useScrollToTop(scrollViewRef);
 
   const fetchAddressBookSorted = useMemo(async () => {
     // excluding this address from the list
-    const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
-    return addressBook
-      .filter((ab: AddressBookFileClass) => ab.address !== zennyTips)
-      .sort((a, b) => {
-        const aLabel = a.label;
-        const bLabel = b.label;
-        return aLabel.localeCompare(bLabel);
-      })
-      .slice(0, numAb);
-  }, [addressBook, numAb, server.chainName]);
+    return addressBook.filter((ab: AddressBookFileClass) => ab.address !== zenniesDonationAddress).slice(0, numAb);
+  }, [addressBook, numAb, zenniesDonationAddress]);
 
   const fetchAddressBookProtected = useMemo(async () => {
     // only protected address to use internally ZingoLabs.
-    const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
-    return addressBook
-      .filter((ab: AddressBookFileClass) => ab.address === zennyTips)
-      .sort((a, b) => {
-        const aLabel = a.label;
-        const bLabel = b.label;
-        return aLabel.localeCompare(bLabel);
-      });
-  }, [addressBook, server.chainName]);
-
-  // because this screen is fired from more places than the menu.
-  useEffect(() => {
-    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
-  }, []);
+    return addressBook.filter((ab: AddressBookFileClass) => ab.address === zenniesDonationAddress);
+  }, [addressBook, zenniesDonationAddress]);
 
   useEffect(() => {
     (async () => {
@@ -112,23 +87,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
         }
         setCurrentItem(index);
       }
+      setLoading(false);
     })();
   }, [addressBookCurrentAddress, fetchAddressBookProtected, fetchAddressBookSorted, numAb]);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      slideAnim.value = withTiming(0 - titleViewHeight + 25, { duration: 100, easing: Easing.linear });
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
-    });
-
-    return () => {
-      !!keyboardDidShowListener && keyboardDidShowListener.remove();
-      !!keyboardDidHideListener && keyboardDidHideListener.remove();
-      slideAnim.value = 0;
-    };
-  }, [slideAnim, titleViewHeight]);
 
   const loadMoreClicked = useCallback(() => {
     setNumAb(numAb + 50);
@@ -153,7 +114,13 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     }
   };
 
-  const doAction = async (a: AddressBookActionEnum, label: string, address: string) => {
+  const doAction = async (
+    a: AddressBookActionEnum,
+    label: string,
+    address: string,
+    uOrchardAddress: string,
+    color: string,
+  ) => {
     if (!label || !address) {
       return;
     }
@@ -161,7 +128,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     if (a === AddressBookActionEnum.Delete) {
       ab = await AddressBookFileImpl.removeAddressBookItem(label, address);
     } else {
-      ab = await AddressBookFileImpl.writeAddressBookItem(label, address);
+      ab = await AddressBookFileImpl.writeAddressBookItem(
+        label,
+        address,
+        uOrchardAddress,
+        color ? color : Utils.generateColorList(1)[0],
+      );
     }
     setAddressBook(ab);
     cancel();
@@ -179,7 +151,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     setIsAtTop(isTop);
   };
 
-  //console.log('render Address Book - 4', currentItem, action);
+  //console.log('render Address Book - 4', currentItem, action, addressBook);
 
   return (
     <SafeAreaView
@@ -190,29 +162,21 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
         height: '100%',
         backgroundColor: colors.background,
       }}>
-      <Animated.View style={{ marginTop: slideAnim }}>
-        <View
-          onLayout={e => {
-            const { height } = e.nativeEvent.layout;
-            setTitleViewHeight(height);
-          }}>
-          <Header
-            title={translate('addressbook.title') as string}
-            noBalance={true}
-            noSyncingStatus={true}
-            noDrawMenu={true}
-            noPrivacy={true}
-          />
-        </View>
-      </Animated.View>
-
+      <Header
+        title={translate('addressbook.title') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        closeScreen={closeModal}
+      />
       <ScrollView
         ref={scrollViewRef}
         onScroll={handleScroll}
         scrollEventThrottle={100}
         testID="addressbook.scroll-view"
         keyboardShouldPersistTaps="handled"
-        style={{ maxHeight: '85%' }}
+        style={{ height: '80%', maxHeight: '80%' }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
@@ -239,7 +203,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
             doAction={doAction}
           />
         )}
-        {!addressBookCurrentAddress && addressBookSorted.length === 0 && currentItem !== -1 && (
+        {!addressBookCurrentAddress && addressBookSorted.length === 0 && currentItem !== -1 && !loading && (
           <View
             style={{
               height: 150,
@@ -250,6 +214,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
             }}>
             <FadeText style={{ color: colors.primary }}>{translate('addressbook.empty') as string}</FadeText>
           </View>
+        )}
+        {loading && (
+          <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
         )}
         {!addressBookCurrentAddress &&
           addressBookSorted.flatMap((aBItem, index) => {
@@ -262,7 +229,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                     item={aBItem}
                     setCurrentItem={setCurrentItem}
                     setAction={setAction}
-                    setSendPageState={setSendPageState}
                     closeModal={closeModal}
                     handleScrollToTop={handleScrollToTop}
                     doAction={doAction}
@@ -282,7 +248,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                     item={aBItem}
                     setCurrentItem={setCurrentItem}
                     setAction={setAction}
-                    setSendPageState={setSendPageState}
                     closeModal={closeModal}
                     handleScrollToTop={handleScrollToTop}
                     doAction={doAction}
@@ -301,7 +266,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                   item={aBItem}
                   setCurrentItem={setCurrentItem}
                   setAction={setAction}
-                  setSendPageState={setSendPageState}
                   closeModal={closeModal}
                   handleScrollToTop={handleScrollToTop}
                   doAction={doAction}
@@ -345,7 +309,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
         )}
       </ScrollView>
       {!isAtTop && (
-        <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 70, right: 10 }}>
+        <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 105, right: 10 }}>
           <FontAwesomeIcon
             style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
             size={50}
@@ -368,12 +332,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
             type={ButtonTypeEnum.Primary}
             title={translate('addressbook.new') as string}
             onPress={() => newAddressBookItem()}
-          />
-          <Button
-            type={ButtonTypeEnum.Secondary}
-            title={translate('cancel') as string}
-            style={{ marginLeft: 10 }}
-            onPress={closeModal}
           />
         </View>
       )}

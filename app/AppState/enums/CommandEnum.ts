@@ -1,5 +1,4 @@
 export enum CommandEnum {
-  sendprogress = 'sendprogress',
   changeserver = 'changeserver',
   walletKind = 'wallet_kind',
   interruptSyncAfterBatch = 'interrupt_sync_after_batch',

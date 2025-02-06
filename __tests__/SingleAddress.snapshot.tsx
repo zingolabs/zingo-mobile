@@ -14,6 +14,10 @@ jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
 }));
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
+}));
 
 // test suite
 describe('Component SingleAddress - test', () => {
@@ -22,7 +26,7 @@ describe('Component SingleAddress - test', () => {
     const onPrev = jest.fn();
     const onNext = jest.fn();
     const single = render(
-      <SingleAddress address={mockAddresses[0].uaAddress} index={0} total={1} prev={onPrev} next={onNext} />,
+      <SingleAddress address={mockAddresses[0].uOrchardAddress} index={0} total={1} prev={onPrev} next={onNext} />,
     );
     expect(single.toJSON()).toMatchSnapshot();
   });

@@ -8,7 +8,6 @@ export default interface AppStateLoaded {
   appStateStatus: AppStateStatus;
 
   // menu drawer
-  isMenuDrawerOpen: boolean;
   selectedMenuDrawerItem: MenuItemEnum | null;
 
   // modals

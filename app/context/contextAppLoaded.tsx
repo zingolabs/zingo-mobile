@@ -3,8 +3,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 
 import {
   SyncingStatusClass,
-  ReceivePageStateClass,
-  SendProgressClass,
   WalletSettingsClass,
   InfoType,
   WalletType,
@@ -32,14 +30,15 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   totalBalance: null,
   addresses: null,
   valueTransfers: null,
+  valueTransfersTotal: null,
   messages: null,
+  messagesTotal: null,
   sendPageState: new SendPageStateClass(new ToAddrClass(0)),
-  receivePageState: new ReceivePageStateClass(''),
+  setSendPageState: () => {},
   info: {} as InfoType,
   walletSettings: new WalletSettingsClass(),
-  sendProgress: new SendProgressClass(0, 0, 0),
   wallet: {} as WalletType,
-  uaAddress: '',
+  uOrchardAddress: '',
   server: {} as ServerType,
   currency: CurrencyEnum.noCurrency,
   language: LanguageEnum.en,
@@ -75,6 +74,9 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   recoveryWalletInfoOnDevice: false,
   shieldingAmount: 0,
   showSwipeableIcons: true,
+  doRefresh: () => {},
+  setZecPrice: () => {},
+  zenniesDonationAddress: '',
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

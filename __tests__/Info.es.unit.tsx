@@ -43,6 +43,10 @@ jest.mock('react-native', () => {
 
   return RN;
 });
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
+}));
 
 // test suite
 describe('Component Info - test', () => {
@@ -53,12 +57,11 @@ describe('Component Info - test', () => {
     state.zecPrice = mockZecPrice;
     state.currency = CurrencyEnum.USDCurrency;
     const onClose = jest.fn();
-    const onSet = jest.fn();
     render(
       <ContextAppLoadedProvider value={state}>
-        <Info closeModal={onClose} setZecPrice={onSet} />
+        <Info closeModal={onClose} />
       </ContextAppLoadedProvider>,
     );
-    screen.getByText('33,33');
+    screen.getByText('$ 33,33');
   });
 });

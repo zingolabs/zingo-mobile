@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, SafeAreaView, ScrollView, TouchableOpacity, Text, Alert } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
@@ -22,9 +22,7 @@ import {
   SettingsNameEnum,
   SnackbarType,
   ButtonTypeEnum,
-  GlobalConst,
 } from '../../app/AppState';
-import RPC from '../../app/rpc';
 import Header from '../Header';
 import Utils from '../../app/utils';
 import SettingsFileImpl from '../Settings/SettingsFileImpl';
@@ -98,14 +96,16 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const [basicFirstViewSeed, setBasicFirstViewSeed] = useState<boolean>(true);
 
   useEffect(() => {
-    (async () => {
-      const bfvs: boolean = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
-      setBasicFirstViewSeed(bfvs);
-      if (!bfvs && keepAwake) {
-        // keep the screen awake while the user is writting the seed
-        keepAwake(true);
-      }
-    })();
+    if (keepAwake) {
+      (async () => {
+        const bfvs: boolean = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
+        setBasicFirstViewSeed(bfvs);
+        if (!bfvs) {
+          // keep the screen awake while the user is writting the seed
+          keepAwake(true);
+        }
+      })();
+    }
   }, [keepAwake]);
 
   useEffect(() => {
@@ -144,13 +144,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     setBirthdayNumber((wallet.birthday && wallet.birthday.toString()) || '');
   }, [action, wallet.seed, wallet.birthday, wallet, translate]);
 
-  // because this screen is fired from more places than the menu.
-  useEffect(() => {
-    if (action !== SeedActionEnum.new) {
-      (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
-    }
-  }, [action]);
-
   const onPressOK = () => {
     Alert.alert(
       !!texts && !!texts[action] ? texts[action][3] : '',
@@ -180,7 +173,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
   //console.log('=================================');
   //console.log(wallet.seed, wallet.birthday);
-  //console.log(seedPhrase, birthdayNumber);
+  //console.log('render seed', privacy);
 
   return (
     <SafeAreaView
@@ -197,18 +190,17 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         noSyncingStatus={true}
         noDrawMenu={true}
         setPrivacyOption={setPrivacyOption}
+        addLastSnackbar={addLastSnackbar}
         translate={translate}
         netInfo={netInfo}
         mode={mode}
-        addLastSnackbar={addLastSnackbar}
+        privacy={privacy}
         receivedLegend={action === SeedActionEnum.view ? !basicFirstViewSeed : false}
+        closeScreen={onClickCancel}
       />
-
-      <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        style={{ maxHeight: '85%' }}
+        style={{ height: '80%', maxHeight: '80%' }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
@@ -329,7 +321,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             mode === ModeEnum.basic
               ? !basicFirstViewSeed
                 ? (translate('seed.showtransactions') as string)
-                : (translate('close') as string)
+                : (translate('cancel') as string)
               : !!texts && !!texts[action]
               ? texts[action][times]
               : ''
@@ -350,15 +342,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             }
           }}
         />
-        {times > 0 && (
-          <Button
-            testID="seed.button.cancel"
-            type={ButtonTypeEnum.Secondary}
-            title={translate('cancel') as string}
-            style={{ marginLeft: 10 }}
-            onPress={onClickCancel}
-          />
-        )}
       </View>
     </SafeAreaView>
   );

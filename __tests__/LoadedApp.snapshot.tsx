@@ -64,7 +64,7 @@ jest.mock('react-native', () => {
 
   RN.NativeModules.RPCModule = {
     execute: jest.fn(() => '[]'),
-    getValueTransfersList: jest.fn(() => '{ "value_transfers": [] }'),
+    getValueTransfersList: jest.fn(() => '{ "value_transfers": [], "total": 0 }'),
   };
 
   return RN;
@@ -95,8 +95,12 @@ jest.mock('react-native-gesture-handler', () => {
     State: {},
     Directions: {},
   };
+
+  const DrawerLayout = jest.fn();
+
   return {
     RNGestureHandlerModule: RN,
+    DrawerLayout,
   };
 });
 jest.mock('react-native-keychain', () => ({
@@ -122,6 +126,10 @@ jest.mock('react-native-keychain', () => ({
   getGenericPassword: jest.fn(),
   resetGenericPassword: jest.fn(),
 }));
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
+}));
 
 // test suite
 describe('Component LoadedApp - test', () => {
@@ -138,6 +146,7 @@ describe('Component LoadedApp - test', () => {
     const readOnly = false;
     const toggleTheme = jest.fn();
     const selectServer = SelectServerEnum.auto;
+    const zenniesDonationAddress = 'xxxxxxxxxxxxxxxxx';
     const loadedapp = render(
       <LoadedAppClass
         navigation={mockNavigation}
@@ -159,6 +168,7 @@ describe('Component LoadedApp - test', () => {
         selectServer={selectServer}
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
+        zenniesDonationAddress={zenniesDonationAddress}
       />,
     );
     expect(loadedapp.toJSON()).toMatchSnapshot();

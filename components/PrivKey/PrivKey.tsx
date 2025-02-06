@@ -2,11 +2,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView, TouchableOpacity, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 
 import FadeText from '../Components/FadeText';
-import Button from '../Components/Button';
 import Utils from '../../app/utils';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -15,7 +14,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { ButtonTypeEnum, SnackbarDurationEnum } from '../../app/AppState';
+import { SnackbarDurationEnum } from '../../app/AppState';
 
 type PrivKeyProps = {
   closeModal: () => void;
@@ -69,10 +68,10 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
+        closeScreen={closeModal}
       />
-
       <ScrollView
-        style={{ maxHeight: '85%' }}
+        style={{ maxHeight: '90%' }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
@@ -128,16 +127,6 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
           ))}
         </View>
       </ScrollView>
-      <View
-        style={{
-          flexGrow: 1,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
-        }}>
-        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
-      </View>
     </SafeAreaView>
   );
 };

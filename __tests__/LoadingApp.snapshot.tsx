@@ -65,7 +65,7 @@ jest.mock('react-native', () => {
     execute: jest.fn(() => '{}'),
     getLatestBlock: jest.fn(() => '{}'),
     walletExists: jest.fn(() => 'false'),
-    getValueTransfersList: jest.fn(() => '{ "value_transfers": [] }'),
+    getValueTransfersList: jest.fn(() => '{ "value_transfers": [], "total": 0 }'),
     setCryptoDefaultProvider: jest.fn(() => 'true'),
   };
 
@@ -109,6 +109,10 @@ jest.mock('react-native-keychain', () => ({
   resetGenericPassword: jest.fn(),
   hasGenericPassword: jest.fn(),
   getSupportedBiometryType: jest.fn(),
+}));
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
 }));
 
 // test suite

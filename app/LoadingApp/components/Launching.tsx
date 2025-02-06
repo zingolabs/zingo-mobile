@@ -3,9 +3,9 @@ import React from 'react';
 import { SafeAreaView, Text, View, ActivityIndicator } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { ThemeType } from '../types';
-import { ButtonTypeEnum, TranslateType } from '../AppState';
-import Button from '../../components/Components/Button';
+import { ThemeType } from '../../types';
+import { ButtonTypeEnum, TranslateType } from '../../AppState';
+import Button from '../../../components/Components/Button';
 
 type LaunchingProps = {
   translate: (key: string) => TranslateType;
@@ -66,7 +66,8 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                 color: colors.primaryDisabled,
                 fontSize: 15,
                 marginTop: 10,
-              }}>
+              }}
+              selectable>
               {props.message}
             </Text>
           )}
@@ -79,7 +80,8 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   fontWeight: 'bold',
                   marginTop: 10,
                   textAlign: 'center',
-                }}>
+                }}
+                selectable>
                 {props.translate('biometricsfailed-title') as string}
               </Text>
               <Text
@@ -88,7 +90,8 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   fontSize: 15,
                   marginTop: 10,
                   textAlign: 'center',
-                }}>
+                }}
+                selectable>
                 {props.translate('biometricsfailed-body') as string}
               </Text>
               <Text
@@ -98,7 +101,8 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   marginTop: 10,
                   marginBottom: 10,
                   textAlign: 'center',
-                }}>
+                }}
+                selectable>
                 {props.translate('biometricsfailed-footer') as string}
               </Text>
               <Button
@@ -119,7 +123,8 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   marginTop: 10,
                   opacity: props.firstLaunchingMessage && !props.biometricsFailed ? 1 : 0,
                   textAlign: 'center',
-                }}>
+                }}
+                selectable>
                 {props.translate('firstlaunchingmessage-title') as string}
               </Text>
               <Text
@@ -129,7 +134,8 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   marginTop: 10,
                   opacity: props.firstLaunchingMessage && !props.biometricsFailed ? 1 : 0,
                   textAlign: 'center',
-                }}>
+                }}
+                selectable>
                 {props.translate('firstlaunchingmessage-body') as string}
               </Text>
               <Text
@@ -140,7 +146,8 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   marginBottom: 10,
                   opacity: props.firstLaunchingMessage && !props.biometricsFailed ? 1 : 0,
                   textAlign: 'center',
-                }}>
+                }}
+                selectable>
                 {props.translate('firstlaunchingmessage-footer') as string}
               </Text>
             </>

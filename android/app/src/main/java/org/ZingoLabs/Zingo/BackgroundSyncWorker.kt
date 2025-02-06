@@ -32,6 +32,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
 import org.ZingoLabs.Zingo.Constants.*
+import java.io.FileInputStream
 
 class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
 
@@ -107,7 +108,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
     private fun loadWalletFile(rpcModule: RPCModule) {
         // I have to init from wallet file in order to do the sync
         // and I need to read the settings.json to find the server & chain type
-        MainApplication.getAppContext()?.openFileInput("settings.json")?.use { file ->
+        MainApplication.getAppContext()?.openFileInput("settings.json")?.use { file: FileInputStream ->
             val settingsBytes = file.readBytes()
             file.close()
             val settingsString = settingsBytes.toString(Charsets.UTF_8)
@@ -160,7 +161,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
 
 class BSCompanion {
     companion object {
-        private const val taskID = "Zingo_Processing_Task_ID"
+        private const val TASKID = "Zingo_Processing_Task_ID"
         private val SYNC_PERIOD = 24.hours
         private val SYNC_DAY_SHIFT = 1.days // Move to tomorrow
         private val SYNC_START_TIME_HOURS = 3.hours // Start around 3 a.m. at night
@@ -189,13 +190,13 @@ class BSCompanion {
             Log.i("SCHEDULING_TASK", "Enqueuing the background task - Background")
             WorkManager.getInstance(reactContext)
                 .enqueueUniquePeriodicWork(
-                    taskID,
-                    ExistingPeriodicWorkPolicy.REPLACE,
+                    TASKID,
+                    ExistingPeriodicWorkPolicy.UPDATE,
                     workRequest
                 )
 
             Log.i("SCHEDULING_TASK", "Task info ${WorkManager.getInstance(reactContext).getWorkInfosForUniqueWork(
-                taskID).get()}")
+                TASKID).get()}")
         }
 
         private fun calculateTargetTimeDifference(): Duration {
@@ -236,7 +237,7 @@ class BSCompanion {
 
             Log.i("SCHEDULING_TASK", "Cancel background Task")
             WorkManager.getInstance(reactContext)
-                .cancelUniqueWork(taskID)
+                .cancelUniqueWork(TASKID)
         }
 
     }

@@ -12,7 +12,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { ButtonTypeEnum, SelectServerEnum } from '../../app/AppState';
+import { ButtonTypeEnum, SelectServerEnum, SnackbarDurationEnum } from '../../app/AppState';
 
 type RescanProps = {
   closeModal: () => void;
@@ -32,6 +32,10 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) 
     }
     doRescan();
     closeModal();
+    addLastSnackbar({
+      message: translate('loadedapp.syncing') as string,
+      duration: SnackbarDurationEnum.longer,
+    });
   };
 
   return (
@@ -49,10 +53,10 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) 
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
+        closeScreen={closeModal}
       />
-
       <ScrollView
-        style={{ maxHeight: '85%' }}
+        style={{ height: '80%', maxHeight: '80%' }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
@@ -71,12 +75,6 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) 
           marginVertical: 5,
         }}>
         <Button type={ButtonTypeEnum.Primary} title={translate('rescan.button') as string} onPress={doRescanAndClose} />
-        <Button
-          type={ButtonTypeEnum.Secondary}
-          title={translate('cancel') as string}
-          style={{ marginLeft: 10 }}
-          onPress={closeModal}
-        />
       </View>
     </SafeAreaView>
   );

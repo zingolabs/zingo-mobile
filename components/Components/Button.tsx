@@ -15,6 +15,7 @@ type ButtonProps = {
   accessible?: boolean;
   accessibilityLabel?: string;
   testID?: string;
+  twoButtons?: boolean;
 };
 
 const Button: React.FunctionComponent<ButtonProps> = ({
@@ -26,6 +27,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   accessible,
   accessibilityLabel,
   testID,
+  twoButtons,
 }) => {
   const { colors } = useTheme() as unknown as ThemeType;
   // type: Primary or Secondary
@@ -33,14 +35,16 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     type === ButtonTypeEnum.Primary
       ? {
           backgroundColor: disabled ? colors.primaryDisabled : colors.primary,
-          borderColor: disabled ? colors.primaryDisabled : colors.text,
+          borderColor: disabled ? colors.primaryDisabled : colors.primary,
           borderWidth: 2,
+          width: twoButtons ? '40%' : '80%',
         }
       : type === ButtonTypeEnum.Secondary
       ? {
           backgroundColor: disabled ? colors.secondaryDisabled : colors.background,
           borderColor: disabled ? colors.primaryDisabled : colors.primary,
           borderWidth: 2,
+          width: twoButtons ? '40%' : '80%',
         }
       : {
           // error

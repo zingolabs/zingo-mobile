@@ -9,6 +9,11 @@ import { render } from '@testing-library/react-native';
 import DetailLine from '../components/Components/DetailLine';
 import { View } from 'react-native';
 
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
+}));
+
 // test suite
 describe('Component DetailLine - test', () => {
   //snapshot test

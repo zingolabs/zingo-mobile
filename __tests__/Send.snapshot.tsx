@@ -61,13 +61,17 @@ jest.mock('react-native-device-info', () => ({
   getManufacturer: jest.fn(() => 'Mocked Manufacturer'),
   getModel: jest.fn(() => 'Mocked Model'),
 }));
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
+}));
 
 // test suite
 describe('Component Send - test', () => {
   //snapshot test
   const state = defaultAppContextLoaded;
   state.valueTransfers = mockValueTransfers;
-  state.uaAddress = mockAddresses[0].uaAddress;
+  state.uOrchardAddress = mockAddresses[0].uOrchardAddress;
   state.addresses = mockAddresses;
   state.translate = mockTranslate;
   state.info = mockInfo;
@@ -86,22 +90,17 @@ describe('Component Send - test', () => {
     const send = render(
       <ContextAppLoadedProvider value={state}>
         <Send
-          setSendPageState={onFunction}
           sendTransaction={onFunction}
           clearToAddr={onFunction}
-          setSendProgress={onFunction}
           toggleMenuDrawer={onFunction}
           setComputingModalVisible={onFunction}
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
-          setZecPrice={onFunction}
           setPrivacyOption={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           setScrollToBottom={onFunction}
           setServerOption={onFunction}
-          clearTimers={onFunction}
-          configure={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
@@ -118,22 +117,17 @@ describe('Component Send - test', () => {
     const send = render(
       <ContextAppLoadedProvider value={state}>
         <Send
-          setSendPageState={onFunction}
           sendTransaction={onFunction}
           clearToAddr={onFunction}
-          setSendProgress={onFunction}
           toggleMenuDrawer={onFunction}
           setComputingModalVisible={onFunction}
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
-          setZecPrice={onFunction}
           setPrivacyOption={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           setScrollToBottom={onFunction}
           setServerOption={onFunction}
-          clearTimers={onFunction}
-          configure={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

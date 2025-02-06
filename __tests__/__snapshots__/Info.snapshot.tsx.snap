@@ -12,70 +12,38 @@ exports[`Component Info - test Info - snapshot 1`] = `
     }
   }
 >
-  <View
-    style={
-      {
-        "alignItems": "center",
-        "backgroundColor": "rgb(255, 255, 255)",
-        "display": "flex",
-        "paddingBottom": 0,
-        "paddingTop": 10,
-        "zIndex": -1,
-      }
-    }
-    testID="header"
-  >
+  <View>
     <View
       style={
         {
           "alignItems": "center",
+          "backgroundColor": "rgb(255, 255, 255)",
           "display": "flex",
-          "flexDirection": "row",
-          "flexWrap": "wrap",
-          "height": 40,
-          "justifyContent": "center",
-          "marginHorizontal": 5,
-          "marginTop": 12,
+          "minHeight": 25,
+          "paddingBottom": 0,
+          "paddingTop": 10,
+          "zIndex": -1,
         }
       }
-    />
-    <View
-      style={
-        {
-          "height": 20,
-        }
-      }
-    />
-    <View
-      style={
-        {
-          "alignItems": "center",
-          "display": "flex",
-          "flexDirection": "column",
-          "flexWrap": "wrap",
-          "justifyContent": "center",
-        }
-      }
+      testID="header"
     >
-      <Text
+      <View
         style={
           {
-            "color": "rgb(28, 28, 30)",
-            "fontSize": 18,
-            "fontWeight": "600",
-            "marginBottom": 3,
-            "opacity": 1,
-            "paddingHorizontal": 5,
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "row",
+            "flexWrap": "wrap",
+            "justifyContent": "center",
+            "marginHorizontal": 5,
+            "marginTop": 12,
           }
         }
-      >
-        text translated
-      </Text>
+      />
     </View>
     <View
       style={
         {
-          "alignItems": "flex-start",
           "left": 0,
           "padding": 11.5,
           "position": "absolute",
@@ -87,6 +55,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
           {
             "alignItems": "center",
             "flexDirection": "row",
+            "height": 45,
           }
         }
       />
@@ -94,7 +63,6 @@ exports[`Component Info - test Info - snapshot 1`] = `
     <View
       style={
         {
-          "alignItems": "flex-end",
           "padding": 15,
           "position": "absolute",
           "right": 0,
@@ -113,6 +81,103 @@ exports[`Component Info - test Info - snapshot 1`] = `
             "height": 38,
             "resizeMode": "contain",
             "width": 38,
+          }
+        }
+      />
+    </View>
+  </View>
+  <View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "display": "flex",
+          "flexDirection": "row",
+          "flexWrap": "wrap",
+          "justifyContent": "space-between",
+          "marginVertical": 5,
+          "width": "100%",
+        }
+      }
+    >
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "opacity": 1,
+          }
+        }
+      >
+        <
+          color="rgb(0, 122, 255)"
+          icon={
+            {
+              "icon": [
+                320,
+                512,
+                [
+                  9001,
+                ],
+                "f053",
+                "M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z",
+              ],
+              "iconName": "chevron-left",
+              "prefix": "fas",
+            }
+          }
+          size={30}
+          style={
+            {
+              "marginHorizontal": 10,
+            }
+          }
+        />
+      </View>
+      <Text
+        style={
+          {
+            "color": "rgb(28, 28, 30)",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "opacity": 1,
+            "paddingHorizontal": 5,
+          }
+        }
+      >
+        text translated
+      </Text>
+      <View
+        style={
+          {
+            "height": 30,
+            "marginHorizontal": 10,
+            "width": 30,
           }
         }
       />
@@ -137,7 +202,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
     }
     style={
       {
-        "maxHeight": "85%",
+        "maxHeight": "90%",
       }
     }
   >
@@ -484,92 +549,5 @@ exports[`Component Info - test Info - snapshot 1`] = `
       </View>
     </View>
   </RCTScrollView>
-  <View
-    style={
-      {
-        "alignItems": "center",
-        "flexDirection": "row",
-        "flexGrow": 1,
-        "justifyContent": "center",
-        "marginVertical": 5,
-      }
-    }
-  >
-    <View
-      accessibilityState={
-        {
-          "busy": undefined,
-          "checked": undefined,
-          "disabled": undefined,
-          "expanded": undefined,
-          "selected": undefined,
-        }
-      }
-      accessibilityValue={
-        {
-          "max": undefined,
-          "min": undefined,
-          "now": undefined,
-          "text": undefined,
-        }
-      }
-      accessible={true}
-      collapsable={false}
-      focusable={true}
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        {
-          "alignItems": "center",
-          "backgroundColor": "rgb(242, 242, 242)",
-          "borderColor": "rgb(0, 122, 255)",
-          "borderRadius": 10,
-          "borderWidth": 2,
-          "justifyContent": "center",
-          "maxWidth": "90%",
-          "minHeight": 48,
-          "minWidth": "30%",
-          "opacity": 1,
-          "padding": 0,
-          "paddingLeft": 20,
-          "paddingRight": 20,
-        }
-      }
-    >
-      <View
-        style={
-          {
-            "alignItems": "center",
-            "display": "flex",
-            "flexDirection": "row",
-            "justifyContent": "center",
-            "margin": 0,
-            "minHeight": 48,
-            "minWidth": 48,
-            "padding": 0,
-          }
-        }
-      >
-        <Text
-          style={
-            {
-              "color": "rgb(0, 122, 255)",
-              "fontSize": 16,
-              "fontWeight": "bold",
-              "textAlign": "center",
-              "textTransform": "uppercase",
-            }
-          }
-        >
-          text translated
-        </Text>
-      </View>
-    </View>
-  </View>
 </RCTSafeAreaView>
 `;

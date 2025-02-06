@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect } from 'react';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@react-navigation/native';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
@@ -65,11 +65,9 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
   return (
     <View style={{ flexDirection: 'column' }}>
       <ScrollView
-        contentContainerStyle={[
-          {
-            alignItems: 'center',
-          },
-        ]}>
+        contentContainerStyle={{
+          alignItems: 'center',
+        }}>
         {!!address && address !== (translate('receive.noaddress') as string) ? (
           <>
             <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.text }}>
@@ -211,6 +209,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
               flexDirection: 'row',
               justifyContent: 'center',
               marginTop: 50,
+              marginBottom: 30,
             }}>
             <RegText>{address}</RegText>
           </View>

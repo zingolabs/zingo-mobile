@@ -4,7 +4,7 @@ import { RPCValueTransfersStatusEnum } from '../../rpc/enums/RPCValueTransfersSt
 
 export default interface ValueTransferType {
   txid: string;
-  kind?: ValueTransferKindEnum; // like kind
+  kind: ValueTransferKindEnum;
   fee?: number;
   confirmations: number;
   time: number;

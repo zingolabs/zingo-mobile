@@ -70,7 +70,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
   </svg>`;
 
   return (
-    <View style={{ ...style, flexDirection: 'row', margin: 5 }}>
+    <View style={{ ...style, flexDirection: 'row', marginHorizontal: 5 }}>
       <TouchableOpacity disabled={!privacyHigh} onPress={onPress}>
         <View
           testID={testID}

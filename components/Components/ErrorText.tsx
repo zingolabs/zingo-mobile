@@ -7,13 +7,14 @@ type ErrorTextProps = {
   style?: TextStyle;
   children: string;
   testID?: string;
+  selectable?: boolean;
 };
 
-const ErrorText: React.FunctionComponent<ErrorTextProps> = ({ style, children, testID }) => {
+const ErrorText: React.FunctionComponent<ErrorTextProps> = ({ style, children, testID, selectable }) => {
   const { colors } = useTheme() as unknown as ThemeType;
 
   return (
-    <Text testID={testID} style={{ color: colors.primary, ...style }}>
+    <Text testID={testID} style={{ color: colors.primary, ...style }} selectable={selectable}>
       {children}
     </Text>
   );

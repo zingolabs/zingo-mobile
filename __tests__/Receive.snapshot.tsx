@@ -49,13 +49,17 @@ jest.mock('react-native', () => {
 
   return RN;
 });
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
+}));
 
 // test suite
 describe('Component Receive - test', () => {
   //snapshot test
   test('Receive - snapshot', () => {
     const state = defaultAppContextLoaded;
-    state.uaAddress = mockAddresses[0].uaAddress;
+    state.uOrchardAddress = mockAddresses[0].uOrchardAddress;
     state.addresses = mockAddresses;
     state.translate = mockTranslate;
     state.info = mockInfo;
@@ -63,7 +67,7 @@ describe('Component Receive - test', () => {
     const onFunction = jest.fn();
     const receive = render(
       <ContextAppLoadedProvider value={state}>
-        <Receive setUaAddress={onFunction} toggleMenuDrawer={onFunction} syncingStatusMoreInfoOnClick={onFunction} />
+        <Receive toggleMenuDrawer={onFunction} syncingStatusMoreInfoOnClick={onFunction} alone={false} />
       </ContextAppLoadedProvider>,
     );
     expect(receive.toJSON()).toMatchSnapshot();

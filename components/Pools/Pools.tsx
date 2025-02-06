@@ -5,11 +5,9 @@ import { useTheme } from '@react-navigation/native';
 
 import ZecAmount from '../Components/ZecAmount';
 import BoldText from '../Components/BoldText';
-import Button from '../Components/Button';
 import DetailLine from '../Components/DetailLine';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import RPC from '../../app/rpc';
 import Header from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import FadeText from '../Components/FadeText';
@@ -18,7 +16,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { ButtonTypeEnum, CommandEnum, GlobalConst } from '../../app/AppState';
+import { CommandEnum } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import { RPCWalletKindType } from '../../app/rpc/types/RPCWalletKindType';
 
@@ -38,8 +36,6 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOpti
 
   useEffect(() => {
     (async () => {
-      // because this screen is fired from more places than the menu.
-      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
       // checking the pools of this wallet
       const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
       try {
@@ -70,10 +66,10 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOpti
         noDrawMenu={true}
         setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
+        closeScreen={closeModal}
       />
-
       <ScrollView
-        style={{ maxHeight: '85%' }}
+        style={{ maxHeight: '90%' }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
@@ -223,22 +219,6 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOpti
           )}
         </View>
       </ScrollView>
-
-      <View
-        style={{
-          flexGrow: 1,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
-        }}>
-        <Button
-          testID="fundpools.button.close"
-          type={ButtonTypeEnum.Secondary}
-          title={translate('close') as string}
-          onPress={closeModal}
-        />
-      </View>
     </SafeAreaView>
   );
 };

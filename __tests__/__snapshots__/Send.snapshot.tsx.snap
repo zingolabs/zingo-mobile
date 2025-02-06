@@ -14,27 +14,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
     }
   }
 >
-  <Modal
-    animationType="slide"
-    hardwareAccelerated={false}
-    onRequestClose={[Function]}
-    transparent={false}
-    visible={false}
-  />
-  <Modal
-    animationType="slide"
-    hardwareAccelerated={false}
-    onRequestClose={[Function]}
-    transparent={false}
-    visible={false}
-  />
-  <Modal
-    animationType="slide"
-    hardwareAccelerated={false}
-    onRequestClose={[Function]}
-    transparent={false}
-    visible={false}
-  />
   <RCTScrollView
     contentContainerStyle={{}}
     keyboardShouldPersistTaps="handled"
@@ -484,7 +463,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                       style={
                         {
                           "flexDirection": "row",
-                          "margin": 5,
+                          "marginHorizontal": 5,
                         }
                       }
                     >
@@ -869,23 +848,12 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                             {
                               "color": "#ffffff",
                               "fontSize": 12.5,
-                              "marginTop": 5,
-                            }
-                          }
-                        >
-                          $
-                        </Text>
-                        <Text
-                          style={
-                            {
-                              "color": "#ffffff",
-                              "fontSize": 12.5,
                               "fontWeight": "700",
                               "marginTop": 5,
                             }
                           }
                         >
-                           -.--
+                          $ -.--
                         </Text>
                       </View>
                     </View>
@@ -1050,6 +1018,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   "padding": 0,
                   "paddingLeft": 20,
                   "paddingRight": 20,
+                  "width": "40%",
                 }
               }
               testID="send.button-disabled"
@@ -1127,6 +1096,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   "padding": 0,
                   "paddingLeft": 20,
                   "paddingRight": 20,
+                  "width": "40%",
                 }
               }
             >
@@ -1181,27 +1151,6 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
     }
   }
 >
-  <Modal
-    animationType="slide"
-    hardwareAccelerated={false}
-    onRequestClose={[Function]}
-    transparent={false}
-    visible={false}
-  />
-  <Modal
-    animationType="slide"
-    hardwareAccelerated={false}
-    onRequestClose={[Function]}
-    transparent={false}
-    visible={false}
-  />
-  <Modal
-    animationType="slide"
-    hardwareAccelerated={false}
-    onRequestClose={[Function]}
-    transparent={false}
-    visible={false}
-  />
   <RCTScrollView
     contentContainerStyle={{}}
     keyboardShouldPersistTaps="handled"
@@ -1651,7 +1600,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       style={
                         {
                           "flexDirection": "row",
-                          "margin": 5,
+                          "marginHorizontal": 5,
                         }
                       }
                     >
@@ -2037,23 +1986,12 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                             {
                               "color": "#ffffff",
                               "fontSize": 12.5,
-                              "marginTop": 5,
-                            }
-                          }
-                        >
-                          $
-                        </Text>
-                        <Text
-                          style={
-                            {
-                              "color": "#ffffff",
-                              "fontSize": 12.5,
                               "fontWeight": "700",
                               "marginTop": 5,
                             }
                           }
                         >
-                           16.66
+                          $ 16.66
                         </Text>
                       </View>
                     </View>
@@ -2218,6 +2156,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   "padding": 0,
                   "paddingLeft": 20,
                   "paddingRight": 20,
+                  "width": "40%",
                 }
               }
               testID="send.button-disabled"
@@ -2295,6 +2234,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   "padding": 0,
                   "paddingLeft": 20,
                   "paddingRight": 20,
+                  "width": "40%",
                 }
               }
             >

@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.10.3 (205)",
+  "version": "zingo-1.11.0 (217)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -32,9 +32,23 @@
   "email": "zingo@zingolabs.org",
   "subject": "Soporte Zingo...",
   "body": "Necesito ayuda con...",
+  "connecting": "Conectando",
+  "syncing": "Sincronizando -",
+  "synced": "Sincronizada",
   "messages": {
     "title": "Mensajes",
-    "empty": "Todavía no hay mensajes."
+    "title-chats": "Chats",
+    "empty": "Todavía no hay mensajes.",
+    "message-placeholder": "Mensaje",
+    "message-placeholder-error": "No hay fondos disponibles gastables",
+    "search-placeholder": "Buscar",
+    "filter-all": "Todos",
+    "filter-contacts": "Contactos",
+    "filter-no-contacts": "No contactos",
+    "clear-filter": "Borrar:",
+    "contacts-empty": "Sin contactos ni direcciones.",
+    "link-all": "Global",
+    "link-anonymous": "Anónimos"
   },
   "addressbook": {
     "title": "Libreta de Direcciones",
@@ -57,7 +71,8 @@
     "delete-alert": "¿Realmente quieres borrar este Contacto de tu libreta de direcciones?",
     "likely": "Probablemente: ",
     "thiswalletaddress": "La Dirección de este Monedero",
-    "addto": "Añadir a "
+    "addto": "Añadir a ",
+    "uorchardaddress": "DU Orchard:\n"
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",
@@ -137,7 +152,7 @@
     "send-menu": "ENVIAR",
     "receive-menu": "RECIBIR",
     "messages-menu": "MENSAJES",
-    "syncing": "Pausando la Sincronización para poder Completar la Transacción.",
+    "syncing": "Deteniendo la Sincronización para poder resetear la billetera.",
     "zcash-url": "Ya tienes una dirección en la pantalla de envío",
     "connection-error": "Esta opción necesita conexión a internet para ser ejecutada.",
     "tryingnewserver": "Intentando conectar con el nuevo Servidor... Puede llevar varios segundos.",
@@ -433,7 +448,6 @@
     "Broadcast": "Transmitida y esperando confirmación Tx:",
     "sending-error": "Error enviando transacción",
     "title": "Enviar",
-    "title-syncing": "Enviar - Sincronizando",
     "more": "ver más...",
     "toaddress": "A la Dirección",
     "invalidaddress": "¡Dirección Incorrecta!",
@@ -482,23 +496,28 @@
     "donation-minimum-message": "La cantidad mínima para donaciones es un Zenny (0,01 ZEC), inténtalo de nuevo y gracias."
   },
   "receive": {
-    "u-title": "Dirección Unificada",
+    "u-title": "Unificada Blindada",
+    "z-title": "Z-Sapling",
+    "t-title": "Expuesta Transparente",
     "noaddress": "Sin Direcciones",
     "unoprivkey": "No hay ninguna dirección Unificada para exportar su Clave Privada",
     "unoviewkey": "No hay ninguna dirección Unificada para exportar su Clave de Visualización",
-    "title": "Recibir",
-    "title-syncing": "Recibir - Sincronizando",
+    "title-advanced": "Mis Direcciones",
+    "title-basic": "Mi Dirección",
+    "title-basic-alone": "Mi Dirección de Recepción",
     "more": "ver más...",
     "newu-option": "Nueva Dirección Unificada Diversificada",
     "privkey-option": "Exportar la Clave para Gastar",
     "viewkey-option": "Exportar la Clave de Visualización Total",
     "import-option": "Importar una Clave...",
     "title-acc": "Pantalla de Recibir",
-    "z-title": "Z-Sapling",
-    "t-title": "Transparente",
     "of": " de ",
     "prev": "Anterior",
-    "next": "Siguiente"
+    "next": "Siguiente",
+    "shielded-orchard": "Orchard",
+    "shielded-sapling": "Z-Sapling",
+    "shielded-orchard-sapling": "Orchard+Sapling",
+    "shielded-full": "Completa"
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",
@@ -522,7 +541,6 @@
     "shield-alert-transparent": "Confirmar para blindar tus fondos al último pool blindado Orchard.",
     "shield-alert-sapling": "Confirmar para asignar tus fondos al último pool blindado Orchard",
     "title": "Histórico",
-    "title-syncing": "Histórico - Sincronizando",
     "more": "ver más...",
     "refreshing": "Refrescando",
     "end": "FIN",
@@ -564,7 +582,10 @@
     "not-confirmed": "Transacción no confirmada todavía",
     "calculated": "Calculada",
     "transmitted": "Transmitida",
-    "mempool": "En Mempool"
+    "mempool": "En Mempool",
+    "confirmed": "Confirmada",
+    "filter-withfunds": "Con fondos",
+    "empty": "Todavía no hay transacciones."
   },
   "report": {
     "title": "Informe de Sincronización",

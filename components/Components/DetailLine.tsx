@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { ReactNode, useContext } from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@react-navigation/native';
 
 import FadeText from './FadeText';

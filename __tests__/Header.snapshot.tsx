@@ -50,9 +50,17 @@ describe('Component Header - test', () => {
   test('Header Simple - snapshot', () => {
     const state = defaultAppContextLoaded;
     state.translate = mockTranslate;
+    const close = jest.fn();
     const about = render(
       <ContextAppLoadedProvider value={state}>
-        <Header title="title" noBalance={true} noSyncingStatus={true} noDrawMenu={true} noPrivacy={true} />
+        <Header
+          title="title"
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          closeScreen={close}
+        />
       </ContextAppLoadedProvider>,
     );
     expect(about.toJSON()).toMatchSnapshot();
@@ -66,12 +74,11 @@ describe('Component Header - test', () => {
     const header = render(
       <ContextAppLoadedProvider value={state}>
         <Header
+          title="title"
           testID="valuetransfer text"
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
           toggleMenuDrawer={onFunction}
-          setZecPrice={onFunction}
-          title="title"
           setComputingModalVisible={onFunction}
           setBackgroundError={onFunction}
           setPrivacyOption={onFunction}

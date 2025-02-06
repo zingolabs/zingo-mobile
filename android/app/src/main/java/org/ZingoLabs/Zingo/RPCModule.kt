@@ -7,11 +7,9 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
-
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
-import kotlin.concurrent.thread
 import org.ZingoLabs.Zingo.Constants.*
 import kotlinx.coroutines.*
 
@@ -434,16 +432,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     saveWalletFile()
                 }
 
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
+                promise.resolve(resp)
             } catch (e: Exception) {
                 val errorMessage = "Error: executing command '$cmd': ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
+                promise.resolve(errorMessage)
             }
         }
     }
@@ -454,16 +448,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             try {
                 val result = saveWalletFile()
 
-                withContext(Dispatchers.Main) {
-                    promise.resolve(result)
-                }
+                promise.resolve(result)
             } catch (e: Exception) {
                 val errorMessage = "Error: saving wallet: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
+                promise.resolve(errorMessage)
             }
         }
     }
@@ -474,16 +464,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             try {
                 val result = saveWalletBackupFile()
 
-                withContext(Dispatchers.Main) {
-                    promise.resolve(result)
-                }
+                promise.resolve(result)
             } catch (e: Exception) {
                 val errorMessage = "Error: saving wallet backup: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
+                promise.resolve(errorMessage)
             }
         }
     }
@@ -495,15 +481,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getLatestBlockServer(server)
 
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
+                promise.resolve(resp)
             } catch (e: Exception) {
                 val errorMessage = "Error: getting latest block: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
+
+                promise.resolve(errorMessage)
             }
         }
     }
@@ -515,15 +498,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getDeveloperDonationAddress()
 
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
+                promise.resolve(resp)
             } catch (e: Exception) {
                 val errorMessage = "Error: getting donation address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
+
+                promise.resolve(errorMessage)
             }
         }
     }
@@ -535,35 +515,29 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getZenniesForZingoDonationAddress()
 
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
+                promise.resolve(resp)
             } catch (e: Exception) {
                 val errorMessage = "Error: getting Zennies donation address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
+
+                promise.resolve(errorMessage)
             }
         }
     }
 
     @ReactMethod
-    fun getValueTransfersList(promise: Promise) {
+    fun getValueTransfersList(items: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getValueTransfers()
+                val resp = uniffi.zingo.getValueTransfers(items)
 
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
+                promise.resolve(resp)
             } catch (e: Exception) {
                 val errorMessage = "Error: getting value transfers list: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
+
+                promise.resolve(errorMessage)
             }
         }
     }
@@ -575,15 +549,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getTransactionSummaries()
 
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
+                promise.resolve(resp)
             } catch (e: Exception) {
                 val errorMessage = "Error: getting transaction summaries list: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
+
+                promise.resolve(errorMessage)
             }
         }
     }
@@ -595,15 +566,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.setCryptoDefaultProviderToRing()
 
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
+                promise.resolve(resp)
             } catch (e: Exception) {
                 val errorMessage = "Error: setting crypto default provider: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
+                promise.resolve(errorMessage)
             }
         }
     }

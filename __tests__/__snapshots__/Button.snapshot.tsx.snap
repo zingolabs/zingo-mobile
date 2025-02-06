@@ -33,7 +33,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
     {
       "alignItems": "center",
       "backgroundColor": "rgb(0, 122, 255)",
-      "borderColor": "rgb(28, 28, 30)",
+      "borderColor": "rgb(0, 122, 255)",
       "borderRadius": 10,
       "borderWidth": 2,
       "justifyContent": "center",
@@ -44,6 +44,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
       "padding": 0,
       "paddingLeft": 20,
       "paddingRight": 20,
+      "width": "80%",
     }
   }
 >
@@ -122,6 +123,7 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
       "padding": 0,
       "paddingLeft": 20,
       "paddingRight": 20,
+      "width": "80%",
     }
   }
 >

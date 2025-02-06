@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView } from 'react-native';
+import { View, ScrollView, SafeAreaView, ActivityIndicator, Platform } from 'react-native';
 
 import FadeText from '../../Components/FadeText';
 import BoldText from '../../Components/BoldText';
@@ -21,9 +21,14 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 
 import { ThemeType } from '../../../app/types';
-import RPC from '../../../app/rpc';
 import Utils from '../../../app/utils';
-import { ButtonTypeEnum, CommandEnum, PrivacyLevelFromEnum, GlobalConst } from '../../../app/AppState';
+import {
+  ButtonTypeEnum,
+  CommandEnum,
+  PrivacyLevelFromEnum,
+  GlobalConst,
+  SendPageStateClass,
+} from '../../../app/AppState';
 import { CurrencyEnum } from '../../../app/AppState';
 import { RPCAddressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
@@ -34,7 +39,7 @@ type ConfirmProps = {
   donationAmount: number;
   closeModal: () => void;
   openModal: () => void;
-  confirmSend: () => void;
+  confirmSend: (s: SendPageStateClass) => void;
   sendAllAmount: boolean;
   calculateFeeWithPropose: (
     amount: string,
@@ -43,6 +48,7 @@ type ConfirmProps = {
     includeUAMemo: boolean,
     command: CommandEnum.send | CommandEnum.sendall,
   ) => Promise<void>;
+  sendPageState: SendPageStateClass;
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
   closeModal,
@@ -52,15 +58,15 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   sendAllAmount,
   openModal,
   calculateFeeWithPropose,
+  sendPageState,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
-    sendPageState,
     info,
     translate,
     currency,
     zecPrice,
-    uaAddress,
+    uOrchardAddress,
     privacy,
     totalBalance,
     addLastSnackbar,
@@ -71,12 +77,14 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [privacyLevel, setPrivacyLevel] = useState<string>('-');
+  const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
   const [sendingTotal, setSendingTotal] = useState<number>(0);
 
-  const memoTotal: string = `${sendPageState.toaddr.memo || ''}${
-    sendPageState.toaddr.includeUAMemo ? '\nReply to: \n' + uaAddress : ''
-  }`;
+  const memoTotal: string = Utils.buildMemo(
+    sendPageState.toaddr.memo,
+    sendPageState.toaddr.includeUAMemo,
+    uOrchardAddress,
+  );
 
   /**
    * Returns the privacy level for the transaction.
@@ -233,7 +241,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       // snack with Error
       addLastSnackbar({ message: translate('biometrics-error') as string });
     } else {
-      confirmSend();
+      confirmSend(sendPageState);
     }
   };
 
@@ -249,11 +257,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     })();
   }, [getPrivacyLevel]);
 
-  // the App is about to send - activate the interrupt syncing flag
-  useEffect(() => {
-    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true))();
-  }, []);
-
   useEffect(() => {
     calculateFeeWithPropose(
       sendPageState.toaddr.amount,
@@ -264,8 +267,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  //console.log(sendPageState, calculatedFee, Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount));
 
   return (
     <SafeAreaView
@@ -282,12 +283,14 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
+        closeScreen={closeModal}
       />
       <ScrollView
         showsVerticalScrollIndicator={true}
         persistentScrollbar={true}
         indicatorStyle={'white'}
         testID="send.confirm.scroll-view"
+        style={{ height: '80%', maxHeight: '80%' }}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
@@ -319,7 +322,14 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <View style={{ margin: 10 }}>
             <FadeText>{translate('send.confirm-privacy-level') as string}</FadeText>
-            <RegText>{privacyLevel}</RegText>
+            {!privacyLevel ? (
+              <ActivityIndicator
+                size={Platform.OS === GlobalConst.platformOSios ? 'small' : 12}
+                color={colors.primary}
+              />
+            ) : (
+              <RegText>{privacyLevel}</RegText>
+            )}
           </View>
           <View style={{ margin: 10 }}>
             <FadeText>{translate('send.fee') as string}</FadeText>
@@ -341,7 +351,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
         {[sendPageState.toaddr].map(to => {
           return (
-            <View key={to.id} style={{ margin: 10 }}>
+            <View key={`${to.id}-${to.to}`} style={{ margin: 10 }}>
               <FadeText>{translate('send.to') as string}</FadeText>
               <AddressItem address={to.to} withIcon={true} closeModal={closeModal} openModal={openModal} />
 
@@ -387,10 +397,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                   privacy={privacy}
                 />
               </View>
-              {!!to.memo && (
+              {!!memoTotal && (
                 <>
                   <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo') as string}</FadeText>
-                  <RegText testID="send.confirm-memo">{memoTotal}</RegText>
+                  <RegText testID="send.confirm-memo" selectable={true}>
+                    {memoTotal}
+                  </RegText>
                 </>
               )}
             </View>
@@ -402,21 +414,16 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       <View
         style={{
           flexGrow: 1,
-          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
           alignItems: 'center',
-          marginTop: 10,
+          marginVertical: 5,
         }}>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <Button
             type={ButtonTypeEnum.Primary}
             title={sendAllAmount ? (translate('send.confirm-button-all') as string) : (translate('confirm') as string)}
             onPress={() => confirmSendBiometrics()}
-          />
-          <Button
-            type={ButtonTypeEnum.Secondary}
-            style={{ marginLeft: 20 }}
-            title={translate('cancel') as string}
-            onPress={closeModal}
           />
         </View>
       </View>

@@ -44,6 +44,10 @@ jest.mock('react-native', () => {
 
   return RN;
 });
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
+}));
 
 // test suite
 describe('Component Info - test', () => {
@@ -55,10 +59,9 @@ describe('Component Info - test', () => {
     state.translate = mockTranslate;
     state.totalBalance = mockTotalBalance;
     const onClose = jest.fn();
-    const onSet = jest.fn();
     const info: any = render(
       <ContextAppLoadedProvider value={state}>
-        <Info closeModal={onClose} setZecPrice={onSet} />
+        <Info closeModal={onClose} />
       </ContextAppLoadedProvider>,
     );
     expect(info.toJSON()).toMatchSnapshot();

@@ -110,13 +110,17 @@ jest.mock('@react-navigation/native', () => ({
   useScrollToTop: jest.fn(),
   useTheme: () => mockTheme,
 }));
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
+}));
 
 // test suite
 describe('Component History - test', () => {
   //snapshot test
   const state = defaultAppContextLoaded;
   state.valueTransfers = mockValueTransfers;
-  state.uaAddress = mockAddresses[0].uaAddress;
+  state.uOrchardAddress = mockAddresses[0].uOrchardAddress;
   state.addresses = mockAddresses;
   state.translate = mockTranslate;
   state.info = mockInfo;
@@ -133,19 +137,18 @@ describe('Component History - test', () => {
     const history = render(
       <ContextAppLoadedProvider value={state}>
         <History
-          doRefresh={onFunction}
           toggleMenuDrawer={onFunction}
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
-          setZecPrice={onFunction}
           setComputingModalVisible={onFunction}
           setPrivacyOption={onFunction}
-          setSendPageState={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           scrollToTop={false}
           setScrollToBottom={onFunction}
           scrollToBottom={false}
+          sendTransaction={onFunction}
+          setServerOption={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
@@ -162,19 +165,18 @@ describe('Component History - test', () => {
     const history = render(
       <ContextAppLoadedProvider value={state}>
         <History
-          doRefresh={onFunction}
           toggleMenuDrawer={onFunction}
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
-          setZecPrice={onFunction}
           setComputingModalVisible={onFunction}
           setPrivacyOption={onFunction}
-          setSendPageState={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           scrollToTop={false}
           setScrollToBottom={onFunction}
           scrollToBottom={false}
+          sendTransaction={onFunction}
+          setServerOption={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

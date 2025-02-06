@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, SafeAreaView, Linking, Text } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -12,18 +12,16 @@ import { useTheme } from '@react-navigation/native';
 import {
   AddressBookFileClass,
   AddressClass,
-  ButtonTypeEnum,
   ChainNameEnum,
-  SendPageStateClass,
   SnackbarDurationEnum,
   ValueTransferType,
   ValueTransferKindEnum,
+  GlobalConst,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
-import Button from '../../Components/Button';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
@@ -45,7 +43,6 @@ type ValueTransferDetailProps = {
   closeModal: () => void;
   openModal: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
-  setSendPageState: (s: SendPageStateClass) => void;
   moveValueTransferDetail: (index: number, type: number) => void;
 };
 
@@ -57,11 +54,21 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   closeModal,
   setPrivacyOption,
   openModal,
-  setSendPageState,
   moveValueTransferDetail,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language, privacy, addLastSnackbar, server, currency, addressBook, addresses } = context;
+  const {
+    info,
+    translate,
+    language,
+    privacy,
+    addLastSnackbar,
+    server,
+    currency,
+    addressBook,
+    addresses,
+    zenniesDonationAddress,
+  } = context;
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
@@ -71,17 +78,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const [addressProtected, setAddressProtected] = useState<boolean>(true);
   const isTheFirstMount = useRef(true);
 
-  const memoTotal = vt.memos && vt.memos.length > 0 ? vt.memos.join('\n') : '';
-  let memo = '';
-  let memoUA = '';
-  if (memoTotal.includes('\nReply to: \n')) {
-    let memoArray = memoTotal.split('\nReply to: \n');
-    const memoPoped = memoArray.pop();
-    memoUA = memoPoped ? memoPoped : '';
-    memo = memoArray.join('');
-  } else {
-    memo = memoTotal;
-  }
+  const { memo, memoUA } = Utils.splitMemo(vt.memos);
 
   useEffect(() => {
     const spendCo =
@@ -130,7 +127,12 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   }, [totalLength]);
 
   const contactFound: (add: string) => boolean = (add: string) => {
-    const contact: AddressBookFileClass[] = addressBook.filter((ab: AddressBookFileClass) => ab.address === add);
+    if (!add) {
+      return false;
+    }
+    const contact: AddressBookFileClass[] = addressBook.filter(
+      (ab: AddressBookFileClass) => ab.address === add || ab.uOrchardAddress === add,
+    );
     return contact.length >= 1;
   };
 
@@ -140,8 +142,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   };
 
   const isAddressProtected: (add: string) => Promise<boolean> = async (add: string) => {
-    const zennyTips = await Utils.getZenniesDonationAddress(server.chainName);
-    return zennyTips === add;
+    return zenniesDonationAddress === add;
   };
 
   //console.log('vt', index, totalLength, isTheFirstMount);
@@ -162,6 +163,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
         noDrawMenu={true}
         setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar}
+        closeScreen={closeModal}
       />
       {showNavigator && (
         <View
@@ -349,7 +351,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                 address={vt.address}
                 withIcon={true}
                 withSendIcon={true}
-                setSendPageState={setSendPageState}
                 closeModal={closeModal}
                 openModal={openModal}
                 addressProtected={addressProtected}
@@ -386,7 +387,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                       duration: SnackbarDurationEnum.short,
                     });
                   }}>
-                  <RegText>{memo}</RegText>
+                  <RegText selectable={true}>{memo}</RegText>
                 </TouchableOpacity>
               )}
               {!!memoUA && (
@@ -404,7 +405,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                       duration: SnackbarDurationEnum.short,
                     });
                   }}>
-                  <RegText>{'\nReply to:'}</RegText>
+                  <RegText>{GlobalConst.replyTo}</RegText>
                   {!thisWalletAddress(memoUA) && (
                     <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
                   )}
@@ -430,9 +431,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
           )}
         </View>
       </ScrollView>
-      <View style={{ flexGrow: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 10 }}>
-        <Button type={ButtonTypeEnum.Secondary} title={translate('close') as string} onPress={closeModal} />
-      </View>
     </SafeAreaView>
   );
 };

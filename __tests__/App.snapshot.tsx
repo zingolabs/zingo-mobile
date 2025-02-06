@@ -40,7 +40,7 @@ jest.mock('react-native', () => {
 
   RN.NativeModules.RPCModule = {
     execute: jest.fn(() => '{}'),
-    getValueTransfersList: jest.fn(() => '{ "value_transfers": [] }'),
+    getValueTransfersList: jest.fn(() => '{ "value_transfers": [], "total": 0 }'),
   };
 
   return RN;
@@ -92,6 +92,10 @@ jest.mock('react-native-keychain', () => ({
   setGenericPassword: jest.fn(),
   getGenericPassword: jest.fn(),
   resetGenericPassword: jest.fn(),
+}));
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
+  setString: jest.fn(),
 }));
 
 // test suite
