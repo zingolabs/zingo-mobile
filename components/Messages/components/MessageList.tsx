@@ -517,7 +517,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           height: address
             ? `${
                 100 -
-                ((memoFieldHeight + (keyboardVisible ? (Platform.OS === GlobalConst.platformOSandroid ? 0 : 60) : 0)) *
+                ((memoFieldHeight + (keyboardVisible ? (Platform.OS === GlobalConst.platformOSandroid ? 40 : 60) : 0)) *
                   100) /
                   dimensions.height
               }%`
@@ -794,7 +794,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         <View
           style={{
             height: `${
-              ((memoFieldHeight + (keyboardVisible ? (Platform.OS === GlobalConst.platformOSandroid ? 0 : 60) : 0)) *
+              ((memoFieldHeight + (keyboardVisible ? (Platform.OS === GlobalConst.platformOSandroid ? 40 : 60) : 0)) *
                 100) /
               dimensions.height
             }%`,
@@ -894,6 +894,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               {!!memoIcon && !disableSend && (
                 <TouchableOpacity
                   onPress={() => {
+                    Keyboard.dismiss();
                     setMemoModalVisible(true);
                   }}>
                   <FontAwesomeIcon style={{ margin: 7 }} size={30} icon={faMagnifyingGlassPlus} color={colors.border} />
