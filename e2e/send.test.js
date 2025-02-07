@@ -8,6 +8,9 @@ describe('Renders wallet data correctly.', () => {
   // i just pulled this seed out of thin air
   it('loads a wallet', async () => await loadRecipientWallet());
   it('adds return address to the memo if that option is selected, and correctly renders confirm screen', async () => {
+    await waitFor(element(by.text('SEND')))
+      .toBeVisible()
+      .withTimeout(sync_timeout);
     await element(by.text('SEND')).tap();
 
     await element(by.id('send.addressplaceholder')).replaceText(

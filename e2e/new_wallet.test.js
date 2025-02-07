@@ -53,6 +53,11 @@ describe('New Wallet', () => {
       .withTimeout(sync_timeout);
     await element(by.id('seed.button.ok')).tap();
 
+    await waitFor(element(by.text('HISTORY')))
+      .toBeVisible()
+      .withTimeout(sync_timeout);
+    await element(by.text('HISTORY')).tap();
+
     await waitFor(element(by.id('valuetransfer text')))
       .toBeVisible()
       .withTimeout(sync_timeout);

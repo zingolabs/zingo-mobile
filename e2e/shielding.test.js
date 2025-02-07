@@ -17,7 +17,7 @@ describe('Renders wallet data correctly.', () => {
     await expect(element(by.text('CONFIRM'))).toBeVisible();
     await element(by.text('CONFIRM')).tap();
     // Wait for confirmation
-    await waitFor(element(by.text(/Transmitted|In Mempool/gi)))
+    await waitFor(element(by.text(/Transmitted|In Mempool/gi))) 
       .toExist()
       .withTimeout(50000);
 

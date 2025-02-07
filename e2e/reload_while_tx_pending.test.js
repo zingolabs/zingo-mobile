@@ -12,7 +12,11 @@ describe('Maintains correct information while tx pending', () => {
     // wait for fully synced.
     //await sleep(4000);
     
+    await waitFor(element(by.text('SEND')))
+      .toBeVisible()
+      .withTimeout(sync_timeout);
     await element(by.text('SEND')).tap();
+
     await element(by.id('send.addressplaceholder')).replaceText(
       'zregtestsapling1fkc26vpg566hgnx33n5uvgye4neuxt4358k68atnx78l5tg2dewdycesmr4m5pn56ffzsa7lyj6',
     );
