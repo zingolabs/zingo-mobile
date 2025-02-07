@@ -116,12 +116,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
     if (!valueTransfers) {
       return [] as ValueTransferType[];
     }
+    // strictly show VT's with some amount on it.
     return valueTransfers
-      .filter((vt: ValueTransferType) =>
-        filter === FilterEnum.withFunds
-          ? vt.amount > Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
-          : true,
-      )
+      .filter((vt: ValueTransferType) => (filter === FilterEnum.withFunds ? vt.amount > 0 : true))
       .slice(0, numVt);
   }, [valueTransfers, numVt, filter]);
 
