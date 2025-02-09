@@ -20,6 +20,7 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
+**/.xcode.env.local
 
 # Exclude compiled libs
 android/app/src/main/jniLibs
@@ -76,7 +77,7 @@ buck-out/
 *.jsbundle
 
 # CocoaPods
-/ios/Pods/
+**/Pods/
 /ios/Podfile.lock
 
 # e2e test logs
