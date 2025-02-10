@@ -16,7 +16,7 @@ buildscript {
     dependencies {
       classpath('com.android.tools.build:gradle:8.3.2')
       classpath("com.facebook.react:react-native-gradle-plugin")
-      classpath "org.jetbrains.kotlin:kotlin-gradle-plugin"
+      classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 }
 
@@ -31,18 +31,4 @@ allprojects {
      maven { url 'https://www.jitpack.io' }
    }
  }
-
-// this is not the best solution, but while the libraries have no namespace...
-// https://discuss.gradle.org/t/namespace-not-specified-for-agp-8-0-0/45850/5
-
-//subprojects {
-//   afterEvaluate { project ->
-//       if (project.hasProperty('android')) {
-//           project.android {
-//               if (namespace == null) {
-//                   namespace project.group
-//               }
-//           }
-//       }
-//   }
-//}
+ 

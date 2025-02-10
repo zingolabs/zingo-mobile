@@ -256,7 +256,8 @@ dependencies {
     implementation "androidx.work:work-rxjava2:$work_version"
 
     // optional - GCMNetworkManager support
-    implementation "androidx.work:work-gcm:$work_version"
+    // GCM is deprecated
+    //implementation "androidx.work:work-gcm:$work_version"
 
     // optional - Test helpers
     androidTestImplementation "androidx.work:work-testing:$work_version"
