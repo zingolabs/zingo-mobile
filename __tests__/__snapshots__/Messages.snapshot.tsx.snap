@@ -1,11 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component Messages - test Messages currency USD, privacy high & mode advanced - snapshot 1`] = `
-<View
+<RCTSafeAreaView
   accessibilityLabel="text translated"
   accessible={true}
   style={
     {
+      "backgroundColor": "#011401",
       "display": "flex",
       "height": "100%",
       "justifyContent": "flex-start",
@@ -614,15 +615,16 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
       }
     }
   />
-</View>
+</RCTSafeAreaView>
 `;
 
 exports[`Component Messages - test Messages no currency, privacy normal & mode basic - snapshot 1`] = `
-<View
+<RCTSafeAreaView
   accessibilityLabel="text translated"
   accessible={true}
   style={
     {
+      "backgroundColor": "#011401",
       "display": "flex",
       "height": "100%",
       "justifyContent": "flex-start",
@@ -1196,5 +1198,5 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
       }
     }
   />
-</View>
+</RCTSafeAreaView>
 `;

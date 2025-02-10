@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Platform, View, TouchableOpacity } from 'react-native';
+import React, { useContext, useRef } from 'react';
+import { Animated, Platform, View, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -9,7 +9,7 @@ import {
   faRefresh,
   faComment,
   faTriangleExclamation,
-  faComments,
+  //faComments,
   faFileLines,
   faPaperPlane,
 } from '@fortawesome/free-solid-svg-icons';
@@ -35,7 +35,7 @@ import 'moment/locale/ru';
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
-import Utils from '../../../app/utils';
+//import Utils from '../../../app/utils';
 
 type ValueTransferLineProps = {
   index: number;
@@ -56,7 +56,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   setValueTransferDetailIndex,
   setValueTransferDetailModalShowing,
   nextLineWithSameTxid,
-  setMessagesAddressModalShowing,
+  //setMessagesAddressModalShowing,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -74,13 +74,13 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const [messagesAddress, setMessagesAddress] = useState<boolean>(false);
+  //const [messagesAddress, setMessagesAddress] = useState<boolean>(false);
 
-  const dimensions = {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-  };
-  const maxWidthHit = useRef<boolean>(false);
+  //const dimensions = {
+  //  width: Dimensions.get('window').width,
+  //  height: Dimensions.get('window').height,
+  //};
+  //const maxWidthHit = useRef<boolean>(false);
   const swipeableRef = useRef<Swipeable | null>(null);
 
   const getAmountColor = (_vt: ValueTransferType) => {
@@ -104,9 +104,9 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     return _vt.memos && _vt.memos.length > 0 && !!_vt.memos.join('');
   };
 
-  useEffect(() => {
-    setMessagesAddress(Utils.isMessagesAddress(vt));
-  }, [vt]);
+  //useEffect(() => {
+  //  setMessagesAddress(Utils.isMessagesAddress(vt));
+  //}, [vt]);
 
   /*
   const handleRenderRightActions = (

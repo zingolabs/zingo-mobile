@@ -1,12 +1,8 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppState';
 import ContactList from './components/ContactList';
-import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../app/types';
 import moment from 'moment';
 import { ContextAppLoaded } from '../../app/context';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 type MessagesModalProps = {
   // side menu
@@ -48,7 +44,6 @@ const MessagesModal: React.FunctionComponent<MessagesModalProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
   return (
