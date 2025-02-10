@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.11.0 (217)",
+  "version": "zingo-1.11.0 (218)",
   "loading": "загрузка...",
   "connectingserver": "Подключение к серверу...",
   "wait": "Пожалуйста, подождите...",
@@ -36,8 +36,8 @@
   "syncing": "Синхронизация -",
   "synced": "Синхронизировано",
   "messages": {
-    "title": "Сообщения",
-    "title-chats": "Чаты",
+    "title": "Сообщения (экспериментально)",
+    "title-chats": "Чаты (экспериментально)",
     "empty": "Сообщений пока нет.",
     "message-placeholder": "Сообщение",
     "message-placeholder-error": "Нет средств, которые можно потратить",

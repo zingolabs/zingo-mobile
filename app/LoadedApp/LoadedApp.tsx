@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faList, faUpload, faDownload, faCog, faComments, faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { faList, faUpload, faDownload, faCog, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
 import { DrawerLayout } from 'react-native-gesture-handler';
 import { I18n } from 'i18n-js';
@@ -91,8 +91,8 @@ import Send from '../../components/Send';
 import Receive from '../../components/Receive';
 import Settings from '../../components/Settings';
 import Menu from './components/Menu';
-import { Messages } from '../../components/Messages';
 import RegText from '../../components/Components/RegText';
+import { MessagesModal } from '../../components/Messages';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -517,6 +517,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       poolsModalVisible: false,
       insightModalVisible: false,
       addressBookModalVisible: false,
+      messagesModalVisible: false,
       newServer: {} as ServerType,
       newSelectServer: null,
       scrollToTop: false,
@@ -804,6 +805,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       addressBookModalVisible: false,
       addressBookCurrentAddress: '',
       addressBookOpenPriorModal: () => {},
+      messagesModalVisible: false,
     });
   };
 
@@ -1256,6 +1258,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setShowSwipeableIcons(false);
       await sendEmail(this.state.translate, this.state.info.zingolib);
       this.setShowSwipeableIcons(true);
+    } else if (item === MenuItemEnum.Chats) {
+      this.setState({ messagesModalVisible: true });
     }
     this.closeDrawer();
     this.setState({
@@ -1713,6 +1717,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       ufvkBackupModalVisible,
       ufvkServerModalVisible,
       addressBookModalVisible,
+      messagesModalVisible,
       snackbars,
       mode,
       valueTransfersTotal,
@@ -1799,8 +1804,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         }
       } else if (route.name === translate('loadedapp.receive-menu')) {
         iconName = faDownload;
-      } else if (route.name === translate('loadedapp.messages-menu')) {
-        iconName = faComments;
       } else {
         iconName = faCog;
       }
@@ -2095,13 +2098,34 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             </Suspense>
           </Modal>
 
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={messagesModalVisible}
+            onRequestClose={() => this.setState({ messagesModalVisible: false })}>
+            <Suspense fallback={<Loading backgroundColor={colors.background} spinColor={colors.primary} />}>
+              <MessagesModal
+                syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
+                setPrivacyOption={this.setPrivacyOption /* header */}
+                setScrollToTop={this.setScrollToTop /* chats */}
+                scrollToTop={scrollToTop /* chats */}
+                setScrollToBottom={this.setScrollToBottom /* messages */}
+                scrollToBottom={scrollToBottom /* messages */}
+                setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
+                sendTransaction={this.sendTransaction /* messages */}
+                setServerOption={this.setServerOption /* messages */}
+                closeModal={() => this.setState({ messagesModalVisible: false })}
+              />
+            </Suspense>
+          </Modal>
+
           <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
           {mode === ModeEnum.advanced ||
           (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
           (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
             <Tab.Navigator
-              initialRouteName={translate('loadedapp.messages-menu') as string}
+              initialRouteName={translate('loadedapp.history-menu') as string}
               screenOptions={({ route, navigation }) => ({
                 tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused, navigation),
                 tabBarLabelPosition: 'below-icon',
@@ -2116,15 +2140,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 },
                 headerShown: false,
               })}>
-              <Tab.Screen name={translate('loadedapp.messages-menu') as string}>
+              <Tab.Screen name={translate('loadedapp.history-menu') as string}>
                 {() => (
-                  <Messages
+                  <History
                     toggleMenuDrawer={this.toggleMenuDrawer /* header */}
+                    poolsMoreInfoOnClick={this.poolsMoreInfoOnClick /* header */}
                     syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
                     setPrivacyOption={this.setPrivacyOption /* header */}
-                    setScrollToTop={this.setScrollToTop /* chats */}
-                    scrollToTop={scrollToTop /* chats */}
-                    setScrollToBottom={this.setScrollToBottom /* messages */}
+                    setShieldingAmount={this.setShieldingAmount /* header */}
+                    setComputingModalVisible={this.setComputingModalVisible /* header */}
+                    setScrollToTop={this.setScrollToTop /* header & history */}
+                    scrollToTop={scrollToTop /* history */}
+                    setScrollToBottom={this.setScrollToBottom /* header & messages */}
                     scrollToBottom={scrollToBottom /* messages */}
                     setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
                     sendTransaction={this.sendTransaction /* messages */}
@@ -2169,25 +2196,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   />
                 )}
               </Tab.Screen>
-              <Tab.Screen name={translate('loadedapp.history-menu') as string}>
-                {() => (
-                  <History
-                    toggleMenuDrawer={this.toggleMenuDrawer /* header */}
-                    poolsMoreInfoOnClick={this.poolsMoreInfoOnClick /* header */}
-                    syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
-                    setPrivacyOption={this.setPrivacyOption /* header */}
-                    setShieldingAmount={this.setShieldingAmount /* header */}
-                    setComputingModalVisible={this.setComputingModalVisible /* header */}
-                    setScrollToTop={this.setScrollToTop /* header & history */}
-                    scrollToTop={scrollToTop /* history */}
-                    setScrollToBottom={this.setScrollToBottom /* header & messages */}
-                    scrollToBottom={scrollToBottom /* messages */}
-                    setUfvkViewModalVisible={this.setUfvkViewModalVisible /* header */}
-                    sendTransaction={this.sendTransaction /* messages */}
-                    setServerOption={this.setServerOption /* messages */}
-                  />
-                )}
-              </Tab.Screen>
             </Tab.Navigator>
           ) : (
             <>
@@ -2195,7 +2203,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 <Loading backgroundColor={colors.background} spinColor={colors.primary} />
               ) : (
                 <Tab.Navigator
-                  initialRouteName={translate('loadedapp.messages-menu') as string}
+                  initialRouteName={translate('loadedapp.history-menu') as string}
                   screenOptions={{
                     tabBarStyle: {
                       borderTopColor: colors.background,
@@ -2204,7 +2212,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     },
                     headerShown: false,
                   }}>
-                  <Tab.Screen name={translate('loadedapp.messages-menu') as string}>
+                  <Tab.Screen name={translate('loadedapp.history-menu') as string}>
                     {() => (
                       <Receive
                         toggleMenuDrawer={this.toggleMenuDrawer /* header */}

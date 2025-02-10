@@ -105,7 +105,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [valueTransfersSliced, setValueTransfersSliced] = useState<ValueTransferType[]>([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
-  const [filter, setFilter] = useState<FilterEnum>(FilterEnum.withFunds);
+  const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
   const scrollViewRef = useRef<ScrollView>(null);
 
   useScrollToTop(scrollViewRef);
@@ -247,30 +247,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
           }}>
           <TouchableOpacity
             onPress={() => {
-              setFilter(FilterEnum.withFunds);
-              setLoading(true);
-            }}>
-            <View
-              style={{
-                backgroundColor: filter === FilterEnum.withFunds ? colors.primary : colors.sideMenuBackground,
-                borderRadius: 15,
-                borderColor: filter === FilterEnum.withFunds ? colors.primary : colors.zingo,
-                borderWidth: 1,
-                paddingHorizontal: 10,
-                paddingVertical: 5,
-                marginHorizontal: 0,
-              }}>
-              <FadeText
-                style={{
-                  color: filter === FilterEnum.withFunds ? colors.sideMenuBackground : colors.zingo,
-                  fontWeight: 'bold',
-                }}>
-                {translate('history.filter-withfunds') as string}
-              </FadeText>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
               setFilter(FilterEnum.all);
               setLoading(true);
             }}>
@@ -290,6 +266,30 @@ const History: React.FunctionComponent<HistoryProps> = ({
                   fontWeight: 'bold',
                 }}>
                 {translate('messages.filter-all') as string}
+              </FadeText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setFilter(FilterEnum.withFunds);
+              setLoading(true);
+            }}>
+            <View
+              style={{
+                backgroundColor: filter === FilterEnum.withFunds ? colors.primary : colors.sideMenuBackground,
+                borderRadius: 15,
+                borderColor: filter === FilterEnum.withFunds ? colors.primary : colors.zingo,
+                borderWidth: 1,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginHorizontal: 0,
+              }}>
+              <FadeText
+                style={{
+                  color: filter === FilterEnum.withFunds ? colors.sideMenuBackground : colors.zingo,
+                  fontWeight: 'bold',
+                }}>
+                {translate('history.filter-withfunds') as string}
               </FadeText>
             </View>
           </TouchableOpacity>

@@ -28,6 +28,7 @@ export default interface AppStateLoaded {
   poolsModalVisible: boolean;
   insightModalVisible: boolean;
   addressBookModalVisible: boolean;
+  messagesModalVisible: boolean;
 
   // change server helper
   newServer: ServerType;

@@ -108,6 +108,13 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer 
           </RegText>
 
           <RegText
+            testID="menu.messages"
+            onPress={() => onItemSelectedWrapper(MenuItemEnum.Chats)}
+            style={{ ...item, color: colors.primary }}>
+            {translate('messages.title-chats') as string}
+          </RegText>
+
+          <RegText
             testID="menu.addressbook"
             onPress={() => onItemSelectedWrapper(MenuItemEnum.AddressBook)}
             style={item}>
