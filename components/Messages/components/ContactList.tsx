@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TextInput,
+  SafeAreaView,
 } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -276,7 +277,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   //console.log('search text:', searchText, 'field:', searchTextField);
 
   return (
-    <View
+    <SafeAreaView
       accessible={true}
       accessibilityLabel={translate('history.title-acc') as string}
       style={{
@@ -284,6 +285,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         justifyContent: 'flex-start',
         width: '100%',
         height: '100%',
+        backgroundColor: colors.background,
       }}>
       {isMessagesAddressModalShowing && (
         <Modal
@@ -620,7 +622,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
           )}
         </>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 

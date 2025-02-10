@@ -52,28 +52,19 @@ const MessagesModal: React.FunctionComponent<MessagesModalProps> = ({
   moment.locale(language);
 
   return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <ContactList
-        syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
-        setPrivacyOption={setPrivacyOption}
-        setUfvkViewModalVisible={setUfvkViewModalVisible}
-        setScrollToTop={setScrollToTop}
-        scrollToTop={scrollToTop}
-        setScrollToBottom={setScrollToBottom}
-        scrollToBottom={scrollToBottom}
-        sendTransaction={sendTransaction}
-        setServerOption={setServerOption}
-        closeModal={closeModal}
-        noDrawMenu={true}
-      />
-    </SafeAreaView>
+    <ContactList
+      syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
+      setPrivacyOption={setPrivacyOption}
+      setUfvkViewModalVisible={setUfvkViewModalVisible}
+      setScrollToTop={setScrollToTop}
+      scrollToTop={scrollToTop}
+      setScrollToBottom={setScrollToBottom}
+      scrollToBottom={scrollToBottom}
+      sendTransaction={sendTransaction}
+      setServerOption={setServerOption}
+      closeModal={closeModal}
+      noDrawMenu={true}
+    />
   );
 };
 

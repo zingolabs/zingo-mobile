@@ -108,6 +108,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     setMessagesAddress(Utils.isMessagesAddress(vt));
   }, [vt]);
 
+  /*
   const handleRenderRightActions = (
     progress: Animated.AnimatedInterpolation<number>,
     dragX: Animated.AnimatedInterpolation<number>,
@@ -170,6 +171,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       </>
     );
   };
+  */
 
   const handleRenderLeftActions = (
     progress: Animated.AnimatedInterpolation<number>,
@@ -277,10 +279,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
         <Swipeable
           ref={swipeableRef}
           overshootLeft={false}
-          overshootRight={messagesAddress ? true : false}
-          rightThreshold={65}
+          overshootRight={false}
           overshootFriction={1}
-          renderRightActions={handleRenderRightActions}
           renderLeftActions={handleRenderLeftActions}>
           <View
             style={{
