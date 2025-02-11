@@ -1,0 +1,84 @@
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession.kt
+index 862c03a..740531d 100644
+--- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession.kt
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession.kt
+@@ -103,7 +103,13 @@ class CameraSession(internal val context: Context, internal val callback: Callba
+     }
+     Log.i(TAG, "configure { ... }: Waiting for lock...")
+ 
+-    val provider = cameraProvider.await(mainExecutor)
++    val provider = try {
++      cameraProvider.await(mainExecutor)
++    } catch (error: Throwable) {
++      Log.e(TAG, "Failed to get CameraProvider! Error: ${error.message}", error)
++      callback.onError(error)
++      return
++    }
+ 
+     mutex.withLock {
+       // Let caller configure a new configuration for the Camera.
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession.kt.rej b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession.kt.rej
+new file mode 100644
+index 0000000..3b9de40
+--- /dev/null
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession.kt.rej
+@@ -0,0 +1,17 @@
++--- node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession.kt
+++++ node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession.kt
++@@ -103,7 +103,13 @@ class CameraSession(internal val context: Context, internal val callback: Callba
++     }
++     Log.i(TAG, "configure { ... }: Waiting for lock...")
++ 
++-    val provider = cameraProvider.await(mainExecutor)
+++    val provider = try {
+++      cameraProvider.await(mainExecutor)
+++    } catch (error: Throwable) {
+++      Log.e(TAG, "Failed to get CameraProvider! Error: ${error.message}", error)
+++      callback.onError(error)
+++      return
+++    }
++ 
++     mutex.withLock {
++       // Let caller configure a new configuration for the Camera.
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraDevicesManager.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraDevicesManager.kt
+index 581d003..c8a7f94 100644
+--- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraDevicesManager.kt
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraDevicesManager.kt
+@@ -64,7 +64,13 @@ class CameraDevicesManager(private val reactContext: ReactApplicationContext) :
+     cameraManager.registerAvailabilityCallback(callback, null)
+     coroutineScope.launch {
+       Log.i(TAG, "Initializing ProcessCameraProvider...")
+-      cameraProvider = ProcessCameraProvider.getInstance(reactContext).await(executor)
++      cameraProvider = try {
++        ProcessCameraProvider.getInstance(reactContext).await(executor)
++      } catch (error: Throwable) {
++        Log.e(TAG, "Failed to get CameraProvider! Error: ${error.message}", error)
++        sendAvailableDevicesChangedEvent()
++        return@launch
++      }
+       Log.i(TAG, "Initializing ExtensionsManager...")
+       extensionsManager = ExtensionsManager.getInstanceAsync(reactContext, cameraProvider!!).await(executor)
+       Log.i(TAG, "Successfully initialized!")
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraDevicesManager.kt.rej b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraDevicesManager.kt.rej
+new file mode 100644
+index 0000000..e6121c9
+--- /dev/null
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraDevicesManager.kt.rej
+@@ -0,0 +1,17 @@
++--- node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraDevicesManager.kt
+++++ node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraDevicesManager.kt
++@@ -64,7 +64,13 @@ class CameraDevicesManager(private val reactContext: ReactApplicationContext) :
++     cameraManager.registerAvailabilityCallback(callback, null)
++     coroutineScope.launch {
++       Log.i(TAG, "Initializing ProcessCameraProvider...")
++-      cameraProvider = ProcessCameraProvider.getInstance(reactContext).await(executor)
+++      cameraProvider = try {
+++        ProcessCameraProvider.getInstance(reactContext).await(executor)
+++      } catch (error: Throwable) {
+++        Log.e(TAG, "Failed to get CameraProvider! Error: ${error.message}", error)
+++        sendAvailableDevicesChangedEvent()
+++        return@launch
+++      }
++       Log.i(TAG, "Initializing ExtensionsManager...")
++       extensionsManager = ExtensionsManager.getInstanceAsync(reactContext, cameraProvider!!).await(executor)
++       Log.i(TAG, "Successfully initialized!")
