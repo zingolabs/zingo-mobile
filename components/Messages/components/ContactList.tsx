@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TextInput,
+  SafeAreaView,
 } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -41,7 +42,7 @@ import ContactLine from './ContactLine';
 import RegText from '../../Components/RegText';
 
 type ContactListProps = {
-  toggleMenuDrawer: () => void;
+  toggleMenuDrawer?: () => void;
   syncingStatusMoreInfoOnClick: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setUfvkViewModalVisible?: (v: boolean) => void;
@@ -56,6 +57,8 @@ type ContactListProps = {
     toast: boolean,
     sameServerChainName: boolean,
   ) => Promise<void>;
+  closeModal?: () => void;
+  noDrawMenu?: boolean;
 };
 
 const ContactList: React.FunctionComponent<ContactListProps> = ({
@@ -69,6 +72,8 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   scrollToBottom,
   sendTransaction,
   setServerOption,
+  closeModal,
+  noDrawMenu,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, valueTransfers, language, server, addressBook, addresses, doRefresh, zenniesDonationAddress } =
@@ -272,7 +277,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   //console.log('search text:', searchText, 'field:', searchTextField);
 
   return (
-    <View
+    <SafeAreaView
       accessible={true}
       accessibilityLabel={translate('history.title-acc') as string}
       style={{
@@ -280,6 +285,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         justifyContent: 'flex-start',
         width: '100%',
         height: '100%',
+        backgroundColor: colors.background,
       }}>
       {isMessagesAddressModalShowing && (
         <Modal
@@ -322,6 +328,8 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         setUfvkViewModalVisible={setUfvkViewModalVisible}
         noPrivacy={true}
         noBalance={true}
+        closeScreen={closeModal}
+        noDrawMenu={noDrawMenu}
       />
       {searchMode && (
         <View style={{ flexDirection: 'row', alignSelf: 'center', alignItems: 'center' }}>
@@ -614,7 +622,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
           )}
         </>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 

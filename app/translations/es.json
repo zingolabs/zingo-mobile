@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.11.0 (217)",
+  "version": "zingo-1.11.0 (218)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -36,8 +36,8 @@
   "syncing": "Sincronizando -",
   "synced": "Sincronizada",
   "messages": {
-    "title": "Mensajes",
-    "title-chats": "Chats",
+    "title": "Mensajes (experimental)",
+    "title-chats": "Chats (experimental)",
     "empty": "Todavía no hay mensajes.",
     "message-placeholder": "Mensaje",
     "message-placeholder-error": "No hay fondos disponibles gastables",

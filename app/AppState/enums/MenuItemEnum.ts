@@ -14,4 +14,5 @@ export enum MenuItemEnum {
   Info = 'Info',
   VoteForNym = 'Vote For Nym',
   Support = 'Support',
+  Chats = 'Chats',
 }
