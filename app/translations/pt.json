@@ -496,9 +496,9 @@
     "donation-minimum-message": "O valor mínimo para doações é um Zenny (0,01 ZEC), tente novamente e obrigado."
   },
   "receive": {
-    "u-title": "Unificada Blindada",
+    "u-title": "Blindadas",
     "z-title": "Z-Sapling",
-    "t-title": "Transparente exposto",
+    "t-title": "Transparente",
     "noaddress": "Sem Endereço",
     "unoprivkey": "Nenhum endereço unificado para importar a Chave de Gastos",
     "unoviewkey": "Nenhum endereço unificado para importar a Chave de Visualização completa",

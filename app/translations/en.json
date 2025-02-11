@@ -496,9 +496,9 @@
     "donation-minimum-message": "The minimum amount for donations is a Zenny (0.01 ZEC), Try again and Thanks."
   },
   "receive": {
-    "u-title": "Shielded Unified",
+    "u-title": "Shielded",
     "z-title": "Z-Sapling",
-    "t-title": "Exposed Transparent",
+    "t-title": "Transparent",
     "noaddress": "No Address",
     "unoprivkey": "No Unified address to import the Spending Key",
     "unoviewkey": "No Unified address to import the Full Viewing Key",

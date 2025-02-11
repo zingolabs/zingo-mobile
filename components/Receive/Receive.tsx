@@ -234,15 +234,18 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                     }}>
                     <View
                       style={{
+                        backgroundColor:
+                          shielded === ShieldedEnum.sapling ? colors.primaryDisabled : colors.sideMenuBackground,
+                        borderRadius: 15,
+                        borderColor: shielded === ShieldedEnum.sapling ? colors.primaryDisabled : colors.zingo,
+                        borderWidth: 1,
                         paddingHorizontal: 10,
                         paddingVertical: 5,
-                        marginHorizontal: 15,
+                        marginHorizontal: 10,
                       }}>
                       <FadeText
                         style={{
-                          color: shielded === ShieldedEnum.sapling ? colors.primary : colors.zingo,
-                          opacity: shielded === ShieldedEnum.sapling ? 1 : undefined,
-                          textDecorationLine: 'underline',
+                          color: shielded === ShieldedEnum.sapling ? colors.sideMenuBackground : colors.zingo,
                           fontWeight: 'bold',
                         }}>
                         {translate('receive.shielded-sapling') as string}
