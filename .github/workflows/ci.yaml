@@ -27,7 +27,6 @@ jobs:
       arch: ${{ matrix.arch }}
 
   # those are really long, near to one hour and sometimes more
-  # I leave them in ci-nightly.
   #android-macos-integration-test:
   #  strategy:
   #    matrix:
