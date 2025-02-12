@@ -1,7 +1,5 @@
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 
-const { resolver: defaultResolver } = getDefaultConfig.getDefaultValues();
-
 /**
  * Metro configuration
  * https://reactnative.dev/docs/metro
@@ -9,14 +7,16 @@ const { resolver: defaultResolver } = getDefaultConfig.getDefaultValues();
  * @type {import('metro-config').MetroConfig}
  */
 
-/**
- * See https://react-native-vision-camera.com/docs/guides/mocking for more information.
- */
+const defaultConfig = getDefaultConfig(__dirname);
+
 const config = {
   resolver: {
-    ...defaultResolver,
-    sourceExts: [process.env.RN_SRC_EXT && process.env.RN_SRC_EXT.split(','), ...defaultResolver.sourceExts],
+    ...defaultConfig.resolver,
+    sourceExts: [
+      ...(process.env.RN_SRC_EXT ? process.env.RN_SRC_EXT.split(',') : []),
+      ...defaultConfig.resolver.sourceExts,
+    ],
   },
 };
 
-module.exports = mergeConfig(getDefaultConfig(__dirname), config);
+module.exports = mergeConfig(defaultConfig, config);
