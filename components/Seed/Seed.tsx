@@ -167,7 +167,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         },
         { text: translate('cancel') as string, onPress: () => onClickCancel(), style: 'cancel' },
       ],
-      { cancelable: false, userInterfaceStyle: 'light' },
+      { cancelable: false },
     );
   };
 

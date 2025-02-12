@@ -1,7 +1,7 @@
 import * as Keychain from 'react-native-keychain';
 import { GlobalConst, WalletType } from './AppState';
 
-const options = (biometrics: Keychain.BIOMETRY_TYPE | null): Keychain.Options => {
+const options = (biometrics: Keychain.BIOMETRY_TYPE | null): Keychain.BaseOptions => {
   return {
     service: GlobalConst.serviceKeyChain,
     accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE, // for both
@@ -11,8 +11,8 @@ const options = (biometrics: Keychain.BIOMETRY_TYPE | null): Keychain.Options =>
     // with biometrics in the device -> SECURE HARDWARE
     securityLevel: biometrics ? Keychain.SECURITY_LEVEL.SECURE_HARDWARE : Keychain.SECURITY_LEVEL.SECURE_SOFTWARE,
     // with biometrics in the device -> RSA
-    storage: biometrics ? Keychain.STORAGE_TYPE.RSA : Keychain.STORAGE_TYPE.AES,
-  } as Keychain.Options;
+    storage: biometrics ? Keychain.STORAGE_TYPE.RSA : Keychain.STORAGE_TYPE.AES_GCM,
+  } as Keychain.BaseOptions;
 };
 
 export const saveRecoveryWalletInfo = async (keys: WalletType): Promise<void> => {

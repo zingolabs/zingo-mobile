@@ -1278,7 +1278,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             },
                             { text: translate('cancel') as string, style: 'cancel' },
                           ],
-                          { cancelable: false, userInterfaceStyle: 'light' },
+                          { cancelable: false },
                         );
                       }
                     }}>
@@ -1371,7 +1371,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 },
                                 { text: translate('cancel') as string, style: 'cancel' },
                               ],
-                              { cancelable: false, userInterfaceStyle: 'light' },
+                              { cancelable: false },
                             );
                           }
                         }}>
