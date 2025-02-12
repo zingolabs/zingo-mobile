@@ -498,7 +498,7 @@
   "receive": {
     "u-title": "Shielded",
     "z-title": "Z-Sapling",
-    "t-title": "Transparent",
+    "t-title": "Exposed transparent",
     "noaddress": "No Address",
     "unoprivkey": "No Unified address to import the Spending Key",
     "unoviewkey": "No Unified address to import the Full Viewing Key",
