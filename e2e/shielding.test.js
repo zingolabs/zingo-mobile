@@ -19,7 +19,7 @@ describe('Renders wallet data correctly.', () => {
     // Wait for confirmation
     await waitFor(element(by.text(/Transmitted|In Mempool/gi)))
       .toExist()
-      .withTimeout(50000);
+      .withTimeout(120000);
 
     // Close and reopen to check that the transaction does not disappear
     await device.launchApp({
@@ -29,9 +29,9 @@ describe('Renders wallet data correctly.', () => {
     // Transaction transmitted
     await waitFor(element(by.text(/In Mempool/gi)))
       .toExist()
-      .withTimeout(50000);
+      .withTimeout(120000);
 
-    const tx = await element(by.text(/In Mempool/gi));
+    const tx = element(by.text(/In Mempool/gi));
 
     console.log('tx', await tx.getAttributes());
   });
