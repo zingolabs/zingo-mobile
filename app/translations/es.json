@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.11.0 (218)",
+  "version": "zingo-1.11.0 (219)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -496,9 +496,9 @@
     "donation-minimum-message": "La cantidad mínima para donaciones es un Zenny (0,01 ZEC), inténtalo de nuevo y gracias."
   },
   "receive": {
-    "u-title": "Unificada Blindada",
+    "u-title": "Blindadas",
     "z-title": "Z-Sapling",
-    "t-title": "Expuesta Transparente",
+    "t-title": "Transparente expuesta",
     "noaddress": "Sin Direcciones",
     "unoprivkey": "No hay ninguna dirección Unificada para exportar su Clave Privada",
     "unoviewkey": "No hay ninguna dirección Unificada para exportar su Clave de Visualización",
