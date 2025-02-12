@@ -79,7 +79,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
         },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
-      { cancelable: false, userInterfaceStyle: 'light' },
+      { cancelable: false },
     );
   };
 

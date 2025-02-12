@@ -152,7 +152,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         .trim()
         .split(' ')
         .filter((w: string) => !!w);
-      console.log(words);
+      //console.log(words);
       if (words[0]) {
         initials = words[0].charAt(0).toUpperCase();
       }

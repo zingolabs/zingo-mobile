@@ -8,7 +8,5 @@ exports[`Component Scanner - test Scanner - snapshot 1`] = `
       "width": "100%",
     }
   }
->
-  <mockQRCodeScanner />
-</RCTSafeAreaView>
+/>
 `;

@@ -1191,7 +1191,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           },
           { text: translate('cancel') as string, style: 'cancel' },
         ],
-        { cancelable: false, userInterfaceStyle: 'light' },
+        { cancelable: false },
       );
     } else if (item === MenuItemEnum.TipZingoLabs) {
       const { translate } = this.state;
@@ -1209,7 +1209,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             style: 'cancel',
           },
         ],
-        { cancelable: false, userInterfaceStyle: 'light' },
+        { cancelable: false },
       );
     } else if (item === MenuItemEnum.AddressBook) {
       this.setState({

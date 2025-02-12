@@ -2,7 +2,6 @@
 import React, { useContext } from 'react';
 
 import { ContextAppLoaded } from '../../../app/context';
-import { BarCodeReadEvent } from 'react-native-camera';
 import Scanner from '../../Components/Scanner';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -14,6 +13,7 @@ import Header from '../../Header';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
 import { SafeAreaView } from 'react-native';
+import { Code } from 'react-native-vision-camera';
 
 type ScannerAddressProps = {
   setAddress: (address: string) => void;
@@ -44,8 +44,12 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
     }
   };
 
-  const onRead = (e: BarCodeReadEvent) => {
-    const scandata = e.data.trim();
+  const onRead = (codes: Code[]) => {
+    const scandata = codes[0].value?.trim();
+
+    if (!scandata) {
+      return;
+    }
 
     validateAddress(scandata);
   };

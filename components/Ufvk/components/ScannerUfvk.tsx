@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { ContextAppLoading } from '../../../app/context';
-import { BarCodeReadEvent } from 'react-native-camera';
 import Scanner from '../../Components/Scanner';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -11,6 +10,7 @@ import Header from '../../Header';
 import { SafeAreaView } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
+import { Code } from 'react-native-vision-camera';
 
 type ScannerKeyProps = {
   setUfvkText: (k: string) => void;
@@ -22,8 +22,12 @@ const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setUfvkText, clo
   const { colors } = useTheme() as unknown as ThemeType;
   moment.locale(language);
 
-  const onRead = async (e: BarCodeReadEvent) => {
-    const scandata = e.data.trim();
+  const onRead = async (codes: Code[]) => {
+    const scandata = codes[0].value?.trim();
+
+    if (!scandata) {
+      return;
+    }
 
     setUfvkText(scandata);
     closeModal();

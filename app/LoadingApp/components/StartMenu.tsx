@@ -352,7 +352,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                       },
                       { text: translate('cancel') as string, style: 'cancel' },
                     ],
-                    { cancelable: false, userInterfaceStyle: 'light' },
+                    { cancelable: false },
                   );
                 } else {
                   createNewWallet();

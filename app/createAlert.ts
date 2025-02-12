@@ -34,7 +34,7 @@ export const createAlert = async (
             },
             { text: translate('cancel') as string, style: 'cancel' },
           ],
-          { cancelable: false, userInterfaceStyle: 'light' },
+          { cancelable: false },
         );
       } else {
         // no email button

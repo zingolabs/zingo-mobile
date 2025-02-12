@@ -720,7 +720,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             onPress: () => reject(),
           },
         ],
-        { cancelable: false, userInterfaceStyle: 'light' },
+        { cancelable: false },
       );
     });
   };
@@ -1243,7 +1243,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           },
           { text: this.props.translate('cancel') as string, style: 'cancel' },
         ],
-        { cancelable: false, userInterfaceStyle: 'light' },
+        { cancelable: false },
       );
     }
   };

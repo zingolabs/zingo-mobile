@@ -17,7 +17,7 @@ const ShowAddressAlertAsync = (translate: (key: string) => TranslateType): Promi
           onPress: () => reject(),
         },
       ],
-      { cancelable: false, userInterfaceStyle: 'light' },
+      { cancelable: false },
     );
   });
 };

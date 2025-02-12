@@ -109,7 +109,6 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 218 // Real
         versionName "zingo-1.11.0" // Real
-        missingDimensionStrategy 'react-native-camera', 'general'
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
@@ -225,7 +224,6 @@ android.applicationVariants.configureEach { variant ->
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-    implementation("com.facebook.react:flipper-integration")
 
     androidTestImplementation('com.wix:detox:20.27.2')
     implementation 'androidx.appcompat:appcompat:1.7.0'
@@ -258,7 +256,8 @@ dependencies {
     implementation "androidx.work:work-rxjava2:$work_version"
 
     // optional - GCMNetworkManager support
-    implementation "androidx.work:work-gcm:$work_version"
+    // GCM is deprecated
+    //implementation "androidx.work:work-gcm:$work_version"
 
     // optional - Test helpers
     androidTestImplementation "androidx.work:work-testing:$work_version"
