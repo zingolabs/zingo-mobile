@@ -8,6 +8,7 @@ import {
   EmitterSubscription,
   AppState,
   NativeEventSubscription,
+  Platform,
 } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@react-navigation/native';
@@ -1225,26 +1226,32 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
   recoverRecoveryWalletInfo = async (security: boolean) => {
     // recover the wallet keys from the device
     const wallet = await getRecoveryWalletInfo();
+    // in IOS the App + OS needs some time to close the biometric screen
+    // then the Alert can be too fast.
     if (wallet.seed || wallet.ufvk) {
       const txt = (wallet.seed || wallet.ufvk) + '\n\n' + wallet.birthday;
-      Alert.alert(
-        this.props.translate('loadedapp.walletseed-basic') as string,
-        (security ? '' : ((this.props.translate('loadingapp.recoverkeysinstall') + '\n\n') as string)) + txt,
-        [
-          {
-            text: this.props.translate('copy') as string,
-            onPress: () => {
-              Clipboard.setString(txt);
-              this.addLastSnackbar({
-                message: this.props.translate('txtcopied') as string,
-                duration: SnackbarDurationEnum.short,
-              });
+      setTimeout(() => {
+        Alert.alert(
+          this.props.translate('loadedapp.walletseed-basic') as string,
+          (security ? '' : ((this.props.translate('loadingapp.recoverkeysinstall') + '\n\n') as string)) + txt,
+          [
+            {
+              text: this.props.translate('copy') as string,
+              onPress: () => {
+                Clipboard.setString(txt);
+                this.addLastSnackbar({
+                  message: this.props.translate('txtcopied') as string,
+                  duration: SnackbarDurationEnum.short,
+                });
+              },
             },
-          },
-          { text: this.props.translate('cancel') as string, style: 'cancel' },
-        ],
-        { cancelable: false },
-      );
+            { text: this.props.translate('cancel') as string, style: 'cancel' },
+          ],
+          { cancelable: false },
+        );
+        // IOS needs time to close the biometric screen.
+        // but Android I don't think so, a little bit Just in case.
+      }, Platform.OS === GlobalConst.platformOSios ? 2000 : 100);
     }
   };
 
