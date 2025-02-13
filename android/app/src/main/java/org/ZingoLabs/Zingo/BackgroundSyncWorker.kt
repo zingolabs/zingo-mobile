@@ -38,7 +38,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun doWork(): Result {
-        val reactContext = ReactApplicationContext(MainApplication.getAppContext())
+        val reactContext = MainApplication.getAppContext() as ReactApplicationContext
         val rpcModule = RPCModule(reactContext)
 
         Log.i("SCHEDULED_TASK_RUN", "Task running")
@@ -168,7 +168,7 @@ class BSCompanion {
         private val SYNC_START_TIME_MINUTES = 60.minutes // Randomize with minutes until 4 a.m.
         @RequiresApi(Build.VERSION_CODES.O)
         fun scheduleBackgroundTask() {
-            val reactContext = ReactApplicationContext(MainApplication.getAppContext())
+            val reactContext = MainApplication.getAppContext() as ReactApplicationContext
 
             // zancas requeriment, not plug-in, reverted.
             val constraints = Constraints.Builder()
@@ -229,7 +229,7 @@ class BSCompanion {
         }
 
         fun cancelExecutingTask() {
-            val reactContext = ReactApplicationContext(MainApplication.getAppContext())
+            val reactContext = MainApplication.getAppContext() as ReactApplicationContext
 
             // run interrupt sync, just in case.
             val interrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "true")
