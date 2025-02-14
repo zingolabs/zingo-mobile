@@ -9,12 +9,12 @@ import {
   AppState,
   NativeEventSubscription,
   Linking,
-  SafeAreaView,
   Platform,
   ActivityIndicator,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog, faRefresh } from '@fortawesome/free-solid-svg-icons';
@@ -683,7 +683,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       });
     });
 
-    this.unsubscribeNetInfo = NetInfo.addEventListener(async state => {
+    this.unsubscribeNetInfo = NetInfo.addEventListener(async (state: any)  => {
       const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
       if (
         isConnected !== state.isConnected ||

@@ -7,7 +7,8 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import Header from '../../Header';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
 import { Code } from 'react-native-vision-camera';

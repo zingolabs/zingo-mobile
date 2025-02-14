@@ -2,7 +2,8 @@
 import React, { useContext } from 'react';
 import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppState';
 import MessageList from './components/MessageList';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';

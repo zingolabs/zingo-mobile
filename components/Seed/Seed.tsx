@@ -1,6 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext } from 'react';
-import { View, SafeAreaView, ScrollView, TouchableOpacity, Text, Alert } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Text, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
 

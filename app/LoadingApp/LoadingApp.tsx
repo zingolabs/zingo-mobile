@@ -2,7 +2,6 @@
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
   Alert,
-  SafeAreaView,
   Modal,
   I18nManager,
   EmitterSubscription,
@@ -10,6 +9,8 @@ import {
   NativeEventSubscription,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';

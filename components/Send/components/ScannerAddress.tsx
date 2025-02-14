@@ -12,7 +12,8 @@ import Utils from '../../../app/utils';
 import Header from '../../Header';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { Code } from 'react-native-vision-camera';
 
 type ScannerAddressProps = {

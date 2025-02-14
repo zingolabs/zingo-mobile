@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { ScrollView, View, Text, Dimensions, SafeAreaView } from 'react-native';
+import { ScrollView, View, Text, Dimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import RegText from '../../../components/Components/RegText';
 

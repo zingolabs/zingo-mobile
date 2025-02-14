@@ -3,13 +3,14 @@ import React, { useContext, useState } from 'react';
 import {
   View,
   ScrollView,
-  SafeAreaView,
   TextInput,
   Dimensions,
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { useTheme } from '@react-navigation/native';
 import Button from '../Components/Button';
 import { ThemeType } from '../../app/types';

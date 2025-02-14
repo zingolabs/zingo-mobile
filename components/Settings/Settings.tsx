@@ -3,12 +3,13 @@ import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
   ScrollView,
-  SafeAreaView,
   TouchableOpacity,
   TextInput,
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { IconDefinition, faDotCircle } from '@fortawesome/free-solid-svg-icons';

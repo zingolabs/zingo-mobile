@@ -3,13 +3,14 @@ import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } 
 import {
   View,
   ScrollView,
-  SafeAreaView,
   Platform,
   NativeScrollEvent,
   NativeSyntheticEvent,
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';

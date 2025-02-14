@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, ActivityIndicator, Platform } from 'react-native';
+import { View, ScrollView, ActivityIndicator, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import FadeText from '../../Components/FadeText';
 import BoldText from '../../Components/BoldText';
