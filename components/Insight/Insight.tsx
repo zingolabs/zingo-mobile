@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
@@ -225,6 +225,15 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
     );
   };
 
+  const renderExternalLabel = useCallback(
+    (item: pieDataItem | undefined) => (
+      <SvgText fontSize={18} fill={item?.color}>
+        {item?.value}
+      </SvgText>
+    ),
+    []
+  );
+
   //console.log('render insight');
 
   return (
@@ -345,11 +354,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
                   strokeColor={colors.background}
                   showValuesAsTooltipText={true}
                   showText
-                  externalLabelComponent={item => (
-                    <SvgText fontSize={18} fill={item?.color}>
-                      {item?.value}
-                    </SvgText>
-                  )}
+                  externalLabelComponent={renderExternalLabel}
                   textSize={18}
                   textBackgroundColor={colors.background}
                   data={pieAmounts}
