@@ -4,8 +4,8 @@ import { View, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } fro
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
-import { PieChart } from 'react-native-svg-charts';
-import { Circle, G, Line, Text } from 'react-native-svg';
+import { PieChart, pieDataItem } from 'react-native-gifted-charts';
+import { Text as SvgText } from 'react-native-svg';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -33,7 +33,7 @@ type DataType = {
   key: string;
   address: string;
   tag: string;
-};
+} & pieDataItem;
 
 type sliceType = {
   labelCentroid: number[];
@@ -43,37 +43,6 @@ type sliceType = {
 
 type LabelProps = {
   slices?: sliceType[];
-};
-
-const Labels: React.FunctionComponent<LabelProps> = props => {
-  const { slices } = props;
-  const totalValue = slices ? slices.reduce((acc, curr) => acc + curr.data.value, 0) : 0;
-
-  return (
-    <>
-      {!!slices &&
-        slices.map((slice: sliceType, index: number) => {
-          const { labelCentroid, pieCentroid, data } = slice;
-          const percent = (100 * data.value) / totalValue;
-
-          return (
-            <G key={index}>
-              <Line
-                x1={labelCentroid[0]}
-                y1={labelCentroid[1]}
-                x2={pieCentroid[0]}
-                y2={pieCentroid[1]}
-                stroke={data.svg.fill}
-              />
-              <Circle cx={labelCentroid[0]} cy={labelCentroid[1]} r={15} fill={data.svg.fill} />
-              <Text x={labelCentroid[0] - (percent === 100 ? 15 : 10)} y={labelCentroid[1] + 5}>
-                {getPercent(percent)}
-              </Text>
-            </G>
-          );
-        })}
-    </>
-  );
 };
 
 const getPercent = (percent: number) => {
@@ -146,6 +115,10 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
             address: item.address,
             tag: item.tag,
             svg: { fill: item.address === 'fee' ? colors.zingo : randomColors[index] },
+            color: item.address === 'fee' ? colors.zingo : randomColors[index],
+            labelLineConfig: {
+              color: item.address === 'fee' ? colors.zingo : randomColors[index],
+            },
             key: `pie-${index}`,
           };
         });
@@ -366,14 +339,32 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
           {loading ? (
             <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 100 }} />
           ) : (
-            <PieChart
-              style={{ height: dimensions.width * 0.7 }}
-              data={pieAmounts}
-              innerRadius={dimensions.width * 0.09}
-              outerRadius={dimensions.width * 0.23}
-              labelRadius={dimensions.width * 0.23 + 30}>
-              <Labels />
-            </PieChart>
+            <View style={{ width: '100%', alignItems: 'center', paddingVertical: 20 }}>
+              <PieChart
+                showExternalLabels
+                labelLineConfig={{
+                  thickness: 2,
+                  avoidOverlappingOfLabels: true,
+                }}
+                strokeWidth={4}
+                donut
+                innerCircleColor={colors.background}
+                innerCircleBorderWidth={4}
+                innerCircleBorderColor={colors.background}
+                strokeColor={colors.background}
+                showValuesAsTooltipText={true}
+                showText
+                externalLabelComponent={item => (
+                  <SvgText fontSize={18} fill={item?.color}>
+                    {item?.value}
+                  </SvgText>
+                )}
+                textSize={18}
+                textBackgroundColor={colors.background}
+                data={pieAmounts}
+                innerRadius={dimensions.width * 0.09}
+              />
+            </View>
           )}
         </View>
         <View style={{ display: 'flex', marginHorizontal: 5, padding: 0, alignItems: 'center' }}>
