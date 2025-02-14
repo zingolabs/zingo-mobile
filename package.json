@@ -63,6 +63,7 @@
     "react-native-svg-charts": "^5.4.0",
     "react-native-tab-view": "^3.3.0",
     "react-native-vision-camera": "^4.6.3",
+    "react-native-worklets-core": "^1.5.0",
     "url-parse": "^1.5.10"
   },
   "devDependencies": {
