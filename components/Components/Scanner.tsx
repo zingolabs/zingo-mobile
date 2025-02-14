@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { Camera, Code, useCameraDevice, useCameraPermission, useCodeScanner } from 'react-native-vision-camera';
 import { Text } from 'react-native-svg';
@@ -33,24 +33,28 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead }) => {
     console.log('permission: ', hasPermission);
     console.log('device: ', device);
     return (
+      <SafeAreaProvider>
+        <SafeAreaView
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+          }}>
+          <Text>No permission</Text>
+        </SafeAreaView>
+      </SafeAreaProvider>
+    );
+  }
+  return (
+    <SafeAreaProvider>
       <SafeAreaView
         style={{
           width: '100%',
           height: '100%',
-          display: 'flex',
         }}>
-        <Text>No permission</Text>
+        <Camera style={{ width: '100%', height: '100%' }} device={device} isActive={active} codeScanner={codeScanner} />
       </SafeAreaView>
-    );
-  }
-  return (
-    <SafeAreaView
-      style={{
-        width: '100%',
-        height: '100%',
-      }}>
-      <Camera style={{ width: '100%', height: '100%' }} device={device} isActive={active} codeScanner={codeScanner} />
-    </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 

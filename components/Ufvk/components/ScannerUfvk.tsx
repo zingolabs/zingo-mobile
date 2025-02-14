@@ -7,7 +7,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import Header from '../../Header';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
@@ -39,24 +39,26 @@ const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setUfvkText, clo
   };
 
   return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <Header
-        title={translate('scanner.text') as string}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noPrivacy={true}
-        closeScreen={doCancel}
-      />
-      <Scanner onRead={onRead} />
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'stretch',
+          height: '100%',
+          backgroundColor: colors.background,
+        }}>
+        <Header
+          title={translate('scanner.text') as string}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          closeScreen={doCancel}
+        />
+        <Scanner onRead={onRead} />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 

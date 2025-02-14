@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, Linking, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import moment from 'moment';
@@ -150,290 +150,292 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   //console.log('vt', index, totalLength, isTheFirstMount);
 
   return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <Header
-        title={translate('history.details') as string}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        setPrivacyOption={setPrivacyOption}
-        addLastSnackbar={addLastSnackbar}
-        closeScreen={closeModal}
-      />
-      {showNavigator && (
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-            marginRight: 30,
-            marginTop: 5,
-          }}>
-          <TouchableOpacity
-            onPress={() => moveValueTransferDetail(index, -1)}
-            style={{ marginRight: 25 }}
-            disabled={index === 0}>
-            <FontAwesomeIcon
-              icon={faChevronUp}
-              color={index === 0 ? colors.primaryDisabled : colors.primary}
-              size={30}
-            />
-          </TouchableOpacity>
-          <FadeText>{(index + 1).toString()}</FadeText>
-          <TouchableOpacity
-            onPress={() => moveValueTransferDetail(index, 1)}
-            style={{ marginLeft: 25 }}
-            disabled={index === length - 1}>
-            <FontAwesomeIcon
-              icon={faChevronDown}
-              color={index === length - 1 ? colors.primaryDisabled : colors.primary}
-              size={30}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
-      <ScrollView
-        showsVerticalScrollIndicator={true}
-        persistentScrollbar={true}
-        indicatorStyle={'white'}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
+    <SafeAreaProvider>
+      <SafeAreaView
+        style={{
+          display: 'flex',
           justifyContent: 'flex-start',
+          alignItems: 'stretch',
+          height: '100%',
+          backgroundColor: colors.background,
         }}>
-        <View
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            margin: 25,
-            marginTop: showNavigator ? 5 : 25,
-            padding: 10,
-            borderWidth: 1,
-            borderRadius: 10,
-            borderColor: colors.border,
-          }}>
-          <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
-            {vt.kind === ValueTransferKindEnum.Sent && vt.confirmations === 0
-              ? (translate('history.sending') as string)
-              : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations > 0
-              ? (translate('history.sent') as string)
-              : vt.kind === ValueTransferKindEnum.Received && vt.confirmations === 0
-              ? (translate('history.receiving') as string)
-              : vt.kind === ValueTransferKindEnum.Received && vt.confirmations > 0
-              ? (translate('history.received') as string)
-              : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations === 0
-              ? (translate('history.sendingtoself') as string)
-              : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations > 0
-              ? (translate('history.memotoself') as string)
-              : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations === 0
-              ? (translate('history.sendingtoself') as string)
-              : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations > 0
-              ? (translate('history.sendtoself') as string)
-              : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations === 0
-              ? (translate('history.shielding') as string)
-              : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations > 0
-              ? (translate('history.shield') as string)
-              : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations === 0
-              ? (translate('history.sending') as string)
-              : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations > 0
-              ? (translate('history.rejection') as string)
-              : ''}
-          </BoldText>
-          <ZecAmount
-            currencyName={info.currencyName}
-            size={36}
-            amtZec={vt.amount}
-            privacy={privacy}
-            smallPrefix={true}
-          />
-          {!!vt.zecPrice && vt.zecPrice > 0 && (
-            <CurrencyAmount price={vt.zecPrice} amtZec={vt.amount} currency={currency} privacy={privacy} />
-          )}
-        </View>
-
-        {vt.confirmations === 0 && (
-          <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-            {(vt.status === RPCValueTransfersStatusEnum.transmitted ||
-              vt.status === RPCValueTransfersStatusEnum.calculated) && (
-              <FontAwesomeIcon
-                style={{ marginRight: 5 }}
-                icon={faTriangleExclamation}
-                color={colors.syncing}
-                size={15}
-              />
-            )}
-            <FadeText
-              style={{
-                color:
-                  vt.status === RPCValueTransfersStatusEnum.transmitted ||
-                  vt.status === RPCValueTransfersStatusEnum.calculated
-                    ? colors.primary
-                    : colors.primaryDisabled,
-                fontSize: 12,
-                opacity: 1,
-                fontWeight: '700',
-                textAlign:
-                  vt.status === RPCValueTransfersStatusEnum.transmitted ||
-                  vt.status === RPCValueTransfersStatusEnum.calculated
-                    ? 'center'
-                    : 'left',
-                textDecorationLine:
-                  vt.status === RPCValueTransfersStatusEnum.transmitted ||
-                  vt.status === RPCValueTransfersStatusEnum.calculated
-                    ? 'underline'
-                    : 'none',
-              }}>
-              {(translate(`history.${vt.status}`) as string) + ' - ' + (translate('history.not-confirmed') as string)}
-            </FadeText>
-          </View>
-        )}
-
-        <View style={{ margin: 10 }}>
-          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-            <View style={{ display: 'flex' }}>
-              <FadeText>{translate('history.time') as string}</FadeText>
-              <RegText>{vt.time ? moment((vt.time || 0) * 1000).format('YYYY MMM D h:mm a') : '--'}</RegText>
-            </View>
-            <View style={{ display: 'flex', alignItems: 'flex-end' }}>
-              <FadeText>{translate('history.confirmations') as string}</FadeText>
-              <RegText>{vt.confirmations.toString()}</RegText>
-            </View>
-          </View>
-
-          <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
-            <FadeText>{translate('history.txid') as string}</FadeText>
+        <Header
+          title={translate('history.details') as string}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar}
+          closeScreen={closeModal}
+        />
+        {showNavigator && (
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              marginRight: 30,
+              marginTop: 5,
+            }}>
             <TouchableOpacity
-              onPress={() => {
-                if (vt.txid) {
-                  Clipboard.setString(vt.txid);
-                  addLastSnackbar({
-                    message: translate('history.txcopied') as string,
-                    duration: SnackbarDurationEnum.short,
-                  });
-                  setExpandTxid(true);
-                }
-              }}>
-              {!vt.txid && <RegText>{'Unknown'}</RegText>}
-              {!expandTxid && !!vt.txid && <RegText>{Utils.trimToSmall(vt.txid, 10)}</RegText>}
-              {expandTxid && !!vt.txid && (
-                <>
-                  <RegText>{vt.txid}</RegText>
-                  {server.chainName !== ChainNameEnum.regtestChainName && (
-                    <TouchableOpacity onPress={() => handleTxIDClick(vt.txid)}>
-                      <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
-                        {translate('history.viewexplorer') as string}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                </>
-              )}
+              onPress={() => moveValueTransferDetail(index, -1)}
+              style={{ marginRight: 25 }}
+              disabled={index === 0}>
+              <FontAwesomeIcon
+                icon={faChevronUp}
+                color={index === 0 ? colors.primaryDisabled : colors.primary}
+                size={30}
+              />
+            </TouchableOpacity>
+            <FadeText>{(index + 1).toString()}</FadeText>
+            <TouchableOpacity
+              onPress={() => moveValueTransferDetail(index, 1)}
+              style={{ marginLeft: 25 }}
+              disabled={index === length - 1}>
+              <FontAwesomeIcon
+                icon={faChevronDown}
+                color={index === length - 1 ? colors.primaryDisabled : colors.primary}
+                size={30}
+              />
             </TouchableOpacity>
           </View>
-
-          {!!vt.fee && vt.fee > 0 && (
-            <View style={{ display: 'flex', marginTop: 10 }}>
-              <FadeText>{translate('history.txfee') as string}</FadeText>
-              <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ZecAmount amtZec={vt.fee} size={18} currencyName={info.currencyName} privacy={privacy} />
-              </View>
-            </View>
-          )}
-
-          {!!vt.address && (
-            <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
-              <FadeText>{translate('history.address') as string}</FadeText>
-              <AddressItem
-                address={vt.address}
-                withIcon={true}
-                withSendIcon={true}
-                closeModal={closeModal}
-                openModal={openModal}
-                addressProtected={addressProtected}
-              />
-            </View>
-          )}
-
-          {!!vt.poolType && (
-            <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
-              <FadeText>{translate('history.pool') as string}</FadeText>
-              <RegText>{vt.poolType}</RegText>
-            </View>
-          )}
-
-          <View style={{ marginTop: 10 }}>
-            <FadeText>{translate('history.amount') as string}</FadeText>
-            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <ZecAmount amtZec={vt.amount} size={18} currencyName={info.currencyName} privacy={privacy} />
-              {!!vt.zecPrice && vt.zecPrice > 0 && (
-                <CurrencyAmount price={vt.zecPrice} amtZec={vt.amount} currency={currency} privacy={privacy} />
-              )}
-            </View>
+        )}
+        <ScrollView
+          showsVerticalScrollIndicator={true}
+          persistentScrollbar={true}
+          indicatorStyle={'white'}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
+          }}>
+          <View
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              margin: 25,
+              marginTop: showNavigator ? 5 : 25,
+              padding: 10,
+              borderWidth: 1,
+              borderRadius: 10,
+              borderColor: colors.border,
+            }}>
+            <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
+              {vt.kind === ValueTransferKindEnum.Sent && vt.confirmations === 0
+                ? (translate('history.sending') as string)
+                : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations > 0
+                ? (translate('history.sent') as string)
+                : vt.kind === ValueTransferKindEnum.Received && vt.confirmations === 0
+                ? (translate('history.receiving') as string)
+                : vt.kind === ValueTransferKindEnum.Received && vt.confirmations > 0
+                ? (translate('history.received') as string)
+                : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations === 0
+                ? (translate('history.sendingtoself') as string)
+                : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations > 0
+                ? (translate('history.memotoself') as string)
+                : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations === 0
+                ? (translate('history.sendingtoself') as string)
+                : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations > 0
+                ? (translate('history.sendtoself') as string)
+                : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations === 0
+                ? (translate('history.shielding') as string)
+                : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations > 0
+                ? (translate('history.shield') as string)
+                : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations === 0
+                ? (translate('history.sending') as string)
+                : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations > 0
+                ? (translate('history.rejection') as string)
+                : ''}
+            </BoldText>
+            <ZecAmount
+              currencyName={info.currencyName}
+              size={36}
+              amtZec={vt.amount}
+              privacy={privacy}
+              smallPrefix={true}
+            />
+            {!!vt.zecPrice && vt.zecPrice > 0 && (
+              <CurrencyAmount price={vt.zecPrice} amtZec={vt.amount} currency={currency} privacy={privacy} />
+            )}
           </View>
 
-          {(!!memo || !!memoUA) && (
-            <View style={{ marginTop: 10 }}>
-              <FadeText>{translate('history.memo') as string}</FadeText>
-              {!!memo && (
-                <TouchableOpacity
-                  onPress={() => {
-                    Clipboard.setString(memo);
-                    addLastSnackbar({
-                      message: translate('history.memocopied') as string,
-                      duration: SnackbarDurationEnum.short,
-                    });
-                  }}>
-                  <RegText selectable={true}>{memo}</RegText>
-                </TouchableOpacity>
+          {vt.confirmations === 0 && (
+            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+              {(vt.status === RPCValueTransfersStatusEnum.transmitted ||
+                vt.status === RPCValueTransfersStatusEnum.calculated) && (
+                <FontAwesomeIcon
+                  style={{ marginRight: 5 }}
+                  icon={faTriangleExclamation}
+                  color={colors.syncing}
+                  size={15}
+                />
               )}
-              {!!memoUA && (
-                <TouchableOpacity
-                  onPress={() => {
-                    Clipboard.setString(memoUA);
-                    if (!thisWalletAddress(memoUA)) {
-                      addLastSnackbar({
-                        message: translate('history.address-http') as string,
-                        duration: SnackbarDurationEnum.long,
-                      });
-                    }
-                    addLastSnackbar({
-                      message: translate('history.addresscopied') as string,
-                      duration: SnackbarDurationEnum.short,
-                    });
-                  }}>
-                  <RegText>{GlobalConst.replyTo}</RegText>
-                  {!thisWalletAddress(memoUA) && (
-                    <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
-                  )}
-                  <RegText style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}>{memoUA}</RegText>
-                  {contactFound(memoUA) && (
-                    <View style={{ flexDirection: 'row' }}>
-                      {!thisWalletAddress(memoUA) && (
-                        <RegText style={{ opacity: 0.6 }}>{translate('addressbook.likely') as string}</RegText>
-                      )}
-                      <AddressItem address={memoUA} onlyContact={true} closeModal={() => {}} openModal={() => {}} />
-                    </View>
-                  )}
-                  {!contactFound(memoUA) && thisWalletAddress(memoUA) && (
-                    <View style={{ flexDirection: 'row' }}>
-                      <RegText color={colors.primaryDisabled}>
-                        {translate('addressbook.thiswalletaddress') as string}
-                      </RegText>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              )}
+              <FadeText
+                style={{
+                  color:
+                    vt.status === RPCValueTransfersStatusEnum.transmitted ||
+                    vt.status === RPCValueTransfersStatusEnum.calculated
+                      ? colors.primary
+                      : colors.primaryDisabled,
+                  fontSize: 12,
+                  opacity: 1,
+                  fontWeight: '700',
+                  textAlign:
+                    vt.status === RPCValueTransfersStatusEnum.transmitted ||
+                    vt.status === RPCValueTransfersStatusEnum.calculated
+                      ? 'center'
+                      : 'left',
+                  textDecorationLine:
+                    vt.status === RPCValueTransfersStatusEnum.transmitted ||
+                    vt.status === RPCValueTransfersStatusEnum.calculated
+                      ? 'underline'
+                      : 'none',
+                }}>
+                {(translate(`history.${vt.status}`) as string) + ' - ' + (translate('history.not-confirmed') as string)}
+              </FadeText>
             </View>
           )}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+
+          <View style={{ margin: 10 }}>
+            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+              <View style={{ display: 'flex' }}>
+                <FadeText>{translate('history.time') as string}</FadeText>
+                <RegText>{vt.time ? moment((vt.time || 0) * 1000).format('YYYY MMM D h:mm a') : '--'}</RegText>
+              </View>
+              <View style={{ display: 'flex', alignItems: 'flex-end' }}>
+                <FadeText>{translate('history.confirmations') as string}</FadeText>
+                <RegText>{vt.confirmations.toString()}</RegText>
+              </View>
+            </View>
+
+            <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
+              <FadeText>{translate('history.txid') as string}</FadeText>
+              <TouchableOpacity
+                onPress={() => {
+                  if (vt.txid) {
+                    Clipboard.setString(vt.txid);
+                    addLastSnackbar({
+                      message: translate('history.txcopied') as string,
+                      duration: SnackbarDurationEnum.short,
+                    });
+                    setExpandTxid(true);
+                  }
+                }}>
+                {!vt.txid && <RegText>{'Unknown'}</RegText>}
+                {!expandTxid && !!vt.txid && <RegText>{Utils.trimToSmall(vt.txid, 10)}</RegText>}
+                {expandTxid && !!vt.txid && (
+                  <>
+                    <RegText>{vt.txid}</RegText>
+                    {server.chainName !== ChainNameEnum.regtestChainName && (
+                      <TouchableOpacity onPress={() => handleTxIDClick(vt.txid)}>
+                        <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
+                          {translate('history.viewexplorer') as string}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+
+            {!!vt.fee && vt.fee > 0 && (
+              <View style={{ display: 'flex', marginTop: 10 }}>
+                <FadeText>{translate('history.txfee') as string}</FadeText>
+                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <ZecAmount amtZec={vt.fee} size={18} currencyName={info.currencyName} privacy={privacy} />
+                </View>
+              </View>
+            )}
+
+            {!!vt.address && (
+              <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
+                <FadeText>{translate('history.address') as string}</FadeText>
+                <AddressItem
+                  address={vt.address}
+                  withIcon={true}
+                  withSendIcon={true}
+                  closeModal={closeModal}
+                  openModal={openModal}
+                  addressProtected={addressProtected}
+                />
+              </View>
+            )}
+
+            {!!vt.poolType && (
+              <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
+                <FadeText>{translate('history.pool') as string}</FadeText>
+                <RegText>{vt.poolType}</RegText>
+              </View>
+            )}
+
+            <View style={{ marginTop: 10 }}>
+              <FadeText>{translate('history.amount') as string}</FadeText>
+              <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <ZecAmount amtZec={vt.amount} size={18} currencyName={info.currencyName} privacy={privacy} />
+                {!!vt.zecPrice && vt.zecPrice > 0 && (
+                  <CurrencyAmount price={vt.zecPrice} amtZec={vt.amount} currency={currency} privacy={privacy} />
+                )}
+              </View>
+            </View>
+
+            {(!!memo || !!memoUA) && (
+              <View style={{ marginTop: 10 }}>
+                <FadeText>{translate('history.memo') as string}</FadeText>
+                {!!memo && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      Clipboard.setString(memo);
+                      addLastSnackbar({
+                        message: translate('history.memocopied') as string,
+                        duration: SnackbarDurationEnum.short,
+                      });
+                    }}>
+                    <RegText selectable={true}>{memo}</RegText>
+                  </TouchableOpacity>
+                )}
+                {!!memoUA && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      Clipboard.setString(memoUA);
+                      if (!thisWalletAddress(memoUA)) {
+                        addLastSnackbar({
+                          message: translate('history.address-http') as string,
+                          duration: SnackbarDurationEnum.long,
+                        });
+                      }
+                      addLastSnackbar({
+                        message: translate('history.addresscopied') as string,
+                        duration: SnackbarDurationEnum.short,
+                      });
+                    }}>
+                    <RegText>{GlobalConst.replyTo}</RegText>
+                    {!thisWalletAddress(memoUA) && (
+                      <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
+                    )}
+                    <RegText style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}>{memoUA}</RegText>
+                    {contactFound(memoUA) && (
+                      <View style={{ flexDirection: 'row' }}>
+                        {!thisWalletAddress(memoUA) && (
+                          <RegText style={{ opacity: 0.6 }}>{translate('addressbook.likely') as string}</RegText>
+                        )}
+                        <AddressItem address={memoUA} onlyContact={true} closeModal={() => {}} openModal={() => {}} />
+                      </View>
+                    )}
+                    {!contactFound(memoUA) && thisWalletAddress(memoUA) && (
+                      <View style={{ flexDirection: 'row' }}>
+                        <RegText color={colors.primaryDisabled}>
+                          {translate('addressbook.thiswalletaddress') as string}
+                        </RegText>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 

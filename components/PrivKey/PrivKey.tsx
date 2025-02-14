@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -56,80 +56,82 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
   };
 
   return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <Header
-        title={keyTypeString + ' ' + translate('privkey.title')}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noPrivacy={true}
-        closeScreen={closeModal}
-      />
-      <ScrollView
-        style={{ maxHeight: '90%' }}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
+    <SafeAreaProvider>
+      <SafeAreaView
+        style={{
+          display: 'flex',
           justifyContent: 'flex-start',
+          alignItems: 'stretch',
+          height: '100%',
+          backgroundColor: colors.background,
         }}>
-        <View
-          style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center', marginBottom: 30 }}>
-          <View style={{ alignItems: 'center', paddingBottom: 0, paddingTop: 10 }}>
-            <FadeText style={{ color: colors.text, textAlign: 'center', marginLeft: 10, marginRight: 10 }}>
-              {translate('privkey.address') as string}
-            </FadeText>
-            <TouchableOpacity
-              onPress={() => {
-                setExpandAddress(true);
-              }}>
-              <FadeText style={{ textAlign: 'center', marginLeft: 10, marginRight: 10 }}>
-                {expandAddress ? address : Utils.trimToSmall(address, 10)}
+        <Header
+          title={keyTypeString + ' ' + translate('privkey.title')}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          closeScreen={closeModal}
+        />
+        <ScrollView
+          style={{ maxHeight: '90%' }}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
+          }}>
+          <View
+            style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center', marginBottom: 30 }}>
+            <View style={{ alignItems: 'center', paddingBottom: 0, paddingTop: 10 }}>
+              <FadeText style={{ color: colors.text, textAlign: 'center', marginLeft: 10, marginRight: 10 }}>
+                {translate('privkey.address') as string}
               </FadeText>
+              <TouchableOpacity
+                onPress={() => {
+                  setExpandAddress(true);
+                }}>
+                <FadeText style={{ textAlign: 'center', marginLeft: 10, marginRight: 10 }}>
+                  {expandAddress ? address : Utils.trimToSmall(address, 10)}
+                </FadeText>
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ padding: 10, backgroundColor: colors.border, marginTop: 15, marginBottom: 20 }}>
+              <QRCode
+                value={privKey}
+                size={225}
+                ecl="L"
+                backgroundColor={colors.border}
+                logo={require('../../assets/img/logobig-zingo.png')}
+                logoSize={35}
+                logoBackgroundColor={colors.border}
+                logoBorderRadius={10} /* android not soported */
+                logoMargin={5}
+              />
+            </View>
+            <TouchableOpacity onPress={doCopy}>
+              <Text style={{ color: colors.text, textDecorationLine: 'underline', marginBottom: 5, minHeight: 48 }}>
+                {translate('seed.tapcopy') as string}
+              </Text>
             </TouchableOpacity>
-          </View>
 
-          <View style={{ padding: 10, backgroundColor: colors.border, marginTop: 15, marginBottom: 20 }}>
-            <QRCode
-              value={privKey}
-              size={225}
-              ecl="L"
-              backgroundColor={colors.border}
-              logo={require('../../assets/img/logobig-zingo.png')}
-              logoSize={35}
-              logoBackgroundColor={colors.border}
-              logoBorderRadius={10} /* android not soported */
-              logoMargin={5}
-            />
+            {keyChunks.map(c => (
+              <FadeText
+                key={c}
+                style={{
+                  flexBasis: '100%',
+                  textAlign: 'center',
+                  fontFamily: 'verdana',
+                  fontSize: 18,
+                  color: colors.text,
+                }}>
+                {c}
+              </FadeText>
+            ))}
           </View>
-          <TouchableOpacity onPress={doCopy}>
-            <Text style={{ color: colors.text, textDecorationLine: 'underline', marginBottom: 5, minHeight: 48 }}>
-              {translate('seed.tapcopy') as string}
-            </Text>
-          </TouchableOpacity>
-
-          {keyChunks.map(c => (
-            <FadeText
-              key={c}
-              style={{
-                flexBasis: '100%',
-                textAlign: 'center',
-                fontFamily: 'verdana',
-                fontSize: 18,
-                color: colors.text,
-              }}>
-              {c}
-            </FadeText>
-          ))}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 

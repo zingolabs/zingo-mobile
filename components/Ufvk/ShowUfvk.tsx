@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, Alert, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -79,78 +79,80 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
   };
 
   return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <Header
-        title={translate('ufvk.viewkey') + ' (' + translate(`seed.${action}`) + ')'}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        setPrivacyOption={setPrivacyOption}
-        addLastSnackbar={addLastSnackbar}
-        closeScreen={onClickCancel}
-      />
-      <ScrollView
-        style={{ height: '80%', maxHeight: '80%' }}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
-        }}>
-        <RegText style={{ marginTop: 0, padding: 20, textAlign: 'center', fontWeight: '900' }}>
-          {action === UfvkActionEnum.backup || action === UfvkActionEnum.change || action === UfvkActionEnum.server
-            ? (translate(`ufvk.text-readonly-${action}`) as string)
-            : (translate('ufvk.text-readonly') as string)}
-        </RegText>
-
-        <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
-          {!!wallet.ufvk && (
-            <SingleAddress address={wallet.ufvk} ufvk={true} index={0} total={1} prev={() => null} next={() => null} />
-          )}
-          {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}
-        </View>
-
-        <View style={{ marginBottom: 30 }} />
-      </ScrollView>
-      <View
+    <SafeAreaProvider>
+      <SafeAreaView
         style={{
-          flexGrow: 1,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'stretch',
+          height: '100%',
+          backgroundColor: colors.background,
         }}>
-        <Button
-          type={mode === ModeEnum.basic ? ButtonTypeEnum.Secondary : ButtonTypeEnum.Primary}
-          style={{
-            backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
-          }}
-          title={
-            mode === ModeEnum.basic
-              ? (translate('cancel') as string)
-              : !!texts && !!texts[action]
-              ? texts[action][times]
-              : ''
-          }
-          onPress={() => {
-            if (!wallet.ufvk) {
-              return;
-            }
-            if (times === 0) {
-              onClickOK();
-            } else if (times === 1) {
-              onPressOK();
-            }
-          }}
+        <Header
+          title={translate('ufvk.viewkey') + ' (' + translate(`seed.${action}`) + ')'}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar}
+          closeScreen={onClickCancel}
         />
-      </View>
-    </SafeAreaView>
+        <ScrollView
+          style={{ height: '80%', maxHeight: '80%' }}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
+          }}>
+          <RegText style={{ marginTop: 0, padding: 20, textAlign: 'center', fontWeight: '900' }}>
+            {action === UfvkActionEnum.backup || action === UfvkActionEnum.change || action === UfvkActionEnum.server
+              ? (translate(`ufvk.text-readonly-${action}`) as string)
+              : (translate('ufvk.text-readonly') as string)}
+          </RegText>
+
+          <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
+            {!!wallet.ufvk && (
+              <SingleAddress address={wallet.ufvk} ufvk={true} index={0} total={1} prev={() => null} next={() => null} />
+            )}
+            {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}
+          </View>
+
+          <View style={{ marginBottom: 30 }} />
+        </ScrollView>
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 5,
+          }}>
+          <Button
+            type={mode === ModeEnum.basic ? ButtonTypeEnum.Secondary : ButtonTypeEnum.Primary}
+            style={{
+              backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
+            }}
+            title={
+              mode === ModeEnum.basic
+                ? (translate('cancel') as string)
+                : !!texts && !!texts[action]
+                ? texts[action][times]
+                : ''
+            }
+            onPress={() => {
+              if (!wallet.ufvk) {
+                return;
+              }
+              if (times === 0) {
+                onClickOK();
+              } else if (times === 1) {
+                onPressOK();
+              }
+            }}
+          />
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 

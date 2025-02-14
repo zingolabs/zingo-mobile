@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog, faRefresh } from '@fortawesome/free-solid-svg-icons';
@@ -353,15 +353,17 @@ export default function LoadedApp(props: LoadedAppProps) {
 
   if (loading) {
     return (
-      <SafeAreaView
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
-        }}>
-        <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
-      </SafeAreaView>
+      <SafeAreaProvider>
+        <SafeAreaView
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+          }}>
+          <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
+        </SafeAreaView>
+      </SafeAreaProvider>
     );
   } else {
     return (
