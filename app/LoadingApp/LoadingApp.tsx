@@ -647,7 +647,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       }
     });
 
-    this.unsubscribeNetInfo = NetInfo.addEventListener(state => {
+    this.unsubscribeNetInfo = NetInfo.addEventListener((state: any) => {
       const { screen } = this.state;
       const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
       if (
