@@ -113,7 +113,7 @@ exports[`Component Components - test CurrencyAmount Normal Privacy - snapshot 1`
     }
     accessible={true}
     collapsable={false}
-    focusable={true}
+    focusable={false}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -252,8 +252,8 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
     >
       <RNSVGSvgView
         align="xMidYMid"
-        bbHeight="20"
-        bbWidth="40"
+        bbHeight={20}
+        bbWidth={40}
         fill="red"
         focusable={false}
         height={20}
@@ -376,7 +376,7 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
     }
     accessible={true}
     collapsable={false}
-    focusable={true}
+    focusable={false}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -402,8 +402,8 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
     >
       <RNSVGSvgView
         align="xMidYMid"
-        bbHeight="20"
-        bbWidth="40"
+        bbHeight={20}
+        bbWidth={40}
         fill="red"
         focusable={false}
         height={20}

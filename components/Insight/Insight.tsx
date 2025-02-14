@@ -35,16 +35,6 @@ type DataType = {
   tag: string;
 } & pieDataItem;
 
-type sliceType = {
-  labelCentroid: number[];
-  pieCentroid: number[];
-  data: DataType;
-};
-
-type LabelProps = {
-  slices?: sliceType[];
-};
-
 const getPercent = (percent: number) => {
   return (percent < 1 ? '<1' : percent < 100 && percent >= 99 ? '99' : percent.toFixed(0)) + '%';
 };
