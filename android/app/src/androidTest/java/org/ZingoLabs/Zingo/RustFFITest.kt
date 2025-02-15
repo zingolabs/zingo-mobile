@@ -113,7 +113,7 @@ data class ParseResult (
     val address_kind: String?
 )
 
-val reactContext = ReactApplicationContext(MainApplication.getAppContext())
+val reactContext = MainApplication.getAppContext() as ReactApplicationContext
 val rpcModule = RPCModule(reactContext)
 
 @Category(OfflineTest::class)
