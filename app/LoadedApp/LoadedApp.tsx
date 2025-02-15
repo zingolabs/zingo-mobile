@@ -19,12 +19,12 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faList, faUpload, faDownload, faCog, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
-import { DrawerLayout } from 'react-native-gesture-handler';
+import ReanimatedDrawerLayout, { DrawerType } from 'react-native-gesture-handler/ReanimatedDrawerLayout';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { cloneDeep, isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
-import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo';
+import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo/src/index';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import RPC from '../rpc';
@@ -685,7 +685,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       });
     });
 
-    this.unsubscribeNetInfo = NetInfo.addEventListener(async (state: any)  => {
+    this.unsubscribeNetInfo = NetInfo.addEventListener(async (state: any) => {
       const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
       if (
         isConnected !== state.isConnected ||
@@ -1839,10 +1839,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     return (
       <ContextAppLoadedProvider value={context}>
-        <DrawerLayout
+        <ReanimatedDrawerLayout
           ref={ref => (this.drawerRef = ref)}
           renderNavigationView={() => menu}
-          drawerType="slide"
+          drawerType={DrawerType.BACK}
           drawerWidth={Dimensions.get('window').width * 0.7}>
           <Modal
             animationType="slide"
@@ -2228,7 +2228,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               )}
             </>
           )}
-        </DrawerLayout>
+        </ReanimatedDrawerLayout>
       </ContextAppLoadedProvider>
     );
   }
