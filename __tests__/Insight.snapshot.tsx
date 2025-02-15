@@ -45,6 +45,9 @@ jest.mock('@react-native-clipboard/clipboard', () => ({
   getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
   setString: jest.fn(),
 }));
+jest.mock('react-native-gifted-charts', () => ({
+  PieChart: jest.fn(() => null),
+}));
 
 // test suite
 describe('Component Insight - test', () => {

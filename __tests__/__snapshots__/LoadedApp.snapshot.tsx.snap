@@ -1,3 +1,231 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `null`;
+exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
+<div>
+  <div>
+    <RCTScrollView
+      scrollsToTop={false}
+      style={
+        {
+          "backgroundColor": undefined,
+        }
+      }
+    >
+      <View>
+        <Text
+          style={
+            {
+              "color": "rgb(28, 28, 30)",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "marginLeft": 30,
+              "marginVertical": 10,
+              "opacity": 1,
+            }
+          }
+        >
+          text translated
+        </Text>
+        <View
+          style={
+            {
+              "backgroundColor": "rgb(0, 122, 255)",
+              "height": 1,
+            }
+          }
+        />
+        <View
+          style={
+            {
+              "display": "flex",
+              "marginLeft": 20,
+            }
+          }
+        >
+          <Text
+            onPress={[Function]}
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 14,
+                "fontWeight": "600",
+                "opacity": 1,
+                "paddingTop": 25,
+              }
+            }
+            testID="menu.about"
+          >
+            text translated
+          </Text>
+          <Text
+            onPress={[Function]}
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 14,
+                "fontWeight": "600",
+                "opacity": 1,
+                "paddingTop": 25,
+              }
+            }
+            testID="menu.settings"
+          >
+            text translated
+          </Text>
+          <Text
+            onPress={[Function]}
+            style={
+              {
+                "color": "rgb(0, 122, 255)",
+                "fontSize": 14,
+                "fontWeight": "600",
+                "opacity": 1,
+                "paddingTop": 25,
+              }
+            }
+            testID="menu.messages"
+          >
+            text translated
+          </Text>
+          <Text
+            onPress={[Function]}
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 14,
+                "fontWeight": "600",
+                "opacity": 1,
+                "paddingTop": 25,
+              }
+            }
+            testID="menu.addressbook"
+          >
+            text translated
+          </Text>
+          <Text
+            onPress={[Function]}
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 14,
+                "fontWeight": "600",
+                "opacity": 1,
+                "paddingTop": 25,
+              }
+            }
+            testID="menu.walletseedufvk"
+          >
+            text translated
+          </Text>
+          <Text
+            onPress={[Function]}
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 14,
+                "fontWeight": "600",
+                "opacity": 1,
+                "paddingTop": 25,
+              }
+            }
+            testID="menu.insight"
+          >
+            text translated
+          </Text>
+          <Text
+            onPress={[Function]}
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 14,
+                "fontWeight": "600",
+                "opacity": 1,
+                "paddingTop": 25,
+              }
+            }
+            testID="menu.tipzingolabs"
+          >
+            text translated
+          </Text>
+          <Text
+            onPress={[Function]}
+            style={
+              {
+                "color": "rgb(28, 28, 30)",
+                "fontSize": 14,
+                "fontWeight": "600",
+                "opacity": 1,
+                "paddingTop": 25,
+              }
+            }
+          >
+            text translated
+          </Text>
+        </View>
+      </View>
+    </RCTScrollView>
+    <View
+      style={
+        {
+          "backgroundColor": undefined,
+          "bottom": 5,
+          "flexDirection": "row",
+          "padding": 10,
+          "position": "absolute",
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+          }
+        }
+      >
+        Version : 
+      </Text>
+      <Text
+        style={
+          {
+            "color": undefined,
+            "fontSize": 8,
+          }
+        }
+      >
+        text translated
+      </Text>
+      <Text
+        style={
+          {
+            "color": "rgb(216, 216, 216)",
+            "fontSize": 8,
+            "marginLeft": 10,
+          }
+        }
+      >
+        text translatedtext translated
+      </Text>
+    </View>
+  </div>
+  <div>
+    <View />
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#011401",
+          "display": "flex",
+          "height": "100%",
+          "justifyContent": "center",
+        }
+      }
+    >
+      <ActivityIndicator
+        color="#18bd18"
+        size="large"
+      />
+    </View>
+  </div>
+</div>
+`;

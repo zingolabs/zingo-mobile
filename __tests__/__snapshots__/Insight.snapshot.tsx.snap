@@ -1,17 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component Insight - test Insight - snapshot 1`] = `
-<RCTSafeAreaView
-  style={
-    {
-      "alignItems": "stretch",
-      "backgroundColor": "rgb(242, 242, 242)",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-    }
-  }
->
+[
   <View>
     <View
       style={
@@ -165,7 +155,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -271,7 +261,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         }
       }
     />
-  </View>
+  </View>,
   <View
     style={
       {
@@ -500,7 +490,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         </Text>
       </View>
     </View>
-  </View>
+  </View>,
   <RCTScrollView
     contentContainerStyle={{}}
     indicatorStyle="white"
@@ -550,6 +540,6 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         />
       </View>
     </View>
-  </RCTScrollView>
-</RCTSafeAreaView>
+  </RCTScrollView>,
+]
 `;

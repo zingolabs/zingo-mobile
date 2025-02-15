@@ -57,6 +57,37 @@ jest.mock('react-native-device-info', () => ({
   getManufacturer: jest.fn(() => 'Mocked Manufacturer'),
   getModel: jest.fn(() => 'Mocked Model'),
 }));
+// Jest setup file or in your test file
+jest.mock('react-native-gesture-handler/ReanimatedDrawerLayout', () => {
+  const R = require('react');
+
+  const ReanimatedDrawerLayout = R.forwardRef((props: any, ref: any) => {
+    const { renderNavigationView, children } = props;
+
+    return (
+      <div ref={ref}>
+        <div>
+          {renderNavigationView && renderNavigationView()}
+        </div>
+        <div>{children}</div>
+      </div>
+    );
+  });
+
+  // Export mock DrawerType if needed
+  const DrawerType = {
+    FRONT: 'front',
+    BACK: 'back',
+    SLIDE: 'slide',
+  };
+
+  return {
+    __esModule: true,
+    default: ReanimatedDrawerLayout,
+    DrawerType,
+  };
+});
+
 jest.mock('react-native-gesture-handler', () => {
   const RN = jest.requireActual('react-native');
 
