@@ -1,19 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component Messages - test Messages currency USD, privacy high & mode advanced - snapshot 1`] = `
-<RCTSafeAreaView
-  accessibilityLabel="text translated"
-  accessible={true}
-  style={
-    {
-      "backgroundColor": "#011401",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-      "width": "100%",
-    }
-  }
->
+[
   <View>
     <View
       style={
@@ -225,7 +213,7 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -282,7 +270,7 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
         }
       }
     />
-  </View>
+  </View>,
   <View
     style={
       {
@@ -605,7 +593,7 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
         </View>
       </View>
     </RCTScrollView>
-  </View>
+  </View>,
   <ActivityIndicator
     color="#18bd18"
     size="large"
@@ -614,24 +602,12 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
         "marginVertical": 20,
       }
     }
-  />
-</RCTSafeAreaView>
+  />,
+]
 `;
 
 exports[`Component Messages - test Messages no currency, privacy normal & mode basic - snapshot 1`] = `
-<RCTSafeAreaView
-  accessibilityLabel="text translated"
-  accessible={true}
-  style={
-    {
-      "backgroundColor": "#011401",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-      "width": "100%",
-    }
-  }
->
+[
   <View>
     <View
       style={
@@ -808,7 +784,7 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -865,7 +841,7 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
         }
       }
     />
-  </View>
+  </View>,
   <View
     style={
       {
@@ -1188,7 +1164,7 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
         </View>
       </View>
     </RCTScrollView>
-  </View>
+  </View>,
   <ActivityIndicator
     color="#18bd18"
     size="large"
@@ -1197,6 +1173,6 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
         "marginVertical": 20,
       }
     }
-  />
-</RCTSafeAreaView>
+  />,
+]
 `;

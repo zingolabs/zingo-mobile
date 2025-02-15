@@ -8,7 +8,7 @@ import OptionsMenu from 'react-native-option-menu';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEllipsisV, faWifi } from '@fortawesome/free-solid-svg-icons';
 
-import { NetInfoStateType } from '@react-native-community/netinfo';
+import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
 import { ThemeType } from '../../types';
 import { ButtonTypeEnum, ChainNameEnum, GlobalConst, ModeEnum, SelectServerEnum } from '../../AppState';

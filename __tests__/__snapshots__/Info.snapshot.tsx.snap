@@ -1,17 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component Info - test Info - snapshot 1`] = `
-<RCTSafeAreaView
-  style={
-    {
-      "alignItems": "stretch",
-      "backgroundColor": "rgb(242, 242, 242)",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-    }
-  }
->
+[
   <View>
     <View
       style={
@@ -85,7 +75,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -191,7 +181,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
         }
       }
     />
-  </View>
+  </View>,
   <RCTScrollView
     contentContainerStyle={
       {
@@ -548,6 +538,6 @@ exports[`Component Info - test Info - snapshot 1`] = `
         </View>
       </View>
     </View>
-  </RCTScrollView>
-</RCTSafeAreaView>
+  </RCTScrollView>,
+]
 `;

@@ -9,6 +9,11 @@ import { render } from '@testing-library/react-native';
 import SingleAddress from '../components/Components/SingleAddress';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 
+jest.mock('react-native-safe-area-context', () => ({
+  SafeAreaProvider: ({ children }: any) => children,
+  SafeAreaView: ({ children }: any) => children,
+  useSafeAreaInsets: () => ({ top: 0, left: 0, right: 0, bottom: 0 }),
+}));
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',

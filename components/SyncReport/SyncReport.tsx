@@ -14,7 +14,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 
 import Header from '../Header';
-import { NetInfoStateType } from '@react-native-community/netinfo';
+import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import RegText from '../Components/RegText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';

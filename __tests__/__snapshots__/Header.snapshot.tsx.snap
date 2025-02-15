@@ -227,7 +227,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             }
             accessible={true}
             collapsable={false}
-            focusable={true}
+            focusable={false}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -253,8 +253,8 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             >
               <RNSVGSvgView
                 align="xMidYMid"
-                bbHeight="25.2"
-                bbWidth="50.4"
+                bbHeight={25.2}
+                bbWidth={50.4}
                 fill="rgb(28, 28, 30)"
                 focusable={false}
                 height={25.2}

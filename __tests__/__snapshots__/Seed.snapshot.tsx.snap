@@ -1,17 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component Seed - test Seed Backup - snapshot 1`] = `
-<RCTSafeAreaView
-  style={
-    {
-      "alignItems": "stretch",
-      "backgroundColor": "rgb(242, 242, 242)",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-    }
-  }
->
+[
   <View>
     <View
       style={
@@ -165,7 +155,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -271,7 +261,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         }
       }
     />
-  </View>
+  </View>,
   <RCTScrollView
     contentContainerStyle={
       {
@@ -501,7 +491,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>
+  </RCTScrollView>,
   <View
     style={
       {
@@ -588,22 +578,12 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>
-</RCTSafeAreaView>
+  </View>,
+]
 `;
 
 exports[`Component Seed - test Seed Change - snapshot 1`] = `
-<RCTSafeAreaView
-  style={
-    {
-      "alignItems": "stretch",
-      "backgroundColor": "rgb(242, 242, 242)",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-    }
-  }
->
+[
   <View>
     <View
       style={
@@ -757,7 +737,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -863,7 +843,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         }
       }
     />
-  </View>
+  </View>,
   <RCTScrollView
     contentContainerStyle={
       {
@@ -1093,7 +1073,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>
+  </RCTScrollView>,
   <View
     style={
       {
@@ -1180,22 +1160,12 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>
-</RCTSafeAreaView>
+  </View>,
+]
 `;
 
 exports[`Component Seed - test Seed New - snapshot 1`] = `
-<RCTSafeAreaView
-  style={
-    {
-      "alignItems": "stretch",
-      "backgroundColor": "rgb(242, 242, 242)",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-    }
-  }
->
+[
   <View>
     <View
       style={
@@ -1349,7 +1319,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -1455,7 +1425,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         }
       }
     />
-  </View>
+  </View>,
   <RCTScrollView
     contentContainerStyle={
       {
@@ -1685,7 +1655,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>
+  </RCTScrollView>,
   <View
     style={
       {
@@ -1772,22 +1742,12 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>
-</RCTSafeAreaView>
+  </View>,
+]
 `;
 
 exports[`Component Seed - test Seed Server - snapshot 1`] = `
-<RCTSafeAreaView
-  style={
-    {
-      "alignItems": "stretch",
-      "backgroundColor": "rgb(242, 242, 242)",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-    }
-  }
->
+[
   <View>
     <View
       style={
@@ -1941,7 +1901,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -2047,7 +2007,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         }
       }
     />
-  </View>
+  </View>,
   <RCTScrollView
     contentContainerStyle={
       {
@@ -2277,7 +2237,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>
+  </RCTScrollView>,
   <View
     style={
       {
@@ -2364,22 +2324,12 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>
-</RCTSafeAreaView>
+  </View>,
+]
 `;
 
 exports[`Component Seed - test Seed View - snapshot 1`] = `
-<RCTSafeAreaView
-  style={
-    {
-      "alignItems": "stretch",
-      "backgroundColor": "rgb(242, 242, 242)",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-    }
-  }
->
+[
   <View>
     <View
       style={
@@ -2533,7 +2483,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -2639,7 +2589,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         }
       }
     />
-  </View>
+  </View>,
   <RCTScrollView
     contentContainerStyle={
       {
@@ -2869,7 +2819,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>
+  </RCTScrollView>,
   <View
     style={
       {
@@ -2956,6 +2906,6 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>
-</RCTSafeAreaView>
+  </View>,
+]
 `;

@@ -35,7 +35,7 @@ import CurrencyAmount from '../Components/CurrencyAmount';
 import PriceFetcher from '../Components/PriceFetcher';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
-import { NetInfoStateType } from '@react-native-community/netinfo';
+import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import Button from '../Components/Button';
 import RPC from '../../app/rpc';
 import { RPCShieldType } from '../../app/rpc/types/RPCShieldType';

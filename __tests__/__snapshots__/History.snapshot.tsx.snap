@@ -267,8 +267,8 @@ exports[`Component History - test History currency USD, privacy high & mode adva
             >
               <RNSVGSvgView
                 align="xMidYMid"
-                bbHeight="25.2"
-                bbWidth="50.4"
+                bbHeight={25.2}
+                bbWidth={50.4}
                 fill="#c3c3c3"
                 focusable={false}
                 height={25.2}
@@ -1033,7 +1033,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             }
             accessible={true}
             collapsable={false}
-            focusable={true}
+            focusable={false}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -1059,8 +1059,8 @@ exports[`Component History - test History no currency, privacy normal & mode bas
             >
               <RNSVGSvgView
                 align="xMidYMid"
-                bbHeight="25.2"
-                bbWidth="50.4"
+                bbHeight={25.2}
+                bbWidth={50.4}
                 fill="#c3c3c3"
                 focusable={false}
                 height={25.2}

@@ -30,6 +30,11 @@ jest.mock('i18n-js', () => ({
   })),
 }));
 
+jest.mock('react-native-safe-area-context', () => ({
+  SafeAreaProvider: ({ children }: any) => children,
+  SafeAreaView: ({ children }: any) => children,
+  useSafeAreaInsets: () => ({ top: 0, left: 0, right: 0, bottom: 0 }),
+}));
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
@@ -48,7 +53,7 @@ jest.mock('react-native-tab-view', () => ({
 }));
 jest.mock('react-native-option-menu', () => '');
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-jest.mock('@react-native-community/netinfo', () => {
+jest.mock('@react-native-community/netinfo/src/index', () => {
   return {
     addEventListener: jest.fn(),
     fetch: jest.fn().mockImplementation(() =>
