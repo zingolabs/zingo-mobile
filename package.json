@@ -29,9 +29,11 @@
     "@react-native-community/checkbox": "^0.5.17",
     "@react-native-community/netinfo": "github:j-piasecki/react-native-netinfo#@jpiasecki/new-arch",
     "@react-native-picker/picker": "^2.11.0",
-    "@react-navigation/bottom-tabs": "^6.4.0",
-    "@react-navigation/native": "^6.1.18",
-    "@react-navigation/stack": "^6.4.1",
+    "@react-navigation/bottom-tabs": "^7.2.0",
+    "@react-navigation/drawer": "^7.1.1",
+    "@react-navigation/elements": "^2.2.5",
+    "@react-navigation/native": "^7.0.14",
+    "@react-navigation/stack": "^7.1.1",
     "@sayem314/react-native-keep-awake": "^1.1.0",
     "buffer": "^6.0.3",
     "i18n-js": "^4.1.1",
@@ -65,7 +67,6 @@
     "react-native-svg": "^15.11.1",
     "react-native-tab-view": "^3.3.0",
     "react-native-vision-camera": "^4.6.3",
-    "react-native-worklets-core": "^1.5.0",
     "url-parse": "^1.5.10"
   },
   "devDependencies": {
