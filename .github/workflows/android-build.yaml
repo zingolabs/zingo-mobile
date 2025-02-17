@@ -94,6 +94,15 @@ jobs:
 
       - name: AWS libcrypto rust building
         run: cargo install --force --locked bindgen-cli
+
+      - name: Install nvm with node 20.9.0
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+          nvm install 20.9.0
+          nvm use 20.9.0
       
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -109,7 +118,7 @@ jobs:
 
       - name: Yarn install
         run: yarn
-        
+
       - name: Gradle clean before
         working-directory: android
         run: |
