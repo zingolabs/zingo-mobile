@@ -95,6 +95,12 @@ jobs:
       - name: AWS libcrypto rust building
         run: cargo install --force --locked bindgen-cli
 
+      - name: clean gradle before
+        run: |
+          android/gradlew clean
+          android/gradlew --stop
+          android/gradle cleanBuildCache
+
       - name: Cargo uniffi kotlin
         working-directory: ./rust/lib
         run: |
