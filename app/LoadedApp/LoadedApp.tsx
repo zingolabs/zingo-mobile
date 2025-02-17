@@ -14,7 +14,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
@@ -434,6 +434,15 @@ type LoadedAppClassProps = {
 };
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
+
+const TabPressable: React.FC<BottomTabBarButtonProps & { colors: ThemeType }> = ({ colors, ...props }) => {
+  console.log('colors', colors);
+
+  return <PlatformPressable {...props} android_ripple={{ color: colors.primary }} />;
+};
+
+const renderTabPressable = (colors: ThemeType) => (props: BottomTabBarButtonProps) =>
+  <TabPressable {...props} colors={colors} />;
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClassState> {
   rpc: RPC;
@@ -2126,7 +2135,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   borderTopWidth: 1,
                 },
                 headerShown: false,
-                tabBarButton: props => <PlatformPressable {...props} android_ripple={{ color: colors.primary }} />,
+                tabBarButton: renderTabPressable(colors),
               })}>
               <Tab.Screen name={translate('loadedapp.history-menu') as string}>
                 {() => (
