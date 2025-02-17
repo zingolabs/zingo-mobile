@@ -101,6 +101,12 @@ jobs:
           distribution: 'temurin'
           java-version: '18'
 
+      - name: Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.8
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
+
       - name: Gradle clean before
         working-directory: android
         run: |
