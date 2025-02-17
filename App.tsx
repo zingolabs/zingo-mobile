@@ -62,6 +62,7 @@ const advancedTheme: ThemeType & Theme = {
 };
 
 const basicTheme: ThemeType = {
+  ...DefaultTheme,
   dark: true,
   colors: {
     background: basicPalette[0],
