@@ -24,7 +24,7 @@ type RescanProps = {
 const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) => {
   const context = useContext(ContextAppLoaded);
   const { wallet, translate, netInfo, addLastSnackbar, language, selectServer } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const doRescanAndClose = () => {

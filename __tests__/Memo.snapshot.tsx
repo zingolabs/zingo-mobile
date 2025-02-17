@@ -9,6 +9,7 @@ import { render } from '@testing-library/react-native';
 import Memo from '../components/Memo';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaProvider: ({ children }: any) => children,
@@ -46,6 +47,10 @@ jest.mock('react-native', () => {
 
   return RN;
 });
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useTheme: () => (mockTheme),
+}));
 
 // test suite
 describe('Component Memo - test', () => {

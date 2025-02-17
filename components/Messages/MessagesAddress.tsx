@@ -40,7 +40,7 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   return (

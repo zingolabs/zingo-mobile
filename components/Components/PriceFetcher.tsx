@@ -20,7 +20,7 @@ type PriceFetcherProps = {
 const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice, textBefore }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, zecPrice, addLastSnackbar, mode, language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [refreshMinutes, setRefreshMinutes] = useState<number>(0);

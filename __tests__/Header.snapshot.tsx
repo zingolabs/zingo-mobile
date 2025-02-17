@@ -11,6 +11,7 @@ import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/contex
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaProvider: ({ children }: any) => children,
@@ -48,6 +49,10 @@ jest.mock('react-native', () => {
 
   return RN;
 });
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useTheme: () => (mockTheme),
+}));
 
 // test suite
 describe('Component Header - test', () => {

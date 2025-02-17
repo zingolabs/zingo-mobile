@@ -49,6 +49,7 @@ jest.mock('react-native', () => {
   return RN;
 });
 jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
   useScrollToTop: jest.fn(),
   useTheme: () => mockTheme,
 }));

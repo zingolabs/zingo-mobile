@@ -18,7 +18,7 @@ type LaunchingProps = {
 };
 
 const Launching: React.FunctionComponent<LaunchingProps> = props => {
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
 
   return (
     <SafeAreaProvider>

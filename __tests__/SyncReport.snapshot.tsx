@@ -14,6 +14,7 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSyncingStatus from '../__mocks__/dataMocks/mockSyncingStatus';
 import { mockNetInfo } from '../__mocks__/dataMocks/mockNetInfo';
+import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
 const NetInfoStateType = {
   unknown: 'unknown',
@@ -69,6 +70,10 @@ jest.mock('react-native', () => {
 jest.mock('@react-native-clipboard/clipboard', () => ({
   getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
   setString: jest.fn(),
+}));
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useTheme: () => (mockTheme),
 }));
 
 // test suite

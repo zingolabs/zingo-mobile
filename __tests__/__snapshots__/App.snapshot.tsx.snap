@@ -5,7 +5,6 @@ exports[`Component App - test App - snapshot 1`] = `
   initialRouteName="LoadingApp"
   screenOptions={
     {
-      "animationEnabled": false,
       "headerShown": false,
     }
   }

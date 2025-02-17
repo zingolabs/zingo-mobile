@@ -86,7 +86,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     language = contextLoaded.language;
   }
 
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [seedPhrase, setSeedPhrase] = useState<string>('');

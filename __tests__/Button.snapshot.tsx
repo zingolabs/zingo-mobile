@@ -8,6 +8,12 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Button from '../components/Components/Button';
 import { ButtonTypeEnum } from '../app/AppState';
+import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
+
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useTheme: () => (mockTheme),
+}));
 
 // test suite
 describe('Component Button - test', () => {

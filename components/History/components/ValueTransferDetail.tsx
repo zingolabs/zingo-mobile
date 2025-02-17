@@ -71,7 +71,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     addresses,
     zenniesDonationAddress,
   } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);

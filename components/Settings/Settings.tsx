@@ -163,7 +163,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     RECOVERYWALLETINFOONDEVICE = recoveryWalletInfoOnDevicesArray as Options[];
   }
 
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(languageContext);
 
   const [memos, setMemos] = useState<string>(walletSettings.downloadMemos);

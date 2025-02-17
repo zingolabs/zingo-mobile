@@ -7,7 +7,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(255, 255, 255)",
+          "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
           "paddingBottom": 0,
@@ -125,7 +125,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         }
       >
         <
-          color="rgb(0, 122, 255)"
+          color="#18bd18"
           icon={
             {
               "icon": [
@@ -152,7 +152,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "opacity": 1,
@@ -175,7 +175,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
@@ -218,7 +218,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -262,7 +262,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 18,
                   "fontWeight": "600",
                   "opacity": 1,
@@ -298,7 +298,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(0, 122, 255)",
+                "color": "#18bd18",
               }
             }
           >
@@ -307,7 +307,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(0, 122, 255)",
+                "color": "#18bd18",
               }
             }
           >
@@ -327,7 +327,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <View
             style={
               {
-                "borderLeftColor": "rgb(0, 122, 255)",
+                "borderLeftColor": "#18bd18",
                 "borderLeftWidth": 1,
                 "height": 10,
               }
@@ -336,7 +336,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <View
             style={
               {
-                "borderRightColor": "rgb(0, 122, 255)",
+                "borderRightColor": "#18bd18",
                 "borderRightWidth": 1,
                 "height": 10,
               }
@@ -346,7 +346,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
         <View
           style={
             {
-              "borderBottomColor": "rgb(0, 122, 255)",
+              "borderBottomColor": "#18bd18",
               "borderBottomWidth": 2,
               "display": "flex",
               "flexDirection": "row",
@@ -360,9 +360,9 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             style={
               {
                 "backgroundColor": "lightyellow",
-                "borderLeftColor": "rgb(0, 122, 255)",
+                "borderLeftColor": "#18bd18",
                 "borderLeftWidth": 1,
-                "borderRightColor": "rgb(0, 122, 255)",
+                "borderRightColor": "#18bd18",
                 "borderRightWidth": 1,
                 "height": 10,
                 "width": "100%",
@@ -396,7 +396,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(0, 122, 255)",
+                "color": "#18bd18",
               }
             }
           >
@@ -418,7 +418,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
               }
             }
           >
@@ -440,7 +440,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(0, 122, 255)",
+                "color": "#18bd18",
               }
             }
           >
@@ -462,7 +462,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
               }
             }
             testID="syncreport.syncednow"
@@ -491,7 +491,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -535,7 +535,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 18,
                   "fontWeight": "600",
                   "opacity": 1,
@@ -558,7 +558,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -602,7 +602,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 18,
                   "fontWeight": "600",
                   "opacity": 1,
@@ -633,7 +633,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "opacity": 0.65,
                 }
               }
@@ -677,7 +677,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "opacity": 1,
@@ -689,14 +689,14 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             </View>
           </View>
           <ActivityIndicator
-            color="rgb(0, 122, 255)"
+            color="#18bd18"
             size="large"
           />
         </View>
         <View
           style={
             {
-              "backgroundColor": "rgb(0, 122, 255)",
+              "backgroundColor": "#18bd18",
               "height": 2,
               "marginTop": 10,
               "width": "100%",
@@ -714,7 +714,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -758,7 +758,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 18,
                   "fontWeight": "600",
                   "opacity": 1,

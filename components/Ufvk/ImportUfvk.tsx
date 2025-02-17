@@ -35,7 +35,7 @@ type ImportUfvkProps = {
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, onClickOK }) => {
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, info, server, mode, addLastSnackbar, language, selectServer } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [seedufvkText, setSeedufvkText] = useState<string>('');

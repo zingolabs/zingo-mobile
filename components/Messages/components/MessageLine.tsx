@@ -50,7 +50,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, privacy, info, addressBook, addresses, addLastSnackbar } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const { memo, memoUA } = Utils.splitMemo(vt.memos);

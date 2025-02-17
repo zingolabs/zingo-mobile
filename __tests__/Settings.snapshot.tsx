@@ -14,6 +14,7 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockWalletSettings } from '../__mocks__/dataMocks/mockWalletSettings';
+import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaProvider: ({ children }: any) => children,
@@ -78,6 +79,10 @@ jest.mock('react-native-keychain', () => ({
   getSupportedBiometryType: jest.fn(),
 }));
 jest.useFakeTimers();
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useTheme: () => (mockTheme),
+}));
 
 // test suite
 describe('Component Settings - test', () => {

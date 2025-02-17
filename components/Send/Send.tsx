@@ -129,7 +129,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     setZecPrice,
     zenniesDonationAddress,
   } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState<boolean>(false);

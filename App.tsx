@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { DefaultTheme, NavigationContainer, Theme } from '@react-navigation/native';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { LoadedApp } from './app/LoadedApp';
@@ -41,7 +41,7 @@ const basicPalette: string[] = [
   '#040C17',
 ];
 
-const advancedTheme: ThemeType & Theme = {
+const advancedTheme: ThemeType = {
   ...DefaultTheme,
   dark: true,
   colors: {

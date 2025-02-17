@@ -5,7 +5,7 @@ exports[`Component Components - test BoldText - snapshot 1`] = `
   style={
     {
       "backgroundColor": "red",
-      "color": "rgb(28, 28, 30)",
+      "color": "#c3c3c3",
       "fontSize": 18,
       "fontWeight": "bold",
       "opacity": 0.87,
@@ -71,7 +71,7 @@ exports[`Component Components - test CurrencyAmount High Privacy - snapshot 1`] 
         style={
           {
             "backgroundColor": "red",
-            "color": undefined,
+            "color": "#ffffff",
             "fontSize": 20,
             "fontWeight": "700",
           }
@@ -139,7 +139,7 @@ exports[`Component Components - test CurrencyAmount Normal Privacy - snapshot 1`
         style={
           {
             "backgroundColor": "red",
-            "color": undefined,
+            "color": "#ffffff",
             "fontSize": 20,
             "fontWeight": "700",
           }
@@ -157,7 +157,7 @@ exports[`Component Components - test ErrorText - snapshot 1`] = `
   style={
     {
       "backgroundColor": "white",
-      "color": "rgb(0, 122, 255)",
+      "color": "#18bd18",
     }
   }
 >
@@ -170,7 +170,7 @@ exports[`Component Components - test FadeText - snapshot 1`] = `
   style={
     {
       "backgroundColor": "red",
-      "color": "rgb(28, 28, 30)",
+      "color": "#c3c3c3",
       "opacity": 0.65,
     }
   }

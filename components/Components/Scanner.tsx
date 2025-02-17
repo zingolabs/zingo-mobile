@@ -4,15 +4,12 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { Camera, Code, useCameraDevice, useCameraPermission, useCodeScanner } from 'react-native-vision-camera';
 import { Text } from 'react-native-svg';
-// import { useTheme } from '@react-navigation/native';
-// import { ThemeType } from '../../app/types/ThemeType';
 
 type ScannerProps = {
   onRead: (codes: Code[]) => void;
 };
 
 const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead }) => {
-  // const { colors } = useTheme() as unknown as ThemeType;
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
   const [active, setActive] = React.useState(true);

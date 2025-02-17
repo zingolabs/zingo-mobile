@@ -9,6 +9,7 @@ import { render } from '@testing-library/react-native';
 import Snackbars from '../components/Components/Snackbars';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockSnackbars } from '../__mocks__/dataMocks/mockSnackbars';
+import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
@@ -20,6 +21,10 @@ jest.mock('react-native-snackbar', () => {
     show: jest.fn(),
   };
 });
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useTheme: () => (mockTheme),
+}));
 
 // test suite
 describe('Component Snackbars - test', () => {

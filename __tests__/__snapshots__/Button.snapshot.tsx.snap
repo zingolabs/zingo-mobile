@@ -32,8 +32,8 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
   style={
     {
       "alignItems": "center",
-      "backgroundColor": "rgb(0, 122, 255)",
-      "borderColor": "rgb(0, 122, 255)",
+      "backgroundColor": "#18bd18",
+      "borderColor": "#18bd18",
       "borderRadius": 10,
       "borderWidth": 2,
       "justifyContent": "center",
@@ -65,7 +65,7 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
     <Text
       style={
         {
-          "color": "rgb(242, 242, 242)",
+          "color": "#011401",
           "fontSize": 16,
           "fontWeight": "bold",
           "textAlign": "center",
@@ -111,8 +111,8 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
   style={
     {
       "alignItems": "center",
-      "backgroundColor": "rgb(242, 242, 242)",
-      "borderColor": "rgb(0, 122, 255)",
+      "backgroundColor": "#011401",
+      "borderColor": "#18bd18",
       "borderRadius": 10,
       "borderWidth": 2,
       "justifyContent": "center",
@@ -144,7 +144,7 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
     <Text
       style={
         {
-          "color": "rgb(0, 122, 255)",
+          "color": "#18bd18",
           "fontSize": 16,
           "fontWeight": "bold",
           "textAlign": "center",

@@ -6,7 +6,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
   style={
     [
       {
-        "backgroundColor": "rgb(242, 242, 242)",
+        "backgroundColor": "#011401",
       },
       {
         "paddingBottom": 0,
@@ -19,7 +19,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(255, 255, 255)",
+          "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
           "paddingBottom": 0,
@@ -137,7 +137,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
         }
       >
         <
-          color="rgb(0, 122, 255)"
+          color="#18bd18"
           icon={
             {
               "icon": [
@@ -164,7 +164,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "opacity": 1,
@@ -187,7 +187,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
@@ -217,7 +217,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
         accessible={true}
         style={
           {
-            "borderColor": "rgb(28, 28, 30)",
+            "borderColor": "#c3c3c3",
             "borderRadius": 5,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -236,7 +236,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
           style={
             {
               "backgroundColor": "transparent",
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "flex": 1,
               "fontSize": 14,
               "fontWeight": "600",
@@ -262,7 +262,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontWeight": "bold",
               "marginTop": 0,
               "opacity": 0.65,
@@ -274,7 +274,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "marginTop": 0,
               "opacity": 0.65,
             }
@@ -285,7 +285,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "marginTop": 0,
               "opacity": 0.65,
             }
@@ -338,8 +338,8 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
+          "borderColor": "#18bd18",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -371,7 +371,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "#011401",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",

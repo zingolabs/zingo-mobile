@@ -21,7 +21,7 @@ type AboutProps = {
 const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const arrayTxtObject = translate('about.copyright');

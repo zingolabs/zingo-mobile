@@ -7,7 +7,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(255, 255, 255)",
+          "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
           "paddingBottom": 0,
@@ -125,7 +125,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
         }
       >
         <
-          color="rgb(0, 122, 255)"
+          color="#18bd18"
           icon={
             {
               "icon": [
@@ -152,7 +152,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "opacity": 1,
@@ -175,7 +175,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
@@ -217,7 +217,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -261,7 +261,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 18,
                   "fontWeight": "600",
                   "opacity": 1,
@@ -283,7 +283,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -327,7 +327,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 18,
                   "fontWeight": "600",
                   "opacity": 1,
@@ -349,7 +349,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -393,7 +393,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 18,
                   "fontWeight": "600",
                   "opacity": 1,
@@ -415,7 +415,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -459,7 +459,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 18,
                   "fontWeight": "600",
                   "opacity": 1,
@@ -481,7 +481,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -525,7 +525,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "fontSize": 18,
                   "fontWeight": "600",
                   "opacity": 1,

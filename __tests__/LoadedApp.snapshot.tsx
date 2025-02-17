@@ -163,6 +163,13 @@ jest.mock('@react-native-clipboard/clipboard', () => ({
   getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
   setString: jest.fn(),
 }));
+jest.mock('@react-navigation/elements', () => ({
+  PlatformPressable: jest.fn().mockImplementation(({ children }) => children),
+}));
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useTheme: () => (mockTheme),
+}));
 
 // test suite
 describe('Component LoadedApp - test', () => {

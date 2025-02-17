@@ -27,7 +27,7 @@ type SyncReportProps = {
 const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
   const { syncingStatus, wallet, translate, background, language, netInfo } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [maxBlocks, setMaxBlocks] = useState<number>(0);

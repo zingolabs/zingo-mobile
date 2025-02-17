@@ -20,7 +20,7 @@ type ScannerKeyProps = {
 const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setUfvkText, closeModal }) => {
   const context = useContext(ContextAppLoading);
   const { translate, language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const onRead = async (codes: Code[]) => {

@@ -30,7 +30,7 @@ type PoolsProps = {
 const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
   const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language, shieldingAmount } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   const [orchardPool, setOrchardPool] = useState<boolean>(false);
   const [saplingPool, setSaplingPool] = useState<boolean>(false);
   const [transparentPool, setTransparentPool] = useState<boolean>(false);

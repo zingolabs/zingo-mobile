@@ -79,7 +79,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, valueTransfers, language, server, addressBook, addresses, doRefresh, zenniesDonationAddress } =
     context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [isMessagesAddressModalShowing, setMessagesAddressModalShowing] = useState<boolean>(false);

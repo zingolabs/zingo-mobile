@@ -21,7 +21,7 @@ const ChainTypeToggle: React.FunctionComponent<ChainTypeToggleProps> = ({
   translate,
   disabled,
 }) => {
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
 
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>

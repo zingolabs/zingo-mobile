@@ -44,7 +44,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     addressBookOpenPriorModal,
     zenniesDonationAddress,
   } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [numAb, setNumAb] = useState<number>(50);

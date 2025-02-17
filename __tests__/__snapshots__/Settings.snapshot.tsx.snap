@@ -6,7 +6,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
   style={
     [
       {
-        "backgroundColor": "rgb(242, 242, 242)",
+        "backgroundColor": "#011401",
       },
       {
         "paddingBottom": 0,
@@ -19,7 +19,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(255, 255, 255)",
+          "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
           "paddingBottom": 0,
@@ -137,7 +137,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         }
       >
         <
-          color="rgb(0, 122, 255)"
+          color="#18bd18"
           icon={
             {
               "icon": [
@@ -164,7 +164,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "opacity": 1,
@@ -187,7 +187,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
@@ -223,7 +223,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "bold",
               "opacity": 0.87,
@@ -252,7 +252,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "bold",
               "opacity": 0.87,
@@ -321,7 +321,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -354,7 +354,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -369,7 +369,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -428,7 +428,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -450,7 +450,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -465,7 +465,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -485,7 +485,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "bold",
               "opacity": 0.87,
@@ -554,7 +554,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -576,7 +576,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -591,7 +591,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -650,7 +650,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -683,7 +683,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -698,7 +698,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -757,7 +757,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -790,7 +790,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -805,7 +805,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -864,7 +864,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -897,7 +897,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -912,7 +912,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -932,7 +932,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "bold",
               "opacity": 0.87,
@@ -1001,7 +1001,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -1034,7 +1034,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -1049,7 +1049,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -1108,7 +1108,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -1130,7 +1130,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -1145,7 +1145,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -1165,7 +1165,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "bold",
               "opacity": 0.87,
@@ -1194,7 +1194,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "bold",
               "opacity": 0.87,
@@ -1263,7 +1263,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -1296,7 +1296,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -1311,7 +1311,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -1370,7 +1370,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -1392,7 +1392,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -1407,7 +1407,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -1427,7 +1427,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "bold",
               "opacity": 0.87,
@@ -1496,7 +1496,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -1529,7 +1529,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -1544,7 +1544,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -1603,7 +1603,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -1625,7 +1625,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -1640,7 +1640,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -1660,7 +1660,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "bold",
               "opacity": 0.87,
@@ -1729,7 +1729,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -1762,7 +1762,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -1785,7 +1785,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -1844,7 +1844,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -1866,7 +1866,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -1879,7 +1879,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "marginLeft": 10,
                     "opacity": 0.65,
                   }
@@ -1900,7 +1900,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -1970,7 +1970,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             onValueChange={[Function]}
             placeholder={
               {
-                "color": "rgb(0, 122, 255)",
+                "color": "#18bd18",
                 "label": "text translated",
                 "value": "",
               }
@@ -1992,7 +1992,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -2025,7 +2025,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -2049,7 +2049,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -2108,7 +2108,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -2141,7 +2141,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -2163,7 +2163,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "opacity": 0.65,
                 }
               }
@@ -2184,7 +2184,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "bold",
               "opacity": 0.87,
@@ -2227,9 +2227,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
-            onCheckColor="rgb(255, 255, 255)"
-            onFillColor="rgb(0, 122, 255)"
-            onTintColor="rgb(0, 122, 255)"
+            onCheckColor="#011401"
+            onFillColor="#18bd18"
+            onTintColor="#18bd18"
             onValueChange={[Function]}
             style={
               [
@@ -2251,11 +2251,11 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 },
               ]
             }
-            tintColor="rgb(28, 28, 30)"
+            tintColor="#c3c3c3"
             tintColors={
               {
-                "false": "rgb(28, 28, 30)",
-                "true": "rgb(0, 122, 255)",
+                "false": "#c3c3c3",
+                "true": "#18bd18",
               }
             }
           />
@@ -2263,7 +2263,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "600",
               "marginTop": 5,
@@ -2306,9 +2306,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
-            onCheckColor="rgb(255, 255, 255)"
-            onFillColor="rgb(0, 122, 255)"
-            onTintColor="rgb(0, 122, 255)"
+            onCheckColor="#011401"
+            onFillColor="#18bd18"
+            onTintColor="#18bd18"
             onValueChange={[Function]}
             style={
               [
@@ -2330,11 +2330,11 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 },
               ]
             }
-            tintColor="rgb(28, 28, 30)"
+            tintColor="#c3c3c3"
             tintColors={
               {
-                "false": "rgb(28, 28, 30)",
-                "true": "rgb(0, 122, 255)",
+                "false": "#c3c3c3",
+                "true": "#18bd18",
               }
             }
           />
@@ -2342,7 +2342,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "600",
               "marginTop": 5,
@@ -2385,9 +2385,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
-            onCheckColor="rgb(255, 255, 255)"
-            onFillColor="rgb(0, 122, 255)"
-            onTintColor="rgb(0, 122, 255)"
+            onCheckColor="#011401"
+            onFillColor="#18bd18"
+            onTintColor="#18bd18"
             onValueChange={[Function]}
             style={
               [
@@ -2409,11 +2409,11 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 },
               ]
             }
-            tintColor="rgb(28, 28, 30)"
+            tintColor="#c3c3c3"
             tintColors={
               {
-                "false": "rgb(28, 28, 30)",
-                "true": "rgb(0, 122, 255)",
+                "false": "#c3c3c3",
+                "true": "#18bd18",
               }
             }
           />
@@ -2421,7 +2421,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "600",
               "marginTop": 5,
@@ -2464,9 +2464,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
-            onCheckColor="rgb(255, 255, 255)"
-            onFillColor="rgb(0, 122, 255)"
-            onTintColor="rgb(0, 122, 255)"
+            onCheckColor="#011401"
+            onFillColor="#18bd18"
+            onTintColor="#18bd18"
             onValueChange={[Function]}
             style={
               [
@@ -2488,11 +2488,11 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 },
               ]
             }
-            tintColor="rgb(28, 28, 30)"
+            tintColor="#c3c3c3"
             tintColors={
               {
-                "false": "rgb(28, 28, 30)",
-                "true": "rgb(0, 122, 255)",
+                "false": "#c3c3c3",
+                "true": "#18bd18",
               }
             }
           />
@@ -2500,7 +2500,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "600",
               "marginTop": 5,
@@ -2543,9 +2543,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
-            onCheckColor="rgb(255, 255, 255)"
-            onFillColor="rgb(0, 122, 255)"
-            onTintColor="rgb(0, 122, 255)"
+            onCheckColor="#011401"
+            onFillColor="#18bd18"
+            onTintColor="#18bd18"
             onValueChange={[Function]}
             style={
               [
@@ -2567,11 +2567,11 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 },
               ]
             }
-            tintColor="rgb(28, 28, 30)"
+            tintColor="#c3c3c3"
             tintColors={
               {
-                "false": "rgb(28, 28, 30)",
-                "true": "rgb(0, 122, 255)",
+                "false": "#c3c3c3",
+                "true": "#18bd18",
               }
             }
           />
@@ -2579,7 +2579,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "600",
               "marginTop": 5,
@@ -2622,9 +2622,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
-            onCheckColor="rgb(255, 255, 255)"
-            onFillColor="rgb(0, 122, 255)"
-            onTintColor="rgb(0, 122, 255)"
+            onCheckColor="#011401"
+            onFillColor="#18bd18"
+            onTintColor="#18bd18"
             onValueChange={[Function]}
             style={
               [
@@ -2646,11 +2646,11 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 },
               ]
             }
-            tintColor="rgb(28, 28, 30)"
+            tintColor="#c3c3c3"
             tintColors={
               {
-                "false": "rgb(28, 28, 30)",
-                "true": "rgb(0, 122, 255)",
+                "false": "#c3c3c3",
+                "true": "#18bd18",
               }
             }
           />
@@ -2658,7 +2658,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "600",
               "marginTop": 5,
@@ -2701,9 +2701,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
-            onCheckColor="rgb(255, 255, 255)"
-            onFillColor="rgb(0, 122, 255)"
-            onTintColor="rgb(0, 122, 255)"
+            onCheckColor="#011401"
+            onFillColor="#18bd18"
+            onTintColor="#18bd18"
             onValueChange={[Function]}
             style={
               [
@@ -2725,11 +2725,11 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 },
               ]
             }
-            tintColor="rgb(28, 28, 30)"
+            tintColor="#c3c3c3"
             tintColors={
               {
-                "false": "rgb(28, 28, 30)",
-                "true": "rgb(0, 122, 255)",
+                "false": "#c3c3c3",
+                "true": "#18bd18",
               }
             }
           />
@@ -2737,7 +2737,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "600",
               "marginTop": 5,
@@ -2780,9 +2780,9 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             animationDuration={0.1}
             boxType="square"
             forwardedRef={null}
-            onCheckColor="rgb(255, 255, 255)"
-            onFillColor="rgb(0, 122, 255)"
-            onTintColor="rgb(0, 122, 255)"
+            onCheckColor="#011401"
+            onFillColor="#18bd18"
+            onTintColor="#18bd18"
             onValueChange={[Function]}
             style={
               [
@@ -2804,11 +2804,11 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
                 },
               ]
             }
-            tintColor="rgb(28, 28, 30)"
+            tintColor="#c3c3c3"
             tintColors={
               {
-                "false": "rgb(28, 28, 30)",
-                "true": "rgb(0, 122, 255)",
+                "false": "#c3c3c3",
+                "true": "#18bd18",
               }
             }
           />
@@ -2816,7 +2816,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "600",
               "marginTop": 5,
@@ -2838,7 +2838,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "bold",
               "opacity": 0.87,
@@ -2861,7 +2861,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           accessible={true}
           style={
             {
-              "borderColor": "rgb(216, 216, 216)",
+              "borderColor": "#ffffff",
               "borderWidth": 1,
               "marginLeft": 5,
               "maxHeight": 48,
@@ -2878,10 +2878,11 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             maxLength={6}
             onChangeText={[Function]}
             placeholder="text translated"
+            placeholderTextColor="#888888"
             style={
               {
                 "backgroundColor": "transparent",
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "fontSize": 18,
                 "fontWeight": "600",
                 "marginLeft": 5,
@@ -2904,7 +2905,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "bold",
               "opacity": 0.87,
@@ -2973,7 +2974,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -3006,7 +3007,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -3021,7 +3022,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -3080,7 +3081,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -3102,7 +3103,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -3117,7 +3118,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -3176,7 +3177,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -3209,7 +3210,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -3224,7 +3225,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -3244,7 +3245,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 18,
               "fontWeight": "bold",
               "opacity": 0.87,
@@ -3313,7 +3314,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -3335,7 +3336,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -3350,7 +3351,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -3409,7 +3410,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               }
             >
               <
-                color="rgb(216, 216, 216)"
+                color="#ffffff"
                 icon={
                   {
                     "icon": [
@@ -3442,7 +3443,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 18,
                     "fontWeight": "600",
                     "marginLeft": 10,
@@ -3457,7 +3458,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "opacity": 0.65,
               }
             }
@@ -3479,7 +3480,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             {
               "borderColor": "red",
               "borderWidth": 1,
-              "color": "rgb(0, 122, 255)",
+              "color": "#18bd18",
               "marginVertical": 10,
               "opacity": 0.65,
               "padding": 5,
@@ -3534,8 +3535,8 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
+          "borderColor": "#18bd18",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -3568,7 +3569,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "#011401",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",

@@ -1,6 +1,8 @@
+import { DefaultTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
 
 export const mockTheme: ThemeType = {
+  ...DefaultTheme,
   dark: true,
   colors: {
     background: '#011401', //'#010101',

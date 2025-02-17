@@ -50,7 +50,7 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
         r={47.5}
         stroke={
           {
-            "payload": 4294967295,
+            "payload": 4278260737,
             "type": 0,
           }
         }
@@ -83,7 +83,7 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
         r={47.5}
         stroke={
           {
-            "payload": 4278221567,
+            "payload": 4279811352,
             "type": 0,
           }
         }
@@ -103,7 +103,7 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
         dy={[]}
         fill={
           {
-            "payload": 4280032286,
+            "payload": 4291019715,
             "type": 0,
           }
         }

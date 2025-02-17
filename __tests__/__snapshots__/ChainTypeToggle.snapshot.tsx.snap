@@ -60,7 +60,7 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "borderColor": "rgb(0, 122, 255)",
+            "borderColor": "#18bd18",
             "borderRadius": 5,
             "borderWidth": 2,
             "flexDirection": "row",
@@ -72,7 +72,7 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(216, 216, 216)",
+              "color": "#ffffff",
               "fontSize": 13,
               "marginRight": 5,
             }
@@ -81,7 +81,7 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
           text translated
         </Text>
         <
-          color="rgb(0, 122, 255)"
+          color="#18bd18"
           icon={
             {
               "icon": [
@@ -150,7 +150,7 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "borderColor": undefined,
+            "borderColor": "#5a8c5a",
             "borderRadius": 5,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -162,7 +162,7 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(216, 216, 216)",
+              "color": "#ffffff",
               "fontSize": 13,
               "marginRight": 5,
             }
@@ -223,7 +223,7 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "borderColor": undefined,
+            "borderColor": "#5a8c5a",
             "borderRadius": 5,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -235,7 +235,7 @@ exports[`Component ChainTypeToggle - test ChainTypeToggle - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(216, 216, 216)",
+              "color": "#ffffff",
               "fontSize": 13,
               "marginRight": 5,
             }

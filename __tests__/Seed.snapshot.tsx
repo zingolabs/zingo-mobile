@@ -18,6 +18,7 @@ import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaProvider: ({ children }: any) => children,
@@ -58,6 +59,10 @@ jest.mock('react-native', () => {
 jest.mock('@react-native-clipboard/clipboard', () => ({
   getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
   setString: jest.fn(),
+}));
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useTheme: () => (mockTheme),
 }));
 
 // test suite

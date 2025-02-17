@@ -47,7 +47,7 @@ type InsightProps = {
 const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, privacy, addLastSnackbar, language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);

@@ -18,7 +18,7 @@ type circularProgressProps = {
 };
 
 const CircularProgress: React.FunctionComponent<circularProgressProps> = props => {
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   const { size, strokeWidth, text, progressPercent } = props;
   const radius = (size - strokeWidth) / 2;
   const circum = radius * 2 * Math.PI;

@@ -7,10 +7,15 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import PriceFetcher from '../components/Components/PriceFetcher';
+import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
+}));
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useTheme: () => (mockTheme),
 }));
 
 // test suite

@@ -61,7 +61,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
 }) => {
   const context = useContext(ContextAppLoading);
   const { netInfo, mode, translate, server, selectServer } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
 
   return (
     <View style={{ width: '100%', height: '100%' }}>

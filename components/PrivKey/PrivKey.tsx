@@ -27,7 +27,7 @@ type PrivKeyProps = {
 const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, privKey, closeModal }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [expandAddress, setExpandAddress] = useState<boolean>(false);

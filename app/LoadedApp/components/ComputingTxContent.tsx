@@ -16,7 +16,7 @@ import 'moment/locale/ru';
 const ComputingTxContent: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
   const { translate, language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
 
   return (

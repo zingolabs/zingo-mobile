@@ -125,7 +125,7 @@ const SERVER_DEFAULT_0: ServerType = {
 } as ServerType;
 
 export default function LoadedApp(props: LoadedAppProps) {
-  const theme = useTheme() as unknown as ThemeType;
+  const theme = useTheme() as ThemeType;
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency);
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);

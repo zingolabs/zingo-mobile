@@ -75,7 +75,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     security,
     language,
   } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);

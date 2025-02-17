@@ -35,7 +35,7 @@ type ShowUfvkProps = {
 const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, wallet, server, mode, addLastSnackbar, language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [times, setTimes] = useState<number>(0);

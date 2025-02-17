@@ -51,7 +51,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, navigation, readOnly, mode, totalBalance, language, selectServer, setSendPageState } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const displayAddress = item.address ? Utils.trimToSmall(item.address, 7) : 'Unknown';

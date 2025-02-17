@@ -55,6 +55,7 @@ jest.mock('@react-native-community/netinfo/src/index', () => {
   return RN;
 });
 jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
   useScrollToTop: jest.fn(),
   useIsFocused: jest.fn(),
   useTheme: () => mockTheme,

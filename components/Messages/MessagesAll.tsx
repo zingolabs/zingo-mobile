@@ -25,7 +25,7 @@ const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   return (

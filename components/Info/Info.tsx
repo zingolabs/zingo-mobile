@@ -25,7 +25,7 @@ type InfoProps = {
 const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, currency, zecPrice, privacy, language, setZecPrice } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   return (
