@@ -102,11 +102,11 @@ jobs:
           java-version: '18'
 
       - name: Gradle clean before
-        working-directory: ./android
+        working-directory: android
         run: |
-          gradlew clean
-          gradlew --stop
-          gradle cleanBuildCache
+          ./gradlew clean
+          ./gradlew --stop
+          ./gradlew cleanBuildCache
 
       - name: Cargo uniffi kotlin
         working-directory: ./rust/lib
