@@ -94,8 +94,14 @@ jobs:
 
       - name: AWS libcrypto rust building
         run: cargo install --force --locked bindgen-cli
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '18'
 
-      - name: clean gradle before
+      - name: Gradle clean before
         run: |
           android/gradlew clean
           android/gradlew --stop
