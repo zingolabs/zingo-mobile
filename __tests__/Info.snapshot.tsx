@@ -31,7 +31,7 @@ jest.mock('react-native-localize', () => ({
     };
   },
 }));
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+jest.mock('react-native/src/private/animated/NativeAnimatedHelper');
 jest.mock('@react-native-community/netinfo/src/index', () => {
   const RN = jest.requireActual('react-native');
 

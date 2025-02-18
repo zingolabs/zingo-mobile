@@ -23,7 +23,7 @@ jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
 }));
 jest.mock('react-native-svg-charts');
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+jest.mock('react-native/src/private/animated/NativeAnimatedHelper');
 jest.mock('@react-native-community/netinfo/src/index', () => {
   const RN = jest.requireActual('react-native');
 
