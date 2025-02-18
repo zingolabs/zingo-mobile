@@ -1,6 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, ScrollView, SafeAreaView } from 'react-native';
+import { View, ScrollView } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+
 import { useTheme } from '@react-navigation/native';
 
 import FadeText from '../Components/FadeText';
@@ -19,7 +21,7 @@ type AboutProps = {
 const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const arrayTxtObject = translate('about.copyright');
@@ -29,41 +31,43 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
   }
 
   return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <Header
-        title={translate('zingo') + ' ' + translate('version')}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noPrivacy={true}
-        closeScreen={closeModal}
-      />
-      <ScrollView
-        style={{ maxHeight: '90%' }}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
+    <SafeAreaProvider>
+      <SafeAreaView
+        style={{
+          display: 'flex',
           justifyContent: 'flex-start',
-          padding: 20,
+          alignItems: 'stretch',
+          height: '100%',
+          backgroundColor: colors.background,
         }}>
-        <FadeText>{arrayTxt[0]}</FadeText>
-        <DetailLine label={translate('info.zingolib') as string} value={info.zingolib} />
-        <View style={{ marginTop: 20 }}>
-          {arrayTxt.map((txt: string, ind: number) => (
-            <View key={txt.substring(0, 10)}>
-              {ind !== 0 && <FadeText style={{ marginBottom: 20 }}>{txt}</FadeText>}
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        <Header
+          title={translate('zingo') + ' ' + translate('version')}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          closeScreen={closeModal}
+        />
+        <ScrollView
+          style={{ maxHeight: '90%' }}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
+            padding: 20,
+          }}>
+          <FadeText>{arrayTxt[0]}</FadeText>
+          <DetailLine label={translate('info.zingolib') as string} value={info.zingolib} />
+          <View style={{ marginTop: 20 }}>
+            {arrayTxt.map((txt: string, ind: number) => (
+              <View key={txt.substring(0, 10)}>
+                {ind !== 0 && <FadeText style={{ marginBottom: 20 }}>{txt}</FadeText>}
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 

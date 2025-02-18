@@ -92,3 +92,5 @@ buck-out/
 
 # Binaries
 /rust/test_binaries/bins/
+
+.cxx

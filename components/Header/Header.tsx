@@ -35,7 +35,7 @@ import CurrencyAmount from '../Components/CurrencyAmount';
 import PriceFetcher from '../Components/PriceFetcher';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
-import { NetInfoStateType } from '@react-native-community/netinfo';
+import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import Button from '../Components/Button';
 import RPC from '../../app/rpc';
 import { RPCShieldType } from '../../app/rpc/types/RPCShieldType';
@@ -154,7 +154,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     privacy = context.privacy;
   }
 
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const opacityValue = useRef(new Animated.Value(1)).current;

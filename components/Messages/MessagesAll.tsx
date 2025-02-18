@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import MessageList from './components/MessageList';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+
 import { ContextAppLoaded } from '../../app/context';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
@@ -24,26 +25,28 @@ const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <MessageList
-        setPrivacyOption={setPrivacyOption}
-        setScrollToBottom={setScrollToBottom}
-        scrollToBottom={scrollToBottom}
-        closeModal={closeModal}
-        openModal={openModal}
-      />
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'stretch',
+          height: '100%',
+          backgroundColor: colors.background,
+        }}>
+        <MessageList
+          setPrivacyOption={setPrivacyOption}
+          setScrollToBottom={setScrollToBottom}
+          scrollToBottom={scrollToBottom}
+          closeModal={closeModal}
+          openModal={openModal}
+        />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 

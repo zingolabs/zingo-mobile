@@ -9,8 +9,8 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
   }
 >
   <RNSVGSvgView
-    bbHeight="100"
-    bbWidth="100"
+    bbHeight={100}
+    bbWidth={100}
     focusable={false}
     height={100}
     style={
@@ -37,8 +37,8 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
       }
     >
       <RNSVGCircle
-        cx="50"
-        cy="50"
+        cx={50}
+        cy={50}
         fill={null}
         propList={
           [
@@ -47,18 +47,18 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
             "strokeWidth",
           ]
         }
-        r="47.5"
+        r={47.5}
         stroke={
           {
-            "payload": 4294967295,
+            "payload": 4278260737,
             "type": 0,
           }
         }
-        strokeWidth="5"
+        strokeWidth={5}
       />
       <RNSVGCircle
-        cx="50"
-        cy="50"
+        cx={50}
+        cy={50}
         fill={null}
         matrix={
           [
@@ -80,10 +80,10 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
             "strokeLinecap",
           ]
         }
-        r="47.5"
+        r={47.5}
         stroke={
           {
-            "payload": 4278221567,
+            "payload": 4279811352,
             "type": 0,
           }
         }
@@ -95,7 +95,7 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
         }
         strokeDashoffset={149.22565104551518}
         strokeLinecap={1}
-        strokeWidth="5"
+        strokeWidth={5}
       />
       <RNSVGText
         content={null}
@@ -103,13 +103,13 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
         dy={[]}
         fill={
           {
-            "payload": 4280032286,
+            "payload": 4291019715,
             "type": 0,
           }
         }
         font={
           {
-            "fontSize": "20",
+            "fontSize": 20,
             "textAnchor": "middle",
           }
         }
@@ -121,12 +121,12 @@ exports[`Component CircularProgress - test CircularProgress - snapshot 1`] = `
         rotate={[]}
         x={
           [
-            "50",
+            50,
           ]
         }
         y={
           [
-            "59",
+            59,
           ]
         }
       >

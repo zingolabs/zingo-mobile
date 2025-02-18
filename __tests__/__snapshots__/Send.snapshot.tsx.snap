@@ -513,8 +513,8 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                         >
                           <RNSVGSvgView
                             align="xMidYMid"
-                            bbHeight="15"
-                            bbWidth="30"
+                            bbHeight={15}
+                            bbWidth={30}
                             fill="red"
                             focusable={false}
                             height={15}
@@ -995,7 +995,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
               }
               accessible={true}
               collapsable={false}
-              focusable={true}
+              focusable={false}
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -1624,7 +1624,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                         }
                         accessible={true}
                         collapsable={false}
-                        focusable={true}
+                        focusable={false}
                         onClick={[Function]}
                         onResponderGrant={[Function]}
                         onResponderMove={[Function]}
@@ -1650,8 +1650,8 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                         >
                           <RNSVGSvgView
                             align="xMidYMid"
-                            bbHeight="15"
-                            bbWidth="30"
+                            bbHeight={15}
+                            bbWidth={30}
                             fill="red"
                             focusable={false}
                             height={15}
@@ -1959,7 +1959,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                       }
                       accessible={true}
                       collapsable={false}
-                      focusable={true}
+                      focusable={false}
                       onClick={[Function]}
                       onResponderGrant={[Function]}
                       onResponderMove={[Function]}
@@ -2133,7 +2133,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
               }
               accessible={true}
               collapsable={false}
-              focusable={true}
+              focusable={false}
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}

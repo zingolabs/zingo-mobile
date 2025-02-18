@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, TextStyle } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../app/types/ThemeType';
+import { ThemeType } from '../../app/types';
 
 type ErrorTextProps = {
   style?: TextStyle;
@@ -11,7 +11,7 @@ type ErrorTextProps = {
 };
 
 const ErrorText: React.FunctionComponent<ErrorTextProps> = ({ style, children, testID, selectable }) => {
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme() as ThemeType;
 
   return (
     <Text testID={testID} style={{ color: colors.primary, ...style }} selectable={selectable}>

@@ -29,7 +29,7 @@ type SingleAddressProps = {
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, index, total, prev, next, ufvk }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(false);

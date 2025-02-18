@@ -1,12 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component Scanner - test Scanner - snapshot 1`] = `
-<RCTSafeAreaView
+<RNCSafeAreaProvider
+  onInsetsChange={[Function]}
   style={
-    {
-      "height": "100%",
-      "width": "100%",
-    }
+    [
+      {
+        "flex": 1,
+      },
+      undefined,
+    ]
   }
 />
 `;

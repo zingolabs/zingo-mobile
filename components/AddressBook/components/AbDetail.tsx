@@ -46,7 +46,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, addLastSnackbar, addressBook, language, mode } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [label, setLabel] = useState<string>(item.label);

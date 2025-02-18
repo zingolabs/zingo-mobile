@@ -32,7 +32,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
 }) => {
   const [privacyHigh, setPrivacyHigh] = useState<boolean>(privacy || false);
   const splits = Utils.splitZecAmountIntoBigSmall(amtZec);
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   const { decimalSeparator } = getNumberFormatSettings();
 
   useEffect(() => {

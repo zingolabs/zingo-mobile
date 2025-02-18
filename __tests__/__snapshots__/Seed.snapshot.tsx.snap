@@ -1,23 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component Seed - test Seed Backup - snapshot 1`] = `
-<RCTSafeAreaView
-  style={
-    {
-      "alignItems": "stretch",
-      "backgroundColor": "rgb(242, 242, 242)",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-    }
-  }
->
+[
   <View>
     <View
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(255, 255, 255)",
+          "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
           "paddingBottom": 0,
@@ -88,7 +78,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "backgroundColor": "rgb(255, 255, 255)",
+                  "backgroundColor": "#011401",
                   "display": "flex",
                   "flexDirection": "row",
                   "justifyContent": "center",
@@ -101,6 +91,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
               }
             >
               <
+                color="#5a8c5a"
                 icon={
                   {
                     "icon": [
@@ -165,7 +156,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -215,7 +206,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         }
       >
         <
-          color="rgb(0, 122, 255)"
+          color="#18bd18"
           icon={
             {
               "icon": [
@@ -242,7 +233,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "opacity": 1,
@@ -265,13 +256,13 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
       }
     />
-  </View>
+  </View>,
   <RCTScrollView
     contentContainerStyle={
       {
@@ -292,7 +283,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#c3c3c3",
             "fontSize": 18,
             "fontWeight": "900",
             "marginTop": 0,
@@ -307,7 +298,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       <View
         style={
           {
-            "borderColor": "rgb(28, 28, 30)",
+            "borderColor": "#c3c3c3",
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
@@ -353,7 +344,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "fontSize": 18,
                 "fontWeight": "600",
                 "opacity": 1,
@@ -410,7 +401,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "marginTop": 0,
                   "minHeight": 48,
                   "padding": 10,
@@ -436,7 +427,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "opacity": 0.65,
               "textAlign": "center",
             }
@@ -481,7 +472,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "fontSize": 18,
                 "fontWeight": "600",
                 "opacity": 1,
@@ -501,7 +492,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>
+  </RCTScrollView>,
   <View
     style={
       {
@@ -544,8 +535,8 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
+          "borderColor": "#18bd18",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -578,7 +569,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "#011401",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
@@ -588,28 +579,18 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>
-</RCTSafeAreaView>
+  </View>,
+]
 `;
 
 exports[`Component Seed - test Seed Change - snapshot 1`] = `
-<RCTSafeAreaView
-  style={
-    {
-      "alignItems": "stretch",
-      "backgroundColor": "rgb(242, 242, 242)",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-    }
-  }
->
+[
   <View>
     <View
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(255, 255, 255)",
+          "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
           "paddingBottom": 0,
@@ -680,7 +661,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "backgroundColor": "rgb(255, 255, 255)",
+                  "backgroundColor": "#011401",
                   "display": "flex",
                   "flexDirection": "row",
                   "justifyContent": "center",
@@ -693,6 +674,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
               }
             >
               <
+                color="#5a8c5a"
                 icon={
                   {
                     "icon": [
@@ -757,7 +739,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -807,7 +789,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         }
       >
         <
-          color="rgb(0, 122, 255)"
+          color="#18bd18"
           icon={
             {
               "icon": [
@@ -834,7 +816,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "opacity": 1,
@@ -857,13 +839,13 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
       }
     />
-  </View>
+  </View>,
   <RCTScrollView
     contentContainerStyle={
       {
@@ -884,7 +866,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#c3c3c3",
             "fontSize": 18,
             "fontWeight": "900",
             "marginTop": 0,
@@ -899,7 +881,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       <View
         style={
           {
-            "borderColor": "rgb(28, 28, 30)",
+            "borderColor": "#c3c3c3",
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
@@ -945,7 +927,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "fontSize": 18,
                 "fontWeight": "600",
                 "opacity": 1,
@@ -1002,7 +984,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "marginTop": 0,
                   "minHeight": 48,
                   "padding": 10,
@@ -1028,7 +1010,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "opacity": 0.65,
               "textAlign": "center",
             }
@@ -1073,7 +1055,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "fontSize": 18,
                 "fontWeight": "600",
                 "opacity": 1,
@@ -1093,7 +1075,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>
+  </RCTScrollView>,
   <View
     style={
       {
@@ -1136,8 +1118,8 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
+          "borderColor": "#18bd18",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -1170,7 +1152,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "#011401",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
@@ -1180,28 +1162,18 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>
-</RCTSafeAreaView>
+  </View>,
+]
 `;
 
 exports[`Component Seed - test Seed New - snapshot 1`] = `
-<RCTSafeAreaView
-  style={
-    {
-      "alignItems": "stretch",
-      "backgroundColor": "rgb(242, 242, 242)",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-    }
-  }
->
+[
   <View>
     <View
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(255, 255, 255)",
+          "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
           "paddingBottom": 0,
@@ -1272,7 +1244,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "backgroundColor": "rgb(255, 255, 255)",
+                  "backgroundColor": "#011401",
                   "display": "flex",
                   "flexDirection": "row",
                   "justifyContent": "center",
@@ -1285,6 +1257,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
               }
             >
               <
+                color="#5a8c5a"
                 icon={
                   {
                     "icon": [
@@ -1349,7 +1322,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -1399,7 +1372,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         }
       >
         <
-          color="rgb(0, 122, 255)"
+          color="#18bd18"
           icon={
             {
               "icon": [
@@ -1426,7 +1399,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "opacity": 1,
@@ -1449,13 +1422,13 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
       }
     />
-  </View>
+  </View>,
   <RCTScrollView
     contentContainerStyle={
       {
@@ -1476,7 +1449,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#c3c3c3",
             "fontSize": 18,
             "fontWeight": "900",
             "marginTop": 0,
@@ -1491,7 +1464,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       <View
         style={
           {
-            "borderColor": "rgb(28, 28, 30)",
+            "borderColor": "#c3c3c3",
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
@@ -1537,7 +1510,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "fontSize": 18,
                 "fontWeight": "600",
                 "opacity": 1,
@@ -1594,7 +1567,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "marginTop": 0,
                   "minHeight": 48,
                   "padding": 10,
@@ -1620,7 +1593,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "opacity": 0.65,
               "textAlign": "center",
             }
@@ -1665,7 +1638,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "fontSize": 18,
                 "fontWeight": "600",
                 "opacity": 1,
@@ -1685,7 +1658,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>
+  </RCTScrollView>,
   <View
     style={
       {
@@ -1728,8 +1701,8 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
+          "borderColor": "#18bd18",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -1762,7 +1735,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "#011401",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
@@ -1772,28 +1745,18 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>
-</RCTSafeAreaView>
+  </View>,
+]
 `;
 
 exports[`Component Seed - test Seed Server - snapshot 1`] = `
-<RCTSafeAreaView
-  style={
-    {
-      "alignItems": "stretch",
-      "backgroundColor": "rgb(242, 242, 242)",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-    }
-  }
->
+[
   <View>
     <View
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(255, 255, 255)",
+          "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
           "paddingBottom": 0,
@@ -1864,7 +1827,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "backgroundColor": "rgb(255, 255, 255)",
+                  "backgroundColor": "#011401",
                   "display": "flex",
                   "flexDirection": "row",
                   "justifyContent": "center",
@@ -1877,6 +1840,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
               }
             >
               <
+                color="#5a8c5a"
                 icon={
                   {
                     "icon": [
@@ -1941,7 +1905,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -1991,7 +1955,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         }
       >
         <
-          color="rgb(0, 122, 255)"
+          color="#18bd18"
           icon={
             {
               "icon": [
@@ -2018,7 +1982,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "opacity": 1,
@@ -2041,13 +2005,13 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
       }
     />
-  </View>
+  </View>,
   <RCTScrollView
     contentContainerStyle={
       {
@@ -2068,7 +2032,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#c3c3c3",
             "fontSize": 18,
             "fontWeight": "900",
             "marginTop": 0,
@@ -2083,7 +2047,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       <View
         style={
           {
-            "borderColor": "rgb(28, 28, 30)",
+            "borderColor": "#c3c3c3",
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
@@ -2129,7 +2093,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "fontSize": 18,
                 "fontWeight": "600",
                 "opacity": 1,
@@ -2186,7 +2150,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "marginTop": 0,
                   "minHeight": 48,
                   "padding": 10,
@@ -2212,7 +2176,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "opacity": 0.65,
               "textAlign": "center",
             }
@@ -2257,7 +2221,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "fontSize": 18,
                 "fontWeight": "600",
                 "opacity": 1,
@@ -2277,7 +2241,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>
+  </RCTScrollView>,
   <View
     style={
       {
@@ -2320,8 +2284,8 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
+          "borderColor": "#18bd18",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -2354,7 +2318,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "#011401",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
@@ -2364,28 +2328,18 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>
-</RCTSafeAreaView>
+  </View>,
+]
 `;
 
 exports[`Component Seed - test Seed View - snapshot 1`] = `
-<RCTSafeAreaView
-  style={
-    {
-      "alignItems": "stretch",
-      "backgroundColor": "rgb(242, 242, 242)",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-    }
-  }
->
+[
   <View>
     <View
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(255, 255, 255)",
+          "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
           "paddingBottom": 0,
@@ -2456,7 +2410,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "backgroundColor": "rgb(255, 255, 255)",
+                  "backgroundColor": "#011401",
                   "display": "flex",
                   "flexDirection": "row",
                   "justifyContent": "center",
@@ -2469,6 +2423,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
               }
             >
               <
+                color="#5a8c5a"
                 icon={
                   {
                     "icon": [
@@ -2533,7 +2488,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -2583,7 +2538,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         }
       >
         <
-          color="rgb(0, 122, 255)"
+          color="#18bd18"
           icon={
             {
               "icon": [
@@ -2610,7 +2565,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "opacity": 1,
@@ -2633,13 +2588,13 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
       }
     />
-  </View>
+  </View>,
   <RCTScrollView
     contentContainerStyle={
       {
@@ -2660,7 +2615,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#c3c3c3",
             "fontSize": 18,
             "fontWeight": "900",
             "marginTop": 0,
@@ -2675,7 +2630,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       <View
         style={
           {
-            "borderColor": "rgb(28, 28, 30)",
+            "borderColor": "#c3c3c3",
             "borderRadius": 10,
             "borderWidth": 1,
             "margin": 10,
@@ -2721,7 +2676,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "fontSize": 18,
                 "fontWeight": "600",
                 "opacity": 1,
@@ -2778,7 +2733,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
             <Text
               style={
                 {
-                  "color": "rgb(28, 28, 30)",
+                  "color": "#c3c3c3",
                   "marginTop": 0,
                   "minHeight": 48,
                   "padding": 10,
@@ -2804,7 +2759,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "opacity": 0.65,
               "textAlign": "center",
             }
@@ -2849,7 +2804,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "rgb(28, 28, 30)",
+                "color": "#c3c3c3",
                 "fontSize": 18,
                 "fontWeight": "600",
                 "opacity": 1,
@@ -2869,7 +2824,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>
+  </RCTScrollView>,
   <View
     style={
       {
@@ -2912,8 +2867,8 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(0, 122, 255)",
-          "borderColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
+          "borderColor": "#18bd18",
           "borderRadius": 10,
           "borderWidth": 2,
           "justifyContent": "center",
@@ -2946,7 +2901,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(242, 242, 242)",
+              "color": "#011401",
               "fontSize": 16,
               "fontWeight": "bold",
               "textAlign": "center",
@@ -2956,6 +2911,6 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>
-</RCTSafeAreaView>
+  </View>,
+]
 `;

@@ -78,7 +78,7 @@
   "txtcopied": "Text copied to Clipboard",
   "insight": {
     "title": "Financial Insight",
-    "no-data": "There is no data in your Wallet that fit the graph selected.",
+    "no-data": "There is no data in your Wallet that fits the graph selected.",
     "sent": "Sent",
     "sends": "# sends",
     "memobytes": "# bytes",
@@ -361,7 +361,7 @@
     "uk": "UK",
     "select-placeholder": "Choose a Server...",
     "value-language-ru": "Russian",
-    "walletkeyssaved" : "The last Wallet Recovery Info stored safely in the device.",
+    "walletkeyssaved": "The last Wallet Recovery Info stored safely in the device.",
     "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!"
   },
   "info": {
@@ -388,33 +388,12 @@
   },
   "seed": {
     "buttontexts": {
-      "new": [
-        "I have saved \n the seed"
-      ],
-      "change": [
-        "",
-        "Open New",
-        "You really want \n to change your \n actual wallet",
-        "Are you certain?"
-      ],
-      "server": [
-        "",
-        "Change Server",
-        "You really want \n to change your \n actual server",
-        "Are you certain?"
-      ],
-      "view": [
-        "I have saved \n the seed"
-      ],
-      "restore": [
-        "Restore Wallet"
-      ],
-      "backup": [
-        "",
-        "Restore",
-        "You really want \n to restore your \n backup wallet",
-        "Are you certain?"
-      ]
+      "new": ["I have saved \n the seed"],
+      "change": ["", "Open New", "You really want \n to change your \n actual wallet", "Are you certain?"],
+      "server": ["", "Change Server", "You really want \n to change your \n actual server", "Are you certain?"],
+      "view": ["I have saved \n the seed"],
+      "restore": ["Restore Wallet"],
+      "backup": ["", "Restore", "You really want \n to restore your \n backup wallet", "Are you certain?"]
     },
     "title": "Seed",
     "new": "New",
@@ -641,33 +620,12 @@
   },
   "ufvk": {
     "buttontexts": {
-      "new": [
-        "I have saved \n the Viewing Key"
-      ],
-      "change": [
-        "",
-        "Open New",
-        "You really want \n to change your \n actual wallet",
-        "Are you certain?"
-      ],
-      "server": [
-        "",
-        "Change Server",
-        "You really want \n to change your \n actual server",
-        "Are you certain?"
-      ],
-      "view": [
-        "I have saved \n the Viewing Key"
-      ],
-      "restore": [
-        "Restore Wallet"
-      ],
-      "backup": [
-        "",
-        "Restore",
-        "You really want \n to restore your \n backup wallet",
-        "Are you certain?"
-      ]
+      "new": ["I have saved \n the Viewing Key"],
+      "change": ["", "Open New", "You really want \n to change your \n actual wallet", "Are you certain?"],
+      "server": ["", "Change Server", "You really want \n to change your \n actual server", "Are you certain?"],
+      "view": ["I have saved \n the Viewing Key"],
+      "restore": ["Restore Wallet"],
+      "backup": ["", "Restore", "You really want \n to restore your \n backup wallet", "Are you certain?"]
     },
     "privkey": "Spending/Private ",
     "viewkey": "Viewing Key ",

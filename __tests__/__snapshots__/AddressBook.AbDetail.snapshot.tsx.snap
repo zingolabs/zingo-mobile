@@ -261,7 +261,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
       }
       accessible={true}
       collapsable={false}
-      focusable={true}
+      focusable={false}
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -655,7 +655,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
               }
               accessible={true}
               collapsable={false}
-              focusable={true}
+              focusable={false}
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -1219,7 +1219,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
       }
       accessible={true}
       collapsable={false}
-      focusable={true}
+      focusable={false}
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}

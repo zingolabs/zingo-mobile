@@ -18,7 +18,8 @@
       android:usesCleartextTraffic="false"
       android:enableOnBackInvokedCallback="false"
       android:hardwareAccelerated="true"
-      android:theme="@style/AppTheme">
+      android:theme="@style/AppTheme"
+      android:supportsRtl="true">
       <uses-library android:name="org.apache.http.legacy" android:required="false"/>
       <activity
         android:name=".MainActivity"

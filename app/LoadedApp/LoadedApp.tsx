@@ -9,22 +9,21 @@ import {
   AppState,
   NativeEventSubscription,
   Linking,
-  SafeAreaView,
   Platform,
   ActivityIndicator,
-  TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faList, faUpload, faDownload, faCog, faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
-import { DrawerLayout } from 'react-native-gesture-handler';
+import ReanimatedDrawerLayout, { DrawerType } from 'react-native-gesture-handler/ReanimatedDrawerLayout';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { cloneDeep, isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
-import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo';
+import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo/src/index';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import RPC from '../rpc';
@@ -91,8 +90,8 @@ import Send from '../../components/Send';
 import Receive from '../../components/Receive';
 import Settings from '../../components/Settings';
 import Menu from './components/Menu';
-import RegText from '../../components/Components/RegText';
 import { MessagesModal } from '../../components/Messages';
+import { PlatformPressable } from '@react-navigation/elements';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -126,7 +125,7 @@ const SERVER_DEFAULT_0: ServerType = {
 } as ServerType;
 
 export default function LoadedApp(props: LoadedAppProps) {
-  const theme = useTheme() as unknown as ThemeType;
+  const theme = useTheme() as ThemeType;
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency);
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
@@ -353,15 +352,17 @@ export default function LoadedApp(props: LoadedAppProps) {
 
   if (loading) {
     return (
-      <SafeAreaView
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
-        }}>
-        <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
-      </SafeAreaView>
+      <SafeAreaProvider>
+        <SafeAreaView
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+          }}>
+          <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
+        </SafeAreaView>
+      </SafeAreaProvider>
     );
   } else {
     return (
@@ -433,6 +434,15 @@ type LoadedAppClassProps = {
 };
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
+
+const TabPressable: React.FC<BottomTabBarButtonProps & { colors: ThemeType }> = ({ colors, ...props }) => {
+  console.log('colors', colors);
+
+  return <PlatformPressable {...props} android_ripple={{ color: colors.primary }} />;
+};
+
+const renderTabPressable = (colors: ThemeType) => (props: BottomTabBarButtonProps) =>
+  <TabPressable {...props} colors={colors} />;
 
 export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClassState> {
   rpc: RPC;
@@ -683,7 +693,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       });
     });
 
-    this.unsubscribeNetInfo = NetInfo.addEventListener(async state => {
+    this.unsubscribeNetInfo = NetInfo.addEventListener(async (state: any) => {
       const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
       if (
         isConnected !== state.isConnected ||
@@ -1785,11 +1795,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     const menu = <Menu onItemSelected={this.onMenuItemSelected} closeDrawer={this.closeDrawer} />;
 
-    const fnTabBarIcon = (route: StackScreenProps<any>['route'], focused: boolean, navigation: any) => {
+    const fnTabBarIcon = (route: StackScreenProps<any>['route'], focused: boolean) => {
       var iconName;
 
       if (route.name === translate('loadedapp.history-menu')) {
-        iconName = faList;
+        iconName = faClockRotateLeft;
       } else if (route.name === translate('loadedapp.send-menu')) {
         if (
           mode === ModeEnum.basic &&
@@ -1800,7 +1810,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         ) {
           iconName = faRefresh;
         } else {
-          iconName = faUpload;
+          iconName = faPaperPlane;
         }
       } else if (route.name === translate('loadedapp.receive-menu')) {
         iconName = faDownload;
@@ -1808,26 +1818,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         iconName = faCog;
       }
 
-      return (
-        <>
-          <TouchableOpacity
-            style={{ justifyContent: 'center', alignItems: 'center' }}
-            onPress={() => {
-              navigation.navigate(route.name);
-            }}>
-            {focused ? (
-              <FontAwesomeIcon size={30} icon={iconName} color={colors.background} />
-            ) : (
-              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <FontAwesomeIcon size={20} icon={iconName} color={colors.money} />
-                <RegText style={{ fontSize: 14 }} color={colors.money}>
-                  {route.name}
-                </RegText>
-              </View>
-            )}
-          </TouchableOpacity>
-        </>
-      );
+      return <FontAwesomeIcon size={20} icon={iconName} color={focused ? colors.background : colors.money} />;
     };
 
     //console.log('render LoadedAppClass - 3');
@@ -1837,10 +1828,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     return (
       <ContextAppLoadedProvider value={context}>
-        <DrawerLayout
+        <ReanimatedDrawerLayout
           ref={ref => (this.drawerRef = ref)}
           renderNavigationView={() => menu}
-          drawerType="slide"
+          drawerType={DrawerType.BACK}
           drawerWidth={Dimensions.get('window').width * 0.7}>
           <Modal
             animationType="slide"
@@ -2125,20 +2116,26 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
           (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
             <Tab.Navigator
+              detachInactiveScreens={true}
               initialRouteName={translate('loadedapp.history-menu') as string}
-              screenOptions={({ route, navigation }) => ({
-                tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused, navigation),
+              screenOptions={({ route }) => ({
+                tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
+                tabBarIconStyle: { alignItems: 'center', justifyContent: 'center', alignSelf: 'center' },
+                tabBarItemStyle: {
+                  justifyContent: 'center',
+                  alignSelf: 'center',
+                },
                 tabBarLabelPosition: 'below-icon',
-                tabBarActiveTintColor: 'transparent',
+                tabBarActiveTintColor: colors.background,
                 tabBarActiveBackgroundColor: colors.primaryDisabled,
                 tabBarInactiveTintColor: colors.money,
-                tabBarShowLabel: false,
                 tabBarStyle: {
                   borderRadius: 0,
                   borderTopColor: colors.primaryDisabled,
                   borderTopWidth: 1,
                 },
                 headerShown: false,
+                tabBarButton: renderTabPressable(colors),
               })}>
               <Tab.Screen name={translate('loadedapp.history-menu') as string}>
                 {() => (
@@ -2226,7 +2223,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               )}
             </>
           )}
-        </DrawerLayout>
+        </ReanimatedDrawerLayout>
       </ContextAppLoadedProvider>
     );
   }

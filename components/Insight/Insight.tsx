@@ -1,9 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { View, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+
 import { useTheme } from '@react-navigation/native';
-import { PieChart } from 'react-native-svg-charts';
-import { Circle, G, Line, Text } from 'react-native-svg';
+import { PieChart, pieDataItem } from 'react-native-gifted-charts';
+import { Text as SvgText } from 'react-native-svg';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -31,48 +33,7 @@ type DataType = {
   key: string;
   address: string;
   tag: string;
-};
-
-type sliceType = {
-  labelCentroid: number[];
-  pieCentroid: number[];
-  data: DataType;
-};
-
-type LabelProps = {
-  slices?: sliceType[];
-};
-
-const Labels: React.FunctionComponent<LabelProps> = props => {
-  const { slices } = props;
-  const totalValue = slices ? slices.reduce((acc, curr) => acc + curr.data.value, 0) : 0;
-
-  return (
-    <>
-      {!!slices &&
-        slices.map((slice: sliceType, index: number) => {
-          const { labelCentroid, pieCentroid, data } = slice;
-          const percent = (100 * data.value) / totalValue;
-
-          return (
-            <G key={index}>
-              <Line
-                x1={labelCentroid[0]}
-                y1={labelCentroid[1]}
-                x2={pieCentroid[0]}
-                y2={pieCentroid[1]}
-                stroke={data.svg.fill}
-              />
-              <Circle cx={labelCentroid[0]} cy={labelCentroid[1]} r={15} fill={data.svg.fill} />
-              <Text x={labelCentroid[0] - (percent === 100 ? 15 : 10)} y={labelCentroid[1] + 5}>
-                {getPercent(percent)}
-              </Text>
-            </G>
-          );
-        })}
-    </>
-  );
-};
+} & pieDataItem;
 
 const getPercent = (percent: number) => {
   return (percent < 1 ? '<1' : percent < 100 && percent >= 99 ? '99' : percent.toFixed(0)) + '%';
@@ -86,7 +47,7 @@ type InsightProps = {
 const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, privacy, addLastSnackbar, language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
@@ -144,6 +105,10 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
             address: item.address,
             tag: item.tag,
             svg: { fill: item.address === 'fee' ? colors.zingo : randomColors[index] },
+            color: item.address === 'fee' ? colors.zingo : randomColors[index],
+            labelLineConfig: {
+              color: item.address === 'fee' ? colors.zingo : randomColors[index],
+            },
             key: `pie-${index}`,
           };
         });
@@ -260,141 +225,166 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
     );
   };
 
+  const renderExternalLabel = useCallback(
+    (item: pieDataItem | undefined) => (
+      <SvgText fontSize={18} fill={item?.color}>
+        {item?.value}
+      </SvgText>
+    ),
+    []
+  );
+
   //console.log('render insight');
 
   return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <Header
-        title={translate('insight.title') as string}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        setPrivacyOption={setPrivacyOption}
-        addLastSnackbar={addLastSnackbar}
-        closeScreen={closeModal}
-      />
+    <SafeAreaProvider>
+      <SafeAreaView
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'stretch',
+          height: '100%',
+          backgroundColor: colors.background,
+        }}>
+        <Header
+          title={translate('insight.title') as string}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar}
+          closeScreen={closeModal}
+        />
 
-      <View style={{ width: '100%', flexDirection: 'row', marginTop: 10 }}>
-        <TouchableOpacity onPress={() => setTab('sent')}>
-          <View
-            style={{
-              width: (dimensions.width - 20) / 3,
-              alignItems: 'center',
-              borderBottomColor: colors.primary,
-              borderBottomWidth: tab === 'sent' ? 2 : 0,
-              paddingBottom: 10,
-            }}>
-            <RegText
+        <View style={{ width: '100%', flexDirection: 'row', marginTop: 10 }}>
+          <TouchableOpacity onPress={() => setTab('sent')}>
+            <View
               style={{
-                fontWeight: tab === 'sent' ? 'bold' : 'normal',
-                fontSize: tab === 'sent' ? 15 : 14,
-                color: colors.text,
+                width: (dimensions.width - 20) / 3,
+                alignItems: 'center',
+                borderBottomColor: colors.primary,
+                borderBottomWidth: tab === 'sent' ? 2 : 0,
+                paddingBottom: 10,
               }}>
-              {translate('insight.sent') as string}
-            </RegText>
-            <RegText style={{ fontSize: 11, color: tab === 'sent' ? colors.primary : colors.text }}>
-              ({translate('insight.sent-text') as string})
-            </RegText>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setTab('sends')}>
-          <View
-            style={{
-              width: (dimensions.width - 20) / 3,
-              alignItems: 'center',
-              borderBottomColor: colors.primary,
-              borderBottomWidth: tab === 'sends' ? 2 : 0,
-              paddingBottom: 10,
-            }}>
-            <RegText
-              style={{
-                fontWeight: tab === 'sends' ? 'bold' : 'normal',
-                fontSize: tab === 'sends' ? 15 : 14,
-                color: colors.text,
-              }}>
-              {translate('insight.sends') as string}
-            </RegText>
-            <RegText style={{ fontSize: 11, color: tab === 'sends' ? colors.primary : colors.text }}>
-              ({translate('insight.sends-text') as string})
-            </RegText>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setTab('memobytes')}>
-          <View
-            style={{
-              width: (dimensions.width - 20) / 3,
-              alignItems: 'center',
-              borderBottomColor: colors.primary,
-              borderBottomWidth: tab === 'memobytes' ? 2 : 0,
-              paddingBottom: 10,
-            }}>
-            <RegText
-              style={{
-                fontWeight: tab === 'memobytes' ? 'bold' : 'normal',
-                fontSize: tab === 'memobytes' ? 15 : 14,
-                color: colors.text,
-              }}>
-              {translate('insight.memobytes') as string}
-            </RegText>
-            <RegText style={{ fontSize: 11, color: tab === 'memobytes' ? colors.primary : colors.text }}>
-              ({translate('insight.memobytes-text') as string})
-            </RegText>
-          </View>
-        </TouchableOpacity>
-      </View>
-      <ScrollView
-        showsVerticalScrollIndicator={true}
-        persistentScrollbar={true}
-        indicatorStyle={'white'}
-        style={{ maxHeight: '90%' }}
-        contentContainerStyle={{}}>
-        <View style={{ display: 'flex', margin: 20 }}>
-          {!loading && (!pieAmounts || !pieAmounts.length) && (
-            <View style={{ width: '100%', alignItems: 'center', marginTop: 100 }}>
-              <RegText>{translate('insight.no-data') as string}</RegText>
+              <RegText
+                style={{
+                  fontWeight: tab === 'sent' ? 'bold' : 'normal',
+                  fontSize: tab === 'sent' ? 15 : 14,
+                  color: colors.text,
+                }}>
+                {translate('insight.sent') as string}
+              </RegText>
+              <RegText style={{ fontSize: 11, color: tab === 'sent' ? colors.primary : colors.text }}>
+                ({translate('insight.sent-text') as string})
+              </RegText>
             </View>
-          )}
-          {loading ? (
-            <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 100 }} />
-          ) : (
-            <PieChart
-              style={{ height: dimensions.width * 0.7 }}
-              data={pieAmounts}
-              innerRadius={dimensions.width * 0.09}
-              outerRadius={dimensions.width * 0.23}
-              labelRadius={dimensions.width * 0.23 + 30}>
-              <Labels />
-            </PieChart>
-          )}
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setTab('sends')}>
+            <View
+              style={{
+                width: (dimensions.width - 20) / 3,
+                alignItems: 'center',
+                borderBottomColor: colors.primary,
+                borderBottomWidth: tab === 'sends' ? 2 : 0,
+                paddingBottom: 10,
+              }}>
+              <RegText
+                style={{
+                  fontWeight: tab === 'sends' ? 'bold' : 'normal',
+                  fontSize: tab === 'sends' ? 15 : 14,
+                  color: colors.text,
+                }}>
+                {translate('insight.sends') as string}
+              </RegText>
+              <RegText style={{ fontSize: 11, color: tab === 'sends' ? colors.primary : colors.text }}>
+                ({translate('insight.sends-text') as string})
+              </RegText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setTab('memobytes')}>
+            <View
+              style={{
+                width: (dimensions.width - 20) / 3,
+                alignItems: 'center',
+                borderBottomColor: colors.primary,
+                borderBottomWidth: tab === 'memobytes' ? 2 : 0,
+                paddingBottom: 10,
+              }}>
+              <RegText
+                style={{
+                  fontWeight: tab === 'memobytes' ? 'bold' : 'normal',
+                  fontSize: tab === 'memobytes' ? 15 : 14,
+                  color: colors.text,
+                }}>
+                {translate('insight.memobytes') as string}
+              </RegText>
+              <RegText style={{ fontSize: 11, color: tab === 'memobytes' ? colors.primary : colors.text }}>
+                ({translate('insight.memobytes-text') as string})
+              </RegText>
+            </View>
+          </TouchableOpacity>
         </View>
-        <View style={{ display: 'flex', marginHorizontal: 5, padding: 0, alignItems: 'center' }}>
-          <View style={{ width: '100%' }}>
-            {!loading && !!pieAmounts && !!pieAmounts.length && (
-              <>
-                {pieAmounts
-                  .filter(item => item.address === 'fee')
-                  .map((item, index) => {
-                    return line(item, index);
-                  })}
-                <View style={{ height: 1, backgroundColor: colors.primary }} />
-                {pieAmounts
-                  .filter(item => item.address !== 'fee')
-                  .map((item, index) => {
-                    return line(item, index);
-                  })}
-              </>
+        <ScrollView
+          showsVerticalScrollIndicator={true}
+          persistentScrollbar={true}
+          indicatorStyle={'white'}
+          style={{ maxHeight: '90%' }}
+          contentContainerStyle={{}}>
+          <View style={{ display: 'flex', margin: 20 }}>
+            {!loading && (!pieAmounts || !pieAmounts.length) && (
+              <View style={{ width: '100%', alignItems: 'center', marginTop: 100 }}>
+                <RegText>{translate('insight.no-data') as string}</RegText>
+              </View>
+            )}
+            {loading ? (
+              <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 100 }} />
+            ) : (
+              <View style={{ width: '100%', alignItems: 'center', paddingVertical: 20 }}>
+                <PieChart
+                  showExternalLabels
+                  labelLineConfig={{
+                    thickness: 2,
+                    avoidOverlappingOfLabels: true,
+                  }}
+                  strokeWidth={4}
+                  donut
+                  innerCircleColor={colors.background}
+                  innerCircleBorderWidth={4}
+                  innerCircleBorderColor={colors.background}
+                  strokeColor={colors.background}
+                  showValuesAsTooltipText={true}
+                  showText
+                  externalLabelComponent={renderExternalLabel}
+                  textSize={18}
+                  textBackgroundColor={colors.background}
+                  data={pieAmounts}
+                  innerRadius={dimensions.width * 0.09}
+                />
+              </View>
             )}
           </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          <View style={{ display: 'flex', marginHorizontal: 5, padding: 0, alignItems: 'center' }}>
+            <View style={{ width: '100%' }}>
+              {!loading && !!pieAmounts && !!pieAmounts.length && (
+                <>
+                  {pieAmounts
+                    .filter(item => item.address === 'fee')
+                    .map((item, index) => {
+                      return line(item, index);
+                    })}
+                  <View style={{ height: 1, backgroundColor: colors.primary }} />
+                  {pieAmounts
+                    .filter(item => item.address !== 'fee')
+                    .map((item, index) => {
+                      return line(item, index);
+                    })}
+                </>
+              )}
+            </View>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 

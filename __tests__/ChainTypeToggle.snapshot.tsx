@@ -9,10 +9,15 @@ import { render } from '@testing-library/react-native';
 import ChainTypeToggle from '../components/Components/ChainTypeToggle';
 import { ChainNameEnum } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
+}));
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useTheme: () => (mockTheme),
 }));
 
 // test suite

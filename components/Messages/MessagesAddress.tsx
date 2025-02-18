@@ -2,7 +2,8 @@
 import React, { useContext } from 'react';
 import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppState';
 import MessageList from './components/MessageList';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -39,29 +40,31 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <MessageList
-        setPrivacyOption={setPrivacyOption}
-        setScrollToBottom={setScrollToBottom}
-        scrollToBottom={scrollToBottom}
-        address={address}
-        closeModal={closeModal}
-        openModal={openModal}
-        sendTransaction={sendTransaction}
-        setServerOption={setServerOption}
-      />
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'stretch',
+          height: '100%',
+          backgroundColor: colors.background,
+        }}>
+        <MessageList
+          setPrivacyOption={setPrivacyOption}
+          setScrollToBottom={setScrollToBottom}
+          scrollToBottom={scrollToBottom}
+          address={address}
+          closeModal={closeModal}
+          openModal={openModal}
+          sendTransaction={sendTransaction}
+          setServerOption={setServerOption}
+        />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 

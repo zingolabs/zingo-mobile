@@ -59,7 +59,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     selectServer,
     setSendPageState,
   } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [expandAddress, setExpandAddress] = useState<boolean>(false);

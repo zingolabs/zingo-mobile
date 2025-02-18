@@ -52,7 +52,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, navigation, showSwipeableIcons, readOnly, selectServer, setSendPageState } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [messagesAddress, setMessagesAddress] = useState<boolean>(false);

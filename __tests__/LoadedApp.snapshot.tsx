@@ -30,6 +30,11 @@ jest.mock('i18n-js', () => ({
   })),
 }));
 
+jest.mock('react-native-safe-area-context', () => ({
+  SafeAreaProvider: ({ children }: any) => children,
+  SafeAreaView: ({ children }: any) => children,
+  useSafeAreaInsets: () => ({ top: 0, left: 0, right: 0, bottom: 0 }),
+}));
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
@@ -48,7 +53,7 @@ jest.mock('react-native-tab-view', () => ({
 }));
 jest.mock('react-native-option-menu', () => '');
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-jest.mock('@react-native-community/netinfo', () => {
+jest.mock('@react-native-community/netinfo/src/index', () => {
   return {
     addEventListener: jest.fn(),
     fetch: jest.fn().mockImplementation(() =>
@@ -81,6 +86,37 @@ jest.mock('react-native-device-info', () => ({
   getManufacturer: jest.fn(() => 'Mocked Manufacturer'),
   getModel: jest.fn(() => 'Mocked Model'),
 }));
+// Jest setup file or in your test file
+jest.mock('react-native-gesture-handler/ReanimatedDrawerLayout', () => {
+  const R = require('react');
+
+  const ReanimatedDrawerLayout = R.forwardRef((props: any, ref: any) => {
+    const { renderNavigationView, children } = props;
+
+    return (
+      <div ref={ref}>
+        <div>
+          {renderNavigationView && renderNavigationView()}
+        </div>
+        <div>{children}</div>
+      </div>
+    );
+  });
+
+  // Export mock DrawerType if needed
+  const DrawerType = {
+    FRONT: 'front',
+    BACK: 'back',
+    SLIDE: 'slide',
+  };
+
+  return {
+    __esModule: true,
+    default: ReanimatedDrawerLayout,
+    DrawerType,
+  };
+});
+
 jest.mock('react-native-gesture-handler', () => {
   const RN = jest.requireActual('react-native');
 
@@ -96,11 +132,8 @@ jest.mock('react-native-gesture-handler', () => {
     Directions: {},
   };
 
-  const DrawerLayout = jest.fn();
-
   return {
     RNGestureHandlerModule: RN,
-    DrawerLayout,
   };
 });
 jest.mock('react-native-keychain', () => ({
@@ -129,6 +162,13 @@ jest.mock('react-native-keychain', () => ({
 jest.mock('@react-native-clipboard/clipboard', () => ({
   getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
   setString: jest.fn(),
+}));
+jest.mock('@react-navigation/elements', () => ({
+  PlatformPressable: jest.fn().mockImplementation(({ children }) => children),
+}));
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useTheme: () => (mockTheme),
 }));
 
 // test suite

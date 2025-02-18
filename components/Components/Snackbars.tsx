@@ -13,7 +13,7 @@ type SnackbarProps = {
 };
 
 const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFirstSnackbar, translate }) => {
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   const [snacking, setSnacking] = useState<boolean>(false);
   const [duration, setDuration] = useState<number>(4000);
 

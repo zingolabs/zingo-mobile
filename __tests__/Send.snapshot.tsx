@@ -18,6 +18,11 @@ import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 
+jest.mock('react-native-safe-area-context', () => ({
+  SafeAreaProvider: ({ children }: any) => children,
+  SafeAreaView: ({ children }: any) => children,
+  useSafeAreaInsets: () => ({ top: 0, left: 0, right: 0, bottom: 0 }),
+}));
 jest.useFakeTimers();
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
   FontAwesomeIcon: '',
@@ -40,7 +45,7 @@ jest.mock('react-native', () => {
 
   return RN;
 });
-jest.mock('@react-native-community/netinfo', () => {
+jest.mock('@react-native-community/netinfo/src/index', () => {
   const RN = jest.requireActual('react-native');
 
   RN.NativeModules.RNCNetInfo = {
@@ -50,6 +55,7 @@ jest.mock('@react-native-community/netinfo', () => {
   return RN;
 });
 jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
   useScrollToTop: jest.fn(),
   useIsFocused: jest.fn(),
   useTheme: () => mockTheme,

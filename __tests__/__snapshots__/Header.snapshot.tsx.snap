@@ -7,7 +7,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(255, 255, 255)",
+          "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 60,
           "paddingBottom": 0,
@@ -168,7 +168,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "backgroundColor": "rgb(255, 255, 255)",
+                  "backgroundColor": "#011401",
                   "display": "flex",
                   "flexDirection": "row",
                   "justifyContent": "center",
@@ -181,6 +181,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
               }
             >
               <
+                color="#5a8c5a"
                 icon={
                   {
                     "icon": [
@@ -227,7 +228,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             }
             accessible={true}
             collapsable={false}
-            focusable={true}
+            focusable={false}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -253,9 +254,9 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             >
               <RNSVGSvgView
                 align="xMidYMid"
-                bbHeight="25.2"
-                bbWidth="50.4"
-                fill="rgb(28, 28, 30)"
+                bbHeight={25.2}
+                bbWidth={50.4}
+                fill="#c3c3c3"
                 focusable={false}
                 height={25.2}
                 meetOrSlice={0}
@@ -290,7 +291,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
                 <RNSVGGroup
                   fill={
                     {
-                      "payload": 4280032286,
+                      "payload": 4291019715,
                       "type": 0,
                     }
                   }
@@ -332,7 +333,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 36,
                     "fontWeight": "700",
                     "margin": 0,
@@ -346,7 +347,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
               <Text
                 style={
                   {
-                    "color": "rgb(28, 28, 30)",
+                    "color": "#c3c3c3",
                     "fontSize": 25.2,
                     "margin": 0,
                     "marginBottom": 2.4,
@@ -398,7 +399,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             style={
               {
                 "alignItems": "center",
-                "backgroundColor": "rgb(255, 255, 255)",
+                "backgroundColor": "#011401",
                 "borderRadius": 10,
                 "display": "flex",
                 "flexDirection": "row",
@@ -412,7 +413,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
             }
           >
             <
-              color="rgb(0, 122, 255)"
+              color="#18bd18"
               icon={
                 {
                   "icon": [
@@ -490,7 +491,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           testID="header.drawmenu"
         >
           <
-            color="rgb(216, 216, 216)"
+            color="#ffffff"
             icon={
               {
                 "icon": [
@@ -563,7 +564,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "opacity": 1,
@@ -588,7 +589,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
@@ -605,7 +606,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(255, 255, 255)",
+          "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
           "paddingBottom": 0,
@@ -723,7 +724,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
         }
       >
         <
-          color="rgb(0, 122, 255)"
+          color="#18bd18"
           icon={
             {
               "icon": [
@@ -750,7 +751,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "opacity": 1,
@@ -773,7 +774,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }

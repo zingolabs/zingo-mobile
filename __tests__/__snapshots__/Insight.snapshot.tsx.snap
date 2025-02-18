@@ -1,23 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component Insight - test Insight - snapshot 1`] = `
-<RCTSafeAreaView
-  style={
-    {
-      "alignItems": "stretch",
-      "backgroundColor": "rgb(242, 242, 242)",
-      "display": "flex",
-      "height": "100%",
-      "justifyContent": "flex-start",
-    }
-  }
->
+[
   <View>
     <View
       style={
         {
           "alignItems": "center",
-          "backgroundColor": "rgb(255, 255, 255)",
+          "backgroundColor": "#011401",
           "display": "flex",
           "minHeight": 25,
           "paddingBottom": 0,
@@ -88,7 +78,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "backgroundColor": "rgb(255, 255, 255)",
+                  "backgroundColor": "#011401",
                   "display": "flex",
                   "flexDirection": "row",
                   "justifyContent": "center",
@@ -101,6 +91,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
               }
             >
               <
+                color="#5a8c5a"
                 icon={
                   {
                     "icon": [
@@ -165,7 +156,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         }
       />
     </View>
-  </View>
+  </View>,
   <View>
     <View
       style={
@@ -215,7 +206,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         }
       >
         <
-          color="rgb(0, 122, 255)"
+          color="#18bd18"
           icon={
             {
               "icon": [
@@ -242,7 +233,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
       <Text
         style={
           {
-            "color": "rgb(28, 28, 30)",
+            "color": "#ffffff",
             "fontSize": 18,
             "fontWeight": "600",
             "opacity": 1,
@@ -265,13 +256,13 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
     <View
       style={
         {
-          "backgroundColor": "rgb(0, 122, 255)",
+          "backgroundColor": "#18bd18",
           "height": 1,
           "width": "100%",
         }
       }
     />
-  </View>
+  </View>,
   <View
     style={
       {
@@ -319,7 +310,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "borderBottomColor": "rgb(0, 122, 255)",
+            "borderBottomColor": "#18bd18",
             "borderBottomWidth": 2,
             "paddingBottom": 10,
             "width": 243.33333333333334,
@@ -329,7 +320,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 15,
               "fontWeight": "bold",
               "opacity": 1,
@@ -341,7 +332,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(0, 122, 255)",
+              "color": "#18bd18",
               "fontSize": 11,
               "fontWeight": "600",
               "opacity": 1,
@@ -392,7 +383,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "borderBottomColor": "rgb(0, 122, 255)",
+            "borderBottomColor": "#18bd18",
             "borderBottomWidth": 0,
             "paddingBottom": 10,
             "width": 243.33333333333334,
@@ -402,7 +393,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 14,
               "fontWeight": "normal",
               "opacity": 1,
@@ -414,7 +405,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 11,
               "fontWeight": "600",
               "opacity": 1,
@@ -465,7 +456,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         style={
           {
             "alignItems": "center",
-            "borderBottomColor": "rgb(0, 122, 255)",
+            "borderBottomColor": "#18bd18",
             "borderBottomWidth": 0,
             "paddingBottom": 10,
             "width": 243.33333333333334,
@@ -475,7 +466,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 14,
               "fontWeight": "normal",
               "opacity": 1,
@@ -487,7 +478,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         <Text
           style={
             {
-              "color": "rgb(28, 28, 30)",
+              "color": "#c3c3c3",
               "fontSize": 11,
               "fontWeight": "600",
               "opacity": 1,
@@ -500,7 +491,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         </Text>
       </View>
     </View>
-  </View>
+  </View>,
   <RCTScrollView
     contentContainerStyle={{}}
     indicatorStyle="white"
@@ -522,7 +513,7 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         }
       >
         <ActivityIndicator
-          color="rgb(0, 122, 255)"
+          color="#18bd18"
           size="large"
           style={
             {
@@ -550,6 +541,6 @@ exports[`Component Insight - test Insight - snapshot 1`] = `
         />
       </View>
     </View>
-  </RCTScrollView>
-</RCTSafeAreaView>
+  </RCTScrollView>,
+]
 `;

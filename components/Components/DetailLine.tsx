@@ -22,7 +22,7 @@ type DetailLineProps = {
 };
 
 const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, children, testID }) => {
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   const context = useContext(ContextAppLoaded);
   const { addLastSnackbar, translate, language } = context;
   moment.locale(language);

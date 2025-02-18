@@ -29,7 +29,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   testID,
   twoButtons,
 }) => {
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   // type: Primary or Secondary
   const styleButton: TextStyle =
     type === ButtonTypeEnum.Primary

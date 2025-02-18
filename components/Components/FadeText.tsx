@@ -2,7 +2,7 @@
 import React from 'react';
 import { Text, TextStyle } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../app/types/ThemeType';
+import { ThemeType } from '../../app/types';
 
 type FadeTextProps = {
   style?: TextStyle;
@@ -19,7 +19,7 @@ const FadeText: React.FunctionComponent<FadeTextProps> = ({
   ellipsizeMode,
   selectable,
 }) => {
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme() as ThemeType;
 
   return (
     <Text

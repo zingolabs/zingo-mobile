@@ -102,7 +102,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     doRefresh,
     somePending,
   } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [isValueTransferDetailModalShowing, setValueTransferDetailModalShowing] = useState<boolean>(false);

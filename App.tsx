@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
-import { SafeAreaView } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { LoadedApp } from './app/LoadedApp';
@@ -42,6 +42,7 @@ const basicPalette: string[] = [
 ];
 
 const advancedTheme: ThemeType = {
+  ...DefaultTheme,
   dark: true,
   colors: {
     background: advancePalette[0],
@@ -61,6 +62,7 @@ const advancedTheme: ThemeType = {
 };
 
 const basicTheme: ThemeType = {
+  ...DefaultTheme,
   dark: true,
   colors: {
     background: basicPalette[0],
@@ -90,25 +92,25 @@ const App: React.FunctionComponent = () => {
 
   //console.log('render App - 1');
   return (
-    <NavigationContainer theme={theme}>
-      <SafeAreaView
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          backgroundColor: theme.colors.card,
-        }}>
-        <Stack.Navigator
-          initialRouteName={RouteEnums.LoadingApp}
-          screenOptions={{ headerShown: false, animationEnabled: false }}>
-          <Stack.Screen name={RouteEnums.LoadingApp}>
-            {props => <LoadingApp {...props} toggleTheme={toggleTheme} />}
-          </Stack.Screen>
-          <Stack.Screen name={RouteEnums.LoadedApp}>
-            {props => <LoadedApp {...props} toggleTheme={toggleTheme} />}
-          </Stack.Screen>
-        </Stack.Navigator>
-      </SafeAreaView>
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer theme={theme}>
+        <SafeAreaView
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            backgroundColor: theme.colors.card,
+          }}>
+          <Stack.Navigator initialRouteName={RouteEnums.LoadingApp} screenOptions={{ headerShown: false }}>
+            <Stack.Screen name={RouteEnums.LoadingApp}>
+              {props => <LoadingApp {...props} toggleTheme={toggleTheme} />}
+            </Stack.Screen>
+            <Stack.Screen name={RouteEnums.LoadedApp}>
+              {props => <LoadedApp {...props} toggleTheme={toggleTheme} />}
+            </Stack.Screen>
+          </Stack.Navigator>
+        </SafeAreaView>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 };
 
