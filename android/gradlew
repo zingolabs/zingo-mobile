@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 # SPDX-License-Identifier: Apache-2.0
 #
 
@@ -41,7 +40,8 @@ done
 SAVED="`pwd`"
 cd "`dirname \"$PRG\"`/" >/dev/null
 # Discard cd standard output in case $CDPATH is set (https://github.com/gradle/gradle/issues/25036)
-APP_HOME=$( cd -P "${APP_HOME:-./}" > /dev/null && printf '%s' "$PWD" ) || exit
+APP_HOME=$( cd -P "${APP_HOME:-./}" > /dev/null && printf '%s
+' "$PWD" ) || exit
 cd "$SAVED" >/dev/null
 
 APP_NAME="Gradle"

@@ -18,7 +18,7 @@ import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-naviga
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
-import ReanimatedDrawerLayout, { DrawerType } from 'react-native-gesture-handler/ReanimatedDrawerLayout';
+import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { cloneDeep, isEqual } from 'lodash';
@@ -436,8 +436,6 @@ type LoadedAppClassProps = {
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
 
 const TabPressable: React.FC<BottomTabBarButtonProps & { colors: ThemeType }> = ({ colors, ...props }) => {
-  console.log('colors', colors);
-
   return <PlatformPressable {...props} android_ripple={{ color: colors.primary }} />;
 };
 
@@ -1818,7 +1816,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         iconName = faCog;
       }
 
-      return <FontAwesomeIcon size={20} icon={iconName} color={focused ? colors.background : colors.money} />;
+      return (
+        <View>
+          <FontAwesomeIcon size={25} icon={iconName} color={focused ? colors.background : colors.money} />
+        </View>
+      );
     };
 
     //console.log('render LoadedAppClass - 3');
@@ -1828,10 +1830,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     return (
       <ContextAppLoadedProvider value={context}>
-        <ReanimatedDrawerLayout
+        <DrawerLayout
           ref={ref => (this.drawerRef = ref)}
           renderNavigationView={() => menu}
-          drawerType={DrawerType.BACK}
+          drawerType={'slide'}
           drawerWidth={Dimensions.get('window').width * 0.7}>
           <Modal
             animationType="slide"
@@ -2120,19 +2122,25 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               initialRouteName={translate('loadedapp.history-menu') as string}
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-                tabBarIconStyle: { alignItems: 'center', justifyContent: 'center', alignSelf: 'center' },
-                tabBarItemStyle: {
-                  justifyContent: 'center',
+                tabBarIconStyle: {
                   alignSelf: 'center',
+                  marginBottom: 2,
                 },
                 tabBarLabelPosition: 'below-icon',
+                tabBarLabelStyle: {
+                  alignSelf: 'center',
+                  fontSize: 14,
+                },
+                tabBarItemStyle: {
+                  height: 55,
+                },
                 tabBarActiveTintColor: colors.background,
                 tabBarActiveBackgroundColor: colors.primaryDisabled,
                 tabBarInactiveTintColor: colors.money,
+                tabBarInactiveBackgroundColor: colors.sideMenuBackground ,
                 tabBarStyle: {
-                  borderRadius: 0,
-                  borderTopColor: colors.primaryDisabled,
                   borderTopWidth: 1,
+                  height: 55,
                 },
                 headerShown: false,
                 tabBarButton: renderTabPressable(colors),
@@ -2203,9 +2211,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   initialRouteName={translate('loadedapp.history-menu') as string}
                   screenOptions={{
                     tabBarStyle: {
-                      borderTopColor: colors.background,
-                      borderTopWidth: 0,
-                      height: 0,
+                      display: 'none',
                     },
                     headerShown: false,
                   }}>
@@ -2223,7 +2229,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               )}
             </>
           )}
-        </ReanimatedDrawerLayout>
+        </DrawerLayout>
       </ContextAppLoadedProvider>
     );
   }

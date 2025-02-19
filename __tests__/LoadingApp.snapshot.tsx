@@ -51,7 +51,7 @@ jest.mock('react-native-tab-view', () => ({
   TabBar: '',
 }));
 jest.mock('react-native-option-menu', () => '');
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+jest.mock('react-native/src/private/animated/NativeAnimatedHelper');
 jest.mock('@react-native-community/netinfo/src/index', () => {
   return {
     addEventListener: jest.fn(),
@@ -76,7 +76,7 @@ jest.mock('react-native', () => {
 
   return RN;
 });
-jest.mock('react-native-simple-biometrics', () => ({
+jest.mock('react-native-easy-biometrics', () => ({
   requestBioAuth: jest.fn(() => Promise.resolve(true)),
 }));
 jest.mock('react-native-fs', () => ({

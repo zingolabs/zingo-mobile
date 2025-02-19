@@ -1,4 +1,4 @@
-import RNBiometrics from 'react-native-simple-biometrics';
+import RNBiometrics from 'react-native-easy-biometrics';
 import { GlobalConst, TranslateType } from './AppState';
 
 import ReactNativeBiometrics from 'react-native-biometrics';
