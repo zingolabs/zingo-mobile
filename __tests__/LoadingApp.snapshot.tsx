@@ -76,7 +76,7 @@ jest.mock('react-native', () => {
 
   return RN;
 });
-jest.mock('react-native-simple-biometrics', () => ({
+jest.mock('react-native-easy-biometrics', () => ({
   requestBioAuth: jest.fn(() => Promise.resolve(true)),
 }));
 jest.mock('react-native-fs', () => ({

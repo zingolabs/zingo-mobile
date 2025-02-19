@@ -9,41 +9,46 @@ import Foundation
 import UIKit
 import BackgroundTasks
 import Network
+import React_RCTAppDelegate
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: RCTAppDelegate {
   private let bcgTaskId = "Zingo_Processing_Task_ID"
   private let bcgSchedulerTaskId = "Zingo_Processing_Scheduler_Task_ID"
   private var monitor: NWPathMonitor?
   private let workerQueue = DispatchQueue(label: "Monitor")
   private var isConnectedToWifi = false
-  var window: UIWindow?
-  private var bridge: RCTBridge!
   private var bgTask: BGProcessingTask? = nil
   private var timeStampStrStart: String? = nil
   
-  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    let jsCodeLocation: URL
-
-    jsCodeLocation = RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index", fallbackExtension: nil)!
-    //jsCodeLocation = Bundle.main.url(forResource: "main", withExtension: "jsbundle")!
-    let rootView = RCTRootView(bundleURL: jsCodeLocation, moduleName: "Zingo", initialProperties: nil, launchOptions: launchOptions)
-    let rootViewController = UIViewController()
-    rootViewController.view = rootView
-
-    self.window = UIWindow(frame: UIScreen.main.bounds)
-    self.window?.rootViewController = rootViewController
-    self.window?.makeKeyAndVisible()
+  override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    self.moduleName = "Zingo"
+    
+    // You can add your custom initial props in the dictionary below.
+    // They will be passed down to the ViewController used by React Native.
+    self.initialProps = [:]
 
     if #available(iOS 13.0, *) {
       NSLog("BGTask registerTasks")
       self.handleBackgroundTask()
     }
 
-    return true
+    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
-  func applicationWillEnterForeground(_ application: UIApplication) {
+  override func sourceURL(for bridge: RCTBridge) -> URL? {
+    self.bundleURL()
+  }
+
+  override func bundleURL() -> URL? {
+  #if DEBUG
+      RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+  #else
+      Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+  #endif
+  }
+
+  override func applicationWillEnterForeground(_ application: UIApplication) {
     if #available(iOS 13.0, *) {
         // cancel existing sync process (if any).
         NSLog("BGTask foreground")
@@ -58,7 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
   }
 
-  func applicationDidEnterBackground(_ application: UIApplication) {
+  override func applicationDidEnterBackground(_ application: UIApplication) {
     if #available(iOS 13.0, *) {
         // Cancel existing sync process (if any).
         NSLog("BGTask background")
