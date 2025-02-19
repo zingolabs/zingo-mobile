@@ -2122,26 +2122,25 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               initialRouteName={translate('loadedapp.history-menu') as string}
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-                tabBarIconStyle: { 
+                tabBarIconStyle: {
                   alignSelf: 'center',
-                  marginBottom: 5,
+                  marginBottom: 2,
                 },
                 tabBarLabelPosition: 'below-icon',
                 tabBarLabelStyle: {
                   alignSelf: 'center',
-                  fontSize: 15,
+                  fontSize: 14,
                 },
                 tabBarItemStyle: {
-                  height: 60,
+                  height: 55,
                 },
                 tabBarActiveTintColor: colors.background,
                 tabBarActiveBackgroundColor: colors.primaryDisabled,
                 tabBarInactiveTintColor: colors.money,
+                tabBarInactiveBackgroundColor: colors.sideMenuBackground ,
                 tabBarStyle: {
-                  borderRadius: 0,
-                  borderTopColor: colors.primaryDisabled,
                   borderTopWidth: 2,
-                  height: 60,
+                  height: 55,
                 },
                 headerShown: false,
                 tabBarButton: renderTabPressable(colors),
