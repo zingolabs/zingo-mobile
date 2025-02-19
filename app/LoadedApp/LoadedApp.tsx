@@ -1816,7 +1816,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         iconName = faCog;
       }
 
-      return <FontAwesomeIcon size={20} icon={iconName} color={focused ? colors.background : colors.money} />;
+      return (
+        <View>
+          <FontAwesomeIcon size={25} icon={iconName} color={focused ? colors.background : colors.money} />
+        </View>
+      );
     };
 
     //console.log('render LoadedAppClass - 3');
@@ -2118,19 +2122,26 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               initialRouteName={translate('loadedapp.history-menu') as string}
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-                tabBarIconStyle: { alignItems: 'center', justifyContent: 'center', alignSelf: 'center' },
-                tabBarItemStyle: {
-                  justifyContent: 'center',
+                tabBarIconStyle: { 
                   alignSelf: 'center',
+                  marginBottom: 5,
                 },
                 tabBarLabelPosition: 'below-icon',
+                tabBarLabelStyle: {
+                  alignSelf: 'center',
+                  fontSize: 15,
+                },
+                tabBarItemStyle: {
+                  height: 60,
+                },
                 tabBarActiveTintColor: colors.background,
                 tabBarActiveBackgroundColor: colors.primaryDisabled,
                 tabBarInactiveTintColor: colors.money,
                 tabBarStyle: {
                   borderRadius: 0,
                   borderTopColor: colors.primaryDisabled,
-                  borderTopWidth: 1,
+                  borderTopWidth: 2,
+                  height: 60,
                 },
                 headerShown: false,
                 tabBarButton: renderTabPressable(colors),
@@ -2201,9 +2212,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   initialRouteName={translate('loadedapp.history-menu') as string}
                   screenOptions={{
                     tabBarStyle: {
-                      borderTopColor: colors.background,
-                      borderTopWidth: 0,
-                      height: 0,
+                      display: 'none',
                     },
                     headerShown: false,
                   }}>
