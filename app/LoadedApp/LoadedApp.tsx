@@ -2139,7 +2139,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 tabBarInactiveTintColor: colors.money,
                 tabBarInactiveBackgroundColor: colors.sideMenuBackground ,
                 tabBarStyle: {
-                  borderTopWidth: 2,
+                  borderTopWidth: 1,
                   height: 55,
                 },
                 headerShown: false,
