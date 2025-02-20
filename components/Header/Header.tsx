@@ -154,7 +154,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     privacy = context.privacy;
   }
 
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
 
   const opacityValue = useRef(new Animated.Value(1)).current;

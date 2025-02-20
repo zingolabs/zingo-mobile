@@ -129,7 +129,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     setZecPrice,
     zenniesDonationAddress,
   } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
 
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState<boolean>(false);
@@ -941,29 +941,27 @@ const Send: React.FunctionComponent<SendProps> = ({
         />
       </Modal>
 
-      <Animated.View style={{ marginTop: slideAnim }}>
-        <View
-          onLayout={e => {
-            const { height } = e.nativeEvent.layout;
-            keyboardListeners(height);
-            //console.log('LAYOUTTT', height);
-          }}>
-          <Header
-            title={translate('send.title') as string}
-            toggleMenuDrawer={toggleMenuDrawer}
-            poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-            syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
-            setPrivacyOption={setPrivacyOption}
-            addLastSnackbar={addLastSnackbar /* context */}
-            setShieldingAmount={setShieldingAmount}
-            setComputingModalVisible={setComputingModalVisible}
-            setScrollToTop={setScrollToTop}
-            setScrollToBottom={setScrollToBottom}
-            setBackgroundError={setBackgroundError /* context */}
-            setUfvkViewModalVisible={setUfvkViewModalVisible}
-          />
-        </View>
-      </Animated.View>
+      <View
+        onLayout={e => {
+          const { height } = e.nativeEvent.layout;
+          keyboardListeners(height);
+          //console.log('LAYOUTTT', height);
+        }}>
+        <Header
+          title={translate('send.title') as string}
+          toggleMenuDrawer={toggleMenuDrawer}
+          poolsMoreInfoOnClick={poolsMoreInfoOnClick}
+          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar /* context */}
+          setShieldingAmount={setShieldingAmount}
+          setComputingModalVisible={setComputingModalVisible}
+          setScrollToTop={setScrollToTop}
+          setScrollToBottom={setScrollToBottom}
+          setBackgroundError={setBackgroundError /* context */}
+          setUfvkViewModalVisible={setUfvkViewModalVisible}
+        />
+      </View>
       <ScrollView
         ref={scrollViewRef}
         onContentSizeChange={(_, height) => setContentHeight(height)}
