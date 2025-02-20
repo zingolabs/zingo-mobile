@@ -13,7 +13,6 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
-import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 import CheckBox from '@react-native-community/checkbox';
 import RNPickerSelect from 'react-native-picker-select';
 
@@ -163,7 +162,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [includeUAMemoBoolean, setIncludeUAMemoBoolean] = useState<boolean>(sendPageState.toaddr.includeUAMemo);
   const [keyboardListenersDone, setKeyboardListenersDone] = useState<boolean>(false);
 
-  const slideAnim = useSharedValue(0);
   const scrollViewRef = useRef<ScrollView>(null);
   const { decimalSeparator } = getNumberFormatSettings();
 
@@ -673,12 +671,10 @@ const Send: React.FunctionComponent<SendProps> = ({
       //only the first time if the height is more than 0.
       setKeyboardListenersDone(true);
       Keyboard.addListener('keyboardDidShow', () => {
-        slideAnim.value = withTiming(0 - titleViewHeightPar + 30, { duration: 100, easing: Easing.linear });
         setKeyboardVisible(true);
         //console.log('OPENNNNNNNNNN', titleViewHeightPar, slideAnim.value);
       });
       Keyboard.addListener('keyboardDidHide', () => {
-        slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
         setKeyboardVisible(false);
         //console.log('CLOSEEEEEEEEE', titleViewHeightPar, slideAnim.value);
       });
