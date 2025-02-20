@@ -61,16 +61,20 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
       onGestureHandlerStateChange={[Function]}
       pointerEvents="none"
       style={
-        {
-          "backgroundColor": "rgba(0, 0, 0, 0.7)",
-          "bottom": 0,
-          "left": 0,
-          "opacity": 0,
-          "position": "absolute",
-          "right": 0,
-          "top": 0,
-          "zIndex": 1000,
-        }
+        [
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+            "zIndex": 1000,
+          },
+          {
+            "backgroundColor": "rgba(0, 0, 0, 0.7)",
+            "opacity": 0,
+          },
+        ]
       }
     />
   </View>
@@ -79,20 +83,26 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
     collapsable={false}
     pointerEvents="box-none"
     style={
-      {
-        "bottom": 0,
-        "flexDirection": "row",
-        "left": 0,
-        "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "transform": [
-          {
-            "translateX": -525,
-          },
-        ],
-        "zIndex": 1001,
-      }
+      [
+        {
+          "bottom": 0,
+          "flexDirection": "row",
+          "left": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+          "zIndex": 1001,
+        },
+        {
+          "flexDirection": "row",
+          "transform": [
+            {
+              "translateX": -525,
+            },
+          ],
+        },
+        undefined,
+      ]
     }
   >
     <View
