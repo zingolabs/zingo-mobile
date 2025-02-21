@@ -37,7 +37,8 @@ import java.io.FileInputStream
 class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun doWork(): Result {
-        val rpcModule = RPCModule(context as ReactApplicationContext)
+        val reactContext = MainApplication.getAppReactContext() ?: context
+        val rpcModule = RPCModule(reactContext as ReactApplicationContext)
 
         Log.i("SCHEDULED_TASK_RUN", "Task running")
 

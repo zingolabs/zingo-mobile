@@ -113,8 +113,8 @@ data class ParseResult (
     val address_kind: String?
 )
 
-val reactContext = MainApplication.getAppReactContext() as ReactApplicationContext
-val rpcModule = RPCModule(reactContext)
+val reactContext = MainApplication.getAppReactContext() ?: MainApplication.getAppContext()!!
+val rpcModule = RPCModule(reactContext as ReactApplicationContext)
 
 @Category(OfflineTest::class)
 class ExecuteAddressesFromSeed {
