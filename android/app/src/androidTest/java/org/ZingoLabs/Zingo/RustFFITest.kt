@@ -114,7 +114,6 @@ data class ParseResult (
 )
 
 val reactContext = MainApplication.getAppReactContext() ?: MainApplication.getAppContext()!!
-val rpcModule = RPCModule(reactContext as ReactApplicationContext)
 
 @Category(OfflineTest::class)
 class ExecuteAddressesFromSeed {
@@ -400,6 +399,8 @@ class ExecuteSaplingBalanceFromSeed {
     @Test
     fun executeSaplingBalanceFromSeed() {
         val mapper = jacksonObjectMapper()
+
+        val rpcModule = RPCModule(reactContext as ReactApplicationContext)
 
         val server = "http://10.0.2.2:20000"
         val chainhint = "regtest"
