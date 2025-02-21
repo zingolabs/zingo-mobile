@@ -35,10 +35,10 @@ import org.ZingoLabs.Zingo.Constants.*
 import java.io.FileInputStream
 
 class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
+    private val rpcModule = RPCModule(MainApplication.getAppReactContext())
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun doWork(): Result {
-        val reactContext = MainApplication.getAppReactContext() ?: context
-        val rpcModule = RPCModule(reactContext as ReactApplicationContext)
 
         Log.i("SCHEDULED_TASK_RUN", "Task running")
 
@@ -60,7 +60,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             Log.i("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
             if (balance.lowercase().startsWith(ErrorPrefix.value)) {
                 // this means this task is running with the App closed
-                loadWalletFile(rpcModule)
+                loadWalletFile()
             } else {
                 // this means the App is open,
                 // stop syncing first, just in case.
@@ -104,7 +104,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         return Result.success()
     }
 
-    private fun loadWalletFile(rpcModule: RPCModule) {
+    private fun loadWalletFile() {
         // I have to init from wallet file in order to do the sync
         // and I need to read the settings.json to find the server & chain type
         context.openFileInput("settings.json")?.use { file: FileInputStream ->
