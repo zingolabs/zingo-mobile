@@ -1,12 +1,15 @@
 package org.ZingoLabs.Zingo
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
+import com.facebook.react.ReactInstanceManager
 import com.facebook.react.ReactNativeHost
 import com.facebook.react.ReactPackage
+import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
@@ -44,17 +47,20 @@ class MainApplication : Application(), ReactApplication {
             load()
         }
 
-        reactHost.currentReactContext?.let {
-            reactContext = WeakReference(it)
-        }
     }
 
     companion object {
         private var context: WeakReference<Context>? = null
-        private var reactContext: WeakReference<Context>? = null
 
         fun getAppContext(): Context? {
-            return reactContext?.get() ?: context?.get()
+            return context?.get()
+        }
+
+        @SuppressLint("VisibleForTests")
+        fun getAppReactContext(): ReactApplicationContext? {
+            val app = getAppContext() as? MainApplication ?: return null
+            val reactInstanceManager: ReactInstanceManager = app.reactNativeHost.reactInstanceManager
+            return reactInstanceManager.currentReactContext as? ReactApplicationContext
         }
 
         init {

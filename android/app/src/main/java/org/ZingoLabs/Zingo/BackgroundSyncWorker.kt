@@ -34,12 +34,10 @@ import kotlin.time.toJavaDuration
 import org.ZingoLabs.Zingo.Constants.*
 import java.io.FileInputStream
 
-class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
-
+class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun doWork(): Result {
-        val reactContext = MainApplication.getAppContext() as ReactApplicationContext
-        val rpcModule = RPCModule(reactContext)
+        val rpcModule = RPCModule(context as ReactApplicationContext)
 
         Log.i("SCHEDULED_TASK_RUN", "Task running")
 
@@ -108,7 +106,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
     private fun loadWalletFile(rpcModule: RPCModule) {
         // I have to init from wallet file in order to do the sync
         // and I need to read the settings.json to find the server & chain type
-        MainApplication.getAppContext()?.openFileInput("settings.json")?.use { file: FileInputStream ->
+        context.openFileInput("settings.json")?.use { file: FileInputStream ->
             val settingsBytes = file.readBytes()
             file.close()
             val settingsString = settingsBytes.toString(Charsets.UTF_8)
@@ -168,8 +166,7 @@ class BSCompanion {
         private val SYNC_START_TIME_MINUTES = 60.minutes // Randomize with minutes until 4 a.m.
         @RequiresApi(Build.VERSION_CODES.O)
         fun scheduleBackgroundTask() {
-            val reactContext = MainApplication.getAppContext() as ReactApplicationContext
-
+            val context = MainApplication.getAppContext() as Context
             // zancas requeriment, not plug-in, reverted.
             val constraints = Constraints.Builder()
                 .setRequiresStorageNotLow(false) // less restricted
@@ -188,14 +185,14 @@ class BSCompanion {
                 .build()
 
             Log.i("SCHEDULING_TASK", "Enqueuing the background task - Background")
-            WorkManager.getInstance(reactContext)
+            WorkManager.getInstance(context)
                 .enqueueUniquePeriodicWork(
                     TASKID,
                     ExistingPeriodicWorkPolicy.UPDATE,
                     workRequest
                 )
 
-            Log.i("SCHEDULING_TASK", "Task info ${WorkManager.getInstance(reactContext).getWorkInfosForUniqueWork(
+            Log.i("SCHEDULING_TASK", "Task info ${WorkManager.getInstance(context).getWorkInfosForUniqueWork(
                 TASKID).get()}")
         }
 
@@ -229,14 +226,13 @@ class BSCompanion {
         }
 
         fun cancelExecutingTask() {
-            val reactContext = MainApplication.getAppContext() as ReactApplicationContext
-
+            val context = MainApplication.getAppContext() as Context
             // run interrupt sync, just in case.
             val interrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "true")
             Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $interrupting")
 
             Log.i("SCHEDULING_TASK", "Cancel background Task")
-            WorkManager.getInstance(reactContext)
+            WorkManager.getInstance(context)
                 .cancelUniqueWork(TASKID)
         }
 

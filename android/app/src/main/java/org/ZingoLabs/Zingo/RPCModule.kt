@@ -24,7 +24,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     fun fileExists(fileName: String): Boolean {
         // Check if a file already exists
-        val file = File(MainApplication.getAppContext()?.filesDir, fileName)
+        val file = File(reactContext.applicationContext.filesDir, fileName)
         return if (file.exists()) {
             Log.i("MAIN", "File $fileName exists")
             true
@@ -35,18 +35,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     private fun readFile(fileName: String): ByteArray {
-        val file = MainApplication.getAppContext()!!.openFileInput(fileName)
+        val file = reactContext.applicationContext.openFileInput(fileName)
         return file.readBytes()
     }
 
     private fun writeFile(fileName: String, fileBytes: ByteArray) {
-        val file = MainApplication.getAppContext()?.openFileOutput(fileName, Context.MODE_PRIVATE)
+        val file = reactContext.applicationContext.openFileOutput(fileName, Context.MODE_PRIVATE)
         file?.write(fileBytes)
         file?.close()
     }
 
     private fun deleteFile(fileName: String): Boolean {
-        val file = MainApplication.getAppContext()?.getFileStreamPath(fileName)
+        val file = reactContext.applicationContext.getFileStreamPath(fileName)
         return file!!.delete()
     }
 
