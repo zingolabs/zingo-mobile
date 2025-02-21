@@ -38,6 +38,7 @@ rust/lib/Generated/zingoFFI.modulemap
 build/
 .idea
 .gradle
+.kotlin
 local.properties
 *.iml
 
