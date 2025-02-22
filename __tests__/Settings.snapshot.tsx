@@ -83,6 +83,7 @@ jest.mock('@react-navigation/native', () => ({
   ...jest.requireActual('@react-navigation/native'),
   useTheme: () => (mockTheme),
 }));
+jest.mock('react-native-bouncy-checkbox', () => 'BouncyCheckbox');
 
 // test suite
 describe('Component Settings - test', () => {

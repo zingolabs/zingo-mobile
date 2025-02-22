@@ -2198,6 +2198,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       <View
         style={
           {
+            "alignItems": "center",
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
@@ -2207,59 +2208,29 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <View
-          accessibilityRole="checkbox"
-          accessibilityState={
+        <BouncyCheckbox
+          disableText={true}
+          disabled={false}
+          fillColor="#18bd18"
+          iconStyle={
             {
-              "checked": false,
-              "disabled": false,
+              "borderRadius": 5,
             }
           }
-          accessibilityValue={
+          innerIconStyle={
             {
-              "text": "off",
+              "borderRadius": 5,
             }
           }
-          accessible={true}
-          pointerEvents="auto"
-        >
-          <RNCCheckbox
-            animationDuration={0.1}
-            boxType="square"
-            forwardedRef={null}
-            onCheckColor="#011401"
-            onFillColor="#18bd18"
-            onTintColor="#18bd18"
-            onValueChange={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "height": 32,
-                  "width": 32,
-                },
-                {
-                  "marginRight": 10,
-                  "transform": [
-                    {
-                      "scaleX": 0.7,
-                    },
-                    {
-                      "scaleY": 0.7,
-                    },
-                  ],
-                },
-              ]
+          onPress={[Function]}
+          style={
+            {
+              "marginRight": 10,
             }
-            tintColor="#c3c3c3"
-            tintColors={
-              {
-                "false": "#c3c3c3",
-                "true": "#18bd18",
-              }
-            }
-          />
-        </View>
+          }
+          unFillColor="#011401"
+          useBuiltInState={false}
+        />
         <Text
           style={
             {
@@ -2277,6 +2248,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       <View
         style={
           {
+            "alignItems": "center",
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
@@ -2286,59 +2258,29 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <View
-          accessibilityRole="checkbox"
-          accessibilityState={
+        <BouncyCheckbox
+          disableText={true}
+          disabled={false}
+          fillColor="#18bd18"
+          iconStyle={
             {
-              "checked": false,
-              "disabled": false,
+              "borderRadius": 5,
             }
           }
-          accessibilityValue={
+          innerIconStyle={
             {
-              "text": "off",
+              "borderRadius": 5,
             }
           }
-          accessible={true}
-          pointerEvents="auto"
-        >
-          <RNCCheckbox
-            animationDuration={0.1}
-            boxType="square"
-            forwardedRef={null}
-            onCheckColor="#011401"
-            onFillColor="#18bd18"
-            onTintColor="#18bd18"
-            onValueChange={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "height": 32,
-                  "width": 32,
-                },
-                {
-                  "marginRight": 10,
-                  "transform": [
-                    {
-                      "scaleX": 0.7,
-                    },
-                    {
-                      "scaleY": 0.7,
-                    },
-                  ],
-                },
-              ]
+          onPress={[Function]}
+          style={
+            {
+              "marginRight": 10,
             }
-            tintColor="#c3c3c3"
-            tintColors={
-              {
-                "false": "#c3c3c3",
-                "true": "#18bd18",
-              }
-            }
-          />
-        </View>
+          }
+          unFillColor="#011401"
+          useBuiltInState={false}
+        />
         <Text
           style={
             {
@@ -2356,6 +2298,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       <View
         style={
           {
+            "alignItems": "center",
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
@@ -2365,59 +2308,29 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <View
-          accessibilityRole="checkbox"
-          accessibilityState={
+        <BouncyCheckbox
+          disableText={true}
+          disabled={false}
+          fillColor="#18bd18"
+          iconStyle={
             {
-              "checked": false,
-              "disabled": false,
+              "borderRadius": 5,
             }
           }
-          accessibilityValue={
+          innerIconStyle={
             {
-              "text": "off",
+              "borderRadius": 5,
             }
           }
-          accessible={true}
-          pointerEvents="auto"
-        >
-          <RNCCheckbox
-            animationDuration={0.1}
-            boxType="square"
-            forwardedRef={null}
-            onCheckColor="#011401"
-            onFillColor="#18bd18"
-            onTintColor="#18bd18"
-            onValueChange={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "height": 32,
-                  "width": 32,
-                },
-                {
-                  "marginRight": 10,
-                  "transform": [
-                    {
-                      "scaleX": 0.7,
-                    },
-                    {
-                      "scaleY": 0.7,
-                    },
-                  ],
-                },
-              ]
+          onPress={[Function]}
+          style={
+            {
+              "marginRight": 10,
             }
-            tintColor="#c3c3c3"
-            tintColors={
-              {
-                "false": "#c3c3c3",
-                "true": "#18bd18",
-              }
-            }
-          />
-        </View>
+          }
+          unFillColor="#011401"
+          useBuiltInState={false}
+        />
         <Text
           style={
             {
@@ -2435,6 +2348,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       <View
         style={
           {
+            "alignItems": "center",
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
@@ -2444,59 +2358,29 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <View
-          accessibilityRole="checkbox"
-          accessibilityState={
+        <BouncyCheckbox
+          disableText={true}
+          disabled={false}
+          fillColor="#18bd18"
+          iconStyle={
             {
-              "checked": false,
-              "disabled": false,
+              "borderRadius": 5,
             }
           }
-          accessibilityValue={
+          innerIconStyle={
             {
-              "text": "off",
+              "borderRadius": 5,
             }
           }
-          accessible={true}
-          pointerEvents="auto"
-        >
-          <RNCCheckbox
-            animationDuration={0.1}
-            boxType="square"
-            forwardedRef={null}
-            onCheckColor="#011401"
-            onFillColor="#18bd18"
-            onTintColor="#18bd18"
-            onValueChange={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "height": 32,
-                  "width": 32,
-                },
-                {
-                  "marginRight": 10,
-                  "transform": [
-                    {
-                      "scaleX": 0.7,
-                    },
-                    {
-                      "scaleY": 0.7,
-                    },
-                  ],
-                },
-              ]
+          onPress={[Function]}
+          style={
+            {
+              "marginRight": 10,
             }
-            tintColor="#c3c3c3"
-            tintColors={
-              {
-                "false": "#c3c3c3",
-                "true": "#18bd18",
-              }
-            }
-          />
-        </View>
+          }
+          unFillColor="#011401"
+          useBuiltInState={false}
+        />
         <Text
           style={
             {
@@ -2514,6 +2398,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       <View
         style={
           {
+            "alignItems": "center",
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
@@ -2523,59 +2408,29 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <View
-          accessibilityRole="checkbox"
-          accessibilityState={
+        <BouncyCheckbox
+          disableText={true}
+          disabled={false}
+          fillColor="#18bd18"
+          iconStyle={
             {
-              "checked": false,
-              "disabled": false,
+              "borderRadius": 5,
             }
           }
-          accessibilityValue={
+          innerIconStyle={
             {
-              "text": "off",
+              "borderRadius": 5,
             }
           }
-          accessible={true}
-          pointerEvents="auto"
-        >
-          <RNCCheckbox
-            animationDuration={0.1}
-            boxType="square"
-            forwardedRef={null}
-            onCheckColor="#011401"
-            onFillColor="#18bd18"
-            onTintColor="#18bd18"
-            onValueChange={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "height": 32,
-                  "width": 32,
-                },
-                {
-                  "marginRight": 10,
-                  "transform": [
-                    {
-                      "scaleX": 0.7,
-                    },
-                    {
-                      "scaleY": 0.7,
-                    },
-                  ],
-                },
-              ]
+          onPress={[Function]}
+          style={
+            {
+              "marginRight": 10,
             }
-            tintColor="#c3c3c3"
-            tintColors={
-              {
-                "false": "#c3c3c3",
-                "true": "#18bd18",
-              }
-            }
-          />
-        </View>
+          }
+          unFillColor="#011401"
+          useBuiltInState={false}
+        />
         <Text
           style={
             {
@@ -2593,6 +2448,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       <View
         style={
           {
+            "alignItems": "center",
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
@@ -2602,59 +2458,29 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <View
-          accessibilityRole="checkbox"
-          accessibilityState={
+        <BouncyCheckbox
+          disableText={true}
+          disabled={false}
+          fillColor="#18bd18"
+          iconStyle={
             {
-              "checked": false,
-              "disabled": false,
+              "borderRadius": 5,
             }
           }
-          accessibilityValue={
+          innerIconStyle={
             {
-              "text": "off",
+              "borderRadius": 5,
             }
           }
-          accessible={true}
-          pointerEvents="auto"
-        >
-          <RNCCheckbox
-            animationDuration={0.1}
-            boxType="square"
-            forwardedRef={null}
-            onCheckColor="#011401"
-            onFillColor="#18bd18"
-            onTintColor="#18bd18"
-            onValueChange={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "height": 32,
-                  "width": 32,
-                },
-                {
-                  "marginRight": 10,
-                  "transform": [
-                    {
-                      "scaleX": 0.7,
-                    },
-                    {
-                      "scaleY": 0.7,
-                    },
-                  ],
-                },
-              ]
+          onPress={[Function]}
+          style={
+            {
+              "marginRight": 10,
             }
-            tintColor="#c3c3c3"
-            tintColors={
-              {
-                "false": "#c3c3c3",
-                "true": "#18bd18",
-              }
-            }
-          />
-        </View>
+          }
+          unFillColor="#011401"
+          useBuiltInState={false}
+        />
         <Text
           style={
             {
@@ -2672,6 +2498,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       <View
         style={
           {
+            "alignItems": "center",
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
@@ -2681,59 +2508,29 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <View
-          accessibilityRole="checkbox"
-          accessibilityState={
+        <BouncyCheckbox
+          disableText={true}
+          disabled={false}
+          fillColor="#18bd18"
+          iconStyle={
             {
-              "checked": false,
-              "disabled": false,
+              "borderRadius": 5,
             }
           }
-          accessibilityValue={
+          innerIconStyle={
             {
-              "text": "off",
+              "borderRadius": 5,
             }
           }
-          accessible={true}
-          pointerEvents="auto"
-        >
-          <RNCCheckbox
-            animationDuration={0.1}
-            boxType="square"
-            forwardedRef={null}
-            onCheckColor="#011401"
-            onFillColor="#18bd18"
-            onTintColor="#18bd18"
-            onValueChange={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "height": 32,
-                  "width": 32,
-                },
-                {
-                  "marginRight": 10,
-                  "transform": [
-                    {
-                      "scaleX": 0.7,
-                    },
-                    {
-                      "scaleY": 0.7,
-                    },
-                  ],
-                },
-              ]
+          onPress={[Function]}
+          style={
+            {
+              "marginRight": 10,
             }
-            tintColor="#c3c3c3"
-            tintColors={
-              {
-                "false": "#c3c3c3",
-                "true": "#18bd18",
-              }
-            }
-          />
-        </View>
+          }
+          unFillColor="#011401"
+          useBuiltInState={false}
+        />
         <Text
           style={
             {
@@ -2751,6 +2548,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
       <View
         style={
           {
+            "alignItems": "center",
             "flexDirection": "row",
             "marginBottom": 5,
             "marginLeft": 20,
@@ -2760,59 +2558,29 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <View
-          accessibilityRole="checkbox"
-          accessibilityState={
+        <BouncyCheckbox
+          disableText={true}
+          disabled={false}
+          fillColor="#18bd18"
+          iconStyle={
             {
-              "checked": false,
-              "disabled": false,
+              "borderRadius": 5,
             }
           }
-          accessibilityValue={
+          innerIconStyle={
             {
-              "text": "off",
+              "borderRadius": 5,
             }
           }
-          accessible={true}
-          pointerEvents="auto"
-        >
-          <RNCCheckbox
-            animationDuration={0.1}
-            boxType="square"
-            forwardedRef={null}
-            onCheckColor="#011401"
-            onFillColor="#18bd18"
-            onTintColor="#18bd18"
-            onValueChange={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "height": 32,
-                  "width": 32,
-                },
-                {
-                  "marginRight": 10,
-                  "transform": [
-                    {
-                      "scaleX": 0.7,
-                    },
-                    {
-                      "scaleY": 0.7,
-                    },
-                  ],
-                },
-              ]
+          onPress={[Function]}
+          style={
+            {
+              "marginRight": 10,
             }
-            tintColor="#c3c3c3"
-            tintColors={
-              {
-                "false": "#c3c3c3",
-                "true": "#18bd18",
-              }
-            }
-          />
-        </View>
+          }
+          unFillColor="#011401"
+          useBuiltInState={false}
+        />
         <Text
           style={
             {

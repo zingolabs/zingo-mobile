@@ -13,7 +13,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
-import CheckBox from '@react-native-community/checkbox';
+import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
 
 import FadeText from '../Components/FadeText';
@@ -1527,22 +1527,23 @@ const Send: React.FunctionComponent<SendProps> = ({
                     justifyContent: 'space-between',
                     alignItems: 'center',
                   }}>
-                  <FadeText style={{ marginTop: 0, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
-                  <View style={{ flexDirection: 'row' }}>
-                    <FadeText style={{ marginTop: 6 }}>{translate('send.includeua') as string}</FadeText>
-                    <CheckBox
+                  <FadeText style={{ marginTop: 6, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <FadeText style={{ marginTop: 6, marginBottom: 5, marginRight: 5 }}>{translate('send.includeua') as string}</FadeText>
+                    <BouncyCheckbox
                       testID="send.checkboxua"
                       disabled={false}
-                      value={includeUAMemoBoolean}
-                      onValueChange={(value: boolean) => updateToField(null, null, null, null, value)}
-                      tintColors={{ true: colors.primary, false: colors.text }}
-                      tintColor={colors.text}
-                      onCheckColor={colors.card}
-                      onFillColor={colors.primary}
-                      onTintColor={colors.primary}
-                      boxType="square"
-                      style={{
-                        transform: Platform.OS === GlobalConst.platformOSios ? [{ scaleX: 0.7 }, { scaleY: 0.7 }] : [],
+                      disableText
+                      isChecked={includeUAMemoBoolean}
+                      useBuiltInState={false}
+                      onPress={() => updateToField(null, null, null, null, !includeUAMemoBoolean)}
+                      unFillColor={colors.card}
+                      fillColor={colors.primary}
+                      innerIconStyle={{
+                        borderRadius: 5,
+                      }}
+                      iconStyle={{
+                        borderRadius: 5,
                       }}
                     />
                   </View>

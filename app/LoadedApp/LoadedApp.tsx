@@ -507,7 +507,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
       // state
       appStateStatus: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
-      selectedMenuDrawerItem: null,
       aboutModalVisible: false,
       computingModalVisible: false,
       settingsModalVisible: false,
@@ -1270,9 +1269,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setState({ messagesModalVisible: true });
     }
     this.closeDrawer();
-    this.setState({
-      selectedMenuDrawerItem: item,
-    });
   };
 
   setWalletOption = async (walletOption: string, value: string): Promise<void> => {
