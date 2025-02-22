@@ -46,7 +46,6 @@ class MainApplication : Application(), ReactApplication {
         if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
             load()
         }
-
     }
 
     companion object {

@@ -19,10 +19,11 @@ class MainActivity : ReactActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("ON_CREATE", "Starting main activity")
-        super.onCreate(null)
+        super.onCreate(savedInstanceState)
     }
 
     override fun createReactActivityDelegate(): ReactActivityDelegate {
+        Log.i("CREATE_REACT_ACTIVITY_DELEGATE", "Created!")
         return DefaultReactActivityDelegate(
             this,
             mainComponentName,  // If you opted-in for the New Architecture, we enable the Fabric Renderer.
@@ -38,6 +39,12 @@ class MainActivity : ReactActivity() {
         super.onPause()
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        Log.w("ON_WINDOW_FOCUS_CHANGE", "trying to focus.")
+        // RN fires a soft exception here if the Context is not available
+        // seems harmless.
+        super.onWindowFocusChanged(hasFocus)
+    }
 
     override fun onResume() {
         Log.i("ON_RESUME", "Resuming main activity - Foreground")
