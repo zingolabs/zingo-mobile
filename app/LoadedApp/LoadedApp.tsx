@@ -2128,7 +2128,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   fontSize: 14,
                 },
                 tabBarItemStyle: {
-                  height: 55,
+                  height: 60,
                 },
                 tabBarActiveTintColor: colors.background,
                 tabBarActiveBackgroundColor: colors.primaryDisabled,
@@ -2136,7 +2136,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 tabBarInactiveBackgroundColor: colors.sideMenuBackground,
                 tabBarStyle: {
                   borderTopWidth: 1,
-                  height: 55,
+                  height: 60,
                 },
                 headerShown: false,
                 tabBarButton: renderTabPressable(colors),
