@@ -4,14 +4,14 @@ import { GlobalConst, WalletType } from './AppState';
 const options = (biometrics: Keychain.BIOMETRY_TYPE | null): Keychain.BaseOptions => {
   return {
     service: GlobalConst.serviceKeyChain,
-    accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE, // for both
+    accessControl: biometrics ? Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE : Keychain.ACCESS_CONTROL.DEVICE_PASSCODE,
     accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY, // for both
-    authenticationType: Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS, // for both
+    authenticationType: biometrics ? Keychain.AUTHENTICATION_TYPE.BIOMETRICS : Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
     rules: Keychain.SECURITY_RULES.NONE, // for both
     // with biometrics in the device -> SECURE HARDWARE
     securityLevel: biometrics ? Keychain.SECURITY_LEVEL.SECURE_HARDWARE : Keychain.SECURITY_LEVEL.SECURE_SOFTWARE,
     // with biometrics in the device -> RSA
-    storage: biometrics ? Keychain.STORAGE_TYPE.RSA : Keychain.STORAGE_TYPE.AES_GCM,
+    storage: biometrics ? Keychain.STORAGE_TYPE.RSA : Keychain.STORAGE_TYPE.AES_GCM_NO_AUTH,
   } as Keychain.BaseOptions;
 };
 

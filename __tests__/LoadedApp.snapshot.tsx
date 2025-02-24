@@ -51,7 +51,7 @@ jest.mock('react-native-tab-view', () => ({
   TabView: '',
   TabBar: '',
 }));
-jest.mock('react-native-option-menu', () => '');
+jest.mock('react-native-context-menu-view', () => '');
 jest.mock('react-native/src/private/animated/NativeAnimatedHelper');
 jest.mock('@react-native-community/netinfo/src/index', () => {
   return {

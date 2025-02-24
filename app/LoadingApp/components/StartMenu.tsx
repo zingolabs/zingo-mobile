@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Text, View, ActivityIndicator, ScrollView, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { Text, View, ActivityIndicator, ScrollView, Image, TouchableOpacity, TextInput, Alert, NativeSyntheticEvent } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import OptionsMenu from 'react-native-option-menu';
+import ContextMenu, { ContextMenuOnPressNativeEvent } from 'react-native-context-menu-view';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEllipsisV, faWifi } from '@fortawesome/free-solid-svg-icons';
@@ -77,46 +77,63 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
         {netInfo.isConnected && !actionButtonsDisabled && (
           <>
             {mode === ModeEnum.basic ? (
-              <OptionsMenu
-                customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
-                buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
-                destructiveIndex={5}
-                options={
-                  hasRecoveryWalletInfoSaved
-                    ? [translate('loadingapp.recoverkeys'), translate('loadingapp.advancedmode'), translate('cancel')]
-                    : [translate('loadingapp.advancedmode'), translate('cancel')]
-                }
+              <ContextMenu
+                title={translate('loadedapp.options') as string}
+                dropdownMenuMode={true}
                 actions={
                   hasRecoveryWalletInfoSaved
-                    ? [() => recoverRecoveryWalletInfo(true), () => changeMode(ModeEnum.advanced)]
-                    : [() => changeMode(ModeEnum.advanced)]
+                    ? [{ title: translate('loadingapp.recoverkeys') as string }, {title: translate('loadingapp.advancedmode') as string }]
+                    : [{ title: translate('loadingapp.advancedmode') as string }]
                 }
-              />
+                onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
+                  if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
+                    recoverRecoveryWalletInfo(true);
+                  } else if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 1) {
+                    changeMode(ModeEnum.advanced);
+                  } else if (!hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
+                    changeMode(ModeEnum.advanced);
+                  }
+                }}
+              >
+                <FontAwesomeIcon style={{ width: 40, padding: 10 }} icon={faEllipsisV} color={'#ffffff'} size={40} />
+              </ContextMenu>
             ) : (
-              <OptionsMenu
-                customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
-                buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
-                destructiveIndex={5}
-                options={
-                  hasRecoveryWalletInfoSaved
-                    ? [translate('loadingapp.recoverkeys'), translate('loadingapp.custom'), translate('cancel')]
-                    : [translate('loadingapp.custom'), translate('cancel')]
-                }
+              <ContextMenu
+                title={translate('loadedapp.options') as string}
+                dropdownMenuMode={true}
                 actions={
-                  hasRecoveryWalletInfoSaved ? [() => recoverRecoveryWalletInfo(true), customServer] : [customServer]
+                  hasRecoveryWalletInfoSaved
+                    ? [{ title: translate('loadingapp.recoverkeys') as string }, { title: translate('loadingapp.custom') as string }]
+                    : [{ title: translate('loadingapp.custom') as string }]
                 }
-              />
+                onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
+                  if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
+                    recoverRecoveryWalletInfo(true);
+                  } else if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 1) {
+                    customServer();
+                  } else if (!hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
+                    customServer();
+                  }
+                }}
+              >
+                <FontAwesomeIcon style={{ width: 40, padding: 10 }} icon={faEllipsisV} color={'#ffffff'} size={40} />
+              </ContextMenu>
             )}
           </>
         )}
         {!netInfo.isConnected && hasRecoveryWalletInfoSaved && !actionButtonsDisabled && (
-          <OptionsMenu
-            customButton={<FontAwesomeIcon icon={faEllipsisV} color={'#ffffff'} size={40} />}
-            buttonStyle={{ width: 40, padding: 10, resizeMode: 'contain' }}
-            destructiveIndex={5}
-            options={[translate('loadingapp.recoverkeys'), translate('cancel')]}
-            actions={[() => recoverRecoveryWalletInfo(true)]}
-          />
+          <ContextMenu
+            title={translate('loadedapp.options') as string}
+            dropdownMenuMode={true}
+            actions={[{ title: translate('loadingapp.recoverkeys') as string }]}
+            onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
+              if (e.nativeEvent.index === 0) {
+                recoverRecoveryWalletInfo(true);
+              }
+            }}
+          >
+            <FontAwesomeIcon style={{ width: 40, padding: 10 }} icon={faEllipsisV} color={'#ffffff'} size={40} />
+          </ContextMenu>
         )}
       </View>
       <ScrollView
