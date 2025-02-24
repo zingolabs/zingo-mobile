@@ -43,7 +43,7 @@ import {
 } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
-import CheckBox from '@react-native-community/checkbox';
+import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
 import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfo';
 
@@ -503,26 +503,29 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       <View
         style={{
           flexDirection: 'row',
+          alignItems: 'center',
           marginLeft: 20,
           marginRight: 10,
           marginBottom: 5,
           maxHeight: 50,
           minHeight: 48,
         }}>
-        <CheckBox
+        <BouncyCheckbox
           disabled={false}
-          value={value}
-          onValueChange={(v: boolean) => setValue(v)}
-          tintColors={{ true: colors.primary, false: colors.text }}
-          tintColor={colors.text}
-          onCheckColor={colors.card}
-          onFillColor={colors.primary}
-          onTintColor={colors.primary}
-          boxType="square"
-          animationDuration={0.1}
+          disableText
+          isChecked={value}
+          useBuiltInState={false}
+          onPress={() => setValue(!value)}
+          unFillColor={colors.card}
+          fillColor={colors.primary}
           style={{
             marginRight: 10,
-            transform: Platform.OS === GlobalConst.platformOSios ? [{ scaleX: 0.7 }, { scaleY: 0.7 }] : [],
+          }}
+          innerIconStyle={{
+            borderRadius: 5,
+          }}
+          iconStyle={{
+            borderRadius: 5,
           }}
         />
         <RegText style={{ marginTop: Platform.OS === GlobalConst.platformOSios ? 5 : 3 }}>{label}</RegText>

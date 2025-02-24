@@ -1,6 +1,6 @@
 FROM ubuntu:latest
-ARG android_ndk_ver=r26d
-# 26.3.11579264
+ARG android_ndk_ver=r27b
+# 27.1.12297006
 
 # Install dependencies
 RUN apt update \

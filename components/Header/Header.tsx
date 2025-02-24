@@ -154,7 +154,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     privacy = context.privacy;
   }
 
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
 
   const opacityValue = useRef(new Animated.Value(1)).current;
@@ -370,23 +370,24 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   };
 
   useEffect(() => {
-    const animation = Animated.loop(
-      Animated.sequence([
-        Animated.delay(2000),
-        Animated.timing(opacityValue, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacityValue, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]),
-    );
-
-    animationRef.current = animation;
+    // Inicializa la animación solo una vez
+    if (!animationRef.current) {
+      animationRef.current = Animated.loop(
+        Animated.sequence([
+          Animated.delay(2000),
+          Animated.timing(opacityValue, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacityValue, {
+            toValue: 1,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+    }
 
     if (!noSyncingStatus) {
       if (syncingStatus.inProgress) {

@@ -13,18 +13,20 @@ import java.io.IOException
 import org.ZingoLabs.Zingo.Constants.*
 import kotlinx.coroutines.*
 
-class RPCModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class RPCModule internal constructor(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext) {
+    private val applicationContext: Context = reactContext?.applicationContext ?: MainApplication.getAppContext()!!
+
     override fun getName(): String {
         return "RPCModule"
     }
 
     private fun getDocumentDirectory(): String {
-        return reactContext.applicationContext.filesDir.absolutePath
+        return applicationContext.filesDir.absolutePath
     }
 
     fun fileExists(fileName: String): Boolean {
         // Check if a file already exists
-        val file = File(MainApplication.getAppContext()?.filesDir, fileName)
+        val file = File(applicationContext.filesDir, fileName)
         return if (file.exists()) {
             Log.i("MAIN", "File $fileName exists")
             true
@@ -35,18 +37,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     private fun readFile(fileName: String): ByteArray {
-        val file = MainApplication.getAppContext()!!.openFileInput(fileName)
+        val file = applicationContext.openFileInput(fileName)
         return file.readBytes()
     }
 
     private fun writeFile(fileName: String, fileBytes: ByteArray) {
-        val file = MainApplication.getAppContext()?.openFileOutput(fileName, Context.MODE_PRIVATE)
+        val file = applicationContext.openFileOutput(fileName, Context.MODE_PRIVATE)
         file?.write(fileBytes)
         file?.close()
     }
 
     private fun deleteFile(fileName: String): Boolean {
-        val file = MainApplication.getAppContext()?.getFileStreamPath(fileName)
+        val file = applicationContext.getFileStreamPath(fileName)
         return file!!.delete()
     }
 
@@ -164,7 +166,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         uniffi.zingo.initLogging()
 
-        val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
+        val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), applicationContext.filesDir.absolutePath, chainhint, true)
         // Log.i("MAIN", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -343,7 +345,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return uniffi.zingo.initFromB64(
             server,
             fileb64.toString(),
-            reactContext.applicationContext.filesDir.absolutePath,
+            applicationContext.filesDir.absolutePath,
             chainhint, true
         )
     }

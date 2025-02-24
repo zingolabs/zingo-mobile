@@ -13,8 +13,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
-import Animated, { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
-import CheckBox from '@react-native-community/checkbox';
+import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
 
 import FadeText from '../Components/FadeText';
@@ -129,7 +128,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     setZecPrice,
     zenniesDonationAddress,
   } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
 
   const [qrcodeModalVisble, setQrcodeModalVisible] = useState<boolean>(false);
@@ -163,7 +162,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [includeUAMemoBoolean, setIncludeUAMemoBoolean] = useState<boolean>(sendPageState.toaddr.includeUAMemo);
   const [keyboardListenersDone, setKeyboardListenersDone] = useState<boolean>(false);
 
-  const slideAnim = useSharedValue(0);
   const scrollViewRef = useRef<ScrollView>(null);
   const { decimalSeparator } = getNumberFormatSettings();
 
@@ -673,12 +671,10 @@ const Send: React.FunctionComponent<SendProps> = ({
       //only the first time if the height is more than 0.
       setKeyboardListenersDone(true);
       Keyboard.addListener('keyboardDidShow', () => {
-        slideAnim.value = withTiming(0 - titleViewHeightPar + 30, { duration: 100, easing: Easing.linear });
         setKeyboardVisible(true);
         //console.log('OPENNNNNNNNNN', titleViewHeightPar, slideAnim.value);
       });
       Keyboard.addListener('keyboardDidHide', () => {
-        slideAnim.value = withTiming(0, { duration: 100, easing: Easing.linear });
         setKeyboardVisible(false);
         //console.log('CLOSEEEEEEEEE', titleViewHeightPar, slideAnim.value);
       });
@@ -941,29 +937,27 @@ const Send: React.FunctionComponent<SendProps> = ({
         />
       </Modal>
 
-      <Animated.View style={{ marginTop: slideAnim }}>
-        <View
-          onLayout={e => {
-            const { height } = e.nativeEvent.layout;
-            keyboardListeners(height);
-            //console.log('LAYOUTTT', height);
-          }}>
-          <Header
-            title={translate('send.title') as string}
-            toggleMenuDrawer={toggleMenuDrawer}
-            poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-            syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
-            setPrivacyOption={setPrivacyOption}
-            addLastSnackbar={addLastSnackbar /* context */}
-            setShieldingAmount={setShieldingAmount}
-            setComputingModalVisible={setComputingModalVisible}
-            setScrollToTop={setScrollToTop}
-            setScrollToBottom={setScrollToBottom}
-            setBackgroundError={setBackgroundError /* context */}
-            setUfvkViewModalVisible={setUfvkViewModalVisible}
-          />
-        </View>
-      </Animated.View>
+      <View
+        onLayout={e => {
+          const { height } = e.nativeEvent.layout;
+          keyboardListeners(height);
+          //console.log('LAYOUTTT', height);
+        }}>
+        <Header
+          title={translate('send.title') as string}
+          toggleMenuDrawer={toggleMenuDrawer}
+          poolsMoreInfoOnClick={poolsMoreInfoOnClick}
+          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar /* context */}
+          setShieldingAmount={setShieldingAmount}
+          setComputingModalVisible={setComputingModalVisible}
+          setScrollToTop={setScrollToTop}
+          setScrollToBottom={setScrollToBottom}
+          setBackgroundError={setBackgroundError /* context */}
+          setUfvkViewModalVisible={setUfvkViewModalVisible}
+        />
+      </View>
       <ScrollView
         ref={scrollViewRef}
         onContentSizeChange={(_, height) => setContentHeight(height)}
@@ -1533,22 +1527,23 @@ const Send: React.FunctionComponent<SendProps> = ({
                     justifyContent: 'space-between',
                     alignItems: 'center',
                   }}>
-                  <FadeText style={{ marginTop: 0, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
-                  <View style={{ flexDirection: 'row' }}>
-                    <FadeText style={{ marginTop: 6 }}>{translate('send.includeua') as string}</FadeText>
-                    <CheckBox
+                  <FadeText style={{ marginTop: 6, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <FadeText style={{ marginTop: 6, marginBottom: 5, marginRight: 5 }}>{translate('send.includeua') as string}</FadeText>
+                    <BouncyCheckbox
                       testID="send.checkboxua"
                       disabled={false}
-                      value={includeUAMemoBoolean}
-                      onValueChange={(value: boolean) => updateToField(null, null, null, null, value)}
-                      tintColors={{ true: colors.primary, false: colors.text }}
-                      tintColor={colors.text}
-                      onCheckColor={colors.card}
-                      onFillColor={colors.primary}
-                      onTintColor={colors.primary}
-                      boxType="square"
-                      style={{
-                        transform: Platform.OS === GlobalConst.platformOSios ? [{ scaleX: 0.7 }, { scaleY: 0.7 }] : [],
+                      disableText
+                      isChecked={includeUAMemoBoolean}
+                      useBuiltInState={false}
+                      onPress={() => updateToField(null, null, null, null, !includeUAMemoBoolean)}
+                      unFillColor={colors.card}
+                      fillColor={colors.primary}
+                      innerIconStyle={{
+                        borderRadius: 5,
+                      }}
+                      iconStyle={{
+                        borderRadius: 5,
                       }}
                     />
                   </View>

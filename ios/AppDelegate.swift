@@ -10,6 +10,7 @@ import UIKit
 import BackgroundTasks
 import Network
 import React_RCTAppDelegate
+import ReactAppDependencyProvider
 
 @UIApplicationMain
 class AppDelegate: RCTAppDelegate {
@@ -21,8 +22,9 @@ class AppDelegate: RCTAppDelegate {
   private var bgTask: BGProcessingTask? = nil
   private var timeStampStrStart: String? = nil
   
-  override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+  override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
     self.moduleName = "Zingo"
+    self.dependencyProvider = RCTAppDependencyProvider()
     
     // You can add your custom initial props in the dictionary below.
     // They will be passed down to the ViewController used by React Native.
@@ -41,11 +43,11 @@ class AppDelegate: RCTAppDelegate {
   }
 
   override func bundleURL() -> URL? {
-  #if DEBUG
-      RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
-  #else
-      Bundle.main.url(forResource: "main", withExtension: "jsbundle")
-  #endif
+#if DEBUG
+    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+#else
+    Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+#endif
   }
 
   override func applicationWillEnterForeground(_ application: UIApplication) {
