@@ -18,7 +18,7 @@ export const SideBar = createDrawerNavigator();
  * @example
  * // Example usage:
  * function App() {
- *   <Drawer>
+ *   <Drawer initialRouteName="About">
  *     <Drawer.Screen name="Settings" component={Settings} />
  *     <Drawer.Screen name="Info" component={Info} />
  *     <Drawer.Screen name="About" component={About} />
