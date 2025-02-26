@@ -1,6 +1,11 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import React from 'react';
 
+type DrawerProps = {
+  initialRouteName: string;
+  children: any;
+};
+
 export const SideBar = createDrawerNavigator();
 
 /**
@@ -20,10 +25,10 @@ export const SideBar = createDrawerNavigator();
  *   </Drawer>
  * }
  */
-function Drawer({ children }: { children: any }) {
+function Drawer({ initialRouteName, children }: DrawerProps) {
   return (
     <SideBar.Navigator
-      initialRouteName="Home"
+      initialRouteName={initialRouteName}
       screenOptions={{
         drawerType: 'slide',
       }}>
