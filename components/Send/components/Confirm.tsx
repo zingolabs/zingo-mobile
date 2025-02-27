@@ -353,7 +353,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             return (
               <View key={`${to.id}-${to.to}`} style={{ margin: 10 }}>
                 <FadeText>{translate('send.to') as string}</FadeText>
-                <AddressItem address={to.to} withIcon={true} closeModal={hide} />
+                <AddressItem address={to.to} withIcon={true} />
 
                 {donationAmount > 0 && (
                   <>

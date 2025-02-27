@@ -310,7 +310,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               <View style={{ display: 'flex' }}>
                 {!!vt.address && vt.confirmations > 0 && (
                   <View>
-                    <AddressItem address={vt.address} oneLine={true} closeModal={() => {}} />
+                    <AddressItem address={vt.address} oneLine={true} />
                   </View>
                 )}
                 <View

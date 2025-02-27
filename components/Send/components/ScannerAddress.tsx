@@ -56,10 +56,6 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
     validateAddress(scandata);
   };
 
-  const doCancel = () => {
-    hide();
-  };
-
   return (
     <SafeAreaProvider>
       <SafeAreaView
@@ -76,7 +72,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={doCancel}
+          closeScreen={hide}
         />
         <Scanner onRead={onRead} />
       </SafeAreaView>

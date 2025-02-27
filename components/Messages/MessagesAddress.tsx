@@ -11,6 +11,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type MessagesAddressProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -37,6 +38,7 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
   const context = useContext(ContextAppLoaded);
   const { language } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   return (
@@ -56,6 +58,7 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
           address={address}
           sendTransaction={sendTransaction}
           setServerOption={setServerOption}
+          closeModal={hide}
         />
       </SafeAreaView>
     </SafeAreaProvider>

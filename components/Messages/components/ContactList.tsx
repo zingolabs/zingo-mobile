@@ -278,7 +278,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         address={Utils.messagesAddress(contactDetail)}
         sendTransaction={sendTransaction}
         setServerOption={setServerOption}
-      />
+      />, { swipeDirection: undefined }
     ).promise;
   };
 
@@ -287,7 +287,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         setPrivacyOption={setPrivacyOption}
         setScrollToBottom={setScrollToBottom}
         scrollToBottom={scrollToBottom}
-      />
+      />, { swipeDirection: undefined }
     ).promise;
   };
 

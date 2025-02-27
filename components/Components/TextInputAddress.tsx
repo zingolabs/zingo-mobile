@@ -61,7 +61,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   }, [address, server.chainName, setError, setUOrchardAddress, translate]);
 
   const setQrcodeModalShow = async () => {
-    await magicModal.show(() => <ScannerAddress setAddress={setAddress} />).promise;
+    await magicModal.show(() => <ScannerAddress setAddress={setAddress} />, { swipeDirection: undefined }).promise;
   };
 
   //console.log('render input text address');

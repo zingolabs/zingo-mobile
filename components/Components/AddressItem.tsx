@@ -25,7 +25,7 @@ import 'moment/locale/ru';
 
 type AddressItemProps = {
   address: string;
-  closeModal: () => void;
+  closeModal?: () => void;
   oneLine?: boolean;
   onlyContact?: boolean;
   withIcon?: boolean;
@@ -190,7 +190,9 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               const sendPageState = new SendPageStateClass(new ToAddrClass(0));
               sendPageState.toaddr.to = address;
               setSendPageState(sendPageState);
-              closeModal();
+              if (closeModal) {
+                closeModal();
+              }
               navigation.navigate(RouteEnums.LoadedApp, {
                 screen: translate('loadedapp.send-menu'),
                 initial: false,

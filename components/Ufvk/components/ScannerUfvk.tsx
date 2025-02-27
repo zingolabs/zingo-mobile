@@ -35,10 +35,6 @@ const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setUfvkText }) =
     hide();
   };
 
-  const doCancel = () => {
-    hide();
-  };
-
   return (
     <SafeAreaProvider>
       <SafeAreaView
@@ -55,7 +51,7 @@ const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setUfvkText }) =
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={doCancel}
+          closeScreen={hide}
         />
         <Scanner onRead={onRead} />
       </SafeAreaView>

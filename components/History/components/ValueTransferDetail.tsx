@@ -425,7 +425,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                         {!thisWalletAddress(memoUA) && (
                           <RegText style={{ opacity: 0.6 }}>{translate('addressbook.likely') as string}</RegText>
                         )}
-                        <AddressItem address={memoUA} onlyContact={true} closeModal={() => {}} />
+                        <AddressItem address={memoUA} onlyContact={true} />
                       </View>
                     )}
                     {!contactFound(memoUA) && thisWalletAddress(memoUA) && (

@@ -459,12 +459,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     });
   };
 
-  const closeModalAndClean = () => {
-    if (closeModal) {
-      closeModal();
-    }
-  };
-
   useEffect(() => {
     const stillConf =
       (totalBalance ? totalBalance.orchardBal : 0) !== (totalBalance ? totalBalance.spendableOrchard : 0) ||
@@ -488,7 +482,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         message={memo}
         includeUAMessage={true}
         setMessage={setMemo}
-      />
+      />, { swipeDirection: undefined }
     ).promise;
   };
 
@@ -499,7 +493,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         valueTransfersSliced={messagesSliced}
         totalLength={messagesFiltered ? messagesFiltered.length : 0}
         setPrivacyOption={setPrivacyOption}
-      />
+      />, { swipeDirection: undefined }
     ).promise;
   };
 
@@ -537,7 +531,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               noDrawMenu={true}
               setPrivacyOption={setPrivacyOption}
               addLastSnackbar={addLastSnackbar}
-              closeScreen={closeModalAndClean}
+              closeScreen={closeModal}
             />
             <View
               style={{
@@ -585,7 +579,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                 address={address}
                 oneLine={true}
                 withIcon={true}
-                closeModal={closeModalAndClean}
               />
             </View>
           </>
@@ -598,7 +591,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               noDrawMenu={true}
               setPrivacyOption={setPrivacyOption}
               addLastSnackbar={addLastSnackbar}
-              closeScreen={closeModalAndClean}
+              closeScreen={closeModal}
             />
             <View style={{ flexDirection: 'row', alignSelf: 'center', alignItems: 'center', margin: 10 }}>
               <TouchableOpacity

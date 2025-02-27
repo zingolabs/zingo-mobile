@@ -110,7 +110,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   const setQrcodeModalShow = async () => {
     await magicModal.show(() => <ScannerUfvk
         setUfvkText={setSeedufvkText}
-      />
+      />, { swipeDirection: undefined }
     ).promise;
   };
 

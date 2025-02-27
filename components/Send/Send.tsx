@@ -856,7 +856,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     await magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
           updateToField(a, null, null, null, null);
         }}
-      />
+      />, { swipeDirection: undefined }
     ).promise;
   };
 
@@ -865,7 +865,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         message={memoText}
         includeUAMessage={includeUAMemoBoolean}
         setMessage={setMemoText}
-      />
+      />, { swipeDirection: undefined }
     ).promise;
   };
 
@@ -885,7 +885,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         }
         calculateFeeWithPropose={calculateFeeWithPropose}
         sendPageState={buildSendState()}
-      />
+      />, { swipeDirection: undefined }
     ).promise;
   };
 
@@ -950,7 +950,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                     oneLine={true}
                     onlyContact={true}
                     withIcon={true}
-                    closeModal={() => {}}
                   />
                 )}
               </View>

@@ -795,7 +795,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         action={SeedActionEnum.view}
         setPrivacyOption={this.setPrivacyOption}
         keepAwake={this.keepAwake}
-      />
+      />, { swipeDirection: undefined }
     );
   };
 
@@ -805,7 +805,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         onClickCancel={() => {}}
         action={UfvkActionEnum.view}
         setPrivacyOption={this.setPrivacyOption}
-      />
+      />, { swipeDirection: undefined }
     );
   };
 
@@ -1044,7 +1044,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setComputingModalShow = () => {
-    magicModal.show(() => <ComputingTxContent />);
+    magicModal.show(() => <ComputingTxContent />, { swipeDirection: undefined });
   };
 
   setInfo = (info: InfoType) => {
@@ -1137,9 +1137,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     // Depending on the menu item, open the appropriate modal
     await this.closeDrawer();
     if (item === MenuItemEnum.About) {
-      return magicModal.show(() => <About />).promise;
+      return magicModal.show(() => <About />, { swipeDirection: undefined }).promise;
     } else if (item === MenuItemEnum.Rescan) {
-      return magicModal.show(() => <Rescan doRescan={this.doRescan} />).promise;
+      return magicModal.show(() => <Rescan doRescan={this.doRescan} />, { swipeDirection: undefined }).promise;
     } else if (item === MenuItemEnum.Settings) {
       return magicModal.show(() => <Settings
         setWalletOption={this.setWalletOption}
@@ -1156,13 +1156,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
       />, { swipeDirection: undefined }).promise;
     } else if (item === MenuItemEnum.Info) {
-      return magicModal.show(() => <Info />).promise;
+      return magicModal.show(() => <Info />, { swipeDirection: undefined }).promise;
     } else if (item === MenuItemEnum.SyncReport) {
-      return magicModal.show(() => <SyncReport />).promise;
+      return magicModal.show(() => <SyncReport />, { swipeDirection: undefined }).promise;
     } else if (item === MenuItemEnum.FundPools) {
-      return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />).promise;
+      return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined }).promise;
     } else if (item === MenuItemEnum.Insight) {
-      return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />).promise;
+      return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined }).promise;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
         this.setUfvkViewModalShow();
@@ -1176,7 +1176,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             onClickCancel={() => {}}
             action={UfvkActionEnum.change}
             setPrivacyOption={this.setPrivacyOption}
-          />
+          />, { swipeDirection: undefined }
         ).promise;
       } else {
         return magicModal.show(() => <Seed
@@ -1184,7 +1184,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             onClickCancel={() => {}}
             action={SeedActionEnum.change}
             setPrivacyOption={this.setPrivacyOption}
-          />
+          />, { swipeDirection: undefined }
         ).promise;
       }
     } else if (item === MenuItemEnum.RestoreWalletBackup) {
@@ -1194,7 +1194,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             onClickCancel={() => {}}
             action={UfvkActionEnum.backup}
             setPrivacyOption={this.setPrivacyOption}
-          />
+          />, { swipeDirection: undefined }
         ).promise;
       } else {
         return magicModal.show(() => <Seed
@@ -1202,7 +1202,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             onClickCancel={() => {}}
             action={SeedActionEnum.backup}
             setPrivacyOption={this.setPrivacyOption}
-          />
+          />, { swipeDirection: undefined }
         ).promise;
       }
     } else if (item === MenuItemEnum.LoadWalletFromSeed) {
@@ -1241,7 +1241,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setState({
         addressBookCurrentAddress: '',
       });
-      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />).promise;
+      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined }).promise;
     } else if (item === MenuItemEnum.VoteForNym) {
       let update = false;
       if (
@@ -1293,7 +1293,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         scrollToBottom={this.state.scrollToBottom /* messages */}
         sendTransaction={this.sendTransaction /* messages */}
         setServerOption={this.setServerOption /* messages */}
-      />).promise;
+      />, { swipeDirection: undefined }).promise;
     }
   };
 
@@ -1380,7 +1380,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             }}
             action={UfvkActionEnum.server}
             setPrivacyOption={this.setPrivacyOption}
-          />
+          />, { swipeDirection: undefined }
         ).promise;
       } else {
         await magicModal.show(() => <Seed
@@ -1393,7 +1393,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             }}
             action={SeedActionEnum.server}
             setPrivacyOption={this.setPrivacyOption}
-          />
+          />, { swipeDirection: undefined }
         ).promise;
       }
       //console.log(`Error Reading Wallet ${value} - ${error}`);
@@ -1674,11 +1674,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   syncingStatusMoreInfoOnClick = async () => {
-    return magicModal.show(() => <SyncReport />).promise;
+    return magicModal.show(() => <SyncReport />, { swipeDirection: undefined }).promise;
   };
 
   poolsMoreInfoOnClick = async () => {
-    return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />).promise;
+    return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined }).promise;
   };
 
   setBackgroundError = (title: string, error: string) => {
@@ -1711,7 +1711,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       addressBookCurrentAddress: address,
     });
-    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />).promise;
+    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined }).promise;
   };
 
   setScrollToTop = (value: boolean) => {

@@ -122,7 +122,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
           }}>
           {!!vt.address && !messageAddress && (
             <View style={{ marginTop: -10, marginBottom: 10, marginLeft: 30 }}>
-              <AddressItem address={vt.address} oneLine={true} closeModal={() => {}} />
+              <AddressItem address={vt.address} oneLine={true} />
             </View>
           )}
           {(!!memo || !!memoUA) && (
@@ -171,7 +171,6 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                             <AddressItem
                               address={memoUA}
                               onlyContact={true}
-                              closeModal={() => {}}
                             />
                           </View>
                         )}

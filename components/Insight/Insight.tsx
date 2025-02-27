@@ -175,7 +175,6 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
                     oneLine={true}
                     onlyContact={true}
                     withIcon={true}
-                    closeModal={() => {}}
                   />
                 )}
                 {!expandAddress[index] && !!item.address && (
