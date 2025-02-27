@@ -6,7 +6,7 @@ type DrawerProps = {
   children: any;
 };
 
-export const SideBar = createDrawerNavigator();
+const SideBar = createDrawerNavigator();
 
 /**
  * A drawer component.
@@ -39,4 +39,4 @@ function Drawer({ initialRouteName, children }: DrawerProps) {
 
 Drawer.Screen = SideBar.Screen;
 
-export { Drawer };
+export default Drawer;
