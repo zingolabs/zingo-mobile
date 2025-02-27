@@ -149,8 +149,8 @@ describe('Component History ValueTransferDetail - test', () => {
     render(
       <ContextAppLoadedProvider value={state}>
         <ValueTransferDetail
-          index={1}
-          vt={mockValueTransfers[1]}
+          index={2}
+          vt={mockValueTransfers[2]}
           valueTransfersSliced={mockValueTransfers}
           totalLength={mockValueTransfers.length}
           setPrivacyOption={onSetOption}
