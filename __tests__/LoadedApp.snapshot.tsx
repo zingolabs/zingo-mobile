@@ -134,6 +134,7 @@ jest.mock('react-native-gesture-handler', () => {
 
   return {
     RNGestureHandlerModule: RN,
+    GestureHandlerRootView: ({ children }: {children: React.ReactNode}) => children,
   };
 });
 jest.mock('react-native-keychain', () => ({

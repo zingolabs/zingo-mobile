@@ -53,6 +53,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
         size="large"
       />
     </View>
+    <View />
     <View
       collapsable={false}
       handlerTag={2}

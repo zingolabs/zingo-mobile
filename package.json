@@ -56,6 +56,7 @@
     "react-native-keychain": "^9.2.2",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-localize": "^3.1.0",
+    "react-native-magic-modal": "^6.0.3",
     "react-native-pager-view": "^6.0.1",
     "react-native-permissions": "^4.1.5",
     "react-native-picker-select": "^9.1.3",

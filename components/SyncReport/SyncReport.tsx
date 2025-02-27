@@ -19,15 +19,16 @@ import RegText from '../Components/RegText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../app/utils';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type SyncReportProps = {
-  closeModal: () => void;
 };
 
-const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) => {
+const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   const context = useContext(ContextAppLoaded);
   const { syncingStatus, wallet, translate, background, language, netInfo } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   const [maxBlocks, setMaxBlocks] = useState<number>(0);
@@ -228,7 +229,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({ closeModal }) =>
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={closeModal}
+          closeScreen={hide}
         />
         <ScrollView
           testID="syncreport.scroll-view"

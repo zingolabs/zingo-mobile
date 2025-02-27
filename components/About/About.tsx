@@ -14,15 +14,16 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type AboutProps = {
-  closeModal: () => void;
 };
-const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
+const About: React.FunctionComponent<AboutProps> = () => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, language } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
+  const { hide } = useMagicModal();
 
   const arrayTxtObject = translate('about.copyright');
   let arrayTxt: string[] = [];
@@ -46,7 +47,7 @@ const About: React.FunctionComponent<AboutProps> = ({ closeModal }) => {
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={closeModal}
+          closeScreen={hide}
         />
         <ScrollView
           style={{ maxHeight: '90%' }}

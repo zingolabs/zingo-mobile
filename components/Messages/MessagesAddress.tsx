@@ -17,8 +17,6 @@ type MessagesAddressProps = {
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
   address: string;
-  closeModal: () => void;
-  openModal: () => void;
   sendTransaction: (s: SendPageStateClass) => Promise<String>;
   setServerOption: (
     value: ServerType,
@@ -33,8 +31,6 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
   setScrollToBottom,
   scrollToBottom,
   address,
-  closeModal,
-  openModal,
   sendTransaction,
   setServerOption,
 }) => {
@@ -58,8 +54,6 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
           setScrollToBottom={setScrollToBottom}
           scrollToBottom={scrollToBottom}
           address={address}
-          closeModal={closeModal}
-          openModal={openModal}
           sendTransaction={sendTransaction}
           setServerOption={setServerOption}
         />

@@ -65,11 +65,11 @@ describe('Component Pools - test', () => {
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
-  const onClose = jest.fn();
+  const onSet = jest.fn();
   test('Pools - snapshot', () => {
     const pools = render(
       <ContextAppLoadedProvider value={state}>
-        <Pools closeModal={onClose} setPrivacyOption={onClose} />
+        <Pools setPrivacyOption={onSet} />
       </ContextAppLoadedProvider>,
     );
     expect(pools.toJSON()).toMatchSnapshot();

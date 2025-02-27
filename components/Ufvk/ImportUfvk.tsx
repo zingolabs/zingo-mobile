@@ -4,7 +4,6 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
-  Modal,
   TextInput,
   KeyboardAvoidingView,
   Platform,
@@ -27,6 +26,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { ButtonTypeEnum, GlobalConst, SelectServerEnum } from '../../app/AppState';
+import { magicModal } from 'react-native-magic-modal';
 
 type ImportUfvkProps = {
   onClickCancel: () => void;
@@ -40,7 +40,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
 
   const [seedufvkText, setSeedufvkText] = useState<string>('');
   const [birthday, setBirthday] = useState<string>('');
-  const [qrcodeModalVisible, setQrcodeModalVisible] = useState<boolean>(false);
   const [latestBlock, setLatestBlock] = useState<number>(0);
 
   useEffect(() => {
@@ -108,6 +107,13 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
   };
 
+  const setQrcodeModalShow = async () => {
+    await magicModal.show(() => <ScannerUfvk
+        setUfvkText={setSeedufvkText}
+      />
+    ).promise;
+  };
+
   return (
     <SafeAreaProvider>
       <KeyboardAvoidingView
@@ -122,13 +128,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
             height: '100%',
             backgroundColor: colors.background,
           }}>
-          <Modal
-            animationType="slide"
-            transparent={false}
-            visible={qrcodeModalVisible}
-            onRequestClose={() => setQrcodeModalVisible(false)}>
-            <ScannerUfvk setUfvkText={setSeedufvkText} closeModal={() => setQrcodeModalVisible(false)} />
-          </Modal>
           <Header
             title={translate('import.title') as string}
             noBalance={true}
@@ -200,7 +199,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
               )}
               <TouchableOpacity
                 onPress={() => {
-                  setQrcodeModalVisible(true);
+                  setQrcodeModalShow();
                 }}>
                 <FontAwesomeIcon size={35} icon={faQrcode} color={colors.border} />
               </TouchableOpacity>

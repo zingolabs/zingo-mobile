@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, TouchableOpacity, TextInput, Modal } from 'react-native';
+import { View, TouchableOpacity, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -15,6 +15,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import Utils from '../../app/utils';
+import { magicModal } from 'react-native-magic-modal';
 
 type TextInputAddressProps = {
   address: string;
@@ -35,7 +36,6 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
-  const [qrcodeModalVisble, setQrcodeModalVisible] = useState<boolean>(false);
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
 
   useEffect(() => {
@@ -60,17 +60,14 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
     }
   }, [address, server.chainName, setError, setUOrchardAddress, translate]);
 
+  const setQrcodeModalShow = async () => {
+    await magicModal.show(() => <ScannerAddress setAddress={setAddress} />).promise;
+  };
+
   //console.log('render input text address');
 
   return (
     <View style={{ display: 'flex', flexDirection: 'column' }}>
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={qrcodeModalVisble}
-        onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScannerAddress setAddress={setAddress} closeModal={() => setQrcodeModalVisible(false)} />
-      </Modal>
       <View style={{ display: 'flex', padding: 10, marginTop: 10 }}>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
           <RegText>{translate('send.toaddress') as string}</RegText>
@@ -129,8 +126,8 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 disabled={disabled}
                 accessible={true}
                 accessibilityLabel={translate('send.scan-acc') as string}
-                onPress={() => {
-                  setQrcodeModalVisible(true);
+                onPress={async () => {
+                  setQrcodeModalShow();
                 }}>
                 <FontAwesomeIcon style={{ marginRight: 5 }} size={35} icon={faQrcode} color={colors.border} />
               </TouchableOpacity>

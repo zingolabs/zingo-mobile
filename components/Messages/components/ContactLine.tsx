@@ -39,7 +39,7 @@ type ContactLineProps = {
   month: string;
   c: ContactType;
   setContactDetail: (c: ContactType) => void;
-  setMessagesAddressModalShowing: (b: boolean) => void;
+  setMessagesAddressModalShow: () => void;
   addressProtected?: boolean;
 };
 const ContactLine: React.FunctionComponent<ContactLineProps> = ({
@@ -47,7 +47,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   c,
   month,
   setContactDetail,
-  setMessagesAddressModalShowing,
+  setMessagesAddressModalShow,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -120,7 +120,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
         if (!maxWidthHit.current) {
           //console.log(value);
           setContactDetail(c);
-          setMessagesAddressModalShowing(true);
+          setMessagesAddressModalShow();
           swipeable.reset();
         }
         maxWidthHit.current = true;
@@ -151,7 +151,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                   style={{ zIndex: 999, padding: 20, alignSelf: 'flex-start' }}
                   onPress={() => {
                     setContactDetail(c);
-                    setMessagesAddressModalShowing(true);
+                    setMessagesAddressModalShow();
                     swipeable.reset();
                   }}>
                   <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faComments} color={colors.money} />
@@ -251,7 +251,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
         style={{ zIndex: 999 }}
         onPress={() => {
           setContactDetail(c);
-          setMessagesAddressModalShowing(true);
+          setMessagesAddressModalShow();
           swipeableRef?.current?.reset();
         }}>
         <Swipeable
@@ -320,7 +320,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                   {c.label ? (
                     <RegText>{c.label}</RegText>
                   ) : (
-                    <AddressItem address={c.address} oneLine={true} closeModal={() => {}} openModal={() => {}} />
+                    <AddressItem address={c.address} oneLine={true} closeModal={() => {}} />
                   )}
                   <FadeText>{c.time ? moment((c.time || 0) * 1000).format('MMM D, h:mm a') : ''}</FadeText>
                 </View>

@@ -65,7 +65,6 @@ describe('Component PrivKey - test', () => {
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
-  const onClose = jest.fn();
   test('PrivKey Private - snapshot', () => {
     const privKey = render(
       <ContextAppLoadedProvider value={state}>
@@ -73,7 +72,6 @@ describe('Component PrivKey - test', () => {
           address={'UA-12345678901234567890'}
           keyType={0}
           privKey={'priv-key-12345678901234567890'}
-          closeModal={onClose}
         />
       </ContextAppLoadedProvider>,
     );
@@ -86,7 +84,6 @@ describe('Component PrivKey - test', () => {
           address={'UA-12345678901234567890'}
           keyType={1}
           privKey={'view-key-12345678901234567890'}
-          closeModal={onClose}
         />
       </ContextAppLoadedProvider>,
     );

@@ -34,18 +34,14 @@ type MessageLineProps = {
   index: number;
   month: string;
   vt: ValueTransferType;
-  setValueTransferDetail: (t: ValueTransferType) => void;
-  setValueTransferDetailIndex: (i: number) => void;
-  setValueTransferDetailModalShowing: (b: boolean) => void;
+  setValueTransferDetailModalShow: (i: number, v: ValueTransferType) => void;
   messageAddress?: string;
 };
 const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   index,
   vt,
   month,
-  setValueTransferDetail,
-  setValueTransferDetailIndex,
-  setValueTransferDetailModalShowing,
+  setValueTransferDetailModalShow,
   messageAddress,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -106,9 +102,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
       <TouchableOpacity
         style={{ zIndex: 999 }}
         onPress={() => {
-          setValueTransferDetail(vt);
-          setValueTransferDetailIndex(index);
-          setValueTransferDetailModalShowing(true);
+          setValueTransferDetailModalShow(index, vt);
         }}>
         <View
           style={{
@@ -128,7 +122,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
           }}>
           {!!vt.address && !messageAddress && (
             <View style={{ marginTop: -10, marginBottom: 10, marginLeft: 30 }}>
-              <AddressItem address={vt.address} oneLine={true} closeModal={() => {}} openModal={() => {}} />
+              <AddressItem address={vt.address} oneLine={true} closeModal={() => {}} />
             </View>
           )}
           {(!!memo || !!memoUA) && (
@@ -178,7 +172,6 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                               address={memoUA}
                               onlyContact={true}
                               closeModal={() => {}}
-                              openModal={() => {}}
                             />
                           </View>
                         )}

@@ -3,7 +3,6 @@ import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } 
 import {
   View,
   ScrollView,
-  Platform,
   NativeScrollEvent,
   NativeSyntheticEvent,
   TouchableOpacity,
@@ -16,7 +15,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, GlobalConst } from '../../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -28,23 +27,23 @@ import AddressBookFileImpl from './AddressBookFileImpl';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../app/utils';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type AddressBookProps = {
-  closeModal: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
 
-const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, setAddressBook }) => {
+const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook }) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
     language,
     addressBook,
     addressBookCurrentAddress,
-    addressBookOpenPriorModal,
     zenniesDonationAddress,
   } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   const [numAb, setNumAb] = useState<number>(50);
@@ -105,13 +104,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
     setCurrentItem(null);
     setAction(null);
     if (addressBookCurrentAddress) {
-      closeModal();
-      setTimeout(
-        () => {
-          addressBookOpenPriorModal();
-        },
-        Platform.OS === GlobalConst.platformOSios ? 100 : 1,
-      );
+      hide();
     }
   };
 
@@ -170,7 +163,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={closeModal}
+          closeScreen={hide}
         />
         <ScrollView
           ref={scrollViewRef}
@@ -231,7 +224,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                       item={aBItem}
                       setCurrentItem={setCurrentItem}
                       setAction={setAction}
-                      closeModal={closeModal}
+                      closeModal={hide}
                       handleScrollToTop={handleScrollToTop}
                       doAction={doAction}
                     />
@@ -250,7 +243,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                       item={aBItem}
                       setCurrentItem={setCurrentItem}
                       setAction={setAction}
-                      closeModal={closeModal}
+                      closeModal={hide}
                       handleScrollToTop={handleScrollToTop}
                       doAction={doAction}
                     />
@@ -268,7 +261,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ closeModal, se
                     item={aBItem}
                     setCurrentItem={setCurrentItem}
                     setAction={setAction}
-                    closeModal={closeModal}
+                    closeModal={hide}
                     handleScrollToTop={handleScrollToTop}
                     doAction={doAction}
                     addressProtected={true}

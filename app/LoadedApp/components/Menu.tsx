@@ -14,10 +14,11 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../../AppState';
+import { HideReturn } from 'react-native-magic-modal';
 
 type MenuProps = {
-  onItemSelected: (item: MenuItemEnum) => Promise<void>;
-  closeDrawer: () => void;
+  onItemSelected: (item: MenuItemEnum) => Promise<HideReturn<unknown> | undefined>;
+  closeDrawer: () => Promise<void>;
 };
 
 const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer }) => {
@@ -64,7 +65,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer 
       //console.log('BIOMETRIC --------> ', resultBio);
       if (resultBio === false) {
         // snack with Error & closing the menu.
-        closeDrawer();
+        await closeDrawer();
         addLastSnackbar({ message: translate('biometrics-error') as string });
       } else {
         onItemSelected(value);

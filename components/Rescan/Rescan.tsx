@@ -15,16 +15,17 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { ButtonTypeEnum, SelectServerEnum, SnackbarDurationEnum } from '../../app/AppState';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type RescanProps = {
-  closeModal: () => void;
   doRescan: () => void;
 };
 
-const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) => {
+const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
   const context = useContext(ContextAppLoaded);
   const { wallet, translate, netInfo, addLastSnackbar, language, selectServer } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   const doRescanAndClose = () => {
@@ -33,7 +34,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) 
       return;
     }
     doRescan();
-    closeModal();
+    hide();
     addLastSnackbar({
       message: translate('loadedapp.syncing') as string,
       duration: SnackbarDurationEnum.longer,
@@ -56,7 +57,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ closeModal, doRescan }) 
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={closeModal}
+          closeScreen={hide}
         />
         <ScrollView
           style={{ height: '80%', maxHeight: '80%' }}

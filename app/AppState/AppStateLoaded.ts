@@ -6,26 +6,6 @@ import { SelectServerEnum } from './enums/SelectServerEnum';
 export default interface AppStateLoaded {
   appStateStatus: AppStateStatus;
 
-  // modals
-  aboutModalVisible: boolean;
-  computingModalVisible: boolean;
-  settingsModalVisible: boolean;
-  infoModalVisible: boolean;
-  rescanModalVisible: boolean;
-  seedViewModalVisible: boolean;
-  seedChangeModalVisible: boolean;
-  seedBackupModalVisible: boolean;
-  seedServerModalVisible: boolean;
-  ufvkViewModalVisible: boolean;
-  ufvkChangeModalVisible: boolean;
-  ufvkBackupModalVisible: boolean;
-  ufvkServerModalVisible: boolean;
-  syncReportModalVisible: boolean;
-  poolsModalVisible: boolean;
-  insightModalVisible: boolean;
-  addressBookModalVisible: boolean;
-  messagesModalVisible: boolean;
-
   // change server helper
   newServer: ServerType;
   newSelectServer: SelectServerEnum | null;

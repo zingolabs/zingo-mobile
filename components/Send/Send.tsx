@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext, useCallback, useRef } from 'react';
-import { View, ScrollView, Modal, Keyboard, TextInput, TouchableOpacity, Platform, Text, Alert } from 'react-native';
+import { View, ScrollView, Keyboard, TextInput, TouchableOpacity, Platform, Text, Alert } from 'react-native';
 import {
   faQrcode,
   faCheck,
@@ -35,6 +35,7 @@ import {
   ServerUrisType,
   ServerType,
   SelectServerEnum,
+  RouteEnums,
 } from '../../app/AppState';
 import { parseZcashURI, serverUris, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
@@ -59,6 +60,7 @@ import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalance
 import { RPCSendallProposeType } from '../../app/rpc/types/RPCSendallProposeType';
 import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
+import { magicModal } from 'react-native-magic-modal';
 
 type SendProps = {
   // side menu
@@ -72,11 +74,8 @@ type SendProps = {
   // addLastSnackbar from context
   // shielding
   setShieldingAmount: (value: number) => void;
-  setComputingModalVisible: (visible: boolean) => void;
   setScrollToTop: (value: boolean) => void;
   setScrollToBottom: (value: boolean) => void;
-  // read-only wallet
-  setUfvkViewModalVisible?: (v: boolean) => void;
   // for send
   sendTransaction: (s: SendPageStateClass) => Promise<String>;
   setServerOption: (
@@ -92,11 +91,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   sendTransaction,
   clearToAddr,
   toggleMenuDrawer,
-  setComputingModalVisible,
   syncingStatusMoreInfoOnClick,
   poolsMoreInfoOnClick,
   setPrivacyOption,
-  setUfvkViewModalVisible,
   setShieldingAmount,
   setScrollToTop,
   setScrollToBottom,
@@ -127,12 +124,12 @@ const Send: React.FunctionComponent<SendProps> = ({
     selectServer,
     setZecPrice,
     zenniesDonationAddress,
+    setComputingModalShow,
+    closeAllModals,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
 
-  const [qrcodeModalVisble, setQrcodeModalVisible] = useState<boolean>(false);
-  const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
   const [memoEnabled, setMemoEnabled] = useState<boolean>(false);
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
@@ -140,7 +137,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
   const [itemsPicker, setItemsPicker] = useState<{ label: string; value: string }[]>([]);
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
-  const [memoModalVisible, setMemoModalVisible] = useState<boolean>(false);
   const [maxAmount, setMaxAmount] = useState<number>(0);
   const [spendable, setSpendable] = useState<number>(0);
   const [fee, setFee] = useState<number>(0);
@@ -704,15 +700,13 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      setConfirmModalVisible(false);
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
     // first interrupt syncing Just in case...
     await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
     // First, close the confirm modal and show the "computing" modal
-    setConfirmModalVisible(false);
-    setComputingModalVisible(true);
+    setComputingModalShow();
 
     // call the sendTransaction method in a timeout, allowing the modals to show properly
     setTimeout(async () => {
@@ -724,9 +718,10 @@ const Send: React.FunctionComponent<SendProps> = ({
         // Clear the fields
         clearState();
 
-        if (navigation) {
-          navigation.navigate(translate('loadedapp.history-menu') as string);
-        }
+        navigation.navigate(RouteEnums.LoadedApp, {
+          screen: translate('loadedapp.history-menu') as string,
+          initial: false,
+        });
 
         // scroll to top in history, just in case.
         setScrollToTop(true);
@@ -740,7 +735,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           true,
           translate,
         );
-        setComputingModalVisible(false);
+        closeAllModals();
         // the app send successfully on the first attemp.
 
         // the sync process can continue
@@ -782,9 +777,10 @@ const Send: React.FunctionComponent<SendProps> = ({
             // Clear the fields
             clearState();
 
-            if (navigation) {
-              navigation.navigate(translate('loadedapp.history-menu') as string);
-            }
+            navigation.navigate(RouteEnums.LoadedApp, {
+              screen: translate('loadedapp.history-menu') as string,
+              initial: false,
+            });
 
             // scroll to top in history, just in case.
             setScrollToTop(true);
@@ -798,7 +794,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               true,
               translate,
             );
-            setComputingModalVisible(false);
+            closeAllModals();
             // the app send successfully on the second attemp.
 
             // the sync process can continue
@@ -830,7 +826,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           info.zingolib,
         );
       }, 1000);
-      setComputingModalVisible(false);
+      closeAllModals();
     });
   };
 
@@ -854,6 +850,43 @@ const Send: React.FunctionComponent<SendProps> = ({
       //console.log('scrolling to end', keyboardVisible);
       scrollViewRef.current.scrollTo({ y: contentHeight, animated: true });
     }
+  };
+
+  const setQrcodeModalShow = async () => {
+    await magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
+          updateToField(a, null, null, null, null);
+        }}
+      />
+    ).promise;
+  };
+
+  const setMemoModalShow = async () => {
+    await magicModal.show(() => <Memo
+        message={memoText}
+        includeUAMessage={includeUAMemoBoolean}
+        setMessage={setMemoText}
+      />
+    ).promise;
+  };
+
+  const setConfirmModalShow = async () => {
+    await magicModal.show(() => <Confirm
+        calculatedFee={fee}
+        donationAmount={
+          donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+            ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
+            : 0
+        }
+        confirmSend={confirmSend}
+        sendAllAmount={
+          mode !== ModeEnum.basic &&
+          Utils.parseStringLocaleToNumberFloat(amountText) ===
+            Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
+        }
+        calculateFeeWithPropose={calculateFeeWithPropose}
+        sendPageState={buildSendState()}
+      />
+    ).promise;
   };
 
   //console.log(
@@ -880,62 +913,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         height: '100%',
         marginBottom: 200,
       }}>
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={qrcodeModalVisble}
-        onRequestClose={() => setQrcodeModalVisible(false)}>
-        <ScannerAddress
-          setAddress={(a: string) => {
-            updateToField(a, null, null, null, null);
-          }}
-          closeModal={() => setQrcodeModalVisible(false)}
-        />
-      </Modal>
-
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={confirmModalVisible}
-        onRequestClose={() => setConfirmModalVisible(false)}>
-        <Confirm
-          calculatedFee={fee}
-          donationAmount={
-            donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
-              ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
-              : 0
-          }
-          closeModal={() => {
-            setConfirmModalVisible(false);
-          }}
-          openModal={() => {
-            setConfirmModalVisible(true);
-          }}
-          confirmSend={confirmSend}
-          sendAllAmount={
-            mode !== ModeEnum.basic &&
-            Utils.parseStringLocaleToNumberFloat(amountText) ===
-              Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
-          }
-          calculateFeeWithPropose={calculateFeeWithPropose}
-          sendPageState={buildSendState()}
-        />
-      </Modal>
-
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={memoModalVisible}
-        onRequestClose={() => setMemoModalVisible(false)}>
-        <Memo
-          closeModal={() => {
-            setMemoModalVisible(false);
-          }}
-          message={memoText}
-          includeUAMessage={includeUAMemoBoolean}
-          setMessage={setMemoText}
-        />
-      </Modal>
 
       <View
         onLayout={e => {
@@ -951,11 +928,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar /* context */}
           setShieldingAmount={setShieldingAmount}
-          setComputingModalVisible={setComputingModalVisible}
           setScrollToTop={setScrollToTop}
           setScrollToBottom={setScrollToBottom}
           setBackgroundError={setBackgroundError /* context */}
-          setUfvkViewModalVisible={setUfvkViewModalVisible}
         />
       </View>
       <ScrollView
@@ -976,7 +951,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                     onlyContact={true}
                     withIcon={true}
                     closeModal={() => {}}
-                    openModal={() => {}}
                   />
                 )}
               </View>
@@ -1128,7 +1102,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     accessible={true}
                     accessibilityLabel={translate('send.scan-acc') as string}
                     onPress={() => {
-                      setQrcodeModalVisible(true);
+                      setQrcodeModalShow();
                     }}>
                     <FontAwesomeIcon style={{ marginRight: 5 }} size={35} icon={faQrcode} color={colors.border} />
                   </TouchableOpacity>
@@ -1644,7 +1618,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     {memoIcon && (
                       <TouchableOpacity
                         onPress={() => {
-                          setMemoModalVisible(true);
+                          setMemoModalShow();
                         }}>
                         <FontAwesomeIcon
                           style={{ margin: 7 }}
@@ -1743,7 +1717,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   }
                   // waiting while closing the keyboard, just in case.
                   setTimeout(async () => {
-                    setConfirmModalVisible(true);
+                    setConfirmModalShow();
                   }, 100);
                 }}
                 twoButtons={true}

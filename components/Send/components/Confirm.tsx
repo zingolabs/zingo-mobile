@@ -34,12 +34,11 @@ import { CurrencyEnum } from '../../../app/AppState';
 import { RPCAddressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
 import { RPCParseAddressStatusEnum } from '../../../app/rpc/enums/RPCParseAddressStatusEnum';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type ConfirmProps = {
   calculatedFee: number;
   donationAmount: number;
-  closeModal: () => void;
-  openModal: () => void;
   confirmSend: (s: SendPageStateClass) => void;
   sendAllAmount: boolean;
   calculateFeeWithPropose: (
@@ -52,12 +51,10 @@ type ConfirmProps = {
   sendPageState: SendPageStateClass;
 };
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
-  closeModal,
   confirmSend,
   calculatedFee,
   donationAmount,
   sendAllAmount,
-  openModal,
   calculateFeeWithPropose,
   sendPageState,
 }) => {
@@ -76,6 +73,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     language,
   } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
@@ -285,7 +283,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={closeModal}
+          closeScreen={hide}
         />
         <ScrollView
           showsVerticalScrollIndicator={true}
@@ -355,7 +353,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             return (
               <View key={`${to.id}-${to.to}`} style={{ margin: 10 }}>
                 <FadeText>{translate('send.to') as string}</FadeText>
-                <AddressItem address={to.to} withIcon={true} closeModal={closeModal} openModal={openModal} />
+                <AddressItem address={to.to} withIcon={true} closeModal={hide} />
 
                 {donationAmount > 0 && (
                   <>

@@ -24,6 +24,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type DataType = {
   svg: {
@@ -40,14 +41,14 @@ const getPercent = (percent: number) => {
 };
 
 type InsightProps = {
-  closeModal: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
 };
 
-const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacyOption }) => {
+const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, privacy, addLastSnackbar, language } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
@@ -175,7 +176,6 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
                     onlyContact={true}
                     withIcon={true}
                     closeModal={() => {}}
-                    openModal={() => {}}
                   />
                 )}
                 {!expandAddress[index] && !!item.address && (
@@ -253,7 +253,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ closeModal, setPrivacy
           noDrawMenu={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
-          closeScreen={closeModal}
+          closeScreen={hide}
         />
 
         <View style={{ width: '100%', flexDirection: 'row', marginTop: 10 }}>

@@ -26,7 +26,6 @@ import 'moment/locale/ru';
 type AddressItemProps = {
   address: string;
   closeModal: () => void;
-  openModal: () => void;
   oneLine?: boolean;
   onlyContact?: boolean;
   withIcon?: boolean;
@@ -41,7 +40,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   withIcon,
   withSendIcon,
   closeModal,
-  openModal,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -157,7 +155,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         )}
       </View>
       {withIcon && !contact && oneLine && (
-        <TouchableOpacity onPress={() => launchAddressBook(address, closeModal, openModal)}>
+        <TouchableOpacity onPress={() => launchAddressBook(address)}>
           <View
             style={{
               flexDirection: 'row',
@@ -171,7 +169,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         </TouchableOpacity>
       )}
       {withIcon && !contact && !oneLine && (
-        <TouchableOpacity onPress={() => launchAddressBook(address, closeModal, openModal)}>
+        <TouchableOpacity onPress={() => launchAddressBook(address)}>
           <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faUserPlus} color={colors.primary} />
         </TouchableOpacity>
       )}

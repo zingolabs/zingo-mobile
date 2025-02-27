@@ -17,15 +17,16 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { ChainNameEnum, CurrencyEnum } from '../../app/AppState';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type InfoProps = {
-  closeModal: () => void;
 };
 
-const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
+const Info: React.FunctionComponent<InfoProps> = () => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, currency, zecPrice, privacy, language, setZecPrice } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   return (
@@ -44,7 +45,7 @@ const Info: React.FunctionComponent<InfoProps> = ({ closeModal }) => {
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={closeModal}
+          closeScreen={hide}
         />
         <ScrollView
           style={{ maxHeight: '90%' }}

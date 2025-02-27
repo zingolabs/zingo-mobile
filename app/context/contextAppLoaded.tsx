@@ -67,7 +67,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   addressBook: [] as AddressBookFileClass[],
   launchAddressBook: () => {},
   addressBookCurrentAddress: '',
-  addressBookOpenPriorModal: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
   rescanMenu: false,
@@ -77,6 +76,9 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   doRefresh: () => {},
   setZecPrice: () => {},
   zenniesDonationAddress: '',
+  setComputingModalShow: () => {},
+  closeAllModals: () => {},
+  setUfvkViewModalShow: () => {},
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

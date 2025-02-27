@@ -12,15 +12,16 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
 import { Code } from 'react-native-vision-camera';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type ScannerKeyProps = {
   setUfvkText: (k: string) => void;
-  closeModal: () => void;
 };
-const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setUfvkText, closeModal }) => {
+const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setUfvkText }) => {
   const context = useContext(ContextAppLoading);
   const { translate, language } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   const onRead = async (codes: Code[]) => {
@@ -31,11 +32,11 @@ const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setUfvkText, clo
     }
 
     setUfvkText(scandata);
-    closeModal();
+    hide();
   };
 
   const doCancel = () => {
-    closeModal();
+    hide();
   };
 
   return (

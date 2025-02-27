@@ -62,10 +62,10 @@ describe('Component Insight - test', () => {
     state.translate = mockTranslate;
     state.info = mockInfo;
     state.totalBalance = mockTotalBalance;
-    const onClose = jest.fn();
+    const onSet = jest.fn();
     const insight = render(
       <ContextAppLoadedProvider value={state}>
-        <Insight closeModal={onClose} setPrivacyOption={onClose} />
+        <Insight setPrivacyOption={onSet} />
       </ContextAppLoadedProvider>,
     );
     expect(insight.toJSON()).toMatchSnapshot();

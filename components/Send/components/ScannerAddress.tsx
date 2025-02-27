@@ -15,22 +15,23 @@ import { ThemeType } from '../../../app/types';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { Code } from 'react-native-vision-camera';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type ScannerAddressProps = {
   setAddress: (address: string) => void;
-  closeModal: () => void;
 };
 
-const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddress, closeModal }) => {
+const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddress }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, language } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   const validateAddress = async (scannedAddress: string) => {
     if (scannedAddress.toLowerCase().startsWith(GlobalConst.zcash)) {
       setAddress(scannedAddress);
-      closeModal();
+      hide();
       return;
     }
 
@@ -41,7 +42,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
 
     if (validAddress.isValid) {
       setAddress(scannedAddress);
-      closeModal();
+      hide();
     }
   };
 
@@ -56,7 +57,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
   };
 
   const doCancel = () => {
-    closeModal();
+    hide();
   };
 
   return (

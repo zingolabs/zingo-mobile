@@ -93,9 +93,8 @@ export default interface AppContextLoaded {
   addressBook: AddressBookFileClass[];
 
   // helpers to open the address book modal from different places in the App
-  launchAddressBook: (add: string, close: () => void, open: () => void) => void;
+  launchAddressBook: (add: string) => void;
   addressBookCurrentAddress: string;
-  addressBookOpenPriorModal: () => void;
 
   // is calculated in the header & needed in the send screen
   shieldingAmount: number;
@@ -124,6 +123,11 @@ export default interface AppContextLoaded {
   selectServer: SelectServerEnum;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
+
+  // modals
+  setComputingModalShow: () => void;
+  closeAllModals: () => void;
+  setUfvkViewModalShow: () => void;
 
   // eslint-disable-next-line semi
 }

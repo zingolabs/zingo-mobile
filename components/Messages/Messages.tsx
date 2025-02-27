@@ -16,8 +16,6 @@ type MessagesProps = {
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
-  // read-only wallet
-  setUfvkViewModalVisible?: (v: boolean) => void;
   // for messages
   sendTransaction: (s: SendPageStateClass) => Promise<String>;
   setServerOption: (
@@ -32,7 +30,6 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
   toggleMenuDrawer,
   syncingStatusMoreInfoOnClick,
   setPrivacyOption,
-  setUfvkViewModalVisible,
   setScrollToTop,
   scrollToTop,
   setScrollToBottom,
@@ -45,7 +42,6 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
       toggleMenuDrawer={toggleMenuDrawer}
       syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
       setPrivacyOption={setPrivacyOption}
-      setUfvkViewModalVisible={setUfvkViewModalVisible}
       setScrollToTop={setScrollToTop}
       scrollToTop={scrollToTop}
       setScrollToBottom={setScrollToBottom}

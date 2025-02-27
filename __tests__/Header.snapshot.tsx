@@ -89,10 +89,8 @@ describe('Component Header - test', () => {
           poolsMoreInfoOnClick={onFunction}
           syncingStatusMoreInfoOnClick={onFunction}
           toggleMenuDrawer={onFunction}
-          setComputingModalVisible={onFunction}
           setBackgroundError={onFunction}
           setPrivacyOption={onFunction}
-          setUfvkViewModalVisible={onFunction}
           addLastSnackbar={onFunction}
           setShieldingAmount={onFunction}
         />
