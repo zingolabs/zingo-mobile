@@ -137,54 +137,61 @@ export default function LoadingApp(props: LoadingAppProps) {
 
   const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
 
+  // TODO: It may be useful to split this loading process into separate functions?
+  // There are also too many state changes, maybe it's better to set state at the end only.
+  // We could use a StackNavigator to move between screens.
+  // Also, `LoadingApp` could be called something like `SettingsLoader`.
   useEffect(() => {
     (async () => {
-      // fallback if no available language fits
+      // Fallback if no available language fits
       const fallback = { languageTag: LanguageEnum.en, isRTL: false };
 
       const { languageTag, isRTL } = RNLocalize.findBestLanguageTag(Object.keys(file)) || fallback;
 
-      // update layout direction
+      // Update layout direction
       I18nManager.forceRTL(isRTL);
 
-      //I have to check what language and other things are in the settings
+      // Check what language and other settings are present
       const settings = await SettingsFileImpl.readSettings();
-      //console.log(settings);
 
-      // checking the version of the App in settings
-      //console.log('versions, old:', settings.version, ' new:', translate('version') as string);
+      // Checking the app version
+      // If null, this is a fresh installq
       if (settings.version === null) {
-        // this is a fresh install
         setFirstLaunchingMessage(false);
       } else if (settings.version === '' || settings.version !== (translate('version') as string)) {
-        // this is an update
+        // Else, this is after un update
         setFirstLaunchingMessage(true);
       }
 
-      // new donation feature.
+      // If first time opening after donation update, show alert
       if (settings.firstInstall || settings.firstUpdateWithDonation) {
         setDonationAlert(true);
       }
 
-      // first I need to know if this launch is a fresh install...
-      // if firstInstall is true -> 100% is the first time.
-      //console.log('first install', settings.firstInstall);
+      // If firstInstall is true -> 100% is the first time.
       if (settings.firstInstall) {
-        // basic mode
+        // Load basic mode
         setMode(ModeEnum.basic);
+
+        // Set the theme
         props.toggleTheme(ModeEnum.basic);
+
+        // Save to file
         await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, ModeEnum.basic);
       } else {
+        // If firstInstall is false -> load the saved mode, or default to advanced if not saved
         if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
           setMode(settings.mode);
           props.toggleTheme(settings.mode);
         } else {
           // if it is not a fresh install -> advanced
+          // Save to file, if it wasn't saved
           await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
           props.toggleTheme(mode);
         }
       }
 
+      // If language in (en, es, pt, ru), load it into state
       if (
         settings.language === LanguageEnum.en ||
         settings.language === LanguageEnum.es ||
@@ -193,8 +200,8 @@ export default function LoadingApp(props: LoadingAppProps) {
       ) {
         setLanguage(settings.language);
         i18n.locale = settings.language;
-        //console.log('apploading settings', settings.language, settings.currency);
       } else {
+        // Else, load languageTag or fallback, and save to file
         const lang =
           languageTag === LanguageEnum.en ||
           languageTag === LanguageEnum.es ||
@@ -202,10 +209,10 @@ export default function LoadingApp(props: LoadingAppProps) {
           languageTag === LanguageEnum.ru
             ? (languageTag as LanguageEnum)
             : (fallback.languageTag as LanguageEnum);
+
         setLanguage(lang);
         i18n.locale = lang;
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
-        //console.log('apploading NO settings', languageTag);
       }
       if (settings.currency === CurrencyEnum.noCurrency || settings.currency === CurrencyEnum.USDCurrency) {
         setCurrency(settings.currency);
@@ -258,10 +265,9 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.recoveryWalletInfoOnDevice, recoveryWalletInfoOnDevice);
       }
 
-      // for testing
-      //await delay(5000);
+      // await delay(5000);
 
-      // reading background task info
+      // Reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
       if (backgroundJson) {
         setBackground(backgroundJson);
