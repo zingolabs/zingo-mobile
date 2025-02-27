@@ -387,7 +387,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             duration: 200,
             useNativeDriver: true,
           }),
-        ])
+        ]),
       );
     }
 
@@ -542,7 +542,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                             flexDirection: 'row',
                             justifyContent: 'center',
                             alignItems: 'center',
-                            paddingHorizontal: 3,
+                            padding: 3,
                           }}>
                           <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
                           {viewSyncStatus && (
@@ -630,7 +630,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                               flexDirection: 'row',
                               justifyContent: 'center',
                               alignItems: 'center',
-                              paddingHorizontal: 3,
+                              padding: 3,
                             }}>
                             <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={18} />
                             <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
