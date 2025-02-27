@@ -24,6 +24,7 @@ import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import ValueTransferType from './types/ValueTransferType';
 import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
+import { HideReturn } from 'react-native-magic-modal';
 
 export default interface AppContextLoaded {
   navigation: StackScreenProps<any>['navigation'];
@@ -93,7 +94,7 @@ export default interface AppContextLoaded {
   addressBook: AddressBookFileClass[];
 
   // helpers to open the address book modal from different places in the App
-  launchAddressBook: (add: string) => void;
+  launchAddressBook: (add: string) => Promise<HideReturn<unknown>>;
   addressBookCurrentAddress: string;
 
   // is calculated in the header & needed in the send screen
@@ -125,9 +126,11 @@ export default interface AppContextLoaded {
   recoveryWalletInfoOnDevice: boolean;
 
   // modals
-  setComputingModalShow: () => void;
+  setComputingModalShow: () => Promise<HideReturn<unknown>>;
   closeAllModals: () => void;
-  setUfvkViewModalShow: () => void;
+  setUfvkViewModalShow: () => Promise<HideReturn<unknown>>;
+  setSyncReportModalShow: () => Promise<HideReturn<unknown>>;
+  setPoolsModalShow: () => Promise<HideReturn<unknown>>;
 
   // eslint-disable-next-line semi
 }

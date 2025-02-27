@@ -62,10 +62,8 @@ type HeaderProps = {
   closeScreen?: () => void;
   // balance
   noBalance?: boolean;
-  poolsMoreInfoOnClick?: () => void;
   // syncing icons
   noSyncingStatus?: boolean;
-  syncingStatusMoreInfoOnClick?: () => void;
   // privacy
   noPrivacy?: boolean;
   setPrivacyOption?: (value: boolean) => Promise<void>;
@@ -86,8 +84,6 @@ type HeaderProps = {
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
-  poolsMoreInfoOnClick,
-  syncingStatusMoreInfoOnClick,
   toggleMenuDrawer,
   title,
   noBalance,
@@ -129,6 +125,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     setComputingModalShow,
     closeAllModals,
     setUfvkViewModalShow,
+    setSyncReportModalShow,
+    setPoolsModalShow,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum, privacy: boolean;
@@ -297,6 +295,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // now zingolib only can shield `transparent`.
     let pools: PoolToShieldEnum = PoolToShieldEnum.transparentPoolToShield;
 
+    // not use await here.
     setComputingModalShow();
     // We need to activate this flag because if the App is syncing
     // while shielding, then it going to finish the current batch
@@ -444,7 +443,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         addLastSnackbar({ message: translate('biometrics-error') as string });
       }
     } else {
-      setUfvkViewModalShow();
+      await setUfvkViewModalShow();
     }
   };
 
@@ -588,7 +587,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           ) : (
                             <TouchableOpacity
                               testID="header.playicon"
-                              onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                              onPress={() => setSyncReportModalShow()}>
                               <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                 <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
                                 {viewSyncStatus && (
@@ -623,7 +622,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           minHeight: 25,
                         }}>
                         <TouchableOpacity
-                          onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                          onPress={() => setSyncReportModalShow()}>
                           <View
                             testID="header.wifiicon"
                             style={{
@@ -662,7 +661,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         size={20}
                       />
                     ) : (
-                      <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                      <TouchableOpacity onPress={() => setSyncReportModalShow()}>
                         <FontAwesomeIcon
                           icon={faCloudDownload}
                           color={!netInfo.isConnected ? 'red' : 'yellow'}
@@ -734,7 +733,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 (totalBalance.orchardBal !== totalBalance.spendableOrchard ||
                   totalBalance.privateBal > 0 ||
                   totalBalance.transparentBal > 0) && (
-                  <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
+                  <TouchableOpacity onPress={() => setPoolsModalShow()}>
                     <View
                       style={{
                         display: 'flex',

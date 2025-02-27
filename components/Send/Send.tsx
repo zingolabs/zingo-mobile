@@ -65,10 +65,6 @@ import { magicModal } from 'react-native-magic-modal';
 type SendProps = {
   // side menu
   toggleMenuDrawer: () => void;
-  // balance
-  poolsMoreInfoOnClick: () => void;
-  // syncing
-  syncingStatusMoreInfoOnClick: () => void;
   // privacy
   setPrivacyOption: (value: boolean) => Promise<void>;
   // addLastSnackbar from context
@@ -91,8 +87,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   sendTransaction,
   clearToAddr,
   toggleMenuDrawer,
-  syncingStatusMoreInfoOnClick,
-  poolsMoreInfoOnClick,
   setPrivacyOption,
   setShieldingAmount,
   setScrollToTop,
@@ -126,6 +120,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     zenniesDonationAddress,
     setComputingModalShow,
     closeAllModals,
+    setPoolsModalShow,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -705,7 +700,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
     // first interrupt syncing Just in case...
     await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
-    // First, close the confirm modal and show the "computing" modal
+
+    // not use await here.
     setComputingModalShow();
 
     // call the sendTransaction method in a timeout, allowing the modals to show properly
@@ -852,16 +848,16 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   };
 
-  const setQrcodeModalShow = async () => {
-    await magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
+  const setQrcodeModalShow = () => {
+    return magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
           updateToField(a, null, null, null, null);
         }}
       />, { swipeDirection: undefined }
     ).promise;
   };
 
-  const setMemoModalShow = async () => {
-    await magicModal.show(() => <Memo
+  const setMemoModalShow = () => {
+    return magicModal.show(() => <Memo
         message={memoText}
         includeUAMessage={includeUAMemoBoolean}
         setMessage={setMemoText}
@@ -869,8 +865,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     ).promise;
   };
 
-  const setConfirmModalShow = async () => {
-    await magicModal.show(() => <Confirm
+  const setConfirmModalShow = () => {
+    return magicModal.show(() => <Confirm
         calculatedFee={fee}
         donationAmount={
           donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
@@ -923,8 +919,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         <Header
           title={translate('send.title') as string}
           toggleMenuDrawer={toggleMenuDrawer}
-          poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar /* context */}
           setShieldingAmount={setShieldingAmount}
@@ -1356,7 +1350,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     </View>
                   )}
                   {stillConfirming && (
-                    <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                    <TouchableOpacity onPress={() => setPoolsModalShow()}>
                       <View
                         style={{
                           display: 'flex',
@@ -1377,7 +1371,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     </TouchableOpacity>
                   )}
                   {showShieldInfo && mode === ModeEnum.advanced && (
-                    <TouchableOpacity onPress={() => poolsMoreInfoOnClick()}>
+                    <TouchableOpacity onPress={() => setPoolsModalShow()}>
                       <View
                         style={{
                           display: 'flex',

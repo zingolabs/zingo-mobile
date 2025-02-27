@@ -491,9 +491,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       doRefresh: this.doRefresh,
       setZecPrice: this.setZecPrice,
       zenniesDonationAddress: props.zenniesDonationAddress,
-      setComputingModalShow: () => {},
-      closeAllModals: () => {},
-      setUfvkViewModalShow: () => {},
+      setComputingModalShow: this.setComputingModalShow,
+      closeAllModals: this.closeAllModals,
+      setUfvkViewModalShow: this.setUfvkViewModalShow,
+      setSyncReportModalShow: this.setSyncReportModalShow,
+      setPoolsModalShow: this.setPoolsModalShow,
 
       // context settings
       server: props.server,
@@ -789,24 +791,24 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setSeedViewModalShow = async () => {
-    magicModal.show(() => <Seed
+    return magicModal.show(() => <Seed
         onClickOK={() => {}}
         onClickCancel={() => {}}
         action={SeedActionEnum.view}
         setPrivacyOption={this.setPrivacyOption}
         keepAwake={this.keepAwake}
       />, { swipeDirection: undefined }
-    );
+    ).promise;
   };
 
   setUfvkViewModalShow = async () => {
-    magicModal.show(() => <ShowUfvk
+    return magicModal.show(() => <ShowUfvk
         onClickOK={() => {}}
         onClickCancel={() => {}}
         action={UfvkActionEnum.view}
         setPrivacyOption={this.setPrivacyOption}
       />, { swipeDirection: undefined }
-    );
+    ).promise;
   };
 
   setShieldingAmount = (value: number) => {
@@ -848,7 +850,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         // only if the wallet have some ValueTransfers
         if (background === GlobalConst.no && valueTransfersTotal > 0) {
           // I need to check this out in the seed screen.
-          this.setSeedViewModalShow();
+          await this.setSeedViewModalShow();
         }
       }
     } else {
@@ -1044,7 +1046,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setComputingModalShow = () => {
-    magicModal.show(() => <ComputingTxContent />, { swipeDirection: undefined });
+    return magicModal.show(() => <ComputingTxContent />, { swipeDirection: undefined }).promise;
   };
 
   setInfo = (info: InfoType) => {
@@ -1165,9 +1167,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined }).promise;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
-        this.setUfvkViewModalShow();
+        await this.setUfvkViewModalShow();
       } else {
-        this.setSeedViewModalShow();
+        await this.setSeedViewModalShow();
       }
     } else if (item === MenuItemEnum.ChangeWallet) {
       if (this.state.readOnly) {
@@ -1285,7 +1287,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setShowSwipeableIcons(true);
     } else if (item === MenuItemEnum.Chats) {
       return magicModal.show(() => <MessagesModal
-        syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
         setPrivacyOption={this.setPrivacyOption /* header */}
         setScrollToTop={this.setScrollToTop /* chats */}
         scrollToTop={this.state.scrollToTop /* chats */}
@@ -1368,9 +1369,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     // if the chainName is different between server or we cannot open the wallet...
     if (error) {
-      // I need to open the modal ASAP.
+      // I need to open the modal ASAP, and keep going with the toast.
       if (this.state.readOnly) {
-        await magicModal.show(() => <ShowUfvk
+        magicModal.show(() => <ShowUfvk
             onClickOK={async () => await this.onClickOKServerWallet()}
             onClickCancel={async () => {
               // restart all the tasks again, nothing happen.
@@ -1381,9 +1382,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             action={UfvkActionEnum.server}
             setPrivacyOption={this.setPrivacyOption}
           />, { swipeDirection: undefined }
-        ).promise;
+        );
       } else {
-        await magicModal.show(() => <Seed
+        magicModal.show(() => <Seed
             onClickOK={async () => await this.onClickOKServerWallet()}
             onClickCancel={async () => {
               // restart all the tasks again, nothing happen.
@@ -1394,7 +1395,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             action={SeedActionEnum.server}
             setPrivacyOption={this.setPrivacyOption}
           />, { swipeDirection: undefined }
-        ).promise;
+        );
       }
       //console.log(`Error Reading Wallet ${value} - ${error}`);
       if (toast) {
@@ -1673,11 +1674,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  syncingStatusMoreInfoOnClick = async () => {
+  setSyncReportModalShow = async () => {
     return magicModal.show(() => <SyncReport />, { swipeDirection: undefined }).promise;
   };
 
-  poolsMoreInfoOnClick = async () => {
+  setPoolsModalShow = async () => {
     return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined }).promise;
   };
 
@@ -1791,6 +1792,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       setComputingModalShow: this.setComputingModalShow,
       closeAllModals: this.closeAllModals,
       setUfvkViewModalShow: this.setUfvkViewModalShow,
+      setSyncReportModalShow: this.setSyncReportModalShow,
+      setPoolsModalShow: this.setPoolsModalShow,
 
       // context settings
       server: this.state.server,
@@ -1889,8 +1892,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   {() => (
                     <History
                       toggleMenuDrawer={this.toggleMenuDrawer /* header */}
-                      poolsMoreInfoOnClick={this.poolsMoreInfoOnClick /* header */}
-                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
                       setPrivacyOption={this.setPrivacyOption /* header */}
                       setShieldingAmount={this.setShieldingAmount /* header */}
                       setScrollToTop={this.setScrollToTop /* header & history */}
@@ -1914,8 +1915,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                       {() => (
                         <Send
                           toggleMenuDrawer={this.toggleMenuDrawer /* header */}
-                          poolsMoreInfoOnClick={this.poolsMoreInfoOnClick /* header */}
-                          syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
                           setPrivacyOption={this.setPrivacyOption /* header */}
                           setShieldingAmount={this.setShieldingAmount /* header */}
                           setScrollToTop={this.setScrollToTop /* header & send */}
@@ -1931,7 +1930,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   {() => (
                     <Receive
                       toggleMenuDrawer={this.toggleMenuDrawer /* header */}
-                      syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
                       alone={false /* receive */}
                     />
                   )}
@@ -1954,7 +1952,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                       {() => (
                         <Receive
                           toggleMenuDrawer={this.toggleMenuDrawer /* header */}
-                          syncingStatusMoreInfoOnClick={this.syncingStatusMoreInfoOnClick /* header */}
                           alone={true /* receive */}
                         />
                       )}

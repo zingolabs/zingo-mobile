@@ -86,8 +86,6 @@ describe('Component Header - test', () => {
         <Header
           title="title"
           testID="valuetransfer text"
-          poolsMoreInfoOnClick={onFunction}
-          syncingStatusMoreInfoOnClick={onFunction}
           toggleMenuDrawer={onFunction}
           setBackgroundError={onFunction}
           setPrivacyOption={onFunction}

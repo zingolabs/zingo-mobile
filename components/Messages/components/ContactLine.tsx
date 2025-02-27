@@ -33,20 +33,19 @@ import AddressItem from '../../Components/AddressItem';
 import Utils from '../../../app/utils';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import RegText from '../../Components/RegText';
+import { HideReturn } from 'react-native-magic-modal';
 
 type ContactLineProps = {
   index: number;
   month: string;
   c: ContactType;
-  setContactDetail: (c: ContactType) => void;
-  setMessagesAddressModalShow: () => void;
+  setMessagesAddressModalShow: (c: ContactType) => Promise<HideReturn<unknown>>;
   addressProtected?: boolean;
 };
 const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   index,
   c,
   month,
-  setContactDetail,
   setMessagesAddressModalShow,
   addressProtected,
 }) => {
@@ -119,8 +118,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
       if (-value >= dimensions.width * (1 / 2) && messagesAddress) {
         if (!maxWidthHit.current) {
           //console.log(value);
-          setContactDetail(c);
-          setMessagesAddressModalShow();
+          setMessagesAddressModalShow(c);
           swipeable.reset();
         }
         maxWidthHit.current = true;
@@ -150,8 +148,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                 <TouchableOpacity
                   style={{ zIndex: 999, padding: 20, alignSelf: 'flex-start' }}
                   onPress={() => {
-                    setContactDetail(c);
-                    setMessagesAddressModalShow();
+                    setMessagesAddressModalShow(c);
                     swipeable.reset();
                   }}>
                   <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faComments} color={colors.money} />
@@ -250,8 +247,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
       <TouchableOpacity
         style={{ zIndex: 999 }}
         onPress={() => {
-          setContactDetail(c);
-          setMessagesAddressModalShow();
+          setMessagesAddressModalShow(c);
           swipeableRef?.current?.reset();
         }}>
         <Swipeable

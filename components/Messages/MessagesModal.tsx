@@ -8,8 +8,6 @@ import { useMagicModal } from 'react-native-magic-modal';
 type MessagesModalProps = {
   // side menu
   // balance
-  // syncing
-  syncingStatusMoreInfoOnClick: () => void;
   // privacy
   setPrivacyOption: (value: boolean) => Promise<void>;
   // addLastSnackbar from context
@@ -29,7 +27,6 @@ type MessagesModalProps = {
 };
 
 const MessagesModal: React.FunctionComponent<MessagesModalProps> = ({
-  syncingStatusMoreInfoOnClick,
   setPrivacyOption,
   setScrollToTop,
   scrollToTop,
@@ -45,7 +42,6 @@ const MessagesModal: React.FunctionComponent<MessagesModalProps> = ({
 
   return (
     <ContactList
-      syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
       setPrivacyOption={setPrivacyOption}
       setScrollToTop={setScrollToTop}
       scrollToTop={scrollToTop}

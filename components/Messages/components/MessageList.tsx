@@ -477,8 +477,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     totalBalance?.spendablePrivate,
   ]);
 
-  const setMemoModalShow = async () => {
-    await magicModal.show(() => <Memo
+  const setMemoModalShow = () => {
+    return magicModal.show(() => <Memo
         message={memo}
         includeUAMessage={true}
         setMessage={setMemo}
@@ -487,7 +487,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   };
 
   const setValueTransferDetailModalShow = async (index: number, vt: ValueTransferType) => {
-    await magicModal.show(() => <ValueTransferDetail
+    return magicModal.show(() => <ValueTransferDetail
         index={index}
         vt={vt}
         valueTransfersSliced={messagesSliced}

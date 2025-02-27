@@ -44,7 +44,6 @@ import { magicModal } from 'react-native-magic-modal';
 
 type ContactListProps = {
   toggleMenuDrawer?: () => void;
-  syncingStatusMoreInfoOnClick: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setScrollToTop: (value: boolean) => void;
   scrollToTop: boolean;
@@ -63,7 +62,6 @@ type ContactListProps = {
 
 const ContactList: React.FunctionComponent<ContactListProps> = ({
   toggleMenuDrawer,
-  syncingStatusMoreInfoOnClick,
   setPrivacyOption,
   setScrollToTop,
   scrollToTop,
@@ -80,7 +78,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
-  const [contactDetail, setContactDetail] = useState<ContactType>({} as ContactType);
   const [contacts, setContacts] = useState<ContactType[]>([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
@@ -270,20 +267,20 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
     setIsAtTop(isTop);
   };
 
-  const setMessagesAddressModalShow = async () => {
-    await magicModal.show(() => <MessagesAddress
+  const setMessagesAddressModalShow = (c: ContactType) => {
+    return magicModal.show(() => <MessagesAddress
         setPrivacyOption={setPrivacyOption}
         setScrollToBottom={setScrollToBottom}
         scrollToBottom={scrollToBottom}
-        address={Utils.messagesAddress(contactDetail)}
+        address={Utils.messagesAddress(c)}
         sendTransaction={sendTransaction}
         setServerOption={setServerOption}
       />, { swipeDirection: undefined }
     ).promise;
   };
 
-  const setMessagesAllModalShow = async () => {
-    await magicModal.show(() => <MessagesAll
+  const setMessagesAllModalShow = () => {
+    return magicModal.show(() => <MessagesAll
         setPrivacyOption={setPrivacyOption}
         setScrollToBottom={setScrollToBottom}
         scrollToBottom={scrollToBottom}
@@ -309,7 +306,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         <Header
           title={translate('messages.title-chats') as string}
           toggleMenuDrawer={toggleMenuDrawer}
-          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
           noPrivacy={true}
           noBalance={true}
           closeScreen={closeModal}
@@ -564,7 +560,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                       index={index}
                       c={c}
                       month={month}
-                      setContactDetail={(ttt: ContactType) => setContactDetail(ttt)}
                       setMessagesAddressModalShow={setMessagesAddressModalShow}
                       addressProtected={c.address === zenniesDonationAddress}
                     />

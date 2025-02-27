@@ -35,15 +35,16 @@ import 'moment/locale/ru';
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
+import { HideReturn } from 'react-native-magic-modal';
 //import Utils from '../../../app/utils';
 
 type ValueTransferLineProps = {
   index: number;
   month: string;
   vt: ValueTransferType;
-  setValueTransferDetailModalShow: (i: number, v: ValueTransferType) => void;
+  setValueTransferDetailModalShow: (i: number, v: ValueTransferType) => Promise<HideReturn<unknown>>;
   nextLineWithSameTxid: boolean;
-  setMessagesAddressModalShow: (vt: ValueTransferType) => Promise<void>;
+  setMessagesAddressModalShow: (vt: ValueTransferType) => Promise<HideReturn<unknown>>;
   addressProtected?: boolean;
 };
 const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({

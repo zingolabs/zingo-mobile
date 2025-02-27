@@ -21,7 +21,6 @@ import { ShieldedEnum } from '../../app/AppState/enums/ShieldedEnum';
 
 type ReceiveProps = {
   toggleMenuDrawer: () => void;
-  syncingStatusMoreInfoOnClick: () => void;
   alone: boolean;
 };
 
@@ -29,8 +28,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   // side menu
   toggleMenuDrawer,
   // balance
-  // syncing
-  syncingStatusMoreInfoOnClick,
   // privacy
   // shielding
   // for receive
@@ -331,7 +328,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               : (translate('receive.title-advanced') as string)
           }
           toggleMenuDrawer={toggleMenuDrawer}
-          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
           noBalance={true}
           noPrivacy={true}
         />

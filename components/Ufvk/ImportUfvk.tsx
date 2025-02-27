@@ -107,8 +107,8 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
   };
 
-  const setQrcodeModalShow = async () => {
-    await magicModal.show(() => <ScannerUfvk
+  const setQrcodeModalShow = () => {
+    return magicModal.show(() => <ScannerUfvk
         setUfvkText={setSeedufvkText}
       />, { swipeDirection: undefined }
     ).promise;

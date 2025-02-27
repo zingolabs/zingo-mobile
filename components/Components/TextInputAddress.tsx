@@ -60,8 +60,8 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
     }
   }, [address, server.chainName, setError, setUOrchardAddress, translate]);
 
-  const setQrcodeModalShow = async () => {
-    await magicModal.show(() => <ScannerAddress setAddress={setAddress} />, { swipeDirection: undefined }).promise;
+  const setQrcodeModalShow = () => {
+    return magicModal.show(() => <ScannerAddress setAddress={setAddress} />, { swipeDirection: undefined }).promise;
   };
 
   //console.log('render input text address');
@@ -126,7 +126,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 disabled={disabled}
                 accessible={true}
                 accessibilityLabel={translate('send.scan-acc') as string}
-                onPress={async () => {
+                onPress={() => {
                   setQrcodeModalShow();
                 }}>
                 <FontAwesomeIcon style={{ marginRight: 5 }} size={35} icon={faQrcode} color={colors.border} />

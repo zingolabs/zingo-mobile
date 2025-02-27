@@ -6,8 +6,6 @@ type MessagesProps = {
   // side menu
   toggleMenuDrawer: () => void;
   // balance
-  // syncing
-  syncingStatusMoreInfoOnClick: () => void;
   // privacy
   setPrivacyOption: (value: boolean) => Promise<void>;
   // addLastSnackbar from context
@@ -28,7 +26,6 @@ type MessagesProps = {
 
 const Messages: React.FunctionComponent<MessagesProps> = ({
   toggleMenuDrawer,
-  syncingStatusMoreInfoOnClick,
   setPrivacyOption,
   setScrollToTop,
   scrollToTop,
@@ -40,7 +37,6 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
   return (
     <ContactList
       toggleMenuDrawer={toggleMenuDrawer}
-      syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
       setPrivacyOption={setPrivacyOption}
       setScrollToTop={setScrollToTop}
       scrollToTop={scrollToTop}

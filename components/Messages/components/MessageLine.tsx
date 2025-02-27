@@ -29,12 +29,13 @@ import AddressItem from '../../Components/AddressItem';
 import RegText from '../../Components/RegText';
 import Utils from '../../../app/utils';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
+import { HideReturn } from 'react-native-magic-modal';
 
 type MessageLineProps = {
   index: number;
   month: string;
   vt: ValueTransferType;
-  setValueTransferDetailModalShow: (i: number, v: ValueTransferType) => void;
+  setValueTransferDetailModalShow: (i: number, v: ValueTransferType) => Promise<HideReturn<unknown>>;
   messageAddress?: string;
 };
 const MessageLine: React.FunctionComponent<MessageLineProps> = ({

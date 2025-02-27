@@ -134,8 +134,6 @@ describe('Component History - test', () => {
       <ContextAppLoadedProvider value={state}>
         <History
           toggleMenuDrawer={onFunction}
-          poolsMoreInfoOnClick={onFunction}
-          syncingStatusMoreInfoOnClick={onFunction}
           setPrivacyOption={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
@@ -161,8 +159,6 @@ describe('Component History - test', () => {
       <ContextAppLoadedProvider value={state}>
         <History
           toggleMenuDrawer={onFunction}
-          poolsMoreInfoOnClick={onFunction}
-          syncingStatusMoreInfoOnClick={onFunction}
           setPrivacyOption={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}

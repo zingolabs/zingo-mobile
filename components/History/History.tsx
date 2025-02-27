@@ -41,10 +41,6 @@ import { magicModal } from 'react-native-magic-modal';
 type HistoryProps = {
   // side menu
   toggleMenuDrawer: () => void;
-  // balance
-  poolsMoreInfoOnClick: () => void;
-  // syncing
-  syncingStatusMoreInfoOnClick: () => void;
   // privacy
   setPrivacyOption: (value: boolean) => Promise<void>;
   // addLastSnackbar from context
@@ -66,8 +62,6 @@ type HistoryProps = {
 
 const History: React.FunctionComponent<HistoryProps> = ({
   toggleMenuDrawer,
-  poolsMoreInfoOnClick,
-  syncingStatusMoreInfoOnClick,
   setPrivacyOption,
   setShieldingAmount,
   setScrollToTop,
@@ -147,8 +141,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
     setIsAtTop(isTop);
   };
 
-  const setValueTransferDetailModalShow = async (index: number, vt: ValueTransferType) => {
-    await magicModal.show(() => <ValueTransferDetail
+  const setValueTransferDetailModalShow = (index: number, vt: ValueTransferType) => {
+    return magicModal.show(() => <ValueTransferDetail
         index={index}
         vt={vt}
         valueTransfersSliced={valueTransfersSliced}
@@ -158,8 +152,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
     ).promise;
   };
 
-  const setMessagesAddressModalShow = async (vt: ValueTransferType) => {
-    await magicModal.show(() => <MessagesAddress
+  const setMessagesAddressModalShow = (vt: ValueTransferType) => {
+    return magicModal.show(() => <MessagesAddress
         setPrivacyOption={setPrivacyOption}
         setScrollToBottom={setScrollToBottom}
         scrollToBottom={scrollToBottom}
@@ -186,8 +180,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
         testID="valuetransfer text"
         title={translate('history.title') as string}
         toggleMenuDrawer={toggleMenuDrawer}
-        poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-        syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
         setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar /* context */}
         setShieldingAmount={setShieldingAmount}
