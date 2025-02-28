@@ -88,6 +88,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   }
 
   const { colors } = useTheme()  as ThemeType;
+  // when this screen is open from LoadingApp (new wallet)
+  // is using the standard modal from react-native
   const { hide } = useMagicModal();
   moment.locale(language);
 
@@ -177,12 +179,20 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
   const onClickCancelHide = () => {
     onClickCancel();
-    hide();
+    // when this screen is open from LoadingApp (new wallet)
+    // is using the standard modal from react-native
+    if (action !== SeedActionEnum.new) {
+      hide();
+    }
   };
 
   const onClickOKHide = (seedPhraseParm: string, birthdayNumberParm: number) => {
     onClickOK(seedPhraseParm, birthdayNumberParm);
-    hide();
+    // when this screen is open from LoadingApp (new wallet)
+    // is using the standard modal from react-native
+    if (action !== SeedActionEnum.new) {
+      hide();
+    }
   };
 
   //console.log('=================================');

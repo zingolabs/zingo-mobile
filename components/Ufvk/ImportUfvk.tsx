@@ -7,6 +7,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Modal,
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
@@ -26,7 +27,6 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { ButtonTypeEnum, GlobalConst, SelectServerEnum } from '../../app/AppState';
-import { magicModal, useMagicModal } from 'react-native-magic-modal';
 
 type ImportUfvkProps = {
   onClickCancel: () => void;
@@ -36,11 +36,11 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, info, server, mode, addLastSnackbar, language, selectServer } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
   moment.locale(language);
 
   const [seedufvkText, setSeedufvkText] = useState<string>('');
   const [birthday, setBirthday] = useState<string>('');
+  const [qrcodeModalVisible, setQrcodeModalVisible] = useState<boolean>(false);
   const [latestBlock, setLatestBlock] = useState<number>(0);
 
   useEffect(() => {
@@ -105,24 +105,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
-    onClickOKAndHide(seedufvkText.trimEnd().trimStart(), Number(birthday));
-  };
-
-  const setQrcodeModalShow = () => {
-    return magicModal.show(() => <ScannerUfvk
-        setUfvkText={setSeedufvkText}
-      />, { swipeDirection: undefined }
-    ).promise;
-  };
-
-  const onClickCancelAndHide = () => {
-    onClickCancel();
-    hide();
-  };
-
-  const onClickOKAndHide = (keyTextParm: string, birthdayParm: number) => {
-    onClickOK(keyTextParm, birthdayParm);
-    hide();
+    onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
   };
 
   return (
@@ -139,6 +122,13 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
             height: '100%',
             backgroundColor: colors.background,
           }}>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={qrcodeModalVisible}
+            onRequestClose={() => setQrcodeModalVisible(false)}>
+            <ScannerUfvk setUfvkText={setSeedufvkText} closeModal={() => setQrcodeModalVisible(false)} />
+          </Modal>
           <Header
             title={translate('import.title') as string}
             noBalance={true}
@@ -148,7 +138,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
             translate={translate}
             netInfo={netInfo}
             mode={mode}
-            closeScreen={onClickCancelAndHide}
+            closeScreen={onClickCancel}
           />
           <ScrollView
             keyboardShouldPersistTaps="handled"
@@ -210,7 +200,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
               )}
               <TouchableOpacity
                 onPress={() => {
-                  setQrcodeModalShow();
+                  setQrcodeModalVisible(true);
                 }}>
                 <FontAwesomeIcon size={35} icon={faQrcode} color={colors.border} />
               </TouchableOpacity>

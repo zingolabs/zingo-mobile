@@ -67,6 +67,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     readOnly,
     selectServer,
     setSendPageState,
+    closeAllModals,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
@@ -216,6 +217,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                     sendPageState.toaddr.to = vt.address ? vt.address : '';
                     setSendPageState(sendPageState);
+                    closeAllModals();
                     navigation.navigate(RouteEnums.LoadedApp, {
                       screen: translate('loadedapp.send-menu'),
                       initial: false,

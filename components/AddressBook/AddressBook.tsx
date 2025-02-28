@@ -224,7 +224,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
                       item={aBItem}
                       setCurrentItem={setCurrentItem}
                       setAction={setAction}
-                      closeModal={hide}
                       handleScrollToTop={handleScrollToTop}
                       doAction={doAction}
                     />
@@ -243,7 +242,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
                       item={aBItem}
                       setCurrentItem={setCurrentItem}
                       setAction={setAction}
-                      closeModal={hide}
                       handleScrollToTop={handleScrollToTop}
                       doAction={doAction}
                     />
@@ -261,7 +259,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
                     item={aBItem}
                     setCurrentItem={setCurrentItem}
                     setAction={setAction}
-                    closeModal={hide}
                     handleScrollToTop={handleScrollToTop}
                     doAction={doAction}
                     addressProtected={true}

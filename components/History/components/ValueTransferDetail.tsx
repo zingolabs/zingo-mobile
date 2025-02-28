@@ -362,7 +362,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                   address={valueTransfer.address}
                   withIcon={true}
                   withSendIcon={true}
-                  closeModal={hide}
                   addressProtected={addressProtected}
                 />
               </View>

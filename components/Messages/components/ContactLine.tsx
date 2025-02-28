@@ -50,7 +50,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, navigation, showSwipeableIcons, readOnly, selectServer, setSendPageState } = context;
+  const { translate, language, navigation, showSwipeableIcons, readOnly, selectServer, setSendPageState, closeAllModals } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
@@ -197,6 +197,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                     sendPageState.toaddr.to = c.address ? c.address : '';
                     setSendPageState(sendPageState);
+                    closeAllModals();
                     navigation.navigate(RouteEnums.LoadedApp, {
                       screen: translate('loadedapp.send-menu'),
                       initial: false,
