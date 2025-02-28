@@ -25,8 +25,6 @@ import 'moment/locale/ru';
 
 type AddressItemProps = {
   address: string;
-  closeModal: () => void;
-  openModal: () => void;
   oneLine?: boolean;
   onlyContact?: boolean;
   withIcon?: boolean;
@@ -40,8 +38,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   onlyContact,
   withIcon,
   withSendIcon,
-  closeModal,
-  openModal,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -58,6 +54,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     language,
     selectServer,
     setSendPageState,
+    closeAllModals,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
@@ -157,7 +154,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         )}
       </View>
       {withIcon && !contact && oneLine && (
-        <TouchableOpacity onPress={() => launchAddressBook(address, closeModal, openModal)}>
+        <TouchableOpacity onPress={() => launchAddressBook(address)}>
           <View
             style={{
               flexDirection: 'row',
@@ -171,7 +168,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         </TouchableOpacity>
       )}
       {withIcon && !contact && !oneLine && (
-        <TouchableOpacity onPress={() => launchAddressBook(address, closeModal, openModal)}>
+        <TouchableOpacity onPress={() => launchAddressBook(address)}>
           <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faUserPlus} color={colors.primary} />
         </TouchableOpacity>
       )}
@@ -192,7 +189,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               const sendPageState = new SendPageStateClass(new ToAddrClass(0));
               sendPageState.toaddr.to = address;
               setSendPageState(sendPageState);
-              closeModal();
+              closeAllModals();
               navigation.navigate(RouteEnums.LoadedApp, {
                 screen: translate('loadedapp.send-menu'),
                 initial: false,

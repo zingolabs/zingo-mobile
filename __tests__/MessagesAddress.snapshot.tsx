@@ -126,8 +126,6 @@ describe('Component Messages Address - test', () => {
           setScrollToBottom={onFunction}
           scrollToBottom={false}
           address={mockAddresses[0].uOrchardAddress}
-          closeModal={onFunction}
-          openModal={onFunction}
           sendTransaction={onFunction}
           setServerOption={onFunction}
         />

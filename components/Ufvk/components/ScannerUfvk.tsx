@@ -13,11 +13,11 @@ import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
 import { Code } from 'react-native-vision-camera';
 
-type ScannerKeyProps = {
+type ScannerUfvkProps = {
   setUfvkText: (k: string) => void;
   closeModal: () => void;
 };
-const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setUfvkText, closeModal }) => {
+const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, closeModal }) => {
   const context = useContext(ContextAppLoading);
   const { translate, language } = context;
   const { colors } = useTheme()  as ThemeType;
@@ -31,10 +31,6 @@ const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setUfvkText, clo
     }
 
     setUfvkText(scandata);
-    closeModal();
-  };
-
-  const doCancel = () => {
     closeModal();
   };
 
@@ -54,7 +50,7 @@ const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setUfvkText, clo
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={doCancel}
+          closeScreen={closeModal}
         />
         <Scanner onRead={onRead} />
       </SafeAreaView>
@@ -62,4 +58,4 @@ const ScannerKey: React.FunctionComponent<ScannerKeyProps> = ({ setUfvkText, clo
   );
 };
 
-export default ScannerKey;
+export default ScannerUfvk;

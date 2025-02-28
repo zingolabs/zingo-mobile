@@ -3,7 +3,6 @@ import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } 
 import {
   View,
   ScrollView,
-  Modal,
   RefreshControl,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -58,6 +57,7 @@ import { createAlert } from '../../../app/createAlert';
 import selectingServer from '../../../app/selectingServer';
 import { serverUris } from '../../../app/uris';
 import Utils from '../../../app/utils';
+import { magicModal } from 'react-native-magic-modal';
 
 type MessageListProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -65,7 +65,6 @@ type MessageListProps = {
   scrollToBottom: boolean;
   address?: string;
   closeModal?: () => void;
-  openModal?: () => void;
   sendTransaction?: (s: SendPageStateClass) => Promise<String>;
   setServerOption?: (
     value: ServerType,
@@ -81,7 +80,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   scrollToBottom,
   address,
   closeModal,
-  openModal,
   sendTransaction,
   setServerOption,
 }) => {
@@ -105,9 +103,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
-  const [isValueTransferDetailModalShowing, setValueTransferDetailModalShowing] = useState<boolean>(false);
-  const [valueTransferDetail, setValueTransferDetail] = useState<ValueTransferType>({} as ValueTransferType);
-  const [valueTransferDetailIndex, setValueTransferDetailIndex] = useState<number>(-1);
   const [numVt, setNumVt] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   const [messagesSliced, setMessagesSliced] = useState<ValueTransferType[]>([]);
@@ -119,7 +114,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   const [contentScrollViewHeight, setContentScrollViewHeight] = useState<number>(0);
   const [scrollable, setScrollable] = useState<boolean>(false);
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
-  const [memoModalVisible, setMemoModalVisible] = useState<boolean>(false);
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [disableSend, setDisableSend] = useState<boolean>(false);
   const [anonymous, setAnonymous] = useState<boolean>(false);
@@ -310,15 +304,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     setNumVt(numVt + 50);
   }, [numVt]);
 
-  const moveValueTransferDetail = (index: number, type: number) => {
-    // -1 -> Previous ValueTransfer
-    //  1 -> Next ValueTransfer
-    if ((index > 0 && type === -1) || (index < messagesSliced.length - 1 && type === 1)) {
-      setValueTransferDetail(messagesSliced[index + type]);
-      setValueTransferDetailIndex(index + type);
-    }
-  };
-
   const handleScrollToBottom = () => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollToEnd({ animated: true });
@@ -474,12 +459,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     });
   };
 
-  const closeModalAndClean = () => {
-    if (closeModal) {
-      closeModal();
-    }
-  };
-
   useEffect(() => {
     const stillConf =
       (totalBalance ? totalBalance.orchardBal : 0) !== (totalBalance ? totalBalance.spendableOrchard : 0) ||
@@ -497,6 +476,26 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     totalBalance?.spendableOrchard,
     totalBalance?.spendablePrivate,
   ]);
+
+  const setMemoModalShow = () => {
+    return magicModal.show(() => <Memo
+        message={memo}
+        includeUAMessage={true}
+        setMessage={setMemo}
+      />, { swipeDirection: undefined }
+    ).promise;
+  };
+
+  const setValueTransferDetailModalShow = async (index: number, vt: ValueTransferType) => {
+    return magicModal.show(() => <ValueTransferDetail
+        index={index}
+        vt={vt}
+        valueTransfersSliced={messagesSliced}
+        totalLength={messagesFiltered ? messagesFiltered.length : 0}
+        setPrivacyOption={setPrivacyOption}
+      />, { swipeDirection: undefined }
+    ).promise;
+  };
 
   //if (address) {
   //  console.log('render Messages', validMemo, 'memo local:', memo);
@@ -523,39 +522,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               }%`
             : '100%',
         }}>
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={isValueTransferDetailModalShowing}
-          onRequestClose={() => setValueTransferDetailModalShowing(false)}>
-          <ValueTransferDetail
-            index={valueTransferDetailIndex}
-            length={messagesSliced.length}
-            totalLength={messagesFiltered ? messagesFiltered.length : 0}
-            vt={valueTransferDetail}
-            closeModal={() => setValueTransferDetailModalShowing(false)}
-            openModal={() => setValueTransferDetailModalShowing(true)}
-            setPrivacyOption={setPrivacyOption}
-            moveValueTransferDetail={moveValueTransferDetail}
-          />
-        </Modal>
-
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={memoModalVisible}
-          onRequestClose={() => setMemoModalVisible(false)}>
-          <Memo
-            closeModal={() => {
-              setMemoModalVisible(false);
-            }}
-            message={memo}
-            includeUAMessage={true}
-            setMessage={setMemo}
-          />
-        </Modal>
-
-        {address && closeModal && openModal ? (
+        {address ? (
           <>
             <Header
               title={translate('messages.title') as string}
@@ -564,7 +531,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               noDrawMenu={true}
               setPrivacyOption={setPrivacyOption}
               addLastSnackbar={addLastSnackbar}
-              closeScreen={closeModalAndClean}
+              closeScreen={closeModal}
             />
             <View
               style={{
@@ -612,8 +579,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                 address={address}
                 oneLine={true}
                 withIcon={true}
-                closeModal={closeModal}
-                openModal={openModal}
               />
             </View>
           </>
@@ -626,7 +591,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               noDrawMenu={true}
               setPrivacyOption={setPrivacyOption}
               addLastSnackbar={addLastSnackbar}
-              closeScreen={closeModalAndClean}
+              closeScreen={closeModal}
             />
             <View style={{ flexDirection: 'row', alignSelf: 'center', alignItems: 'center', margin: 10 }}>
               <TouchableOpacity
@@ -770,9 +735,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                 index={index}
                 vt={vt}
                 month={month}
-                setValueTransferDetail={(ttt: ValueTransferType) => setValueTransferDetail(ttt)}
-                setValueTransferDetailIndex={(iii: number) => setValueTransferDetailIndex(iii)}
-                setValueTransferDetailModalShowing={(bbb: boolean) => setValueTransferDetailModalShowing(bbb)}
+                setValueTransferDetailModalShow={setValueTransferDetailModalShow}
                 messageAddress={address}
               />
             );
@@ -895,7 +858,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                 <TouchableOpacity
                   onPress={() => {
                     Keyboard.dismiss();
-                    setMemoModalVisible(true);
+                    setMemoModalShow();
                   }}>
                   <FontAwesomeIcon style={{ margin: 7 }} size={30} icon={faMagnifyingGlassPlus} color={colors.border} />
                 </TouchableOpacity>

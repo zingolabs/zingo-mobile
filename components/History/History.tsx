@@ -3,7 +3,6 @@ import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } 
 import {
   View,
   ScrollView,
-  Modal,
   RefreshControl,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -37,26 +36,20 @@ import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import { MessagesAddress } from '../Messages';
 import Utils from '../../app/utils';
+import { magicModal } from 'react-native-magic-modal';
 
 type HistoryProps = {
   // side menu
   toggleMenuDrawer: () => void;
-  // balance
-  poolsMoreInfoOnClick: () => void;
-  // syncing
-  syncingStatusMoreInfoOnClick: () => void;
   // privacy
   setPrivacyOption: (value: boolean) => Promise<void>;
   // addLastSnackbar from context
   // shielding / sending
   setShieldingAmount: (value: number) => void;
-  setComputingModalVisible: (visible: boolean) => void;
   setScrollToTop: (value: boolean) => void;
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
-  // read-only wallet
-  setUfvkViewModalVisible?: (v: boolean) => void;
   // for messages
   sendTransaction: (s: SendPageStateClass) => Promise<String>;
   setServerOption: (
@@ -69,11 +62,7 @@ type HistoryProps = {
 
 const History: React.FunctionComponent<HistoryProps> = ({
   toggleMenuDrawer,
-  poolsMoreInfoOnClick,
-  syncingStatusMoreInfoOnClick,
-  setComputingModalVisible,
   setPrivacyOption,
-  setUfvkViewModalVisible,
   setShieldingAmount,
   setScrollToTop,
   scrollToTop,
@@ -96,10 +85,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
-  const [isValueTransferDetailModalShowing, setValueTransferDetailModalShowing] = useState<boolean>(false);
-  const [isMessagesAddressModalShowing, setMessagesAddressModalShowing] = useState<boolean>(false);
-  const [valueTransferDetail, setValueTransferDetail] = useState<ValueTransferType>({} as ValueTransferType);
-  const [valueTransferDetailIndex, setValueTransferDetailIndex] = useState<number>(-1);
   const [numVt, setNumVt] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   const [valueTransfersSliced, setValueTransfersSliced] = useState<ValueTransferType[]>([]);
@@ -144,15 +129,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     setNumVt(numVt + 50);
   }, [numVt]);
 
-  const moveValueTransferDetail = (index: number, type: number) => {
-    // -1 -> Previous ValueTransfer
-    //  1 -> Next ValueTransfer
-    if ((index > 0 && type === -1) || (index < valueTransfersSliced.length - 1 && type === 1)) {
-      setValueTransferDetail(valueTransfersSliced[index + type]);
-      setValueTransferDetailIndex(index + type);
-    }
-  };
-
   const handleScrollToTop = () => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollTo({ y: 0, animated: true });
@@ -163,6 +139,29 @@ const History: React.FunctionComponent<HistoryProps> = ({
     const { contentOffset } = event.nativeEvent;
     const isTop = contentOffset.y === 0;
     setIsAtTop(isTop);
+  };
+
+  const setValueTransferDetailModalShow = (index: number, vt: ValueTransferType) => {
+    return magicModal.show(() => <ValueTransferDetail
+        index={index}
+        vt={vt}
+        valueTransfersSliced={valueTransfersSliced}
+        totalLength={valueTransfers !== null ? valueTransfers.length : 0}
+        setPrivacyOption={setPrivacyOption}
+      />, { swipeDirection: undefined }
+    ).promise;
+  };
+
+  const setMessagesAddressModalShow = (vt: ValueTransferType) => {
+    return magicModal.show(() => <MessagesAddress
+        setPrivacyOption={setPrivacyOption}
+        setScrollToBottom={setScrollToBottom}
+        scrollToBottom={scrollToBottom}
+        address={Utils.messagesAddress(vt)}
+        sendTransaction={sendTransaction}
+        setServerOption={setServerOption}
+      />, { swipeDirection: undefined }
+    ).promise;
   };
 
   //console.log('render History - 4');
@@ -177,55 +176,16 @@ const History: React.FunctionComponent<HistoryProps> = ({
         width: '100%',
         height: '100%',
       }}>
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={isValueTransferDetailModalShowing}
-        onRequestClose={() => setValueTransferDetailModalShowing(false)}>
-        <ValueTransferDetail
-          index={valueTransferDetailIndex}
-          length={valueTransfersSliced.length}
-          totalLength={valueTransfers !== null ? valueTransfers.length : 0}
-          vt={valueTransferDetail}
-          closeModal={() => setValueTransferDetailModalShowing(false)}
-          openModal={() => setValueTransferDetailModalShowing(true)}
-          setPrivacyOption={setPrivacyOption}
-          moveValueTransferDetail={moveValueTransferDetail}
-        />
-      </Modal>
-
-      {isMessagesAddressModalShowing && (
-        <Modal
-          animationType="slide"
-          transparent={false}
-          visible={isMessagesAddressModalShowing}
-          onRequestClose={() => setMessagesAddressModalShowing(false)}>
-          <MessagesAddress
-            setPrivacyOption={setPrivacyOption}
-            setScrollToBottom={setScrollToBottom}
-            scrollToBottom={scrollToBottom}
-            address={Utils.messagesAddress(valueTransferDetail)}
-            closeModal={() => setMessagesAddressModalShowing(false)}
-            openModal={() => setMessagesAddressModalShowing(true)}
-            sendTransaction={sendTransaction}
-            setServerOption={setServerOption}
-          />
-        </Modal>
-      )}
       <Header
         testID="valuetransfer text"
         title={translate('history.title') as string}
         toggleMenuDrawer={toggleMenuDrawer}
-        poolsMoreInfoOnClick={poolsMoreInfoOnClick}
-        syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
         setPrivacyOption={setPrivacyOption}
         addLastSnackbar={addLastSnackbar /* context */}
         setShieldingAmount={setShieldingAmount}
-        setComputingModalVisible={setComputingModalVisible}
         setScrollToTop={setScrollToTop}
         setScrollToBottom={setScrollToBottom}
         setBackgroundError={setBackgroundError /* context */}
-        setUfvkViewModalVisible={setUfvkViewModalVisible}
       />
       <View
         style={{
@@ -335,15 +295,13 @@ const History: React.FunctionComponent<HistoryProps> = ({
                     index={index}
                     vt={vt}
                     month={month}
-                    setValueTransferDetail={(ttt: ValueTransferType) => setValueTransferDetail(ttt)}
-                    setValueTransferDetailIndex={(iii: number) => setValueTransferDetailIndex(iii)}
-                    setValueTransferDetailModalShowing={(bbb: boolean) => setValueTransferDetailModalShowing(bbb)}
+                    setValueTransferDetailModalShow={setValueTransferDetailModalShow}
                     nextLineWithSameTxid={
                       index >= valueTransfersSliced.length - 1
                         ? false
                         : valueTransfersSliced[index + 1].txid === vt.txid
                     }
-                    setMessagesAddressModalShowing={(bbb: boolean) => setMessagesAddressModalShowing(bbb)}
+                    setMessagesAddressModalShow={setMessagesAddressModalShow}
                     addressProtected={vt.address === zenniesDonationAddress}
                   />
                 );

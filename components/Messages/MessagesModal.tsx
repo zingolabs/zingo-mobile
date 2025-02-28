@@ -3,12 +3,11 @@ import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppS
 import ContactList from './components/ContactList';
 import moment from 'moment';
 import { ContextAppLoaded } from '../../app/context';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type MessagesModalProps = {
   // side menu
   // balance
-  // syncing
-  syncingStatusMoreInfoOnClick: () => void;
   // privacy
   setPrivacyOption: (value: boolean) => Promise<void>;
   // addLastSnackbar from context
@@ -17,9 +16,6 @@ type MessagesModalProps = {
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
-  closeModal: () => void;
-  // read-only wallet
-  setUfvkViewModalVisible?: (v: boolean) => void;
   // for messages
   sendTransaction: (s: SendPageStateClass) => Promise<String>;
   setServerOption: (
@@ -31,33 +27,29 @@ type MessagesModalProps = {
 };
 
 const MessagesModal: React.FunctionComponent<MessagesModalProps> = ({
-  syncingStatusMoreInfoOnClick,
   setPrivacyOption,
-  setUfvkViewModalVisible,
   setScrollToTop,
   scrollToTop,
   setScrollToBottom,
   scrollToBottom,
   sendTransaction,
   setServerOption,
-  closeModal,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { language } = context;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   return (
     <ContactList
-      syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
       setPrivacyOption={setPrivacyOption}
-      setUfvkViewModalVisible={setUfvkViewModalVisible}
       setScrollToTop={setScrollToTop}
       scrollToTop={scrollToTop}
       setScrollToBottom={setScrollToBottom}
       scrollToBottom={scrollToBottom}
       sendTransaction={sendTransaction}
       setServerOption={setServerOption}
-      closeModal={closeModal}
+      closeModal={hide}
       noDrawMenu={true}
     />
   );

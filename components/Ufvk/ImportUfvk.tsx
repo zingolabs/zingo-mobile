@@ -4,10 +4,10 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
-  Modal,
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Modal,
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
@@ -30,7 +30,7 @@ import { ButtonTypeEnum, GlobalConst, SelectServerEnum } from '../../app/AppStat
 
 type ImportUfvkProps = {
   onClickCancel: () => void;
-  onClickOK: (keyText: string, birthday: number) => Promise<void>;
+  onClickOK: (keyText: string, birthday: number) => void;
 };
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, onClickOK }) => {
   const context = useContext(ContextAppLoading);

@@ -86,11 +86,10 @@ describe('Component SyncReport - test', () => {
   state.wallet = mockWallet;
   state.syncingStatus = mockSyncingStatus;
   state.netInfo = mockNetInfo;
-  const onClose = jest.fn();
   test('SyncReport - snapshot', () => {
     const sync = render(
       <ContextAppLoadedProvider value={state}>
-        <SyncReport closeModal={onClose} />
+        <SyncReport />
       </ContextAppLoadedProvider>,
     );
     expect(sync.toJSON()).toMatchSnapshot();

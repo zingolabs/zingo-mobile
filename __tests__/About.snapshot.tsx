@@ -66,10 +66,9 @@ describe('Component About - test', () => {
     state.translate = mockTranslate;
     state.info = mockInfo;
     state.totalBalance = mockTotalBalance;
-    const onClose = jest.fn();
     const about = render(
       <ContextAppLoadedProvider value={state}>
-        <About closeModal={onClose} />
+        <About />
       </ContextAppLoadedProvider>,
     );
     expect(about.toJSON()).toMatchSnapshot();

@@ -46,9 +46,9 @@ import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
 import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfo';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type SettingsProps = {
-  closeModal: () => void;
   setWalletOption: (walletOption: string, value: string) => Promise<void>;
   setServerOption: (
     value: ServerType,
@@ -86,7 +86,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setSelectServerOption,
   setRescanMenuOption,
   setRecoveryWalletInfoOnDeviceOption,
-  closeModal,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -164,6 +163,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }
 
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(languageContext);
 
   const [memos, setMemos] = useState<string>(walletSettings.downloadMemos);
@@ -456,7 +456,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
 
     setTimeout(() => {
-      closeModal();
+      hide();
     }, ms);
   };
 
@@ -553,7 +553,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             noSyncingStatus={true}
             noDrawMenu={true}
             noPrivacy={true}
-            closeScreen={closeModal}
+            closeScreen={hide}
           />
           <ScrollView
             keyboardShouldPersistTaps="handled"

@@ -33,25 +33,24 @@ import AddressItem from '../../Components/AddressItem';
 import Utils from '../../../app/utils';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import RegText from '../../Components/RegText';
+import { HideReturn } from 'react-native-magic-modal';
 
 type ContactLineProps = {
   index: number;
   month: string;
   c: ContactType;
-  setContactDetail: (c: ContactType) => void;
-  setMessagesAddressModalShowing: (b: boolean) => void;
+  setMessagesAddressModalShow: (c: ContactType) => Promise<HideReturn<unknown>>;
   addressProtected?: boolean;
 };
 const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   index,
   c,
   month,
-  setContactDetail,
-  setMessagesAddressModalShowing,
+  setMessagesAddressModalShow,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, navigation, showSwipeableIcons, readOnly, selectServer, setSendPageState } = context;
+  const { translate, language, navigation, showSwipeableIcons, readOnly, selectServer, setSendPageState, closeAllModals } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
@@ -119,8 +118,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
       if (-value >= dimensions.width * (1 / 2) && messagesAddress) {
         if (!maxWidthHit.current) {
           //console.log(value);
-          setContactDetail(c);
-          setMessagesAddressModalShowing(true);
+          setMessagesAddressModalShow(c);
           swipeable.reset();
         }
         maxWidthHit.current = true;
@@ -150,8 +148,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                 <TouchableOpacity
                   style={{ zIndex: 999, padding: 20, alignSelf: 'flex-start' }}
                   onPress={() => {
-                    setContactDetail(c);
-                    setMessagesAddressModalShowing(true);
+                    setMessagesAddressModalShow(c);
                     swipeable.reset();
                   }}>
                   <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faComments} color={colors.money} />
@@ -200,6 +197,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                     sendPageState.toaddr.to = c.address ? c.address : '';
                     setSendPageState(sendPageState);
+                    closeAllModals();
                     navigation.navigate(RouteEnums.LoadedApp, {
                       screen: translate('loadedapp.send-menu'),
                       initial: false,
@@ -250,8 +248,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
       <TouchableOpacity
         style={{ zIndex: 999 }}
         onPress={() => {
-          setContactDetail(c);
-          setMessagesAddressModalShowing(true);
+          setMessagesAddressModalShow(c);
           swipeableRef?.current?.reset();
         }}>
         <Swipeable
@@ -320,7 +317,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                   {c.label ? (
                     <RegText>{c.label}</RegText>
                   ) : (
-                    <AddressItem address={c.address} oneLine={true} closeModal={() => {}} openModal={() => {}} />
+                    <AddressItem address={c.address} oneLine={true} />
                   )}
                   <FadeText>{c.time ? moment((c.time || 0) * 1000).format('MMM D, h:mm a') : ''}</FadeText>
                 </View>

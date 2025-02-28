@@ -25,17 +25,18 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type MemoProps = {
-  closeModal: () => void;
   message: string;
   includeUAMessage: boolean;
   setMessage: (m: string) => void;
 };
-const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, message, includeUAMessage, setMessage }) => {
+const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, setMessage }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, uOrchardAddress } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   const [memo, setMemo] = useState<string>(message);
@@ -47,7 +48,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, message, include
 
   const doSaveAndClose = () => {
     setMessage(memo);
-    closeModal();
+    hide();
   };
 
   return (
@@ -70,7 +71,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ closeModal, message, include
             noSyncingStatus={true}
             noDrawMenu={true}
             noPrivacy={true}
-            closeScreen={closeModal}
+            closeScreen={hide}
           />
           <ScrollView
             style={{

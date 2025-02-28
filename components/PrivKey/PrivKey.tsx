@@ -17,17 +17,18 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { SnackbarDurationEnum } from '../../app/AppState';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type PrivKeyProps = {
-  closeModal: () => void;
   address: string;
   keyType: number;
   privKey: string;
 };
-const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, privKey, closeModal }) => {
+const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, privKey }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addLastSnackbar, language } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   const [expandAddress, setExpandAddress] = useState<boolean>(false);
@@ -71,7 +72,7 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={closeModal}
+          closeScreen={hide}
         />
         <ScrollView
           style={{ maxHeight: '90%' }}

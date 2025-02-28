@@ -34,29 +34,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 // this is for http. (red)
 import { faTriangleExclamation, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
+import { useMagicModal } from 'react-native-magic-modal';
 // this is for https. (primary)
 //import { faLock } from '@fortawesome/free-solid-svg-icons';
 
 type ValueTransferDetailProps = {
   index: number;
-  length: number;
-  totalLength: number;
   vt: ValueTransferType;
-  closeModal: () => void;
-  openModal: () => void;
+  valueTransfersSliced: ValueTransferType[];
+  totalLength: number;
   setPrivacyOption: (value: boolean) => Promise<void>;
-  moveValueTransferDetail: (index: number, type: number) => void;
 };
 
 const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = ({
   index,
-  length,
-  totalLength,
   vt,
-  closeModal,
+  valueTransfersSliced,
+  totalLength,
   setPrivacyOption,
-  openModal,
-  moveValueTransferDetail,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -72,32 +67,35 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     zenniesDonationAddress,
   } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
+  const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(vt);
+  const [valueTransferIndex, setValueTransferIndex] = useState<number>(index);
   const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
   const [showNavigator, setShowNavigator] = useState<boolean>(true);
   const [addressProtected, setAddressProtected] = useState<boolean>(true);
   const isTheFirstMount = useRef(true);
 
-  const { memo, memoUA } = Utils.splitMemo(vt.memos);
+  const { memo, memoUA } = Utils.splitMemo(valueTransfer.memos);
 
   useEffect(() => {
     const spendCo =
-      vt.confirmations === 0
+      valueTransfer.confirmations === 0
         ? colors.primaryDisabled
-        : vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
+        : valueTransfer.kind === ValueTransferKindEnum.Received || valueTransfer.kind === ValueTransferKindEnum.Shield
         ? colors.primary
         : colors.text;
     setSpendColor(spendCo);
-  }, [colors.primary, colors.primaryDisabled, colors.text, vt.confirmations, vt.kind]);
+  }, [colors.primary, colors.primaryDisabled, colors.text, valueTransfer.confirmations, valueTransfer.kind]);
 
   useEffect(() => {
     (async () => {
-      setAddressProtected(await isAddressProtected(vt.address ? vt.address : ''));
+      setAddressProtected(await isAddressProtected(valueTransfer.address ? valueTransfer.address : ''));
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vt.address]);
+  }, [valueTransfer.address]);
 
   const handleTxIDClick = (txid?: string) => {
     if (!txid) {
@@ -147,7 +145,17 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     return zenniesDonationAddress === add;
   };
 
-  //console.log('vt', index, totalLength, isTheFirstMount);
+  const moveValueTransferDetail = (indexParm: number, typeParm: number) => {
+    // -1 -> Previous ValueTransfer
+    //  1 -> Next ValueTransfer
+    if ((indexParm > 0 && typeParm === -1) || (indexParm < valueTransfersSliced.length - 1 && typeParm === 1)) {
+      const newIndex = indexParm + typeParm;
+      setValueTransfer(valueTransfersSliced[newIndex]);
+      setValueTransferIndex(newIndex);
+    }
+  };
+
+  //console.log('vt', index, totalLength, isTheFirstMount, vt);
 
   return (
     <SafeAreaProvider>
@@ -166,7 +174,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
           noDrawMenu={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
-          closeScreen={closeModal}
+          closeScreen={hide}
         />
         {showNavigator && (
           <View
@@ -178,23 +186,23 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               marginTop: 5,
             }}>
             <TouchableOpacity
-              onPress={() => moveValueTransferDetail(index, -1)}
+              onPress={() => moveValueTransferDetail(valueTransferIndex, -1)}
               style={{ marginRight: 25 }}
-              disabled={index === 0}>
+              disabled={valueTransferIndex === 0}>
               <FontAwesomeIcon
                 icon={faChevronUp}
-                color={index === 0 ? colors.primaryDisabled : colors.primary}
+                color={valueTransferIndex === 0 ? colors.primaryDisabled : colors.primary}
                 size={30}
               />
             </TouchableOpacity>
-            <FadeText>{(index + 1).toString()}</FadeText>
+            <FadeText>{(valueTransferIndex + 1).toString()}</FadeText>
             <TouchableOpacity
-              onPress={() => moveValueTransferDetail(index, 1)}
+              onPress={() => moveValueTransferDetail(valueTransferIndex, 1)}
               style={{ marginLeft: 25 }}
-              disabled={index === length - 1}>
+              disabled={valueTransferIndex === valueTransfersSliced.length - 1}>
               <FontAwesomeIcon
                 icon={faChevronDown}
-                color={index === length - 1 ? colors.primaryDisabled : colors.primary}
+                color={valueTransferIndex === valueTransfersSliced.length - 1 ? colors.primaryDisabled : colors.primary}
                 size={30}
               />
             </TouchableOpacity>
@@ -221,48 +229,48 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               borderColor: colors.border,
             }}>
             <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
-              {vt.kind === ValueTransferKindEnum.Sent && vt.confirmations === 0
+              {valueTransfer.kind === ValueTransferKindEnum.Sent && valueTransfer.confirmations === 0
                 ? (translate('history.sending') as string)
-                : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations > 0
+                : valueTransfer.kind === ValueTransferKindEnum.Sent && valueTransfer.confirmations > 0
                 ? (translate('history.sent') as string)
-                : vt.kind === ValueTransferKindEnum.Received && vt.confirmations === 0
+                : valueTransfer.kind === ValueTransferKindEnum.Received && valueTransfer.confirmations === 0
                 ? (translate('history.receiving') as string)
-                : vt.kind === ValueTransferKindEnum.Received && vt.confirmations > 0
+                : valueTransfer.kind === ValueTransferKindEnum.Received && valueTransfer.confirmations > 0
                 ? (translate('history.received') as string)
-                : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations === 0
+                : valueTransfer.kind === ValueTransferKindEnum.MemoToSelf && valueTransfer.confirmations === 0
                 ? (translate('history.sendingtoself') as string)
-                : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations > 0
+                : valueTransfer.kind === ValueTransferKindEnum.MemoToSelf && valueTransfer.confirmations > 0
                 ? (translate('history.memotoself') as string)
-                : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations === 0
+                : valueTransfer.kind === ValueTransferKindEnum.SendToSelf && valueTransfer.confirmations === 0
                 ? (translate('history.sendingtoself') as string)
-                : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations > 0
+                : valueTransfer.kind === ValueTransferKindEnum.SendToSelf && valueTransfer.confirmations > 0
                 ? (translate('history.sendtoself') as string)
-                : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations === 0
+                : valueTransfer.kind === ValueTransferKindEnum.Shield && valueTransfer.confirmations === 0
                 ? (translate('history.shielding') as string)
-                : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations > 0
+                : valueTransfer.kind === ValueTransferKindEnum.Shield && valueTransfer.confirmations > 0
                 ? (translate('history.shield') as string)
-                : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations === 0
+                : valueTransfer.kind === ValueTransferKindEnum.Rejection && valueTransfer.confirmations === 0
                 ? (translate('history.sending') as string)
-                : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations > 0
+                : valueTransfer.kind === ValueTransferKindEnum.Rejection && valueTransfer.confirmations > 0
                 ? (translate('history.rejection') as string)
                 : ''}
             </BoldText>
             <ZecAmount
               currencyName={info.currencyName}
               size={36}
-              amtZec={vt.amount}
+              amtZec={valueTransfer.amount}
               privacy={privacy}
               smallPrefix={true}
             />
-            {!!vt.zecPrice && vt.zecPrice > 0 && (
-              <CurrencyAmount price={vt.zecPrice} amtZec={vt.amount} currency={currency} privacy={privacy} />
+            {!!valueTransfer.zecPrice && valueTransfer.zecPrice > 0 && (
+              <CurrencyAmount price={valueTransfer.zecPrice} amtZec={valueTransfer.amount} currency={currency} privacy={privacy} />
             )}
           </View>
 
-          {vt.confirmations === 0 && (
+          {valueTransfer.confirmations === 0 && (
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              {(vt.status === RPCValueTransfersStatusEnum.transmitted ||
-                vt.status === RPCValueTransfersStatusEnum.calculated) && (
+              {(valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                valueTransfer.status === RPCValueTransfersStatusEnum.calculated) && (
                 <FontAwesomeIcon
                   style={{ marginRight: 5 }}
                   icon={faTriangleExclamation}
@@ -273,25 +281,25 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               <FadeText
                 style={{
                   color:
-                    vt.status === RPCValueTransfersStatusEnum.transmitted ||
-                    vt.status === RPCValueTransfersStatusEnum.calculated
+                    valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                    valueTransfer.status === RPCValueTransfersStatusEnum.calculated
                       ? colors.primary
                       : colors.primaryDisabled,
                   fontSize: 12,
                   opacity: 1,
                   fontWeight: '700',
                   textAlign:
-                    vt.status === RPCValueTransfersStatusEnum.transmitted ||
-                    vt.status === RPCValueTransfersStatusEnum.calculated
+                    valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                    valueTransfer.status === RPCValueTransfersStatusEnum.calculated
                       ? 'center'
                       : 'left',
                   textDecorationLine:
-                    vt.status === RPCValueTransfersStatusEnum.transmitted ||
-                    vt.status === RPCValueTransfersStatusEnum.calculated
+                    valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                    valueTransfer.status === RPCValueTransfersStatusEnum.calculated
                       ? 'underline'
                       : 'none',
                 }}>
-                {(translate(`history.${vt.status}`) as string) + ' - ' + (translate('history.not-confirmed') as string)}
+                {(translate(`history.${valueTransfer.status}`) as string) + ' - ' + (translate('history.not-confirmed') as string)}
               </FadeText>
             </View>
           )}
@@ -300,11 +308,11 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
               <View style={{ display: 'flex' }}>
                 <FadeText>{translate('history.time') as string}</FadeText>
-                <RegText>{vt.time ? moment((vt.time || 0) * 1000).format('YYYY MMM D h:mm a') : '--'}</RegText>
+                <RegText>{valueTransfer.time ? moment((valueTransfer.time || 0) * 1000).format('YYYY MMM D h:mm a') : '--'}</RegText>
               </View>
               <View style={{ display: 'flex', alignItems: 'flex-end' }}>
                 <FadeText>{translate('history.confirmations') as string}</FadeText>
-                <RegText>{vt.confirmations.toString()}</RegText>
+                <RegText>{valueTransfer.confirmations.toString()}</RegText>
               </View>
             </View>
 
@@ -312,8 +320,8 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               <FadeText>{translate('history.txid') as string}</FadeText>
               <TouchableOpacity
                 onPress={() => {
-                  if (vt.txid) {
-                    Clipboard.setString(vt.txid);
+                  if (valueTransfer.txid) {
+                    Clipboard.setString(valueTransfer.txid);
                     addLastSnackbar({
                       message: translate('history.txcopied') as string,
                       duration: SnackbarDurationEnum.short,
@@ -321,13 +329,13 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                     setExpandTxid(true);
                   }
                 }}>
-                {!vt.txid && <RegText>{'Unknown'}</RegText>}
-                {!expandTxid && !!vt.txid && <RegText>{Utils.trimToSmall(vt.txid, 10)}</RegText>}
-                {expandTxid && !!vt.txid && (
+                {!valueTransfer.txid && <RegText>{'Unknown'}</RegText>}
+                {!expandTxid && !!valueTransfer.txid && <RegText>{Utils.trimToSmall(valueTransfer.txid, 10)}</RegText>}
+                {expandTxid && !!valueTransfer.txid && (
                   <>
-                    <RegText>{vt.txid}</RegText>
+                    <RegText>{valueTransfer.txid}</RegText>
                     {server.chainName !== ChainNameEnum.regtestChainName && (
-                      <TouchableOpacity onPress={() => handleTxIDClick(vt.txid)}>
+                      <TouchableOpacity onPress={() => handleTxIDClick(valueTransfer.txid)}>
                         <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
                           {translate('history.viewexplorer') as string}
                         </Text>
@@ -338,42 +346,40 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               </TouchableOpacity>
             </View>
 
-            {!!vt.fee && vt.fee > 0 && (
+            {!!valueTransfer.fee && valueTransfer.fee > 0 && (
               <View style={{ display: 'flex', marginTop: 10 }}>
                 <FadeText>{translate('history.txfee') as string}</FadeText>
                 <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <ZecAmount amtZec={vt.fee} size={18} currencyName={info.currencyName} privacy={privacy} />
+                  <ZecAmount amtZec={valueTransfer.fee} size={18} currencyName={info.currencyName} privacy={privacy} />
                 </View>
               </View>
             )}
 
-            {!!vt.address && (
+            {!!valueTransfer.address && (
               <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
                 <FadeText>{translate('history.address') as string}</FadeText>
                 <AddressItem
-                  address={vt.address}
+                  address={valueTransfer.address}
                   withIcon={true}
                   withSendIcon={true}
-                  closeModal={closeModal}
-                  openModal={openModal}
                   addressProtected={addressProtected}
                 />
               </View>
             )}
 
-            {!!vt.poolType && (
+            {!!valueTransfer.poolType && (
               <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 10 }}>
                 <FadeText>{translate('history.pool') as string}</FadeText>
-                <RegText>{vt.poolType}</RegText>
+                <RegText>{valueTransfer.poolType}</RegText>
               </View>
             )}
 
             <View style={{ marginTop: 10 }}>
               <FadeText>{translate('history.amount') as string}</FadeText>
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ZecAmount amtZec={vt.amount} size={18} currencyName={info.currencyName} privacy={privacy} />
-                {!!vt.zecPrice && vt.zecPrice > 0 && (
-                  <CurrencyAmount price={vt.zecPrice} amtZec={vt.amount} currency={currency} privacy={privacy} />
+                <ZecAmount amtZec={valueTransfer.amount} size={18} currencyName={info.currencyName} privacy={privacy} />
+                {!!valueTransfer.zecPrice && valueTransfer.zecPrice > 0 && (
+                  <CurrencyAmount price={valueTransfer.zecPrice} amtZec={valueTransfer.amount} currency={currency} privacy={privacy} />
                 )}
               </View>
             </View>
@@ -418,7 +424,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                         {!thisWalletAddress(memoUA) && (
                           <RegText style={{ opacity: 0.6 }}>{translate('addressbook.likely') as string}</RegText>
                         )}
-                        <AddressItem address={memoUA} onlyContact={true} closeModal={() => {}} openModal={() => {}} />
+                        <AddressItem address={memoUA} onlyContact={true} />
                       </View>
                     )}
                     {!contactFound(memoUA) && thisWalletAddress(memoUA) && (
