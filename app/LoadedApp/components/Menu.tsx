@@ -50,6 +50,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer 
   };
 
   const onItemSelectedWrapper = async (value: MenuItemEnum) => {
+    await closeDrawer();
     if (
       (value === MenuItemEnum.WalletSeedUfvk && security.seedUfvkScreen) ||
       (value === MenuItemEnum.Rescan && security.rescanScreen) ||
@@ -65,13 +66,16 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer 
       //console.log('BIOMETRIC --------> ', resultBio);
       if (resultBio === false) {
         // snack with Error & closing the menu.
-        await closeDrawer();
         addLastSnackbar({ message: translate('biometrics-error') as string });
       } else {
         onItemSelected(value);
       }
     } else {
-      onItemSelected(value);
+      // the App/Drawer needs a bit of time to close
+      // properly
+      setTimeout(() => {
+        onItemSelected(value);
+      }, 200);
     }
   };
 

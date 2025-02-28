@@ -1137,7 +1137,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
   onMenuItemSelected = async (item: MenuItemEnum) => {
     // Depending on the menu item, open the appropriate modal
-    await this.closeDrawer();
     if (item === MenuItemEnum.About) {
       return magicModal.show(() => <About />, { swipeDirection: undefined }).promise;
     } else if (item === MenuItemEnum.Rescan) {
@@ -1960,8 +1959,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 )}
               </>
             )}
-            <MagicModalPortal />
           </DrawerLayout>
+          <MagicModalPortal />
         </GestureHandlerRootView>
       </ContextAppLoadedProvider>
     );

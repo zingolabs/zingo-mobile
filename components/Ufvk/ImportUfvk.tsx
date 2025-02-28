@@ -26,16 +26,17 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { ButtonTypeEnum, GlobalConst, SelectServerEnum } from '../../app/AppState';
-import { magicModal } from 'react-native-magic-modal';
+import { magicModal, useMagicModal } from 'react-native-magic-modal';
 
 type ImportUfvkProps = {
   onClickCancel: () => void;
-  onClickOK: (keyText: string, birthday: number) => Promise<void>;
+  onClickOK: (keyText: string, birthday: number) => void;
 };
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, onClickOK }) => {
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, info, server, mode, addLastSnackbar, language, selectServer } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   const [seedufvkText, setSeedufvkText] = useState<string>('');
@@ -104,7 +105,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
-    onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
+    onClickOKAndHide(seedufvkText.trimEnd().trimStart(), Number(birthday));
   };
 
   const setQrcodeModalShow = () => {
@@ -112,6 +113,16 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
         setUfvkText={setSeedufvkText}
       />, { swipeDirection: undefined }
     ).promise;
+  };
+
+  const onClickCancelAndHide = () => {
+    onClickCancel();
+    hide();
+  };
+
+  const onClickOKAndHide = (keyTextParm: string, birthdayParm: number) => {
+    onClickOK(keyTextParm, birthdayParm);
+    hide();
   };
 
   return (
@@ -137,7 +148,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
             translate={translate}
             netInfo={netInfo}
             mode={mode}
-            closeScreen={onClickCancel}
+            closeScreen={onClickCancelAndHide}
           />
           <ScrollView
             keyboardShouldPersistTaps="handled"
