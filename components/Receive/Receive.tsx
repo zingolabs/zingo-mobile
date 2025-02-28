@@ -21,8 +21,6 @@ import { ShieldedEnum } from '../../app/AppState/enums/ShieldedEnum';
 
 type ReceiveProps = {
   toggleMenuDrawer: () => void;
-  syncingStatusMoreInfoOnClick: () => void;
-  setUfvkViewModalVisible?: (v: boolean) => void;
   alone: boolean;
 };
 
@@ -30,12 +28,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   // side menu
   toggleMenuDrawer,
   // balance
-  // syncing
-  syncingStatusMoreInfoOnClick,
   // privacy
   // shielding
-  // read-only wallet
-  setUfvkViewModalVisible,
   // for receive
   alone,
 }) => {
@@ -334,8 +328,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               : (translate('receive.title-advanced') as string)
           }
           toggleMenuDrawer={toggleMenuDrawer}
-          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
-          setUfvkViewModalVisible={setUfvkViewModalVisible}
           noBalance={true}
           noPrivacy={true}
         />

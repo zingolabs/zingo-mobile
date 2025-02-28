@@ -32,6 +32,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type TextsType = {
   new: string[];
@@ -87,6 +88,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   }
 
   const { colors } = useTheme()  as ThemeType;
+  // when this screen is open from LoadingApp (new wallet)
+  // is using the standard modal from react-native
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   const [seedPhrase, setSeedPhrase] = useState<string>('');
@@ -164,13 +168,31 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         {
           text: translate('confirm') as string,
           onPress: () => {
-            onClickOK(seedPhrase, Number(birthdayNumber));
+            onClickOKHide(seedPhrase, Number(birthdayNumber));
           },
         },
-        { text: translate('cancel') as string, onPress: () => onClickCancel(), style: 'cancel' },
+        { text: translate('cancel') as string, onPress: () => onClickCancelHide(), style: 'cancel' },
       ],
       { cancelable: false },
     );
+  };
+
+  const onClickCancelHide = () => {
+    onClickCancel();
+    // when this screen is open from LoadingApp (new wallet)
+    // is using the standard modal from react-native
+    if (action !== SeedActionEnum.new) {
+      hide();
+    }
+  };
+
+  const onClickOKHide = (seedPhraseParm: string, birthdayNumberParm: number) => {
+    onClickOK(seedPhraseParm, birthdayNumberParm);
+    // when this screen is open from LoadingApp (new wallet)
+    // is using the standard modal from react-native
+    if (action !== SeedActionEnum.new) {
+      hide();
+    }
   };
 
   //console.log('=================================');
@@ -199,7 +221,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           mode={mode}
           privacy={privacy}
           receivedLegend={action === SeedActionEnum.view ? !basicFirstViewSeed : false}
-          closeScreen={onClickCancel}
+          closeScreen={onClickCancelHide}
         />
         <ScrollView
           keyboardShouldPersistTaps="handled"
@@ -339,7 +361,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                 keepAwake(false);
               }
               if (times === 0) {
-                onClickOK(seedPhrase, Number(birthdayNumber));
+                onClickOKHide(seedPhrase, Number(birthdayNumber));
               } else if (times === 1) {
                 onPressOK();
               }

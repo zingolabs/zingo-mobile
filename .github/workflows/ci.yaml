@@ -53,20 +53,22 @@ jobs:
       api-level: ${{ matrix.config['api-level'] }}
       target: ${{ matrix.config.target }}
 
-  android-ubuntu-e2e-test-ci:
-    strategy:
-      matrix:
-        config:
-          - { abi: x86_64, api-level: 30, target: default }
-          - { abi: x86, api-level: 28, target: default }
-    uses: ./.github/workflows/android-ubuntu-e2e-test-ci.yaml
-    needs: [create-timestamp, android-build]
-    with:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-      abi: ${{ matrix.config.abi }}
-      api-level: ${{ matrix.config['api-level'] }}
-      target: ${{ matrix.config.target }}
+  # deactivating these for now, until we know how to fix
+  # detox run in android
+  #android-ubuntu-e2e-test-ci:
+  #  strategy:
+  #    matrix:
+  #      config:
+  #        - { abi: x86_64, api-level: 30, target: default }
+  #        - { abi: x86, api-level: 28, target: default }
+  #  uses: ./.github/workflows/android-ubuntu-e2e-test-ci.yaml
+  #  needs: [create-timestamp, android-build]
+  #  with:
+  #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+  #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+  #    abi: ${{ matrix.config.abi }}
+  #    api-level: ${{ matrix.config['api-level'] }}
+  #    target: ${{ matrix.config.target }}
 
   ios-build:
     uses: ./.github/workflows/ios-build.yaml

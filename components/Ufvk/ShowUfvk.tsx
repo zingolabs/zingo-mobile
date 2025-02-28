@@ -16,6 +16,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import RegText from '../Components/RegText';
 import { ButtonTypeEnum, ChainNameEnum, ModeEnum, UfvkActionEnum } from '../../app/AppState';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type TextsType = {
   new: string[];
@@ -36,6 +37,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
   const context = useContext(ContextAppLoaded);
   const { translate, wallet, server, mode, addLastSnackbar, language } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   const [times, setTimes] = useState<number>(0);
@@ -70,12 +72,22 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
       [
         {
           text: translate('confirm') as string,
-          onPress: () => onClickOK(),
+          onPress: () => onClickOKHide(),
         },
-        { text: translate('cancel') as string, onPress: () => onClickCancel(), style: 'cancel' },
+        { text: translate('cancel') as string, onPress: () => onClickCancelHide(), style: 'cancel' },
       ],
       { cancelable: false },
     );
+  };
+
+  const onClickCancelHide = () => {
+    onClickCancel();
+    hide();
+  };
+
+  const onClickOKHide = () => {
+    onClickOK();
+    hide();
   };
 
   return (
@@ -95,7 +107,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           noDrawMenu={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
-          closeScreen={onClickCancel}
+          closeScreen={onClickCancelHide}
         />
         <ScrollView
           style={{ height: '80%', maxHeight: '80%' }}
@@ -144,7 +156,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
                 return;
               }
               if (times === 0) {
-                onClickOK();
+                onClickOKHide();
               } else if (times === 1) {
                 onPressOK();
               }

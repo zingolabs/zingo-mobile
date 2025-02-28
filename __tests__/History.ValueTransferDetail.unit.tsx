@@ -105,22 +105,17 @@ describe('Component History ValueTransferDetail - test', () => {
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
   state.valueTransfers = mockValueTransfers;
-  const onClose = jest.fn();
   const onSetOption = jest.fn();
-  const onMove = jest.fn();
 
   test('History ValueTransferDetail - sent ValueTransfer with 2 addresses', () => {
     render(
       <ContextAppLoadedProvider value={state}>
         <ValueTransferDetail
           index={0}
-          length={mockValueTransfers.length}
-          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[0]}
-          closeModal={onClose}
-          openModal={onClose}
+          valueTransfersSliced={mockValueTransfers}
+          totalLength={mockValueTransfers.length}
           setPrivacyOption={onSetOption}
-          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     ).toJSON();
@@ -137,13 +132,10 @@ describe('Component History ValueTransferDetail - test', () => {
       <ContextAppLoadedProvider value={state}>
         <ValueTransferDetail
           index={1}
-          length={mockValueTransfers.length}
-          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[1]}
-          closeModal={onClose}
-          openModal={onClose}
+          valueTransfersSliced={mockValueTransfers}
+          totalLength={mockValueTransfers.length}
           setPrivacyOption={onSetOption}
-          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
@@ -158,13 +150,10 @@ describe('Component History ValueTransferDetail - test', () => {
       <ContextAppLoadedProvider value={state}>
         <ValueTransferDetail
           index={2}
-          length={mockValueTransfers.length}
-          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[2]}
-          closeModal={onClose}
-          openModal={onClose}
+          valueTransfersSliced={mockValueTransfers}
+          totalLength={mockValueTransfers.length}
           setPrivacyOption={onSetOption}
-          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
@@ -178,13 +167,10 @@ describe('Component History ValueTransferDetail - test', () => {
       <ContextAppLoadedProvider value={state}>
         <ValueTransferDetail
           index={3}
-          length={mockValueTransfers.length}
-          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[3]}
-          closeModal={onClose}
-          openModal={onClose}
+          valueTransfersSliced={mockValueTransfers}
+          totalLength={mockValueTransfers.length}
           setPrivacyOption={onSetOption}
-          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
@@ -200,13 +186,10 @@ describe('Component History ValueTransferDetail - test', () => {
       <ContextAppLoadedProvider value={state}>
         <ValueTransferDetail
           index={4}
-          length={mockValueTransfers.length}
-          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[4]}
-          closeModal={onClose}
-          openModal={onClose}
+          valueTransfersSliced={mockValueTransfers}
+          totalLength={mockValueTransfers.length}
           setPrivacyOption={onSetOption}
-          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
@@ -219,14 +202,11 @@ describe('Component History ValueTransferDetail - test', () => {
     render(
       <ContextAppLoadedProvider value={state}>
         <ValueTransferDetail
-          index={4}
-          length={mockValueTransfers.length}
-          totalLength={mockValueTransfers.length}
+          index={5}
           vt={mockValueTransfers[5]}
-          closeModal={onClose}
-          openModal={onClose}
+          valueTransfersSliced={mockValueTransfers}
+          totalLength={mockValueTransfers.length}
           setPrivacyOption={onSetOption}
-          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );

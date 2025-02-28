@@ -6,8 +6,6 @@ type MessagesProps = {
   // side menu
   toggleMenuDrawer: () => void;
   // balance
-  // syncing
-  syncingStatusMoreInfoOnClick: () => void;
   // privacy
   setPrivacyOption: (value: boolean) => Promise<void>;
   // addLastSnackbar from context
@@ -16,8 +14,6 @@ type MessagesProps = {
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
-  // read-only wallet
-  setUfvkViewModalVisible?: (v: boolean) => void;
   // for messages
   sendTransaction: (s: SendPageStateClass) => Promise<String>;
   setServerOption: (
@@ -30,9 +26,7 @@ type MessagesProps = {
 
 const Messages: React.FunctionComponent<MessagesProps> = ({
   toggleMenuDrawer,
-  syncingStatusMoreInfoOnClick,
   setPrivacyOption,
-  setUfvkViewModalVisible,
   setScrollToTop,
   scrollToTop,
   setScrollToBottom,
@@ -43,9 +37,7 @@ const Messages: React.FunctionComponent<MessagesProps> = ({
   return (
     <ContactList
       toggleMenuDrawer={toggleMenuDrawer}
-      syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
       setPrivacyOption={setPrivacyOption}
-      setUfvkViewModalVisible={setUfvkViewModalVisible}
       setScrollToTop={setScrollToTop}
       scrollToTop={scrollToTop}
       setScrollToBottom={setScrollToBottom}

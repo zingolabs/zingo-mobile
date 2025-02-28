@@ -21,16 +21,17 @@ import 'moment/locale/ru';
 import { CommandEnum } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import { RPCWalletKindType } from '../../app/rpc/types/RPCWalletKindType';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type PoolsProps = {
-  closeModal: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
 };
 
-const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOption }) => {
+const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
   const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language, shieldingAmount } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   const [orchardPool, setOrchardPool] = useState<boolean>(false);
   const [saplingPool, setSaplingPool] = useState<boolean>(false);
   const [transparentPool, setTransparentPool] = useState<boolean>(false);
@@ -69,7 +70,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ closeModal, setPrivacyOpti
           noDrawMenu={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
-          closeScreen={closeModal}
+          closeScreen={hide}
         />
         <ScrollView
           style={{ maxHeight: '90%' }}

@@ -11,14 +11,13 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type MessagesAddressProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
   address: string;
-  closeModal: () => void;
-  openModal: () => void;
   sendTransaction: (s: SendPageStateClass) => Promise<String>;
   setServerOption: (
     value: ServerType,
@@ -33,14 +32,13 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
   setScrollToBottom,
   scrollToBottom,
   address,
-  closeModal,
-  openModal,
   sendTransaction,
   setServerOption,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { language } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   return (
@@ -58,10 +56,9 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
           setScrollToBottom={setScrollToBottom}
           scrollToBottom={scrollToBottom}
           address={address}
-          closeModal={closeModal}
-          openModal={openModal}
           sendTransaction={sendTransaction}
           setServerOption={setServerOption}
+          closeModal={hide}
         />
       </SafeAreaView>
     </SafeAreaProvider>

@@ -7,25 +7,23 @@ import { ContextAppLoaded } from '../../app/context';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
 import moment from 'moment';
+import { useMagicModal } from 'react-native-magic-modal';
 
 type MessagesAllProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
-  closeModal: () => void;
-  openModal: () => void;
 };
 
 const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
   setPrivacyOption,
   setScrollToBottom,
   scrollToBottom,
-  closeModal,
-  openModal,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { language } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
   moment.locale(language);
 
   return (
@@ -42,8 +40,7 @@ const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
           setPrivacyOption={setPrivacyOption}
           setScrollToBottom={setScrollToBottom}
           scrollToBottom={scrollToBottom}
-          closeModal={closeModal}
-          openModal={openModal}
+          closeModal={hide}
         />
       </SafeAreaView>
     </SafeAreaProvider>

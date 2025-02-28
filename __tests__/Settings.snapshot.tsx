@@ -100,13 +100,11 @@ describe('Component Settings - test', () => {
   state.recoveryWalletInfoOnDevice = true;
   state.donation = false;
   state.walletSettings = mockWalletSettings;
-  const onClose = jest.fn();
   const onSetOption = jest.fn();
   test('Settings - snapshot', () => {
     const settings = render(
       <ContextAppLoadedProvider value={state}>
         <Settings
-          closeModal={onClose}
           setWalletOption={onSetOption}
           setServerOption={onSetOption}
           setCurrencyOption={onSetOption}

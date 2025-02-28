@@ -28,6 +28,7 @@ import {
   GlobalConst,
   CommandEnum,
   SelectServerEnum,
+  RouteEnums,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
@@ -61,17 +62,14 @@ type HeaderProps = {
   closeScreen?: () => void;
   // balance
   noBalance?: boolean;
-  poolsMoreInfoOnClick?: () => void;
   // syncing icons
   noSyncingStatus?: boolean;
-  syncingStatusMoreInfoOnClick?: () => void;
   // privacy
   noPrivacy?: boolean;
   setPrivacyOption?: (value: boolean) => Promise<void>;
   addLastSnackbar?: (snackbar: SnackbarType) => void;
   // shielding
   setShieldingAmount?: (value: number) => void;
-  setComputingModalVisible?: (visible: boolean) => void;
   setScrollToTop?: (value: boolean) => void;
   setScrollToBottom?: (value: boolean) => void;
   // seed screen - shared between AppLoading & AppLoadad - different contexts
@@ -81,15 +79,11 @@ type HeaderProps = {
   privacy?: boolean;
   // store the error if the App is in background
   setBackgroundError?: (title: string, error: string) => void;
-  // read-only wallet
-  setUfvkViewModalVisible?: (v: boolean) => void;
   // first funds received legend for the Seed screen
   receivedLegend?: boolean;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
-  poolsMoreInfoOnClick,
-  syncingStatusMoreInfoOnClick,
   toggleMenuDrawer,
   title,
   noBalance,
@@ -100,11 +94,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   netInfo: netInfoProp,
   mode: modeProp,
   privacy: privacyProp,
-  setComputingModalVisible,
   setBackgroundError,
   noPrivacy,
   setPrivacyOption,
-  setUfvkViewModalVisible,
   addLastSnackbar,
   receivedLegend,
   setShieldingAmount,
@@ -130,6 +122,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     navigation,
     selectServer,
     setZecPrice,
+    setComputingModalShow,
+    closeAllModals,
+    setUfvkViewModalShow,
+    setSyncReportModalShow,
+    setPoolsModalShow,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum, privacy: boolean;
@@ -287,7 +284,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }, []);
 
   const shieldFunds = async () => {
-    if (!setComputingModalVisible || !setBackgroundError || !addLastSnackbar) {
+    if (!setBackgroundError || !addLastSnackbar) {
       return;
     }
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
@@ -298,7 +295,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // now zingolib only can shield `transparent`.
     let pools: PoolToShieldEnum = PoolToShieldEnum.transparentPoolToShield;
 
-    setComputingModalVisible(true);
+    // not use await here.
+    setComputingModalShow();
     // We need to activate this flag because if the App is syncing
     // while shielding, then it going to finish the current batch
     // and after that it run the shield process.
@@ -355,7 +353,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
       // change to the history screen, just in case.
       if (navigation) {
-        navigation.navigate(translate('loadedapp.history-menu') as string);
+        navigation.navigate(RouteEnums.LoadedApp, {
+          screen: translate('loadedapp.history-menu') as string,
+          initial: false,
+        });
       }
       // scroll to top in history, just in case.
       if (setScrollToTop) {
@@ -365,7 +366,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       if (setScrollToBottom) {
         setScrollToBottom(true);
       }
-      setComputingModalVisible(false);
+      closeAllModals();
     }
   };
 
@@ -442,9 +443,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         addLastSnackbar({ message: translate('biometrics-error') as string });
       }
     } else {
-      if (setUfvkViewModalVisible) {
-        setUfvkViewModalVisible(true);
-      }
+      await setUfvkViewModalShow();
     }
   };
 
@@ -588,7 +587,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           ) : (
                             <TouchableOpacity
                               testID="header.playicon"
-                              onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                              onPress={() => setSyncReportModalShow()}>
                               <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                 <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
                                 {viewSyncStatus && (
@@ -623,7 +622,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           minHeight: 25,
                         }}>
                         <TouchableOpacity
-                          onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                          onPress={() => setSyncReportModalShow()}>
                           <View
                             testID="header.wifiicon"
                             style={{
@@ -662,7 +661,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         size={20}
                       />
                     ) : (
-                      <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
+                      <TouchableOpacity onPress={() => setSyncReportModalShow()}>
                         <FontAwesomeIcon
                           icon={faCloudDownload}
                           color={!netInfo.isConnected ? 'red' : 'yellow'}
@@ -734,7 +733,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 (totalBalance.orchardBal !== totalBalance.spendableOrchard ||
                   totalBalance.privateBal > 0 ||
                   totalBalance.transparentBal > 0) && (
-                  <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
+                  <TouchableOpacity onPress={() => setPoolsModalShow()}>
                     <View
                       style={{
                         display: 'flex',
@@ -793,7 +792,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
           {showShieldButton &&
             !calculateDisableButtonToShield() &&
-            setComputingModalVisible &&
             valueTransfersTotal !== null && (
               <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <FadeText style={{ fontSize: 8 }}>
@@ -835,8 +833,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             )}
             {readOnly && (
               <>
-                {setUfvkViewModalVisible &&
-                !(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal <= 0) &&
+                {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal <= 0) &&
                 !(mode === ModeEnum.basic && totalBalance && totalBalance.total <= 0) ? (
                   <TouchableOpacity onPress={() => ufvkShowModal()}>
                     <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />

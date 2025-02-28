@@ -28,7 +28,6 @@ type AbSummaryLineProps = {
   item: AddressBookFileClass;
   setCurrentItem: (b: number) => void;
   setAction: (action: AddressBookActionEnum) => void;
-  closeModal: () => void;
   handleScrollToTop: () => void;
   doAction: (
     action: AddressBookActionEnum,
@@ -44,13 +43,12 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   item,
   setCurrentItem,
   setAction,
-  closeModal,
   handleScrollToTop,
   doAction,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, navigation, readOnly, mode, totalBalance, language, selectServer, setSendPageState } = context;
+  const { translate, navigation, readOnly, mode, totalBalance, language, selectServer, setSendPageState, closeAllModals } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
@@ -161,7 +159,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
-                  closeModal();
+                  closeAllModals();
                   navigation.navigate(RouteEnums.LoadedApp, {
                     screen: translate('loadedapp.send-menu'),
                     initial: false,

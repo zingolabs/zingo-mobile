@@ -58,11 +58,10 @@ describe('Component Memo - test', () => {
   test('Memo - snapshot', () => {
     const state = defaultAppContextLoaded;
     state.translate = mockTranslate;
-    const onClose = jest.fn();
     const onSetMemo = jest.fn();
     const memo = render(
       <ContextAppLoadedProvider value={state}>
-        <Memo closeModal={onClose} message={''} includeUAMessage={true} setMessage={onSetMemo} />
+        <Memo message={''} includeUAMessage={true} setMessage={onSetMemo} />
       </ContextAppLoadedProvider>,
     );
     expect(memo.toJSON()).toMatchSnapshot();

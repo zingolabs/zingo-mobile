@@ -123,7 +123,6 @@ describe('Component Messages - test', () => {
       <ContextAppLoadedProvider value={state}>
         <Messages
           toggleMenuDrawer={onFunction}
-          syncingStatusMoreInfoOnClick={onFunction}
           setPrivacyOption={onFunction}
           setScrollToBottom={onFunction}
           scrollToBottom={false}
@@ -148,7 +147,6 @@ describe('Component Messages - test', () => {
       <ContextAppLoadedProvider value={state}>
         <Messages
           toggleMenuDrawer={onFunction}
-          syncingStatusMoreInfoOnClick={onFunction}
           setPrivacyOption={onFunction}
           setScrollToBottom={onFunction}
           scrollToBottom={false}

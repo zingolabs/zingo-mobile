@@ -3,7 +3,6 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import {
   View,
   ScrollView,
-  Modal,
   RefreshControl,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -41,12 +40,11 @@ import { MessagesAddress, MessagesAll } from '../../Messages';
 import Utils from '../../../app/utils';
 import ContactLine from './ContactLine';
 import RegText from '../../Components/RegText';
+import { magicModal } from 'react-native-magic-modal';
 
 type ContactListProps = {
   toggleMenuDrawer?: () => void;
-  syncingStatusMoreInfoOnClick: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
-  setUfvkViewModalVisible?: (v: boolean) => void;
   setScrollToTop: (value: boolean) => void;
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
@@ -64,9 +62,7 @@ type ContactListProps = {
 
 const ContactList: React.FunctionComponent<ContactListProps> = ({
   toggleMenuDrawer,
-  syncingStatusMoreInfoOnClick,
   setPrivacyOption,
-  setUfvkViewModalVisible,
   setScrollToTop,
   scrollToTop,
   setScrollToBottom,
@@ -82,9 +78,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
-  const [isMessagesAddressModalShowing, setMessagesAddressModalShowing] = useState<boolean>(false);
-  const [isMessagesAllModalShowing, setMessagesAllModalShowing] = useState<boolean>(false);
-  const [contactDetail, setContactDetail] = useState<ContactType>({} as ContactType);
   const [contacts, setContacts] = useState<ContactType[]>([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
@@ -274,6 +267,27 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
     setIsAtTop(isTop);
   };
 
+  const setMessagesAddressModalShow = (c: ContactType) => {
+    return magicModal.show(() => <MessagesAddress
+        setPrivacyOption={setPrivacyOption}
+        setScrollToBottom={setScrollToBottom}
+        scrollToBottom={scrollToBottom}
+        address={Utils.messagesAddress(c)}
+        sendTransaction={sendTransaction}
+        setServerOption={setServerOption}
+      />, { swipeDirection: undefined }
+    ).promise;
+  };
+
+  const setMessagesAllModalShow = () => {
+    return magicModal.show(() => <MessagesAll
+        setPrivacyOption={setPrivacyOption}
+        setScrollToBottom={setScrollToBottom}
+        scrollToBottom={scrollToBottom}
+      />, { swipeDirection: undefined }
+    ).promise;
+  };
+
   //console.log('render Contacts', filter, searchMode);
   //console.log('search text:', searchText, 'field:', searchTextField);
 
@@ -289,45 +303,9 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
           height: '100%',
           backgroundColor: colors.background,
         }}>
-        {isMessagesAddressModalShowing && (
-          <Modal
-            animationType="slide"
-            transparent={false}
-            visible={isMessagesAddressModalShowing}
-            onRequestClose={() => setMessagesAddressModalShowing(false)}>
-            <MessagesAddress
-              setPrivacyOption={setPrivacyOption}
-              setScrollToBottom={setScrollToBottom}
-              scrollToBottom={scrollToBottom}
-              address={Utils.messagesAddress(contactDetail)}
-              closeModal={() => setMessagesAddressModalShowing(false)}
-              openModal={() => setMessagesAddressModalShowing(true)}
-              sendTransaction={sendTransaction}
-              setServerOption={setServerOption}
-            />
-          </Modal>
-        )}
-
-        {isMessagesAllModalShowing && (
-          <Modal
-            animationType="slide"
-            transparent={false}
-            visible={isMessagesAllModalShowing}
-            onRequestClose={() => setMessagesAllModalShowing(false)}>
-            <MessagesAll
-              setPrivacyOption={setPrivacyOption}
-              setScrollToBottom={setScrollToBottom}
-              scrollToBottom={scrollToBottom}
-              closeModal={() => setMessagesAllModalShowing(false)}
-              openModal={() => setMessagesAllModalShowing(true)}
-            />
-          </Modal>
-        )}
         <Header
           title={translate('messages.title-chats') as string}
           toggleMenuDrawer={toggleMenuDrawer}
-          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
-          setUfvkViewModalVisible={setUfvkViewModalVisible}
           noPrivacy={true}
           noBalance={true}
           closeScreen={closeModal}
@@ -415,7 +393,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             <TouchableOpacity
               onPress={() => {
                 // call the screen
-                setMessagesAllModalShowing(true);
+                setMessagesAllModalShow();
               }}>
               <View
                 style={{
@@ -582,8 +560,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                       index={index}
                       c={c}
                       month={month}
-                      setContactDetail={(ttt: ContactType) => setContactDetail(ttt)}
-                      setMessagesAddressModalShowing={(bbb: boolean) => setMessagesAddressModalShowing(bbb)}
+                      setMessagesAddressModalShow={setMessagesAddressModalShow}
                       addressProtected={c.address === zenniesDonationAddress}
                     />
                   );
