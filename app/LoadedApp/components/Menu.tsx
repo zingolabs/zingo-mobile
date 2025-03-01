@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { ScrollView, View, Text, Dimensions } from 'react-native';
+import { View, Text, Dimensions } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import RegText from '../../../components/Components/RegText';
@@ -15,13 +15,14 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../../AppState';
 import { HideReturn } from 'react-native-magic-modal';
+import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 
 type MenuProps = {
   onItemSelected: (item: MenuItemEnum) => Promise<HideReturn<unknown> | undefined>;
-  closeDrawer: () => Promise<void>;
+  navigation: DrawerContentComponentProps['navigation'];
 };
 
-const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer }) => {
+const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, navigation }) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -50,7 +51,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer 
   };
 
   const onItemSelectedWrapper = async (value: MenuItemEnum) => {
-    await closeDrawer();
+    navigation.closeDrawer();
     if (
       (value === MenuItemEnum.WalletSeedUfvk && security.seedUfvkScreen) ||
       (value === MenuItemEnum.Rescan && security.rescanScreen) ||
@@ -89,7 +90,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer 
           height: '100%',
           backgroundColor: colors.background,
         }}>
-        <ScrollView
+        <DrawerContentScrollView
           scrollsToTop={false}
           style={{
             backgroundColor: colors.sideMenuBackground,
@@ -159,7 +160,10 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer 
             )}
 
             {mode !== ModeEnum.basic && (
-              <RegText testID="menu.fundpools" onPress={() => onItemSelectedWrapper(MenuItemEnum.FundPools)} style={item}>
+              <RegText
+                testID="menu.fundpools"
+                onPress={() => onItemSelectedWrapper(MenuItemEnum.FundPools)}
+                style={item}>
                 {translate('loadedapp.fundpools') as string}
               </RegText>
             )}
@@ -219,7 +223,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer 
               {translate('loadedapp.support') as string}
             </RegText>
           </View>
-        </ScrollView>
+        </DrawerContentScrollView>
         <View
           style={{
             padding: 10,
@@ -230,9 +234,9 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, closeDrawer 
           }}>
           <Text style={{ fontSize: 8, color: colors.border }}>Version : </Text>
           <Text style={{ fontSize: 8, color: colors.primaryDisabled }}>{translate('version') as string}</Text>
-          <Text style={{ fontSize: 8, color: colors.border, marginLeft: 10 }}>{`${translate('settings.mode')}${translate(
-            `settings.value-mode-${mode}`,
-          )}`}</Text>
+          <Text style={{ fontSize: 8, color: colors.border, marginLeft: 10 }}>{`${translate(
+            'settings.mode',
+          )}${translate(`settings.value-mode-${mode}`)}`}</Text>
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
