@@ -150,7 +150,7 @@ jobs:
           LD: ld
           RANLIB: llvm-ranlib
           CC: ${{ env.CC }}24-clang
-          OPENSSL_DIR: /opt/openssl-3.4.1/${{ env.OPENSSL_PATH }}
+          OPENSSL_DIR: /opt/openssl-3.3.2/${{ env.OPENSSL_PATH }}
           CARGO_FEATURE_STD: true
 
       - name: LLVM Strip
