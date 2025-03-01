@@ -4,7 +4,7 @@ import React from 'react';
 type DrawerProps = {
   initialRouteName: string;
   children: any;
-  drawerContent: (props: DrawerContentComponentProps) => React.ReactNode;
+  drawerContent?: (props: DrawerContentComponentProps) => React.ReactNode;
 };
 
 const SideBar = createDrawerNavigator();
