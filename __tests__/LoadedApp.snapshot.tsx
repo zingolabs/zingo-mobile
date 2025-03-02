@@ -86,34 +86,23 @@ jest.mock('react-native-device-info', () => ({
   getManufacturer: jest.fn(() => 'Mocked Manufacturer'),
   getModel: jest.fn(() => 'Mocked Model'),
 }));
-// Jest setup file or in your test file
-jest.mock('react-native-gesture-handler/ReanimatedDrawerLayout', () => {
-  const R = require('react');
 
-  const ReanimatedDrawerLayout = R.forwardRef((props: any, ref: any) => {
-    const { renderNavigationView, children } = props;
+jest.mock('@react-navigation/drawer', () => {
+  const MockNavigator = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+  const MockScreen = ({ name, children, component }: any) => {
+    if (typeof children === 'function') {
+      return children({ navigation: {} });
+    }
 
-    return (
-      <div ref={ref}>
-        <div>
-          {renderNavigationView && renderNavigationView()}
-        </div>
-        <div>{children}</div>
-      </div>
-    );
-  });
-
-  // Export mock DrawerType if needed
-  const DrawerType = {
-    FRONT: 'front',
-    BACK: 'back',
-    SLIDE: 'slide',
+    const Component = component;
+    return Component ? <Component /> : <>{children}</>;
   };
 
   return {
-    __esModule: true,
-    default: ReanimatedDrawerLayout,
-    DrawerType,
+    createDrawerNavigator: jest.fn(() => ({
+      Navigator: MockNavigator,
+      Screen: MockScreen,
+    })),
   };
 });
 
@@ -134,7 +123,7 @@ jest.mock('react-native-gesture-handler', () => {
 
   return {
     RNGestureHandlerModule: RN,
-    GestureHandlerRootView: ({ children }: {children: React.ReactNode}) => children,
+    GestureHandlerRootView: ({ children }: { children: React.ReactNode }) => children,
   };
 });
 jest.mock('react-native-keychain', () => ({
@@ -169,7 +158,7 @@ jest.mock('@react-navigation/elements', () => ({
 }));
 jest.mock('@react-navigation/native', () => ({
   ...jest.requireActual('@react-navigation/native'),
-  useTheme: () => (mockTheme),
+  useTheme: () => mockTheme,
 }));
 
 // test suite

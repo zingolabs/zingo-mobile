@@ -1,9 +1,10 @@
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentComponentProps } from '@react-navigation/drawer';
 import React from 'react';
 
 type DrawerProps = {
   initialRouteName: string;
   children: any;
+  drawerContent?: (props: DrawerContentComponentProps) => React.ReactNode;
 };
 
 const SideBar = createDrawerNavigator();
@@ -25,11 +26,13 @@ const SideBar = createDrawerNavigator();
  *   </Drawer>
  * }
  */
-function Drawer({ initialRouteName, children }: DrawerProps) {
+function Drawer({ initialRouteName, drawerContent, children }: DrawerProps) {
   return (
     <SideBar.Navigator
+      drawerContent={drawerContent}
       initialRouteName={initialRouteName}
       screenOptions={{
+        headerShown: false,
         drawerType: 'slide',
       }}>
       {children}

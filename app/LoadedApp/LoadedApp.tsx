@@ -10,7 +10,6 @@ import {
   Linking,
   Platform,
   ActivityIndicator,
-  Dimensions,
 } from 'react-native';
 import { MagicModalPortal, magicModal } from 'react-native-magic-modal';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -18,7 +17,6 @@ import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-naviga
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
-import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { cloneDeep, isEqual } from 'lodash';
@@ -93,6 +91,8 @@ import Menu from './components/Menu';
 import { MessagesModal } from '../../components/Messages';
 import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Drawer from '../../components/Drawer';
+import { DrawerContentComponentProps } from '@react-navigation/drawer';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -448,7 +448,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
-  drawerRef: any;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -791,23 +790,31 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setSeedViewModalShow = async () => {
-    return magicModal.show(() => <Seed
-        onClickOK={() => {}}
-        onClickCancel={() => {}}
-        action={SeedActionEnum.view}
-        setPrivacyOption={this.setPrivacyOption}
-        keepAwake={this.keepAwake}
-      />, { swipeDirection: undefined }
+    return magicModal.show(
+      () => (
+        <Seed
+          onClickOK={() => {}}
+          onClickCancel={() => {}}
+          action={SeedActionEnum.view}
+          setPrivacyOption={this.setPrivacyOption}
+          keepAwake={this.keepAwake}
+        />
+      ),
+      { swipeDirection: undefined },
     ).promise;
   };
 
   setUfvkViewModalShow = async () => {
-    return magicModal.show(() => <ShowUfvk
-        onClickOK={() => {}}
-        onClickCancel={() => {}}
-        action={UfvkActionEnum.view}
-        setPrivacyOption={this.setPrivacyOption}
-      />, { swipeDirection: undefined }
+    return magicModal.show(
+      () => (
+        <ShowUfvk
+          onClickOK={() => {}}
+          onClickCancel={() => {}}
+          action={UfvkActionEnum.view}
+          setPrivacyOption={this.setPrivacyOption}
+        />
+      ),
+      { swipeDirection: undefined },
     ).promise;
   };
 
@@ -1120,12 +1127,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.rpc.refreshSync(false, true);
   };
 
-  toggleMenuDrawer = () => {
-    //const start = Date.now();
-    this.openDrawer();
-    //console.log('=========================================== > TOGGLE MENU STORED SETSTATE - ', Date.now() - start);
-  };
-
   setWallet = async (wallet: WalletType) => {
     //console.log(wallet, this.state.readOnly);
     if (!isEqual(this.state.wallet, wallet)) {
@@ -1142,28 +1143,35 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     } else if (item === MenuItemEnum.Rescan) {
       return magicModal.show(() => <Rescan doRescan={this.doRescan} />, { swipeDirection: undefined }).promise;
     } else if (item === MenuItemEnum.Settings) {
-      return magicModal.show(() => <Settings
-        setWalletOption={this.setWalletOption}
-        setServerOption={this.setServerOption}
-        setCurrencyOption={this.setCurrencyOption}
-        setLanguageOption={this.setLanguageOption}
-        setSendAllOption={this.setSendAllOption}
-        setDonationOption={this.setDonationOption}
-        setPrivacyOption={this.setPrivacyOption}
-        setModeOption={this.setModeOption}
-        setSecurityOption={this.setSecurityOption}
-        setSelectServerOption={this.setSelectServerOption}
-        setRescanMenuOption={this.setRescanMenuOption}
-        setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
-      />, { swipeDirection: undefined }).promise;
+      return magicModal.show(
+        () => (
+          <Settings
+            setWalletOption={this.setWalletOption}
+            setServerOption={this.setServerOption}
+            setCurrencyOption={this.setCurrencyOption}
+            setLanguageOption={this.setLanguageOption}
+            setSendAllOption={this.setSendAllOption}
+            setDonationOption={this.setDonationOption}
+            setPrivacyOption={this.setPrivacyOption}
+            setModeOption={this.setModeOption}
+            setSecurityOption={this.setSecurityOption}
+            setSelectServerOption={this.setSelectServerOption}
+            setRescanMenuOption={this.setRescanMenuOption}
+            setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
+          />
+        ),
+        { swipeDirection: undefined },
+      ).promise;
     } else if (item === MenuItemEnum.Info) {
       return magicModal.show(() => <Info />, { swipeDirection: undefined }).promise;
     } else if (item === MenuItemEnum.SyncReport) {
       return magicModal.show(() => <SyncReport />, { swipeDirection: undefined }).promise;
     } else if (item === MenuItemEnum.FundPools) {
-      return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined }).promise;
+      return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined })
+        .promise;
     } else if (item === MenuItemEnum.Insight) {
-      return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined }).promise;
+      return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined })
+        .promise;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
         await this.setUfvkViewModalShow();
@@ -1172,38 +1180,54 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
     } else if (item === MenuItemEnum.ChangeWallet) {
       if (this.state.readOnly) {
-        return magicModal.show(() => <ShowUfvk
-            onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
-            onClickCancel={() => {}}
-            action={UfvkActionEnum.change}
-            setPrivacyOption={this.setPrivacyOption}
-          />, { swipeDirection: undefined }
+        return magicModal.show(
+          () => (
+            <ShowUfvk
+              onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
+              onClickCancel={() => {}}
+              action={UfvkActionEnum.change}
+              setPrivacyOption={this.setPrivacyOption}
+            />
+          ),
+          { swipeDirection: undefined },
         ).promise;
       } else {
-        return magicModal.show(() => <Seed
-            onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
-            onClickCancel={() => {}}
-            action={SeedActionEnum.change}
-            setPrivacyOption={this.setPrivacyOption}
-          />, { swipeDirection: undefined }
+        return magicModal.show(
+          () => (
+            <Seed
+              onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
+              onClickCancel={() => {}}
+              action={SeedActionEnum.change}
+              setPrivacyOption={this.setPrivacyOption}
+            />
+          ),
+          { swipeDirection: undefined },
         ).promise;
       }
     } else if (item === MenuItemEnum.RestoreWalletBackup) {
       if (this.state.readOnly) {
-        return magicModal.show(() => <ShowUfvk
-            onClickOK={async () => await this.onClickOKRestoreBackup()}
-            onClickCancel={() => {}}
-            action={UfvkActionEnum.backup}
-            setPrivacyOption={this.setPrivacyOption}
-          />, { swipeDirection: undefined }
+        return magicModal.show(
+          () => (
+            <ShowUfvk
+              onClickOK={async () => await this.onClickOKRestoreBackup()}
+              onClickCancel={() => {}}
+              action={UfvkActionEnum.backup}
+              setPrivacyOption={this.setPrivacyOption}
+            />
+          ),
+          { swipeDirection: undefined },
         ).promise;
       } else {
-        return magicModal.show(() => <Seed
-            onClickOK={async () => await this.onClickOKRestoreBackup()}
-            onClickCancel={() => {}}
-            action={SeedActionEnum.backup}
-            setPrivacyOption={this.setPrivacyOption}
-          />, { swipeDirection: undefined }
+        return magicModal.show(
+          () => (
+            <Seed
+              onClickOK={async () => await this.onClickOKRestoreBackup()}
+              onClickCancel={() => {}}
+              action={SeedActionEnum.backup}
+              setPrivacyOption={this.setPrivacyOption}
+            />
+          ),
+          { swipeDirection: undefined },
         ).promise;
       }
     } else if (item === MenuItemEnum.LoadWalletFromSeed) {
@@ -1242,7 +1266,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setState({
         addressBookCurrentAddress: '',
       });
-      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined }).promise;
+      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined })
+        .promise;
     } else if (item === MenuItemEnum.VoteForNym) {
       let update = false;
       if (
@@ -1285,15 +1310,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       await sendEmail(this.state.translate, this.state.info.zingolib);
       this.setShowSwipeableIcons(true);
     } else if (item === MenuItemEnum.Chats) {
-      return magicModal.show(() => <MessagesModal
-        setPrivacyOption={this.setPrivacyOption /* header */}
-        setScrollToTop={this.setScrollToTop /* chats */}
-        scrollToTop={this.state.scrollToTop /* chats */}
-        setScrollToBottom={this.setScrollToBottom /* messages */}
-        scrollToBottom={this.state.scrollToBottom /* messages */}
-        sendTransaction={this.sendTransaction /* messages */}
-        setServerOption={this.setServerOption /* messages */}
-      />, { swipeDirection: undefined }).promise;
+      return magicModal.show(
+        () => (
+          <MessagesModal
+            setPrivacyOption={this.setPrivacyOption /* header */}
+            setScrollToTop={this.setScrollToTop /* chats */}
+            scrollToTop={this.state.scrollToTop /* chats */}
+            setScrollToBottom={this.setScrollToBottom /* messages */}
+            scrollToBottom={this.state.scrollToBottom /* messages */}
+            sendTransaction={this.sendTransaction /* messages */}
+            setServerOption={this.setServerOption /* messages */}
+          />
+        ),
+        { swipeDirection: undefined },
+      ).promise;
     }
   };
 
@@ -1370,30 +1400,38 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (error) {
       // I need to open the modal ASAP, and keep going with the toast.
       if (this.state.readOnly) {
-        magicModal.show(() => <ShowUfvk
-            onClickOK={async () => await this.onClickOKServerWallet()}
-            onClickCancel={async () => {
-              // restart all the tasks again, nothing happen.
-              this.rpc.setInRefresh(false);
-              await this.rpc.clearTimers();
-              await this.rpc.configure();
-            }}
-            action={UfvkActionEnum.server}
-            setPrivacyOption={this.setPrivacyOption}
-          />, { swipeDirection: undefined }
+        magicModal.show(
+          () => (
+            <ShowUfvk
+              onClickOK={async () => await this.onClickOKServerWallet()}
+              onClickCancel={async () => {
+                // restart all the tasks again, nothing happen.
+                this.rpc.setInRefresh(false);
+                await this.rpc.clearTimers();
+                await this.rpc.configure();
+              }}
+              action={UfvkActionEnum.server}
+              setPrivacyOption={this.setPrivacyOption}
+            />
+          ),
+          { swipeDirection: undefined },
         );
       } else {
-        magicModal.show(() => <Seed
-            onClickOK={async () => await this.onClickOKServerWallet()}
-            onClickCancel={async () => {
-              // restart all the tasks again, nothing happen.
-              this.rpc.setInRefresh(false);
-              await this.rpc.clearTimers();
-              await this.rpc.configure();
-            }}
-            action={SeedActionEnum.server}
-            setPrivacyOption={this.setPrivacyOption}
-          />, { swipeDirection: undefined }
+        magicModal.show(
+          () => (
+            <Seed
+              onClickOK={async () => await this.onClickOKServerWallet()}
+              onClickCancel={async () => {
+                // restart all the tasks again, nothing happen.
+                this.rpc.setInRefresh(false);
+                await this.rpc.clearTimers();
+                await this.rpc.configure();
+              }}
+              action={SeedActionEnum.server}
+              setPrivacyOption={this.setPrivacyOption}
+            />
+          ),
+          { swipeDirection: undefined },
         );
       }
       //console.log(`Error Reading Wallet ${value} - ${error}`);
@@ -1678,7 +1716,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setPoolsModalShow = async () => {
-    return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined }).promise;
+    return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined })
+      .promise;
   };
 
   setBackgroundError = (title: string, error: string) => {
@@ -1711,7 +1750,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       addressBookCurrentAddress: address,
     });
-    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined }).promise;
+    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined })
+      .promise;
   };
 
   setScrollToTop = (value: boolean) => {
@@ -1724,17 +1764,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       scrollToBottom: value,
     });
-  };
-
-  closeDrawer = async () => {
-    await this.drawerRef.closeDrawer();
-    // wait a little to close the drawer menu properly
-    // we have to replace the drawer, check this out after.
-    //await new Promise(resolve => setTimeout(resolve, 150));
-  };
-
-  openDrawer = () => {
-    this.drawerRef.openDrawer();
   };
 
   render() {
@@ -1808,7 +1837,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
     };
 
-    const menu = <Menu onItemSelected={this.onMenuItemSelected} closeDrawer={this.closeDrawer} />;
+    const menu = (props: DrawerContentComponentProps) => <Menu onItemSelected={this.onMenuItemSelected} {...props} />;
 
     const fnTabBarIcon = (route: StackScreenProps<any>['route'], focused: boolean) => {
       var iconName;
@@ -1848,118 +1877,123 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     return (
       <ContextAppLoadedProvider value={context}>
         <GestureHandlerRootView>
-          <DrawerLayout
-            ref={ref => (this.drawerRef = ref)}
-            renderNavigationView={() => menu}
-            drawerType={'slide'}
-            drawerWidth={Dimensions.get('window').width * 0.7}>
+          <Drawer drawerContent={menu} initialRouteName="Home">
+            <Drawer.Screen name="Home">
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
+                <>
+                  <Snackbars
+                    snackbars={snackbars}
+                    removeFirstSnackbar={this.removeFirstSnackbar}
+                    translate={translate}
+                  />
 
-            <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
-
-            {mode === ModeEnum.advanced ||
-            (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
-            (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
-              <Tab.Navigator
-                detachInactiveScreens={true}
-                initialRouteName={translate('loadedapp.history-menu') as string}
-                screenOptions={({ route }) => ({
-                  tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-                  tabBarIconStyle: {
-                    alignSelf: 'center',
-                    marginBottom: 2,
-                  },
-                  tabBarLabelPosition: 'below-icon',
-                  tabBarLabelStyle: {
-                    alignSelf: 'center',
-                    fontSize: 14,
-                  },
-                  tabBarItemStyle: {
-                    height: 60,
-                  },
-                  tabBarActiveTintColor: colors.background,
-                  tabBarActiveBackgroundColor: colors.primaryDisabled,
-                  tabBarInactiveTintColor: colors.money,
-                  tabBarInactiveBackgroundColor: colors.sideMenuBackground,
-                  tabBarStyle: {
-                    borderTopWidth: 1,
-                    height: 60,
-                  },
-                  headerShown: false,
-                  tabBarButton: renderTabPressable(colors),
-                })}>
-                <Tab.Screen name={translate('loadedapp.history-menu') as string}>
-                  {() => (
-                    <History
-                      toggleMenuDrawer={this.toggleMenuDrawer /* header */}
-                      setPrivacyOption={this.setPrivacyOption /* header */}
-                      setShieldingAmount={this.setShieldingAmount /* header */}
-                      setScrollToTop={this.setScrollToTop /* header & history */}
-                      scrollToTop={scrollToTop /* history */}
-                      setScrollToBottom={this.setScrollToBottom /* header & messages */}
-                      scrollToBottom={scrollToBottom /* messages */}
-                      sendTransaction={this.sendTransaction /* messages */}
-                      setServerOption={this.setServerOption /* messages */}
-                    />
-                  )}
-                </Tab.Screen>
-                {!readOnly &&
-                  selectServer !== SelectServerEnum.offline &&
-                  (mode === ModeEnum.advanced ||
-                    (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ||
-                    (!!totalBalance &&
-                      totalBalance.orchardBal + totalBalance.privateBal > 0 &&
-                      totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
-                      somePending)) && (
-                    <Tab.Screen name={translate('loadedapp.send-menu') as string}>
-                      {() => (
-                        <Send
-                          toggleMenuDrawer={this.toggleMenuDrawer /* header */}
-                          setPrivacyOption={this.setPrivacyOption /* header */}
-                          setShieldingAmount={this.setShieldingAmount /* header */}
-                          setScrollToTop={this.setScrollToTop /* header & send */}
-                          setScrollToBottom={this.setScrollToBottom /* header & send */}
-                          sendTransaction={this.sendTransaction /* send */}
-                          setServerOption={this.setServerOption /* send */}
-                          clearToAddr={this.clearToAddr /* send */}
-                        />
+                  {mode === ModeEnum.advanced ||
+                  (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
+                  (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
+                    <Tab.Navigator
+                      detachInactiveScreens={true}
+                      initialRouteName={translate('loadedapp.history-menu') as string}
+                      screenOptions={({ route }) => ({
+                        tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
+                        tabBarIconStyle: {
+                          alignSelf: 'center',
+                          marginBottom: 2,
+                        },
+                        tabBarLabelPosition: 'below-icon',
+                        tabBarLabelStyle: {
+                          alignSelf: 'center',
+                          fontSize: 14,
+                        },
+                        tabBarItemStyle: {
+                          height: 60,
+                        },
+                        tabBarActiveTintColor: colors.background,
+                        tabBarActiveBackgroundColor: colors.primaryDisabled,
+                        tabBarInactiveTintColor: colors.money,
+                        tabBarInactiveBackgroundColor: colors.sideMenuBackground,
+                        tabBarStyle: {
+                          borderTopWidth: 1,
+                          height: 60,
+                        },
+                        headerShown: false,
+                        tabBarButton: renderTabPressable(colors),
+                      })}>
+                      <Tab.Screen name={translate('loadedapp.history-menu') as string}>
+                        {() => (
+                          <History
+                            toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                            setPrivacyOption={this.setPrivacyOption /* header */}
+                            setShieldingAmount={this.setShieldingAmount /* header */}
+                            setScrollToTop={this.setScrollToTop /* header & history */}
+                            scrollToTop={scrollToTop /* history */}
+                            setScrollToBottom={this.setScrollToBottom /* header & messages */}
+                            scrollToBottom={scrollToBottom /* messages */}
+                            sendTransaction={this.sendTransaction /* messages */}
+                            setServerOption={this.setServerOption /* messages */}
+                          />
+                        )}
+                      </Tab.Screen>
+                      {!readOnly &&
+                        selectServer !== SelectServerEnum.offline &&
+                        (mode === ModeEnum.advanced ||
+                          (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ||
+                          (!!totalBalance &&
+                            totalBalance.orchardBal + totalBalance.privateBal > 0 &&
+                            totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
+                            somePending)) && (
+                          <Tab.Screen name={translate('loadedapp.send-menu') as string}>
+                            {() => (
+                              <Send
+                                toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                                setPrivacyOption={this.setPrivacyOption /* header */}
+                                setShieldingAmount={this.setShieldingAmount /* header */}
+                                setScrollToTop={this.setScrollToTop /* header & send */}
+                                setScrollToBottom={this.setScrollToBottom /* header & send */}
+                                sendTransaction={this.sendTransaction /* send */}
+                                setServerOption={this.setServerOption /* send */}
+                                clearToAddr={this.clearToAddr /* send */}
+                              />
+                            )}
+                          </Tab.Screen>
+                        )}
+                      <Tab.Screen name={translate('loadedapp.receive-menu') as string}>
+                        {() => (
+                          <Receive
+                            toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                            alone={false /* receive */}
+                          />
+                        )}
+                      </Tab.Screen>
+                    </Tab.Navigator>
+                  ) : (
+                    <>
+                      {valueTransfersTotal === null || addresses === null || totalBalance === null ? (
+                        <Loading backgroundColor={colors.background} spinColor={colors.primary} />
+                      ) : (
+                        <Tab.Navigator
+                          initialRouteName={translate('loadedapp.history-menu') as string}
+                          screenOptions={{
+                            tabBarStyle: {
+                              display: 'none',
+                            },
+                            headerShown: false,
+                          }}>
+                          <Tab.Screen name={translate('loadedapp.history-menu') as string}>
+                            {() => (
+                              <Receive
+                                toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                                alone={true /* receive */}
+                              />
+                            )}
+                          </Tab.Screen>
+                        </Tab.Navigator>
                       )}
-                    </Tab.Screen>
+                    </>
                   )}
-                <Tab.Screen name={translate('loadedapp.receive-menu') as string}>
-                  {() => (
-                    <Receive
-                      toggleMenuDrawer={this.toggleMenuDrawer /* header */}
-                      alone={false /* receive */}
-                    />
-                  )}
-                </Tab.Screen>
-              </Tab.Navigator>
-            ) : (
-              <>
-                {valueTransfersTotal === null || addresses === null || totalBalance === null ? (
-                  <Loading backgroundColor={colors.background} spinColor={colors.primary} />
-                ) : (
-                  <Tab.Navigator
-                    initialRouteName={translate('loadedapp.history-menu') as string}
-                    screenOptions={{
-                      tabBarStyle: {
-                        display: 'none',
-                      },
-                      headerShown: false,
-                    }}>
-                    <Tab.Screen name={translate('loadedapp.history-menu') as string}>
-                      {() => (
-                        <Receive
-                          toggleMenuDrawer={this.toggleMenuDrawer /* header */}
-                          alone={true /* receive */}
-                        />
-                      )}
-                    </Tab.Screen>
-                  </Tab.Navigator>
-                )}
-              </>
-            )}
-          </DrawerLayout>
+                </>
+              )}
+            </Drawer.Screen>
+          </Drawer>
           <MagicModalPortal />
         </GestureHandlerRootView>
       </ContextAppLoadedProvider>
