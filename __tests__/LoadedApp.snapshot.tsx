@@ -89,7 +89,14 @@ jest.mock('react-native-device-info', () => ({
 
 jest.mock('@react-navigation/drawer', () => {
   const MockNavigator = ({ children }: { children: React.ReactNode }) => <>{children}</>;
-  const MockScreen = () => null; // No-op component
+  const MockScreen = ({ name, children, component }: any) => {
+    if (typeof children === 'function') {
+      return children({ navigation: {} });
+    }
+
+    const Component = component;
+    return Component ? <Component /> : <>{children}</>;
+  };
 
   return {
     createDrawerNavigator: jest.fn(() => ({
