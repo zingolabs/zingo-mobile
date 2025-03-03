@@ -7,12 +7,6 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import CircularProgress from '../components/Components/CircularProgress';
-import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
-
-jest.mock('@react-navigation/native', () => ({
-  ...jest.requireActual('@react-navigation/native'),
-  useTheme: () => (mockTheme),
-}));
 
 // test suite
 describe('Component CircularProgress - test', () => {

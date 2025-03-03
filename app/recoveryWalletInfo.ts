@@ -26,7 +26,7 @@ export const saveRecoveryWalletInfo = async (keys: WalletType): Promise<void> =>
       JSON.stringify(keys),
       options(await Keychain.getSupportedBiometryType()),
     );
-    console.log('keys saved correctly');
+    //console.log('keys saved correctly');
     //console.log('key:', GlobalConst.keyKeyChain);
     //console.log('value:', keys);
   } catch (error) {
@@ -38,8 +38,8 @@ export const getRecoveryWalletInfo = async (): Promise<WalletType> => {
   try {
     const credentials = await Keychain.getGenericPassword(options(await Keychain.getSupportedBiometryType()));
     if (credentials) {
-      console.log('keys read correctly', credentials);
-      console.log('biometrics', await Keychain.getSupportedBiometryType());
+      //console.log('keys read correctly', credentials);
+      //console.log('biometrics', await Keychain.getSupportedBiometryType());
       //console.log('key:', credentials.username);
       //console.log('value:', credentials.password);
       if (credentials.username === GlobalConst.keyKeyChain && credentials.service === GlobalConst.serviceKeyChain) {
@@ -63,7 +63,7 @@ export const hasRecoveryWalletInfo = async (): Promise<boolean> => {
 
 export const createUpdateRecoveryWalletInfo = async (keys: WalletType): Promise<void> => {
   // have not Wallet Keys
-  console.log('creating keys');
+  //console.log('creating keys');
   await saveRecoveryWalletInfo(keys);
 };
 

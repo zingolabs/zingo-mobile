@@ -11,26 +11,7 @@ import AbDetail from '../components/AddressBook/components/AbDetail';
 import { AddressBookActionEnum, AddressBookFileClass } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
-import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
-jest.mock('react-native-safe-area-context', () => ({
-  SafeAreaProvider: ({ children }: any) => children,
-  SafeAreaView: ({ children }: any) => children,
-  useSafeAreaInsets: () => ({ top: 0, left: 0, right: 0, bottom: 0 }),
-}));
-jest.useFakeTimers();
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-  FontAwesomeIcon: '',
-}));
-jest.mock('react-native-localize', () => ({
-  getNumberFormatSettings: () => {
-    return {
-      decimalSeparator: '.', // us
-      groupingSeparator: ',', // us
-    };
-  },
-}));
-jest.mock('react-native/src/private/animated/NativeAnimatedHelper');
 jest.mock('@react-native-community/netinfo/src/index', () => {
   const RN = jest.requireActual('react-native');
 
@@ -49,11 +30,6 @@ jest.mock('react-native', () => {
 
   return RN;
 });
-jest.mock('@react-navigation/native', () => ({
-  ...jest.requireActual('@react-navigation/native'),
-  useScrollToTop: jest.fn(),
-  useTheme: () => mockTheme,
-}));
 
 // test suite
 describe('Component Address Book Details - test', () => {

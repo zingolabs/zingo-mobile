@@ -8,16 +8,6 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import DetailLine from '../components/Components/DetailLine';
 import { View } from 'react-native';
-import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
-
-jest.mock('@react-native-clipboard/clipboard', () => ({
-  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
-  setString: jest.fn(),
-}));
-jest.mock('@react-navigation/native', () => ({
-  ...jest.requireActual('@react-navigation/native'),
-  useTheme: () => (mockTheme),
-}));
 
 // test suite
 describe('Component DetailLine - test', () => {

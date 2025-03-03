@@ -13,21 +13,6 @@ import FadeText from '../components/Components/FadeText';
 import ErrorText from '../components/Components/ErrorText';
 import RegText from '../components/Components/RegText';
 import { CurrencyEnum, CurrencyNameEnum } from '../app/AppState';
-import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
-
-jest.mock('react-native-localize', () => ({
-  getNumberFormatSettings: () => {
-    return {
-      decimalSeparator: '.',
-      groupingSeparator: ',',
-    };
-  },
-}));
-jest.mock('react-native/src/private/animated/NativeAnimatedHelper');
-jest.mock('@react-navigation/native', () => ({
-  ...jest.requireActual('@react-navigation/native'),
-  useTheme: () => (mockTheme),
-}));
 
 // test suite
 describe('Component Components - test', () => {

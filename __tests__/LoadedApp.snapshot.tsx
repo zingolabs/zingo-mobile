@@ -30,29 +30,6 @@ jest.mock('i18n-js', () => ({
   })),
 }));
 
-jest.mock('react-native-safe-area-context', () => ({
-  SafeAreaProvider: ({ children }: any) => children,
-  SafeAreaView: ({ children }: any) => children,
-  useSafeAreaInsets: () => ({ top: 0, left: 0, right: 0, bottom: 0 }),
-}));
-jest.useFakeTimers();
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-  FontAwesomeIcon: '',
-}));
-jest.mock('react-native-localize', () => ({
-  getNumberFormatSettings: () => {
-    return {
-      decimalSeparator: '.',
-      groupingSeparator: ',',
-    };
-  },
-}));
-jest.mock('react-native-tab-view', () => ({
-  TabView: '',
-  TabBar: '',
-}));
-jest.mock('react-native-context-menu-view', () => '');
-jest.mock('react-native/src/private/animated/NativeAnimatedHelper');
 jest.mock('@react-native-community/netinfo/src/index', () => {
   return {
     addEventListener: jest.fn(),
@@ -79,33 +56,6 @@ jest.mock('react-native-fs', () => ({
   writeFile: jest.fn(() => Promise.resolve()), // o Promise.reject(new Error('Write failed'))
   // Agrega más funciones mockeadas según sea necesario
 }));
-jest.mock('react-native-picker-select', () => 'RNPickerSelect');
-jest.mock('react-native-device-info', () => ({
-  getSystemName: jest.fn(() => 'Mocked System Name'),
-  getSystemVersion: jest.fn(() => 'Mocked System Version'),
-  getManufacturer: jest.fn(() => 'Mocked Manufacturer'),
-  getModel: jest.fn(() => 'Mocked Model'),
-}));
-
-jest.mock('@react-navigation/drawer', () => {
-  const MockNavigator = ({ children }: { children: React.ReactNode }) => <>{children}</>;
-  const MockScreen = ({ name, children, component }: any) => {
-    if (typeof children === 'function') {
-      return children({ navigation: {} });
-    }
-
-    const Component = component;
-    return Component ? <Component /> : <>{children}</>;
-  };
-
-  return {
-    createDrawerNavigator: jest.fn(() => ({
-      Navigator: MockNavigator,
-      Screen: MockScreen,
-    })),
-  };
-});
-
 jest.mock('react-native-gesture-handler', () => {
   const RN = jest.requireActual('react-native');
 
@@ -126,40 +76,6 @@ jest.mock('react-native-gesture-handler', () => {
     GestureHandlerRootView: ({ children }: { children: React.ReactNode }) => children,
   };
 });
-jest.mock('react-native-keychain', () => ({
-  ACCESS_CONTROL: {
-    BIOMETRY_CURRENT_SET: 'biometryCurrentSet',
-  },
-  ACCESSIBLE: {
-    WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'whenUnlockedThisDeviceOnly',
-  },
-  AUTHENTICATION_TYPE: {
-    BIOMETRICS: 'biometrics',
-  },
-  SECURITY_LEVEL: {
-    SECURE_SOFTWARE: 'secureSoftware',
-  },
-  SECURITY_RULES: {
-    NONE: 'none',
-  },
-  STORAGE_TYPE: {
-    AES: 'AES',
-  },
-  setGenericPassword: jest.fn(),
-  getGenericPassword: jest.fn(),
-  resetGenericPassword: jest.fn(),
-}));
-jest.mock('@react-native-clipboard/clipboard', () => ({
-  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
-  setString: jest.fn(),
-}));
-jest.mock('@react-navigation/elements', () => ({
-  PlatformPressable: jest.fn().mockImplementation(({ children }) => children),
-}));
-jest.mock('@react-navigation/native', () => ({
-  ...jest.requireActual('@react-navigation/native'),
-  useTheme: () => mockTheme,
-}));
 
 // test suite
 describe('Component LoadedApp - test', () => {
