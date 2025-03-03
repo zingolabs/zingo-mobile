@@ -87,7 +87,6 @@ import History from '../../components/History';
 import Send from '../../components/Send';
 import Receive from '../../components/Receive';
 import Settings from '../../components/Settings';
-import Menu from './components/Menu';
 import { MessagesModal } from '../../components/Messages';
 import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -1837,8 +1836,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
     };
 
-    const menu = (props: DrawerContentComponentProps) => <Menu onItemSelected={this.onMenuItemSelected} {...props} />;
-
     const fnTabBarIcon = (route: StackScreenProps<any>['route'], focused: boolean) => {
       var iconName;
 
@@ -1877,7 +1874,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     return (
       <ContextAppLoadedProvider value={context}>
         <GestureHandlerRootView>
-          <Drawer drawerContent={menu} initialRouteName="Home">
+          <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName="Home">
             <Drawer.Screen name="Home">
               {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
                 <>
