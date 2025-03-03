@@ -25,12 +25,13 @@ import { useMagicModal } from 'react-native-magic-modal';
 
 type PoolsProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
+  goBack: () => void;
 };
 
-const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
+const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption, goBack }) => {
   const context = useContext(ContextAppLoaded);
   const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language, shieldingAmount } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { hide } = useMagicModal();
   const [orchardPool, setOrchardPool] = useState<boolean>(false);
   const [saplingPool, setSaplingPool] = useState<boolean>(false);
@@ -70,7 +71,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
           noDrawMenu={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
-          closeScreen={hide}
+          closeScreen={goBack}
         />
         <ScrollView
           style={{ maxHeight: '90%' }}
@@ -113,7 +114,8 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
                           size={18}
                           currencyName={info.currencyName}
                           color={
-                            totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
+                            totalBalance.spendableOrchard > 0 &&
+                            totalBalance.spendableOrchard === totalBalance.orchardBal
                               ? colors.primary
                               : 'red'
                           }
@@ -156,7 +158,8 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
                           size={18}
                           currencyName={info.currencyName}
                           color={
-                            totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
+                            totalBalance.spendablePrivate > 0 &&
+                            totalBalance.spendablePrivate === totalBalance.privateBal
                               ? colors.syncing
                               : 'red'
                           }

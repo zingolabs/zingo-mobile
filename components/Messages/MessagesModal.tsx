@@ -24,6 +24,7 @@ type MessagesModalProps = {
     toast: boolean,
     sameServerChainName: boolean,
   ) => Promise<void>;
+  goBack: () => void;
 };
 
 const MessagesModal: React.FunctionComponent<MessagesModalProps> = ({
@@ -34,6 +35,7 @@ const MessagesModal: React.FunctionComponent<MessagesModalProps> = ({
   scrollToBottom,
   sendTransaction,
   setServerOption,
+  goBack,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { language } = context;
@@ -49,7 +51,7 @@ const MessagesModal: React.FunctionComponent<MessagesModalProps> = ({
       scrollToBottom={scrollToBottom}
       sendTransaction={sendTransaction}
       setServerOption={setServerOption}
-      closeModal={hide}
+      closeModal={goBack}
       noDrawMenu={true}
     />
   );

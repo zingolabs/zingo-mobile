@@ -17,11 +17,12 @@ import 'moment/locale/ru';
 import { useMagicModal } from 'react-native-magic-modal';
 
 type AboutProps = {
+  goBack: () => void;
 };
-const About: React.FunctionComponent<AboutProps> = () => {
+const About: React.FunctionComponent<AboutProps> = ({ goBack }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, language } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
   const { hide } = useMagicModal();
 
@@ -47,7 +48,7 @@ const About: React.FunctionComponent<AboutProps> = () => {
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={goBack}
         />
         <ScrollView
           style={{ maxHeight: '90%' }}

@@ -19,12 +19,13 @@ import { useMagicModal } from 'react-native-magic-modal';
 
 type RescanProps = {
   doRescan: () => void;
+  goBack: () => void;
 };
 
-const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
+const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan, goBack }) => {
   const context = useContext(ContextAppLoaded);
   const { wallet, translate, netInfo, addLastSnackbar, language, selectServer } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { hide } = useMagicModal();
   moment.locale(language);
 
@@ -57,7 +58,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={goBack}
         />
         <ScrollView
           style={{ height: '80%', maxHeight: '80%' }}
@@ -78,7 +79,11 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
             alignItems: 'center',
             marginVertical: 5,
           }}>
-          <Button type={ButtonTypeEnum.Primary} title={translate('rescan.button') as string} onPress={doRescanAndClose} />
+          <Button
+            type={ButtonTypeEnum.Primary}
+            title={translate('rescan.button') as string}
+            onPress={doRescanAndClose}
+          />
         </View>
       </SafeAreaView>
     </SafeAreaProvider>

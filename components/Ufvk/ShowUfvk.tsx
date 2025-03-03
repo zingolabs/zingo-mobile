@@ -32,11 +32,18 @@ type ShowUfvkProps = {
   onClickCancel: () => void;
   action: UfvkActionEnum;
   setPrivacyOption: (value: boolean) => Promise<void>;
+  goBack: () => void;
 };
-const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, setPrivacyOption }) => {
+const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
+  onClickOK,
+  onClickCancel,
+  action,
+  setPrivacyOption,
+  goBack,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { translate, wallet, server, mode, addLastSnackbar, language } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { hide } = useMagicModal();
   moment.locale(language);
 
@@ -107,7 +114,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           noDrawMenu={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
-          closeScreen={onClickCancelHide}
+          closeScreen={goBack}
         />
         <ScrollView
           style={{ height: '80%', maxHeight: '80%' }}
@@ -124,7 +131,14 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
 
           <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
             {!!wallet.ufvk && (
-              <SingleAddress address={wallet.ufvk} ufvk={true} index={0} total={1} prev={() => null} next={() => null} />
+              <SingleAddress
+                address={wallet.ufvk}
+                ufvk={true}
+                index={0}
+                total={1}
+                prev={() => null}
+                next={() => null}
+              />
             )}
             {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}
           </View>

@@ -42,12 +42,13 @@ const getPercent = (percent: number) => {
 
 type InsightProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
+  goBack: () => void;
 };
 
-const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) => {
+const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption, goBack }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, privacy, addLastSnackbar, language } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { hide } = useMagicModal();
   moment.locale(language);
 
@@ -170,12 +171,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
                   flexWrap: 'wrap',
                 }}>
                 {item.address !== 'fee' && (
-                  <AddressItem
-                    address={item.address}
-                    oneLine={true}
-                    onlyContact={true}
-                    withIcon={true}
-                  />
+                  <AddressItem address={item.address} oneLine={true} onlyContact={true} withIcon={true} />
                 )}
                 {!expandAddress[index] && !!item.address && (
                   <RegText>
@@ -230,7 +226,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
         {item?.value}
       </SvgText>
     ),
-    []
+    [],
   );
 
   //console.log('render insight');
@@ -252,7 +248,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
           noDrawMenu={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
-          closeScreen={hide}
+          closeScreen={goBack}
         />
 
         <View style={{ width: '100%', flexDirection: 'row', marginTop: 10 }}>

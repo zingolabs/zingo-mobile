@@ -49,6 +49,7 @@ type SeedProps = {
   action: SeedActionEnum;
   setPrivacyOption: (value: boolean) => Promise<void>;
   keepAwake?: (v: boolean) => void;
+  goBack: () => void;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({
   onClickOK,
@@ -56,6 +57,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   action,
   setPrivacyOption,
   keepAwake,
+  goBack,
 }) => {
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
@@ -87,7 +89,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     language = contextLoaded.language;
   }
 
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   // when this screen is open from LoadingApp (new wallet)
   // is using the standard modal from react-native
   const { hide } = useMagicModal();
@@ -221,7 +223,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           mode={mode}
           privacy={privacy}
           receivedLegend={action === SeedActionEnum.view ? !basicFirstViewSeed : false}
-          closeScreen={onClickCancelHide}
+          closeScreen={goBack}
         />
         <ScrollView
           keyboardShouldPersistTaps="handled"

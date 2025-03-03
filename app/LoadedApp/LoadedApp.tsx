@@ -10,6 +10,7 @@ import {
   Linking,
   Platform,
   ActivityIndicator,
+  Text,
 } from 'react-native';
 import { MagicModalPortal, magicModal } from 'react-native-magic-modal';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -93,16 +94,25 @@ import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
+import About from '../../components/About';
+import Seed from '../../components/Seed';
+import Info from '../../components/Info';
+import Rescan from '../../components/Rescan';
+import Pools from '../../components/Pools';
+import Insight from '../../components/Insight';
+import { ShowUfvk } from '../../components/Ufvk';
+import ComputingTxContent from './components/ComputingTxContent';
+import SyncReport from '../../components/SyncReport';
 
-const About = React.lazy(() => import('../../components/About'));
-const Seed = React.lazy(() => import('../../components/Seed'));
-const Info = React.lazy(() => import('../../components/Info'));
-const SyncReport = React.lazy(() => import('../../components/SyncReport'));
-const Rescan = React.lazy(() => import('../../components/Rescan'));
-const Pools = React.lazy(() => import('../../components/Pools'));
-const Insight = React.lazy(() => import('../../components/Insight'));
-const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
-const ComputingTxContent = React.lazy(() => import('./components/ComputingTxContent'));
+// const About = React.lazy(() => import('../../components/About'));
+// const Seed = React.lazy(() => import('../../components/Seed'));
+// const Info = React.lazy(() => import('../../components/Info'));
+// const Rescan = React.lazy(() => import('../../components/Rescan'));
+// const Pools = React.lazy(() => import('../../components/Pools'));
+// const SyncReport = React.lazy(() => import('../../components/SyncReport'));
+// const Insight = React.lazy(() => import('../../components/Insight'));
+// const ShowUfvk = React.lazy(() => import('../../components/Ufvk/ShowUfvk'));
+// const ComputingTxContent = React.lazy(() => import('./components/ComputingTxContent'));
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -793,6 +803,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     return magicModal.show(
       () => (
         <Seed
+          goBack={this.closeAllModals}
           onClickOK={() => {}}
           onClickCancel={() => {}}
           action={SeedActionEnum.view}
@@ -808,6 +819,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     return magicModal.show(
       () => (
         <ShowUfvk
+          goBack={this.closeAllModals}
           onClickOK={() => {}}
           onClickCancel={() => {}}
           action={UfvkActionEnum.view}
@@ -1139,193 +1151,193 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   onMenuItemSelected = async (item: MenuItemEnum) => {
     return;
     // Depending on the menu item, open the appropriate modal
-    if (item === MenuItemEnum.About) {
-      return magicModal.show(() => <About />, { swipeDirection: undefined }).promise;
-    } else if (item === MenuItemEnum.Rescan) {
-      return magicModal.show(() => <Rescan doRescan={this.doRescan} />, { swipeDirection: undefined }).promise;
-    } else if (item === MenuItemEnum.Settings) {
-      return magicModal.show(
-        () => (
-          <Settings
-            setWalletOption={this.setWalletOption}
-            setServerOption={this.setServerOption}
-            setCurrencyOption={this.setCurrencyOption}
-            setLanguageOption={this.setLanguageOption}
-            setSendAllOption={this.setSendAllOption}
-            setDonationOption={this.setDonationOption}
-            setPrivacyOption={this.setPrivacyOption}
-            setModeOption={this.setModeOption}
-            setSecurityOption={this.setSecurityOption}
-            setSelectServerOption={this.setSelectServerOption}
-            setRescanMenuOption={this.setRescanMenuOption}
-            setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
-          />
-        ),
-        { swipeDirection: undefined },
-      ).promise;
-    } else if (item === MenuItemEnum.Info) {
-      return magicModal.show(() => <Info />, { swipeDirection: undefined }).promise;
-    } else if (item === MenuItemEnum.SyncReport) {
-      return magicModal.show(() => <SyncReport />, { swipeDirection: undefined }).promise;
-    } else if (item === MenuItemEnum.FundPools) {
-      return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined })
-        .promise;
-    } else if (item === MenuItemEnum.Insight) {
-      return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined })
-        .promise;
-    } else if (item === MenuItemEnum.WalletSeedUfvk) {
-      if (this.state.readOnly) {
-        await this.setUfvkViewModalShow();
-      } else {
-        await this.setSeedViewModalShow();
-      }
-    } else if (item === MenuItemEnum.ChangeWallet) {
-      if (this.state.readOnly) {
-        return magicModal.show(
-          () => (
-            <ShowUfvk
-              onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
-              onClickCancel={() => {}}
-              action={UfvkActionEnum.change}
-              setPrivacyOption={this.setPrivacyOption}
-            />
-          ),
-          { swipeDirection: undefined },
-        ).promise;
-      } else {
-        return magicModal.show(
-          () => (
-            <Seed
-              onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
-              onClickCancel={() => {}}
-              action={SeedActionEnum.change}
-              setPrivacyOption={this.setPrivacyOption}
-            />
-          ),
-          { swipeDirection: undefined },
-        ).promise;
-      }
-    } else if (item === MenuItemEnum.RestoreWalletBackup) {
-      if (this.state.readOnly) {
-        return magicModal.show(
-          () => (
-            <ShowUfvk
-              onClickOK={async () => await this.onClickOKRestoreBackup()}
-              onClickCancel={() => {}}
-              action={UfvkActionEnum.backup}
-              setPrivacyOption={this.setPrivacyOption}
-            />
-          ),
-          { swipeDirection: undefined },
-        ).promise;
-      } else {
-        return magicModal.show(
-          () => (
-            <Seed
-              onClickOK={async () => await this.onClickOKRestoreBackup()}
-              onClickCancel={() => {}}
-              action={SeedActionEnum.backup}
-              setPrivacyOption={this.setPrivacyOption}
-            />
-          ),
-          { swipeDirection: undefined },
-        ).promise;
-      }
-    } else if (item === MenuItemEnum.LoadWalletFromSeed) {
-      const { translate } = this.state;
-      Alert.alert(
-        translate('loadedapp.restorewallet-title') as string,
-        translate('loadedapp.restorewallet-alert') as string,
-        [
-          {
-            text: translate('confirm') as string,
-            onPress: async () => await this.onClickOKChangeWallet({ screen: 3, startingApp: false }),
-          },
-          { text: translate('cancel') as string, style: 'cancel' },
-        ],
-        { cancelable: false },
-      );
-    } else if (item === MenuItemEnum.TipZingoLabs) {
-      const { translate } = this.state;
-      Alert.alert(
-        translate('loadingapp.alert-donation-title') as string,
-        translate('loadingapp.alert-donation-body') as string,
-        [
-          {
-            text: translate('confirm') as string,
-            onPress: async () => await this.setDonationOption(true),
-          },
-          {
-            text: translate('cancel') as string,
-            onPress: async () => await this.setDonationOption(false),
-            style: 'cancel',
-          },
-        ],
-        { cancelable: false },
-      );
-    } else if (item === MenuItemEnum.AddressBook) {
-      this.setState({
-        addressBookCurrentAddress: '',
-      });
-      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined })
-        .promise;
-    } else if (item === MenuItemEnum.VoteForNym) {
-      let update = false;
-      if (
-        this.state.sendPageState.toaddr.to &&
-        this.state.sendPageState.toaddr.to !== (await Utils.getNymDonationAddress(this.state.server.chainName))
-      ) {
-        await ShowAddressAlertAsync(this.state.translate)
-          .then(async () => {
-            // fill the fields in the screen with the donation data
-            update = true;
-          })
-          .catch(() => {});
-      } else {
-        // fill the fields in the screen with the donation data
-        update = true;
-      }
-      if (update) {
-        const newSendPageState = new SendPageStateClass(new ToAddrClass(0));
-        let uriToAddr: ToAddrClass = new ToAddrClass(0);
-        const to = new ToAddrClass(0);
+    // if (item === MenuItemEnum.About) {
+    //   return magicModal.show(() => <About />, { swipeDirection: undefined }).promise;
+    // } else if (item === MenuItemEnum.Rescan) {
+    //   return magicModal.show(() => <Rescan doRescan={this.doRescan} />, { swipeDirection: undefined }).promise;
+    // } else if (item === MenuItemEnum.Settings) {
+    //   return magicModal.show(
+    //     () => (
+    //       <Settings
+    //         setWalletOption={this.setWalletOption}
+    //         setServerOption={this.setServerOption}
+    //         setCurrencyOption={this.setCurrencyOption}
+    //         setLanguageOption={this.setLanguageOption}
+    //         setSendAllOption={this.setSendAllOption}
+    //         setDonationOption={this.setDonationOption}
+    //         setPrivacyOption={this.setPrivacyOption}
+    //         setModeOption={this.setModeOption}
+    //         setSecurityOption={this.setSecurityOption}
+    //         setSelectServerOption={this.setSelectServerOption}
+    //         setRescanMenuOption={this.setRescanMenuOption}
+    //         setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
+    //       />
+    //     ),
+    //     { swipeDirection: undefined },
+    //   ).promise;
+    // } else if (item === MenuItemEnum.Info) {
+    //   return magicModal.show(() => <Info />, { swipeDirection: undefined }).promise;
+    // } else if (item === MenuItemEnum.SyncReport) {
+    //   return magicModal.show(() => <SyncReport />, { swipeDirection: undefined }).promise;
+    // } else if (item === MenuItemEnum.FundPools) {
+    //   return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined })
+    //     .promise;
+    // } else if (item === MenuItemEnum.Insight) {
+    //   return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined })
+    //     .promise;
+    // } else if (item === MenuItemEnum.WalletSeedUfvk) {
+    //   if (this.state.readOnly) {
+    //     await this.setUfvkViewModalShow();
+    //   } else {
+    //     await this.setSeedViewModalShow();
+    //   }
+    // } else if (item === MenuItemEnum.ChangeWallet) {
+    //   if (this.state.readOnly) {
+    //     return magicModal.show(
+    //       () => (
+    //         <ShowUfvk
+    //           onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
+    //           onClickCancel={() => {}}
+    //           action={UfvkActionEnum.change}
+    //           setPrivacyOption={this.setPrivacyOption}
+    //         />
+    //       ),
+    //       { swipeDirection: undefined },
+    //     ).promise;
+    //   } else {
+    //     return magicModal.show(
+    //       () => (
+    //         <Seed
+    //           onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
+    //           onClickCancel={() => {}}
+    //           action={SeedActionEnum.change}
+    //           setPrivacyOption={this.setPrivacyOption}
+    //         />
+    //       ),
+    //       { swipeDirection: undefined },
+    //     ).promise;
+    //   }
+    // } else if (item === MenuItemEnum.RestoreWalletBackup) {
+    //   if (this.state.readOnly) {
+    //     return magicModal.show(
+    //       () => (
+    //         <ShowUfvk
+    //           onClickOK={async () => await this.onClickOKRestoreBackup()}
+    //           onClickCancel={() => {}}
+    //           action={UfvkActionEnum.backup}
+    //           setPrivacyOption={this.setPrivacyOption}
+    //         />
+    //       ),
+    //       { swipeDirection: undefined },
+    //     ).promise;
+    //   } else {
+    //     return magicModal.show(
+    //       () => (
+    //         <Seed
+    //           onClickOK={async () => await this.onClickOKRestoreBackup()}
+    //           onClickCancel={() => {}}
+    //           action={SeedActionEnum.backup}
+    //           setPrivacyOption={this.setPrivacyOption}
+    //         />
+    //       ),
+    //       { swipeDirection: undefined },
+    //     ).promise;
+    //   }
+    // } else if (item === MenuItemEnum.LoadWalletFromSeed) {
+    //   const { translate } = this.state;
+    //   Alert.alert(
+    //     translate('loadedapp.restorewallet-title') as string,
+    //     translate('loadedapp.restorewallet-alert') as string,
+    //     [
+    //       {
+    //         text: translate('confirm') as string,
+    //         onPress: async () => await this.onClickOKChangeWallet({ screen: 3, startingApp: false }),
+    //       },
+    //       { text: translate('cancel') as string, style: 'cancel' },
+    //     ],
+    //     { cancelable: false },
+    //   );
+    // } else if (item === MenuItemEnum.TipZingoLabs) {
+    //   const { translate } = this.state;
+    //   Alert.alert(
+    //     translate('loadingapp.alert-donation-title') as string,
+    //     translate('loadingapp.alert-donation-body') as string,
+    //     [
+    //       {
+    //         text: translate('confirm') as string,
+    //         onPress: async () => await this.setDonationOption(true),
+    //       },
+    //       {
+    //         text: translate('cancel') as string,
+    //         onPress: async () => await this.setDonationOption(false),
+    //         style: 'cancel',
+    //       },
+    //     ],
+    //     { cancelable: false },
+    //   );
+    // } else if (item === MenuItemEnum.AddressBook) {
+    //   this.setState({
+    //     addressBookCurrentAddress: '',
+    //   });
+    //   return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined })
+    //     .promise;
+    // } else if (item === MenuItemEnum.VoteForNym) {
+    //   let update = false;
+    //   if (
+    //     this.state.sendPageState.toaddr.to &&
+    //     this.state.sendPageState.toaddr.to !== (await Utils.getNymDonationAddress(this.state.server.chainName))
+    //   ) {
+    //     await ShowAddressAlertAsync(this.state.translate)
+    //       .then(async () => {
+    //         // fill the fields in the screen with the donation data
+    //         update = true;
+    //       })
+    //       .catch(() => {});
+    //   } else {
+    //     // fill the fields in the screen with the donation data
+    //     update = true;
+    //   }
+    //   if (update) {
+    //     const newSendPageState = new SendPageStateClass(new ToAddrClass(0));
+    //     let uriToAddr: ToAddrClass = new ToAddrClass(0);
+    //     const to = new ToAddrClass(0);
 
-        to.to = await Utils.getNymDonationAddress(this.state.server.chainName);
-        to.amount = Utils.getNymDonationAmount();
-        to.memo = Utils.getNymDonationMemo(this.state.translate);
-        to.includeUAMemo = true;
+    //     to.to = await Utils.getNymDonationAddress(this.state.server.chainName);
+    //     to.amount = Utils.getNymDonationAmount();
+    //     to.memo = Utils.getNymDonationMemo(this.state.translate);
+    //     to.includeUAMemo = true;
 
-        uriToAddr = to;
+    //     uriToAddr = to;
 
-        newSendPageState.toaddr = uriToAddr;
+    //     newSendPageState.toaddr = uriToAddr;
 
-        this.setSendPageState(newSendPageState);
-      }
-      this.closeAllModals();
-      this.state.navigation.navigate(RouteEnums.LoadedApp, {
-        screen: this.state.translate('loadedapp.send-menu'),
-        initial: false,
-      });
-    } else if (item === MenuItemEnum.Support) {
-      this.setShowSwipeableIcons(false);
-      await sendEmail(this.state.translate, this.state.info.zingolib);
-      this.setShowSwipeableIcons(true);
-    } else if (item === MenuItemEnum.Chats) {
-      return magicModal.show(
-        () => (
-          <MessagesModal
-            setPrivacyOption={this.setPrivacyOption /* header */}
-            setScrollToTop={this.setScrollToTop /* chats */}
-            scrollToTop={this.state.scrollToTop /* chats */}
-            setScrollToBottom={this.setScrollToBottom /* messages */}
-            scrollToBottom={this.state.scrollToBottom /* messages */}
-            sendTransaction={this.sendTransaction /* messages */}
-            setServerOption={this.setServerOption /* messages */}
-          />
-        ),
-        { swipeDirection: undefined },
-      ).promise;
-    }
+    //     this.setSendPageState(newSendPageState);
+    //   }
+    //   this.closeAllModals();
+    //   this.state.navigation.navigate(RouteEnums.LoadedApp, {
+    //     screen: this.state.translate('loadedapp.send-menu'),
+    //     initial: false,
+    //   });
+    // } else if (item === MenuItemEnum.Support) {
+    //   this.setShowSwipeableIcons(false);
+    //   await sendEmail(this.state.translate, this.state.info.zingolib);
+    //   this.setShowSwipeableIcons(true);
+    // } else if (item === MenuItemEnum.Chats) {
+    //   return magicModal.show(
+    //     () => (
+    //       <MessagesModal
+    //         setPrivacyOption={this.setPrivacyOption /* header */}
+    //         setScrollToTop={this.setScrollToTop /* chats */}
+    //         scrollToTop={this.state.scrollToTop /* chats */}
+    //         setScrollToBottom={this.setScrollToBottom /* messages */}
+    //         scrollToBottom={this.state.scrollToBottom /* messages */}
+    //         sendTransaction={this.sendTransaction /* messages */}
+    //         setServerOption={this.setServerOption /* messages */}
+    //       />
+    //     ),
+    //     { swipeDirection: undefined },
+    //   ).promise;
+    // }
   };
 
   setWalletOption = async (walletOption: string, value: string): Promise<void> => {
@@ -1404,6 +1416,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         magicModal.show(
           () => (
             <ShowUfvk
+              goBack={async () => {
+                // restart all the tasks again, nothing happen.
+                this.rpc.setInRefresh(false);
+                await this.rpc.clearTimers();
+                await this.rpc.configure();
+              }}
               onClickOK={async () => await this.onClickOKServerWallet()}
               onClickCancel={async () => {
                 // restart all the tasks again, nothing happen.
@@ -1421,6 +1439,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         magicModal.show(
           () => (
             <Seed
+              goBack={async () => {
+                // restart all the tasks again, nothing happen.
+                this.rpc.setInRefresh(false);
+                await this.rpc.clearTimers();
+                await this.rpc.configure();
+              }}
               onClickOK={async () => await this.onClickOKServerWallet()}
               onClickCancel={async () => {
                 // restart all the tasks again, nothing happen.
@@ -1713,12 +1737,15 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setSyncReportModalShow = async () => {
-    return magicModal.show(() => <SyncReport />, { swipeDirection: undefined }).promise;
+    return magicModal.show(() => <SyncReport goBack={this.state.closeAllModals} />, { swipeDirection: undefined })
+      .promise;
   };
 
   setPoolsModalShow = async () => {
-    return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined })
-      .promise;
+    return magicModal.show(
+      () => <Pools goBack={this.state.closeAllModals} setPrivacyOption={this.setPrivacyOption} />,
+      { swipeDirection: undefined },
+    ).promise;
   };
 
   setBackgroundError = (title: string, error: string) => {
@@ -1751,8 +1778,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       addressBookCurrentAddress: address,
     });
-    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined })
-      .promise;
+    return magicModal.show(
+      () => <AddressBook goBack={this.state.closeAllModals} setAddressBook={this.setAddressBook} />,
+      { swipeDirection: undefined },
+    ).promise;
   };
 
   setScrollToTop = (value: boolean) => {
@@ -1838,7 +1867,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
     };
 
-    const menu = (props: DrawerContentComponentProps) => <Menu onItemSelected={this.onMenuItemSelected} {...props} />;
+    // const menu = (props: DrawerContentComponentProps) => <Menu onItemSelected={this.onMenuItemSelected} {...props} />;
 
     const fnTabBarIcon = (route: StackScreenProps<any>['route'], focused: boolean) => {
       var iconName;
@@ -2016,21 +2045,23 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               )}
             </Drawer.Screen>
             <Drawer.Screen name="About">
-              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => <About />}
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
+                <About goBack={navigation.goBack} />
+              )}
             </Drawer.Screen>
             <Drawer.Screen name="Rescan">
               {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
-                <Rescan doRescan={this.doRescan} />
+                <Rescan goBack={navigation.goBack} doRescan={this.doRescan} />
               )}
             </Drawer.Screen>
             <Drawer.Screen name="Pools">
               {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
-                <Pools setPrivacyOption={this.setPrivacyOption} />
+                <Pools goBack={navigation.goBack} setPrivacyOption={this.setPrivacyOption} />
               )}
             </Drawer.Screen>
             <Drawer.Screen name="Insight">
               {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
-                <Insight setPrivacyOption={this.setPrivacyOption} />
+                <Insight goBack={navigation.goBack} setPrivacyOption={this.setPrivacyOption} />
               )}
             </Drawer.Screen>
             {/* <Drawer.Screen name="WalletSeed">
@@ -2046,8 +2077,88 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               }}
             </Drawer.Screen> */}
             <Drawer.Screen name="Change Wallet">
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {
+                if (this.state.readOnly) {
+                  return (
+                    <ShowUfvk
+                      goBack={navigation.goBack}
+                      onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
+                      onClickCancel={() => {}}
+                      action={UfvkActionEnum.change}
+                      setPrivacyOption={this.setPrivacyOption}
+                    />
+                  );
+                } else {
+                  return (
+                    <Seed
+                      goBack={navigation.goBack}
+                      onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
+                      onClickCancel={() => {}}
+                      action={SeedActionEnum.change}
+                      setPrivacyOption={this.setPrivacyOption}
+                    />
+                  );
+                }
+              }}
+            </Drawer.Screen>
+            <Drawer.Screen name="Restore Wallet Backup">
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {
+                if (this.state.readOnly) {
+                  return (
+                    <ShowUfvk
+                      goBack={navigation.goBack}
+                      onClickOK={async () => await this.onClickOKRestoreBackup()}
+                      onClickCancel={() => {}}
+                      action={UfvkActionEnum.backup}
+                      setPrivacyOption={this.setPrivacyOption}
+                    />
+                  );
+                } else {
+                  return (
+                    <Seed
+                      goBack={navigation.goBack}
+                      onClickOK={async () => await this.onClickOKRestoreBackup()}
+                      onClickCancel={() => {}}
+                      action={SeedActionEnum.backup}
+                      setPrivacyOption={this.setPrivacyOption}
+                    />
+                  );
+                }
+              }}
+            </Drawer.Screen>
+            <Drawer.Screen name="Restore Wallet">
               {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
-                <Insight setPrivacyOption={this.setPrivacyOption} />
+                <Pools goBack={navigation.goBack} setPrivacyOption={this.setPrivacyOption} />
+              )}
+            </Drawer.Screen>
+            <Drawer.Screen name="Donate">
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
+                // <Pools goBack={navigation.goBack} setPrivacyOption={this.setPrivacyOption} />
+                <View>
+                  <Text>TODO: Donate</Text>
+                </View>
+              )}
+            </Drawer.Screen>
+            <Drawer.Screen name="Address Book">
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
+                // <AddressBook goBack={navigation.goBack} setAddressBook={this.setAddressBook} />
+                <View>
+                  <Text>TODO: Address book</Text>
+                </View>
+              )}
+            </Drawer.Screen>
+            <Drawer.Screen name="Chats">
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
+                <MessagesModal
+                  goBack={navigation.goBack}
+                  setPrivacyOption={this.setPrivacyOption /* header */}
+                  setScrollToTop={this.setScrollToTop /* chats */}
+                  scrollToTop={this.state.scrollToTop /* chats */}
+                  setScrollToBottom={this.setScrollToBottom /* messages */}
+                  scrollToBottom={this.state.scrollToBottom /* messages */}
+                  sendTransaction={this.sendTransaction /* messages */}
+                  setServerOption={this.setServerOption /* messages */}
+                />
               )}
             </Drawer.Screen>
           </Drawer>

@@ -31,18 +31,13 @@ import { useMagicModal } from 'react-native-magic-modal';
 
 type AddressBookProps = {
   setAddressBook: (ab: AddressBookFileClass[]) => void;
+  goBack: () => void;
 };
 
-const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook }) => {
+const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook, goBack }) => {
   const context = useContext(ContextAppLoaded);
-  const {
-    translate,
-    language,
-    addressBook,
-    addressBookCurrentAddress,
-    zenniesDonationAddress,
-  } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { translate, language, addressBook, addressBookCurrentAddress, zenniesDonationAddress } = context;
+  const { colors } = useTheme() as ThemeType;
   const { hide } = useMagicModal();
   moment.locale(language);
 
@@ -163,7 +158,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={goBack}
         />
         <ScrollView
           ref={scrollViewRef}

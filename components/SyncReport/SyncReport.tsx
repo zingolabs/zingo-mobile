@@ -22,12 +22,13 @@ import Utils from '../../app/utils';
 import { useMagicModal } from 'react-native-magic-modal';
 
 type SyncReportProps = {
+  goBack: () => void;
 };
 
-const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
+const SyncReport: React.FunctionComponent<SyncReportProps> = ({ goBack }) => {
   const context = useContext(ContextAppLoaded);
   const { syncingStatus, wallet, translate, background, language, netInfo } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { hide } = useMagicModal();
   moment.locale(language);
 
@@ -229,7 +230,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={goBack}
         />
         <ScrollView
           testID="syncreport.scroll-view"
