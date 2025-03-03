@@ -20,14 +20,6 @@ import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockBackground } from '../__mocks__/dataMocks/mockBackground';
 import { mockSecurity } from '../__mocks__/dataMocks/mockSecurity';
 
-// Crea un mock para el constructor de I18n
-jest.mock('i18n-js', () => ({
-  __esModule: true,
-  I18n: jest.fn().mockImplementation(() => ({
-    t: jest.fn(),
-    // Agrega otros métodos y propiedades según sea necesario para tus pruebas
-  })),
-}));
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
 

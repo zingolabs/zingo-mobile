@@ -21,20 +21,17 @@ import { mockBackground } from '../__mocks__/dataMocks/mockBackground';
 import { mockSecurity } from '../__mocks__/dataMocks/mockSecurity';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 
-// Crea un mock para el constructor de I18n
-jest.mock('i18n-js', () => ({
-  __esModule: true,
-  I18n: jest.fn().mockImplementation(() => ({
-    t: jest.fn(),
-    // Agrega otros métodos y propiedades según sea necesario para tus pruebas
-  })),
-}));
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
 
   RN.NativeModules.RPCModule = {
-    execute: jest.fn(() => '[]'),
+    execute: jest.fn(() => '{}'),
+    getLatestBlock: jest.fn(() => '{}'),
+    walletExists: jest.fn(() => 'false'),
     getValueTransfersList: jest.fn(() => '{ "value_transfers": [], "total": 0 }'),
+    setCryptoDefaultProvider: jest.fn(() => 'true'),
+    createNewWallet: jest.fn(() => '{ "seed": "seed phrase test", "birthday": 0 }'),
+    doSave: jest.fn(),
   };
 
   return RN;

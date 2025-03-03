@@ -13,42 +13,17 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 
-jest.mock('moment', () => {
-  // Here we are able to mock chain builder pattern
-  const mMoment = {
-    format: (p: string) => {
-      if (p === 'MMM YYYY') {
-        return 'Dec 2022';
-      } else if (p === 'YYYY MMM D h:mm a') {
-        return '2022 Dec 13 8:00 am';
-      } else if (p === 'MMM D, h:mm a') {
-        return 'Dec 13, 8:00 am';
-      }
-    },
-  };
-  // Here we are able to mock the constructor and to modify instance methods
-  const fn = () => {
-    return mMoment;
-  };
-  // Here we are able to mock moment methods that depend on moment not on a moment instance
-  fn.locale = jest.fn();
-  return fn;
-});
-jest.mock('moment/locale/es', () => () => ({
-  defineLocale: jest.fn(),
-}));
-jest.mock('moment/locale/pt', () => () => ({
-  defineLocale: jest.fn(),
-}));
-
-jest.mock('moment/locale/ru', () => () => ({
-  defineLocale: jest.fn(),
-}));
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
 
   RN.NativeModules.RPCModule = {
     execute: jest.fn(() => '{}'),
+    getLatestBlock: jest.fn(() => '{}'),
+    walletExists: jest.fn(() => 'false'),
+    getValueTransfersList: jest.fn(() => '{ "value_transfers": [], "total": 0 }'),
+    setCryptoDefaultProvider: jest.fn(() => 'true'),
+    createNewWallet: jest.fn(() => '{ "seed": "seed phrase test", "birthday": 0 }'),
+    doSave: jest.fn(),
   };
 
   return RN;

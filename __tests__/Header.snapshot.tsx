@@ -12,15 +12,6 @@ import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RPCModule = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
 
 // test suite
 describe('Component Header - test', () => {
