@@ -1,13 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import {
-  View,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Platform,
-  KeyboardAvoidingView,
-} from 'react-native';
+import { View, ScrollView, TouchableOpacity, TextInput, Platform, KeyboardAvoidingView } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
@@ -66,6 +59,7 @@ type SettingsProps = {
   setSelectServerOption: (value: string) => Promise<void>;
   setRescanMenuOption: (value: boolean) => Promise<void>;
   setRecoveryWalletInfoOnDeviceOption: (value: boolean) => Promise<void>;
+  goBack: () => void;
 };
 
 type Options = {
@@ -86,6 +80,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setSelectServerOption,
   setRescanMenuOption,
   setRecoveryWalletInfoOnDeviceOption,
+  goBack,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -162,7 +157,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     RECOVERYWALLETINFOONDEVICE = recoveryWalletInfoOnDevicesArray as Options[];
   }
 
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { hide } = useMagicModal();
   moment.locale(languageContext);
 
@@ -553,7 +548,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
             noSyncingStatus={true}
             noDrawMenu={true}
             noPrivacy={true}
-            closeScreen={hide}
+            closeScreen={goBack}
           />
           <ScrollView
             keyboardShouldPersistTaps="handled"

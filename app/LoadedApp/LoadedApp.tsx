@@ -1137,6 +1137,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   onMenuItemSelected = async (item: MenuItemEnum) => {
+    return;
     // Depending on the menu item, open the appropriate modal
     if (item === MenuItemEnum.About) {
       return magicModal.show(() => <About />, { swipeDirection: undefined }).promise;
@@ -1877,7 +1878,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     return (
       <ContextAppLoadedProvider value={context}>
         <GestureHandlerRootView>
-          <Drawer drawerContent={menu} initialRouteName="Home">
+          <Drawer
+            // drawerContent={menu}
+            initialRouteName="Home">
             <Drawer.Screen name="Home">
               {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
                 <>
@@ -1991,6 +1994,60 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     </>
                   )}
                 </>
+              )}
+            </Drawer.Screen>
+            <Drawer.Screen name="Settings">
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
+                <Settings
+                  setWalletOption={this.setWalletOption}
+                  setServerOption={this.setServerOption}
+                  setCurrencyOption={this.setCurrencyOption}
+                  setLanguageOption={this.setLanguageOption}
+                  setSendAllOption={this.setSendAllOption}
+                  setDonationOption={this.setDonationOption}
+                  setPrivacyOption={this.setPrivacyOption}
+                  setModeOption={this.setModeOption}
+                  setSecurityOption={this.setSecurityOption}
+                  setSelectServerOption={this.setSelectServerOption}
+                  setRescanMenuOption={this.setRescanMenuOption}
+                  setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
+                  goBack={navigation.goBack}
+                />
+              )}
+            </Drawer.Screen>
+            <Drawer.Screen name="About">
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => <About />}
+            </Drawer.Screen>
+            <Drawer.Screen name="Rescan">
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
+                <Rescan doRescan={this.doRescan} />
+              )}
+            </Drawer.Screen>
+            <Drawer.Screen name="Pools">
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
+                <Pools setPrivacyOption={this.setPrivacyOption} />
+              )}
+            </Drawer.Screen>
+            <Drawer.Screen name="Insight">
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
+                <Insight setPrivacyOption={this.setPrivacyOption} />
+              )}
+            </Drawer.Screen>
+            {/* <Drawer.Screen name="WalletSeed">
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {
+                navigation.closeDrawer();
+                if (this.state.readOnly) {
+                  this.setUfvkViewModalShow();
+                } else {
+                  this.setSeedViewModalShow();
+                }
+                // TODO: Should be Home, but for now it's a hack
+                return <View />;
+              }}
+            </Drawer.Screen> */}
+            <Drawer.Screen name="Change Wallet">
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
+                <Insight setPrivacyOption={this.setPrivacyOption} />
               )}
             </Drawer.Screen>
           </Drawer>
