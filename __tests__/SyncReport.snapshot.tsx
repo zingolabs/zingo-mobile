@@ -15,29 +15,6 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSyncingStatus from '../__mocks__/dataMocks/mockSyncingStatus';
 import { mockNetInfo } from '../__mocks__/dataMocks/mockNetInfo';
 
-const NetInfoStateType = {
-  unknown: 'unknown',
-  none: 'none',
-  cellular: 'cellular',
-  wifi: 'wifi',
-  bluetooth: 'bluetooth',
-  ethernet: 'ethernet',
-  wimax: 'wimax',
-  vpn: 'vpn',
-  other: 'other',
-};
-jest.mock('@react-native-community/netinfo/src/index', () => ({
-  RNCNetInfo: () => {
-    const RN = jest.requireActual('react-native');
-
-    RN.NativeModules.RNCNetInfo = {
-      execute: jest.fn(() => '{}'),
-    };
-
-    return RN;
-  },
-  NetInfoStateType: NetInfoStateType,
-}));
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
 

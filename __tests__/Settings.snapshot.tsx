@@ -15,15 +15,6 @@ import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockWalletSettings } from '../__mocks__/dataMocks/mockWalletSettings';
 
-jest.mock('@react-native-community/netinfo/src/index', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNCNetInfo = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
 

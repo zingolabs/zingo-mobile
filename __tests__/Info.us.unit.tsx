@@ -12,15 +12,6 @@ import { CurrencyEnum } from '../app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 
-jest.mock('@react-native-community/netinfo/src/index', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNCNetInfo = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
 

@@ -26,15 +26,6 @@ jest.mock('react-native', () => {
 
   return RN;
 });
-jest.mock('@react-native-community/netinfo/src/index', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNCNetInfo = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
 
 // test suite
 describe('Component Send - test', () => {

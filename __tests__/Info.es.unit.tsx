@@ -21,15 +21,6 @@ jest.mock('react-native-localize', () => ({
     };
   },
 }));
-jest.mock('@react-native-community/netinfo/src/index', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNCNetInfo = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
 

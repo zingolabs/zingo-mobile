@@ -28,19 +28,6 @@ jest.mock('i18n-js', () => ({
     // Agrega otros métodos y propiedades según sea necesario para tus pruebas
   })),
 }));
-jest.mock('react-native/src/private/animated/NativeAnimatedHelper');
-
-jest.mock('@react-native-community/netinfo/src/index', () => {
-  return {
-    addEventListener: jest.fn(),
-    fetch: jest.fn().mockImplementation(() =>
-      Promise.resolve({
-        isConnected: true,
-        isInternetReachable: true,
-      }),
-    ),
-  };
-});
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
 
@@ -56,14 +43,6 @@ jest.mock('react-native', () => {
 
   return RN;
 });
-jest.mock('react-native-easy-biometrics', () => ({
-  requestBioAuth: jest.fn(() => Promise.resolve(true)),
-}));
-jest.mock('react-native-fs', () => ({
-  readFile: jest.fn(() => Promise.resolve('{}')), // o Promise.reject(new Error('File not found'))
-  writeFile: jest.fn(() => Promise.resolve()), // o Promise.reject(new Error('Write failed'))
-  // Agrega más funciones mockeadas según sea necesario
-}));
 
 // test suite
 describe('Component LoadingApp - test', () => {

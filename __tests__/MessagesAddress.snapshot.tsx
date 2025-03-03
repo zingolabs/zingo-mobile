@@ -45,23 +45,6 @@ jest.mock('moment/locale/pt', () => () => ({
 jest.mock('moment/locale/ru', () => () => ({
   defineLocale: jest.fn(),
 }));
-
-jest.mock('react-native-gesture-handler', () => {
-  const View = require('react-native').View;
-  return {
-    TouchableOpacity: View,
-    Swipeable: View,
-  };
-});
-jest.mock('@react-native-community/netinfo/src/index', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNCNetInfo = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
 
