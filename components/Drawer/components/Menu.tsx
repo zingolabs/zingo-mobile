@@ -6,14 +6,14 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import RegText from '../../../components/Components/RegText';
 
 import { useTheme } from '@react-navigation/native';
-import { ContextAppLoaded } from '../../context';
-import { ThemeType } from '../../types';
-import simpleBiometrics from '../../simpleBiometrics';
+import { ContextAppLoaded } from '../../../app/context';
+import { ThemeType } from '../../../app/types';
+import simpleBiometrics from '../../../app/simpleBiometrics';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../../AppState';
+import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../../../app/AppState';
 import { HideReturn } from 'react-native-magic-modal';
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 

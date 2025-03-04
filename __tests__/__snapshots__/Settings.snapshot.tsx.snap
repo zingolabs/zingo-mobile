@@ -1909,135 +1909,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           </Text>
         </View>
         <View>
-          <RNPickerSelect
-            fixAndroidTouchableBug={true}
-            items={
-              [
-                {
-                  "label": "text translated https://zec.rocks:443",
-                  "value": "https://zec.rocks:443",
-                },
-                {
-                  "label": "text translated https://lwd1.zcash-infra.com:9067",
-                  "value": "https://lwd1.zcash-infra.com:9067",
-                },
-                {
-                  "label": "text translated https://na.zec.rocks:443",
-                  "value": "https://na.zec.rocks:443",
-                },
-                {
-                  "label": "text translated https://sa.zec.rocks:443",
-                  "value": "https://sa.zec.rocks:443",
-                },
-                {
-                  "label": "text translated https://eu.zec.rocks:443",
-                  "value": "https://eu.zec.rocks:443",
-                },
-                {
-                  "label": "text translated https://ap.zec.rocks:443",
-                  "value": "https://ap.zec.rocks:443",
-                },
-                {
-                  "label": "text translated https://lwd2.zcash-infra.com:9067",
-                  "value": "https://lwd2.zcash-infra.com:9067",
-                },
-                {
-                  "label": "text translated https://lwd3.zcash-infra.com:9067",
-                  "value": "https://lwd3.zcash-infra.com:9067",
-                },
-                {
-                  "label": "text translated https://lwd4.zcash-infra.com:9067",
-                  "value": "https://lwd4.zcash-infra.com:9067",
-                },
-                {
-                  "label": "text translated https://lwd5.zcash-infra.com:9067",
-                  "value": "https://lwd5.zcash-infra.com:9067",
-                },
-                {
-                  "label": "text translated https://lwd6.zcash-infra.com:9067",
-                  "value": "https://lwd6.zcash-infra.com:9067",
-                },
-                {
-                  "label": "text translated https://lwd7.zcash-infra.com:9067",
-                  "value": "https://lwd7.zcash-infra.com:9067",
-                },
-                {
-                  "label": "text translated https://lwd8.zcash-infra.com:9067",
-                  "value": "https://lwd8.zcash-infra.com:9067",
-                },
-              ]
-            }
-            onValueChange={[Function]}
-            placeholder={
-              {
-                "color": "#18bd18",
-                "label": "text translated",
-                "value": "",
-              }
-            }
-            useNativeAndroidPickerStyle={false}
-            value=""
-          >
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "display": "flex",
-                  "flexDirection": "row",
-                  "marginBottom": 5,
-                  "marginRight": 10,
-                  "maxHeight": 50,
-                  "minHeight": 48,
-                }
-              }
-            >
-              <
-                color="#ffffff"
-                icon={
-                  {
-                    "icon": [
-                      512,
-                      512,
-                      [
-                        128308,
-                        128309,
-                        128992,
-                        128993,
-                        128994,
-                        128995,
-                        128996,
-                        9679,
-                        9898,
-                        9899,
-                        11044,
-                        61708,
-                        61915,
-                      ],
-                      "f111",
-                      "M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z",
-                    ],
-                    "iconName": "circle",
-                    "prefix": "far",
-                  }
-                }
-                size={20}
-              />
-              <Text
-                style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 18,
-                    "fontWeight": "600",
-                    "marginLeft": 10,
-                    "opacity": 1,
-                  }
-                }
-                testID="settings.list-server"
-              >
-                text translated
-              </Text>
-            </View>
-          </RNPickerSelect>
+          RNPickerSelect
         </View>
         <View
           style={
@@ -2208,29 +2080,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <BouncyCheckbox
-          disableText={true}
-          disabled={false}
-          fillColor="#18bd18"
-          iconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          innerIconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          onPress={[Function]}
-          style={
-            {
-              "marginRight": 10,
-            }
-          }
-          unFillColor="#011401"
-          useBuiltInState={false}
-        />
+        BouncyCheckbox
         <Text
           style={
             {
@@ -2258,29 +2108,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <BouncyCheckbox
-          disableText={true}
-          disabled={false}
-          fillColor="#18bd18"
-          iconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          innerIconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          onPress={[Function]}
-          style={
-            {
-              "marginRight": 10,
-            }
-          }
-          unFillColor="#011401"
-          useBuiltInState={false}
-        />
+        BouncyCheckbox
         <Text
           style={
             {
@@ -2308,29 +2136,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <BouncyCheckbox
-          disableText={true}
-          disabled={false}
-          fillColor="#18bd18"
-          iconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          innerIconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          onPress={[Function]}
-          style={
-            {
-              "marginRight": 10,
-            }
-          }
-          unFillColor="#011401"
-          useBuiltInState={false}
-        />
+        BouncyCheckbox
         <Text
           style={
             {
@@ -2358,29 +2164,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <BouncyCheckbox
-          disableText={true}
-          disabled={false}
-          fillColor="#18bd18"
-          iconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          innerIconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          onPress={[Function]}
-          style={
-            {
-              "marginRight": 10,
-            }
-          }
-          unFillColor="#011401"
-          useBuiltInState={false}
-        />
+        BouncyCheckbox
         <Text
           style={
             {
@@ -2408,29 +2192,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <BouncyCheckbox
-          disableText={true}
-          disabled={false}
-          fillColor="#18bd18"
-          iconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          innerIconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          onPress={[Function]}
-          style={
-            {
-              "marginRight": 10,
-            }
-          }
-          unFillColor="#011401"
-          useBuiltInState={false}
-        />
+        BouncyCheckbox
         <Text
           style={
             {
@@ -2458,29 +2220,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <BouncyCheckbox
-          disableText={true}
-          disabled={false}
-          fillColor="#18bd18"
-          iconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          innerIconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          onPress={[Function]}
-          style={
-            {
-              "marginRight": 10,
-            }
-          }
-          unFillColor="#011401"
-          useBuiltInState={false}
-        />
+        BouncyCheckbox
         <Text
           style={
             {
@@ -2508,29 +2248,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <BouncyCheckbox
-          disableText={true}
-          disabled={false}
-          fillColor="#18bd18"
-          iconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          innerIconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          onPress={[Function]}
-          style={
-            {
-              "marginRight": 10,
-            }
-          }
-          unFillColor="#011401"
-          useBuiltInState={false}
-        />
+        BouncyCheckbox
         <Text
           style={
             {
@@ -2558,29 +2276,7 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
           }
         }
       >
-        <BouncyCheckbox
-          disableText={true}
-          disabled={false}
-          fillColor="#18bd18"
-          iconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          innerIconStyle={
-            {
-              "borderRadius": 5,
-            }
-          }
-          onPress={[Function]}
-          style={
-            {
-              "marginRight": 10,
-            }
-          }
-          unFillColor="#011401"
-          useBuiltInState={false}
-        />
+        BouncyCheckbox
         <Text
           style={
             {

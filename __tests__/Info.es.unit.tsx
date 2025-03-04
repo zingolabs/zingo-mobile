@@ -11,17 +11,8 @@ import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/contex
 import { CurrencyEnum } from '../app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
-import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 
-jest.mock('react-native-safe-area-context', () => ({
-  SafeAreaProvider: ({ children }: any) => children,
-  SafeAreaView: ({ children }: any) => children,
-  useSafeAreaInsets: () => ({ top: 0, left: 0, right: 0, bottom: 0 }),
-}));
-jest.useFakeTimers();
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-  FontAwesomeIcon: '',
-}));
+// don't delete -> mocking in Spanish.
 jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {
     return {
@@ -29,33 +20,6 @@ jest.mock('react-native-localize', () => ({
       groupingSeparator: '.', // es
     };
   },
-}));
-jest.mock('react-native/src/private/animated/NativeAnimatedHelper');
-jest.mock('@react-native-community/netinfo/src/index', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNCNetInfo = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RPCModule = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
-jest.mock('@react-native-clipboard/clipboard', () => ({
-  getString: jest.fn(() => Promise.resolve('mocked clipboard content')),
-  setString: jest.fn(),
-}));
-jest.mock('@react-navigation/native', () => ({
-  ...jest.requireActual('@react-navigation/native'),
-  useTheme: () => (mockTheme),
 }));
 
 // test suite
