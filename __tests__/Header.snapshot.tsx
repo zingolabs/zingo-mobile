@@ -12,7 +12,6 @@ import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
-
 // test suite
 describe('Component Header - test', () => {
   //snapshot test
