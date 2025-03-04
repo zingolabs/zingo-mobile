@@ -101,11 +101,11 @@ const App: React.FunctionComponent = () => {
             justifyContent: 'center',
             backgroundColor: theme.colors.card,
           }}>
-          <Stack.Navigator initialRouteName={RouteEnums.LoadingApp} screenOptions={{ headerShown: false }}>
-            <Stack.Screen name={RouteEnums.LoadingApp}>
+          <Stack.Navigator initialRouteName={RouteEnums.LoadingApp} screenOptions={{ headerShown: false, animation: 'none' }}>
+            <Stack.Screen name={RouteEnums.LoadingApp} options={{ animation: 'none' }}>
               {props => <LoadingApp {...props} toggleTheme={toggleTheme} />}
             </Stack.Screen>
-            <Stack.Screen name={RouteEnums.LoadedApp}>
+            <Stack.Screen name={RouteEnums.LoadedApp} options={{ animation: 'none' }}>
               {props => <LoadedApp {...props} toggleTheme={toggleTheme} />}
             </Stack.Screen>
           </Stack.Navigator>
