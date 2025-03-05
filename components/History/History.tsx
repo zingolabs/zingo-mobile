@@ -13,7 +13,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import { useScrollToTop, useTheme } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 
@@ -98,7 +98,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<RecyclerListView<any, any>>(null);
 
   const layoutProvider = useMemo(() => new LayoutProvider(
     (index: number) => {
@@ -120,10 +120,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
     (type, dim) => {
       if (type === ViewTypes.WITHOUT_MONTH) {
         dim.width = Dimensions.get('window').width;
-        dim.height = 70;
+        dim.height = 65;
       } else if (type === ViewTypes.WITH_MONTH) {
         dim.width = Dimensions.get('window').width;
-        dim.height = 100;
+        dim.height = 95;
       }
     },
   ), [valueTransfersSliced]);
@@ -133,8 +133,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
   ), []);
 
   const [dataProvider, setDataProvider] = useState<DataProvider>(_dataProvider);
-
-  useScrollToTop(scrollViewRef);
 
   const fetchValueTransfersSliced = useMemo(() => {
     if (!valueTransfers) {
@@ -171,7 +169,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   const handleScrollToTop = () => {
     if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+      scrollViewRef.current.scrollToTop(true);
     }
   };
 
@@ -319,6 +317,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           {valueTransfersSliced &&
             valueTransfersSliced.length > 0 && (
             <RecyclerListView
+              ref={scrollViewRef}
               renderAheadOffset={300}
               scrollViewProps={{
                 refreshControl: (
