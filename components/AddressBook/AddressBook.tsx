@@ -58,7 +58,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
 
   const scrollViewRef = useRef<ScrollView>(null);
 
-  useScrollToTop(scrollViewRef);
+  useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
 
   const fetchAddressBookSorted = useMemo(async () => {
     // excluding this address from the list

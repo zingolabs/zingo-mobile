@@ -93,7 +93,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
   const scrollViewRef = useRef<ScrollView>(null);
 
-  useScrollToTop(scrollViewRef);
+  useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
 
   var lastMonth = '';
 

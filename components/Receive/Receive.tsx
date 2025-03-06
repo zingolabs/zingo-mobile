@@ -9,7 +9,6 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import RegText from '../Components/RegText';
-import { Scene } from 'react-native-tab-view/lib/typescript/src/types';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -266,12 +265,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     }
   };
 
-  const renderLabelCustom: (
-    scene: Scene<Route> & {
-      focused: boolean;
-      color: string;
-    },
-  ) => ReactNode = ({ route, focused, color }) => {
+  const renderLabelCustom: ({ route, focused, color }: {route: any, focused: any, color: any }) => ReactNode = ({ route, focused, color }) => {
     const w = (dimensions.width - 50) / (mode === ModeEnum.basic ? 1 : 2);
     //const w = route.key === 'uaddr' ? '40%' : '30%';
     return (
@@ -336,8 +330,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           {...props}
           indicatorStyle={{ backgroundColor: colors.primary }}
           style={{ backgroundColor: colors.background }}
-          renderLabel={renderLabelCustom}
-          renderTabBarItem={p => <TabBarItem {...p} key={p.route.key} />}
+          renderTabBarItem={p => <TabBarItem {...p} key={p.route.key} label={renderLabelCustom} />}
         />
       </View>
     );

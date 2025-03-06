@@ -63,14 +63,14 @@ def enableProguardInReleaseBuilds = false
  * The preferred build flavor of JavaScriptCore (JSC).
  *
  * For example, to use the international variant, you can use:
- * `def jscFlavor = 'org.webkit:android-jsc-intl:+'`
+ * `def jscFlavor = io.github.react-native-community:jsc-android-intl:2026004.+`
  *
  * The international variant includes ICU i18n library and necessary data
  * allowing to use e.g. `Date.toLocaleString` and `String.localeCompare` that
  * give correct results when using with locales other than en-US.  Note that
  * this variant is about 6MiB larger per architecture than default.
  */
-def jscFlavor = 'org.webkit:android-jsc:+'
+def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
 /**
  * Whether to enable building a separate APK for each ABI.
@@ -222,7 +222,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
-    androidTestImplementation('com.wix:detox:20.27.2')
+    androidTestImplementation('com.wix:detox:20.34.4')
     implementation 'androidx.appcompat:appcompat:1.7.0'
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
@@ -241,7 +241,7 @@ dependencies {
 	implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.5.0"
 
-    def work_version = "2.9.1"
+    def work_version = "2.10.0"
 
     // (Java only)
     implementation "androidx.work:work-runtime:$work_version"
@@ -266,7 +266,7 @@ dependencies {
     androidTestImplementation "com.google.truth:truth:1.1.3"
     
     // JSON parsing
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.14.3"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3"
     
     // JUnit test runners
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
@@ -278,5 +278,5 @@ dependencies {
     implementation "net.java.dev.jna:jna:5.9.0@aar"
 
     // back navigation implementation
-    implementation "androidx.activity:activity:1.6.0-alpha05"
+    implementation 'androidx.activity:activity:1.10.1'
 }

@@ -88,7 +88,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   const [randomColors] = useState<string[]>(Utils.generateColorList(10));
   const scrollViewRef = useRef<ScrollView>(null);
 
-  useScrollToTop(scrollViewRef);
+  useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
 
   var lastMonth = '';
 
