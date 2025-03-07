@@ -87,7 +87,7 @@ import History from '../../components/History';
 import Send from '../../components/Send';
 import Receive from '../../components/Receive';
 import Settings from '../../components/Settings';
-import { MessagesModal } from '../../components/Messages';
+import { MessagesAll } from '../../components/Messages';
 import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
@@ -1311,14 +1311,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     } else if (item === MenuItemEnum.Chats) {
       return magicModal.show(
         () => (
-          <MessagesModal
-            setPrivacyOption={this.setPrivacyOption /* header */}
-            setScrollToTop={this.setScrollToTop /* chats */}
-            scrollToTop={this.state.scrollToTop /* chats */}
-            setScrollToBottom={this.setScrollToBottom /* messages */}
-            scrollToBottom={this.state.scrollToBottom /* messages */}
-            sendTransaction={this.sendTransaction /* messages */}
-            setServerOption={this.setServerOption /* messages */}
+          <MessagesAll
+            setPrivacyOption={this.setPrivacyOption}
+            setScrollToBottom={this.setScrollToBottom}
+            scrollToBottom={this.state.scrollToBottom}
           />
         ),
         { swipeDirection: undefined },

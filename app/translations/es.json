@@ -36,8 +36,8 @@
   "syncing": "Sincronizando -",
   "synced": "Sincronizada",
   "messages": {
-    "title": "Mensajes (experimental)",
-    "title-chats": "Chats (experimental)",
+    "title": "Mensajes",
+    "title-chats": "Mensajes",
     "empty": "Todavía no hay mensajes.",
     "message-placeholder": "Mensaje",
     "message-placeholder-error": "No hay fondos disponibles gastables",
