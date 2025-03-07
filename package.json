@@ -71,12 +71,12 @@
     "url-parse": "^1.5.10"
   },
   "devDependencies": {
-    "@babel/core": "^7.26.9",
-    "@babel/preset-env": "^7.26.9",
-    "@babel/runtime": "^7.26.9",
-    "@react-native-community/cli": "^17.0.0",
-    "@react-native-community/cli-platform-android": "^17.0.0",
-    "@react-native-community/cli-platform-ios": "^17.0.0",
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.3",
+    "@babel/runtime": "^7.25.0",
+    "@react-native-community/cli": "^15.0.1",
+    "@react-native-community/cli-platform-android": "^15.0.1",
+    "@react-native-community/cli-platform-ios": "^15.0.1",
     "@react-native/babel-preset": "0.78.0",
     "@react-native/eslint-config": "0.78.0",
     "@react-native/metro-config": "0.78.0",
@@ -92,15 +92,16 @@
     "@types/react-native-keychain": "^3.1.0",
     "@types/react-test-renderer": "^19.0.0",
     "@types/url-parse": "^1.4.11",
+    "babel-jest": "^29.6.3",
     "babel-plugin-dynamic-import-node": "^2.3.3",
     "depcheck": "^1.4.7",
     "detox": "^20.34.4",
     "eslint": "^8.19.0",
-    "jest": "^29.6.3",
+    "jest": "^29.2.1",
     "prettier": "^2.8.8",
     "react-test-renderer": "^19.0.0",
     "rimraf": "^6.0.1",
-    "typescript": "5.5.2"
+    "typescript": "5.0.4"
   },
   "transformIgnorePatterns": [
     "node_modules/(?!((jest-)?react-native|react-navigation|@react-navigation/.*))"
