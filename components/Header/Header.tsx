@@ -543,7 +543,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                             alignItems: 'center',
                             padding: 3,
                           }}>
-                          <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
+                          <FontAwesomeIcon icon={faCheck} color={colors.primary} size={19} />
                           {viewSyncStatus && (
                             <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{translate('synced') as string}</FadeText>
                           )}
@@ -570,11 +570,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                             flexDirection: 'row',
                             justifyContent: 'center',
                             alignItems: 'center',
-                            paddingHorizontal: 3,
+                            padding: 3,
                           }}>
                           {mode === ModeEnum.basic ? (
                             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                              <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
+                              <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={19} />
                               {viewSyncStatus && (
                                 <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
                                   {translate('syncing') as string}
@@ -589,7 +589,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                               testID="header.playicon"
                               onPress={() => setSyncReportModalShow()}>
                               <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
+                                <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={19} />
                                 {viewSyncStatus && (
                                   <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
                                     {translate('syncing') as string}
@@ -631,7 +631,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                               alignItems: 'center',
                               padding: 3,
                             }}>
-                            <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={18} />
+                            <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={19} />
                             <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
                               {translate('connecting') as string}
                             </FadeText>

@@ -98,6 +98,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
+  const [showFooter, setShowFooter] = useState<boolean>(false);
   const scrollViewRef = useRef<RecyclerListView<any, any>>(null);
 
   const layoutProvider = useMemo(() => new LayoutProvider(
@@ -147,12 +148,12 @@ const History: React.FunctionComponent<HistoryProps> = ({
   useEffect(() => {
     if (valueTransfers !== null) {
       const vts = fetchValueTransfersSliced;
+      setDataProvider((data) => data.cloneWithRows(vts));
       setLoadMoreButton(numVt < (vts ? vts.length : 0));
       setValueTransfersSliced(vts);
-      setDataProvider((data) => data.cloneWithRows(vts));
-      //setTimeout(() => {
+      setTimeout(() => {
         setLoading(false);
-      //}, 500);
+      }, 500);
     }
   }, [fetchValueTransfersSliced, numVt, valueTransfers, server.chainName]);
 
@@ -176,6 +177,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const handleScroll = (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
     const isTop = offsetY === 0;
     setIsAtTop(isTop);
+    setShowFooter(true);
   };
 
   const setValueTransferDetailModalShow = (index: number, vt: ValueTransferType) => {
@@ -264,6 +266,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             onPress={() => {
               setFilter(FilterEnum.all);
               setLoading(true);
+              setShowFooter(false);
             }}>
             <View
               style={{
@@ -288,6 +291,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             onPress={() => {
               setFilter(FilterEnum.withFunds);
               setLoading(true);
+              setShowFooter(false);
             }}>
             <View
               style={{
@@ -318,7 +322,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             valueTransfersSliced.length > 0 && (
             <RecyclerListView
               ref={scrollViewRef}
-              renderAheadOffset={300}
+              renderAheadOffset={1000}
               scrollViewProps={{
                 refreshControl: (
                   <RefreshControl
@@ -339,26 +343,16 @@ const History: React.FunctionComponent<HistoryProps> = ({
               layoutProvider={layoutProvider}
               dataProvider={dataProvider}
               rowRenderer={_rowRenderer}
+              onEndReachedThreshold={0.75}
+              onEndReached={() => {
+                setShowFooter(true);
+              }}
+              disableRecycling={true}
               renderFooter={() => (
                 <>
-                  {loadMoreButton ? (
-                    <View
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        marginTop: 10,
-                        marginBottom: 30,
-                      }}>
-                      <Button
-                        type={ButtonTypeEnum.Secondary}
-                        title={translate('history.loadmore') as string}
-                        onPress={loadMoreClicked}
-                      />
-                    </View>
-                  ) : (
+                  {showFooter ? (
                     <>
-                      {!!valueTransfersSliced && !!valueTransfersSliced.length ? (
+                      {loadMoreButton ? (
                         <View
                           style={{
                             display: 'flex',
@@ -367,22 +361,41 @@ const History: React.FunctionComponent<HistoryProps> = ({
                             marginTop: 10,
                             marginBottom: 30,
                           }}>
-                          <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
+                          <Button
+                            type={ButtonTypeEnum.Secondary}
+                            title={translate('history.loadmore') as string}
+                            onPress={loadMoreClicked}
+                          />
                         </View>
                       ) : (
-                        <View
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'flex-start',
-                            marginTop: 10,
-                            marginBottom: 10,
-                          }}>
-                          <FadeText style={{ color: colors.primary }}>{translate('history.empty') as string}</FadeText>
-                        </View>
+                        <>
+                          {!!valueTransfersSliced && !!valueTransfersSliced.length ? (
+                            <View
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                marginTop: 10,
+                                marginBottom: 30,
+                              }}>
+                              <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
+                            </View>
+                          ) : (
+                            <View
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                marginTop: 10,
+                                marginBottom: 10,
+                              }}>
+                              <FadeText style={{ color: colors.primary }}>{translate('history.empty') as string}</FadeText>
+                            </View>
+                          )}
+                        </>
                       )}
                     </>
-                  )}
+                  ) : null}
                 </>
               )}
             />)

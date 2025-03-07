@@ -1,1 +1,3 @@
-export const requestBioAuth = jest.fn(() => Promise.resolve(true));
+export const RNBiometrics = {
+    requestBioAuth: jest.fn(() => Promise.resolve(true)),
+};

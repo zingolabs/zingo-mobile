@@ -1093,7 +1093,7 @@ export default class RPC {
         this.fetchAddressesLock = false;
         return;
       }
-      const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr);
+      const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr) || [];
 
       //const start2 = Date.now();
       const orchardAddressesStr: string = await RPCModule.execute(CommandEnum.addresses, CommandAddressesEnum.orchard);
@@ -1109,7 +1109,7 @@ export default class RPC {
         this.fetchAddressesLock = false;
         return;
       }
-      const orchardAddressesJSON: RPCAddressType[] = await JSON.parse(orchardAddressesStr);
+      const orchardAddressesJSON: RPCAddressType[] = await JSON.parse(orchardAddressesStr) || [];
       const uOrchardAddress: string =
         orchardAddressesJSON && orchardAddressesJSON.length > 0 ? orchardAddressesJSON[0].address : '';
 
