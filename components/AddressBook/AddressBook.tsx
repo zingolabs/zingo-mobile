@@ -214,7 +214,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
             <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
           )}
           {!addressBookCurrentAddress &&
-            addressBookSorted.flatMap((aBItem, index) => {
+            addressBookSorted.map((aBItem, index) => {
               return (
                 <View key={`container-${index}-${aBItem.label}`}>
                   {currentItem === index && (
@@ -232,7 +232,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
               );
             })}
           {!addressBookCurrentAddress &&
-            addressBookSorted.flatMap((aBItem, index) => {
+            addressBookSorted.map((aBItem, index) => {
               return (
                 <View key={`container-${index}-${aBItem.label}`}>
                   {currentItem !== index && (
@@ -250,7 +250,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
               );
             })}
           {!addressBookCurrentAddress &&
-            addressBookProtected.flatMap((aBItem, index) => {
+            addressBookProtected.map((aBItem, index) => {
               return (
                 <View key={`container-${index}-${aBItem.label}`}>
                   <AbSummaryLine

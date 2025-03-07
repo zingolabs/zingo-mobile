@@ -280,7 +280,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             }}>
             {valueTransfersSliced &&
               valueTransfersSliced.length > 0 &&
-              valueTransfersSliced.flatMap((vt, index) => {
+              valueTransfersSliced.map((vt, index) => {
                 let txmonth = vt && vt.time ? moment(vt.time * 1000).format('MMM YYYY') : '--- ----';
 
                 var month = '';

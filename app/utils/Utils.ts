@@ -241,7 +241,7 @@ export default class Utils {
   ): Promise<SendJsonToTypeType[]> {
     let donationAddress: boolean = false;
     const json: Promise<SendJsonToTypeType[][]> = Promise.all(
-      [sendPageState.toaddr].flatMap(async (to: ToAddrClass) => {
+      [sendPageState.toaddr].map(async (to: ToAddrClass) => {
         const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uOrchardAddress);
         const amount = parseInt((Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(0), 10);
 

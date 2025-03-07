@@ -545,7 +545,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               }}>
               {contacts &&
                 contacts.length > 0 &&
-                contacts.flatMap((c, index) => {
+                contacts.map((c, index) => {
                   let txmonth = c && c.time ? moment(c.time * 1000).format('MMM YYYY') : '';
 
                   var month = '';
