@@ -4,17 +4,16 @@ import {
   View,
   ScrollView,
   RefreshControl,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   TouchableOpacity,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import { useScrollToTop, useTheme } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 
@@ -37,6 +36,14 @@ import Header from '../Header';
 import { MessagesAddress } from '../Messages';
 import Utils from '../../app/utils';
 import { magicModal } from 'react-native-magic-modal';
+import { DataProvider, RecyclerListView, LayoutProvider } from 'recyclerlistview';
+import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
+import { isEqual } from 'lodash';
+
+const ViewTypes = {
+  WITH_MONTH: 0,
+  WITHOUT_MONTH: 1,
+};
 
 type HistoryProps = {
   // side menu
@@ -91,17 +98,48 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const [showFooter, setShowFooter] = useState<boolean>(false);
+  const scrollViewRef = useRef<RecyclerListView<any, any>>(null);
 
-  useScrollToTop(scrollViewRef);
+  const layoutProvider = useMemo(() => new LayoutProvider(
+    (index: number) => {
+      if (index === 0) {
+        return ViewTypes.WITH_MONTH;
+      }
+      const lastData = valueTransfersSliced[index - 1];
+      let lasttxmonth = lastData && lastData.time ? moment(lastData.time * 1000).format('MMM YYYY') : '--- ----';
 
-  var lastMonth = '';
+      const data = valueTransfersSliced[index];
+      let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
+
+      if (txmonth !== lasttxmonth) {
+        return ViewTypes.WITH_MONTH;
+      } else {
+        return ViewTypes.WITHOUT_MONTH;
+      }
+    },
+    (type, dim) => {
+      if (type === ViewTypes.WITHOUT_MONTH) {
+        dim.width = Dimensions.get('window').width;
+        dim.height = 65;
+      } else if (type === ViewTypes.WITH_MONTH) {
+        dim.width = Dimensions.get('window').width;
+        dim.height = 95;
+      }
+    },
+  ), [valueTransfersSliced]);
+
+  const _dataProvider = useMemo(() => new DataProvider(
+    (r1: ValueTransferType, r2: ValueTransferType) => !isEqual(r1, r2)
+  ), []);
+
+  const [dataProvider, setDataProvider] = useState<DataProvider>(_dataProvider);
 
   const fetchValueTransfersSliced = useMemo(() => {
     if (!valueTransfers) {
       return [] as ValueTransferType[];
     }
-    // strictly show VT's with some amount on it.
+    // strictly show VT's with some amount on funds.
     return valueTransfers
       .filter((vt: ValueTransferType) => (filter === FilterEnum.withFunds ? vt.amount > 0 : true))
       .slice(0, numVt);
@@ -110,6 +148,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   useEffect(() => {
     if (valueTransfers !== null) {
       const vts = fetchValueTransfersSliced;
+      setDataProvider((data) => data.cloneWithRows(vts));
       setLoadMoreButton(numVt < (vts ? vts.length : 0));
       setValueTransfersSliced(vts);
       setTimeout(() => {
@@ -131,14 +170,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   const handleScrollToTop = () => {
     if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+      scrollViewRef.current.scrollToTop(true);
     }
   };
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { contentOffset } = event.nativeEvent;
-    const isTop = contentOffset.y === 0;
+  const handleScroll = (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
+    const isTop = offsetY === 0;
     setIsAtTop(isTop);
+    setShowFooter(true);
   };
 
   const setValueTransferDetailModalShow = (index: number, vt: ValueTransferType) => {
@@ -162,6 +201,24 @@ const History: React.FunctionComponent<HistoryProps> = ({
         setServerOption={setServerOption}
       />, { swipeDirection: undefined }
     ).promise;
+  };
+
+  const _rowRenderer = (type: any, data: ValueTransferType, index: number) => {
+    let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
+
+    return <ValueTransferLine
+      index={index}
+      vt={data}
+      month={type === ViewTypes.WITH_MONTH ? txmonth : ''}
+      setValueTransferDetailModalShow={setValueTransferDetailModalShow}
+      nextLineWithSameTxid={
+        index >= valueTransfersSliced.length - 1
+          ? false
+          : valueTransfersSliced[index + 1].txid === data.txid
+      }
+      setMessagesAddressModalShow={setMessagesAddressModalShow}
+      addressProtected={data.address === zenniesDonationAddress}
+    />;
   };
 
   //console.log('render History - 4');
@@ -209,6 +266,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             onPress={() => {
               setFilter(FilterEnum.all);
               setLoading(true);
+              setShowFooter(false);
             }}>
             <View
               style={{
@@ -233,6 +291,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
             onPress={() => {
               setFilter(FilterEnum.withFunds);
               setLoading(true);
+              setShowFooter(false);
             }}>
             <View
               style={{
@@ -259,96 +318,88 @@ const History: React.FunctionComponent<HistoryProps> = ({
         <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
       ) : (
         <>
-          <ScrollView
-            ref={scrollViewRef}
-            onScroll={handleScroll}
-            scrollEventThrottle={100}
-            accessible={true}
-            accessibilityLabel={translate('history.list-acc') as string}
-            refreshControl={
-              <RefreshControl
-                refreshing={false}
-                onRefresh={() => doRefresh(RefreshScreenEnum.History)}
-                tintColor={colors.text}
-                title={translate('history.refreshing') as string}
-              />
-            }
-            style={{
-              flexGrow: 1,
-              marginTop: 10,
-              width: '100%',
-            }}>
-            {valueTransfersSliced &&
-              valueTransfersSliced.length > 0 &&
-              valueTransfersSliced.flatMap((vt, index) => {
-                let txmonth = vt && vt.time ? moment(vt.time * 1000).format('MMM YYYY') : '--- ----';
-
-                var month = '';
-                if (txmonth !== lastMonth) {
-                  month = txmonth;
-                  lastMonth = txmonth;
-                }
-
-                return (
-                  <ValueTransferLine
-                    key={`${index}-${vt.txid}-${vt.kind}`}
-                    index={index}
-                    vt={vt}
-                    month={month}
-                    setValueTransferDetailModalShow={setValueTransferDetailModalShow}
-                    nextLineWithSameTxid={
-                      index >= valueTransfersSliced.length - 1
-                        ? false
-                        : valueTransfersSliced[index + 1].txid === vt.txid
-                    }
-                    setMessagesAddressModalShow={setMessagesAddressModalShow}
-                    addressProtected={vt.address === zenniesDonationAddress}
+          {valueTransfersSliced &&
+            valueTransfersSliced.length > 0 && (
+            <RecyclerListView
+              ref={scrollViewRef}
+              renderAheadOffset={1000}
+              scrollViewProps={{
+                refreshControl: (
+                  <RefreshControl
+                    refreshing={false}
+                    onRefresh={() => doRefresh(RefreshScreenEnum.History)}
+                    tintColor={colors.text}
+                    title={translate('history.refreshing') as string}
                   />
-                );
-              })}
-            {loadMoreButton ? (
-              <View
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
+                ),
+                style: {
+                  flexGrow: 1,
                   marginTop: 10,
-                  marginBottom: 30,
-                }}>
-                <Button
-                  type={ButtonTypeEnum.Secondary}
-                  title={translate('history.loadmore') as string}
-                  onPress={loadMoreClicked}
-                />
-              </View>
-            ) : (
-              <>
-                {!!valueTransfersSliced && !!valueTransfersSliced.length ? (
-                  <View
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                      marginTop: 10,
-                      marginBottom: 30,
-                    }}>
-                    <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
-                  </View>
-                ) : (
-                  <View
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                      marginTop: 10,
-                      marginBottom: 10,
-                    }}>
-                    <FadeText style={{ color: colors.primary }}>{translate('history.empty') as string}</FadeText>
-                  </View>
-                )}
-              </>
-            )}
-          </ScrollView>
+                  width: '100%',
+                },
+              }}
+              onScroll={handleScroll}
+              scrollThrottle={100}
+              layoutProvider={layoutProvider}
+              dataProvider={dataProvider}
+              rowRenderer={_rowRenderer}
+              onEndReachedThreshold={0.75}
+              onEndReached={() => {
+                setShowFooter(true);
+              }}
+              disableRecycling={true}
+              renderFooter={() => (
+                <>
+                  {showFooter ? (
+                    <>
+                      {loadMoreButton ? (
+                        <View
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-start',
+                            marginTop: 10,
+                            marginBottom: 30,
+                          }}>
+                          <Button
+                            type={ButtonTypeEnum.Secondary}
+                            title={translate('history.loadmore') as string}
+                            onPress={loadMoreClicked}
+                          />
+                        </View>
+                      ) : (
+                        <>
+                          {!!valueTransfersSliced && !!valueTransfersSliced.length ? (
+                            <View
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                marginTop: 10,
+                                marginBottom: 30,
+                              }}>
+                              <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
+                            </View>
+                          ) : (
+                            <View
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                marginTop: 10,
+                                marginBottom: 10,
+                              }}>
+                              <FadeText style={{ color: colors.primary }}>{translate('history.empty') as string}</FadeText>
+                            </View>
+                          )}
+                        </>
+                      )}
+                    </>
+                  ) : null}
+                </>
+              )}
+            />)
+          }
           {!isAtTop && (
             <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 10 }}>
               <FontAwesomeIcon

@@ -14,6 +14,7 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
+import Utils from '../app/utils';
 
 // test suite
 describe('Component Messages Address - test', () => {
@@ -40,7 +41,7 @@ describe('Component Messages Address - test', () => {
           setPrivacyOption={onFunction}
           setScrollToBottom={onFunction}
           scrollToBottom={false}
-          address={mockAddresses[0].uOrchardAddress}
+          address={Utils.messagesAddress(mockValueTransfers[0])}
           sendTransaction={onFunction}
           setServerOption={onFunction}
         />

@@ -720,7 +720,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             </>
           )}
 
-          {messagesSliced.flatMap((vt, index) => {
+          {messagesSliced.map((vt, index) => {
             let txmonth = vt.time ? moment(vt.time * 1000).format('MMM YYYY') : '--- ----';
 
             var month = '';
