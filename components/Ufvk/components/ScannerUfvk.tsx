@@ -7,11 +7,12 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import Header from '../../Header';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
 import { Code } from 'react-native-vision-camera';
+import { View } from 'react-native';
 
 type ScannerUfvkProps = {
   setUfvkText: (k: string) => void;
@@ -21,6 +22,7 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, c
   const context = useContext(ContextAppLoading);
   const { translate, language } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
 
   const onRead = async (codes: Code[]) => {
@@ -35,26 +37,25 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, c
   };
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
-          backgroundColor: colors.background,
-        }}>
-        <Header
-          title={translate('scanner.text') as string}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          closeScreen={closeModal}
-        />
-        <Scanner onRead={onRead} />
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <View
+      style={{
+        marginTop: top,
+        marginBottom: bottom,
+        marginRight: right,
+        marginLeft: left,
+        flex: 1,
+        backgroundColor: colors.background,
+      }}>
+      <Header
+        title={translate('scanner.text') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        closeScreen={closeModal}
+      />
+      <Scanner onRead={onRead} />
+    </View>
   );
 };
 

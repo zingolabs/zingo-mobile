@@ -9,7 +9,7 @@ import { LoadingApp } from './app/LoadingApp';
 import { ThemeType } from './app/types';
 import { ModeEnum, RouteEnums } from './app/AppState';
 
-import { LogBox, StatusBar } from 'react-native';
+import { LogBox, StatusBar, View } from 'react-native';
 
 LogBox.ignoreLogs(['[Reanimated] Reduced motion setting is enabled on this device.']);
 
@@ -98,8 +98,7 @@ const App: React.FunctionComponent = () => {
         <SafeAreaView
           style={{
             flex: 1,
-            justifyContent: 'center',
-            backgroundColor: theme.colors.card,
+            backgroundColor: theme.colors.background,
           }}>
           <Stack.Navigator initialRouteName={RouteEnums.LoadingApp} screenOptions={{ headerShown: false, animation: 'none' }}>
             <Stack.Screen name={RouteEnums.LoadingApp} options={{ animation: 'none' }}>

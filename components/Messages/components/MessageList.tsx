@@ -58,6 +58,7 @@ import selectingServer from '../../../app/selectingServer';
 import { serverUris } from '../../../app/uris';
 import Utils from '../../../app/utils';
 import { magicModal } from 'react-native-magic-modal';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type MessageListProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -101,6 +102,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     somePending,
   } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
 
   const [numVt, setNumVt] = useState<number>(50);
@@ -482,7 +484,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         message={memo}
         includeUAMessage={true}
         setMessage={setMemo}
-      />, { swipeDirection: undefined }
+      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -493,7 +495,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         valueTransfersSliced={messagesSliced}
         totalLength={messagesFiltered ? messagesFiltered.length : 0}
         setPrivacyOption={setPrivacyOption}
-      />, { swipeDirection: undefined }
+      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -505,7 +507,20 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     <KeyboardAvoidingView
       behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
-      style={{ backgroundColor: colors.background }}>
+      style={{
+        marginTop: top,
+        marginBottom: bottom,
+        marginRight: right,
+        marginLeft: left,
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+        }}>
       <View
         accessible={true}
         accessibilityLabel={translate('history.title-acc') as string}
@@ -903,6 +918,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           )}
         </View>
       )}
+      </View>
     </KeyboardAvoidingView>
   );
 };

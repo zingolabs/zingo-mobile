@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import moment from 'moment';
 import 'moment/locale/es';
@@ -44,6 +44,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
 
   const [numAb, setNumAb] = useState<number>(50);
@@ -148,111 +149,76 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
   //console.log('render Address Book - 4', currentItem, action, addressBook);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
+    <View
+      style={{
+        marginTop: top,
+        marginBottom: bottom,
+        marginRight: right,
+        marginLeft: left,
+        flex: 1,
+        backgroundColor: colors.background,
+      }}>
+      <Header
+        title={translate('addressbook.title') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        closeScreen={hide}
+      />
+      <ScrollView
+        ref={scrollViewRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={100}
+        testID="addressbook.scroll-view"
+        keyboardShouldPersistTaps="handled"
+        style={{ height: '80%', maxHeight: '80%' }}
+        contentContainerStyle={{
+          flexDirection: 'column',
           alignItems: 'stretch',
-          height: '100%',
-          backgroundColor: colors.background,
+          justifyContent: 'flex-start',
         }}>
-        <Header
-          title={translate('addressbook.title') as string}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          closeScreen={hide}
-        />
-        <ScrollView
-          ref={scrollViewRef}
-          onScroll={handleScroll}
-          scrollEventThrottle={100}
-          testID="addressbook.scroll-view"
-          keyboardShouldPersistTaps="handled"
-          style={{ height: '80%', maxHeight: '80%' }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
-          }}>
-          {currentItem === -1 && action !== null && (
-            <AbDetail
-              index={-1}
-              key={'detail-new'}
-              item={{} as AddressBookFileClass}
-              cancel={cancel}
-              action={action}
-              doAction={doAction}
-              addressBookCurrentAddress={addressBookCurrentAddress}
-            />
-          )}
-          {currentItem !== null && currentItem > -1 && action !== null && (
-            <AbDetail
-              index={currentItem}
-              key={`detail-${currentItem}-${addressBookSorted[currentItem].label}`}
-              item={addressBookSorted[currentItem]}
-              cancel={cancel}
-              action={action}
-              doAction={doAction}
-            />
-          )}
-          {!addressBookCurrentAddress && addressBookSorted.length === 0 && currentItem !== -1 && !loading && (
-            <View
-              style={{
-                height: 150,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                marginTop: 30,
-              }}>
-              <FadeText style={{ color: colors.primary }}>{translate('addressbook.empty') as string}</FadeText>
-            </View>
-          )}
-          {loading && (
-            <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
-          )}
-          {!addressBookCurrentAddress &&
-            addressBookSorted.map((aBItem, index) => {
-              return (
-                <View key={`container-${index}-${aBItem.label}`}>
-                  {currentItem === index && (
-                    <AbSummaryLine
-                      index={index}
-                      key={`line-${index}-${aBItem.label}`}
-                      item={aBItem}
-                      setCurrentItem={setCurrentItem}
-                      setAction={setAction}
-                      handleScrollToTop={handleScrollToTop}
-                      doAction={doAction}
-                    />
-                  )}
-                </View>
-              );
-            })}
-          {!addressBookCurrentAddress &&
-            addressBookSorted.map((aBItem, index) => {
-              return (
-                <View key={`container-${index}-${aBItem.label}`}>
-                  {currentItem !== index && (
-                    <AbSummaryLine
-                      index={index}
-                      key={`line-${index}-${aBItem.label}`}
-                      item={aBItem}
-                      setCurrentItem={setCurrentItem}
-                      setAction={setAction}
-                      handleScrollToTop={handleScrollToTop}
-                      doAction={doAction}
-                    />
-                  )}
-                </View>
-              );
-            })}
-          {!addressBookCurrentAddress &&
-            addressBookProtected.map((aBItem, index) => {
-              return (
-                <View key={`container-${index}-${aBItem.label}`}>
+        {currentItem === -1 && action !== null && (
+          <AbDetail
+            index={-1}
+            key={'detail-new'}
+            item={{} as AddressBookFileClass}
+            cancel={cancel}
+            action={action}
+            doAction={doAction}
+            addressBookCurrentAddress={addressBookCurrentAddress}
+          />
+        )}
+        {currentItem !== null && currentItem > -1 && action !== null && (
+          <AbDetail
+            index={currentItem}
+            key={`detail-${currentItem}-${addressBookSorted[currentItem].label}`}
+            item={addressBookSorted[currentItem]}
+            cancel={cancel}
+            action={action}
+            doAction={doAction}
+          />
+        )}
+        {!addressBookCurrentAddress && addressBookSorted.length === 0 && currentItem !== -1 && !loading && (
+          <View
+            style={{
+              height: 150,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              marginTop: 30,
+            }}>
+            <FadeText style={{ color: colors.primary }}>{translate('addressbook.empty') as string}</FadeText>
+          </View>
+        )}
+        {loading && (
+          <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
+        )}
+        {!addressBookCurrentAddress &&
+          addressBookSorted.map((aBItem, index) => {
+            return (
+              <View key={`container-${index}-${aBItem.label}`}>
+                {currentItem === index && (
                   <AbSummaryLine
                     index={index}
                     key={`line-${index}-${aBItem.label}`}
@@ -261,74 +227,108 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
                     setAction={setAction}
                     handleScrollToTop={handleScrollToTop}
                     doAction={doAction}
-                    addressProtected={true}
                   />
-                </View>
-              );
-            })}
-          {loadMoreButton ? (
-            <View
-              style={{
-                height: 150,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                marginTop: 5,
-                marginBottom: 30,
-              }}>
-              <Button
-                type={ButtonTypeEnum.Secondary}
-                title={translate('addressbook.loadmore') as string}
-                onPress={loadMoreClicked}
-              />
-            </View>
-          ) : (
-            <>
-              {!addressBookCurrentAddress && !!addressBookSorted && !!addressBookSorted.length && (
-                <View
-                  style={{
-                    height: 150,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    marginTop: 5,
-                    marginBottom: 30,
-                  }}>
-                  <FadeText style={{ color: colors.primary }}>{translate('addressbook.end') as string}</FadeText>
-                </View>
-              )}
-            </>
-          )}
-        </ScrollView>
-        {!isAtTop && (
-          <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 105, right: 10 }}>
-            <FontAwesomeIcon
-              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-              size={50}
-              icon={faAnglesUp}
-              color={colors.zingo}
-            />
-          </TouchableOpacity>
-        )}
-        {currentItem === null && (
+                )}
+              </View>
+            );
+          })}
+        {!addressBookCurrentAddress &&
+          addressBookSorted.map((aBItem, index) => {
+            return (
+              <View key={`container-${index}-${aBItem.label}`}>
+                {currentItem !== index && (
+                  <AbSummaryLine
+                    index={index}
+                    key={`line-${index}-${aBItem.label}`}
+                    item={aBItem}
+                    setCurrentItem={setCurrentItem}
+                    setAction={setAction}
+                    handleScrollToTop={handleScrollToTop}
+                    doAction={doAction}
+                  />
+                )}
+              </View>
+            );
+          })}
+        {!addressBookCurrentAddress &&
+          addressBookProtected.map((aBItem, index) => {
+            return (
+              <View key={`container-${index}-${aBItem.label}`}>
+                <AbSummaryLine
+                  index={index}
+                  key={`line-${index}-${aBItem.label}`}
+                  item={aBItem}
+                  setCurrentItem={setCurrentItem}
+                  setAction={setAction}
+                  handleScrollToTop={handleScrollToTop}
+                  doAction={doAction}
+                  addressProtected={true}
+                />
+              </View>
+            );
+          })}
+        {loadMoreButton ? (
           <View
             style={{
-              flexGrow: 1,
-              flexDirection: 'row',
-              justifyContent: 'center',
+              height: 150,
+              display: 'flex',
               alignItems: 'center',
-              marginVertical: 5,
+              justifyContent: 'flex-start',
+              marginTop: 5,
+              marginBottom: 30,
             }}>
             <Button
-              testID="addressbook.button.new"
-              type={ButtonTypeEnum.Primary}
-              title={translate('addressbook.new') as string}
-              onPress={() => newAddressBookItem()}
+              type={ButtonTypeEnum.Secondary}
+              title={translate('addressbook.loadmore') as string}
+              onPress={loadMoreClicked}
             />
           </View>
+        ) : (
+          <>
+            {!addressBookCurrentAddress && !!addressBookSorted && !!addressBookSorted.length && (
+              <View
+                style={{
+                  height: 150,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  marginTop: 5,
+                  marginBottom: 30,
+                }}>
+                <FadeText style={{ color: colors.primary }}>{translate('addressbook.end') as string}</FadeText>
+              </View>
+            )}
+          </>
         )}
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </ScrollView>
+      {!isAtTop && (
+        <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 105, right: 10 }}>
+          <FontAwesomeIcon
+            style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+            size={50}
+            icon={faAnglesUp}
+            color={colors.zingo}
+          />
+        </TouchableOpacity>
+      )}
+      {currentItem === null && (
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 5,
+          }}>
+          <Button
+            testID="addressbook.button.new"
+            type={ButtonTypeEnum.Primary}
+            title={translate('addressbook.new') as string}
+            onPress={() => newAddressBookItem()}
+          />
+        </View>
+      )}
+    </View>
   );
 };
 

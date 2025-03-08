@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 
 import RegText from '../../../components/Components/RegText';
@@ -17,38 +17,38 @@ const ComputingTxContent: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
   const { translate, language } = context;
   const { colors } = useTheme() as ThemeType;
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
+    <View
+      style={{
+        marginTop: top,
+        marginBottom: bottom,
+        marginRight: right,
+        marginLeft: left,
+        flex: 1,
+        backgroundColor: colors.background,
+      }}>
+      <Header
+        title={translate('send.sending-title') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+      />
+      <View
         style={{
           display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
-          backgroundColor: colors.background,
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '70%',
         }}>
-        <Header
-          title={translate('send.sending-title') as string}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-        />
-        <View
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '70%',
-          }}>
-          <RegText>{translate('loadedapp.computingtx') as string}</RegText>
-          <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
-          <RegText>{translate('wait') as string}</RegText>
-        </View>
-      </SafeAreaView>
-    </SafeAreaProvider>
+        <RegText>{translate('loadedapp.computingtx') as string}</RegText>
+        <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
+        <RegText>{translate('wait') as string}</RegText>
+      </View>
+    </View>
   );
 };
 

@@ -12,10 +12,11 @@ import Utils from '../../../app/utils';
 import Header from '../../Header';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Code } from 'react-native-vision-camera';
 import { useMagicModal } from 'react-native-magic-modal';
+import { View } from 'react-native';
 
 type ScannerAddressProps = {
   setAddress: (address: string) => void;
@@ -26,6 +27,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
   const { translate, server, language } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
 
   const validateAddress = async (scannedAddress: string) => {
@@ -57,26 +59,25 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
   };
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
-          backgroundColor: colors.background,
-        }}>
-        <Header
-          title={translate('scanner.scanaddress') as string}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          closeScreen={hide}
-        />
-        <Scanner onRead={onRead} />
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <View
+      style={{
+        marginTop: top,
+        marginBottom: bottom,
+        marginRight: right,
+        marginLeft: left,
+        flex: 1,
+        backgroundColor: colors.background,
+      }}>
+      <Header
+        title={translate('scanner.scanaddress') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        closeScreen={hide}
+      />
+      <Scanner onRead={onRead} />
+    </View>
   );
 };
 

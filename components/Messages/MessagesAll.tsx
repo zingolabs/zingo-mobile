@@ -1,7 +1,6 @@
-/* eslint-disable react-native/no-inline-styles */
+
 import React, { useContext } from 'react';
 import MessageList from './components/MessageList';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { ContextAppLoaded } from '../../app/context';
 import { useTheme } from '@react-navigation/native';
@@ -27,23 +26,12 @@ const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
   moment.locale(language);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
-          backgroundColor: colors.background,
-        }}>
-        <MessageList
-          setPrivacyOption={setPrivacyOption}
-          setScrollToBottom={setScrollToBottom}
-          scrollToBottom={scrollToBottom}
-          closeModal={hide}
-        />
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <MessageList
+      setPrivacyOption={setPrivacyOption}
+      setScrollToBottom={setScrollToBottom}
+      scrollToBottom={scrollToBottom}
+      closeModal={hide}
+    />
   );
 };
 

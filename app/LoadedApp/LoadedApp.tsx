@@ -12,7 +12,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { MagicModalPortal, magicModal } from 'react-native-magic-modal';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
@@ -352,17 +351,7 @@ export default function LoadedApp(props: LoadedAppProps) {
 
   if (loading) {
     return (
-      <SafeAreaProvider>
-        <SafeAreaView
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-          }}>
-          <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
-        </SafeAreaView>
-      </SafeAreaProvider>
+      <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
     );
   } else {
     return (
@@ -789,6 +778,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setSeedViewModalShow = async () => {
+    const { colors } = this.props.theme;
     return magicModal.show(
       () => (
         <Seed
@@ -799,11 +789,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           keepAwake={this.keepAwake}
         />
       ),
-      { swipeDirection: undefined },
+      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
   setUfvkViewModalShow = async () => {
+    const { colors } = this.props.theme;
     return magicModal.show(
       () => (
         <ShowUfvk
@@ -813,7 +804,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           setPrivacyOption={this.setPrivacyOption}
         />
       ),
-      { swipeDirection: undefined },
+      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
@@ -1052,7 +1043,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setComputingModalShow = () => {
-    return magicModal.show(() => <ComputingTxContent />, { swipeDirection: undefined }).promise;
+    const { colors } = this.props.theme;
+    return magicModal.show(() => <ComputingTxContent />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
   };
 
   setInfo = (info: InfoType) => {
@@ -1136,11 +1128,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   onMenuItemSelected = async (item: MenuItemEnum) => {
+    const { colors } = this.props.theme;
     // Depending on the menu item, open the appropriate modal
     if (item === MenuItemEnum.About) {
-      return magicModal.show(() => <About />, { swipeDirection: undefined }).promise;
+      return magicModal.show(() => <About />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.Rescan) {
-      return magicModal.show(() => <Rescan doRescan={this.doRescan} />, { swipeDirection: undefined }).promise;
+      return magicModal.show(() => <Rescan doRescan={this.doRescan} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.Settings) {
       return magicModal.show(
         () => (
@@ -1159,17 +1152,17 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
           />
         ),
-        { swipeDirection: undefined },
+        { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
       ).promise;
     } else if (item === MenuItemEnum.Info) {
-      return magicModal.show(() => <Info />, { swipeDirection: undefined }).promise;
+      return magicModal.show(() => <Info />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.SyncReport) {
-      return magicModal.show(() => <SyncReport />, { swipeDirection: undefined }).promise;
+      return magicModal.show(() => <SyncReport />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.FundPools) {
-      return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined })
+      return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
         .promise;
     } else if (item === MenuItemEnum.Insight) {
-      return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined })
+      return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
         .promise;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
@@ -1188,7 +1181,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: undefined },
+          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       } else {
         return magicModal.show(
@@ -1200,7 +1193,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: undefined },
+          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       }
     } else if (item === MenuItemEnum.RestoreWalletBackup) {
@@ -1214,7 +1207,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: undefined },
+          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       } else {
         return magicModal.show(
@@ -1226,7 +1219,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: undefined },
+          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       }
     } else if (item === MenuItemEnum.LoadWalletFromSeed) {
@@ -1265,7 +1258,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setState({
         addressBookCurrentAddress: '',
       });
-      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined })
+      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
         .promise;
     } else if (item === MenuItemEnum.VoteForNym) {
       let update = false;
@@ -1317,7 +1310,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             scrollToBottom={this.state.scrollToBottom}
           />
         ),
-        { swipeDirection: undefined },
+        { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
       ).promise;
     }
   };
@@ -1335,6 +1328,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     toast: boolean,
     sameServerChainName: boolean,
   ): Promise<void> => {
+    const { colors } = this.props.theme;
     // here I know the server was changed, clean all the tasks before anything.
     this.rpc.setInRefresh(false);
     await this.rpc.clearTimers();
@@ -1409,7 +1403,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: undefined },
+          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
         );
       } else {
         magicModal.show(
@@ -1426,7 +1420,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: undefined },
+          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
         );
       }
       //console.log(`Error Reading Wallet ${value} - ${error}`);
@@ -1707,11 +1701,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setSyncReportModalShow = async () => {
-    return magicModal.show(() => <SyncReport />, { swipeDirection: undefined }).promise;
+    const { colors } = this.props.theme;
+    return magicModal.show(() => <SyncReport />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
   };
 
   setPoolsModalShow = async () => {
-    return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined })
+    const { colors } = this.props.theme;
+    return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
       .promise;
   };
 
@@ -1742,10 +1738,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   // close modal make sense because this is called
   // in a component which can live in differents screens
   launchAddressBook = (address: string) => {
+    const { colors } = this.props.theme;
     this.setState({
       addressBookCurrentAddress: address,
     });
-    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined })
+    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
       .promise;
   };
 

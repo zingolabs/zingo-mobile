@@ -187,7 +187,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         valueTransfersSliced={valueTransfersSliced}
         totalLength={valueTransfers !== null ? valueTransfers.length : 0}
         setPrivacyOption={setPrivacyOption}
-      />, { swipeDirection: undefined }
+      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -199,7 +199,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         address={Utils.messagesAddress(vt)}
         sendTransaction={sendTransaction}
         setServerOption={setServerOption}
-      />, { swipeDirection: undefined }
+      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 

@@ -1,8 +1,7 @@
-/* eslint-disable react-native/no-inline-styles */
+
 import React, { useContext } from 'react';
 import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppState';
 import MessageList from './components/MessageList';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
@@ -42,26 +41,15 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
   moment.locale(language);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
-          backgroundColor: colors.background,
-        }}>
-        <MessageList
-          setPrivacyOption={setPrivacyOption}
-          setScrollToBottom={setScrollToBottom}
-          scrollToBottom={scrollToBottom}
-          address={address}
-          sendTransaction={sendTransaction}
-          setServerOption={setServerOption}
-          closeModal={hide}
-        />
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <MessageList
+      setPrivacyOption={setPrivacyOption}
+      setScrollToBottom={setScrollToBottom}
+      scrollToBottom={scrollToBottom}
+      address={address}
+      sendTransaction={sendTransaction}
+      setServerOption={setServerOption}
+      closeModal={hide}
+    />
   );
 };
 

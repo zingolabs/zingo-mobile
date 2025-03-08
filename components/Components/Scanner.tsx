@@ -1,15 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { Camera, Code, useCameraDevice, useCameraPermission, useCodeScanner } from 'react-native-vision-camera';
 import { Text } from 'react-native-svg';
+import { useTheme } from '@react-navigation/native';
+import { ThemeType } from '../../app/types';
+import { View } from 'react-native';
 
 type ScannerProps = {
   onRead: (codes: Code[]) => void;
 };
 
 const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead }) => {
+  const { colors } = useTheme()  as ThemeType;
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
   const [active, setActive] = React.useState(true);
@@ -26,32 +29,21 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead }) => {
     },
   });
 
-  if (!hasPermission || device == null) {
-    console.log('permission: ', hasPermission);
-    console.log('device: ', device);
-    return (
-      <SafeAreaProvider>
-        <SafeAreaView
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-          }}>
-          <Text>No permission</Text>
-        </SafeAreaView>
-      </SafeAreaProvider>
-    );
-  }
+  console.log('permission', hasPermission);
+  console.log('device', device);
+
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
-        style={{
-          width: '100%',
-          height: '100%',
-        }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}>
+      {!hasPermission || device == null ? (
+        <Text>No permission</Text>
+      ) : (
         <Camera style={{ width: '100%', height: '100%' }} device={device} isActive={active} codeScanner={codeScanner} />
-      </SafeAreaView>
-    </SafeAreaProvider>
+      )}
+    </View>
   );
 };
 

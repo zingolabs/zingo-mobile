@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, Text, ActivityIndicator } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -29,6 +29,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   const { syncingStatus, wallet, translate, background, language, netInfo } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
 
   const [maxBlocks, setMaxBlocks] = useState<number>(0);
@@ -214,476 +215,475 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   //console.log('render sync report. ServerWallet:', serverWallet);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
+    <View
+      style={{
+        marginTop: top,
+        marginBottom: bottom,
+        marginRight: right,
+        marginLeft: left,
+        flex: 1,
+        backgroundColor: colors.background,
+      }}>
+      <Header
+        title={translate('report.title') as string}
+        noBalance={true}
+        noSyncingStatus={true}
+        noDrawMenu={true}
+        noPrivacy={true}
+        closeScreen={hide}
+      />
+      <ScrollView
+        testID="syncreport.scroll-view"
+        style={{ maxHeight: '90%' }}
+        contentContainerStyle={{
+          flexDirection: 'column',
           alignItems: 'stretch',
-          height: '100%',
-          backgroundColor: colors.background,
+          justifyContent: 'flex-start',
         }}>
-        <Header
-          title={translate('report.title') as string}
-          noBalance={true}
-          noSyncingStatus={true}
-          noDrawMenu={true}
-          noPrivacy={true}
-          closeScreen={hide}
-        />
-        <ScrollView
-          testID="syncreport.scroll-view"
-          style={{ maxHeight: '90%' }}
-          contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
-          }}>
-          {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
+        {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'flex-end',
+              marginHorizontal: 20,
+            }}>
+            <DetailLine label={translate('report.networkstatus') as string}>
+              <View style={{ display: 'flex', flexDirection: 'column' }}>
+                {!netInfo.isConnected && <RegText color="red"> {translate('report.nointernet') as string} </RegText>}
+                {netInfo.type === NetInfoStateType.cellular && (
+                  <RegText color="yellow"> {translate('report.cellulardata') as string} </RegText>
+                )}
+                {netInfo.isConnectionExpensive && (
+                  <RegText color="yellow"> {translate('report.connectionexpensive') as string} </RegText>
+                )}
+              </View>
+            </DetailLine>
+            <FontAwesomeIcon
+              icon={faCloudDownload}
+              color={!netInfo.isConnected ? 'red' : 'yellow'}
+              size={20}
+              style={{ marginBottom: 5, marginLeft: 5 }}
+            />
+          </View>
+        )}
+        {(Number(background.date) > 0 || Number(background.dateEnd) > 0 || !!background.message) &&
+          showBackgroundLegend && (
             <View
               style={{
                 display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-end',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
                 marginHorizontal: 20,
               }}>
-              <DetailLine label={translate('report.networkstatus') as string}>
-                <View style={{ display: 'flex', flexDirection: 'column' }}>
-                  {!netInfo.isConnected && <RegText color="red"> {translate('report.nointernet') as string} </RegText>}
-                  {netInfo.type === NetInfoStateType.cellular && (
-                    <RegText color="yellow"> {translate('report.cellulardata') as string} </RegText>
-                  )}
-                  {netInfo.isConnectionExpensive && (
-                    <RegText color="yellow"> {translate('report.connectionexpensive') as string} </RegText>
-                  )}
-                </View>
-              </DetailLine>
-              <FontAwesomeIcon
-                icon={faCloudDownload}
-                color={!netInfo.isConnected ? 'red' : 'yellow'}
-                size={20}
-                style={{ marginBottom: 5, marginLeft: 5 }}
+              <DetailLine
+                label={translate('report.lastbackgroundsync') as string}
+                value={
+                  //background.batches.toString() +
+                  //translate('report.batches-date') +
+                  moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a') +
+                  (Number(background.dateEnd) > 0
+                    ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
+                    : '')
+                }
               />
+              {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
             </View>
           )}
-          {(Number(background.date) > 0 || Number(background.dateEnd) > 0 || !!background.message) &&
-            showBackgroundLegend && (
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  marginHorizontal: 20,
-                }}>
-                <DetailLine
-                  label={translate('report.lastbackgroundsync') as string}
-                  value={
-                    //background.batches.toString() +
-                    //translate('report.batches-date') +
-                    moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a') +
-                    (Number(background.dateEnd) > 0
-                      ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
-                      : '')
-                  }
-                />
-                {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
-              </View>
-            )}
-          {maxBlocks && netInfo.isConnected ? (
-            <>
-              <View style={{ display: 'flex', marginHorizontal: 20, marginBottom: 30 }}>
-                <DetailLine
-                  label="Sync ID"
-                  value={
-                    syncingStatus.syncID >= 0
-                      ? syncingStatus.syncID +
-                        ' - (' +
-                        (syncingStatus.inProgress
-                          ? (translate('report.running') as string)
-                          : syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet
-                          ? (translate('report.finished') as string)
-                          : (translate('report.paused') as string)) +
-                        ')'
-                      : (translate('connectingserver') as string)
-                  }
-                />
-                {!!syncingStatus.lastError && (
-                  <>
-                    <View style={{ height: 2, width: '100%', backgroundColor: 'red', marginTop: 10 }} />
-                    <DetailLine label="Last Error" value={syncingStatus.lastError} />
-                    <View style={{ height: 2, width: '100%', backgroundColor: 'red', marginBottom: 10 }} />
-                  </>
-                )}
+        {maxBlocks && netInfo.isConnected ? (
+          <>
+            <View style={{ display: 'flex', marginHorizontal: 20, marginBottom: 30 }}>
+              <DetailLine
+                label="Sync ID"
+                value={
+                  syncingStatus.syncID >= 0
+                    ? syncingStatus.syncID +
+                      ' - (' +
+                      (syncingStatus.inProgress
+                        ? (translate('report.running') as string)
+                        : syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet
+                        ? (translate('report.finished') as string)
+                        : (translate('report.paused') as string)) +
+                      ')'
+                    : (translate('connectingserver') as string)
+                }
+              />
+              {!!syncingStatus.lastError && (
+                <>
+                  <View style={{ height: 2, width: '100%', backgroundColor: 'red', marginTop: 10 }} />
+                  <DetailLine label="Last Error" value={syncingStatus.lastError} />
+                  <View style={{ height: 2, width: '100%', backgroundColor: 'red', marginBottom: 10 }} />
+                </>
+              )}
 
-                <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
+              <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
 
-                {!!maxBlocks && serverServer > 0 && serverWallet > 0 && (
-                  <>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        width: '100%',
-                        justifyContent: 'space-between',
-                        marginTop: 10,
-                      }}>
-                      {labels.map((label: string) => (
-                        <Text key={label} style={{ color: colors.primary }}>
-                          {label}
-                        </Text>
-                      ))}
-                    </View>
-                    <View style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-                      {points.map((point: number) => (
-                        <View
-                          key={point}
-                          style={{
-                            height: 10,
-                            borderRightColor: colors.primary,
-                            borderRightWidth: 1,
-                            borderLeftColor: colors.primary,
-                            borderLeftWidth: 1,
-                            width: `${(points[1] * 100) / maxBlocks}%`,
-                          }}
-                        />
-                      ))}
-                    </View>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        width: '100%',
-                        borderBottomColor: colors.primary,
-                        borderBottomWidth: 2,
-                        marginBottom: 0,
-                      }}>
-                      {server1Percent >= 0 && (
-                        <View
-                          style={{
-                            height: 10,
-                            backgroundColor: 'blue',
-                            borderLeftColor: colors.primary,
-                            borderLeftWidth: 1,
-                            borderRightColor: 'blue',
-                            borderRightWidth: server1Percent > 0 ? 1 : 0,
-                            width: `${server1Percent}%`,
-                          }}
-                        />
-                      )}
-                      {server2Percent >= 0 && (
-                        <View
-                          style={{
-                            height: 10,
-                            backgroundColor: 'yellow',
-                            borderRightColor: 'yellow',
-                            borderRightWidth: server2Percent > 0 ? 1 : 0,
-                            width: `${server2Percent}%`,
-                            borderBottomColor: 'blue',
-                            borderBottomWidth: 5,
-                          }}
-                        />
-                      )}
-                      {server3Percent >= 0 && (
-                        <View
-                          style={{
-                            height: 10,
-                            backgroundColor: '#333333',
-                            borderRightColor: colors.primary,
-                            borderRightWidth: 1,
-                            width: `${server3Percent}%`,
-                          }}
-                        />
-                      )}
-                    </View>
-                    {serverServer > 0 && (
+              {!!maxBlocks && serverServer > 0 && serverWallet > 0 && (
+                <>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      width: '100%',
+                      justifyContent: 'space-between',
+                      marginTop: 10,
+                    }}>
+                    {labels.map((label: string) => (
+                      <Text key={label} style={{ color: colors.primary }}>
+                        {label}
+                      </Text>
+                    ))}
+                  </View>
+                  <View style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+                    {points.map((point: number) => (
                       <View
+                        key={point}
                         style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '100%',
-                          justifyContent: 'flex-start',
-                          alignItems: 'center',
-                          marginTop: 5,
-                        }}>
-                        <Text style={{ color: colors.primary }}>{translate('report.server-title') as string}</Text>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: 'blue',
-                            margin: 5,
-                          }}
-                        />
-                        <Text style={{ color: colors.text }}>
-                          {serverServer + (translate('report.blocks') as string)}
-                        </Text>
-                      </View>
-                    )}
-                    {serverWallet > 0 && (
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '100%',
-                          justifyContent: 'flex-start',
-                          alignItems: 'center',
-                          marginTop: 5,
-                        }}>
-                        <Text style={{ color: colors.primary }}>{translate('report.wallet') as string}</Text>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: 'yellow',
-                            margin: 5,
-                          }}
-                        />
-                        <Text testID="syncreport.wallettotalblocks" style={{ color: colors.text }}>
-                          {serverWallet + (translate('report.blocks') as string)}
-                        </Text>
-                      </View>
-                    )}
-
-                    <View
-                      style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }}
-                    />
-                  </>
-                )}
-
-                {!!maxBlocks && syncingStatus.syncID >= 0 && (
-                  <>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        width: '100%',
-                        justifyContent: 'space-between',
-                        marginTop: 10,
-                      }}>
-                      <>
-                        <Text style={{ color: colors.primary }}>
-                          {processEndBlockFixed >= wallet.birthday ? wallet.birthday : processEndBlockFixed}
-                        </Text>
-                        <Text style={{ color: colors.primary }}>{syncingStatus.lastBlockServer}</Text>
-                      </>
-                    </View>
-                    <View
-                      style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
-                      <>
-                        <View
-                          style={{
-                            height: 10,
-                            borderLeftColor: colors.primary,
-                            borderLeftWidth: 1,
-                          }}
-                        />
-                        <View
-                          style={{
-                            height: 10,
-                            borderRightColor: colors.primary,
-                            borderRightWidth: 1,
-                          }}
-                        />
-                      </>
-                    </View>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        width: '100%',
-                        borderBottomColor: colors.primary,
-                        borderBottomWidth: 2,
-                        marginBottom: 0,
-                      }}>
-                      {walletOldSyncedPercent >= 0 && (
-                        <View
-                          style={{
-                            height: 10,
-                            width: `${walletOldSyncedPercent}%`,
-                            backgroundColor: 'lightyellow',
-                            borderLeftColor: colors.primary,
-                            borderLeftWidth: 1,
-                            borderRightColor: walletOldSyncedPercent === 100 ? colors.primary : 'lightyellow',
-                            borderRightWidth: walletOldSyncedPercent > 0 ? 1 : 0,
-                          }}
-                        />
-                      )}
-                      {walletNewSyncedPercent >= 0 && (
-                        <View
-                          style={{
-                            height: 10,
-                            width: `${walletNewSyncedPercent}%`,
-                            backgroundColor: 'orange',
-                            borderRightColor: 'orange',
-                            borderRightWidth: walletNewSyncedPercent > 0 ? 1 : 0,
-                          }}
-                        />
-                      )}
-                      {walletForSyncedPercent >= 0 && (
-                        <View
-                          style={{
-                            height: 10,
-                            backgroundColor: '#333333',
-                            borderRightColor: colors.primary,
-                            borderRightWidth: 1,
-                            width: `${walletForSyncedPercent}%`,
-                          }}
-                        />
-                      )}
-                    </View>
-                    {wallet1 > 0 && (
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '100%',
-                          justifyContent: 'flex-start',
-                          alignItems: 'center',
-                          marginTop: 5,
-                        }}>
-                        <Text style={{ color: colors.primary }}>{translate('report.syncedbefore') as string}</Text>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: 'lightyellow',
-                            margin: 5,
-                          }}
-                        />
-                        <Text style={{ color: colors.text }}>
-                          {wallet1 +
-                            (translate('report.blocks') as string) +
-                            Utils.parseNumberFloatToStringLocale(walletOldSyncedPercent, 2) +
-                            '%'}
-                        </Text>
-                      </View>
-                    )}
-                    {wallet2 > 0 && (
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '100%',
-                          justifyContent: 'flex-start',
-                          alignItems: 'center',
-                          marginTop: 5,
-                        }}>
-                        <Text style={{ color: colors.primary }}>{translate('report.syncednow') as string}</Text>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: 'orange',
-                            margin: 5,
-                          }}
-                        />
-                        <Text testID="syncreport.syncednow" style={{ color: colors.text }}>
-                          {wallet2 +
-                            (translate('report.blocks') as string) +
-                            Utils.parseNumberFloatToStringLocale(walletNewSyncedPercent, 2) +
-                            '%'}
-                        </Text>
-                      </View>
-                    )}
-                    {wallet3 > 0 && (
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '100%',
-                          justifyContent: 'flex-start',
-                          alignItems: 'center',
-                          marginTop: 5,
-                        }}>
-                        <Text style={{ color: colors.primary }}>{translate('report.notyetsynced') as string}</Text>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: '#333333',
-                            margin: 5,
-                          }}
-                        />
-                        <Text testID="syncreport.notyetsynced" style={{ color: colors.text }}>
-                          {wallet3 +
-                            (translate('report.blocks') as string) +
-                            Utils.parseNumberFloatToStringLocale(walletForSyncedPercent, 2) +
-                            '%'}
-                        </Text>
-                      </View>
-                    )}
-
-                    <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15 }} />
-                  </>
-                )}
-
-                {syncingStatus.inProgress && syncingStatus.currentBatch > 0 && (
-                  <>
-                    <DetailLine
-                      testID="syncreport.currentbatch"
-                      label={translate('report.batches') as string}
-                      value={
-                        (translate('report.processingbatch') as string) +
-                        syncingStatus.currentBatch +
-                        (translate('report.totalbatches') as string) +
-                        syncingStatus.totalBatches
-                      }
-                    />
-                    <DetailLine
-                      testID="syncreport.blocksperbatch"
-                      label={translate('report.blocksperbatch') as string}
-                      value={syncingStatus.blocksPerBatch.toString()}
-                    />
-                    <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                      <DetailLine
-                        label={translate('report.secondsperbatch') as string}
-                        value={syncingStatus.secondsPerBatch.toString()}
+                          height: 10,
+                          borderRightColor: colors.primary,
+                          borderRightWidth: 1,
+                          borderLeftColor: colors.primary,
+                          borderLeftWidth: 1,
+                          width: `${(points[1] * 100) / maxBlocks}%`,
+                        }}
                       />
-                      <ActivityIndicator size="large" color={colors.primary} />
+                    ))}
+                  </View>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'flex-start',
+                      width: '100%',
+                      borderBottomColor: colors.primary,
+                      borderBottomWidth: 2,
+                      marginBottom: 0,
+                    }}>
+                    {server1Percent >= 0 && (
+                      <View
+                        style={{
+                          height: 10,
+                          backgroundColor: 'blue',
+                          borderLeftColor: colors.primary,
+                          borderLeftWidth: 1,
+                          borderRightColor: 'blue',
+                          borderRightWidth: server1Percent > 0 ? 1 : 0,
+                          width: `${server1Percent}%`,
+                        }}
+                      />
+                    )}
+                    {server2Percent >= 0 && (
+                      <View
+                        style={{
+                          height: 10,
+                          backgroundColor: 'yellow',
+                          borderRightColor: 'yellow',
+                          borderRightWidth: server2Percent > 0 ? 1 : 0,
+                          width: `${server2Percent}%`,
+                          borderBottomColor: 'blue',
+                          borderBottomWidth: 5,
+                        }}
+                      />
+                    )}
+                    {server3Percent >= 0 && (
+                      <View
+                        style={{
+                          height: 10,
+                          backgroundColor: '#333333',
+                          borderRightColor: colors.primary,
+                          borderRightWidth: 1,
+                          width: `${server3Percent}%`,
+                        }}
+                      />
+                    )}
+                  </View>
+                  {serverServer > 0 && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        marginTop: 5,
+                      }}>
+                      <Text style={{ color: colors.primary }}>{translate('report.server-title') as string}</Text>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          width: 10,
+                          height: 10,
+                          justifyContent: 'flex-start',
+                          backgroundColor: 'blue',
+                          margin: 5,
+                        }}
+                      />
+                      <Text style={{ color: colors.text }}>
+                        {serverServer + (translate('report.blocks') as string)}
+                      </Text>
                     </View>
-                  </>
-                )}
-                {syncingStatus.inProgress && syncingStatus.currentBlock > 0 && !!syncingStatus.lastBlockServer && (
-                  <>
-                    <View style={{ height: 2, width: '100%', backgroundColor: colors.primary, marginTop: 10 }} />
+                  )}
+                  {serverWallet > 0 && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        marginTop: 5,
+                      }}>
+                      <Text style={{ color: colors.primary }}>{translate('report.wallet') as string}</Text>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          width: 10,
+                          height: 10,
+                          justifyContent: 'flex-start',
+                          backgroundColor: 'yellow',
+                          margin: 5,
+                        }}
+                      />
+                      <Text testID="syncreport.wallettotalblocks" style={{ color: colors.text }}>
+                        {serverWallet + (translate('report.blocks') as string)}
+                      </Text>
+                    </View>
+                  )}
+
+                  <View
+                    style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }}
+                  />
+                </>
+              )}
+
+              {!!maxBlocks && syncingStatus.syncID >= 0 && (
+                <>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      width: '100%',
+                      justifyContent: 'space-between',
+                      marginTop: 10,
+                    }}>
+                    <>
+                      <Text style={{ color: colors.primary }}>
+                        {processEndBlockFixed >= wallet.birthday ? wallet.birthday : processEndBlockFixed}
+                      </Text>
+                      <Text style={{ color: colors.primary }}>{syncingStatus.lastBlockServer}</Text>
+                    </>
+                  </View>
+                  <View
+                    style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+                    <>
+                      <View
+                        style={{
+                          height: 10,
+                          borderLeftColor: colors.primary,
+                          borderLeftWidth: 1,
+                        }}
+                      />
+                      <View
+                        style={{
+                          height: 10,
+                          borderRightColor: colors.primary,
+                          borderRightWidth: 1,
+                        }}
+                      />
+                    </>
+                  </View>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'flex-start',
+                      width: '100%',
+                      borderBottomColor: colors.primary,
+                      borderBottomWidth: 2,
+                      marginBottom: 0,
+                    }}>
+                    {walletOldSyncedPercent >= 0 && (
+                      <View
+                        style={{
+                          height: 10,
+                          width: `${walletOldSyncedPercent}%`,
+                          backgroundColor: 'lightyellow',
+                          borderLeftColor: colors.primary,
+                          borderLeftWidth: 1,
+                          borderRightColor: walletOldSyncedPercent === 100 ? colors.primary : 'lightyellow',
+                          borderRightWidth: walletOldSyncedPercent > 0 ? 1 : 0,
+                        }}
+                      />
+                    )}
+                    {walletNewSyncedPercent >= 0 && (
+                      <View
+                        style={{
+                          height: 10,
+                          width: `${walletNewSyncedPercent}%`,
+                          backgroundColor: 'orange',
+                          borderRightColor: 'orange',
+                          borderRightWidth: walletNewSyncedPercent > 0 ? 1 : 0,
+                        }}
+                      />
+                    )}
+                    {walletForSyncedPercent >= 0 && (
+                      <View
+                        style={{
+                          height: 10,
+                          backgroundColor: '#333333',
+                          borderRightColor: colors.primary,
+                          borderRightWidth: 1,
+                          width: `${walletForSyncedPercent}%`,
+                        }}
+                      />
+                    )}
+                  </View>
+                  {wallet1 > 0 && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        marginTop: 5,
+                      }}>
+                      <Text style={{ color: colors.primary }}>{translate('report.syncedbefore') as string}</Text>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          width: 10,
+                          height: 10,
+                          justifyContent: 'flex-start',
+                          backgroundColor: 'lightyellow',
+                          margin: 5,
+                        }}
+                      />
+                      <Text style={{ color: colors.text }}>
+                        {wallet1 +
+                          (translate('report.blocks') as string) +
+                          Utils.parseNumberFloatToStringLocale(walletOldSyncedPercent, 2) +
+                          '%'}
+                      </Text>
+                    </View>
+                  )}
+                  {wallet2 > 0 && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        marginTop: 5,
+                      }}>
+                      <Text style={{ color: colors.primary }}>{translate('report.syncednow') as string}</Text>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          width: 10,
+                          height: 10,
+                          justifyContent: 'flex-start',
+                          backgroundColor: 'orange',
+                          margin: 5,
+                        }}
+                      />
+                      <Text testID="syncreport.syncednow" style={{ color: colors.text }}>
+                        {wallet2 +
+                          (translate('report.blocks') as string) +
+                          Utils.parseNumberFloatToStringLocale(walletNewSyncedPercent, 2) +
+                          '%'}
+                      </Text>
+                    </View>
+                  )}
+                  {wallet3 > 0 && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        marginTop: 5,
+                      }}>
+                      <Text style={{ color: colors.primary }}>{translate('report.notyetsynced') as string}</Text>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          width: 10,
+                          height: 10,
+                          justifyContent: 'flex-start',
+                          backgroundColor: '#333333',
+                          margin: 5,
+                        }}
+                      />
+                      <Text testID="syncreport.notyetsynced" style={{ color: colors.text }}>
+                        {wallet3 +
+                          (translate('report.blocks') as string) +
+                          Utils.parseNumberFloatToStringLocale(walletForSyncedPercent, 2) +
+                          '%'}
+                      </Text>
+                    </View>
+                  )}
+
+                  <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15 }} />
+                </>
+              )}
+
+              {syncingStatus.inProgress && syncingStatus.currentBatch > 0 && (
+                <>
+                  <DetailLine
+                    testID="syncreport.currentbatch"
+                    label={translate('report.batches') as string}
+                    value={
+                      (translate('report.processingbatch') as string) +
+                      syncingStatus.currentBatch +
+                      (translate('report.totalbatches') as string) +
+                      syncingStatus.totalBatches
+                    }
+                  />
+                  <DetailLine
+                    testID="syncreport.blocksperbatch"
+                    label={translate('report.blocksperbatch') as string}
+                    value={syncingStatus.blocksPerBatch.toString()}
+                  />
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
                     <DetailLine
-                      label={translate('report.blocks-title') as string}
-                      value={
-                        (translate('report.processingblock') as string) +
-                        syncingStatus.currentBlock +
-                        (translate('report.totalblocks') as string) +
-                        syncingStatus.lastBlockServer
-                      }
+                      label={translate('report.secondsperbatch') as string}
+                      value={syncingStatus.secondsPerBatch.toString()}
                     />
-                  </>
-                )}
-              </View>
-            </>
-          ) : (
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-              {netInfo.isConnected && <DetailLine label="" value={translate('connectingserver') as string} />}
+                    <ActivityIndicator size="large" color={colors.primary} />
+                  </View>
+                </>
+              )}
+              {syncingStatus.inProgress && syncingStatus.currentBlock > 0 && !!syncingStatus.lastBlockServer && (
+                <>
+                  <View style={{ height: 2, width: '100%', backgroundColor: colors.primary, marginTop: 10 }} />
+                  <DetailLine
+                    label={translate('report.blocks-title') as string}
+                    value={
+                      (translate('report.processingblock') as string) +
+                      syncingStatus.currentBlock +
+                      (translate('report.totalblocks') as string) +
+                      syncingStatus.lastBlockServer
+                    }
+                  />
+                </>
+              )}
             </View>
-          )}
-        </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+          </>
+        ) : (
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            {netInfo.isConnected && <DetailLine label="" value={translate('connectingserver') as string} />}
+          </View>
+        )}
+      </ScrollView>
+    </View>
   );
 };
 

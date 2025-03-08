@@ -9,7 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import Button from '../Components/Button';
@@ -37,6 +37,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
   const { translate, language, uOrchardAddress } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
 
   const [memo, setMemo] = useState<string>(message);
@@ -52,117 +53,120 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
   };
 
   return (
-    <SafeAreaProvider>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
-        style={{ backgroundColor: colors.background }}>
-        <SafeAreaView
+    <KeyboardAvoidingView
+      behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
+      style={{
+        marginTop: top,
+        marginBottom: bottom,
+        marginRight: right,
+        marginLeft: left,
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+        }}>
+        <Header
+          title={translate('send.memo') as string}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          closeScreen={hide}
+        />
+        <ScrollView
           style={{
-            display: 'flex',
-            justifyContent: 'flex-start',
+            height: '80%',
+            maxHeight: '80%',
+            minHeight: '50%',
+          }}
+          contentContainerStyle={{
+            flexDirection: 'column',
             alignItems: 'stretch',
-            height: '100%',
-            backgroundColor: colors.background,
+            justifyContent: 'flex-start',
+            padding: 20,
           }}>
-          <Header
-            title={translate('send.memo') as string}
-            noBalance={true}
-            noSyncingStatus={true}
-            noDrawMenu={true}
-            noPrivacy={true}
-            closeScreen={hide}
-          />
-          <ScrollView
-            style={{
-              height: '80%',
-              maxHeight: '80%',
-              minHeight: '50%',
-            }}
-            contentContainerStyle={{
-              flexDirection: 'column',
-              alignItems: 'stretch',
-              justifyContent: 'flex-start',
-              padding: 20,
-            }}>
-            <View
-              accessible={true}
-              accessibilityLabel={translate('send.memo-acc') as string}
-              style={{
-                flexGrow: 1,
-                borderWidth: 1,
-                borderRadius: 5,
-                borderColor: colors.text,
-                minWidth: 48,
-                minHeight: 48,
-                maxHeight: dimensions.height * 0.4,
-                flexDirection: 'row',
-              }}>
-              <TextInput
-                testID="send.memo-field"
-                multiline
-                style={{
-                  flex: 1,
-                  color: colors.text,
-                  fontWeight: '600',
-                  fontSize: 14,
-                  minWidth: 48,
-                  minHeight: 48,
-                  margin: 5,
-                  backgroundColor: 'transparent',
-                  textAlignVertical: 'top',
-                }}
-                value={memo}
-                onChangeText={(text: string) => setMemo(text)}
-                onEndEditing={(e: any) => setMemo(e.nativeEvent.text)}
-                maxLength={GlobalConst.memoMaxLength}
-              />
-              {memo && (
-                <TouchableOpacity
-                  onPress={() => {
-                    setMemo('');
-                  }}>
-                  <FontAwesomeIcon style={{ margin: 10 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
-                </TouchableOpacity>
-              )}
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-              }}>
-              <FadeText
-                style={{
-                  marginTop: 0,
-                  fontWeight: 'bold',
-                  color:
-                    Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress) > GlobalConst.memoMaxLength
-                      ? 'red'
-                      : colors.text,
-                }}>{`${Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress)} `}</FadeText>
-              <FadeText style={{ marginTop: 0 }}>{translate('loadedapp.of') as string}</FadeText>
-              <FadeText style={{ marginTop: 0 }}>{' ' + GlobalConst.memoMaxLength.toString() + ' '}</FadeText>
-            </View>
-          </ScrollView>
           <View
+            accessible={true}
+            accessibilityLabel={translate('send.memo-acc') as string}
             style={{
               flexGrow: 1,
+              borderWidth: 1,
+              borderRadius: 5,
+              borderColor: colors.text,
+              minWidth: 48,
+              minHeight: 48,
+              maxHeight: dimensions.height * 0.4,
               flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginVertical: 10,
             }}>
-            <Button
-              type={ButtonTypeEnum.Primary}
-              title={translate('save') as string}
-              onPress={doSaveAndClose}
-              disabled={Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress) > GlobalConst.memoMaxLength}
+            <TextInput
+              testID="send.memo-field"
+              multiline
+              style={{
+                flex: 1,
+                color: colors.text,
+                fontWeight: '600',
+                fontSize: 14,
+                minWidth: 48,
+                minHeight: 48,
+                margin: 5,
+                backgroundColor: 'transparent',
+                textAlignVertical: 'top',
+              }}
+              value={memo}
+              onChangeText={(text: string) => setMemo(text)}
+              onEndEditing={(e: any) => setMemo(e.nativeEvent.text)}
+              maxLength={GlobalConst.memoMaxLength}
             />
+            {memo && (
+              <TouchableOpacity
+                onPress={() => {
+                  setMemo('');
+                }}>
+                <FontAwesomeIcon style={{ margin: 10 }} size={25} icon={faXmark} color={colors.primaryDisabled} />
+              </TouchableOpacity>
+            )}
           </View>
-        </SafeAreaView>
-      </KeyboardAvoidingView>
-    </SafeAreaProvider>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+            }}>
+            <FadeText
+              style={{
+                marginTop: 0,
+                fontWeight: 'bold',
+                color:
+                  Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress) > GlobalConst.memoMaxLength
+                    ? 'red'
+                    : colors.text,
+              }}>{`${Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress)} `}</FadeText>
+            <FadeText style={{ marginTop: 0 }}>{translate('loadedapp.of') as string}</FadeText>
+            <FadeText style={{ marginTop: 0 }}>{' ' + GlobalConst.memoMaxLength.toString() + ' '}</FadeText>
+          </View>
+        </ScrollView>
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 10,
+          }}>
+          <Button
+            type={ButtonTypeEnum.Primary}
+            title={translate('save') as string}
+            onPress={doSaveAndClose}
+            disabled={Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress) > GlobalConst.memoMaxLength}
+          />
+        </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 

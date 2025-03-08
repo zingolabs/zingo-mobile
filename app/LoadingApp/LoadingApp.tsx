@@ -1,4 +1,4 @@
-/* eslint-disable react-native/no-inline-styles */
+
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
   Alert,
@@ -9,7 +9,6 @@ import {
   NativeEventSubscription,
   Platform,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@react-navigation/native';
@@ -275,17 +274,7 @@ export default function LoadingApp(props: LoadingAppProps) {
 
   if (loading) {
     return (
-      <SafeAreaProvider>
-        <SafeAreaView
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-          }}>
-          <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
-        </SafeAreaView>
-      </SafeAreaProvider>
+      <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
     );
   } else {
     return (
@@ -1320,77 +1309,66 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     return (
       <ContextAppLoadingProvider value={context}>
-        <SafeAreaProvider>
-          <SafeAreaView
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100%',
-              backgroundColor: colors.background,
-            }}>
-            <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
+        <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
-            {screen === 0 && (
-              <Launching
-                translate={translate}
-                firstLaunchingMessage={firstLaunchingMessage}
-                biometricsFailed={biometricsFailed}
-                tryAgain={() => {
-                  this.setState({ biometricsFailed: false }, () => this.componentDidMount());
-                }}
-              />
-            )}
-            {screen === 1 && (
-              <StartMenu
-                actionButtonsDisabled={actionButtonsDisabled}
-                hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
-                recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
-                changeMode={this.changeMode}
-                customServer={this.customServer}
-                customServerShow={customServerShow}
-                customServerOffline={customServerOffline}
-                onPressServerOffline={this.onPressServerOffline}
-                customServerChainName={customServerChainName}
-                onPressServerChainName={this.onPressServerChainName}
-                customServerUri={customServerUri}
-                setCustomServerUri={this.setCustomServerUri}
-                usingCustomServer={this.usingCustomServer}
-                setCustomServerShow={this.setCustomServerShow}
-                walletExists={walletExists}
-                openCurrentWallet={this.openCurrentWallet}
-                createNewWallet={this.createNewWallet}
-                getwalletToRestore={this.getwalletToRestore}
-              />
-            )}
-            {screen === 2 && wallet && (
-              <Modal
-                animationType="slide"
-                transparent={false}
-                visible={screen === 2}
-                onRequestClose={() => this.navigateToLoadedApp()}>
-                <Seed
-                  onClickOK={() => this.navigateToLoadedApp()}
-                  onClickCancel={() => this.navigateToLoadedApp()}
-                  action={SeedActionEnum.new}
-                  setPrivacyOption={this.setPrivacyOption}
-                />
-              </Modal>
-            )}
-            {screen === 3 && (
-              <Modal
-                animationType="slide"
-                transparent={false}
-                visible={screen === 3}
-                onRequestClose={() => this.setState({ screen: 1 })}>
-                <ImportUfvk
-                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                  onClickCancel={() => this.setState({ screen: 1 })}
-                />
-              </Modal>
-            )}
-          </SafeAreaView>
-        </SafeAreaProvider>
+        {screen === 0 && (
+          <Launching
+            translate={translate}
+            firstLaunchingMessage={firstLaunchingMessage}
+            biometricsFailed={biometricsFailed}
+            tryAgain={() => {
+              this.setState({ biometricsFailed: false }, () => this.componentDidMount());
+            }}
+          />
+        )}
+        {screen === 1 && (
+          <StartMenu
+            actionButtonsDisabled={actionButtonsDisabled}
+            hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
+            recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
+            changeMode={this.changeMode}
+            customServer={this.customServer}
+            customServerShow={customServerShow}
+            customServerOffline={customServerOffline}
+            onPressServerOffline={this.onPressServerOffline}
+            customServerChainName={customServerChainName}
+            onPressServerChainName={this.onPressServerChainName}
+            customServerUri={customServerUri}
+            setCustomServerUri={this.setCustomServerUri}
+            usingCustomServer={this.usingCustomServer}
+            setCustomServerShow={this.setCustomServerShow}
+            walletExists={walletExists}
+            openCurrentWallet={this.openCurrentWallet}
+            createNewWallet={this.createNewWallet}
+            getwalletToRestore={this.getwalletToRestore}
+          />
+        )}
+        {screen === 2 && wallet && (
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={screen === 2}
+            onRequestClose={() => this.navigateToLoadedApp()}>
+            <Seed
+              onClickOK={() => this.navigateToLoadedApp()}
+              onClickCancel={() => this.navigateToLoadedApp()}
+              action={SeedActionEnum.new}
+              setPrivacyOption={this.setPrivacyOption}
+            />
+          </Modal>
+        )}
+        {screen === 3 && (
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={screen === 3}
+            onRequestClose={() => this.setState({ screen: 1 })}>
+            <ImportUfvk
+              onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+              onClickCancel={() => this.setState({ screen: 1 })}
+            />
+          </Modal>
+        )}
       </ContextAppLoadingProvider>
     );
   }
