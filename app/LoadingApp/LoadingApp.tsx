@@ -280,6 +280,7 @@ export default function LoadingApp(props: LoadingAppProps) {
     return (
       <LoadingAppClass
         {...props}
+        navigationApp={props.navigation}
         theme={theme}
         translate={translate}
         language={language}
@@ -302,7 +303,7 @@ export default function LoadingApp(props: LoadingAppProps) {
 }
 
 type LoadingAppClassProps = {
-  navigation: StackScreenProps<any>['navigation'];
+  navigationApp: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
   toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
@@ -335,7 +336,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     this.state = {
       // context
-      navigation: props.navigation,
       netInfo: {} as NetInfoType,
       wallet: {} as WalletType,
       info: {} as InfoType,
@@ -965,10 +965,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
   };
 
   navigateToLoadedApp = () => {
-    const { navigation } = this.state;
-    navigation.reset({
+    this.props.navigationApp.reset({
       index: 0,
-      routes: [{ name: RouteEnums.LoadedApp, params: { readOnly: this.state.readOnly } }],
+      routes: [
+        {
+          name: RouteEnums.LoadedApp,
+          params: { readOnly: this.state.readOnly},
+        },
+      ],
     });
   };
 
@@ -1274,13 +1278,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       translate,
       hasRecoveryWalletInfoSaved,
     } = this.state;
-    const { colors } = this.props.theme;
 
     //console.log('render loadingAppClass - 3', this.state.privacy);
 
     const context = {
       // context
-      navigation: this.state.navigation,
       netInfo: this.state.netInfo,
       wallet: this.state.wallet,
       info: this.state.info,

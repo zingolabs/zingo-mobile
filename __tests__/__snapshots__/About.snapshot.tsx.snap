@@ -1,7 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component About - test About - snapshot 1`] = `
-[
+<View
+  style={
+    {
+      "backgroundColor": "#011401",
+      "flex": 1,
+      "marginBottom": 0,
+      "marginLeft": 0,
+      "marginRight": 0,
+      "marginTop": 0,
+    }
+  }
+>
   <View>
     <View
       style={
@@ -75,7 +86,7 @@ exports[`Component About - test About - snapshot 1`] = `
         }
       />
     </View>
-  </View>,
+  </View>
   <View>
     <View
       style={
@@ -181,7 +192,7 @@ exports[`Component About - test About - snapshot 1`] = `
         }
       }
     />
-  </View>,
+  </View>
   <RCTScrollView
     contentContainerStyle={
       {
@@ -280,6 +291,6 @@ exports[`Component About - test About - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>,
-]
+  </RCTScrollView>
+</View>
 `;

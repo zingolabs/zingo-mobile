@@ -160,7 +160,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
                   closeAllModals();
-                  navigation.navigate(RouteEnums.LoadedApp, {
+                  navigation.navigate(RouteEnums.Home, {
                     screen: translate('loadedapp.send-menu'),
                     initial: false,
                   });

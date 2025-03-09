@@ -1,3 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component Scanner - test Scanner - snapshot 1`] = `null`;
+exports[`Component Scanner - test Scanner - snapshot 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#011401",
+    }
+  }
+/>
+`;

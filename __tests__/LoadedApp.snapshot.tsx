@@ -39,7 +39,7 @@ describe('Component LoadedApp - test', () => {
     const zenniesDonationAddress = 'xxxxxxxxxxxxxxxxx';
     const loadedapp = render(
       <LoadedAppClass
-        navigation={mockNavigation}
+        navigationApp={mockNavigation}
         route={mockRoute}
         toggleTheme={toggleTheme}
         translate={mockTranslate}

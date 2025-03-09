@@ -35,11 +35,12 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead }) => {
   return (
     <View
       style={{
-        flex: 1,
         backgroundColor: colors.background,
       }}>
       {!hasPermission || device == null ? (
-        <Text>No permission</Text>
+        <View style={{ marginTop: 50 }}>
+          <Text>No permission</Text>
+        </View>
       ) : (
         <Camera style={{ width: '100%', height: '100%' }} device={device} isActive={active} codeScanner={codeScanner} />
       )}

@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react';
-import { StackScreenProps } from '@react-navigation/stack';
 
 import {
   SyncingStatusClass,
@@ -22,9 +21,10 @@ import {
   SnackbarType,
   AppContextLoaded,
 } from '../AppState';
+import { DrawerContentComponentProps } from '@react-navigation/drawer';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
-  navigation: {} as StackScreenProps<any>['navigation'],
+  navigation: {} as DrawerContentComponentProps['navigation'],
   netInfo: {} as NetInfoType,
   syncingStatus: new SyncingStatusClass(),
   totalBalance: null,

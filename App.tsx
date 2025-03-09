@@ -9,7 +9,7 @@ import { LoadingApp } from './app/LoadingApp';
 import { ThemeType } from './app/types';
 import { ModeEnum, RouteEnums } from './app/AppState';
 
-import { LogBox, StatusBar, View } from 'react-native';
+import { LogBox, StatusBar } from 'react-native';
 
 LogBox.ignoreLogs(['[Reanimated] Reduced motion setting is enabled on this device.']);
 

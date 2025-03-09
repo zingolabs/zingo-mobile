@@ -357,6 +357,7 @@ export default function LoadedApp(props: LoadedAppProps) {
     return (
       <LoadedAppClass
         {...props}
+        navigationApp={props.navigation}
         theme={theme}
         translate={translate}
         language={language}
@@ -400,7 +401,7 @@ const Loading: React.FC<LoadingProps> = ({ backgroundColor, spinColor }) => {
 };
 
 type LoadedAppClassProps = {
-  navigation: StackScreenProps<any>['navigation'];
+  navigationApp: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
   toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
@@ -442,7 +443,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     this.state = {
       //context
-      navigation: props.navigation,
+      navigation: {} as DrawerContentComponentProps['navigation'],
       netInfo: {} as NetInfoType,
       totalBalance: null,
       addresses: null,
@@ -658,7 +659,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
 
       this.closeAllModals();
-      this.state.navigation.navigate(RouteEnums.LoadedApp, {
+      this.state.navigation.navigate(RouteEnums.Home, {
         screen: this.state.translate('loadedapp.send-menu'),
         initial: false,
       });
@@ -1293,7 +1294,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.setSendPageState(newSendPageState);
       }
       this.closeAllModals();
-      this.state.navigation.navigate(RouteEnums.LoadedApp, {
+      this.state.navigation.navigate(RouteEnums.Home, {
         screen: this.state.translate('loadedapp.send-menu'),
         initial: false,
       });
@@ -1557,14 +1558,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   navigateToLoadingApp = async (state: any) => {
-    const { navigation } = this.state;
-
     this.rpc.setInRefresh(false);
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
       await this.setModeOption(ModeEnum.advanced);
     }
-    navigation.reset({
+    this.props.navigationApp.reset({
       index: 0,
       routes: [
         {
@@ -1758,6 +1757,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
   };
 
+  setNavigation = (navigation: DrawerContentComponentProps['navigation']) => {
+    this.setState({
+      navigation,
+    });
+  };
+
   render() {
     const {
       snackbars,
@@ -1867,9 +1872,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     return (
       <ContextAppLoadedProvider value={context}>
         <GestureHandlerRootView>
-          <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName="Home">
-            <Drawer.Screen name="Home">
-              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
+          <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnums.Home}>
+            <Drawer.Screen name={RouteEnums.Home}>
+              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {
+                useEffect(() => {
+                  this.setNavigation(navigation);
+                }, [navigation]);
+                return (
                 <>
                   <Snackbars
                     snackbars={snackbars}
@@ -1981,7 +1990,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     </>
                   )}
                 </>
-              )}
+              );}}
             </Drawer.Screen>
           </Drawer>
           <MagicModalPortal />

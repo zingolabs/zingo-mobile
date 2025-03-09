@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, Text, Dimensions } from 'react-native';
+import { View, Text, Dimensions, Platform } from 'react-native';
 
 import RegText from '../../../components/Components/RegText';
 
@@ -12,7 +12,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { MenuItemEnum, ModeEnum, SelectServerEnum } from '../../../app/AppState';
+import { GlobalConst, MenuItemEnum, ModeEnum, SelectServerEnum } from '../../../app/AppState';
 import { HideReturn } from 'react-native-magic-modal';
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 
@@ -50,7 +50,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, navigation }
   };
 
   const onItemSelectedWrapper = async (value: MenuItemEnum) => {
-    navigation.closeDrawer();
+    navigation.toggleDrawer();
     if (
       (value === MenuItemEnum.WalletSeedUfvk && security.seedUfvkScreen) ||
       (value === MenuItemEnum.Rescan && security.rescanScreen) ||
@@ -75,7 +75,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, navigation }
       // properly
       setTimeout(() => {
         onItemSelected(value);
-      }, 200);
+      }, Platform.OS === GlobalConst.platformOSandroid ? 500 : 0);
     }
   };
 

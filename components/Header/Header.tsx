@@ -353,7 +353,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
       // change to the history screen, just in case.
       if (navigation) {
-        navigation.navigate(RouteEnums.LoadedApp, {
+        navigation.navigate(RouteEnums.Home, {
           screen: translate('loadedapp.history-menu') as string,
           initial: false,
         });

@@ -1,7 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component Pools - test Pools - snapshot 1`] = `
-[
+<View
+  style={
+    {
+      "backgroundColor": "#011401",
+      "flex": 1,
+      "marginBottom": 0,
+      "marginLeft": 0,
+      "marginRight": 0,
+      "marginTop": 0,
+    }
+  }
+>
   <View>
     <View
       style={
@@ -156,7 +167,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
         }
       />
     </View>
-  </View>,
+  </View>
   <View>
     <View
       style={
@@ -262,7 +273,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
         }
       }
     />
-  </View>,
+  </View>
   <RCTScrollView
     contentContainerStyle={
       {
@@ -298,6 +309,6 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
         />
       </View>
     </View>
-  </RCTScrollView>,
-]
+  </RCTScrollView>
+</View>
 `;

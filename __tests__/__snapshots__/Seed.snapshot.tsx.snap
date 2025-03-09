@@ -1,7 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component Seed - test Seed Backup - snapshot 1`] = `
-[
+<View
+  style={
+    {
+      "backgroundColor": "#011401",
+      "flex": 1,
+      "marginBottom": 0,
+      "marginLeft": 0,
+      "marginRight": 0,
+      "marginTop": 0,
+    }
+  }
+>
   <View>
     <View
       style={
@@ -156,7 +167,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         }
       />
     </View>
-  </View>,
+  </View>
   <View>
     <View
       style={
@@ -262,7 +273,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         }
       }
     />
-  </View>,
+  </View>
   <RCTScrollView
     contentContainerStyle={
       {
@@ -492,7 +503,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>,
+  </RCTScrollView>
   <View
     style={
       {
@@ -579,12 +590,23 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>,
-]
+  </View>
+</View>
 `;
 
 exports[`Component Seed - test Seed Change - snapshot 1`] = `
-[
+<View
+  style={
+    {
+      "backgroundColor": "#011401",
+      "flex": 1,
+      "marginBottom": 0,
+      "marginLeft": 0,
+      "marginRight": 0,
+      "marginTop": 0,
+    }
+  }
+>
   <View>
     <View
       style={
@@ -739,7 +761,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         }
       />
     </View>
-  </View>,
+  </View>
   <View>
     <View
       style={
@@ -845,7 +867,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         }
       }
     />
-  </View>,
+  </View>
   <RCTScrollView
     contentContainerStyle={
       {
@@ -1075,7 +1097,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>,
+  </RCTScrollView>
   <View
     style={
       {
@@ -1162,12 +1184,23 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>,
-]
+  </View>
+</View>
 `;
 
 exports[`Component Seed - test Seed New - snapshot 1`] = `
-[
+<View
+  style={
+    {
+      "backgroundColor": "#011401",
+      "flex": 1,
+      "marginBottom": 0,
+      "marginLeft": 0,
+      "marginRight": 0,
+      "marginTop": 0,
+    }
+  }
+>
   <View>
     <View
       style={
@@ -1322,7 +1355,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         }
       />
     </View>
-  </View>,
+  </View>
   <View>
     <View
       style={
@@ -1428,7 +1461,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         }
       }
     />
-  </View>,
+  </View>
   <RCTScrollView
     contentContainerStyle={
       {
@@ -1658,7 +1691,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>,
+  </RCTScrollView>
   <View
     style={
       {
@@ -1745,12 +1778,23 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>,
-]
+  </View>
+</View>
 `;
 
 exports[`Component Seed - test Seed Server - snapshot 1`] = `
-[
+<View
+  style={
+    {
+      "backgroundColor": "#011401",
+      "flex": 1,
+      "marginBottom": 0,
+      "marginLeft": 0,
+      "marginRight": 0,
+      "marginTop": 0,
+    }
+  }
+>
   <View>
     <View
       style={
@@ -1905,7 +1949,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         }
       />
     </View>
-  </View>,
+  </View>
   <View>
     <View
       style={
@@ -2011,7 +2055,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         }
       }
     />
-  </View>,
+  </View>
   <RCTScrollView
     contentContainerStyle={
       {
@@ -2241,7 +2285,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>,
+  </RCTScrollView>
   <View
     style={
       {
@@ -2328,12 +2372,23 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>,
-]
+  </View>
+</View>
 `;
 
 exports[`Component Seed - test Seed View - snapshot 1`] = `
-[
+<View
+  style={
+    {
+      "backgroundColor": "#011401",
+      "flex": 1,
+      "marginBottom": 0,
+      "marginLeft": 0,
+      "marginRight": 0,
+      "marginTop": 0,
+    }
+  }
+>
   <View>
     <View
       style={
@@ -2488,7 +2543,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         }
       />
     </View>
-  </View>,
+  </View>
   <View>
     <View
       style={
@@ -2594,7 +2649,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         }
       }
     />
-  </View>,
+  </View>
   <RCTScrollView
     contentContainerStyle={
       {
@@ -2824,7 +2879,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         }
       />
     </View>
-  </RCTScrollView>,
+  </RCTScrollView>
   <View
     style={
       {
@@ -2911,6 +2966,6 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
         />
       </View>
     </View>
-  </View>,
-]
+  </View>
+</View>
 `;

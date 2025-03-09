@@ -198,7 +198,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                     sendPageState.toaddr.to = c.address ? c.address : '';
                     setSendPageState(sendPageState);
                     closeAllModals();
-                    navigation.navigate(RouteEnums.LoadedApp, {
+                    navigation.navigate(RouteEnums.Home, {
                       screen: translate('loadedapp.send-menu'),
                       initial: false,
                     });

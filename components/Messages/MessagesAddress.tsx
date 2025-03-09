@@ -3,8 +3,6 @@ import React, { useContext } from 'react';
 import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppState';
 import MessageList from './components/MessageList';
 
-import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -36,7 +34,6 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { language } = context;
-  const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   moment.locale(language);
 

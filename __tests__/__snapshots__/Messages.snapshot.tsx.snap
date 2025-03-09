@@ -1,7 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component Messages - test Messages currency USD, privacy high & mode advanced - snapshot 1`] = `
-[
+<View
+  style={
+    {
+      "backgroundColor": "#011401",
+      "flex": 1,
+      "marginBottom": 0,
+      "marginLeft": 0,
+      "marginRight": 0,
+      "marginTop": 0,
+    }
+  }
+>
   <View>
     <View
       style={
@@ -213,7 +224,7 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
         }
       />
     </View>
-  </View>,
+  </View>
   <View>
     <View
       style={
@@ -270,7 +281,7 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
         }
       }
     />
-  </View>,
+  </View>
   <View
     style={
       {
@@ -593,7 +604,7 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
         </View>
       </View>
     </RCTScrollView>
-  </View>,
+  </View>
   <ActivityIndicator
     color="#18bd18"
     size="large"
@@ -602,12 +613,23 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
         "marginVertical": 20,
       }
     }
-  />,
-]
+  />
+</View>
 `;
 
 exports[`Component Messages - test Messages no currency, privacy normal & mode basic - snapshot 1`] = `
-[
+<View
+  style={
+    {
+      "backgroundColor": "#011401",
+      "flex": 1,
+      "marginBottom": 0,
+      "marginLeft": 0,
+      "marginRight": 0,
+      "marginTop": 0,
+    }
+  }
+>
   <View>
     <View
       style={
@@ -784,7 +806,7 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
         }
       />
     </View>
-  </View>,
+  </View>
   <View>
     <View
       style={
@@ -841,7 +863,7 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
         }
       }
     />
-  </View>,
+  </View>
   <View
     style={
       {
@@ -1164,7 +1186,7 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
         </View>
       </View>
     </RCTScrollView>
-  </View>,
+  </View>
   <ActivityIndicator
     color="#18bd18"
     size="large"
@@ -1173,6 +1195,6 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
         "marginVertical": 20,
       }
     }
-  />,
-]
+  />
+</View>
 `;

@@ -38,7 +38,7 @@ describe('Component LoadingApp - test', () => {
     const donationAlert = false;
     const loadingapp = render(
       <LoadingAppClass
-        navigation={mockNavigation}
+        navigationApp={mockNavigation}
         route={mockRoute}
         toggleTheme={toggleTheme}
         translate={mockTranslate}

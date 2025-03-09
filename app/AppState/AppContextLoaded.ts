@@ -1,5 +1,3 @@
-import { StackScreenProps } from '@react-navigation/stack';
-
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import AddressClass from './classes/AddressClass';
 import SendPageStateClass from './classes/SendPageStateClass';
@@ -25,9 +23,10 @@ import { SelectServerEnum } from './enums/SelectServerEnum';
 import ValueTransferType from './types/ValueTransferType';
 import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
 import { HideReturn } from 'react-native-magic-modal';
+import { DrawerContentComponentProps } from '@react-navigation/drawer';
 
 export default interface AppContextLoaded {
-  navigation: StackScreenProps<any>['navigation'];
+  navigation: DrawerContentComponentProps['navigation'];
   netInfo: NetInfoType;
 
   // The total confirmed and pending balance in this wallet

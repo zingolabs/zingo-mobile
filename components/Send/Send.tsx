@@ -714,7 +714,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         // Clear the fields
         clearState();
 
-        navigation.navigate(RouteEnums.LoadedApp, {
+        navigation.navigate(RouteEnums.Home, {
           screen: translate('loadedapp.history-menu') as string,
           initial: false,
         });
@@ -773,7 +773,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             // Clear the fields
             clearState();
 
-            navigation.navigate(RouteEnums.LoadedApp, {
+            navigation.navigate(RouteEnums.Home, {
               screen: translate('loadedapp.history-menu') as string,
               initial: false,
             });
