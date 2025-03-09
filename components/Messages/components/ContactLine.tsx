@@ -50,7 +50,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, navigation, showSwipeableIcons, readOnly, selectServer, setSendPageState, closeAllModals } = context;
+  const { translate, language, navigationHome, showSwipeableIcons, readOnly, selectServer, setSendPageState, closeAllModals } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
@@ -198,10 +198,14 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                     sendPageState.toaddr.to = c.address ? c.address : '';
                     setSendPageState(sendPageState);
                     closeAllModals();
-                    navigation.navigate(RouteEnums.Home, {
-                      screen: translate('loadedapp.send-menu'),
-                      initial: false,
-                    });
+                    if (navigationHome) {
+                      navigationHome.navigate(RouteEnums.Home, {
+                        screen: translate('loadedapp.send-menu'),
+                        initial: false,
+                      });
+                    } else {
+                      console.log('Error navigation Home');
+                    }
                     swipeable.reset();
                   }}>
                   <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />

@@ -99,7 +99,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     info,
     totalBalance,
     sendPageState,
-    navigation,
+    navigationHome,
     zecPrice,
     sendAll,
     netInfo,
@@ -714,10 +714,14 @@ const Send: React.FunctionComponent<SendProps> = ({
         // Clear the fields
         clearState();
 
-        navigation.navigate(RouteEnums.Home, {
-          screen: translate('loadedapp.history-menu') as string,
-          initial: false,
-        });
+        if (navigationHome) {
+          navigationHome.navigate(RouteEnums.Home, {
+            screen: translate('loadedapp.history-menu') as string,
+            initial: false,
+          });
+        } else {
+          console.log('Error navigation Home');
+        }
 
         // scroll to top in history, just in case.
         setScrollToTop(true);
@@ -773,10 +777,14 @@ const Send: React.FunctionComponent<SendProps> = ({
             // Clear the fields
             clearState();
 
-            navigation.navigate(RouteEnums.Home, {
-              screen: translate('loadedapp.history-menu') as string,
-              initial: false,
-            });
+            if (navigationHome) {
+              navigationHome.navigate(RouteEnums.Home, {
+                screen: translate('loadedapp.history-menu') as string,
+                initial: false,
+              });
+            } else {
+              console.log('Error navigation Home');
+            }
 
             // scroll to top in history, just in case.
             setScrollToTop(true);

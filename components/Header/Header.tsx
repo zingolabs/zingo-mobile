@@ -119,7 +119,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     security,
     language,
     shieldingAmount,
-    navigation,
+    navigationHome,
     selectServer,
     setZecPrice,
     setComputingModalShow,
@@ -352,11 +352,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       }
       await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
       // change to the history screen, just in case.
-      if (navigation) {
-        navigation.navigate(RouteEnums.Home, {
+      if (navigationHome) {
+        navigationHome.navigate(RouteEnums.Home, {
           screen: translate('loadedapp.history-menu') as string,
           initial: false,
         });
+      } else {
+        console.log('Error navigation Home');
       }
       // scroll to top in history, just in case.
       if (setScrollToTop) {

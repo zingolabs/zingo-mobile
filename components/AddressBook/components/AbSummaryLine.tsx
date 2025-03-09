@@ -48,7 +48,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, navigation, readOnly, mode, totalBalance, language, selectServer, setSendPageState, closeAllModals } = context;
+  const { translate, navigationHome, readOnly, mode, totalBalance, language, selectServer, setSendPageState, closeAllModals } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
@@ -160,10 +160,14 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
                   closeAllModals();
-                  navigation.navigate(RouteEnums.Home, {
-                    screen: translate('loadedapp.send-menu'),
-                    initial: false,
-                  });
+                  if (navigationHome) {
+                    navigationHome.navigate(RouteEnums.Home, {
+                      screen: translate('loadedapp.send-menu'),
+                      initial: false,
+                    });
+                  } else {
+                    console.log('Error navigation Home');
+                  }
                 }}>
                 <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />
               </TouchableOpacity>

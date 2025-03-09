@@ -26,7 +26,7 @@ import { HideReturn } from 'react-native-magic-modal';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
 
 export default interface AppContextLoaded {
-  navigation: DrawerContentComponentProps['navigation'];
+  navigationHome: DrawerContentComponentProps['navigation'] | null;
   netInfo: NetInfoType;
 
   // The total confirmed and pending balance in this wallet

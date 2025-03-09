@@ -47,7 +47,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     addressBook,
     launchAddressBook,
     privacy,
-    navigation,
+    navigationHome,
     readOnly,
     mode,
     totalBalance,
@@ -190,10 +190,14 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               sendPageState.toaddr.to = address;
               setSendPageState(sendPageState);
               closeAllModals();
-              navigation.navigate(RouteEnums.Home, {
-                screen: translate('loadedapp.send-menu'),
-                initial: false,
-              });
+              if (navigationHome) {
+                navigationHome.navigate(RouteEnums.Home, {
+                  screen: translate('loadedapp.send-menu'),
+                  initial: false,
+                });
+              } else {
+                console.log('Error navigation Home');
+              }
             }}>
             <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faPaperPlane} color={colors.primary} />
           </TouchableOpacity>

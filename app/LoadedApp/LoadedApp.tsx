@@ -443,7 +443,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     this.state = {
       //context
-      navigation: {} as DrawerContentComponentProps['navigation'],
+      navigationHome: null,
       netInfo: {} as NetInfoType,
       totalBalance: null,
       addresses: null,
@@ -659,10 +659,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
 
       this.closeAllModals();
-      this.state.navigation.navigate(RouteEnums.Home, {
-        screen: this.state.translate('loadedapp.send-menu'),
-        initial: false,
-      });
+      if (this.state.navigationHome) {
+        this.state.navigationHome.navigate(RouteEnums.Home, {
+          screen: this.state.translate('loadedapp.send-menu'),
+          initial: false,
+        });
+      } else {
+        console.log('Error navigation Home');
+      }
     });
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(async (state: any) => {
@@ -1294,10 +1298,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.setSendPageState(newSendPageState);
       }
       this.closeAllModals();
-      this.state.navigation.navigate(RouteEnums.Home, {
-        screen: this.state.translate('loadedapp.send-menu'),
-        initial: false,
-      });
+      if (this.state.navigationHome) {
+        this.state.navigationHome.navigate(RouteEnums.Home, {
+          screen: this.state.translate('loadedapp.send-menu'),
+          initial: false,
+        });
+      } else {
+        console.log('Error navigation Home');
+      }
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
       await sendEmail(this.state.translate, this.state.info.zingolib);
@@ -1757,10 +1765,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
   };
 
-  setNavigation = (navigation: DrawerContentComponentProps['navigation']) => {
-    this.setState({
-      navigation,
-    });
+  setNavigation = (navigationHome: DrawerContentComponentProps['navigation']) => {
+    if (!this.state.navigationHome) {
+      this.setState({
+        navigationHome,
+      });
+    }
   };
 
   render() {
@@ -1781,7 +1791,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     const context = {
       //context
-      navigation: this.state.navigation,
+      navigationHome: this.state.navigationHome,
       netInfo: this.state.netInfo,
       wallet: this.state.wallet,
       totalBalance: this.state.totalBalance,
@@ -1877,7 +1887,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {
                 useEffect(() => {
                   this.setNavigation(navigation);
-                }, [navigation]);
+                });
                 return (
                 <>
                   <Snackbars

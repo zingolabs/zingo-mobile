@@ -63,7 +63,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     language,
     privacy,
     info,
-    navigation,
+    navigationHome,
     showSwipeableIcons,
     readOnly,
     selectServer,
@@ -219,10 +219,14 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     sendPageState.toaddr.to = vt.address ? vt.address : '';
                     setSendPageState(sendPageState);
                     closeAllModals();
-                    navigation.navigate(RouteEnums.Home, {
-                      screen: translate('loadedapp.send-menu'),
-                      initial: false,
-                    });
+                    if (navigationHome) {
+                      navigationHome.navigate(RouteEnums.Home, {
+                        screen: translate('loadedapp.send-menu'),
+                        initial: false,
+                      });
+                    } else {
+                      console.log('Error navigation Home');
+                    }
                     swipeable.reset();
                   }}>
                   <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />

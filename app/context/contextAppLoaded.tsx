@@ -21,10 +21,9 @@ import {
   SnackbarType,
   AppContextLoaded,
 } from '../AppState';
-import { DrawerContentComponentProps } from '@react-navigation/drawer';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
-  navigation: {} as DrawerContentComponentProps['navigation'],
+  navigationHome: null,
   netInfo: {} as NetInfoType,
   syncingStatus: new SyncingStatusClass(),
   totalBalance: null,
