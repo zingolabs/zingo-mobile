@@ -13,6 +13,7 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
     }
   }
 >
+  <View />
   <View>
     <View
       style={
@@ -45,7 +46,7 @@ exports[`Component Messages - test Messages currency USD, privacy high & mode ad
           style={
             {
               "flexDirection": "row",
-              "minHeight": 25,
+              "minHeight": 29,
             }
           }
         >
@@ -630,6 +631,7 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
     }
   }
 >
+  <View />
   <View>
     <View
       style={
@@ -662,7 +664,7 @@ exports[`Component Messages - test Messages no currency, privacy normal & mode b
           style={
             {
               "flexDirection": "row",
-              "minHeight": 25,
+              "minHeight": 29,
             }
           }
         >

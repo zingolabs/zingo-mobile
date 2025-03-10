@@ -45,7 +45,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           style={
             {
               "flexDirection": "row",
-              "minHeight": 25,
+              "minHeight": 29,
             }
           }
         >
@@ -954,7 +954,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           style={
             {
               "flexDirection": "row",
-              "minHeight": 25,
+              "minHeight": 29,
             }
           }
         >

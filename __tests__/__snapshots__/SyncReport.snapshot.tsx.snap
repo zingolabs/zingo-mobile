@@ -13,6 +13,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     }
   }
 >
+  <View />
   <View>
     <View
       style={

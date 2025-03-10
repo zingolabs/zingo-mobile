@@ -1719,6 +1719,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   // waiting while closing the keyboard, just in case.
                   setTimeout(async () => {
                     setConfirmModalShow();
+                    Keyboard.dismiss();
                   }, 100);
                 }}
                 twoButtons={true}
@@ -1732,6 +1733,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   defaultValuesSpendableMaxAmount();
                   clearState();
                   setPickerTempSelectedAddress('');
+                  Keyboard.dismiss();
                 }}
                 twoButtons={true}
               />

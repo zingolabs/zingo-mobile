@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -51,6 +52,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
   const doSaveAndClose = () => {
     setMessage(memo);
     hide();
+    Keyboard.dismiss();
   };
 
   return (

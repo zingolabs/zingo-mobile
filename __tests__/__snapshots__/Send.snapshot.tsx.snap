@@ -49,7 +49,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             style={
               {
                 "flexDirection": "row",
-                "minHeight": 25,
+                "minHeight": 29,
               }
             }
           >
@@ -1925,7 +1925,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             style={
               {
                 "flexDirection": "row",
-                "minHeight": 25,
+                "minHeight": 29,
               }
             }
           >

@@ -7,6 +7,7 @@ import {
   TextInput,
   Platform,
   KeyboardAvoidingView,
+  Keyboard,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -1057,6 +1058,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               // waiting while closing the keyboard, just in case.
               setTimeout(async () => {
                 await saveSettings();
+                Keyboard.dismiss();
               }, 100);
             }}
           />

@@ -13,6 +13,7 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
     }
   }
 >
+  <View />
   <View>
     <View
       style={
@@ -396,6 +397,7 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
     }
   }
 >
+  <View />
   <View>
     <View
       style={

@@ -13,6 +13,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
     }
   }
 >
+  <View />
   <View>
     <View
       style={

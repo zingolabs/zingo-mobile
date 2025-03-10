@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
+  Keyboard,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -108,6 +109,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
       return;
     }
     onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
+    Keyboard.dismiss();
   };
 
   return (
