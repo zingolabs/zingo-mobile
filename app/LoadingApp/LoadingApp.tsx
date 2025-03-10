@@ -1348,7 +1348,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         {screen === 2 && wallet && (
           <Modal
             animationType="slide"
-            transparent={false}
+            transparent={true}
             visible={screen === 2}
             onRequestClose={() => this.navigateToLoadedApp()}>
             <Seed
@@ -1362,7 +1362,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         {screen === 3 && (
           <Modal
             animationType="slide"
-            transparent={false}
+            transparent={true}
             visible={screen === 3}
             onRequestClose={() => this.setState({ screen: 1 })}>
             <ImportUfvk
