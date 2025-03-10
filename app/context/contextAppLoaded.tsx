@@ -61,6 +61,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
+  removeFirstSnackbar: () => {},
   restartApp: () => {},
   somePending: false,
   addressBook: [] as AddressBookFileClass[],

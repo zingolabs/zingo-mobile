@@ -35,6 +35,7 @@ import { RPCAddressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
 import { RPCParseAddressStatusEnum } from '../../../app/rpc/enums/RPCParseAddressStatusEnum';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../../Components/Snackbars';
 
 type ConfirmProps = {
   calculatedFee: number;
@@ -71,6 +72,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     server,
     security,
     language,
+    snackbars,
+    removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
@@ -278,6 +281,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={translate('send.confirm-title') as string}
         noBalance={true}

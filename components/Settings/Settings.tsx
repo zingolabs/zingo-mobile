@@ -47,6 +47,7 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
 import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfo';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
 
 type SettingsProps = {
   setWalletOption: (walletOption: string, value: string) => Promise<void>;
@@ -105,6 +106,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     rescanMenu: rescanMenuContext,
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     readOnly,
+    snackbars,
+    removeFirstSnackbar,
   } = context;
 
   const memosArray = translate('settings.memos');
@@ -547,6 +550,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         backgroundColor: colors.background,
       }}
     >
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <View
         style={{
           flex: 1,

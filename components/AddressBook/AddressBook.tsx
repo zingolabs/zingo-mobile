@@ -28,6 +28,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../app/utils';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
 
 type AddressBookProps = {
   setAddressBook: (ab: AddressBookFileClass[]) => void;
@@ -41,6 +42,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
     addressBook,
     addressBookCurrentAddress,
     zenniesDonationAddress,
+    snackbars,
+    removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
@@ -158,6 +161,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={translate('addressbook.title') as string}
         noBalance={true}

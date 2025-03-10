@@ -347,6 +347,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       readOnly: false,
       snackbars: [] as SnackbarType[],
       addLastSnackbar: this.addLastSnackbar,
+      removeFirstSnackbar: this.removeFirstSnackbar,
 
       // context settings
       server: props.server,
@@ -933,7 +934,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         return;
       }
 
-      this.state.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string });
+      this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string });
 
       const cs = {
         uri: uri,
@@ -956,7 +957,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           customServerOffline: false,
         });
       } else {
-        this.state.addLastSnackbar({
+        this.addLastSnackbar({
           message: (this.state.translate('loadedapp.changeservernew-error') as string) + uri,
         });
       }
@@ -1294,6 +1295,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       readOnly: this.state.readOnly,
       snackbars: this.state.snackbars,
       addLastSnackbar: this.state.addLastSnackbar,
+      removeFirstSnackbar: this.removeFirstSnackbar,
 
       // settings
       server: this.state.server,

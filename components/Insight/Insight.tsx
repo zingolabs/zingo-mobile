@@ -25,6 +25,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
 
 type DataType = {
   svg: {
@@ -46,7 +47,7 @@ type InsightProps = {
 
 const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, privacy, addLastSnackbar, language } = context;
+  const { info, translate, privacy, addLastSnackbar, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -246,6 +247,12 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={translate('insight.title') as string}
         noBalance={true}

@@ -27,6 +27,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { ButtonTypeEnum, GlobalConst, SelectServerEnum } from '../../app/AppState';
+import Snackbars from '../Components/Snackbars';
 
 type ImportUfvkProps = {
   onClickCancel: () => void;
@@ -34,7 +35,7 @@ type ImportUfvkProps = {
 };
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, onClickOK }) => {
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, info, server, mode, addLastSnackbar, language, selectServer } = context;
+  const { translate, netInfo, info, server, mode, addLastSnackbar, language, selectServer, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
@@ -122,6 +123,11 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
         backgroundColor: colors.background,
       }}
     >
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
       <View
         style={{
           flex: 1,

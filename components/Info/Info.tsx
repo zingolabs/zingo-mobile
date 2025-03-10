@@ -18,13 +18,14 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { ChainNameEnum, CurrencyEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
 
 type InfoProps = {
 };
 
 const Info: React.FunctionComponent<InfoProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, currency, zecPrice, privacy, language, setZecPrice } = context;
+  const { info, translate, currency, zecPrice, privacy, language, setZecPrice, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -40,6 +41,12 @@ const Info: React.FunctionComponent<InfoProps> = () => {
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={translate('info.title') as string}
         noBalance={true}

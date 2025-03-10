@@ -13,6 +13,7 @@ import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
 import { Code } from 'react-native-vision-camera';
 import { View } from 'react-native';
+import Snackbars from '../../Components/Snackbars';
 
 type ScannerUfvkProps = {
   setUfvkText: (k: string) => void;
@@ -20,7 +21,7 @@ type ScannerUfvkProps = {
 };
 const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, closeModal }) => {
   const context = useContext(ContextAppLoading);
-  const { translate, language } = context;
+  const { translate, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
@@ -46,6 +47,12 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, c
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={translate('scanner.text') as string}
         noBalance={true}

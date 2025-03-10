@@ -27,6 +27,7 @@ export default interface AppContextLoading {
   readOnly: boolean;
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
+  removeFirstSnackbar: () => void;
 
   // context settings
   server: ServerType;

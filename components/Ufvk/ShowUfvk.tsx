@@ -17,6 +17,7 @@ import 'moment/locale/ru';
 import RegText from '../Components/RegText';
 import { ButtonTypeEnum, ChainNameEnum, ModeEnum, UfvkActionEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
 
 type TextsType = {
   new: string[];
@@ -35,7 +36,7 @@ type ShowUfvkProps = {
 };
 const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, wallet, server, mode, addLastSnackbar, language } = context;
+  const { translate, wallet, server, mode, addLastSnackbar, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -101,6 +102,12 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={translate('ufvk.viewkey') + ' (' + translate(`seed.${action}`) + ')'}
         noBalance={true}

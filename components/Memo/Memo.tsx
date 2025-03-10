@@ -26,6 +26,7 @@ import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
 
 type MemoProps = {
   message: string;
@@ -34,7 +35,7 @@ type MemoProps = {
 };
 const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, setMessage }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, uOrchardAddress } = context;
+  const { translate, language, uOrchardAddress, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -65,6 +66,12 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
         backgroundColor: colors.background,
       }}
     >
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <View
         style={{
           flex: 1,

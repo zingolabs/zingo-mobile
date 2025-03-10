@@ -44,6 +44,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
+  removeFirstSnackbar: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
   rescanMenu: false,

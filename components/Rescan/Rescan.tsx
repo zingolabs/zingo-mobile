@@ -16,6 +16,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { ButtonTypeEnum, SelectServerEnum, SnackbarDurationEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
 
 type RescanProps = {
   doRescan: () => void;
@@ -23,7 +24,7 @@ type RescanProps = {
 
 const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
   const context = useContext(ContextAppLoaded);
-  const { wallet, translate, netInfo, addLastSnackbar, language, selectServer } = context;
+  const { wallet, translate, netInfo, addLastSnackbar, language, selectServer, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -52,6 +53,12 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={translate('rescan.title') as string}
         noBalance={true}

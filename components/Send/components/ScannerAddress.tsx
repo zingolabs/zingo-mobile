@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Code } from 'react-native-vision-camera';
 import { useMagicModal } from 'react-native-magic-modal';
 import { View } from 'react-native';
+import Snackbars from '../../Components/Snackbars';
 
 type ScannerAddressProps = {
   setAddress: (address: string) => void;
@@ -24,7 +25,7 @@ type ScannerAddressProps = {
 
 const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddress }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, language } = context;
+  const { translate, server, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -68,6 +69,12 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={translate('scanner.scanaddress') as string}
         noBalance={true}

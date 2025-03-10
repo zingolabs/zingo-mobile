@@ -41,6 +41,7 @@ import Utils from '../../../app/utils';
 import ContactLine from './ContactLine';
 import RegText from '../../Components/RegText';
 import { magicModal } from 'react-native-magic-modal';
+import Snackbars from '../../Components/Snackbars';
 
 type ContactListProps = {
   toggleMenuDrawer?: () => void;
@@ -73,7 +74,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   noDrawMenu,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, valueTransfers, language, server, addressBook, addresses, doRefresh, zenniesDonationAddress } =
+  const { translate, valueTransfers, language, server, addressBook, addresses, doRefresh, zenniesDonationAddress, snackbars, removeFirstSnackbar } =
     context;
   const { colors } = useTheme()  as ThemeType;
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -302,6 +303,12 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={translate('messages.title-chats') as string}
         toggleMenuDrawer={toggleMenuDrawer}

@@ -59,6 +59,7 @@ import { serverUris } from '../../../app/uris';
 import Utils from '../../../app/utils';
 import { magicModal } from 'react-native-magic-modal';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Snackbars from '../../Components/Snackbars';
 
 type MessageListProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -100,6 +101,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     totalBalance,
     doRefresh,
     somePending,
+    snackbars,
+    removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -516,6 +519,12 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         backgroundColor: colors.background,
       }}
     >
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <View
         style={{
           flex: 1,

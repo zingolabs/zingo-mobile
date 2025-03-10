@@ -33,6 +33,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
 
 type TextsType = {
   new: string[];
@@ -66,6 +67,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     privacy: boolean,
     mode: ModeEnum.basic | ModeEnum.advanced,
     addLastSnackbar: (snackbar: SnackbarType) => void,
+    snackbars: SnackbarType[],
+    removeFirstSnackbar: () => void,
     language: LanguageEnum;
   if (action === SeedActionEnum.new) {
     wallet = contextLoading.wallet;
@@ -75,6 +78,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     privacy = contextLoading.privacy;
     mode = contextLoading.mode;
     addLastSnackbar = contextLoading.addLastSnackbar;
+    snackbars = contextLoading.snackbars;
+    removeFirstSnackbar = contextLoading.removeFirstSnackbar;
     language = contextLoading.language;
   } else {
     wallet = contextLoaded.wallet;
@@ -84,6 +89,8 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     privacy = contextLoaded.privacy;
     mode = contextLoaded.mode;
     addLastSnackbar = contextLoaded.addLastSnackbar;
+    snackbars = contextLoaded.snackbars;
+    removeFirstSnackbar = contextLoaded.removeFirstSnackbar;
     language = contextLoaded.language;
   }
 
@@ -210,6 +217,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={translate('seed.title') + ' (' + translate(`seed.${action}`) + ')'}
         noBalance={true}

@@ -18,6 +18,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { SnackbarDurationEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
 
 type PrivKeyProps = {
   address: string;
@@ -26,7 +27,7 @@ type PrivKeyProps = {
 };
 const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, privKey }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addLastSnackbar, language } = context;
+  const { translate, addLastSnackbar, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -67,6 +68,12 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={keyTypeString + ' ' + translate('privkey.title')}
         noBalance={true}

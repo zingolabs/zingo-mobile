@@ -35,6 +35,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTriangleExclamation, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../../Components/Snackbars';
 // this is for https. (primary)
 //import { faLock } from '@fortawesome/free-solid-svg-icons';
 
@@ -65,6 +66,8 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     addressBook,
     addresses,
     zenniesDonationAddress,
+    snackbars,
+    removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
@@ -168,6 +171,12 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={translate('history.details') as string}
         noBalance={true}

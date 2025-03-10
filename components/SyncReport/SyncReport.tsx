@@ -20,13 +20,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../app/utils';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
 
 type SyncReportProps = {
 };
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { syncingStatus, wallet, translate, background, language, netInfo } = context;
+  const { syncingStatus, wallet, translate, background, language, netInfo, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -224,6 +225,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={translate('report.title') as string}
         noBalance={true}

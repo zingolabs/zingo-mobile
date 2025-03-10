@@ -22,6 +22,7 @@ import { CommandEnum } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import { RPCWalletKindType } from '../../app/rpc/types/RPCWalletKindType';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
 
 type PoolsProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -29,7 +30,7 @@ type PoolsProps = {
 
 const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language, shieldingAmount } = context;
+  const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language, shieldingAmount, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -64,6 +65,12 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={translate('pools.title') as string}
         noBalance={true}

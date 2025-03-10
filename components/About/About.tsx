@@ -15,12 +15,13 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
 
 type AboutProps = {
 };
 const About: React.FunctionComponent<AboutProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language } = context;
+  const { info, translate, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -44,6 +45,12 @@ const About: React.FunctionComponent<AboutProps> = () => {
         flex: 1,
         backgroundColor: colors.background,
       }}>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        translate={translate}
+      />
+
       <Header
         title={translate('zingo') + ' ' + translate('version')}
         noBalance={true}
