@@ -3,7 +3,9 @@
 ln -s $(which node) /usr/local/bin/node
 
 cd ../lib
-cargo run --release --bin uniffi-bindgen generate ../lib/src/zingo.udl --language swift --out-dir ./Generated
+cargo run --release --bin uniffi-bindgen generate ./src/zingo.udl --language swift --out-dir ./Generated
+cargo build --release --target aarch64-apple-ios-sim -Z build-std
+cargo build --release --target x86_64-apple-ios -Z build-std
 cargo lipo --release --targets aarch64-apple-ios-sim x86_64-apple-ios
 
 cp ./Generated/zingo.swift ../../ios
