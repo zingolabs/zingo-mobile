@@ -823,7 +823,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             position: 'absolute',
             left: 0,
           }}>
-          <View style={{ alignItems: 'center', flexDirection: 'row', height: 45 }}>
+          <View style={{ alignItems: 'center', flexDirection: 'row', height: 40 }}>
             {!noDrawMenu && (
               <TouchableOpacity
                 style={{ marginRight: 5 }}
@@ -831,7 +831,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 accessible={true}
                 accessibilityLabel={translate('menudrawer-acc') as string}
                 onPress={toggleMenuDrawer}>
-                <FontAwesomeIcon icon={faBars} size={45} color={colors.border} />
+                <FontAwesomeIcon icon={faBars} size={40} color={colors.border} />
               </TouchableOpacity>
             )}
             {readOnly && (
@@ -851,7 +851,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
         <View
           style={{
-            padding: 15,
+            padding: 13,
             position: 'absolute',
             right: 0,
           }}>
@@ -879,7 +879,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   }
                 }
             }}>
-              <FontAwesomeIcon icon={faGear} size={40} color={colors.border} />
+              <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
             </TouchableOpacity>
           ) : (
             <Image

@@ -449,7 +449,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "height": 45,
+            "height": 40,
           }
         }
       >
@@ -507,7 +507,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
                 "prefix": "fas",
               }
             }
-            size={45}
+            size={40}
           />
         </View>
       </View>
@@ -515,7 +515,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
     <View
       style={
         {
-          "padding": 15,
+          "padding": 13,
           "position": "absolute",
           "right": 0,
         }
@@ -575,7 +575,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
               "prefix": "fas",
             }
           }
-          size={40}
+          size={35}
         />
       </View>
     </View>
@@ -686,7 +686,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "height": 45,
+            "height": 40,
           }
         }
       />
@@ -694,7 +694,7 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
     <View
       style={
         {
-          "padding": 15,
+          "padding": 13,
           "position": "absolute",
           "right": 0,
         }

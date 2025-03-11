@@ -71,7 +71,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "row",
-              "height": 45,
+              "height": 40,
             }
           }
         />
@@ -79,7 +79,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
       <View
         style={
           {
-            "padding": 15,
+            "padding": 13,
             "position": "absolute",
             "right": 0,
           }

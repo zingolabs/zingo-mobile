@@ -602,7 +602,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "height": 45,
+            "height": 40,
           }
         }
       >
@@ -660,7 +660,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                 "prefix": "fas",
               }
             }
-            size={45}
+            size={40}
           />
         </View>
       </View>
@@ -668,7 +668,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
     <View
       style={
         {
-          "padding": 15,
+          "padding": 13,
           "position": "absolute",
           "right": 0,
         }
@@ -728,7 +728,7 @@ exports[`Component History - test History currency USD, privacy high & mode adva
               "prefix": "fas",
             }
           }
-          size={40}
+          size={35}
         />
       </View>
     </View>
@@ -1224,7 +1224,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "height": 45,
+            "height": 40,
           }
         }
       >
@@ -1282,7 +1282,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 "prefix": "fas",
               }
             }
-            size={45}
+            size={40}
           />
         </View>
       </View>
@@ -1290,7 +1290,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
     <View
       style={
         {
-          "padding": 15,
+          "padding": 13,
           "position": "absolute",
           "right": 0,
         }
@@ -1350,7 +1350,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
               "prefix": "fas",
             }
           }
-          size={40}
+          size={35}
         />
       </View>
     </View>

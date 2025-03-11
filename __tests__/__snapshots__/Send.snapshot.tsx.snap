@@ -606,7 +606,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             {
               "alignItems": "center",
               "flexDirection": "row",
-              "height": 45,
+              "height": 40,
             }
           }
         >
@@ -664,7 +664,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                   "prefix": "fas",
                 }
               }
-              size={45}
+              size={40}
             />
           </View>
         </View>
@@ -672,7 +672,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
       <View
         style={
           {
-            "padding": 15,
+            "padding": 13,
             "position": "absolute",
             "right": 0,
           }
@@ -732,7 +732,7 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
                 "prefix": "fas",
               }
             }
-            size={40}
+            size={35}
           />
         </View>
       </View>
@@ -2195,7 +2195,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             {
               "alignItems": "center",
               "flexDirection": "row",
-              "height": 45,
+              "height": 40,
             }
           }
         >
@@ -2253,7 +2253,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                   "prefix": "fas",
                 }
               }
-              size={45}
+              size={40}
             />
           </View>
         </View>
@@ -2261,7 +2261,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
       <View
         style={
           {
-            "padding": 15,
+            "padding": 13,
             "position": "absolute",
             "right": 0,
           }
@@ -2321,7 +2321,7 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                 "prefix": "fas",
               }
             }
-            size={40}
+            size={35}
           />
         </View>
       </View>
