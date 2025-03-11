@@ -24,7 +24,6 @@ exports[`Component Rescan - test Rescan - snapshot 1`] = `
           "minHeight": 25,
           "paddingBottom": 0,
           "paddingTop": 10,
-          "zIndex": -1,
         }
       }
       testID="header"

@@ -506,7 +506,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             alignItems: 'center',
             paddingBottom: 0,
             backgroundColor: colors.card,
-            zIndex: -1,
             paddingTop: 10,
             minHeight: !noDrawMenu ? 60 : 25,
           }}>

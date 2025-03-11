@@ -27,7 +27,6 @@ exports[`Component Send - test Send currency USD, privacy high & mode advanced -
             "minHeight": 60,
             "paddingBottom": 0,
             "paddingTop": 10,
-            "zIndex": -1,
           }
         }
         testID="header"
@@ -1945,7 +1944,6 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
             "minHeight": 60,
             "paddingBottom": 0,
             "paddingTop": 10,
-            "zIndex": -1,
           }
         }
         testID="header"

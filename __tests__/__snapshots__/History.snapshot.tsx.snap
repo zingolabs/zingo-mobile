@@ -23,7 +23,6 @@ exports[`Component History - test History currency USD, privacy high & mode adva
           "minHeight": 60,
           "paddingBottom": 0,
           "paddingTop": 10,
-          "zIndex": -1,
         }
       }
       testID="header"
@@ -974,7 +973,6 @@ exports[`Component History - test History no currency, privacy normal & mode bas
           "minHeight": 60,
           "paddingBottom": 0,
           "paddingTop": 10,
-          "zIndex": -1,
         }
       }
       testID="header"

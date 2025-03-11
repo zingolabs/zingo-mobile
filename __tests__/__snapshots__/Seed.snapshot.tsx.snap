@@ -24,7 +24,6 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           "minHeight": 25,
           "paddingBottom": 0,
           "paddingTop": 10,
-          "zIndex": -1,
         }
       }
       testID="header"
@@ -619,7 +618,6 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           "minHeight": 25,
           "paddingBottom": 0,
           "paddingTop": 10,
-          "zIndex": -1,
         }
       }
       testID="header"
@@ -1214,7 +1212,6 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
           "minHeight": 25,
           "paddingBottom": 0,
           "paddingTop": 10,
-          "zIndex": -1,
         }
       }
       testID="header"
@@ -1809,7 +1806,6 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           "minHeight": 25,
           "paddingBottom": 0,
           "paddingTop": 10,
-          "zIndex": -1,
         }
       }
       testID="header"
@@ -2404,7 +2400,6 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
           "minHeight": 25,
           "paddingBottom": 0,
           "paddingTop": 10,
-          "zIndex": -1,
         }
       }
       testID="header"

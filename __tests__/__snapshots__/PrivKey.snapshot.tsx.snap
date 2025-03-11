@@ -24,7 +24,6 @@ exports[`Component PrivKey - test PrivKey Private - snapshot 1`] = `
           "minHeight": 25,
           "paddingBottom": 0,
           "paddingTop": 10,
-          "zIndex": -1,
         }
       }
       testID="header"
@@ -408,7 +407,6 @@ exports[`Component PrivKey - test PrivKey View - snapshot 1`] = `
           "minHeight": 25,
           "paddingBottom": 0,
           "paddingTop": 10,
-          "zIndex": -1,
         }
       }
       testID="header"

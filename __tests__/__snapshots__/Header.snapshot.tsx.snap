@@ -12,7 +12,6 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
           "minHeight": 60,
           "paddingBottom": 0,
           "paddingTop": 10,
-          "zIndex": -1,
         }
       }
       testID="header"
@@ -653,7 +652,6 @@ exports[`Component Header - test Header Simple - snapshot 1`] = `
           "minHeight": 25,
           "paddingBottom": 0,
           "paddingTop": 10,
-          "zIndex": -1,
         }
       }
       testID="header"
