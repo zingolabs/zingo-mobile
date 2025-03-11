@@ -54,7 +54,6 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, navigation }
     if (
       (value === MenuItemEnum.WalletSeedUfvk && security.seedUfvkScreen) ||
       (value === MenuItemEnum.Rescan && security.rescanScreen) ||
-      (value === MenuItemEnum.Settings && security.settingsScreen) ||
       (value === MenuItemEnum.ChangeWallet && security.changeWalletScreen) ||
       (value === MenuItemEnum.RestoreWalletBackup && security.restoreWalletBackupScreen)
     ) {
@@ -106,10 +105,6 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, navigation }
               {translate('loadedapp.info') as string}
             </RegText>
           )}
-
-          <RegText testID="menu.settings" onPress={() => onItemSelectedWrapper(MenuItemEnum.Settings)} style={item}>
-            {translate('loadedapp.settings') as string}
-          </RegText>
 
           <RegText
             testID="menu.messages"

@@ -1140,26 +1140,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       return magicModal.show(() => <About />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.Rescan) {
       return magicModal.show(() => <Rescan doRescan={this.doRescan} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
-    } else if (item === MenuItemEnum.Settings) {
-      return magicModal.show(
-        () => (
-          <Settings
-            setWalletOption={this.setWalletOption}
-            setServerOption={this.setServerOption}
-            setCurrencyOption={this.setCurrencyOption}
-            setLanguageOption={this.setLanguageOption}
-            setSendAllOption={this.setSendAllOption}
-            setDonationOption={this.setDonationOption}
-            setPrivacyOption={this.setPrivacyOption}
-            setModeOption={this.setModeOption}
-            setSecurityOption={this.setSecurityOption}
-            setSelectServerOption={this.setSelectServerOption}
-            setRescanMenuOption={this.setRescanMenuOption}
-            setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
-          />
-        ),
-        { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
-      ).promise;
     } else if (item === MenuItemEnum.Info) {
       return magicModal.show(() => <Info />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.SyncReport) {
@@ -1884,6 +1864,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     return (
       <ContextAppLoadedProvider value={context}>
         <GestureHandlerRootView>
+          <Snackbars
+            snackbars={snackbars}
+            removeFirstSnackbar={this.removeFirstSnackbar}
+            translate={translate}
+          />
           <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnums.Home}>
             <Drawer.Screen name={RouteEnums.Home}>
               {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {
@@ -1892,12 +1877,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 });
                 return (
                 <>
-                  <Snackbars
-                    snackbars={snackbars}
-                    removeFirstSnackbar={this.removeFirstSnackbar}
-                    translate={translate}
-                  />
-
                   {mode === ModeEnum.advanced ||
                   (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
                   (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
@@ -2001,6 +1980,27 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                       )}
                     </>
                   )}
+                </>
+              );}}
+            </Drawer.Screen>
+            <Drawer.Screen name={RouteEnums.Settings}>
+              {() => {
+                return (
+                <>
+                  <Settings
+                    setWalletOption={this.setWalletOption}
+                    setServerOption={this.setServerOption}
+                    setCurrencyOption={this.setCurrencyOption}
+                    setLanguageOption={this.setLanguageOption}
+                    setSendAllOption={this.setSendAllOption}
+                    setDonationOption={this.setDonationOption}
+                    setPrivacyOption={this.setPrivacyOption}
+                    setModeOption={this.setModeOption}
+                    setSecurityOption={this.setSecurityOption}
+                    setSelectServerOption={this.setSelectServerOption}
+                    setRescanMenuOption={this.setRescanMenuOption}
+                    setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
+                  />
                 </>
               );}}
             </Drawer.Screen>

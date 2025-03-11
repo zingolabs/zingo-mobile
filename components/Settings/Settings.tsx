@@ -41,14 +41,13 @@ import {
   WalletOptionEnum,
   ButtonTypeEnum,
   GlobalConst,
+  RouteEnums,
 } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
 import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfo';
-import { useMagicModal } from 'react-native-magic-modal';
-import Snackbars from '../Components/Snackbars';
 
 type SettingsProps = {
   setWalletOption: (walletOption: string, value: string) => Promise<void>;
@@ -107,8 +106,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     rescanMenu: rescanMenuContext,
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     readOnly,
-    snackbars,
-    removeFirstSnackbar,
+    navigationHome,
   } = context;
 
   const memosArray = translate('settings.memos');
@@ -167,7 +165,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }
 
   const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(languageContext);
 
@@ -207,7 +204,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [listIcon, setListIcon] = useState<IconDefinition>(farCircle);
   const [customIcon, setCustomIcon] = useState<IconDefinition>(farCircle);
   const [offlineIcon, setOfflineIcon] = useState<IconDefinition>(farCircle);
-  const [disabled, setDisabled] = useState<boolean>();
+  const [disabled, setDisabled] = useState<boolean>(false);
   const [hasRecoveryWalletInfoSaved, setHasRecoveryWalletInfoSaved] = useState<boolean>(false);
   const [storageRecoveryWalletInfo, setStorageRecoveryWalletInfo] = useState<string>('');
 
@@ -461,8 +458,16 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
 
     setTimeout(() => {
-      hide();
+      navigateToHome();
     }, ms);
+  };
+
+  const navigateToHome = () => {
+    if (navigationHome) {
+      navigationHome.navigate(RouteEnums.Home);
+    } else {
+      console.log('Error navigation Home');
+    }
   };
 
   const optionsRadio = (
@@ -516,7 +521,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           minHeight: 48,
         }}>
         <BouncyCheckbox
-          disabled={false}
+          disabled={disabled}
           disableText
           isChecked={value}
           useBuiltInState={false}
@@ -551,12 +556,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         backgroundColor: colors.background,
       }}
     >
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        translate={translate}
-      />
-
       <View
         style={{
           flex: 1,
@@ -568,7 +567,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={navigateToHome}
         />
         <ScrollView
           keyboardShouldPersistTaps="handled"

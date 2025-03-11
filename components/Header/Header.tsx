@@ -11,6 +11,7 @@ import {
   //faXmark,
   faWifi,
   faChevronLeft,
+  faGears,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
@@ -854,10 +855,38 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             position: 'absolute',
             right: 0,
           }}>
-          <Image
-            source={require('../../assets/img/logobig-zingo.png')}
-            style={{ width: 38, height: 38, resizeMode: 'contain', borderRadius: 10 }}
-          />
+          {!noDrawMenu ? (
+            <TouchableOpacity
+              style={{ marginRight: 5 }}
+              testID="header.drawmenu"
+              onPress={async () => {
+                const resultBio = security.settingsScreen ? await simpleBiometrics({ translate: translate }) : true;
+                // can be:
+                // - true      -> the user do pass the authentication
+                // - false     -> the user do NOT pass the authentication
+                // - undefined -> no biometric authentication available -> Passcode.
+                //console.log('BIOMETRIC --------> ', resultBio);
+                if (resultBio === false) {
+                  // snack with Error & closing the menu.
+                  if (addLastSnackbar) {
+                    addLastSnackbar({ message: translate('biometrics-error') as string });
+                  }
+                } else {
+                  if (navigationHome) {
+                    navigationHome.navigate(RouteEnums.Settings);
+                  } else {
+                    console.log('Error navigation Home');
+                  }
+                }
+            }}>
+              <FontAwesomeIcon icon={faGears} size={45} color={colors.border} />
+            </TouchableOpacity>
+          ) : (
+            <Image
+              source={require('../../assets/img/logobig-zingo.png')}
+              style={{ width: 38, height: 38, resizeMode: 'contain', borderRadius: 10 }}
+            />
+          )}
         </View>
       </View>
       <View>
