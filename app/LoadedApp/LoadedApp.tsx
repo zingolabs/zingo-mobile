@@ -14,7 +14,7 @@ import {
 import { MagicModalPortal, magicModal } from 'react-native-magic-modal';
 import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft, faComments } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
@@ -86,11 +86,11 @@ import History from '../../components/History';
 import Send from '../../components/Send';
 import Receive from '../../components/Receive';
 import Settings from '../../components/Settings';
-import { MessagesAll } from '../../components/Messages';
 import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
+import MessageList from '../../components/Messages/components/MessageList';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -1143,10 +1143,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     } else if (item === MenuItemEnum.Info) {
       return magicModal.show(() => <Info />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.SyncReport) {
-      return magicModal.show(() => <SyncReport />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
+      return this.setSyncReportModalShow();
     } else if (item === MenuItemEnum.FundPools) {
-      return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
-        .promise;
+      return this.setPoolsModalShow();
     } else if (item === MenuItemEnum.Insight) {
       return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
         .promise;
@@ -1291,17 +1290,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setShowSwipeableIcons(false);
       await sendEmail(this.state.translate, this.state.info.zingolib);
       this.setShowSwipeableIcons(true);
-    } else if (item === MenuItemEnum.Chats) {
-      return magicModal.show(
-        () => (
-          <MessagesAll
-            setPrivacyOption={this.setPrivacyOption}
-            setScrollToBottom={this.setScrollToBottom}
-            scrollToBottom={this.state.scrollToBottom}
-          />
-        ),
-        { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
-      ).promise;
     }
   };
 
@@ -1845,6 +1833,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         }
       } else if (route.name === translate('loadedapp.receive-menu')) {
         iconName = faDownload;
+      } else if (route.name === translate('loadedapp.messages-menu')) {
+        iconName = faComments;
       } else {
         iconName = faCog;
       }
@@ -1951,6 +1941,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                           <Receive
                             toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
                             alone={false /* receive */}
+                          />
+                        )}
+                      </Tab.Screen>
+                      <Tab.Screen name={translate('loadedapp.messages-menu') as string}>
+                        {() => (
+                          <MessageList
+                            toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                            setPrivacyOption={this.setPrivacyOption /* header */}
+                            setScrollToBottom={this.setScrollToBottom /* header & messages */}
+                            scrollToBottom={scrollToBottom /* messages */}
+                            sendTransaction={this.sendTransaction /* messages */}
+                            setServerOption={this.setServerOption /* messages */}
                           />
                         )}
                       </Tab.Screen>

@@ -11,7 +11,7 @@ import {
   //faXmark,
   faWifi,
   faChevronLeft,
-  faGears,
+  faGear,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
@@ -879,7 +879,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   }
                 }
             }}>
-              <FontAwesomeIcon icon={faGears} size={45} color={colors.border} />
+              <FontAwesomeIcon icon={faGear} size={40} color={colors.border} />
             </TouchableOpacity>
           ) : (
             <Image
