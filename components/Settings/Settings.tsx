@@ -165,7 +165,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }
 
   const { colors } = useTheme()  as ThemeType;
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(languageContext);
 
   const [memos, setMemos] = useState<string>(walletSettings.downloadMemos);
@@ -548,10 +547,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
       style={{
-        marginTop: top,
-        marginBottom: bottom,
-        marginRight: right,
-        marginLeft: left,
         flex: 1,
         backgroundColor: colors.background,
       }}
