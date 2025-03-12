@@ -21,7 +21,6 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import Snackbars from '../../Components/Snackbars';
 
 type AbDetailProps = {
   index: number;
@@ -46,7 +45,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   addressBookCurrentAddress,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, addLastSnackbar, addressBook, language, mode, snackbars, removeFirstSnackbar } = context;
+  const { translate, server, addLastSnackbar, addressBook, language, mode } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
@@ -147,12 +146,6 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
     <View
       testID={`addressbookdetail.${index + 1}`}
       style={{ display: 'flex', flexDirection: 'column', borderColor: colors.primary, borderWidth: 1, margin: 10 }}>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        translate={translate}
-      />
-
       <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>{translate('addressbook.label') as string}</RegText>
       <View
         style={{
