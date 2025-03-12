@@ -13,7 +13,6 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
   }
   testID="addressbookdetail.0"
 >
-  <View />
   <Text
     style={
       {
@@ -413,7 +412,6 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
   }
   testID="addressbookdetail.2"
 >
-  <View />
   <Text
     style={
       {
@@ -882,7 +880,6 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
   }
   testID="addressbookdetail.1"
 >
-  <View />
   <Text
     style={
       {

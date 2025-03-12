@@ -660,14 +660,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
 
       this.closeAllModals();
-      if (this.state.navigationHome) {
-        this.state.navigationHome.navigate(RouteEnums.Home, {
-          screen: this.state.translate('loadedapp.send-menu'),
-          initial: false,
-        });
-      } else {
-        console.log('Error navigation Home');
-      }
+      this.state.navigationHome?.navigate(RouteEnums.Home, {
+        screen: this.state.translate('loadedapp.send-menu'),
+        initial: false,
+      });
     });
 
     this.unsubscribeNetInfo = NetInfo.addEventListener(async (state: any) => {
@@ -1278,14 +1274,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.setSendPageState(newSendPageState);
       }
       this.closeAllModals();
-      if (this.state.navigationHome) {
-        this.state.navigationHome.navigate(RouteEnums.Home, {
-          screen: this.state.translate('loadedapp.send-menu'),
-          initial: false,
-        });
-      } else {
-        console.log('Error navigation Home');
-      }
+      this.state.navigationHome?.navigate(RouteEnums.Home, {
+        screen: this.state.translate('loadedapp.send-menu'),
+        initial: false,
+      });
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
       await sendEmail(this.state.translate, this.state.info.zingolib);

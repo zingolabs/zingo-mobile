@@ -106,7 +106,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
 
   const [numVt, setNumVt] = useState<number>(50);
@@ -512,20 +511,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
       style={{
-        marginTop: top,
-        marginBottom: bottom,
-        marginRight: right,
-        marginLeft: left,
         flex: 1,
         backgroundColor: colors.background,
       }}
     >
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        translate={translate}
-      />
-
       <View
         style={{
           flex: 1,

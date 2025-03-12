@@ -353,14 +353,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       }
       await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
       // change to the history screen, just in case.
-      if (navigationHome) {
-        navigationHome.navigate(RouteEnums.Home, {
-          screen: translate('loadedapp.history-menu') as string,
-          initial: false,
-        });
-      } else {
-        console.log('Error navigation Home');
-      }
+      navigationHome?.navigate(RouteEnums.Home, {
+        screen: translate('loadedapp.history-menu') as string,
+        initial: false,
+      });
       // scroll to top in history, just in case.
       if (setScrollToTop) {
         setScrollToTop(true);
@@ -871,11 +867,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     addLastSnackbar({ message: translate('biometrics-error') as string });
                   }
                 } else {
-                  if (navigationHome) {
-                    navigationHome.navigate(RouteEnums.Settings);
-                  } else {
-                    console.log('Error navigation Home');
-                  }
+                  navigationHome?.navigate(RouteEnums.Settings);
                 }
             }}>
               <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />

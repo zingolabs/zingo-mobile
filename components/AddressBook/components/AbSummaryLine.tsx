@@ -160,14 +160,10 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
                   closeAllModals();
-                  if (navigationHome) {
-                    navigationHome.navigate(RouteEnums.Home, {
-                      screen: translate('loadedapp.send-menu'),
-                      initial: false,
-                    });
-                  } else {
-                    console.log('Error navigation Home');
-                  }
+                  navigationHome?.navigate(RouteEnums.Home, {
+                    screen: translate('loadedapp.send-menu'),
+                    initial: false,
+                  });
                 }}>
                 <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />
               </TouchableOpacity>

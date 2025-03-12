@@ -474,6 +474,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (walletSettings.downloadMemos !== memos) {
       if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
+        setDisabled(false);
         return;
       }
       await setWalletOption(WalletOptionEnum.downloadMemos, memos);
@@ -481,6 +482,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (walletSettings.transactionFilterThreshold !== filter) {
       if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
+        setDisabled(false);
         return;
       }
       await setWalletOption(WalletOptionEnum.transactionFilterThreshold, filter);
@@ -532,18 +534,19 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       }
     }
 
+    setDisabled(false);
     setTimeout(() => {
-      navigateToHome();
+      navigateToHome(false);
     }, ms);
   };
 
-  const navigateToHome = () => {
-    if (navigationHome) {
-      // we need to wait before close this screen.
-      if (disabled) {
-        return;
-      }
-      // restore all settings - no save changes
+  const navigateToHome = (reset: boolean) => {
+    // we need to wait before close this screen.
+    if (disabled) {
+      return;
+    }
+    if (reset) {
+      // reset all settings - no save changes
       setMode(modeContext);
       setCurrency(currencyContext);
       setLanguage(languageContext);
@@ -564,10 +567,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setRecoveryWalletInfoOnDevice(recoveryWalletInfoOnDeviceContext);
       setMemos(walletSettings.downloadMemos);
       setFilter(walletSettings.transactionFilterThreshold);
-      navigationHome.navigate(RouteEnums.Home);
-    } else {
-      console.log('Error navigation Home');
     }
+    navigationHome?.navigate(RouteEnums.Home);
   };
 
   const optionsRadio = (
@@ -663,7 +664,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={navigateToHome}
+          closeScreen={() => navigateToHome(true)}
         />
         <ScrollView
           keyboardShouldPersistTaps="handled"

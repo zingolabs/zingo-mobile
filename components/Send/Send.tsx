@@ -714,14 +714,10 @@ const Send: React.FunctionComponent<SendProps> = ({
         // Clear the fields
         clearState();
 
-        if (navigationHome) {
-          navigationHome.navigate(RouteEnums.Home, {
-            screen: translate('loadedapp.history-menu') as string,
-            initial: false,
-          });
-        } else {
-          console.log('Error navigation Home');
-        }
+        navigationHome?.navigate(RouteEnums.Home, {
+          screen: translate('loadedapp.history-menu') as string,
+          initial: false,
+        });
 
         // scroll to top in history, just in case.
         setScrollToTop(true);
@@ -777,14 +773,10 @@ const Send: React.FunctionComponent<SendProps> = ({
             // Clear the fields
             clearState();
 
-            if (navigationHome) {
-              navigationHome.navigate(RouteEnums.Home, {
-                screen: translate('loadedapp.history-menu') as string,
-                initial: false,
-              });
-            } else {
-              console.log('Error navigation Home');
-            }
+            navigationHome?.navigate(RouteEnums.Home, {
+              screen: translate('loadedapp.history-menu') as string,
+              initial: false,
+            });
 
             // scroll to top in history, just in case.
             setScrollToTop(true);

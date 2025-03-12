@@ -190,14 +190,10 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               sendPageState.toaddr.to = address;
               setSendPageState(sendPageState);
               closeAllModals();
-              if (navigationHome) {
-                navigationHome.navigate(RouteEnums.Home, {
-                  screen: translate('loadedapp.send-menu'),
-                  initial: false,
-                });
-              } else {
-                console.log('Error navigation Home');
-              }
+              navigationHome?.navigate(RouteEnums.Home, {
+                screen: translate('loadedapp.send-menu'),
+                initial: false,
+              });
             }}>
             <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faPaperPlane} color={colors.primary} />
           </TouchableOpacity>
