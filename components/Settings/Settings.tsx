@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -203,6 +203,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [customIcon, setCustomIcon] = useState<IconDefinition>(farCircle);
   const [offlineIcon, setOfflineIcon] = useState<IconDefinition>(farCircle);
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [disabledButton, setDisabledButton] = useState<boolean>(false);
   const [hasRecoveryWalletInfoSaved, setHasRecoveryWalletInfoSaved] = useState<boolean>(false);
   const [storageRecoveryWalletInfo, setStorageRecoveryWalletInfo] = useState<string>('');
 
@@ -215,7 +216,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     })();
   }, [translate]);
 
-  useEffect(() => {
+  const setServer = () => {
     if (selectServerContext === SelectServerEnum.auto) {
       setAutoIcon(faDotCircle);
       setAutoServerUri(serverContext.uri);
@@ -243,6 +244,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setAutoServerUri(serverUris(translate)[0].uri);
       setAutoServerChainName(serverUris(translate)[0].chainName);
     }
+  };
+
+  useEffect(() => {
+    setServer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // only the first time
 
@@ -257,7 +262,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setItemsPicker(items);
   }, [translate]);
 
-  const securityObject: () => SecurityType = () => {
+  const securityObject: () => SecurityType = useCallback(() => {
     return {
       startApp,
       foregroundApp,
@@ -268,7 +273,79 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       changeWalletScreen,
       restoreWalletBackupScreen,
     };
-  };
+  }, [changeWalletScreen, foregroundApp, rescanScreen, restoreWalletBackupScreen, seedUfvkScreen, sendConfirm, settingsScreen, startApp]);
+
+  useEffect(() => {
+    let serverUriParsed = '';
+    let chainNameParsed = '';
+    if (selectServer === SelectServerEnum.auto) {
+      serverUriParsed = autoServerUri;
+      chainNameParsed = autoServerChainName;
+    } else if (selectServer === SelectServerEnum.list) {
+      serverUriParsed = listServerUri;
+      chainNameParsed = listServerChainName;
+    } else if (selectServer === SelectServerEnum.custom) {
+      serverUriParsed = customServerUri;
+      chainNameParsed = customServerChainName;
+    } else if (selectServer === SelectServerEnum.offline) {
+      serverUriParsed = '';
+      chainNameParsed = ChainNameEnum.mainChainName;
+    }
+    if (
+      walletSettings.downloadMemos === memos &&
+      walletSettings.transactionFilterThreshold === filter &&
+      serverContext.uri === serverUriParsed &&
+      serverContext.chainName === chainNameParsed &&
+      currencyContext === currency &&
+      languageContext === language &&
+      sendAllContext === sendAll &&
+      donationContext === donation &&
+      privacyContext === privacy &&
+      modeContext === mode &&
+      isEqual(securityContext, securityObject()) &&
+      selectServerContext === selectServer &&
+      rescanMenuContext === rescanMenu &&
+      recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice
+    ) {
+      setDisabledButton(true);
+    } else {
+      setDisabledButton(false);
+    }
+
+  }, [
+    autoServerChainName,
+    autoServerUri,
+    currency,
+    currencyContext,
+    customServerChainName,
+    customServerUri,
+    donation,
+    donationContext,
+    filter,
+    language,
+    languageContext,
+    listServerChainName,
+    listServerUri,
+    memos,
+    mode,
+    modeContext,
+    privacy,
+    privacyContext,
+    recoveryWalletInfoOnDevice,
+    recoveryWalletInfoOnDeviceContext,
+    rescanMenu,
+    rescanMenuContext,
+    securityContext,
+    selectServer,
+    selectServerContext,
+    sendAll,
+    sendAllContext,
+    serverContext.chainName,
+    serverContext.uri,
+    walletSettings.downloadMemos,
+    walletSettings.transactionFilterThreshold,
+    securityObject,
+  ]);
 
   const saveSettings = async () => {
     let serverUriParsed = '';
@@ -462,6 +539,31 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const navigateToHome = () => {
     if (navigationHome) {
+      // we need to wait before close this screen.
+      if (disabled) {
+        return;
+      }
+      // restore all settings - no save changes
+      setMode(modeContext);
+      setCurrency(currencyContext);
+      setLanguage(languageContext);
+      setDonation(donationContext);
+      setPrivacy(privacyContext);
+      setSendAll(sendAllContext);
+      setRescanMenu(rescanMenuContext);
+      setServer();
+      setSelectServer(selectServerContext);
+      setStartApp(securityContext.startApp);
+      setForegroundApp(securityContext.foregroundApp);
+      setSendConfirm(securityContext.sendConfirm);
+      setSeedUfvkScreen(securityContext.seedUfvkScreen);
+      setRescanScreen(securityContext.rescanScreen);
+      setSettingsScreen(securityContext.settingsScreen);
+      setChangeWalletScreen(securityContext.changeWalletScreen);
+      setRestoreWalletBackupScreen(securityContext.restoreWalletBackupScreen);
+      setRecoveryWalletInfoOnDevice(recoveryWalletInfoOnDeviceContext);
+      setMemos(walletSettings.downloadMemos);
+      setFilter(walletSettings.transactionFilterThreshold);
       navigationHome.navigate(RouteEnums.Home);
     } else {
       console.log('Error navigation Home');
@@ -1044,7 +1146,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           }}>
           <Button
             testID="settings.button.save"
-            disabled={disabled}
+            disabled={disabled || disabledButton}
             type={ButtonTypeEnum.Primary}
             title={translate('settings.save') as string}
             onPress={() => {

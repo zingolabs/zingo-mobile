@@ -965,7 +965,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
             {
               "busy": undefined,
               "checked": undefined,
-              "disabled": false,
+              "disabled": true,
               "expanded": undefined,
               "selected": undefined,
             }
@@ -980,7 +980,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
           }
           accessible={true}
           collapsable={false}
-          focusable={true}
+          focusable={false}
           onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
@@ -991,8 +991,8 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#18bd18",
-              "borderColor": "#18bd18",
+              "backgroundColor": "#5a8c5a",
+              "borderColor": "#5a8c5a",
               "borderRadius": 10,
               "borderWidth": 2,
               "justifyContent": "center",
