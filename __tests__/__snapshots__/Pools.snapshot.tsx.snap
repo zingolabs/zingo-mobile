@@ -94,7 +94,7 @@ exports[`Component Pools - test Pools - snapshot 1`] = `
                   "flexDirection": "row",
                   "justifyContent": "center",
                   "margin": 0,
-                  "marginRight": 5,
+                  "marginHorizontal": 2.5,
                   "minHeight": 25,
                   "minWidth": 25,
                   "padding": 0,
