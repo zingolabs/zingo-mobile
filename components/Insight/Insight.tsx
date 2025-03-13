@@ -229,7 +229,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
 
   const renderExternalLabel = useCallback(
     (item: pieDataItem | undefined) => (
-      <SvgText fontSize={18} fill={item?.color}>
+      <SvgText fontSize={12} fill={item?.color}>
         {item?.value}
       </SvgText>
     ),
@@ -348,23 +348,22 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
             {loading ? (
               <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 100 }} />
             ) : (
-              <View style={{ width: '100%', alignItems: 'center', paddingVertical: 20 }}>
+              <View style={{ width: '100%', alignItems: 'center', paddingVertical: 10 }}>
                 <PieChart
                   showExternalLabels
                   labelLineConfig={{
-                    thickness: 2,
+                    thickness: 1,
                     avoidOverlappingOfLabels: true,
                   }}
                   strokeWidth={4}
                   donut
                   innerCircleColor={colors.background}
-                  innerCircleBorderWidth={4}
+                  innerCircleBorderWidth={0}
                   innerCircleBorderColor={colors.background}
                   strokeColor={colors.background}
                   showValuesAsTooltipText={true}
                   showText
                   externalLabelComponent={renderExternalLabel}
-                  textSize={18}
                   textBackgroundColor={colors.background}
                   data={pieAmounts}
                   innerRadius={dimensions.width * 0.09}
