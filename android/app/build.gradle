@@ -110,7 +110,7 @@ android {
         applicationId 'org.ZingoLabs.Zingo' // Real
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 221 // Real
+        versionCode 222 // Real
         versionName "zingo-1.11.1" // Real
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
