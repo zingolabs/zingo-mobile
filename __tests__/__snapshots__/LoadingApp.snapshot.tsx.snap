@@ -1,8 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
-[
-  <View />,
+<View
+  style={
+    [
+      {
+        "flex": 1,
+      },
+      undefined,
+    ]
+  }
+>
+  <View />
   <View
     style={
       {
@@ -124,6 +133,6 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
         </Text>
       </View>
     </View>
-  </View>,
-]
+  </View>
+</View>
 `;

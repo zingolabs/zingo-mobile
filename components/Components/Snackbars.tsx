@@ -35,7 +35,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
       removeFirstSnackbar();
       setDuration(4000);
     }, 0);
-  }, [removeFirstSnackbar]);
+  }, [removeFirstSnackbar, snackbars]);
 
   // short  - 1 sec
   // long   - 4 sec
@@ -85,9 +85,8 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     handleSnackbarClose,
     snackbars,
     snackbars.length,
-    snacking.current,
-    snackingMessage.current,
     translate,
+    duration,
   ]);
 
   useEffect(() => {
@@ -99,7 +98,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
       }, Platform.OS === GlobalConst.platformOSandroid ? duration : duration + 500);
       return () => clearTimeout(timer);
     }
-  }, [duration, handleSnackbarClose, snackbars, snackbars.length, snacking.current]);
+  }, [duration, handleSnackbarClose, snackbars, snackbars.length]);
 
   useEffect(() => {
     return () => {

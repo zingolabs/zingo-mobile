@@ -1,8 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
-[
-  <View />,
+<View
+  style={
+    [
+      {
+        "flex": 1,
+      },
+      undefined,
+    ]
+  }
+>
+  <View />
   <View
     style={
       {
@@ -18,7 +27,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
       color="#18bd18"
       size="large"
     />
-  </View>,
+  </View>
   <View
     onLayout={[Function]}
     style={
@@ -1039,7 +1048,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
         </View>
       </View>
     </View>
-  </View>,
-  <View />,
-]
+  </View>
+  <View />
+</View>
 `;
