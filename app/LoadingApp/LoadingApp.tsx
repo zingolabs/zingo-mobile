@@ -1315,7 +1315,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     return (
       <ToastProvider>
         <ContextAppLoadingProvider value={context}>
-          <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
+          <Snackbars
+            snackbars={snackbars}
+            removeFirstSnackbar={this.removeFirstSnackbar}
+            translate={translate}
+          />
 
           {screen === 0 && (
             <Launching

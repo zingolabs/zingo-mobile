@@ -132,6 +132,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           removeFirstSnackbar={removeFirstSnackbar}
           translate={translate}
         />
+
         <View
           style={{
             flex: 1,

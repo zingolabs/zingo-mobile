@@ -1,11 +1,10 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react';
-import { Platform, View } from 'react-native';
-import Snackbar from 'react-native-snackbar';
-import { GlobalConst, SnackbarType } from '../../app/AppState';
+import { View } from 'react-native';
+import { SnackbarType } from '../../app/AppState';
 import { SnackbarDurationEnum, TranslateType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import { useTheme } from '@react-navigation/native';
-import { ToastService } from 'react-native-toastier';
+import { useToast } from 'react-native-toastier';
 
 type SnackbarProps = {
   snackbars: SnackbarType[];
@@ -19,13 +18,11 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
   const snacking = useRef<boolean>(false);
   const snackingMessage = useRef<string>(undefined);
   const [duration, setDuration] = useState<number>(4000);
+  const toast = useToast();
 
   const handleSnackbarClose = useCallback(() => {
     if (snackbars[0]?.message !== snackingMessage.current) {
       return;
-    }
-    if (Platform.OS === GlobalConst.platformOSandroid) {
-      Snackbar.dismiss();
     }
     // we need some time between messages
     setTimeout(() => {
@@ -53,30 +50,14 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
           ? 1000
           : 4000,
       );
-      if (Platform.OS === GlobalConst.platformOSios) {
-        console.log('show snackbar', currentSnackbar);
-        ToastService.show({
-          message: currentSnackbar.message,
-          messageStyle: { color: colors.money },
-          contentContainerStyle: { flex: 0.95, backgroundColor: colors.secondaryDisabled, marginBottom: 50 },
-          animation: 'zoomIn',
-          duration,
-        });
-      } else {
-        Snackbar.show({
-          text: currentSnackbar.message,
-          numberOfLines: 3,
-          duration: Snackbar.LENGTH_INDEFINITE,
-          marginBottom: 120,
-          backgroundColor: colors.secondaryDisabled,
-          textColor: colors.money,
-          action: {
-            text: translate('close') as string,
-            textColor: colors.primary,
-            onPress: () => handleSnackbarClose(),
-          },
-        });
-      }
+      console.log('show snackbar', currentSnackbar);
+      toast.show({
+        message: currentSnackbar.message,
+        messageStyle: { color: colors.money, fontSize: 17, fontWeight: 'bold' },
+        contentContainerStyle: { flex: 0.95, backgroundColor: colors.secondaryDisabled, marginBottom: 100, padding: 15, paddingRight: 0 },
+        animation: 'zoomIn',
+        duration,
+      });
     }
   }, [
     colors.money,
@@ -87,6 +68,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     snackbars.length,
     translate,
     duration,
+    toast,
   ]);
 
   useEffect(() => {
@@ -95,17 +77,16 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
       // closing after duration, just in case.
       const timer = setTimeout(() => {
         handleSnackbarClose();
-      }, Platform.OS === GlobalConst.platformOSandroid ? duration : duration + 500);
+      }, duration + 500);
       return () => clearTimeout(timer);
     }
   }, [duration, handleSnackbarClose, snackbars, snackbars.length]);
 
   useEffect(() => {
+    console.log('MOUNTING - snackbar');
     return () => {
       setTimeout(() => {
-        if (Platform.OS === GlobalConst.platformOSandroid) {
-          Snackbar.dismiss();
-        }
+        console.log('CLOSING - waiting for some message');
       }, 2000);
     };
   }, []);
