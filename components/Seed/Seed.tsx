@@ -34,7 +34,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type TextsType = {
   new: string[];
@@ -101,6 +101,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [seedPhrase, setSeedPhrase] = useState<string>('');
   const [birthdayNumber, setBirthdayNumber] = useState<string>('');
@@ -188,6 +189,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
   const onClickCancelHide = () => {
     onClickCancel();
+    clear();
     // when this screen is open from LoadingApp (new wallet)
     // is using the standard modal from react-native
     if (action !== SeedActionEnum.new) {
@@ -197,6 +199,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
   const onClickOKHide = (seedPhraseParm: string, birthdayNumberParm: number) => {
     onClickOK(seedPhraseParm, birthdayNumberParm);
+    clear();
     // when this screen is open from LoadingApp (new wallet)
     // is using the standard modal from react-native
     if (action !== SeedActionEnum.new) {

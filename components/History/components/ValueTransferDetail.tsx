@@ -36,7 +36,7 @@ import { faTriangleExclamation, faChevronDown, faChevronUp } from '@fortawesome/
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../../Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 // this is for https. (primary)
 //import { faLock } from '@fortawesome/free-solid-svg-icons';
 
@@ -74,6 +74,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(vt);
   const [valueTransferIndex, setValueTransferIndex] = useState<number>(index);
@@ -186,7 +187,10 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
           noDrawMenu={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
         {showNavigator && (
           <View

@@ -29,7 +29,7 @@ import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../app/utils';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type AddressBookProps = {
   setAddressBook: (ab: AddressBookFileClass[]) => void;
@@ -50,6 +50,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [numAb, setNumAb] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
@@ -175,7 +176,10 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
         <ScrollView
           ref={scrollViewRef}

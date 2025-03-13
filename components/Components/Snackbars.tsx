@@ -110,7 +110,6 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     console.log('MOUNTING - snackbar');
     return () => {
       setTimeout(() => {
-        toast.clear();
         console.log('CLOSING - waiting for some message');
       }, 2000);
     };

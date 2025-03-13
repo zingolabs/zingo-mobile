@@ -9,6 +9,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useMagicModal } from 'react-native-magic-modal';
+import { useToast } from 'react-native-toastier';
 
 type MessagesAddressProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -36,6 +37,7 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
   const { language } = context;
   const { hide } = useMagicModal();
   moment.locale(language);
+  const { clear } = useToast();
 
   return (
     <MessageList
@@ -45,7 +47,10 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
       address={address}
       sendTransaction={sendTransaction}
       setServerOption={setServerOption}
-      closeModal={hide}
+      closeModal={() => {
+        clear();
+        hide();
+      }}
     />
   );
 };

@@ -8,6 +8,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useMagicModal } from 'react-native-magic-modal';
+import { useToast } from 'react-native-toastier';
 
 type MessagesAllProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -24,13 +25,17 @@ const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
   const { language } = context;
   const { hide } = useMagicModal();
   moment.locale(language);
+  const { clear } = useToast();
 
   return (
     <MessageList
       setPrivacyOption={setPrivacyOption}
       setScrollToBottom={setScrollToBottom}
       scrollToBottom={scrollToBottom}
-      closeModal={hide}
+      closeModal={() => {
+        clear();
+        hide();
+      }}
     />
   );
 };

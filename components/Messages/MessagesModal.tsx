@@ -7,6 +7,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { ContextAppLoaded } from '../../app/context';
 import { useMagicModal } from 'react-native-magic-modal';
+import { useToast } from 'react-native-toastier';
 
 type MessagesModalProps = {
   // side menu
@@ -42,6 +43,7 @@ const MessagesModal: React.FunctionComponent<MessagesModalProps> = ({
   const { language } = context;
   const { hide } = useMagicModal();
   moment.locale(language);
+  const { clear } = useToast();
 
   return (
     <ContactList
@@ -52,7 +54,10 @@ const MessagesModal: React.FunctionComponent<MessagesModalProps> = ({
       scrollToBottom={scrollToBottom}
       sendTransaction={sendTransaction}
       setServerOption={setServerOption}
-      closeModal={hide}
+      closeModal={() => {
+        clear();
+        hide();
+      }}
       noDrawMenu={true}
     />
   );
