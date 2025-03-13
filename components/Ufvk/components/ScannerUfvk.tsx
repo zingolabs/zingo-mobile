@@ -14,6 +14,7 @@ import { ThemeType } from '../../../app/types';
 import { Code } from 'react-native-vision-camera';
 import { View } from 'react-native';
 import Snackbars from '../../Components/Snackbars';
+import { ToastProvider } from 'react-native-toastier';
 
 type ScannerUfvkProps = {
   setUfvkText: (k: string) => void;
@@ -38,31 +39,33 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, c
   };
 
   return (
-    <View
-      style={{
-        marginTop: top,
-        marginBottom: bottom,
-        marginRight: right,
-        marginLeft: left,
-        flex: 1,
-        backgroundColor: colors.background,
-      }}>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        translate={translate}
-      />
+    <ToastProvider>
+      <View
+        style={{
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
+          backgroundColor: colors.background,
+        }}>
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
 
-      <Header
-        title={translate('scanner.text') as string}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noPrivacy={true}
-        closeScreen={closeModal}
-      />
-      <Scanner onRead={onRead} />
-    </View>
+        <Header
+          title={translate('scanner.text') as string}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          closeScreen={closeModal}
+        />
+        <Scanner onRead={onRead} />
+      </View>
+    </ToastProvider>
   );
 };
 

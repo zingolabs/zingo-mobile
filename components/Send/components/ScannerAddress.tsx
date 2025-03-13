@@ -18,6 +18,7 @@ import { Code } from 'react-native-vision-camera';
 import { useMagicModal } from 'react-native-magic-modal';
 import { View } from 'react-native';
 import Snackbars from '../../Components/Snackbars';
+import { ToastProvider } from 'react-native-toastier';
 
 type ScannerAddressProps = {
   setAddress: (address: string) => void;
@@ -60,31 +61,33 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
   };
 
   return (
-    <View
-      style={{
-        marginTop: top,
-        marginBottom: bottom,
-        marginRight: right,
-        marginLeft: left,
-        flex: 1,
-        backgroundColor: colors.background,
-      }}>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        translate={translate}
-      />
+    <ToastProvider>
+      <View
+        style={{
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
+          backgroundColor: colors.background,
+        }}>
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
 
-      <Header
-        title={translate('scanner.scanaddress') as string}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noPrivacy={true}
-        closeScreen={hide}
-      />
-      <Scanner onRead={onRead} />
-    </View>
+        <Header
+          title={translate('scanner.scanaddress') as string}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          closeScreen={hide}
+        />
+        <Scanner onRead={onRead} />
+      </View>
+    </ToastProvider>
   );
 };
 

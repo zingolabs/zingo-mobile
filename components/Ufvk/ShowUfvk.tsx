@@ -18,6 +18,7 @@ import RegText from '../Components/RegText';
 import { ButtonTypeEnum, ChainNameEnum, ModeEnum, UfvkActionEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
+import { ToastProvider } from 'react-native-toastier';
 
 type TextsType = {
   new: string[];
@@ -93,85 +94,87 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
   };
 
   return (
-    <View
-      style={{
-        marginTop: top,
-        marginBottom: bottom,
-        marginRight: right,
-        marginLeft: left,
-        flex: 1,
-        backgroundColor: colors.background,
-      }}>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        translate={translate}
-      />
-
-      <Header
-        title={translate('ufvk.viewkey') + ' (' + translate(`seed.${action}`) + ')'}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        setPrivacyOption={setPrivacyOption}
-        addLastSnackbar={addLastSnackbar}
-        closeScreen={onClickCancelHide}
-      />
-      <ScrollView
-        style={{ height: '80%', maxHeight: '80%' }}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
-        }}>
-        <RegText style={{ marginTop: 0, padding: 20, textAlign: 'center', fontWeight: '900' }}>
-          {action === UfvkActionEnum.backup || action === UfvkActionEnum.change || action === UfvkActionEnum.server
-            ? (translate(`ufvk.text-readonly-${action}`) as string)
-            : (translate('ufvk.text-readonly') as string)}
-        </RegText>
-
-        <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
-          {!!wallet.ufvk && (
-            <SingleAddress address={wallet.ufvk} ufvk={true} index={0} total={1} prev={() => null} next={() => null} />
-          )}
-          {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}
-        </View>
-
-        <View style={{ marginBottom: 30 }} />
-      </ScrollView>
+    <ToastProvider>
       <View
         style={{
-          flexGrow: 1,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
+          backgroundColor: colors.background,
         }}>
-        <Button
-          type={mode === ModeEnum.basic ? ButtonTypeEnum.Secondary : ButtonTypeEnum.Primary}
-          style={{
-            backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
-          }}
-          title={
-            mode === ModeEnum.basic
-              ? (translate('cancel') as string)
-              : !!texts && !!texts[action]
-              ? texts[action][times]
-              : ''
-          }
-          onPress={() => {
-            if (!wallet.ufvk) {
-              return;
-            }
-            if (times === 0) {
-              onClickOKHide();
-            } else if (times === 1) {
-              onPressOK();
-            }
-          }}
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
         />
+
+        <Header
+          title={translate('ufvk.viewkey') + ' (' + translate(`seed.${action}`) + ')'}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar}
+          closeScreen={onClickCancelHide}
+        />
+        <ScrollView
+          style={{ height: '80%', maxHeight: '80%' }}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
+          }}>
+          <RegText style={{ marginTop: 0, padding: 20, textAlign: 'center', fontWeight: '900' }}>
+            {action === UfvkActionEnum.backup || action === UfvkActionEnum.change || action === UfvkActionEnum.server
+              ? (translate(`ufvk.text-readonly-${action}`) as string)
+              : (translate('ufvk.text-readonly') as string)}
+          </RegText>
+
+          <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
+            {!!wallet.ufvk && (
+              <SingleAddress address={wallet.ufvk} ufvk={true} index={0} total={1} prev={() => null} next={() => null} />
+            )}
+            {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}
+          </View>
+
+          <View style={{ marginBottom: 30 }} />
+        </ScrollView>
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 5,
+          }}>
+          <Button
+            type={mode === ModeEnum.basic ? ButtonTypeEnum.Secondary : ButtonTypeEnum.Primary}
+            style={{
+              backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
+            }}
+            title={
+              mode === ModeEnum.basic
+                ? (translate('cancel') as string)
+                : !!texts && !!texts[action]
+                ? texts[action][times]
+                : ''
+            }
+            onPress={() => {
+              if (!wallet.ufvk) {
+                return;
+              }
+              if (times === 0) {
+                onClickOKHide();
+              } else if (times === 1) {
+                onPressOK();
+              }
+            }}
+          />
+        </View>
       </View>
-    </View>
+    </ToastProvider>
   );
 };
 

@@ -91,6 +91,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import MessageList from '../../components/Messages/components/MessageList';
+import { ToastProvider } from 'react-native-toastier';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -1844,164 +1845,166 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     //console.log('ba', totalBalance);
 
     return (
-      <ContextAppLoadedProvider value={context}>
-        <GestureHandlerRootView>
-          <Snackbars
-            snackbars={snackbars}
-            removeFirstSnackbar={this.removeFirstSnackbar}
-            translate={translate}
-          />
-          <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnums.Home}>
-            <Drawer.Screen name={RouteEnums.Home}>
-              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {
-                useEffect(() => {
-                  this.setNavigation(navigation);
-                });
-                return (
-                <>
-                  {mode === ModeEnum.advanced ||
-                  (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
-                  (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
-                    <Tab.Navigator
-                      detachInactiveScreens={true}
-                      initialRouteName={translate('loadedapp.history-menu') as string}
-                      screenOptions={({ route }) => ({
-                        tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-                        tabBarIconStyle: {
-                          alignSelf: 'center',
-                          marginBottom: 2,
-                        },
-                        tabBarLabelPosition: 'below-icon',
-                        tabBarLabelStyle: {
-                          alignSelf: 'center',
-                          fontSize: 14,
-                        },
-                        tabBarItemStyle: {
-                          height: 60,
-                        },
-                        tabBarActiveTintColor: colors.background,
-                        tabBarActiveBackgroundColor: colors.primaryDisabled,
-                        tabBarInactiveTintColor: colors.money,
-                        tabBarInactiveBackgroundColor: colors.sideMenuBackground,
-                        tabBarStyle: {
-                          borderTopWidth: 1,
-                          height: 60,
-                        },
-                        headerShown: false,
-                        tabBarButton: renderTabPressable(colors),
-                      })}>
-                      <Tab.Screen name={translate('loadedapp.history-menu') as string}>
-                        {() => (
-                          <History
-                            toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
-                            setPrivacyOption={this.setPrivacyOption /* header */}
-                            setShieldingAmount={this.setShieldingAmount /* header */}
-                            setScrollToTop={this.setScrollToTop /* header & history */}
-                            scrollToTop={scrollToTop /* history */}
-                            setScrollToBottom={this.setScrollToBottom /* header & messages */}
-                            scrollToBottom={scrollToBottom /* messages */}
-                            sendTransaction={this.sendTransaction /* messages */}
-                            setServerOption={this.setServerOption /* messages */}
-                          />
+      <ToastProvider>
+        <ContextAppLoadedProvider value={context}>
+          <GestureHandlerRootView>
+            <Snackbars
+              snackbars={snackbars}
+              removeFirstSnackbar={this.removeFirstSnackbar}
+              translate={translate}
+            />
+            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnums.Home}>
+              <Drawer.Screen name={RouteEnums.Home}>
+                {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {
+                  useEffect(() => {
+                    this.setNavigation(navigation);
+                  });
+                  return (
+                  <>
+                    {mode === ModeEnum.advanced ||
+                    (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
+                    (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
+                      <Tab.Navigator
+                        detachInactiveScreens={true}
+                        initialRouteName={translate('loadedapp.history-menu') as string}
+                        screenOptions={({ route }) => ({
+                          tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
+                          tabBarIconStyle: {
+                            alignSelf: 'center',
+                            marginBottom: 2,
+                          },
+                          tabBarLabelPosition: 'below-icon',
+                          tabBarLabelStyle: {
+                            alignSelf: 'center',
+                            fontSize: 14,
+                          },
+                          tabBarItemStyle: {
+                            height: 60,
+                          },
+                          tabBarActiveTintColor: colors.background,
+                          tabBarActiveBackgroundColor: colors.primaryDisabled,
+                          tabBarInactiveTintColor: colors.money,
+                          tabBarInactiveBackgroundColor: colors.sideMenuBackground,
+                          tabBarStyle: {
+                            borderTopWidth: 1,
+                            height: 60,
+                          },
+                          headerShown: false,
+                          tabBarButton: renderTabPressable(colors),
+                        })}>
+                        <Tab.Screen name={translate('loadedapp.history-menu') as string}>
+                          {() => (
+                            <History
+                              toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                              setPrivacyOption={this.setPrivacyOption /* header */}
+                              setShieldingAmount={this.setShieldingAmount /* header */}
+                              setScrollToTop={this.setScrollToTop /* header & history */}
+                              scrollToTop={scrollToTop /* history */}
+                              setScrollToBottom={this.setScrollToBottom /* header & messages */}
+                              scrollToBottom={scrollToBottom /* messages */}
+                              sendTransaction={this.sendTransaction /* messages */}
+                              setServerOption={this.setServerOption /* messages */}
+                            />
+                          )}
+                        </Tab.Screen>
+                        {!readOnly &&
+                          selectServer !== SelectServerEnum.offline &&
+                          (mode === ModeEnum.advanced ||
+                            (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ||
+                            (!!totalBalance &&
+                              totalBalance.orchardBal + totalBalance.privateBal > 0 &&
+                              totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
+                              somePending)) && (
+                            <Tab.Screen name={translate('loadedapp.send-menu') as string}>
+                              {() => (
+                                <Send
+                                  toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                                  setPrivacyOption={this.setPrivacyOption /* header */}
+                                  setShieldingAmount={this.setShieldingAmount /* header */}
+                                  setScrollToTop={this.setScrollToTop /* header & send */}
+                                  setScrollToBottom={this.setScrollToBottom /* header & send */}
+                                  sendTransaction={this.sendTransaction /* send */}
+                                  setServerOption={this.setServerOption /* send */}
+                                  clearToAddr={this.clearToAddr /* send */}
+                                />
+                              )}
+                            </Tab.Screen>
+                          )}
+                        <Tab.Screen name={translate('loadedapp.receive-menu') as string}>
+                          {() => (
+                            <Receive
+                              toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                              alone={false /* receive */}
+                            />
+                          )}
+                        </Tab.Screen>
+                        <Tab.Screen name={translate('loadedapp.messages-menu') as string}>
+                          {() => (
+                            <MessageList
+                              toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                              setPrivacyOption={this.setPrivacyOption /* header */}
+                              setScrollToBottom={this.setScrollToBottom /* header & messages */}
+                              scrollToBottom={scrollToBottom /* messages */}
+                              sendTransaction={this.sendTransaction /* messages */}
+                              setServerOption={this.setServerOption /* messages */}
+                            />
+                          )}
+                        </Tab.Screen>
+                      </Tab.Navigator>
+                    ) : (
+                      <>
+                        {valueTransfersTotal === null || addresses === null || totalBalance === null ? (
+                          <Loading backgroundColor={colors.background} spinColor={colors.primary} />
+                        ) : (
+                          <Tab.Navigator
+                            initialRouteName={translate('loadedapp.history-menu') as string}
+                            screenOptions={{
+                              tabBarStyle: {
+                                display: 'none',
+                              },
+                              headerShown: false,
+                            }}>
+                            <Tab.Screen name={translate('loadedapp.history-menu') as string}>
+                              {() => (
+                                <Receive
+                                  toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                                  alone={true /* receive */}
+                                />
+                              )}
+                            </Tab.Screen>
+                          </Tab.Navigator>
                         )}
-                      </Tab.Screen>
-                      {!readOnly &&
-                        selectServer !== SelectServerEnum.offline &&
-                        (mode === ModeEnum.advanced ||
-                          (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ||
-                          (!!totalBalance &&
-                            totalBalance.orchardBal + totalBalance.privateBal > 0 &&
-                            totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
-                            somePending)) && (
-                          <Tab.Screen name={translate('loadedapp.send-menu') as string}>
-                            {() => (
-                              <Send
-                                toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
-                                setPrivacyOption={this.setPrivacyOption /* header */}
-                                setShieldingAmount={this.setShieldingAmount /* header */}
-                                setScrollToTop={this.setScrollToTop /* header & send */}
-                                setScrollToBottom={this.setScrollToBottom /* header & send */}
-                                sendTransaction={this.sendTransaction /* send */}
-                                setServerOption={this.setServerOption /* send */}
-                                clearToAddr={this.clearToAddr /* send */}
-                              />
-                            )}
-                          </Tab.Screen>
-                        )}
-                      <Tab.Screen name={translate('loadedapp.receive-menu') as string}>
-                        {() => (
-                          <Receive
-                            toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
-                            alone={false /* receive */}
-                          />
-                        )}
-                      </Tab.Screen>
-                      <Tab.Screen name={translate('loadedapp.messages-menu') as string}>
-                        {() => (
-                          <MessageList
-                            toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
-                            setPrivacyOption={this.setPrivacyOption /* header */}
-                            setScrollToBottom={this.setScrollToBottom /* header & messages */}
-                            scrollToBottom={scrollToBottom /* messages */}
-                            sendTransaction={this.sendTransaction /* messages */}
-                            setServerOption={this.setServerOption /* messages */}
-                          />
-                        )}
-                      </Tab.Screen>
-                    </Tab.Navigator>
-                  ) : (
-                    <>
-                      {valueTransfersTotal === null || addresses === null || totalBalance === null ? (
-                        <Loading backgroundColor={colors.background} spinColor={colors.primary} />
-                      ) : (
-                        <Tab.Navigator
-                          initialRouteName={translate('loadedapp.history-menu') as string}
-                          screenOptions={{
-                            tabBarStyle: {
-                              display: 'none',
-                            },
-                            headerShown: false,
-                          }}>
-                          <Tab.Screen name={translate('loadedapp.history-menu') as string}>
-                            {() => (
-                              <Receive
-                                toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
-                                alone={true /* receive */}
-                              />
-                            )}
-                          </Tab.Screen>
-                        </Tab.Navigator>
-                      )}
-                    </>
-                  )}
-                </>
-              );}}
-            </Drawer.Screen>
-            <Drawer.Screen name={RouteEnums.Settings}>
-              {() => {
-                return (
-                <>
-                  <Settings
-                    setWalletOption={this.setWalletOption}
-                    setServerOption={this.setServerOption}
-                    setCurrencyOption={this.setCurrencyOption}
-                    setLanguageOption={this.setLanguageOption}
-                    setSendAllOption={this.setSendAllOption}
-                    setDonationOption={this.setDonationOption}
-                    setPrivacyOption={this.setPrivacyOption}
-                    setModeOption={this.setModeOption}
-                    setSecurityOption={this.setSecurityOption}
-                    setSelectServerOption={this.setSelectServerOption}
-                    setRescanMenuOption={this.setRescanMenuOption}
-                    setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
-                  />
-                </>
-              );}}
-            </Drawer.Screen>
-          </Drawer>
-          <MagicModalPortal />
-        </GestureHandlerRootView>
-      </ContextAppLoadedProvider>
+                      </>
+                    )}
+                  </>
+                );}}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnums.Settings}>
+                {() => {
+                  return (
+                  <>
+                    <Settings
+                      setWalletOption={this.setWalletOption}
+                      setServerOption={this.setServerOption}
+                      setCurrencyOption={this.setCurrencyOption}
+                      setLanguageOption={this.setLanguageOption}
+                      setSendAllOption={this.setSendAllOption}
+                      setDonationOption={this.setDonationOption}
+                      setPrivacyOption={this.setPrivacyOption}
+                      setModeOption={this.setModeOption}
+                      setSecurityOption={this.setSecurityOption}
+                      setSelectServerOption={this.setSelectServerOption}
+                      setRescanMenuOption={this.setRescanMenuOption}
+                      setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
+                    />
+                  </>
+                );}}
+              </Drawer.Screen>
+            </Drawer>
+            <MagicModalPortal />
+          </GestureHandlerRootView>
+        </ContextAppLoadedProvider>
+      </ToastProvider>
     );
   }
 }

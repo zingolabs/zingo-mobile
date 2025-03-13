@@ -36,6 +36,7 @@ import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
 import { RPCParseAddressStatusEnum } from '../../../app/rpc/enums/RPCParseAddressStatusEnum';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../../Components/Snackbars';
+import { ToastProvider } from 'react-native-toastier';
 
 type ConfirmProps = {
   calculatedFee: number;
@@ -272,172 +273,174 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   }, []);
 
   return (
-    <View
-      style={{
-        marginTop: top,
-        marginBottom: bottom,
-        marginRight: right,
-        marginLeft: left,
-        flex: 1,
-        backgroundColor: colors.background,
-      }}>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        translate={translate}
-      />
-
-      <Header
-        title={translate('send.confirm-title') as string}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noPrivacy={true}
-        closeScreen={hide}
-      />
-      <ScrollView
-        showsVerticalScrollIndicator={true}
-        persistentScrollbar={true}
-        indicatorStyle={'white'}
-        testID="send.confirm.scroll-view"
-        style={{ height: '80%', maxHeight: '80%' }}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
+    <ToastProvider>
+      <View
+        style={{
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
+          backgroundColor: colors.background,
         }}>
-        <View
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            margin: 25,
-            padding: 10,
-            borderWidth: 1,
-            borderRadius: 10,
-            borderColor: colors.border,
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
+
+        <Header
+          title={translate('send.confirm-title') as string}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          closeScreen={hide}
+        />
+        <ScrollView
+          showsVerticalScrollIndicator={true}
+          persistentScrollbar={true}
+          indicatorStyle={'white'}
+          testID="send.confirm.scroll-view"
+          style={{ height: '80%', maxHeight: '80%' }}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
           }}>
-          <BoldText style={{ textAlign: 'center', textTransform: 'capitalize' }}>
-            {translate('send.sending-title') as string}
-          </BoldText>
+          <View
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              margin: 25,
+              padding: 10,
+              borderWidth: 1,
+              borderRadius: 10,
+              borderColor: colors.border,
+            }}>
+            <BoldText style={{ textAlign: 'center', textTransform: 'capitalize' }}>
+              {translate('send.sending-title') as string}
+            </BoldText>
 
-          <ZecAmount
-            currencyName={info.currencyName}
-            amtZec={sendingTotal}
-            privacy={false}
-            size={36}
-            smallPrefix={true}
-          />
-          <CurrencyAmount amtZec={sendingTotal} price={zecPrice.zecPrice} currency={currency} privacy={false} />
-        </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <View style={{ margin: 10 }}>
-            <FadeText>{translate('send.confirm-privacy-level') as string}</FadeText>
-            {!privacyLevel ? (
-              <ActivityIndicator
-                size={Platform.OS === GlobalConst.platformOSios ? 'small' : 12}
-                color={colors.primary}
-              />
-            ) : (
-              <RegText>{privacyLevel}</RegText>
-            )}
+            <ZecAmount
+              currencyName={info.currencyName}
+              amtZec={sendingTotal}
+              privacy={false}
+              size={36}
+              smallPrefix={true}
+            />
+            <CurrencyAmount amtZec={sendingTotal} price={zecPrice.zecPrice} currency={currency} privacy={false} />
           </View>
-          <View style={{ margin: 10 }}>
-            <FadeText>{translate('send.fee') as string}</FadeText>
-            <ZecAmount currencyName={info.currencyName} size={18} amtZec={calculatedFee} privacy={privacy} />
-          </View>
-          {currency === CurrencyEnum.USDCurrency && (
-            <View style={{ margin: 10, alignItems: 'flex-end' }}>
-              <FadeText style={{ opacity: 0 }}>{translate('send.fee') as string}</FadeText>
-              <CurrencyAmount
-                style={{ fontSize: 18 }}
-                amtZec={calculatedFee}
-                price={zecPrice.zecPrice}
-                currency={currency}
-                privacy={privacy}
-              />
-            </View>
-          )}
-        </View>
-
-        {[sendPageState.toaddr].map(to => {
-          return (
-            <View key={`${to.id}-${to.to}`} style={{ margin: 10 }}>
-              <FadeText>{translate('send.to') as string}</FadeText>
-              <AddressItem address={to.to} withIcon={true} />
-
-              {donationAmount > 0 && (
-                <>
-                  <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-donation') as string}</FadeText>
-                  <View
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}>
-                    <ZecAmount currencyName={info.currencyName} size={18} amtZec={donationAmount} privacy={privacy} />
-                    <CurrencyAmount
-                      style={{ fontSize: 18 }}
-                      amtZec={donationAmount}
-                      price={zecPrice.zecPrice}
-                      currency={currency}
-                      privacy={privacy}
-                    />
-                  </View>
-                </>
-              )}
-
-              <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-amount') as string}</FadeText>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
-                <ZecAmount
-                  currencyName={info.currencyName}
-                  size={18}
-                  amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
-                  privacy={privacy}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={{ margin: 10 }}>
+              <FadeText>{translate('send.confirm-privacy-level') as string}</FadeText>
+              {!privacyLevel ? (
+                <ActivityIndicator
+                  size={Platform.OS === GlobalConst.platformOSios ? 'small' : 12}
+                  color={colors.primary}
                 />
+              ) : (
+                <RegText>{privacyLevel}</RegText>
+              )}
+            </View>
+            <View style={{ margin: 10 }}>
+              <FadeText>{translate('send.fee') as string}</FadeText>
+              <ZecAmount currencyName={info.currencyName} size={18} amtZec={calculatedFee} privacy={privacy} />
+            </View>
+            {currency === CurrencyEnum.USDCurrency && (
+              <View style={{ margin: 10, alignItems: 'flex-end' }}>
+                <FadeText style={{ opacity: 0 }}>{translate('send.fee') as string}</FadeText>
                 <CurrencyAmount
                   style={{ fontSize: 18 }}
-                  amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
+                  amtZec={calculatedFee}
                   price={zecPrice.zecPrice}
                   currency={currency}
                   privacy={privacy}
                 />
               </View>
-              {!!memoTotal && (
-                <>
-                  <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo') as string}</FadeText>
-                  <RegText testID="send.confirm-memo" selectable={true}>
-                    {memoTotal}
-                  </RegText>
-                </>
-              )}
-            </View>
-          );
-        })}
-        <View style={{ marginBottom: 30 }} />
-      </ScrollView>
+            )}
+          </View>
 
-      <View
-        style={{
-          flexGrow: 1,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
-        }}>
-        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-          <Button
-            type={ButtonTypeEnum.Primary}
-            title={sendAllAmount ? (translate('send.confirm-button-all') as string) : (translate('confirm') as string)}
-            onPress={() => confirmSendBiometrics()}
-          />
+          {[sendPageState.toaddr].map(to => {
+            return (
+              <View key={`${to.id}-${to.to}`} style={{ margin: 10 }}>
+                <FadeText>{translate('send.to') as string}</FadeText>
+                <AddressItem address={to.to} withIcon={true} />
+
+                {donationAmount > 0 && (
+                  <>
+                    <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-donation') as string}</FadeText>
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                      }}>
+                      <ZecAmount currencyName={info.currencyName} size={18} amtZec={donationAmount} privacy={privacy} />
+                      <CurrencyAmount
+                        style={{ fontSize: 18 }}
+                        amtZec={donationAmount}
+                        price={zecPrice.zecPrice}
+                        currency={currency}
+                        privacy={privacy}
+                      />
+                    </View>
+                  </>
+                )}
+
+                <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-amount') as string}</FadeText>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
+                  <ZecAmount
+                    currencyName={info.currencyName}
+                    size={18}
+                    amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
+                    privacy={privacy}
+                  />
+                  <CurrencyAmount
+                    style={{ fontSize: 18 }}
+                    amtZec={Utils.parseStringLocaleToNumberFloat(to.amount)}
+                    price={zecPrice.zecPrice}
+                    currency={currency}
+                    privacy={privacy}
+                  />
+                </View>
+                {!!memoTotal && (
+                  <>
+                    <FadeText style={{ marginTop: 10 }}>{translate('send.confirm-memo') as string}</FadeText>
+                    <RegText testID="send.confirm-memo" selectable={true}>
+                      {memoTotal}
+                    </RegText>
+                  </>
+                )}
+              </View>
+            );
+          })}
+          <View style={{ marginBottom: 30 }} />
+        </ScrollView>
+
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 5,
+          }}>
+          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+            <Button
+              type={ButtonTypeEnum.Primary}
+              title={sendAllAmount ? (translate('send.confirm-button-all') as string) : (translate('confirm') as string)}
+              onPress={() => confirmSendBiometrics()}
+            />
+          </View>
         </View>
       </View>
-    </View>
+    </ToastProvider>
   );
 };
 

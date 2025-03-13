@@ -541,10 +541,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   };
 
   const navigateToHome = (reset: boolean) => {
-    // we need to wait before close this screen.
-    if (disabled) {
-      return;
-    }
     if (reset) {
       // reset all settings - no save changes
       setMode(modeContext);
@@ -664,7 +660,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={() => navigateToHome(true)}
+          closeScreen={() => {
+            if (!disabled) {
+              navigateToHome(true);
+            }
+          }}
         />
         <ScrollView
           keyboardShouldPersistTaps="handled"

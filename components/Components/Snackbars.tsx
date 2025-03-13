@@ -1,10 +1,11 @@
-import React, { useEffect, useCallback, useState } from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useCallback, useState, useRef } from 'react';
+import { Platform, View } from 'react-native';
 import Snackbar from 'react-native-snackbar';
-import { SnackbarType } from '../../app/AppState';
+import { GlobalConst, SnackbarType } from '../../app/AppState';
 import { SnackbarDurationEnum, TranslateType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import { useTheme } from '@react-navigation/native';
+import { ToastService } from 'react-native-toastier';
 
 type SnackbarProps = {
   snackbars: SnackbarType[];
@@ -14,15 +15,26 @@ type SnackbarProps = {
 
 const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFirstSnackbar, translate }) => {
   const { colors } = useTheme()  as ThemeType;
-  const [snacking, setSnacking] = useState<boolean>(false);
+  //const [snacking, setSnacking] = useState<boolean>(false);
+  const snacking = useRef<boolean>(false);
+  const snackingMessage = useRef<string>(undefined);
   const [duration, setDuration] = useState<number>(4000);
 
   const handleSnackbarClose = useCallback(() => {
-    //console.log('remove first snackbar');
-    Snackbar.dismiss();
-    removeFirstSnackbar();
-    setDuration(4000);
-    setSnacking(false);
+    if (snackbars[0]?.message !== snackingMessage.current) {
+      return;
+    }
+    if (Platform.OS === GlobalConst.platformOSandroid) {
+      Snackbar.dismiss();
+    }
+    // we need some time between messages
+    setTimeout(() => {
+      console.log('remove first snackbar', snackbars[0]?.message, snackingMessage.current);
+      snacking.current = false;
+      snackingMessage.current = undefined;
+      removeFirstSnackbar();
+      setDuration(4000);
+    }, 0);
   }, [removeFirstSnackbar]);
 
   // short  - 1 sec
@@ -30,9 +42,10 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
   // longer - 8 sec
 
   useEffect(() => {
-    if (snackbars.length > 0 && !snacking) {
+    if (snackbars.length > 0 && !snacking.current) {
       const currentSnackbar = snackbars[0];
-      //console.log('show snackbar', currentSnackbar);
+      snacking.current = true;
+      snackingMessage.current = currentSnackbar.message;
       setDuration(
         currentSnackbar.duration === SnackbarDurationEnum.longer
           ? 8000
@@ -40,20 +53,30 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
           ? 1000
           : 4000,
       );
-      setSnacking(true);
-      Snackbar.show({
-        text: currentSnackbar.message,
-        numberOfLines: 3,
-        duration: Snackbar.LENGTH_INDEFINITE,
-        marginBottom: 120,
-        backgroundColor: colors.secondaryDisabled,
-        textColor: colors.money,
-        action: {
-          text: translate('close') as string,
-          textColor: colors.primary,
-          onPress: () => handleSnackbarClose(),
-        },
-      });
+      if (Platform.OS === GlobalConst.platformOSios) {
+        console.log('show snackbar', currentSnackbar);
+        ToastService.show({
+          message: currentSnackbar.message,
+          messageStyle: { color: colors.money },
+          contentContainerStyle: { flex: 0.95, backgroundColor: colors.secondaryDisabled, marginBottom: 50 },
+          animation: 'zoomIn',
+          duration,
+        });
+      } else {
+        Snackbar.show({
+          text: currentSnackbar.message,
+          numberOfLines: 3,
+          duration: Snackbar.LENGTH_INDEFINITE,
+          marginBottom: 120,
+          backgroundColor: colors.secondaryDisabled,
+          textColor: colors.money,
+          action: {
+            text: translate('close') as string,
+            textColor: colors.primary,
+            onPress: () => handleSnackbarClose(),
+          },
+        });
+      }
     }
   }, [
     colors.money,
@@ -62,28 +85,33 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     handleSnackbarClose,
     snackbars,
     snackbars.length,
-    snacking,
+    snacking.current,
+    snackingMessage.current,
     translate,
   ]);
 
   useEffect(() => {
-    if (snackbars.length > 0 && snacking) {
+    if (snackbars.length > 0 && snacking.current) {
+      // we do not know if the message was properly shown
+      // closing after duration, just in case.
       const timer = setTimeout(() => {
         handleSnackbarClose();
-      }, duration);
+      }, Platform.OS === GlobalConst.platformOSandroid ? duration : duration + 500);
       return () => clearTimeout(timer);
     }
-  }, [duration, handleSnackbarClose, snackbars, snackbars.length, snacking]);
+  }, [duration, handleSnackbarClose, snackbars, snackbars.length, snacking.current]);
 
   useEffect(() => {
     return () => {
       setTimeout(() => {
-        Snackbar.dismiss();
+        if (Platform.OS === GlobalConst.platformOSandroid) {
+          Snackbar.dismiss();
+        }
       }, 2000);
     };
   }, []);
 
-  //console.log('snackbars', snackbars);
+  console.log('snackbars', snackbars, duration, snacking);
 
   return <View />;
 };
