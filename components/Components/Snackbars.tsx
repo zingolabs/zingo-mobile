@@ -52,22 +52,35 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
       );
       console.log('show snackbar', currentSnackbar);
       toast.show({
+        //message: currentSnackbar.message + 'vhasi  eiofjwf weoi fewo fjpe fwpf f efwp ejpo efjpwoe jp oj peowfjwpoefwpoe wpoefjwpo powe fpwoef jp wow pojfpwoej kjANLK ALCALKDSCLAK CLAK CLAKDC ALKDSCM LAKDSC LAKDC MLAKDA',
         message: currentSnackbar.message,
-        messageStyle: { color: colors.money, fontSize: 17, fontWeight: 'bold' },
-        titleStyle: {
-          fontSize: 25,
-          fontWeight: 'light',
-        },
-        contentContainerStyle: {
-          flex: 0.95,
-          backgroundColor: colors.secondaryDisabled,
-          marginBottom: 100,
-          padding: 5,
-          paddingLeft: 10,
-          paddingRight: 0,
-        },
         animation: 'zoomIn',
         duration,
+        textContainerStyle: {
+          padding: 0,
+          margin: 0,
+          paddingVertical: 10,
+        },
+        messageStyle: {
+          color: colors.money,
+          fontSize: 15,
+          padding: 0,
+          margin: 0,
+        },
+        titleStyle: {
+          fontSize: 15,
+          fontWeight: 'light',
+          padding: 0,
+          margin: 0,
+        },
+        contentContainerStyle: {
+          flex: 0.999,
+          backgroundColor: colors.secondaryDisabled,
+          marginBottom: 100,
+          padding: 0,
+          paddingLeft: 20,
+          paddingRight: 5,
+        },
       });
     }
   }, [
@@ -97,10 +110,11 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     console.log('MOUNTING - snackbar');
     return () => {
       setTimeout(() => {
+        toast.clear();
         console.log('CLOSING - waiting for some message');
       }, 2000);
     };
-  }, []);
+  }, [toast]);
 
   console.log('snackbars', snackbars, duration, snacking);
 
