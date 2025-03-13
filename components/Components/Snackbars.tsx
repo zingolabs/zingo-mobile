@@ -54,7 +54,18 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
       toast.show({
         message: currentSnackbar.message,
         messageStyle: { color: colors.money, fontSize: 17, fontWeight: 'bold' },
-        contentContainerStyle: { flex: 0.95, backgroundColor: colors.secondaryDisabled, marginBottom: 100, padding: 15, paddingRight: 0 },
+        titleStyle: {
+          fontSize: 25,
+          fontWeight: 'light',
+        },
+        contentContainerStyle: {
+          flex: 0.95,
+          backgroundColor: colors.secondaryDisabled,
+          marginBottom: 100,
+          padding: 5,
+          paddingLeft: 10,
+          paddingRight: 0,
+        },
         animation: 'zoomIn',
         duration,
       });
