@@ -1,15 +1,15 @@
 
 import React, { useContext } from 'react';
 import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppState';
-import MessageList from './components/MessageList';
+//import MessageList from './components/MessageList';
 
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { useMagicModal } from 'react-native-magic-modal';
-import { useToast } from 'react-native-toastier';
+//import { useMagicModal } from 'react-native-magic-modal';
+//import { useToast } from 'react-native-toastier';
 
 type MessagesAddressProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -26,19 +26,22 @@ type MessagesAddressProps = {
 };
 
 const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
-  setPrivacyOption,
-  setScrollToBottom,
-  scrollToBottom,
-  address,
-  sendTransaction,
-  setServerOption,
+  //setPrivacyOption,
+  //setScrollToBottom,
+  //scrollToBottom,
+  //address,
+  //sendTransaction,
+  //setServerOption,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { language } = context;
-  const { hide } = useMagicModal();
+  //const { hide } = useMagicModal();
   moment.locale(language);
-  const { clear } = useToast();
+  //const { clear } = useToast();
 
+  return null;
+
+  /*
   return (
     <MessageList
       setPrivacyOption={setPrivacyOption}
@@ -53,6 +56,7 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
       }}
     />
   );
+  */
 };
 
 export default React.memo(MessagesAddress);

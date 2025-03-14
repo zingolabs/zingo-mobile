@@ -83,7 +83,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
           closeScreen={() => {
-            clear();  
+            clear();
             hide();
           }}
         />

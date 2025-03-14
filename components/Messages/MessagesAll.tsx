@@ -1,14 +1,14 @@
 
 import React, { useContext } from 'react';
-import MessageList from './components/MessageList';
+//import MessageList from './components/MessageList';
 
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { useMagicModal } from 'react-native-magic-modal';
-import { useToast } from 'react-native-toastier';
+//import { useMagicModal } from 'react-native-magic-modal';
+//import { useToast } from 'react-native-toastier';
 
 type MessagesAllProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -17,16 +17,19 @@ type MessagesAllProps = {
 };
 
 const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
-  setPrivacyOption,
-  setScrollToBottom,
-  scrollToBottom,
+  //setPrivacyOption,
+  //setScrollToBottom,
+  //scrollToBottom,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { language } = context;
-  const { hide } = useMagicModal();
+  //const { hide } = useMagicModal();
   moment.locale(language);
-  const { clear } = useToast();
+  //const { clear } = useToast();
 
+  return null;
+
+  /*
   return (
     <MessageList
       setPrivacyOption={setPrivacyOption}
@@ -38,6 +41,7 @@ const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
       }}
     />
   );
+  */
 };
 
 export default React.memo(MessagesAll);
