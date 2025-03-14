@@ -17,7 +17,6 @@ import { ContextAppLoading } from '../../context';
 import BoldText from '../../../components/Components/BoldText';
 import FadeText from '../../../components/Components/FadeText';
 import ChainTypeToggle from '../../../components/Components/ChainTypeToggle';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
@@ -63,15 +62,10 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const context = useContext(ContextAppLoading);
   const { netInfo, mode, translate, server, selectServer } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { top, bottom, right, left } = useSafeAreaInsets();
 
   return (
     <View
       style={{
-        marginTop: top,
-        marginBottom: bottom,
-        marginRight: right,
-        marginLeft: left,
         flex: 1,
         backgroundColor: colors.background,
       }}>
