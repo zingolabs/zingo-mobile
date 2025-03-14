@@ -69,7 +69,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
         },
         titleStyle: {
           fontSize: 15,
-          fontWeight: 'light',
+          fontWeight: 'normal',
           padding: 0,
           margin: 0,
         },
