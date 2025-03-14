@@ -59,7 +59,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Zingo needs access to the camera to scan address QRCodes</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Zingo do not use any Location Feature</string>
+	<string>Zingo does not use any Location Features</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
