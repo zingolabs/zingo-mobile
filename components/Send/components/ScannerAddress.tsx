@@ -18,7 +18,7 @@ import { Code } from 'react-native-vision-camera';
 import { useMagicModal } from 'react-native-magic-modal';
 import { View } from 'react-native';
 import Snackbars from '../../Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type ScannerAddressProps = {
   setAddress: (address: string) => void;
@@ -31,6 +31,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const validateAddress = async (scannedAddress: string) => {
     if (scannedAddress.toLowerCase().startsWith(GlobalConst.zcash)) {
@@ -83,7 +84,10 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
         <Scanner onRead={onRead} />
       </View>

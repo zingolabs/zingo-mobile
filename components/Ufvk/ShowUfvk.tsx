@@ -18,7 +18,7 @@ import RegText from '../Components/RegText';
 import { ButtonTypeEnum, ChainNameEnum, ModeEnum, UfvkActionEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type TextsType = {
   new: string[];
@@ -42,6 +42,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
@@ -85,11 +86,13 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
 
   const onClickCancelHide = () => {
     onClickCancel();
+    clear();
     hide();
   };
 
   const onClickOKHide = () => {
     onClickOK();
+    clear();
     hide();
   };
 

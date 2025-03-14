@@ -17,7 +17,7 @@ import 'moment/locale/ru';
 import { ButtonTypeEnum, SelectServerEnum, SnackbarDurationEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type RescanProps = {
   doRescan: () => void;
@@ -30,6 +30,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const doRescanAndClose = () => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
@@ -67,7 +68,10 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
         <ScrollView
           style={{ height: '80%', maxHeight: '80%' }}

@@ -19,7 +19,7 @@ import 'moment/locale/ru';
 import { SnackbarDurationEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type PrivKeyProps = {
   address: string;
@@ -33,6 +33,7 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [expandAddress, setExpandAddress] = useState<boolean>(false);
   const [keyTypeString, setKeyTypeString] = useState<string>('');
@@ -82,7 +83,10 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
         <ScrollView
           style={{ maxHeight: '90%' }}

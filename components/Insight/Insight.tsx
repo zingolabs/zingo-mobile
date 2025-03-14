@@ -26,7 +26,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type DataType = {
   svg: {
@@ -53,6 +53,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
@@ -262,7 +263,10 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
           noDrawMenu={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
 
         <View style={{ width: '100%', flexDirection: 'row', marginTop: 10 }}>

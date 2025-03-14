@@ -19,7 +19,7 @@ import 'moment/locale/ru';
 import { ChainNameEnum, CurrencyEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type InfoProps = {
 };
@@ -31,6 +31,7 @@ const Info: React.FunctionComponent<InfoProps> = () => {
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   return (
     <ToastProvider>
@@ -55,7 +56,10 @@ const Info: React.FunctionComponent<InfoProps> = () => {
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
         <ScrollView
           style={{ maxHeight: '90%' }}

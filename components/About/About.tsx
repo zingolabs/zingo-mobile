@@ -16,7 +16,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type AboutProps = {
 };
@@ -27,6 +27,7 @@ const About: React.FunctionComponent<AboutProps> = () => {
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const arrayTxtObject = translate('about.copyright');
   let arrayTxt: string[] = [];
@@ -59,7 +60,10 @@ const About: React.FunctionComponent<AboutProps> = () => {
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
         <ScrollView
           style={{ maxHeight: '90%' }}

@@ -36,7 +36,7 @@ import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
 import { RPCParseAddressStatusEnum } from '../../../app/rpc/enums/RPCParseAddressStatusEnum';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../../Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type ConfirmProps = {
   calculatedFee: number;
@@ -80,6 +80,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
   const [sendingTotal, setSendingTotal] = useState<number>(0);
@@ -295,7 +296,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
         <ScrollView
           showsVerticalScrollIndicator={true}

@@ -23,7 +23,7 @@ import RPCModule from '../../app/RPCModule';
 import { RPCWalletKindType } from '../../app/rpc/types/RPCWalletKindType';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type PoolsProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -35,10 +35,12 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
+  moment.locale(language);
+  const { clear } = useToast();
+
   const [orchardPool, setOrchardPool] = useState<boolean>(false);
   const [saplingPool, setSaplingPool] = useState<boolean>(false);
   const [transparentPool, setTransparentPool] = useState<boolean>(false);
-  moment.locale(language);
 
   useEffect(() => {
     (async () => {
@@ -80,7 +82,10 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
           noDrawMenu={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();  
+            hide();
+          }}
         />
         <ScrollView
           style={{ maxHeight: '90%' }}

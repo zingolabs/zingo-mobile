@@ -28,7 +28,7 @@ import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
-import { ToastProvider } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type MemoProps = {
   message: string;
@@ -42,6 +42,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [memo, setMemo] = useState<string>(message);
 
@@ -87,7 +88,10 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
             noSyncingStatus={true}
             noDrawMenu={true}
             noPrivacy={true}
-            closeScreen={hide}
+            closeScreen={() => {
+              clear();  
+              hide();
+            }}
           />
           <ScrollView
             style={{
