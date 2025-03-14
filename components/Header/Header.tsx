@@ -579,7 +579,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                 </FadeText>
                               )}
                               {blocksRemaining > 0 && (
-                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
+                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` - ${blocksRemaining}`}</FadeText>
                               )}
                             </View>
                           ) : (
@@ -594,7 +594,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                   </FadeText>
                                 )}
                                 {blocksRemaining > 0 && (
-                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
+                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` - ${blocksRemaining}`}</FadeText>
                                 )}
                               </View>
                             </TouchableOpacity>
@@ -789,6 +789,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           )}
 
           {showShieldButton &&
+            !noBalance &&
             !calculateDisableButtonToShield() &&
             valueTransfersTotal !== null && (
               <View style={{ justifyContent: 'center', alignItems: 'center' }}>
