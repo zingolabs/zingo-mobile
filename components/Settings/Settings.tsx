@@ -837,6 +837,16 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 <View>
                   {!disabled && itemsPicker.length > 0 ? (
                     <RNPickerSelect
+                      style={{
+                        modalViewBottom: {
+                          minHeight: 300,
+                        },
+                      }}
+                      pickerProps={{
+                        itemStyle: {
+                          color: colors.background,
+                        },
+                      }}
                       fixAndroidTouchableBug={true}
                       value={listServerUri}
                       items={itemsPicker}

@@ -1014,6 +1014,16 @@ const Send: React.FunctionComponent<SendProps> = ({
                     <>
                       {!updatingToField ? (
                         <RNPickerSelect
+                          style={{
+                            modalViewBottom: {
+                              minHeight: 300,
+                            },
+                          }}
+                          pickerProps={{
+                            itemStyle: {
+                              color: colors.background,
+                            },
+                          }}
                           fixAndroidTouchableBug={true}
                           value={
                             pickerTempSelectedAddress && Platform.OS === GlobalConst.platformOSios
