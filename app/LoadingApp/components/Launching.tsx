@@ -24,6 +24,8 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
       style={{
         flex: 1,
         backgroundColor: colors.background,
+        alignItems: 'center',
+        justifyContent: 'center',
       }}>
       <View
         style={{
