@@ -578,8 +578,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                   {translate('syncing') as string}
                                 </FadeText>
                               )}
+                              {viewSyncStatus && blocksRemaining > 0 && (
+                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
+                              )}
                               {blocksRemaining > 0 && (
-                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` - ${blocksRemaining}`}</FadeText>
+                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${blocksRemaining}`}</FadeText>
                               )}
                             </View>
                           ) : (
@@ -593,8 +596,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                     {translate('syncing') as string}
                                   </FadeText>
                                 )}
+                                {viewSyncStatus && blocksRemaining > 0 && (
+                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
+                                )}
                                 {blocksRemaining > 0 && (
-                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` - ${blocksRemaining}`}</FadeText>
+                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${blocksRemaining}`}</FadeText>
                                 )}
                               </View>
                             </TouchableOpacity>
