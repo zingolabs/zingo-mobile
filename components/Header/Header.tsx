@@ -11,6 +11,7 @@ import {
   //faXmark,
   faWifi,
   faChevronLeft,
+  faGear,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
@@ -119,7 +120,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     security,
     language,
     shieldingAmount,
-    navigation,
+    navigationHome,
     selectServer,
     setZecPrice,
     setComputingModalShow,
@@ -352,12 +353,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       }
       await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
       // change to the history screen, just in case.
-      if (navigation) {
-        navigation.navigate(RouteEnums.LoadedApp, {
-          screen: translate('loadedapp.history-menu') as string,
-          initial: false,
-        });
-      }
+      navigationHome?.navigate(RouteEnums.Home, {
+        screen: translate('loadedapp.history-menu') as string,
+        initial: false,
+      });
       // scroll to top in history, just in case.
       if (setScrollToTop) {
         setScrollToTop(true);
@@ -476,7 +475,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             justifyContent: 'center',
             backgroundColor: colors.card,
             margin: 0,
-            marginRight: 5,
+            marginHorizontal: 2.5,
             padding: 0,
             minWidth: 25,
             minHeight: 25,
@@ -503,7 +502,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             alignItems: 'center',
             paddingBottom: 0,
             backgroundColor: colors.card,
-            zIndex: -1,
             paddingTop: 10,
             minHeight: !noDrawMenu ? 60 : 25,
           }}>
@@ -518,7 +516,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               marginHorizontal: 5,
             }}>
             {!noSyncingStatus && selectServer !== SelectServerEnum.offline && (
-              <View style={{ minHeight: 25, flexDirection: 'row' }}>
+              <View style={{ minHeight: 29, flexDirection: 'row' }}>
                 {netInfo.isConnected && !!syncingStatus.lastBlockServer && syncingStatus.syncID >= 0 ? (
                   <>
                     {!syncingStatus.inProgress && syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet && (
@@ -527,7 +525,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           alignItems: 'center',
                           justifyContent: 'center',
                           margin: 0,
-                          marginRight: 5,
+                          marginHorizontal: 2.5,
                           padding: 1,
                           borderColor: colors.primary,
                           borderWidth: 1,
@@ -556,7 +554,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           alignItems: 'center',
                           justifyContent: 'center',
                           margin: 0,
-                          marginRight: 5,
+                          marginHorizontal: 2.5,
                           padding: 1,
                           borderColor: colors.syncing,
                           borderWidth: 1,
@@ -580,8 +578,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                   {translate('syncing') as string}
                                 </FadeText>
                               )}
+                              {viewSyncStatus && blocksRemaining > 0 && (
+                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
+                              )}
                               {blocksRemaining > 0 && (
-                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
+                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${blocksRemaining}`}</FadeText>
                               )}
                             </View>
                           ) : (
@@ -595,8 +596,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                     {translate('syncing') as string}
                                   </FadeText>
                                 )}
+                                {viewSyncStatus && blocksRemaining > 0 && (
+                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
+                                )}
                                 {blocksRemaining > 0 && (
-                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
+                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${blocksRemaining}`}</FadeText>
                                 )}
                               </View>
                             </TouchableOpacity>
@@ -613,7 +617,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           alignItems: 'center',
                           justifyContent: 'center',
                           margin: 0,
-                          marginRight: 5,
+                          marginHorizontal: 2.5,
                           padding: 1,
                           borderColor: colors.primaryDisabled,
                           borderWidth: 1,
@@ -649,7 +653,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                       alignItems: 'center',
                       justifyContent: 'center',
                       margin: 0,
-                      marginRight: 5,
+                      marginHorizontal: 2.5,
                       padding: 0,
                       minWidth: 25,
                       minHeight: 25,
@@ -679,7 +683,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   margin: 0,
-                  marginRight: 5,
+                  marginHorizontal: 2.5,
                   paddingHorizontal: 5,
                   paddingVertical: 1,
                   borderColor: colors.zingo,
@@ -791,6 +795,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           )}
 
           {showShieldButton &&
+            !noBalance &&
             !calculateDisableButtonToShield() &&
             valueTransfersTotal !== null && (
               <View style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -820,7 +825,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             position: 'absolute',
             left: 0,
           }}>
-          <View style={{ alignItems: 'center', flexDirection: 'row', height: 45 }}>
+          <View style={{ alignItems: 'center', flexDirection: 'row', height: 40 }}>
             {!noDrawMenu && (
               <TouchableOpacity
                 style={{ marginRight: 5 }}
@@ -828,7 +833,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 accessible={true}
                 accessibilityLabel={translate('menudrawer-acc') as string}
                 onPress={toggleMenuDrawer}>
-                <FontAwesomeIcon icon={faBars} size={45} color={colors.border} />
+                <FontAwesomeIcon icon={faBars} size={40} color={colors.border} />
               </TouchableOpacity>
             )}
             {readOnly && (
@@ -848,14 +853,38 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
         <View
           style={{
-            padding: 15,
+            padding: 13,
             position: 'absolute',
             right: 0,
           }}>
-          <Image
-            source={require('../../assets/img/logobig-zingo.png')}
-            style={{ width: 38, height: 38, resizeMode: 'contain', borderRadius: 10 }}
-          />
+          {!noDrawMenu ? (
+            <TouchableOpacity
+              style={{ marginRight: 5 }}
+              testID="header.drawmenu"
+              onPress={async () => {
+                const resultBio = security.settingsScreen ? await simpleBiometrics({ translate: translate }) : true;
+                // can be:
+                // - true      -> the user do pass the authentication
+                // - false     -> the user do NOT pass the authentication
+                // - undefined -> no biometric authentication available -> Passcode.
+                //console.log('BIOMETRIC --------> ', resultBio);
+                if (resultBio === false) {
+                  // snack with Error & closing the menu.
+                  if (addLastSnackbar) {
+                    addLastSnackbar({ message: translate('biometrics-error') as string });
+                  }
+                } else {
+                  navigationHome?.navigate(RouteEnums.Settings);
+                }
+            }}>
+              <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
+            </TouchableOpacity>
+          ) : (
+            <Image
+              source={require('../../assets/img/logobig-zingo.png')}
+              style={{ width: 38, height: 38, resizeMode: 'contain', borderRadius: 10 }}
+            />
+          )}
         </View>
       </View>
       <View>

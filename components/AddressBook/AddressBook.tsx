@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import moment from 'moment';
 import 'moment/locale/es';
@@ -28,6 +28,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../app/utils';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type AddressBookProps = {
   setAddressBook: (ab: AddressBookFileClass[]) => void;
@@ -41,10 +43,14 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
     addressBook,
     addressBookCurrentAddress,
     zenniesDonationAddress,
+    snackbars,
+    removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [numAb, setNumAb] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
@@ -148,22 +154,32 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
   //console.log('render Address Book - 4', currentItem, action, addressBook);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
+    <ToastProvider>
+      <View
         style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
           backgroundColor: colors.background,
         }}>
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
+
         <Header
           title={translate('addressbook.title') as string}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
         <ScrollView
           ref={scrollViewRef}
@@ -327,8 +343,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
             />
           </View>
         )}
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </View>
+    </ToastProvider>
   );
 };
 

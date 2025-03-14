@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -18,6 +18,8 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { SnackbarDurationEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type PrivKeyProps = {
   address: string;
@@ -26,10 +28,12 @@ type PrivKeyProps = {
 };
 const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, privKey }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addLastSnackbar, language } = context;
+  const { translate, addLastSnackbar, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [expandAddress, setExpandAddress] = useState<boolean>(false);
   const [keyTypeString, setKeyTypeString] = useState<string>('');
@@ -57,22 +61,32 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
   };
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
+    <ToastProvider>
+      <View
         style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
           backgroundColor: colors.background,
         }}>
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
+
         <Header
           title={keyTypeString + ' ' + translate('privkey.title')}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
         <ScrollView
           style={{ maxHeight: '90%' }}
@@ -131,8 +145,8 @@ const PrivKey: React.FunctionComponent<PrivKeyProps> = ({ address, keyType, priv
             ))}
           </View>
         </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </View>
+    </ToastProvider>
   );
 };
 

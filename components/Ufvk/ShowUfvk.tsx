@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, Alert, ActivityIndicator } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -17,6 +17,8 @@ import 'moment/locale/ru';
 import RegText from '../Components/RegText';
 import { ButtonTypeEnum, ChainNameEnum, ModeEnum, UfvkActionEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type TextsType = {
   new: string[];
@@ -35,10 +37,12 @@ type ShowUfvkProps = {
 };
 const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, wallet, server, mode, addLastSnackbar, language } = context;
+  const { translate, wallet, server, mode, addLastSnackbar, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
@@ -82,24 +86,33 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
 
   const onClickCancelHide = () => {
     onClickCancel();
+    clear();
     hide();
   };
 
   const onClickOKHide = () => {
     onClickOK();
+    clear();
     hide();
   };
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
+    <ToastProvider>
+      <View
         style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
           backgroundColor: colors.background,
         }}>
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
+
         <Header
           title={translate('ufvk.viewkey') + ' (' + translate(`seed.${action}`) + ')'}
           noBalance={true}
@@ -163,8 +176,8 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
             }}
           />
         </View>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </View>
+    </ToastProvider>
   );
 };
 

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect } from 'react';
-import { View, TextInput } from 'react-native';
+import { View, TextInput, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import {
@@ -223,6 +223,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           title={translate(`addressbook.${action.toLowerCase()}`) as string}
           onPress={() => {
             doAction(action, label.trim(), address, uOrchardAddress, item.color ? item.color : '');
+            Keyboard.dismiss();
           }}
           disabled={
             action === AddressBookActionEnum.Delete
@@ -237,7 +238,10 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           type={ButtonTypeEnum.Secondary}
           title={translate('cancel') as string}
           style={{ marginLeft: 10 }}
-          onPress={cancel}
+          onPress={() => {
+            cancel();
+            Keyboard.dismiss();
+          }}
           twoButtons={true}
         />
       </View>

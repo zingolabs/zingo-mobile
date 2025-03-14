@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { View, ScrollView } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -18,34 +18,48 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { ChainNameEnum, CurrencyEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type InfoProps = {
 };
 
 const Info: React.FunctionComponent<InfoProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, currency, zecPrice, privacy, language, setZecPrice } = context;
+  const { info, translate, currency, zecPrice, privacy, language, setZecPrice, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
+    <ToastProvider>
+      <View
         style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
           backgroundColor: colors.background,
         }}>
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
+
         <Header
           title={translate('info.title') as string}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
         <ScrollView
           style={{ maxHeight: '90%' }}
@@ -97,8 +111,8 @@ const Info: React.FunctionComponent<InfoProps> = () => {
             )}
           </View>
         </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </View>
+    </ToastProvider>
   );
 };
 

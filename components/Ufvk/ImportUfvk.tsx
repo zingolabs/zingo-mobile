@@ -8,8 +8,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
+  Keyboard,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import { faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -27,6 +28,8 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { ButtonTypeEnum, GlobalConst, SelectServerEnum } from '../../app/AppState';
+import Snackbars from '../Components/Snackbars';
+import { ToastProvider } from 'react-native-toastier';
 
 type ImportUfvkProps = {
   onClickCancel: () => void;
@@ -34,8 +37,9 @@ type ImportUfvkProps = {
 };
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, onClickOK }) => {
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, info, server, mode, addLastSnackbar, language, selectServer } = context;
+  const { translate, netInfo, info, server, mode, addLastSnackbar, language, selectServer, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
 
   const [seedufvkText, setSeedufvkText] = useState<string>('');
@@ -106,20 +110,32 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
       return;
     }
     onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
+    Keyboard.dismiss();
   };
 
   return (
-    <SafeAreaProvider>
+    <ToastProvider>
       <KeyboardAvoidingView
         behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
-        style={{ backgroundColor: colors.background }}>
-        <SafeAreaView
+        style={{
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
+          backgroundColor: colors.background,
+        }}
+      >
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
+
+        <View
           style={{
-            display: 'flex',
-            justifyContent: 'flex-start',
-            alignItems: 'stretch',
-            height: '100%',
+            flex: 1,
             backgroundColor: colors.background,
           }}>
           <Modal
@@ -278,9 +294,9 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
               }}
             />
           </View>
-        </SafeAreaView>
+        </View>
       </KeyboardAvoidingView>
-    </SafeAreaProvider>
+    </ToastProvider>
   );
 };
 

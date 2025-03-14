@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, Linking, Text } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import moment from 'moment';
@@ -35,6 +35,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTriangleExclamation, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../../Components/Snackbars';
+import { ToastProvider, useToast } from 'react-native-toastier';
 // this is for https. (primary)
 //import { faLock } from '@fortawesome/free-solid-svg-icons';
 
@@ -65,10 +67,14 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     addressBook,
     addresses,
     zenniesDonationAddress,
+    snackbars,
+    removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(vt);
   const [valueTransferIndex, setValueTransferIndex] = useState<number>(index);
@@ -158,15 +164,22 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   //console.log('vt', index, totalLength, isTheFirstMount, vt);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
+    <ToastProvider>
+      <View
         style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
           backgroundColor: colors.background,
         }}>
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
+
         <Header
           title={translate('history.details') as string}
           noBalance={true}
@@ -174,7 +187,10 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
           noDrawMenu={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
         {showNavigator && (
           <View
@@ -440,8 +456,8 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             )}
           </View>
         </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </View>
+    </ToastProvider>
   );
 };
 

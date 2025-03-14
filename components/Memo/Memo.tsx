@@ -8,8 +8,9 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import Button from '../Components/Button';
@@ -26,6 +27,8 @@ import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type MemoProps = {
   message: string;
@@ -34,10 +37,12 @@ type MemoProps = {
 };
 const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, setMessage }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, uOrchardAddress } = context;
+  const { translate, language, uOrchardAddress, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [memo, setMemo] = useState<string>(message);
 
@@ -49,20 +54,32 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
   const doSaveAndClose = () => {
     setMessage(memo);
     hide();
+    Keyboard.dismiss();
   };
 
   return (
-    <SafeAreaProvider>
+    <ToastProvider>
       <KeyboardAvoidingView
         behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
-        style={{ backgroundColor: colors.background }}>
-        <SafeAreaView
+        style={{
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
+          backgroundColor: colors.background,
+        }}
+      >
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
+
+        <View
           style={{
-            display: 'flex',
-            justifyContent: 'flex-start',
-            alignItems: 'stretch',
-            height: '100%',
+            flex: 1,
             backgroundColor: colors.background,
           }}>
           <Header
@@ -71,7 +88,10 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
             noSyncingStatus={true}
             noDrawMenu={true}
             noPrivacy={true}
-            closeScreen={hide}
+            closeScreen={() => {
+              clear();
+              hide();
+            }}
           />
           <ScrollView
             style={{
@@ -160,9 +180,9 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
               disabled={Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress) > GlobalConst.memoMaxLength}
             />
           </View>
-        </SafeAreaView>
+        </View>
       </KeyboardAvoidingView>
-    </SafeAreaProvider>
+    </ToastProvider>
   );
 };
 

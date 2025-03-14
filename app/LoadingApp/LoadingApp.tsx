@@ -1,4 +1,4 @@
-/* eslint-disable react-native/no-inline-styles */
+
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
   Alert,
@@ -9,7 +9,6 @@ import {
   NativeEventSubscription,
   Platform,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useTheme } from '@react-navigation/native';
@@ -78,6 +77,7 @@ import ImportUfvk from '../../components/Ufvk/ImportUfvk';
 import { sendEmail } from '../sendEmail';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
 import StartMenu from './components/StartMenu';
+import { ToastProvider } from 'react-native-toastier';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -275,22 +275,13 @@ export default function LoadingApp(props: LoadingAppProps) {
 
   if (loading) {
     return (
-      <SafeAreaProvider>
-        <SafeAreaView
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-          }}>
-          <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
-        </SafeAreaView>
-      </SafeAreaProvider>
+      <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
     );
   } else {
     return (
       <LoadingAppClass
         {...props}
+        navigationApp={props.navigation}
         theme={theme}
         translate={translate}
         language={language}
@@ -313,7 +304,7 @@ export default function LoadingApp(props: LoadingAppProps) {
 }
 
 type LoadingAppClassProps = {
-  navigation: StackScreenProps<any>['navigation'];
+  navigationApp: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
   toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
@@ -346,7 +337,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     this.state = {
       // context
-      navigation: props.navigation,
       netInfo: {} as NetInfoType,
       wallet: {} as WalletType,
       info: {} as InfoType,
@@ -358,6 +348,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       readOnly: false,
       snackbars: [] as SnackbarType[],
       addLastSnackbar: this.addLastSnackbar,
+      removeFirstSnackbar: this.removeFirstSnackbar,
 
       // context settings
       server: props.server,
@@ -944,7 +935,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         return;
       }
 
-      this.state.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string });
+      this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string });
 
       const cs = {
         uri: uri,
@@ -967,7 +958,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           customServerOffline: false,
         });
       } else {
-        this.state.addLastSnackbar({
+        this.addLastSnackbar({
           message: (this.state.translate('loadedapp.changeservernew-error') as string) + uri,
         });
       }
@@ -976,10 +967,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
   };
 
   navigateToLoadedApp = () => {
-    const { navigation } = this.state;
-    navigation.reset({
+    this.props.navigationApp.reset({
       index: 0,
-      routes: [{ name: RouteEnums.LoadedApp, params: { readOnly: this.state.readOnly } }],
+      routes: [
+        {
+          name: RouteEnums.LoadedApp,
+          params: { readOnly: this.state.readOnly},
+        },
+      ],
     });
   };
 
@@ -1285,13 +1280,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       translate,
       hasRecoveryWalletInfoSaved,
     } = this.state;
-    const { colors } = this.props.theme;
 
     //console.log('render loadingAppClass - 3', this.state.privacy);
 
     const context = {
       // context
-      navigation: this.state.navigation,
       netInfo: this.state.netInfo,
       wallet: this.state.wallet,
       info: this.state.info,
@@ -1303,6 +1296,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       readOnly: this.state.readOnly,
       snackbars: this.state.snackbars,
       addLastSnackbar: this.state.addLastSnackbar,
+      removeFirstSnackbar: this.removeFirstSnackbar,
 
       // settings
       server: this.state.server,
@@ -1319,79 +1313,74 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     };
 
     return (
-      <ContextAppLoadingProvider value={context}>
-        <SafeAreaProvider>
-          <SafeAreaView
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100%',
-              backgroundColor: colors.background,
-            }}>
-            <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
+      <ToastProvider>
+        <ContextAppLoadingProvider value={context}>
+          <Snackbars
+            snackbars={snackbars}
+            removeFirstSnackbar={this.removeFirstSnackbar}
+            translate={translate}
+          />
 
-            {screen === 0 && (
-              <Launching
-                translate={translate}
-                firstLaunchingMessage={firstLaunchingMessage}
-                biometricsFailed={biometricsFailed}
-                tryAgain={() => {
-                  this.setState({ biometricsFailed: false }, () => this.componentDidMount());
-                }}
+          {screen === 0 && (
+            <Launching
+              translate={translate}
+              firstLaunchingMessage={firstLaunchingMessage}
+              biometricsFailed={biometricsFailed}
+              tryAgain={() => {
+                this.setState({ biometricsFailed: false }, () => this.componentDidMount());
+              }}
+            />
+          )}
+          {screen === 1 && (
+            <StartMenu
+              actionButtonsDisabled={actionButtonsDisabled}
+              hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
+              recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
+              changeMode={this.changeMode}
+              customServer={this.customServer}
+              customServerShow={customServerShow}
+              customServerOffline={customServerOffline}
+              onPressServerOffline={this.onPressServerOffline}
+              customServerChainName={customServerChainName}
+              onPressServerChainName={this.onPressServerChainName}
+              customServerUri={customServerUri}
+              setCustomServerUri={this.setCustomServerUri}
+              usingCustomServer={this.usingCustomServer}
+              setCustomServerShow={this.setCustomServerShow}
+              walletExists={walletExists}
+              openCurrentWallet={this.openCurrentWallet}
+              createNewWallet={this.createNewWallet}
+              getwalletToRestore={this.getwalletToRestore}
+            />
+          )}
+          {screen === 2 && wallet && (
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={screen === 2}
+              onRequestClose={() => this.navigateToLoadedApp()}>
+              <Seed
+                onClickOK={() => this.navigateToLoadedApp()}
+                onClickCancel={() => this.navigateToLoadedApp()}
+                action={SeedActionEnum.new}
+                setPrivacyOption={this.setPrivacyOption}
               />
-            )}
-            {screen === 1 && (
-              <StartMenu
-                actionButtonsDisabled={actionButtonsDisabled}
-                hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
-                recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
-                changeMode={this.changeMode}
-                customServer={this.customServer}
-                customServerShow={customServerShow}
-                customServerOffline={customServerOffline}
-                onPressServerOffline={this.onPressServerOffline}
-                customServerChainName={customServerChainName}
-                onPressServerChainName={this.onPressServerChainName}
-                customServerUri={customServerUri}
-                setCustomServerUri={this.setCustomServerUri}
-                usingCustomServer={this.usingCustomServer}
-                setCustomServerShow={this.setCustomServerShow}
-                walletExists={walletExists}
-                openCurrentWallet={this.openCurrentWallet}
-                createNewWallet={this.createNewWallet}
-                getwalletToRestore={this.getwalletToRestore}
+            </Modal>
+          )}
+          {screen === 3 && (
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={screen === 3}
+              onRequestClose={() => this.setState({ screen: 1 })}>
+              <ImportUfvk
+                onClickOK={(s: string, b: number) => this.doRestore(s, b)}
+                onClickCancel={() => this.setState({ screen: 1 })}
               />
-            )}
-            {screen === 2 && wallet && (
-              <Modal
-                animationType="slide"
-                transparent={false}
-                visible={screen === 2}
-                onRequestClose={() => this.navigateToLoadedApp()}>
-                <Seed
-                  onClickOK={() => this.navigateToLoadedApp()}
-                  onClickCancel={() => this.navigateToLoadedApp()}
-                  action={SeedActionEnum.new}
-                  setPrivacyOption={this.setPrivacyOption}
-                />
-              </Modal>
-            )}
-            {screen === 3 && (
-              <Modal
-                animationType="slide"
-                transparent={false}
-                visible={screen === 3}
-                onRequestClose={() => this.setState({ screen: 1 })}>
-                <ImportUfvk
-                  onClickOK={(s: string, b: number) => this.doRestore(s, b)}
-                  onClickCancel={() => this.setState({ screen: 1 })}
-                />
-              </Modal>
-            )}
-          </SafeAreaView>
-        </SafeAreaProvider>
-      </ContextAppLoadingProvider>
+            </Modal>
+          )}
+        </ContextAppLoadingProvider>
+      </ToastProvider>
     );
   }
 }

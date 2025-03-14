@@ -1,5 +1,3 @@
-import { StackScreenProps } from '@react-navigation/stack';
-
 import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
 import ZecPriceType from './types/ZecPriceType';
@@ -18,7 +16,6 @@ import { SelectServerEnum } from './enums/SelectServerEnum';
 
 export default interface AppContextLoading {
   // context
-  navigation: StackScreenProps<any>['navigation'];
   netInfo: NetInfoType;
   wallet: WalletType;
   info: InfoType;
@@ -30,6 +27,7 @@ export default interface AppContextLoading {
   readOnly: boolean;
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
+  removeFirstSnackbar: () => void;
 
   // context settings
   server: ServerType;

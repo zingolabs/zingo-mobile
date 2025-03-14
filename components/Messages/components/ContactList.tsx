@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   TextInput,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import moment from 'moment';
 import 'moment/locale/es';
@@ -41,6 +41,8 @@ import Utils from '../../../app/utils';
 import ContactLine from './ContactLine';
 import RegText from '../../Components/RegText';
 import { magicModal } from 'react-native-magic-modal';
+import Snackbars from '../../Components/Snackbars';
+import { ToastProvider } from 'react-native-toastier';
 
 type ContactListProps = {
   toggleMenuDrawer?: () => void;
@@ -73,9 +75,10 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   noDrawMenu,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, valueTransfers, language, server, addressBook, addresses, doRefresh, zenniesDonationAddress } =
+  const { translate, valueTransfers, language, server, addressBook, addresses, doRefresh, zenniesDonationAddress, snackbars, removeFirstSnackbar } =
     context;
   const { colors } = useTheme()  as ThemeType;
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
 
   const [contacts, setContacts] = useState<ContactType[]>([]);
@@ -275,7 +278,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         address={Utils.messagesAddress(c)}
         sendTransaction={sendTransaction}
         setServerOption={setServerOption}
-      />, { swipeDirection: undefined }
+      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -284,7 +287,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         setPrivacyOption={setPrivacyOption}
         setScrollToBottom={setScrollToBottom}
         scrollToBottom={scrollToBottom}
-      />, { swipeDirection: undefined }
+      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -292,17 +295,22 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   //console.log('search text:', searchText, 'field:', searchTextField);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
-        accessible={true}
-        accessibilityLabel={translate('history.title-acc') as string}
+    <ToastProvider>
+      <View
         style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          width: '100%',
-          height: '100%',
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
           backgroundColor: colors.background,
         }}>
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
+
         <Header
           title={translate('messages.title-chats') as string}
           toggleMenuDrawer={toggleMenuDrawer}
@@ -601,8 +609,8 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             )}
           </>
         )}
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </View>
+    </ToastProvider>
   );
 };
 

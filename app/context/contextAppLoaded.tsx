@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react';
-import { StackScreenProps } from '@react-navigation/stack';
 
 import {
   SyncingStatusClass,
@@ -24,7 +23,7 @@ import {
 } from '../AppState';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
-  navigation: {} as StackScreenProps<any>['navigation'],
+  navigationHome: null,
   netInfo: {} as NetInfoType,
   syncingStatus: new SyncingStatusClass(),
   totalBalance: null,
@@ -62,6 +61,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
+  removeFirstSnackbar: () => {},
   restartApp: () => {},
   somePending: false,
   addressBook: [] as AddressBookFileClass[],

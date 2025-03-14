@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -7,8 +7,8 @@ import {
   TextInput,
   Platform,
   KeyboardAvoidingView,
+  Keyboard,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -40,13 +40,13 @@ import {
   WalletOptionEnum,
   ButtonTypeEnum,
   GlobalConst,
+  RouteEnums,
 } from '../../app/AppState';
 import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
 import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfo';
-import { useMagicModal } from 'react-native-magic-modal';
 
 type SettingsProps = {
   setWalletOption: (walletOption: string, value: string) => Promise<void>;
@@ -105,6 +105,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     rescanMenu: rescanMenuContext,
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     readOnly,
+    navigationHome,
   } = context;
 
   const memosArray = translate('settings.memos');
@@ -163,7 +164,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }
 
   const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
   moment.locale(languageContext);
 
   const [memos, setMemos] = useState<string>(walletSettings.downloadMemos);
@@ -202,7 +202,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [listIcon, setListIcon] = useState<IconDefinition>(farCircle);
   const [customIcon, setCustomIcon] = useState<IconDefinition>(farCircle);
   const [offlineIcon, setOfflineIcon] = useState<IconDefinition>(farCircle);
-  const [disabled, setDisabled] = useState<boolean>();
+  const [disabled, setDisabled] = useState<boolean>(false);
+  const [disabledButton, setDisabledButton] = useState<boolean>(false);
   const [hasRecoveryWalletInfoSaved, setHasRecoveryWalletInfoSaved] = useState<boolean>(false);
   const [storageRecoveryWalletInfo, setStorageRecoveryWalletInfo] = useState<string>('');
 
@@ -215,7 +216,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     })();
   }, [translate]);
 
-  useEffect(() => {
+  const setServer = () => {
     if (selectServerContext === SelectServerEnum.auto) {
       setAutoIcon(faDotCircle);
       setAutoServerUri(serverContext.uri);
@@ -243,6 +244,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setAutoServerUri(serverUris(translate)[0].uri);
       setAutoServerChainName(serverUris(translate)[0].chainName);
     }
+  };
+
+  useEffect(() => {
+    setServer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // only the first time
 
@@ -257,7 +262,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     setItemsPicker(items);
   }, [translate]);
 
-  const securityObject: () => SecurityType = () => {
+  const securityObject: () => SecurityType = useCallback(() => {
     return {
       startApp,
       foregroundApp,
@@ -268,7 +273,79 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       changeWalletScreen,
       restoreWalletBackupScreen,
     };
-  };
+  }, [changeWalletScreen, foregroundApp, rescanScreen, restoreWalletBackupScreen, seedUfvkScreen, sendConfirm, settingsScreen, startApp]);
+
+  useEffect(() => {
+    let serverUriParsed = '';
+    let chainNameParsed = '';
+    if (selectServer === SelectServerEnum.auto) {
+      serverUriParsed = autoServerUri;
+      chainNameParsed = autoServerChainName;
+    } else if (selectServer === SelectServerEnum.list) {
+      serverUriParsed = listServerUri;
+      chainNameParsed = listServerChainName;
+    } else if (selectServer === SelectServerEnum.custom) {
+      serverUriParsed = customServerUri;
+      chainNameParsed = customServerChainName;
+    } else if (selectServer === SelectServerEnum.offline) {
+      serverUriParsed = '';
+      chainNameParsed = ChainNameEnum.mainChainName;
+    }
+    if (
+      walletSettings.downloadMemos === memos &&
+      walletSettings.transactionFilterThreshold === filter &&
+      serverContext.uri === serverUriParsed &&
+      serverContext.chainName === chainNameParsed &&
+      currencyContext === currency &&
+      languageContext === language &&
+      sendAllContext === sendAll &&
+      donationContext === donation &&
+      privacyContext === privacy &&
+      modeContext === mode &&
+      isEqual(securityContext, securityObject()) &&
+      selectServerContext === selectServer &&
+      rescanMenuContext === rescanMenu &&
+      recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice
+    ) {
+      setDisabledButton(true);
+    } else {
+      setDisabledButton(false);
+    }
+
+  }, [
+    autoServerChainName,
+    autoServerUri,
+    currency,
+    currencyContext,
+    customServerChainName,
+    customServerUri,
+    donation,
+    donationContext,
+    filter,
+    language,
+    languageContext,
+    listServerChainName,
+    listServerUri,
+    memos,
+    mode,
+    modeContext,
+    privacy,
+    privacyContext,
+    recoveryWalletInfoOnDevice,
+    recoveryWalletInfoOnDeviceContext,
+    rescanMenu,
+    rescanMenuContext,
+    securityContext,
+    selectServer,
+    selectServerContext,
+    sendAll,
+    sendAllContext,
+    serverContext.chainName,
+    serverContext.uri,
+    walletSettings.downloadMemos,
+    walletSettings.transactionFilterThreshold,
+    securityObject,
+  ]);
 
   const saveSettings = async () => {
     let serverUriParsed = '';
@@ -397,6 +474,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (walletSettings.downloadMemos !== memos) {
       if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
+        setDisabled(false);
         return;
       }
       await setWalletOption(WalletOptionEnum.downloadMemos, memos);
@@ -404,6 +482,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (walletSettings.transactionFilterThreshold !== filter) {
       if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
+        setDisabled(false);
         return;
       }
       await setWalletOption(WalletOptionEnum.transactionFilterThreshold, filter);
@@ -455,9 +534,37 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       }
     }
 
+    setDisabled(false);
     setTimeout(() => {
-      hide();
+      navigateToHome(false);
     }, ms);
+  };
+
+  const navigateToHome = (reset: boolean) => {
+    if (reset) {
+      // reset all settings - no save changes
+      setMode(modeContext);
+      setCurrency(currencyContext);
+      setLanguage(languageContext);
+      setDonation(donationContext);
+      setPrivacy(privacyContext);
+      setSendAll(sendAllContext);
+      setRescanMenu(rescanMenuContext);
+      setServer();
+      setSelectServer(selectServerContext);
+      setStartApp(securityContext.startApp);
+      setForegroundApp(securityContext.foregroundApp);
+      setSendConfirm(securityContext.sendConfirm);
+      setSeedUfvkScreen(securityContext.seedUfvkScreen);
+      setRescanScreen(securityContext.rescanScreen);
+      setSettingsScreen(securityContext.settingsScreen);
+      setChangeWalletScreen(securityContext.changeWalletScreen);
+      setRestoreWalletBackupScreen(securityContext.restoreWalletBackupScreen);
+      setRecoveryWalletInfoOnDevice(recoveryWalletInfoOnDeviceContext);
+      setMemos(walletSettings.downloadMemos);
+      setFilter(walletSettings.transactionFilterThreshold);
+    }
+    navigationHome?.navigate(RouteEnums.Home);
   };
 
   const optionsRadio = (
@@ -511,7 +618,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           minHeight: 48,
         }}>
         <BouncyCheckbox
-          disabled={false}
+          disabled={disabled}
           disableText
           isChecked={value}
           useBuiltInState={false}
@@ -534,245 +641,241 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   };
 
   return (
-    <SafeAreaProvider>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
-        style={{ backgroundColor: colors.background }}>
-        <SafeAreaView
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-start',
+    <KeyboardAvoidingView
+      behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+        }}>
+        <Header
+          title={translate('settings.title') as string}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          closeScreen={() => {
+            if (!disabled) {
+              navigateToHome(true);
+            }
+          }}
+        />
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          testID="settings.scroll-view"
+          style={{ height: '80%', maxHeight: '80%' }}
+          contentContainerStyle={{
+            flexDirection: 'column',
             alignItems: 'stretch',
-            height: '100%',
-            backgroundColor: colors.background,
+            justifyContent: 'flex-start',
           }}>
-          <Header
-            title={translate('settings.title') as string}
-            noBalance={true}
-            noSyncingStatus={true}
-            noDrawMenu={true}
-            noPrivacy={true}
-            closeScreen={hide}
-          />
-          <ScrollView
-            keyboardShouldPersistTaps="handled"
-            testID="settings.scroll-view"
-            style={{ height: '80%', maxHeight: '80%' }}
-            contentContainerStyle={{
-              flexDirection: 'column',
-              alignItems: 'stretch',
-              justifyContent: 'flex-start',
-            }}>
-            <View style={{ display: 'flex', margin: 10 }}>
-              <BoldText>{translate('settings.mode-title') as string}</BoldText>
-            </View>
+          <View style={{ display: 'flex', margin: 10 }}>
+            <BoldText>{translate('settings.mode-title') as string}</BoldText>
+          </View>
 
-            <View style={{ display: 'flex', marginLeft: 25 }}>
-              {optionsRadio(
-                MODES,
-                setMode as React.Dispatch<React.SetStateAction<string | boolean>>,
-                String,
-                mode,
-                'mode',
+          <View style={{ display: 'flex', marginLeft: 25 }}>
+            {optionsRadio(
+              MODES,
+              setMode as React.Dispatch<React.SetStateAction<string | boolean>>,
+              String,
+              mode,
+              'mode',
+            )}
+          </View>
+
+          <View style={{ display: 'flex', margin: 10 }}>
+            <BoldText>{translate('settings.currency-title') as string}</BoldText>
+          </View>
+
+          <View style={{ display: 'flex', marginLeft: 25 }}>
+            {optionsRadio(
+              CURRENCIES,
+              setCurrency as React.Dispatch<React.SetStateAction<string | boolean>>,
+              String,
+              currency,
+              'currency',
+            )}
+          </View>
+
+          <View style={{ display: 'flex', margin: 10 }}>
+            <BoldText>{translate('settings.language-title') as string}</BoldText>
+          </View>
+
+          <View style={{ display: 'flex', marginLeft: 25 }}>
+            {optionsRadio(
+              LANGUAGES,
+              setLanguage as React.Dispatch<React.SetStateAction<string | boolean>>,
+              String,
+              language,
+              'language',
+            )}
+          </View>
+
+          {modeContext !== ModeEnum.basic && (
+            <>
+              {!readOnly && (
+                <>
+                  <View style={{ display: 'flex', margin: 10 }}>
+                    <BoldText>{translate('settings.donation-title') as string}</BoldText>
+                  </View>
+
+                  <View style={{ display: 'flex', marginLeft: 25 }}>
+                    {optionsRadio(
+                      DONATIONS,
+                      setDonation as React.Dispatch<React.SetStateAction<string | boolean>>,
+                      Boolean,
+                      donation,
+                      'donation',
+                    )}
+                  </View>
+                </>
               )}
-            </View>
 
-            <View style={{ display: 'flex', margin: 10 }}>
-              <BoldText>{translate('settings.currency-title') as string}</BoldText>
-            </View>
+              <View style={{ display: 'flex', margin: 10 }}>
+                <BoldText>{translate('settings.privacy-title') as string}</BoldText>
+              </View>
 
-            <View style={{ display: 'flex', marginLeft: 25 }}>
-              {optionsRadio(
-                CURRENCIES,
-                setCurrency as React.Dispatch<React.SetStateAction<string | boolean>>,
-                String,
-                currency,
-                'currency',
-              )}
-            </View>
-
-            <View style={{ display: 'flex', margin: 10 }}>
-              <BoldText>{translate('settings.language-title') as string}</BoldText>
-            </View>
-
-            <View style={{ display: 'flex', marginLeft: 25 }}>
-              {optionsRadio(
-                LANGUAGES,
-                setLanguage as React.Dispatch<React.SetStateAction<string | boolean>>,
-                String,
-                language,
-                'language',
-              )}
-            </View>
-
-            {modeContext !== ModeEnum.basic && (
-              <>
-                {!readOnly && (
-                  <>
-                    <View style={{ display: 'flex', margin: 10 }}>
-                      <BoldText>{translate('settings.donation-title') as string}</BoldText>
-                    </View>
-
-                    <View style={{ display: 'flex', marginLeft: 25 }}>
-                      {optionsRadio(
-                        DONATIONS,
-                        setDonation as React.Dispatch<React.SetStateAction<string | boolean>>,
-                        Boolean,
-                        donation,
-                        'donation',
-                      )}
-                    </View>
-                  </>
+              <View style={{ display: 'flex', marginLeft: 25 }}>
+                {optionsRadio(
+                  PRIVACYS,
+                  setPrivacy as React.Dispatch<React.SetStateAction<string | boolean>>,
+                  Boolean,
+                  privacy,
+                  'privacy',
                 )}
+              </View>
 
-                <View style={{ display: 'flex', margin: 10 }}>
-                  <BoldText>{translate('settings.privacy-title') as string}</BoldText>
-                </View>
+              {!readOnly && (
+                <>
+                  <View style={{ display: 'flex', margin: 10 }}>
+                    <BoldText>{translate('settings.sendall-title') as string}</BoldText>
+                  </View>
 
-                <View style={{ display: 'flex', marginLeft: 25 }}>
-                  {optionsRadio(
-                    PRIVACYS,
-                    setPrivacy as React.Dispatch<React.SetStateAction<string | boolean>>,
-                    Boolean,
-                    privacy,
-                    'privacy',
-                  )}
-                </View>
+                  <View style={{ display: 'flex', marginLeft: 25 }}>
+                    {optionsRadio(
+                      SENDALLS,
+                      setSendAll as React.Dispatch<React.SetStateAction<string | boolean>>,
+                      Boolean,
+                      sendAll,
+                      'sendall',
+                    )}
+                  </View>
+                </>
+              )}
 
-                {!readOnly && (
-                  <>
-                    <View style={{ display: 'flex', margin: 10 }}>
-                      <BoldText>{translate('settings.sendall-title') as string}</BoldText>
-                    </View>
+              <View style={{ display: 'flex', margin: 10 }}>
+                <BoldText>{translate('settings.rescanmenu-title') as string}</BoldText>
+              </View>
 
-                    <View style={{ display: 'flex', marginLeft: 25 }}>
-                      {optionsRadio(
-                        SENDALLS,
-                        setSendAll as React.Dispatch<React.SetStateAction<string | boolean>>,
-                        Boolean,
-                        sendAll,
-                        'sendall',
-                      )}
-                    </View>
-                  </>
+              <View style={{ display: 'flex', marginLeft: 25 }}>
+                {optionsRadio(
+                  RESCANMENU,
+                  setRescanMenu as React.Dispatch<React.SetStateAction<string | boolean>>,
+                  Boolean,
+                  rescanMenu,
+                  'rescanmenu',
                 )}
+              </View>
 
-                <View style={{ display: 'flex', margin: 10 }}>
-                  <BoldText>{translate('settings.rescanmenu-title') as string}</BoldText>
+              <View style={{ display: 'flex', margin: 10 }}>
+                <BoldText>{translate('settings.server-title') as string}</BoldText>
+              </View>
+
+              <View style={{ display: 'flex', marginLeft: 25 }}>
+                <View>
+                  <TouchableOpacity
+                    testID="settings.offline-server"
+                    disabled={disabled}
+                    style={{ marginRight: 10, marginBottom: 0, maxHeight: 50, minHeight: 48 }}
+                    onPress={() => {
+                      setOfflineIcon(faDotCircle);
+                      setAutoIcon(farCircle);
+                      setListIcon(farCircle);
+                      setCustomIcon(farCircle);
+                      setSelectServer(SelectServerEnum.offline);
+                    }}>
+                    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                      {offlineIcon && <FontAwesomeIcon icon={offlineIcon} size={20} color={colors.border} />}
+                      <RegText style={{ marginLeft: 10 }}>{translate('settings.server-offline') as string}</RegText>
+                      {offlineIcon === faDotCircle && <FadeText style={{ marginLeft: 10 }}>{''}</FadeText>}
+                    </View>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ display: 'flex' }}>
+                  <FadeText>{translate('settings.server-offline-text') as string}</FadeText>
                 </View>
 
-                <View style={{ display: 'flex', marginLeft: 25 }}>
-                  {optionsRadio(
-                    RESCANMENU,
-                    setRescanMenu as React.Dispatch<React.SetStateAction<string | boolean>>,
-                    Boolean,
-                    rescanMenu,
-                    'rescanmenu',
-                  )}
+                <View>
+                  <TouchableOpacity
+                    testID="settings.auto-server"
+                    disabled={disabled}
+                    style={{ marginRight: 10, marginBottom: 0, maxHeight: 50, minHeight: 48 }}
+                    onPress={() => {
+                      setOfflineIcon(farCircle);
+                      setAutoIcon(faDotCircle);
+                      setListIcon(farCircle);
+                      setCustomIcon(farCircle);
+                      setSelectServer(SelectServerEnum.auto);
+                    }}>
+                    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                      {autoIcon && <FontAwesomeIcon icon={autoIcon} size={20} color={colors.border} />}
+                      <RegText style={{ marginLeft: 10 }}>{translate('settings.server-auto') as string}</RegText>
+                      {autoIcon === faDotCircle && <FadeText style={{ marginLeft: 10 }}>{autoServerUri}</FadeText>}
+                    </View>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ display: 'flex' }}>
+                  <FadeText>{translate('settings.server-auto-text') as string}</FadeText>
                 </View>
 
-                <View style={{ display: 'flex', margin: 10 }}>
-                  <BoldText>{translate('settings.server-title') as string}</BoldText>
-                </View>
-
-                <View style={{ display: 'flex', marginLeft: 25 }}>
-                  <View>
-                    <TouchableOpacity
-                      testID="settings.offline-server"
-                      disabled={disabled}
-                      style={{ marginRight: 10, marginBottom: 0, maxHeight: 50, minHeight: 48 }}
-                      onPress={() => {
-                        setOfflineIcon(faDotCircle);
-                        setAutoIcon(farCircle);
-                        setListIcon(farCircle);
-                        setCustomIcon(farCircle);
-                        setSelectServer(SelectServerEnum.offline);
-                      }}>
-                      <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-                        {offlineIcon && <FontAwesomeIcon icon={offlineIcon} size={20} color={colors.border} />}
-                        <RegText style={{ marginLeft: 10 }}>{translate('settings.server-offline') as string}</RegText>
-                        {offlineIcon === faDotCircle && <FadeText style={{ marginLeft: 10 }}>{''}</FadeText>}
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={{ display: 'flex' }}>
-                    <FadeText>{translate('settings.server-offline-text') as string}</FadeText>
-                  </View>
-
-                  <View>
-                    <TouchableOpacity
-                      testID="settings.auto-server"
-                      disabled={disabled}
-                      style={{ marginRight: 10, marginBottom: 0, maxHeight: 50, minHeight: 48 }}
-                      onPress={() => {
-                        setOfflineIcon(farCircle);
-                        setAutoIcon(faDotCircle);
-                        setListIcon(farCircle);
-                        setCustomIcon(farCircle);
-                        setSelectServer(SelectServerEnum.auto);
-                      }}>
-                      <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-                        {autoIcon && <FontAwesomeIcon icon={autoIcon} size={20} color={colors.border} />}
-                        <RegText style={{ marginLeft: 10 }}>{translate('settings.server-auto') as string}</RegText>
-                        {autoIcon === faDotCircle && <FadeText style={{ marginLeft: 10 }}>{autoServerUri}</FadeText>}
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={{ display: 'flex' }}>
-                    <FadeText>{translate('settings.server-auto-text') as string}</FadeText>
-                  </View>
-
-                  <View>
-                    {!disabled && itemsPicker.length > 0 ? (
-                      <RNPickerSelect
-                        fixAndroidTouchableBug={true}
-                        value={listServerUri}
-                        items={itemsPicker}
-                        placeholder={{
-                          label: translate('settings.select-placeholder') as string,
-                          value: listServerUri,
-                          color: colors.primary,
-                        }}
-                        useNativeAndroidPickerStyle={false}
-                        onValueChange={(itemValue: string) => {
-                          //console.log(JSON.stringify(item));
-                          if (itemValue) {
-                            setOfflineIcon(farCircle);
-                            setAutoIcon(farCircle);
-                            setListIcon(faDotCircle);
-                            setCustomIcon(farCircle);
-                            setSelectServer(SelectServerEnum.list);
-                            setListServerUri(itemValue);
-                            // avoiding obsolete ones
-                            const cnItem = serverUris(translate).find(
-                              (s: ServerUrisType) => s.uri === itemValue && !s.obsolete,
-                            );
-                            if (cnItem) {
-                              setListServerChainName(cnItem.chainName);
-                            } else {
-                              console.log('chain name not found');
-                            }
+                <View>
+                  {!disabled && itemsPicker.length > 0 ? (
+                    <RNPickerSelect
+                      style={{
+                        modalViewBottom: {
+                          minHeight: 300,
+                        },
+                      }}
+                      pickerProps={{
+                        itemStyle: {
+                          color: colors.background,
+                        },
+                      }}
+                      fixAndroidTouchableBug={true}
+                      value={listServerUri}
+                      items={itemsPicker}
+                      placeholder={{
+                        label: translate('settings.select-placeholder') as string,
+                        value: listServerUri,
+                        color: colors.primary,
+                      }}
+                      useNativeAndroidPickerStyle={false}
+                      onValueChange={(itemValue: string) => {
+                        //console.log(JSON.stringify(item));
+                        if (itemValue) {
+                          setOfflineIcon(farCircle);
+                          setAutoIcon(farCircle);
+                          setListIcon(faDotCircle);
+                          setCustomIcon(farCircle);
+                          setSelectServer(SelectServerEnum.list);
+                          setListServerUri(itemValue);
+                          // avoiding obsolete ones
+                          const cnItem = serverUris(translate).find(
+                            (s: ServerUrisType) => s.uri === itemValue && !s.obsolete,
+                          );
+                          if (cnItem) {
+                            setListServerChainName(cnItem.chainName);
+                          } else {
+                            console.log('chain name not found');
                           }
-                        }}>
-                        <View
-                          style={{
-                            marginRight: 10,
-                            marginBottom: 5,
-                            maxHeight: 50,
-                            minHeight: 48,
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                          }}>
-                          {listIcon && <FontAwesomeIcon icon={listIcon} size={20} color={colors.border} />}
-                          <RegText testID="settings.list-server" style={{ marginLeft: 10 }}>
-                            {translate('settings.server-list') as string}
-                          </RegText>
-                          {listIcon === faDotCircle && <FadeText style={{ marginLeft: 10 }}>{listServerUri}</FadeText>}
-                        </View>
-                      </RNPickerSelect>
-                    ) : (
+                        }
+                      }}>
                       <View
                         style={{
                           marginRight: 10,
@@ -784,272 +887,290 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           alignItems: 'center',
                         }}>
                         {listIcon && <FontAwesomeIcon icon={listIcon} size={20} color={colors.border} />}
-                        <RegText style={{ marginLeft: 10 }}>{translate('settings.server-list') as string}</RegText>
+                        <RegText testID="settings.list-server" style={{ marginLeft: 10 }}>
+                          {translate('settings.server-list') as string}
+                        </RegText>
                         {listIcon === faDotCircle && <FadeText style={{ marginLeft: 10 }}>{listServerUri}</FadeText>}
                       </View>
-                    )}
-                  </View>
-                  <View style={{ display: 'flex' }}>
-                    <FadeText>{translate('settings.server-list-text') as string}</FadeText>
-                  </View>
-
-                  <View>
-                    <TouchableOpacity
-                      testID="settings.custom-server"
-                      disabled={disabled}
-                      style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
-                      onPress={() => {
-                        setAutoIcon(farCircle);
-                        setListIcon(farCircle);
-                        setCustomIcon(faDotCircle);
-                        setSelectServer(SelectServerEnum.custom);
+                    </RNPickerSelect>
+                  ) : (
+                    <View
+                      style={{
+                        marginRight: 10,
+                        marginBottom: 5,
+                        maxHeight: 50,
+                        minHeight: 48,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
                       }}>
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginTop: 10,
-                        }}>
-                        {customIcon && <FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />}
-                        <RegText style={{ marginLeft: 10 }}>{translate('settings.server-custom') as string}</RegText>
-                      </View>
-                    </TouchableOpacity>
-                    {customIcon === farCircle && (
-                      <View style={{ display: 'flex' }}>
-                        <FadeText>{translate('settings.server-custom-text') as string}</FadeText>
-                      </View>
-                    )}
+                      {listIcon && <FontAwesomeIcon icon={listIcon} size={20} color={colors.border} />}
+                      <RegText style={{ marginLeft: 10 }}>{translate('settings.server-list') as string}</RegText>
+                      {listIcon === faDotCircle && <FadeText style={{ marginLeft: 10 }}>{listServerUri}</FadeText>}
+                    </View>
+                  )}
+                </View>
+                <View style={{ display: 'flex' }}>
+                  <FadeText>{translate('settings.server-list-text') as string}</FadeText>
+                </View>
 
-                    {customIcon === faDotCircle && (
-                      <View>
-                        <View
-                          accessible={true}
-                          accessibilityLabel={translate('settings.server-acc') as string}
+                <View>
+                  <TouchableOpacity
+                    testID="settings.custom-server"
+                    disabled={disabled}
+                    style={{ marginRight: 10, marginBottom: 5, maxHeight: 50, minHeight: 48 }}
+                    onPress={() => {
+                      setAutoIcon(farCircle);
+                      setListIcon(farCircle);
+                      setCustomIcon(faDotCircle);
+                      setSelectServer(SelectServerEnum.custom);
+                    }}>
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginTop: 10,
+                      }}>
+                      {customIcon && <FontAwesomeIcon icon={customIcon} size={20} color={colors.border} />}
+                      <RegText style={{ marginLeft: 10 }}>{translate('settings.server-custom') as string}</RegText>
+                    </View>
+                  </TouchableOpacity>
+                  {customIcon === farCircle && (
+                    <View style={{ display: 'flex' }}>
+                      <FadeText>{translate('settings.server-custom-text') as string}</FadeText>
+                    </View>
+                  )}
+
+                  {customIcon === faDotCircle && (
+                    <View>
+                      <View
+                        accessible={true}
+                        accessibilityLabel={translate('settings.server-acc') as string}
+                        style={{
+                          borderColor: colors.border,
+                          borderWidth: 1,
+                          marginLeft: 5,
+                          width: 'auto',
+                          maxWidth: '90%',
+                          minWidth: '50%',
+                          minHeight: 48,
+                        }}>
+                        <TextInput
+                          testID="settings.custom-server-field"
+                          placeholder={GlobalConst.serverPlaceHolder}
+                          placeholderTextColor={colors.placeholder}
                           style={{
-                            borderColor: colors.border,
-                            borderWidth: 1,
-                            marginLeft: 5,
-                            width: 'auto',
-                            maxWidth: '90%',
+                            color: colors.text,
+                            fontWeight: '600',
+                            fontSize: 18,
                             minWidth: '50%',
+                            maxWidth: '90%',
                             minHeight: 48,
+                            marginLeft: 5,
+                            backgroundColor: 'transparent',
+                          }}
+                          value={customServerUri}
+                          onChangeText={(text: string) => setCustomServerUri(text)}
+                          editable={!disabled}
+                          maxLength={100}
+                        />
+                      </View>
+                      <View
+                        accessible={true}
+                        accessibilityLabel={translate('settings.server-acc') as string}
+                        style={{
+                          marginLeft: 5,
+                          width: 'auto',
+                          maxWidth: '90%',
+                          minWidth: '50%',
+                          minHeight: 48,
+                        }}>
+                        <View
+                          style={{
+                            paddingTop: 10,
+                            paddingLeft: 10,
+                            paddingRight: 10,
+                            marginBottom: 5,
+                            justifyContent: 'center',
+                            alignItems: 'center',
                           }}>
-                          <TextInput
-                            testID="settings.custom-server-field"
-                            placeholder={GlobalConst.serverPlaceHolder}
-                            placeholderTextColor={colors.placeholder}
-                            style={{
-                              color: colors.text,
-                              fontWeight: '600',
-                              fontSize: 18,
-                              minWidth: '50%',
-                              maxWidth: '90%',
-                              minHeight: 48,
-                              marginLeft: 5,
-                              backgroundColor: 'transparent',
-                            }}
-                            value={customServerUri}
-                            onChangeText={(text: string) => setCustomServerUri(text)}
-                            editable={!disabled}
-                            maxLength={100}
+                          <ChainTypeToggle
+                            customServerChainName={customServerChainName}
+                            onPress={onPressServerChainName}
+                            translate={translate}
+                            disabled={disabled}
                           />
                         </View>
-                        <View
-                          accessible={true}
-                          accessibilityLabel={translate('settings.server-acc') as string}
-                          style={{
-                            marginLeft: 5,
-                            width: 'auto',
-                            maxWidth: '90%',
-                            minWidth: '50%',
-                            minHeight: 48,
-                          }}>
-                          <View
-                            style={{
-                              paddingTop: 10,
-                              paddingLeft: 10,
-                              paddingRight: 10,
-                              marginBottom: 5,
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <ChainTypeToggle
-                              customServerChainName={customServerChainName}
-                              onPress={onPressServerChainName}
-                              translate={translate}
-                              disabled={disabled}
-                            />
-                          </View>
-                        </View>
                       </View>
-                    )}
-                  </View>
+                    </View>
+                  )}
                 </View>
+              </View>
 
-                <View style={{ display: 'flex', margin: 10 }}>
-                  <BoldText testID="settings.securitytitle">{translate('settings.security-title') as string}</BoldText>
-                </View>
+              <View style={{ display: 'flex', margin: 10 }}>
+                <BoldText testID="settings.securitytitle">{translate('settings.security-title') as string}</BoldText>
+              </View>
 
-                {securityCheckBox(
-                  startApp,
-                  setStartApp as React.Dispatch<React.SetStateAction<string | boolean>>,
-                  translate('settings.security-startapp') as string,
-                )}
-                {securityCheckBox(
-                  foregroundApp,
-                  setForegroundApp as React.Dispatch<React.SetStateAction<string | boolean>>,
-                  translate('settings.security-foregroundapp') as string,
-                )}
-                {securityCheckBox(
-                  sendConfirm,
-                  setSendConfirm as React.Dispatch<React.SetStateAction<string | boolean>>,
-                  translate('settings.security-sendconfirm') as string,
-                )}
-                {securityCheckBox(
-                  seedUfvkScreen,
-                  setSeedUfvkScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
-                  readOnly
-                    ? (translate('settings.security-ufvkscreen') as string)
-                    : (translate('settings.security-seedscreen') as string),
-                )}
-                {securityCheckBox(
-                  rescanScreen,
-                  setRescanScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
-                  translate('settings.security-rescanscreen') as string,
-                )}
-                {securityCheckBox(
-                  settingsScreen,
-                  setSettingsScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
-                  translate('settings.security-settingsscreen') as string,
-                )}
-                {securityCheckBox(
-                  changeWalletScreen,
-                  setChangeWalletScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
-                  translate('settings.security-changewalletscreen') as string,
-                )}
-                {securityCheckBox(
-                  restoreWalletBackupScreen,
-                  setRestoreWalletBackupScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
-                  translate('settings.security-restorewalletbackupscreen') as string,
-                )}
+              {securityCheckBox(
+                startApp,
+                setStartApp as React.Dispatch<React.SetStateAction<string | boolean>>,
+                translate('settings.security-startapp') as string,
+              )}
+              {securityCheckBox(
+                foregroundApp,
+                setForegroundApp as React.Dispatch<React.SetStateAction<string | boolean>>,
+                translate('settings.security-foregroundapp') as string,
+              )}
+              {securityCheckBox(
+                sendConfirm,
+                setSendConfirm as React.Dispatch<React.SetStateAction<string | boolean>>,
+                translate('settings.security-sendconfirm') as string,
+              )}
+              {securityCheckBox(
+                seedUfvkScreen,
+                setSeedUfvkScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
+                readOnly
+                  ? (translate('settings.security-ufvkscreen') as string)
+                  : (translate('settings.security-seedscreen') as string),
+              )}
+              {securityCheckBox(
+                rescanScreen,
+                setRescanScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
+                translate('settings.security-rescanscreen') as string,
+              )}
+              {securityCheckBox(
+                settingsScreen,
+                setSettingsScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
+                translate('settings.security-settingsscreen') as string,
+              )}
+              {securityCheckBox(
+                changeWalletScreen,
+                setChangeWalletScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
+                translate('settings.security-changewalletscreen') as string,
+              )}
+              {securityCheckBox(
+                restoreWalletBackupScreen,
+                setRestoreWalletBackupScreen as React.Dispatch<React.SetStateAction<string | boolean>>,
+                translate('settings.security-restorewalletbackupscreen') as string,
+              )}
 
-                <View style={{ display: 'flex', margin: 10 }}>
-                  <BoldText>{translate('settings.threshold-title') as string}</BoldText>
-                </View>
+              <View style={{ display: 'flex', margin: 10 }}>
+                <BoldText>{translate('settings.threshold-title') as string}</BoldText>
+              </View>
 
-                <View style={{ display: 'flex', marginLeft: 25 }}>
-                  <View
-                    accessible={true}
-                    accessibilityLabel={translate('settings.threshold-acc') as string}
+              <View style={{ display: 'flex', marginLeft: 25 }}>
+                <View
+                  accessible={true}
+                  accessibilityLabel={translate('settings.threshold-acc') as string}
+                  style={{
+                    borderColor: colors.border,
+                    borderWidth: 1,
+                    marginLeft: 5,
+                    width: 'auto',
+                    maxWidth: '60%',
+                    maxHeight: 48,
+                    minWidth: '30%',
+                    minHeight: 48,
+                  }}>
+                  <TextInput
+                    placeholder={translate('settings.number') as string}
+                    placeholderTextColor={colors.placeholder}
+                    keyboardType="numeric"
                     style={{
-                      borderColor: colors.border,
-                      borderWidth: 1,
-                      marginLeft: 5,
-                      width: 'auto',
-                      maxWidth: '60%',
-                      maxHeight: 48,
+                      color: colors.text,
+                      fontWeight: '600',
+                      fontSize: 18,
                       minWidth: '30%',
                       minHeight: 48,
-                    }}>
-                    <TextInput
-                      placeholder={translate('settings.number') as string}
-                      placeholderTextColor={colors.placeholder}
-                      keyboardType="numeric"
-                      style={{
-                        color: colors.text,
-                        fontWeight: '600',
-                        fontSize: 18,
-                        minWidth: '30%',
-                        minHeight: 48,
-                        marginLeft: 5,
-                        backgroundColor: 'transparent',
-                      }}
-                      value={filter}
-                      onChangeText={(text: string) => setFilter(text)}
-                      editable={!disabled}
-                      maxLength={6}
-                    />
-                  </View>
+                      marginLeft: 5,
+                      backgroundColor: 'transparent',
+                    }}
+                    value={filter}
+                    onChangeText={(text: string) => setFilter(text)}
+                    editable={!disabled}
+                    maxLength={6}
+                  />
                 </View>
+              </View>
 
-                <View style={{ display: 'flex', margin: 10 }}>
-                  <BoldText>{translate('settings.memo-title') as string}</BoldText>
-                </View>
+              <View style={{ display: 'flex', margin: 10 }}>
+                <BoldText>{translate('settings.memo-title') as string}</BoldText>
+              </View>
 
-                <View style={{ display: 'flex', marginLeft: 25 }}>
-                  {optionsRadio(
-                    MEMOS,
-                    setMemos as React.Dispatch<React.SetStateAction<string | boolean>>,
-                    String,
-                    memos,
-                    'memo',
-                  )}
-                </View>
-
-                <View style={{ display: 'flex', margin: 10 }}>
-                  <BoldText>{translate('settings.recoverywalletinfoondevice-title') as string}</BoldText>
-                </View>
-
-                <View style={{ display: 'flex', marginLeft: 25 }}>
-                  {optionsRadio(
-                    RECOVERYWALLETINFOONDEVICE,
-                    setRecoveryWalletInfoOnDevice as React.Dispatch<React.SetStateAction<string | boolean>>,
-                    Boolean,
-                    recoveryWalletInfoOnDevice,
-                    'recoverywalletinfoondevice',
-                  )}
-                </View>
-
-                {hasRecoveryWalletInfoSaved && (
-                  <View style={{ display: 'flex' }}>
-                    <FadeText style={{ color: colors.primary, textAlign: 'center', marginTop: 10, padding: 5 }}>
-                      {(translate('settings.walletkeyssaved') as string) +
-                        (storageRecoveryWalletInfo ? ' [' + storageRecoveryWalletInfo + ']' : '')}
-                    </FadeText>
-                  </View>
+              <View style={{ display: 'flex', marginLeft: 25 }}>
+                {optionsRadio(
+                  MEMOS,
+                  setMemos as React.Dispatch<React.SetStateAction<string | boolean>>,
+                  String,
+                  memos,
+                  'memo',
                 )}
+              </View>
 
-                <View style={{ display: 'flex', margin: 10 }}>
-                  <FadeText
-                    style={{
-                      color: colors.primary,
-                      textAlign: 'center',
-                      marginVertical: 10,
-                      padding: 5,
-                      borderColor: 'red',
-                      borderWidth: 1,
-                    }}>
-                    {translate('settings.walletkeyswarning') as string}
+              <View style={{ display: 'flex', margin: 10 }}>
+                <BoldText>{translate('settings.recoverywalletinfoondevice-title') as string}</BoldText>
+              </View>
+
+              <View style={{ display: 'flex', marginLeft: 25 }}>
+                {optionsRadio(
+                  RECOVERYWALLETINFOONDEVICE,
+                  setRecoveryWalletInfoOnDevice as React.Dispatch<React.SetStateAction<string | boolean>>,
+                  Boolean,
+                  recoveryWalletInfoOnDevice,
+                  'recoverywalletinfoondevice',
+                )}
+              </View>
+
+              {hasRecoveryWalletInfoSaved && (
+                <View style={{ display: 'flex' }}>
+                  <FadeText style={{ color: colors.primary, textAlign: 'center', marginTop: 10, padding: 5 }}>
+                    {(translate('settings.walletkeyssaved') as string) +
+                      (storageRecoveryWalletInfo ? ' [' + storageRecoveryWalletInfo + ']' : '')}
                   </FadeText>
                 </View>
-              </>
-            )}
-          </ScrollView>
-          <View
-            style={{
-              flexGrow: 1,
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginVertical: 5,
-            }}>
-            <Button
-              testID="settings.button.save"
-              disabled={disabled}
-              type={ButtonTypeEnum.Primary}
-              title={translate('settings.save') as string}
-              onPress={() => {
-                // waiting while closing the keyboard, just in case.
-                setTimeout(async () => {
-                  await saveSettings();
-                }, 100);
-              }}
-            />
-          </View>
-        </SafeAreaView>
-      </KeyboardAvoidingView>
-    </SafeAreaProvider>
+              )}
+
+              <View style={{ display: 'flex', margin: 10 }}>
+                <FadeText
+                  style={{
+                    color: colors.primary,
+                    textAlign: 'center',
+                    marginVertical: 10,
+                    padding: 5,
+                    borderColor: 'red',
+                    borderWidth: 1,
+                  }}>
+                  {translate('settings.walletkeyswarning') as string}
+                </FadeText>
+              </View>
+            </>
+          )}
+        </ScrollView>
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 5,
+          }}>
+          <Button
+            testID="settings.button.save"
+            disabled={disabled || disabledButton}
+            type={ButtonTypeEnum.Primary}
+            title={translate('settings.save') as string}
+            onPress={() => {
+              // waiting while closing the keyboard, just in case.
+              setTimeout(async () => {
+                await saveSettings();
+                Keyboard.dismiss();
+              }, 100);
+            }}
+          />
+        </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 

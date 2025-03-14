@@ -47,7 +47,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     addressBook,
     launchAddressBook,
     privacy,
-    navigation,
+    navigationHome,
     readOnly,
     mode,
     totalBalance,
@@ -190,7 +190,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               sendPageState.toaddr.to = address;
               setSendPageState(sendPageState);
               closeAllModals();
-              navigation.navigate(RouteEnums.LoadedApp, {
+              navigationHome?.navigate(RouteEnums.Home, {
                 screen: translate('loadedapp.send-menu'),
                 initial: false,
               });

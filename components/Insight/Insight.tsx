@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import { PieChart, pieDataItem } from 'react-native-gifted-charts';
@@ -25,6 +25,8 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type DataType = {
   svg: {
@@ -46,10 +48,12 @@ type InsightProps = {
 
 const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, privacy, addLastSnackbar, language } = context;
+  const { info, translate, privacy, addLastSnackbar, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
@@ -226,7 +230,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
 
   const renderExternalLabel = useCallback(
     (item: pieDataItem | undefined) => (
-      <SvgText fontSize={18} fill={item?.color}>
+      <SvgText fontSize={12} fill={item?.color}>
         {item?.value}
       </SvgText>
     ),
@@ -236,15 +240,22 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
   //console.log('render insight');
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
+    <ToastProvider>
+      <View
         style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
           backgroundColor: colors.background,
         }}>
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
+
         <Header
           title={translate('insight.title') as string}
           noBalance={true}
@@ -252,7 +263,10 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
           noDrawMenu={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
 
         <View style={{ width: '100%', flexDirection: 'row', marginTop: 10 }}>
@@ -338,23 +352,22 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
             {loading ? (
               <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 100 }} />
             ) : (
-              <View style={{ width: '100%', alignItems: 'center', paddingVertical: 20 }}>
+              <View style={{ width: '100%', alignItems: 'center', paddingVertical: 10 }}>
                 <PieChart
                   showExternalLabels
                   labelLineConfig={{
-                    thickness: 2,
+                    thickness: 1,
                     avoidOverlappingOfLabels: true,
                   }}
                   strokeWidth={4}
                   donut
                   innerCircleColor={colors.background}
-                  innerCircleBorderWidth={4}
+                  innerCircleBorderWidth={0}
                   innerCircleBorderColor={colors.background}
                   strokeColor={colors.background}
                   showValuesAsTooltipText={true}
                   showText
                   externalLabelComponent={renderExternalLabel}
-                  textSize={18}
                   textBackgroundColor={colors.background}
                   data={pieAmounts}
                   innerRadius={dimensions.width * 0.09}
@@ -382,8 +395,8 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
             </View>
           </View>
         </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </View>
+    </ToastProvider>
   );
 };
 

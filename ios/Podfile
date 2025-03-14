@@ -1,24 +1,12 @@
-# Transform this into a `node_require` generic function:
-def node_require(script)
-  # Resolve script with node to allow for hoisting
-  require Pod::Executable.execute_command('node', ['-p',
-    "require.resolve(
-      '#{script}',
-      {paths: [process.argv[1]]},
-    )", __dir__]).strip
-end
-
-# Use it to require both react-native's and this package's scripts:
-node_require('react-native/scripts/react_native_pods.rb')
-node_require('react-native-permissions/scripts/setup.rb') 
+# Resolve script with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+'require.resolve(
+  "react-native/scripts/react_native_pods.rb",
+  {paths: [process.argv[1]]},
+)', __dir__]).strip
 
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
-
-setup_permissions([
-  'Camera',
-  'FaceID',
-])
  
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
@@ -32,9 +20,8 @@ target 'ZingoMobile' do
 
   use_react_native!(
     :path => config[:reactNativePath],
-    # Hermes is now enabled by default. Disable by setting this flag to false.
-    :hermes_enabled => true,
-    :fabric_enabled => true,
+    # An absolute path to your application root.
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
   target 'ZingoMobileTests' do
@@ -43,23 +30,12 @@ target 'ZingoMobile' do
   end
 
   post_install do |installer|
+    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
       installer,
       config[:reactNativePath],
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
-
     )
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        # Set the preprocessing macro for the whole Pods project
-        existing_flags = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
-        existing_flags << '_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION'
-        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = existing_flags
-        if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] < '12.4'
-          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.4'
-        end
-      end
-    end
   end
 end

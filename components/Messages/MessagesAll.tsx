@@ -1,13 +1,14 @@
-/* eslint-disable react-native/no-inline-styles */
+
 import React, { useContext } from 'react';
-import MessageList from './components/MessageList';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+//import MessageList from './components/MessageList';
 
 import { ContextAppLoaded } from '../../app/context';
-import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../app/types';
 import moment from 'moment';
-import { useMagicModal } from 'react-native-magic-modal';
+import 'moment/locale/es';
+import 'moment/locale/pt';
+import 'moment/locale/ru';
+//import { useMagicModal } from 'react-native-magic-modal';
+//import { useToast } from 'react-native-toastier';
 
 type MessagesAllProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -16,35 +17,31 @@ type MessagesAllProps = {
 };
 
 const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
-  setPrivacyOption,
-  setScrollToBottom,
-  scrollToBottom,
+  //setPrivacyOption,
+  //setScrollToBottom,
+  //scrollToBottom,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { language } = context;
-  const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
+  //const { hide } = useMagicModal();
   moment.locale(language);
+  //const { clear } = useToast();
 
+  return null;
+
+  /*
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
-          backgroundColor: colors.background,
-        }}>
-        <MessageList
-          setPrivacyOption={setPrivacyOption}
-          setScrollToBottom={setScrollToBottom}
-          scrollToBottom={scrollToBottom}
-          closeModal={hide}
-        />
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <MessageList
+      setPrivacyOption={setPrivacyOption}
+      setScrollToBottom={setScrollToBottom}
+      scrollToBottom={scrollToBottom}
+      closeModal={() => {
+        clear();
+        hide();
+      }}
+    />
   );
+  */
 };
 
 export default React.memo(MessagesAll);

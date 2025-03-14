@@ -1,17 +1,15 @@
-/* eslint-disable react-native/no-inline-styles */
+
 import React, { useContext } from 'react';
 import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppState';
-import MessageList from './components/MessageList';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+//import MessageList from './components/MessageList';
 
-import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { useMagicModal } from 'react-native-magic-modal';
+//import { useMagicModal } from 'react-native-magic-modal';
+//import { useToast } from 'react-native-toastier';
 
 type MessagesAddressProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -28,41 +26,37 @@ type MessagesAddressProps = {
 };
 
 const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
-  setPrivacyOption,
-  setScrollToBottom,
-  scrollToBottom,
-  address,
-  sendTransaction,
-  setServerOption,
+  //setPrivacyOption,
+  //setScrollToBottom,
+  //scrollToBottom,
+  //address,
+  //sendTransaction,
+  //setServerOption,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { language } = context;
-  const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
+  //const { hide } = useMagicModal();
   moment.locale(language);
+  //const { clear } = useToast();
 
+  return null;
+
+  /*
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
-          backgroundColor: colors.background,
-        }}>
-        <MessageList
-          setPrivacyOption={setPrivacyOption}
-          setScrollToBottom={setScrollToBottom}
-          scrollToBottom={scrollToBottom}
-          address={address}
-          sendTransaction={sendTransaction}
-          setServerOption={setServerOption}
-          closeModal={hide}
-        />
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <MessageList
+      setPrivacyOption={setPrivacyOption}
+      setScrollToBottom={setScrollToBottom}
+      scrollToBottom={scrollToBottom}
+      address={address}
+      sendTransaction={sendTransaction}
+      setServerOption={setServerOption}
+      closeModal={() => {
+        clear();
+        hide();
+      }}
+    />
   );
+  */
 };
 
 export default React.memo(MessagesAddress);

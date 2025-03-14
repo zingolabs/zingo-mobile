@@ -110,8 +110,8 @@ android {
         applicationId 'org.ZingoLabs.Zingo' // Real
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 219 // Real
-        versionName "zingo-1.11.0" // Real
+        versionCode 225 // Real
+        versionName "zingo-1.11.1" // Real
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
@@ -222,7 +222,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
-    androidTestImplementation('com.wix:detox:20.34.4')
+    androidTestImplementation('com.wix:detox:+')
     implementation 'androidx.appcompat:appcompat:1.7.0'
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"

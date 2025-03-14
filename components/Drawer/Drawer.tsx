@@ -8,7 +8,6 @@ type DrawerProps = {
   onMenuItemSelected: (i: MenuItemEnum) => Promise<HideReturn<unknown> | undefined>;
   initialRouteName: string;
   children: any;
-  drawerContent?: (props: DrawerContentComponentProps) => React.ReactNode;
 };
 
 const SideBar = createDrawerNavigator();

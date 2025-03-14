@@ -12,10 +12,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { MagicModalPortal, magicModal } from 'react-native-magic-modal';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft, faComments } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
@@ -87,11 +86,12 @@ import History from '../../components/History';
 import Send from '../../components/Send';
 import Receive from '../../components/Receive';
 import Settings from '../../components/Settings';
-import { MessagesModal } from '../../components/Messages';
 import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
+import MessageList from '../../components/Messages/components/MessageList';
+import { ToastProvider } from 'react-native-toastier';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -352,22 +352,13 @@ export default function LoadedApp(props: LoadedAppProps) {
 
   if (loading) {
     return (
-      <SafeAreaProvider>
-        <SafeAreaView
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-          }}>
-          <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
-        </SafeAreaView>
-      </SafeAreaProvider>
+      <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
     );
   } else {
     return (
       <LoadedAppClass
         {...props}
+        navigationApp={props.navigation}
         theme={theme}
         translate={translate}
         language={language}
@@ -411,7 +402,7 @@ const Loading: React.FC<LoadingProps> = ({ backgroundColor, spinColor }) => {
 };
 
 type LoadedAppClassProps = {
-  navigation: StackScreenProps<any>['navigation'];
+  navigationApp: StackScreenProps<any>['navigation'];
   route: StackScreenProps<any>['route'];
   toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
@@ -453,7 +444,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     this.state = {
       //context
-      navigation: props.navigation,
+      navigationHome: null,
       netInfo: {} as NetInfoType,
       totalBalance: null,
       addresses: null,
@@ -479,6 +470,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       readOnly: props.readOnly,
       snackbars: [] as SnackbarType[],
       addLastSnackbar: this.addLastSnackbar,
+      removeFirstSnackbar: this.removeFirstSnackbar,
       restartApp: this.navigateToLoadingApp,
       somePending: false,
       addressBook: props.addressBook,
@@ -669,7 +661,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
 
       this.closeAllModals();
-      this.state.navigation.navigate(RouteEnums.LoadedApp, {
+      this.state.navigationHome?.navigate(RouteEnums.Home, {
         screen: this.state.translate('loadedapp.send-menu'),
         initial: false,
       });
@@ -789,6 +781,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setSeedViewModalShow = async () => {
+    const { colors } = this.props.theme;
     return magicModal.show(
       () => (
         <Seed
@@ -799,11 +792,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           keepAwake={this.keepAwake}
         />
       ),
-      { swipeDirection: undefined },
+      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
   setUfvkViewModalShow = async () => {
+    const { colors } = this.props.theme;
     return magicModal.show(
       () => (
         <ShowUfvk
@@ -813,7 +807,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           setPrivacyOption={this.setPrivacyOption}
         />
       ),
-      { swipeDirection: undefined },
+      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
@@ -1052,7 +1046,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setComputingModalShow = () => {
-    return magicModal.show(() => <ComputingTxContent />, { swipeDirection: undefined }).promise;
+    const { colors } = this.props.theme;
+    return magicModal.show(() => <ComputingTxContent />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
   };
 
   setInfo = (info: InfoType) => {
@@ -1136,40 +1131,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   onMenuItemSelected = async (item: MenuItemEnum) => {
+    const { colors } = this.props.theme;
     // Depending on the menu item, open the appropriate modal
     if (item === MenuItemEnum.About) {
-      return magicModal.show(() => <About />, { swipeDirection: undefined }).promise;
+      return magicModal.show(() => <About />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.Rescan) {
-      return magicModal.show(() => <Rescan doRescan={this.doRescan} />, { swipeDirection: undefined }).promise;
-    } else if (item === MenuItemEnum.Settings) {
-      return magicModal.show(
-        () => (
-          <Settings
-            setWalletOption={this.setWalletOption}
-            setServerOption={this.setServerOption}
-            setCurrencyOption={this.setCurrencyOption}
-            setLanguageOption={this.setLanguageOption}
-            setSendAllOption={this.setSendAllOption}
-            setDonationOption={this.setDonationOption}
-            setPrivacyOption={this.setPrivacyOption}
-            setModeOption={this.setModeOption}
-            setSecurityOption={this.setSecurityOption}
-            setSelectServerOption={this.setSelectServerOption}
-            setRescanMenuOption={this.setRescanMenuOption}
-            setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
-          />
-        ),
-        { swipeDirection: undefined },
-      ).promise;
+      return magicModal.show(() => <Rescan doRescan={this.doRescan} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.Info) {
-      return magicModal.show(() => <Info />, { swipeDirection: undefined }).promise;
+      return magicModal.show(() => <Info />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.SyncReport) {
-      return magicModal.show(() => <SyncReport />, { swipeDirection: undefined }).promise;
+      return this.setSyncReportModalShow();
     } else if (item === MenuItemEnum.FundPools) {
-      return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined })
-        .promise;
+      return this.setPoolsModalShow();
     } else if (item === MenuItemEnum.Insight) {
-      return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined })
+      return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
         .promise;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
@@ -1188,7 +1163,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: undefined },
+          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       } else {
         return magicModal.show(
@@ -1200,7 +1175,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: undefined },
+          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       }
     } else if (item === MenuItemEnum.RestoreWalletBackup) {
@@ -1214,7 +1189,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: undefined },
+          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       } else {
         return magicModal.show(
@@ -1226,7 +1201,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: undefined },
+          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       }
     } else if (item === MenuItemEnum.LoadWalletFromSeed) {
@@ -1265,7 +1240,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setState({
         addressBookCurrentAddress: '',
       });
-      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined })
+      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
         .promise;
     } else if (item === MenuItemEnum.VoteForNym) {
       let update = false;
@@ -1300,7 +1275,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.setSendPageState(newSendPageState);
       }
       this.closeAllModals();
-      this.state.navigation.navigate(RouteEnums.LoadedApp, {
+      this.state.navigationHome?.navigate(RouteEnums.Home, {
         screen: this.state.translate('loadedapp.send-menu'),
         initial: false,
       });
@@ -1308,21 +1283,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setShowSwipeableIcons(false);
       await sendEmail(this.state.translate, this.state.info.zingolib);
       this.setShowSwipeableIcons(true);
-    } else if (item === MenuItemEnum.Chats) {
-      return magicModal.show(
-        () => (
-          <MessagesModal
-            setPrivacyOption={this.setPrivacyOption /* header */}
-            setScrollToTop={this.setScrollToTop /* chats */}
-            scrollToTop={this.state.scrollToTop /* chats */}
-            setScrollToBottom={this.setScrollToBottom /* messages */}
-            scrollToBottom={this.state.scrollToBottom /* messages */}
-            sendTransaction={this.sendTransaction /* messages */}
-            setServerOption={this.setServerOption /* messages */}
-          />
-        ),
-        { swipeDirection: undefined },
-      ).promise;
     }
   };
 
@@ -1339,6 +1299,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     toast: boolean,
     sameServerChainName: boolean,
   ): Promise<void> => {
+    const { colors } = this.props.theme;
     // here I know the server was changed, clean all the tasks before anything.
     this.rpc.setInRefresh(false);
     await this.rpc.clearTimers();
@@ -1413,7 +1374,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: undefined },
+          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
         );
       } else {
         magicModal.show(
@@ -1430,7 +1391,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: undefined },
+          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
         );
       }
       //console.log(`Error Reading Wallet ${value} - ${error}`);
@@ -1567,14 +1528,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   navigateToLoadingApp = async (state: any) => {
-    const { navigation } = this.state;
-
     this.rpc.setInRefresh(false);
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
       await this.setModeOption(ModeEnum.advanced);
     }
-    navigation.reset({
+    this.props.navigationApp.reset({
       index: 0,
       routes: [
         {
@@ -1711,11 +1670,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setSyncReportModalShow = async () => {
-    return magicModal.show(() => <SyncReport />, { swipeDirection: undefined }).promise;
+    const { colors } = this.props.theme;
+    return magicModal.show(() => <SyncReport />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
   };
 
   setPoolsModalShow = async () => {
-    return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined })
+    const { colors } = this.props.theme;
+    return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
       .promise;
   };
 
@@ -1746,10 +1707,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   // close modal make sense because this is called
   // in a component which can live in differents screens
   launchAddressBook = (address: string) => {
+    const { colors } = this.props.theme;
     this.setState({
       addressBookCurrentAddress: address,
     });
-    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined })
+    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
       .promise;
   };
 
@@ -1763,6 +1725,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       scrollToBottom: value,
     });
+  };
+
+  setNavigation = (navigationHome: DrawerContentComponentProps['navigation']) => {
+    if (!this.state.navigationHome) {
+      this.setState({
+        navigationHome,
+      });
+    }
   };
 
   render() {
@@ -1783,7 +1753,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     const context = {
       //context
-      navigation: this.state.navigation,
+      navigationHome: this.state.navigationHome,
       netInfo: this.state.netInfo,
       wallet: this.state.wallet,
       totalBalance: this.state.totalBalance,
@@ -1806,6 +1776,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       readOnly: this.state.readOnly,
       snackbars: this.state.snackbars,
       addLastSnackbar: this.state.addLastSnackbar,
+      removeFirstSnackbar: this.state.removeFirstSnackbar,
       addressBook: this.state.addressBook,
       launchAddressBook: this.state.launchAddressBook,
       addressBookCurrentAddress: this.state.addressBookCurrentAddress,
@@ -1855,6 +1826,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         }
       } else if (route.name === translate('loadedapp.receive-menu')) {
         iconName = faDownload;
+      } else if (route.name === translate('loadedapp.messages-menu')) {
+        iconName = faComments;
       } else {
         iconName = faCog;
       }
@@ -1872,128 +1845,166 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     //console.log('ba', totalBalance);
 
     return (
-      <ContextAppLoadedProvider value={context}>
-        <GestureHandlerRootView>
-          <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName="Home">
-            <Drawer.Screen name="Home">
-              {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => (
-                <>
-                  <Snackbars
-                    snackbars={snackbars}
-                    removeFirstSnackbar={this.removeFirstSnackbar}
-                    translate={translate}
-                  />
-
-                  {mode === ModeEnum.advanced ||
-                  (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
-                  (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
-                    <Tab.Navigator
-                      detachInactiveScreens={true}
-                      initialRouteName={translate('loadedapp.history-menu') as string}
-                      screenOptions={({ route }) => ({
-                        tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
-                        tabBarIconStyle: {
-                          alignSelf: 'center',
-                          marginBottom: 2,
-                        },
-                        tabBarLabelPosition: 'below-icon',
-                        tabBarLabelStyle: {
-                          alignSelf: 'center',
-                          fontSize: 14,
-                        },
-                        tabBarItemStyle: {
-                          height: 60,
-                        },
-                        tabBarActiveTintColor: colors.background,
-                        tabBarActiveBackgroundColor: colors.primaryDisabled,
-                        tabBarInactiveTintColor: colors.money,
-                        tabBarInactiveBackgroundColor: colors.sideMenuBackground,
-                        tabBarStyle: {
-                          borderTopWidth: 1,
-                          height: 60,
-                        },
-                        headerShown: false,
-                        tabBarButton: renderTabPressable(colors),
-                      })}>
-                      <Tab.Screen name={translate('loadedapp.history-menu') as string}>
-                        {() => (
-                          <History
-                            toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
-                            setPrivacyOption={this.setPrivacyOption /* header */}
-                            setShieldingAmount={this.setShieldingAmount /* header */}
-                            setScrollToTop={this.setScrollToTop /* header & history */}
-                            scrollToTop={scrollToTop /* history */}
-                            setScrollToBottom={this.setScrollToBottom /* header & messages */}
-                            scrollToBottom={scrollToBottom /* messages */}
-                            sendTransaction={this.sendTransaction /* messages */}
-                            setServerOption={this.setServerOption /* messages */}
-                          />
+      <ToastProvider>
+        <ContextAppLoadedProvider value={context}>
+          <GestureHandlerRootView>
+            <Snackbars
+              snackbars={snackbars}
+              removeFirstSnackbar={this.removeFirstSnackbar}
+              translate={translate}
+            />
+            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnums.Home}>
+              <Drawer.Screen name={RouteEnums.Home}>
+                {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {
+                  useEffect(() => {
+                    this.setNavigation(navigation);
+                  });
+                  return (
+                  <>
+                    {mode === ModeEnum.advanced ||
+                    (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
+                    (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
+                      <Tab.Navigator
+                        detachInactiveScreens={true}
+                        initialRouteName={translate('loadedapp.history-menu') as string}
+                        screenOptions={({ route }) => ({
+                          tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
+                          tabBarIconStyle: {
+                            alignSelf: 'center',
+                            marginBottom: 2,
+                          },
+                          tabBarLabelPosition: 'below-icon',
+                          tabBarLabelStyle: {
+                            alignSelf: 'center',
+                            fontSize: 14,
+                          },
+                          tabBarItemStyle: {
+                            height: 60,
+                          },
+                          tabBarActiveTintColor: colors.background,
+                          tabBarActiveBackgroundColor: colors.primaryDisabled,
+                          tabBarInactiveTintColor: colors.money,
+                          tabBarInactiveBackgroundColor: colors.sideMenuBackground,
+                          tabBarStyle: {
+                            borderTopWidth: 1,
+                            height: 60,
+                          },
+                          headerShown: false,
+                          tabBarButton: renderTabPressable(colors),
+                        })}>
+                        <Tab.Screen name={translate('loadedapp.history-menu') as string}>
+                          {() => (
+                            <History
+                              toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                              setPrivacyOption={this.setPrivacyOption /* header */}
+                              setShieldingAmount={this.setShieldingAmount /* header */}
+                              setScrollToTop={this.setScrollToTop /* header & history */}
+                              scrollToTop={scrollToTop /* history */}
+                              setScrollToBottom={this.setScrollToBottom /* header & messages */}
+                              scrollToBottom={scrollToBottom /* messages */}
+                              sendTransaction={this.sendTransaction /* messages */}
+                              setServerOption={this.setServerOption /* messages */}
+                            />
+                          )}
+                        </Tab.Screen>
+                        {!readOnly &&
+                          selectServer !== SelectServerEnum.offline &&
+                          (mode === ModeEnum.advanced ||
+                            (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ||
+                            (!!totalBalance &&
+                              totalBalance.orchardBal + totalBalance.privateBal > 0 &&
+                              totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
+                              somePending)) && (
+                            <Tab.Screen name={translate('loadedapp.send-menu') as string}>
+                              {() => (
+                                <Send
+                                  toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                                  setPrivacyOption={this.setPrivacyOption /* header */}
+                                  setShieldingAmount={this.setShieldingAmount /* header */}
+                                  setScrollToTop={this.setScrollToTop /* header & send */}
+                                  setScrollToBottom={this.setScrollToBottom /* header & send */}
+                                  sendTransaction={this.sendTransaction /* send */}
+                                  setServerOption={this.setServerOption /* send */}
+                                  clearToAddr={this.clearToAddr /* send */}
+                                />
+                              )}
+                            </Tab.Screen>
+                          )}
+                        <Tab.Screen name={translate('loadedapp.receive-menu') as string}>
+                          {() => (
+                            <Receive
+                              toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                              alone={false /* receive */}
+                            />
+                          )}
+                        </Tab.Screen>
+                        <Tab.Screen name={translate('loadedapp.messages-menu') as string}>
+                          {() => (
+                            <MessageList
+                              toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                              setPrivacyOption={this.setPrivacyOption /* header */}
+                              setScrollToBottom={this.setScrollToBottom /* header & messages */}
+                              scrollToBottom={scrollToBottom /* messages */}
+                              sendTransaction={this.sendTransaction /* messages */}
+                              setServerOption={this.setServerOption /* messages */}
+                            />
+                          )}
+                        </Tab.Screen>
+                      </Tab.Navigator>
+                    ) : (
+                      <>
+                        {valueTransfersTotal === null || addresses === null || totalBalance === null ? (
+                          <Loading backgroundColor={colors.background} spinColor={colors.primary} />
+                        ) : (
+                          <Tab.Navigator
+                            initialRouteName={translate('loadedapp.history-menu') as string}
+                            screenOptions={{
+                              tabBarStyle: {
+                                display: 'none',
+                              },
+                              headerShown: false,
+                            }}>
+                            <Tab.Screen name={translate('loadedapp.history-menu') as string}>
+                              {() => (
+                                <Receive
+                                  toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                                  alone={true /* receive */}
+                                />
+                              )}
+                            </Tab.Screen>
+                          </Tab.Navigator>
                         )}
-                      </Tab.Screen>
-                      {!readOnly &&
-                        selectServer !== SelectServerEnum.offline &&
-                        (mode === ModeEnum.advanced ||
-                          (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ||
-                          (!!totalBalance &&
-                            totalBalance.orchardBal + totalBalance.privateBal > 0 &&
-                            totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
-                            somePending)) && (
-                          <Tab.Screen name={translate('loadedapp.send-menu') as string}>
-                            {() => (
-                              <Send
-                                toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
-                                setPrivacyOption={this.setPrivacyOption /* header */}
-                                setShieldingAmount={this.setShieldingAmount /* header */}
-                                setScrollToTop={this.setScrollToTop /* header & send */}
-                                setScrollToBottom={this.setScrollToBottom /* header & send */}
-                                sendTransaction={this.sendTransaction /* send */}
-                                setServerOption={this.setServerOption /* send */}
-                                clearToAddr={this.clearToAddr /* send */}
-                              />
-                            )}
-                          </Tab.Screen>
-                        )}
-                      <Tab.Screen name={translate('loadedapp.receive-menu') as string}>
-                        {() => (
-                          <Receive
-                            toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
-                            alone={false /* receive */}
-                          />
-                        )}
-                      </Tab.Screen>
-                    </Tab.Navigator>
-                  ) : (
-                    <>
-                      {valueTransfersTotal === null || addresses === null || totalBalance === null ? (
-                        <Loading backgroundColor={colors.background} spinColor={colors.primary} />
-                      ) : (
-                        <Tab.Navigator
-                          initialRouteName={translate('loadedapp.history-menu') as string}
-                          screenOptions={{
-                            tabBarStyle: {
-                              display: 'none',
-                            },
-                            headerShown: false,
-                          }}>
-                          <Tab.Screen name={translate('loadedapp.history-menu') as string}>
-                            {() => (
-                              <Receive
-                                toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
-                                alone={true /* receive */}
-                              />
-                            )}
-                          </Tab.Screen>
-                        </Tab.Navigator>
-                      )}
-                    </>
-                  )}
-                </>
-              )}
-            </Drawer.Screen>
-          </Drawer>
-          <MagicModalPortal />
-        </GestureHandlerRootView>
-      </ContextAppLoadedProvider>
+                      </>
+                    )}
+                  </>
+                );}}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnums.Settings}>
+                {() => {
+                  return (
+                  <>
+                    <Settings
+                      setWalletOption={this.setWalletOption}
+                      setServerOption={this.setServerOption}
+                      setCurrencyOption={this.setCurrencyOption}
+                      setLanguageOption={this.setLanguageOption}
+                      setSendAllOption={this.setSendAllOption}
+                      setDonationOption={this.setDonationOption}
+                      setPrivacyOption={this.setPrivacyOption}
+                      setModeOption={this.setModeOption}
+                      setSecurityOption={this.setSecurityOption}
+                      setSelectServerOption={this.setSelectServerOption}
+                      setRescanMenuOption={this.setRescanMenuOption}
+                      setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
+                    />
+                  </>
+                );}}
+              </Drawer.Screen>
+            </Drawer>
+            <MagicModalPortal />
+          </GestureHandlerRootView>
+        </ContextAppLoadedProvider>
+      </ToastProvider>
     );
   }
 }

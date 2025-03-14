@@ -99,7 +99,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     info,
     totalBalance,
     sendPageState,
-    navigation,
+    navigationHome,
     zecPrice,
     sendAll,
     netInfo,
@@ -714,7 +714,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         // Clear the fields
         clearState();
 
-        navigation.navigate(RouteEnums.LoadedApp, {
+        navigationHome?.navigate(RouteEnums.Home, {
           screen: translate('loadedapp.history-menu') as string,
           initial: false,
         });
@@ -773,7 +773,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             // Clear the fields
             clearState();
 
-            navigation.navigate(RouteEnums.LoadedApp, {
+            navigationHome?.navigate(RouteEnums.Home, {
               screen: translate('loadedapp.history-menu') as string,
               initial: false,
             });
@@ -852,7 +852,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     return magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
           updateToField(a, null, null, null, null);
         }}
-      />, { swipeDirection: undefined }
+      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -861,7 +861,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         message={memoText}
         includeUAMessage={includeUAMemoBoolean}
         setMessage={setMemoText}
-      />, { swipeDirection: undefined }
+      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -881,7 +881,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         }
         calculateFeeWithPropose={calculateFeeWithPropose}
         sendPageState={buildSendState()}
-      />, { swipeDirection: undefined }
+      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -1014,6 +1014,16 @@ const Send: React.FunctionComponent<SendProps> = ({
                     <>
                       {!updatingToField ? (
                         <RNPickerSelect
+                          style={{
+                            modalViewBottom: {
+                              minHeight: 300,
+                            },
+                          }}
+                          pickerProps={{
+                            itemStyle: {
+                              color: colors.background,
+                            },
+                          }}
                           fixAndroidTouchableBug={true}
                           value={
                             pickerTempSelectedAddress && Platform.OS === GlobalConst.platformOSios
@@ -1711,6 +1721,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   // waiting while closing the keyboard, just in case.
                   setTimeout(async () => {
                     setConfirmModalShow();
+                    Keyboard.dismiss();
                   }, 100);
                 }}
                 twoButtons={true}
@@ -1724,6 +1735,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   defaultValuesSpendableMaxAmount();
                   clearState();
                   setPickerTempSelectedAddress('');
+                  Keyboard.dismiss();
                 }}
                 twoButtons={true}
               />

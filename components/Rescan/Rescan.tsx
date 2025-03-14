@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { View, ScrollView } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -16,6 +16,8 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { ButtonTypeEnum, SelectServerEnum, SnackbarDurationEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type RescanProps = {
   doRescan: () => void;
@@ -23,10 +25,12 @@ type RescanProps = {
 
 const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
   const context = useContext(ContextAppLoaded);
-  const { wallet, translate, netInfo, addLastSnackbar, language, selectServer } = context;
+  const { wallet, translate, netInfo, addLastSnackbar, language, selectServer, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const doRescanAndClose = () => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
@@ -42,22 +46,32 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
   };
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
+    <ToastProvider>
+      <View
         style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
           backgroundColor: colors.background,
         }}>
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
+
         <Header
           title={translate('rescan.title') as string}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
         <ScrollView
           style={{ height: '80%', maxHeight: '80%' }}
@@ -80,8 +94,8 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
           }}>
           <Button type={ButtonTypeEnum.Primary} title={translate('rescan.button') as string} onPress={doRescanAndClose} />
         </View>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </View>
+    </ToastProvider>
   );
 };
 

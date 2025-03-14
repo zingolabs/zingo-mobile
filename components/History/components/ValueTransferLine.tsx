@@ -63,7 +63,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     language,
     privacy,
     info,
-    navigation,
+    navigationHome,
     showSwipeableIcons,
     readOnly,
     selectServer,
@@ -219,7 +219,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     sendPageState.toaddr.to = vt.address ? vt.address : '';
                     setSendPageState(sendPageState);
                     closeAllModals();
-                    navigation.navigate(RouteEnums.LoadedApp, {
+                    navigationHome?.navigate(RouteEnums.Home, {
                       screen: translate('loadedapp.send-menu'),
                       initial: false,
                     });

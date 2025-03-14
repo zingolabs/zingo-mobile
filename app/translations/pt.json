@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.11.0 (219)",
+  "version": "zingo-1.11.1 (225)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -33,11 +33,11 @@
   "subject": "Suporte Zingo...",
   "body": "Preciso de ajuda com...",
   "connecting": "Conectando",
-  "syncing": "Sincronizando -",
+  "syncing": "Sincronizando",
   "synced": "Sincronizada",
   "messages": {
-    "title": "Mensagens (experimental)",
-    "title-chats": "Chats (experimental)",
+    "title": "Mensagens",
+    "title-chats": "Mensagens",
     "empty": "Nenhuma mensagem ainda.",
     "message-placeholder": "Mensagem",
     "message-placeholder-error": "Não há fundos disponíveis para gastar",
@@ -361,7 +361,7 @@
     "uk": "Reino Unido",
     "select-placeholder": "Escolha um Servidor...",
     "value-language-ru": "Russo",
-    "walletkeyssaved" : "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo.",
+    "walletkeyssaved": "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo.",
     "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!"
   },
   "info": {

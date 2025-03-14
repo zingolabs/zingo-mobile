@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Text, View, ActivityIndicator, ScrollView, Image, TouchableOpacity, TextInput, Alert, NativeSyntheticEvent } from 'react-native';
+import { Text, View, ActivityIndicator, ScrollView, Image, TouchableOpacity, TextInput, Alert, NativeSyntheticEvent, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import ContextMenu, { ContextMenuOnPressNativeEvent } from 'react-native-context-menu-view';
@@ -64,7 +64,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   const { colors } = useTheme()  as ThemeType;
 
   return (
-    <View style={{ width: '100%', height: '100%' }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}>
       <View
         style={{
           backgroundColor: colors.card,
@@ -138,6 +142,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
       </View>
       <ScrollView
         style={{ maxHeight: '90%' }}
+        keyboardShouldPersistTaps={'handled'}
         contentContainerStyle={{
           flexDirection: 'column',
           alignItems: 'stretch',
@@ -264,7 +269,10 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   type={ButtonTypeEnum.Primary}
                   title={translate('save') as string}
                   disabled={actionButtonsDisabled}
-                  onPress={usingCustomServer}
+                  onPress={() => {
+                    usingCustomServer();
+                    Keyboard.dismiss();
+                  }}
                   style={{ marginBottom: 10 }}
                   twoButtons={true}
                 />
@@ -272,7 +280,10 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   type={ButtonTypeEnum.Secondary}
                   title={translate('cancel') as string}
                   disabled={actionButtonsDisabled}
-                  onPress={() => setCustomServerShow(false)}
+                  onPress={() => {
+                    setCustomServerShow(false);
+                    Keyboard.dismiss();
+                  }}
                   style={{ marginBottom: 10, marginLeft: 10 }}
                   twoButtons={true}
                 />

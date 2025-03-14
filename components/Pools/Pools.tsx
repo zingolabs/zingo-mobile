@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, ActivityIndicator } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -22,6 +22,8 @@ import { CommandEnum } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import { RPCWalletKindType } from '../../app/rpc/types/RPCWalletKindType';
 import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type PoolsProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -29,13 +31,16 @@ type PoolsProps = {
 
 const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language, shieldingAmount } = context;
+  const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language, shieldingAmount, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
+  const { top, bottom, right, left } = useSafeAreaInsets();
+  moment.locale(language);
+  const { clear } = useToast();
+
   const [orchardPool, setOrchardPool] = useState<boolean>(false);
   const [saplingPool, setSaplingPool] = useState<boolean>(false);
   const [transparentPool, setTransparentPool] = useState<boolean>(false);
-  moment.locale(language);
 
   useEffect(() => {
     (async () => {
@@ -54,15 +59,22 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
   //console.log('render pools. Balance:', totalBalance);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
+    <ToastProvider>
+      <View
         style={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          height: '100%',
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
           backgroundColor: colors.background,
         }}>
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
+
         <Header
           title={translate('pools.title') as string}
           noBalance={true}
@@ -70,7 +82,10 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
           noDrawMenu={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
-          closeScreen={hide}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
         />
         <ScrollView
           style={{ maxHeight: '90%' }}
@@ -223,8 +238,8 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
             )}
           </View>
         </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </View>
+    </ToastProvider>
   );
 };
 

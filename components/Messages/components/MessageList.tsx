@@ -60,6 +60,7 @@ import Utils from '../../../app/utils';
 import { magicModal } from 'react-native-magic-modal';
 
 type MessageListProps = {
+  toggleMenuDrawer: () => void;
   setPrivacyOption: (value: boolean) => Promise<void>;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
@@ -75,11 +76,11 @@ type MessageListProps = {
 };
 
 const MessageList: React.FunctionComponent<MessageListProps> = ({
+  toggleMenuDrawer,
   setPrivacyOption,
   setScrollToBottom,
   scrollToBottom,
   address,
-  closeModal,
   sendTransaction,
   setServerOption,
 }) => {
@@ -482,7 +483,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         message={memo}
         includeUAMessage={true}
         setMessage={setMemo}
-      />, { swipeDirection: undefined }
+      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -493,7 +494,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         valueTransfersSliced={messagesSliced}
         totalLength={messagesFiltered ? messagesFiltered.length : 0}
         setPrivacyOption={setPrivacyOption}
-      />, { swipeDirection: undefined }
+      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -505,7 +506,16 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     <KeyboardAvoidingView
       behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
-      style={{ backgroundColor: colors.background }}>
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+        }}>
       <View
         accessible={true}
         accessibilityLabel={translate('history.title-acc') as string}
@@ -522,17 +532,15 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               }%`
             : '100%',
         }}>
+        <Header
+          title={translate('messages.title') as string}
+          toggleMenuDrawer={toggleMenuDrawer}
+          noBalance={true}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar /* context */}
+          />
         {address ? (
           <>
-            <Header
-              title={translate('messages.title') as string}
-              noBalance={true}
-              noSyncingStatus={true}
-              noDrawMenu={true}
-              setPrivacyOption={setPrivacyOption}
-              addLastSnackbar={addLastSnackbar}
-              closeScreen={closeModal}
-            />
             <View
               style={{
                 display: 'flex',
@@ -584,15 +592,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           </>
         ) : (
           <>
-            <Header
-              title={translate('messages.title') as string}
-              noBalance={true}
-              noSyncingStatus={true}
-              noDrawMenu={true}
-              setPrivacyOption={setPrivacyOption}
-              addLastSnackbar={addLastSnackbar}
-              closeScreen={closeModal}
-            />
             <View style={{ flexDirection: 'row', alignSelf: 'center', alignItems: 'center', margin: 10 }}>
               <TouchableOpacity
                 onPress={() => {
@@ -903,6 +902,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           )}
         </View>
       )}
+      </View>
     </KeyboardAvoidingView>
   );
 };
