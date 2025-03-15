@@ -1,10 +1,10 @@
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { View } from 'react-native';
-import Snackbar from 'react-native-snackbar';
 import { SnackbarType } from '../../app/AppState';
 import { SnackbarDurationEnum, TranslateType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import { useTheme } from '@react-navigation/native';
+import { useToast } from 'react-native-toastier';
 
 type SnackbarProps = {
   snackbars: SnackbarType[];
@@ -13,26 +13,36 @@ type SnackbarProps = {
 };
 
 const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFirstSnackbar, translate }) => {
-  const { colors } = useTheme() as unknown as ThemeType;
-  const [snacking, setSnacking] = useState<boolean>(false);
+  const { colors } = useTheme()  as ThemeType;
+  //const [snacking, setSnacking] = useState<boolean>(false);
+  const snacking = useRef<boolean>(false);
+  const snackingMessage = useRef<string>(undefined);
   const [duration, setDuration] = useState<number>(4000);
+  const toast = useToast();
 
   const handleSnackbarClose = useCallback(() => {
-    //console.log('remove first snackbar');
-    Snackbar.dismiss();
-    removeFirstSnackbar();
-    setDuration(4000);
-    setSnacking(false);
-  }, [removeFirstSnackbar]);
+    if (snackbars[0]?.message !== snackingMessage.current) {
+      return;
+    }
+    // we need some time between messages
+    setTimeout(() => {
+      console.log('remove first snackbar', snackbars[0]?.message, snackingMessage.current);
+      snacking.current = false;
+      snackingMessage.current = undefined;
+      removeFirstSnackbar();
+      setDuration(4000);
+    }, 0);
+  }, [removeFirstSnackbar, snackbars]);
 
   // short  - 1 sec
   // long   - 4 sec
   // longer - 8 sec
 
   useEffect(() => {
-    if (snackbars.length > 0 && !snacking) {
+    if (snackbars.length > 0 && !snacking.current) {
       const currentSnackbar = snackbars[0];
-      //console.log('show snackbar', currentSnackbar);
+      snacking.current = true;
+      snackingMessage.current = currentSnackbar.message;
       setDuration(
         currentSnackbar.duration === SnackbarDurationEnum.longer
           ? 8000
@@ -40,18 +50,36 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
           ? 1000
           : 4000,
       );
-      setSnacking(true);
-      Snackbar.show({
-        text: currentSnackbar.message,
-        numberOfLines: 3,
-        duration: Snackbar.LENGTH_INDEFINITE,
-        marginBottom: 120,
-        backgroundColor: colors.secondaryDisabled,
-        textColor: colors.money,
-        action: {
-          text: translate('close') as string,
-          textColor: colors.primary,
-          onPress: () => handleSnackbarClose(),
+      console.log('show snackbar', currentSnackbar);
+      toast.show({
+        //message: currentSnackbar.message + 'vhasi  eiofjwf weoi fewo fjpe fwpf f efwp ejpo efjpwoe jp oj peowfjwpoefwpoe wpoefjwpo powe fpwoef jp wow pojfpwoej kjANLK ALCALKDSCLAK CLAK CLAKDC ALKDSCM LAKDSC LAKDC MLAKDA',
+        message: currentSnackbar.message,
+        animation: 'zoomIn',
+        duration,
+        textContainerStyle: {
+          padding: 0,
+          margin: 0,
+          paddingVertical: 10,
+        },
+        messageStyle: {
+          color: colors.money,
+          fontSize: 15,
+          padding: 0,
+          margin: 0,
+        },
+        titleStyle: {
+          fontSize: 15,
+          fontWeight: 'normal',
+          padding: 0,
+          margin: 0,
+        },
+        contentContainerStyle: {
+          flex: 0.999,
+          backgroundColor: colors.secondaryDisabled,
+          marginBottom: 100,
+          padding: 0,
+          paddingLeft: 20,
+          paddingRight: 5,
         },
       });
     }
@@ -62,28 +90,32 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     handleSnackbarClose,
     snackbars,
     snackbars.length,
-    snacking,
     translate,
+    duration,
+    toast,
   ]);
 
   useEffect(() => {
-    if (snackbars.length > 0 && snacking) {
+    if (snackbars.length > 0 && snacking.current) {
+      // we do not know if the message was properly shown
+      // closing after duration, just in case.
       const timer = setTimeout(() => {
         handleSnackbarClose();
-      }, duration);
+      }, duration + 500);
       return () => clearTimeout(timer);
     }
-  }, [duration, handleSnackbarClose, snackbars, snackbars.length, snacking]);
+  }, [duration, handleSnackbarClose, snackbars, snackbars.length]);
 
   useEffect(() => {
+    console.log('MOUNTING - snackbar');
     return () => {
       setTimeout(() => {
-        Snackbar.dismiss();
+        console.log('CLOSING - waiting for some message');
       }, 2000);
     };
-  }, []);
+  }, [toast]);
 
-  //console.log('snackbars', snackbars);
+  console.log('snackbars', snackbars, duration, snacking);
 
   return <View />;
 };

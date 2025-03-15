@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, ReactNode, useEffect } from 'react';
-import { Dimensions, View } from 'react-native';
+import { Dimensions, TouchableOpacity, View } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, Route, NavigationState, TabBarItem } from 'react-native-tab-view';
 import { useTheme } from '@react-navigation/native';
 
@@ -9,128 +9,91 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import RegText from '../Components/RegText';
-import { Scene } from 'react-native-tab-view/lib/typescript/src/types';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import { AddressClass, AddressKindEnum, ModeEnum } from '../../app/AppState';
+import { AddressClass, AddressKindEnum, ModeEnum, ReceiverEnum } from '../../app/AppState';
+import FadeText from '../Components/FadeText';
+import { ShieldedEnum } from '../../app/AppState/enums/ShieldedEnum';
 
 type ReceiveProps = {
-  setUaAddress: (uaAddress: string) => void;
   toggleMenuDrawer: () => void;
-  syncingStatusMoreInfoOnClick: () => void;
-  setUfvkViewModalVisible?: (v: boolean) => void;
+  alone: boolean;
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
-  setUaAddress,
+  // side menu
   toggleMenuDrawer,
-  syncingStatusMoreInfoOnClick,
-  setUfvkViewModalVisible,
+  // balance
+  // privacy
+  // shielding
+  // for receive
+  alone,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addresses, uaAddress, mode, addLastSnackbar, language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { translate, addresses, uOrchardAddress, mode, language } = context;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [index, setIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
 
-  const [uindex, setUIndex] = useState<number>(0);
-  const [zindex, setZIndex] = useState<number>(0);
-  const [tindex, setTIndex] = useState<number>(0);
-  const [uaddrs, setUaddrs] = useState<AddressClass[]>([]);
-  const [zaddrs, setZaddrs] = useState<AddressClass[]>([]);
-  const [taddrs, setTaddrs] = useState<AddressClass[]>([]);
+  const [uFullAddr, setUFulladdr] = useState<AddressClass>({} as AddressClass);
+  const [uOrcharSaplingdAddr, setUOrcharSaplingdAddr] = useState<AddressClass>({} as AddressClass);
+  const [uOrchardAddr, setUOrchardAddr] = useState<AddressClass>({} as AddressClass);
+  const [zAddr, setZAddr] = useState<AddressClass>({} as AddressClass);
+  const [tAddr, setTAddr] = useState<AddressClass>({} as AddressClass);
+  const [shielded, setShielded] = useState<ShieldedEnum>(ShieldedEnum.uOrchard);
 
   const dimensions = {
-    width: Dimensions.get('screen').width,
-    height: Dimensions.get('screen').height,
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
   };
 
   useEffect(() => {
-    if (addresses && addresses.length > 0 && uaAddress) {
-      const uadd = addresses.filter(a => a.addressKind === AddressKindEnum.u) || [];
-      const zadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === AddressKindEnum.z) || [];
-      const tadd = addresses.filter(a => a.uaAddress === uaAddress && a.addressKind === AddressKindEnum.t) || [];
-      setUaddrs(uadd);
-      setZaddrs(zadd);
-      setTaddrs(tadd);
-
-      const uaAddressIndex = uadd.findIndex(a => a.address === uaAddress);
-      setUIndex(uaAddressIndex);
-    } else if (addresses && addresses.length > 0) {
-      const uadd = addresses.filter(a => a.addressKind === AddressKindEnum.u) || [];
-      setUaddrs(uadd);
-
-      setUIndex(0);
+    if (addresses && addresses.length > 0) {
+      const uFullAdd =
+        addresses.filter(
+          a =>
+            a.addressKind === AddressKindEnum.u &&
+            a.receivers.length === 3 &&
+            a.receivers.includes(ReceiverEnum.o) &&
+            a.receivers.includes(ReceiverEnum.z) &&
+            a.receivers.includes(ReceiverEnum.t),
+        ) || [];
+      // this is a edge case but possible
+      // if you restore from ufvk with NO transparent receiver.
+      const uOrchardSaplingAdd =
+        addresses.filter(
+          a =>
+            a.addressKind === AddressKindEnum.u &&
+            a.receivers.length === 2 &&
+            a.receivers.includes(ReceiverEnum.o) &&
+            a.receivers.includes(ReceiverEnum.z),
+        ) || [];
+      const uOrchardAdd =
+        addresses.filter(
+          a => a.addressKind === AddressKindEnum.u && a.receivers.length === 1 && a.receivers === ReceiverEnum.o,
+        ) || [];
+      const zAdd = addresses.filter(a => a.addressKind === AddressKindEnum.z) || [];
+      const tAdd = addresses.filter(a => a.addressKind === AddressKindEnum.t) || [];
+      setUFulladdr(uFullAdd[0]);
+      setUOrcharSaplingdAddr(uOrchardSaplingAdd[0]);
+      setUOrchardAddr(uOrchardAdd[0]);
+      setZAddr(zAdd[0]);
+      setTAddr(tAdd[0]);
     }
-  }, [addresses, uaAddress]);
-
-  const prev = (type: AddressKindEnum) => {
-    if (type === AddressKindEnum.u) {
-      if (uaddrs.length === 0) {
-        return;
-      }
-      let newIndex = uindex - 1;
-      if (newIndex < 0) {
-        newIndex = uaddrs.length - 1;
-      }
-      setUIndex(newIndex);
-      setUaAddress(uaddrs[newIndex].address);
-    } else if (type === AddressKindEnum.z) {
-      if (zaddrs.length === 0) {
-        return;
-      }
-      let newIndex = zindex - 1;
-      if (newIndex < 0) {
-        newIndex = zaddrs.length - 1;
-      }
-      setZIndex(newIndex);
-    } else if (type === AddressKindEnum.t) {
-      if (taddrs.length === 0) {
-        return;
-      }
-      let newIndex = tindex - 1;
-      if (newIndex < 0) {
-        newIndex = taddrs.length - 1;
-      }
-      setTIndex(newIndex);
-    }
-  };
-
-  const next = (type: AddressKindEnum) => {
-    if (type === AddressKindEnum.u) {
-      if (uaddrs.length === 0) {
-        return;
-      }
-      const newIndex = (uindex + 1) % uaddrs.length;
-      setUIndex(newIndex);
-      setUaAddress(uaddrs[newIndex].address);
-    } else if (type === AddressKindEnum.z) {
-      if (zaddrs.length === 0) {
-        return;
-      }
-      const newIndex = (zindex + 1) % zaddrs.length;
-      setZIndex(newIndex);
-    } else if (type === AddressKindEnum.t) {
-      if (taddrs.length === 0) {
-        return;
-      }
-      const newIndex = (tindex + 1) % taddrs.length;
-      setTIndex(newIndex);
-    }
-  };
+  }, [addresses]);
 
   useEffect(() => {
-    const basicModeRoutes = [{ key: 'uaddr', title: translate('receive.u-title') as string }];
+    const basicModeRoutes = [{ key: 'uorchardaddr', title: translate('receive.u-title') as string }];
     const advancedModeRoutes = [
-      { key: 'uaddr', title: translate('receive.u-title') as string },
-      { key: 'zaddr', title: translate('receive.z-title') as string },
+      { key: 'uorchardaddr', title: translate('receive.u-title') as string },
       { key: 'taddr', title: translate('receive.t-title') as string },
     ];
+    setShielded(ShieldedEnum.uOrchard);
     setRoutes(mode === ModeEnum.basic ? basicModeRoutes : advancedModeRoutes);
   }, [mode, translate]);
 
@@ -140,85 +103,170 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     },
   ) => ReactNode = ({ route }) => {
     switch (route.key) {
-      case 'uaddr': {
-        let uaddr = translate('receive.noaddress') as string;
-        if (uaddrs.length > 0) {
-          uaddr = uaddrs[uindex].address;
+      case 'uorchardaddr': {
+        let uFull = translate('receive.noaddress') as string;
+        if (uFullAddr) {
+          uFull = uFullAddr.address;
+        }
+        let uOrchardSapling = translate('receive.noaddress') as string;
+        if (uOrcharSaplingdAddr) {
+          uOrchardSapling = uOrcharSaplingdAddr.address;
+        }
+        let uOrchard = translate('receive.noaddress') as string;
+        if (uOrchardAddr) {
+          uOrchard = uOrchardAddr.address;
+        }
+        let sapling = translate('receive.noaddress') as string;
+        if (zAddr) {
+          sapling = zAddr.address;
         }
 
         return (
-          !!addresses &&
-          !!uaAddress && (
-            <SingleAddress
-              address={uaddr}
-              index={uindex}
-              total={uaddrs.length}
-              prev={() => {
-                prev(AddressKindEnum.u);
-              }}
-              next={() => {
-                next(AddressKindEnum.u);
-              }}
-            />
-          )
-        );
-      }
-      case 'zaddr': {
-        let zaddr = translate('receive.noaddress') as string;
-        if (zaddrs.length > 0) {
-          zaddr = zaddrs[zindex].address;
-        }
-
-        return (
-          !!addresses &&
-          !!uaAddress && (
-            <SingleAddress
-              address={zaddr}
-              index={zindex}
-              total={zaddrs.length}
-              prev={() => {
-                prev(AddressKindEnum.z);
-              }}
-              next={() => {
-                next(AddressKindEnum.z);
-              }}
-            />
-          )
+          <>
+            {!!addresses && !!uOrchardAddress && (
+              <>
+                {shielded === ShieldedEnum.uFull && (
+                  <SingleAddress address={uFull} index={0} total={1} prev={() => {}} next={() => {}} />
+                )}
+                {shielded === ShieldedEnum.uOrchardSapling && (
+                  <SingleAddress address={uOrchardSapling} index={0} total={1} prev={() => {}} next={() => {}} />
+                )}
+                {shielded === ShieldedEnum.uOrchard && (
+                  <SingleAddress address={uOrchard} index={0} total={1} prev={() => {}} next={() => {}} />
+                )}
+                {shielded === ShieldedEnum.sapling && (
+                  <SingleAddress address={sapling} index={0} total={1} prev={() => {}} next={() => {}} />
+                )}
+              </>
+            )}
+            {mode === ModeEnum.advanced && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 'auto',
+                  marginHorizontal: 5,
+                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setShielded(ShieldedEnum.uOrchard);
+                  }}>
+                  <View
+                    style={{
+                      backgroundColor: shielded === ShieldedEnum.uOrchard ? colors.primary : colors.sideMenuBackground,
+                      borderRadius: 15,
+                      borderColor: shielded === ShieldedEnum.uOrchard ? colors.primary : colors.zingo,
+                      borderWidth: 1,
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      marginHorizontal: 5,
+                    }}>
+                    <FadeText
+                      style={{
+                        color: shielded === ShieldedEnum.uOrchard ? colors.sideMenuBackground : colors.zingo,
+                        fontWeight: 'bold',
+                      }}>
+                      {translate('receive.shielded-orchard') as string}
+                    </FadeText>
+                  </View>
+                </TouchableOpacity>
+                {uOrchardSapling && uOrcharSaplingdAddr && uOrcharSaplingdAddr.address && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setShielded(ShieldedEnum.uOrchardSapling);
+                    }}>
+                    <View
+                      style={{
+                        backgroundColor:
+                          shielded === ShieldedEnum.uOrchardSapling ? colors.primary : colors.sideMenuBackground,
+                        borderRadius: 15,
+                        borderColor: shielded === ShieldedEnum.uOrchardSapling ? colors.primary : colors.zingo,
+                        borderWidth: 1,
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        marginHorizontal: 5,
+                      }}>
+                      <FadeText
+                        style={{
+                          color: shielded === ShieldedEnum.uOrchardSapling ? colors.sideMenuBackground : colors.zingo,
+                          fontWeight: 'bold',
+                        }}>
+                        {translate('receive.shielded-orchard-sapling') as string}
+                      </FadeText>
+                    </View>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity
+                  onPress={() => {
+                    setShielded(ShieldedEnum.uFull);
+                  }}>
+                  <View
+                    style={{
+                      backgroundColor: shielded === ShieldedEnum.uFull ? colors.primary : colors.sideMenuBackground,
+                      borderRadius: 15,
+                      borderColor: shielded === ShieldedEnum.uFull ? colors.primary : colors.zingo,
+                      borderWidth: 1,
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      marginHorizontal: 5,
+                    }}>
+                    <FadeText
+                      style={{
+                        color: shielded === ShieldedEnum.uFull ? colors.sideMenuBackground : colors.zingo,
+                        fontWeight: 'bold',
+                      }}>
+                      {translate('receive.shielded-full') as string}
+                    </FadeText>
+                  </View>
+                </TouchableOpacity>
+                {sapling && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setShielded(ShieldedEnum.sapling);
+                    }}>
+                    <View
+                      style={{
+                        backgroundColor:
+                          shielded === ShieldedEnum.sapling ? colors.primaryDisabled : colors.sideMenuBackground,
+                        borderRadius: 15,
+                        borderColor: shielded === ShieldedEnum.sapling ? colors.primaryDisabled : colors.zingo,
+                        borderWidth: 1,
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        marginHorizontal: 10,
+                      }}>
+                      <FadeText
+                        style={{
+                          color: shielded === ShieldedEnum.sapling ? colors.sideMenuBackground : colors.zingo,
+                          fontWeight: 'bold',
+                        }}>
+                        {translate('receive.shielded-sapling') as string}
+                      </FadeText>
+                    </View>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+          </>
         );
       }
       case 'taddr': {
         let taddr = translate('receive.noaddress') as string;
-        if (taddrs.length > 0) {
-          taddr = taddrs[tindex].address;
+        if (tAddr) {
+          taddr = tAddr.address;
         }
 
         return (
           !!addresses &&
-          !!uaAddress && (
-            <SingleAddress
-              address={taddr}
-              index={tindex}
-              total={taddrs.length}
-              prev={() => {
-                prev(AddressKindEnum.t);
-              }}
-              next={() => {
-                next(AddressKindEnum.t);
-              }}
-            />
-          )
+          !!uOrchardAddress && <SingleAddress address={taddr} index={0} total={1} prev={() => {}} next={() => {}} />
         );
       }
     }
   };
 
-  const renderLabelCustom: (
-    scene: Scene<Route> & {
-      focused: boolean;
-      color: string;
-    },
-  ) => ReactNode = ({ route, focused, color }) => {
-    const w = (dimensions.width - 50) / (mode === ModeEnum.basic ? 1 : 3);
+  const renderLabelCustom: ({ route, focused, color }: {route: any, focused: any, color: any }) => ReactNode = ({ route, focused, color }) => {
+    const w = (dimensions.width - 50) / (mode === ModeEnum.basic ? 1 : 2);
     //const w = route.key === 'uaddr' ? '40%' : '30%';
     return (
       <View
@@ -266,21 +314,23 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           width: '100%',
         }}>
         <Header
+          title={
+            alone
+              ? (translate('receive.title-basic-alone') as string)
+              : mode === ModeEnum.basic
+              ? (translate('receive.title-basic') as string)
+              : (translate('receive.title-advanced') as string)
+          }
           toggleMenuDrawer={toggleMenuDrawer}
-          syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
-          title={translate('receive.title') as string}
           noBalance={true}
           noPrivacy={true}
-          setUfvkViewModalVisible={setUfvkViewModalVisible}
-          addLastSnackbar={addLastSnackbar}
         />
 
         <TabBar
           {...props}
           indicatorStyle={{ backgroundColor: colors.primary }}
           style={{ backgroundColor: colors.background }}
-          renderLabel={renderLabelCustom}
-          renderTabBarItem={p => <TabBarItem {...p} key={p.route.key} />}
+          renderTabBarItem={p => <TabBarItem {...p} key={p.route.key} label={renderLabelCustom} />}
         />
       </View>
     );

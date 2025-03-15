@@ -8,11 +8,6 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import PriceFetcher from '../components/Components/PriceFetcher';
 
-jest.useFakeTimers();
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-  FontAwesomeIcon: '',
-}));
-
 // test suite
 describe('Component PriceFetcher - test', () => {
   //snapshot test

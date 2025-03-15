@@ -13,76 +13,6 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 
-jest.useFakeTimers();
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-  FontAwesomeIcon: '',
-}));
-jest.mock('react-native-localize', () => ({
-  getNumberFormatSettings: () => {
-    return {
-      decimalSeparator: '.',
-      groupingSeparator: ',',
-    };
-  },
-}));
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-jest.mock('moment', () => {
-  // Here we are able to mock chain builder pattern
-  const mMoment = {
-    format: (p: string) => {
-      if (p === 'MMM YYYY') {
-        return 'Dec 2022';
-      } else if (p === 'YYYY MMM D h:mm a') {
-        return '2022 Dec 13 8:00 am';
-      } else if (p === 'MMM D, h:mm a') {
-        return 'Dec 13, 8:00 am';
-      }
-    },
-  };
-  // Here we are able to mock the constructor and to modify instance methods
-  const fn = () => {
-    return mMoment;
-  };
-  // Here we are able to mock moment methods that depend on moment not on a moment instance
-  fn.locale = jest.fn();
-  return fn;
-});
-jest.mock('moment/locale/es', () => () => ({
-  defineLocale: jest.fn(),
-}));
-jest.mock('moment/locale/pt', () => () => ({
-  defineLocale: jest.fn(),
-}));
-
-jest.mock('moment/locale/ru', () => () => ({
-  defineLocale: jest.fn(),
-}));
-
-jest.mock('react-native-gesture-handler', () => {
-  const View = require('react-native').View;
-  return {
-    TouchableOpacity: View,
-  };
-});
-jest.mock('@react-native-community/netinfo', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNCNetInfo = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RPCModule = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
-
 // test suite
 describe('Component History ValueTransferDetail - test', () => {
   //unit test
@@ -91,23 +21,17 @@ describe('Component History ValueTransferDetail - test', () => {
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
   state.valueTransfers = mockValueTransfers;
-  const onClose = jest.fn();
   const onSetOption = jest.fn();
-  const onMove = jest.fn();
 
   test('History ValueTransferDetail - sent ValueTransfer with 2 addresses', () => {
     render(
       <ContextAppLoadedProvider value={state}>
         <ValueTransferDetail
           index={0}
-          length={mockValueTransfers.length}
-          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[0]}
-          closeModal={onClose}
-          openModal={onClose}
+          valueTransfersSliced={mockValueTransfers}
+          totalLength={mockValueTransfers.length}
           setPrivacyOption={onSetOption}
-          setSendPageState={onClose}
-          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     ).toJSON();
@@ -124,14 +48,10 @@ describe('Component History ValueTransferDetail - test', () => {
       <ContextAppLoadedProvider value={state}>
         <ValueTransferDetail
           index={1}
-          length={mockValueTransfers.length}
-          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[1]}
-          closeModal={onClose}
-          openModal={onClose}
+          valueTransfersSliced={mockValueTransfers}
+          totalLength={mockValueTransfers.length}
           setPrivacyOption={onSetOption}
-          setSendPageState={onClose}
-          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
@@ -146,14 +66,10 @@ describe('Component History ValueTransferDetail - test', () => {
       <ContextAppLoadedProvider value={state}>
         <ValueTransferDetail
           index={2}
-          length={mockValueTransfers.length}
-          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[2]}
-          closeModal={onClose}
-          openModal={onClose}
+          valueTransfersSliced={mockValueTransfers}
+          totalLength={mockValueTransfers.length}
           setPrivacyOption={onSetOption}
-          setSendPageState={onClose}
-          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
@@ -167,14 +83,10 @@ describe('Component History ValueTransferDetail - test', () => {
       <ContextAppLoadedProvider value={state}>
         <ValueTransferDetail
           index={3}
-          length={mockValueTransfers.length}
-          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[3]}
-          closeModal={onClose}
-          openModal={onClose}
+          valueTransfersSliced={mockValueTransfers}
+          totalLength={mockValueTransfers.length}
           setPrivacyOption={onSetOption}
-          setSendPageState={onClose}
-          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
@@ -190,14 +102,10 @@ describe('Component History ValueTransferDetail - test', () => {
       <ContextAppLoadedProvider value={state}>
         <ValueTransferDetail
           index={4}
-          length={mockValueTransfers.length}
-          totalLength={mockValueTransfers.length}
           vt={mockValueTransfers[4]}
-          closeModal={onClose}
-          openModal={onClose}
+          valueTransfersSliced={mockValueTransfers}
+          totalLength={mockValueTransfers.length}
           setPrivacyOption={onSetOption}
-          setSendPageState={onClose}
-          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );
@@ -210,15 +118,11 @@ describe('Component History ValueTransferDetail - test', () => {
     render(
       <ContextAppLoadedProvider value={state}>
         <ValueTransferDetail
-          index={4}
-          length={mockValueTransfers.length}
-          totalLength={mockValueTransfers.length}
+          index={5}
           vt={mockValueTransfers[5]}
-          closeModal={onClose}
-          openModal={onClose}
+          valueTransfersSliced={mockValueTransfers}
+          totalLength={mockValueTransfers.length}
           setPrivacyOption={onSetOption}
-          setSendPageState={onClose}
-          moveValueTransferDetail={onMove}
         />
       </ContextAppLoadedProvider>,
     );

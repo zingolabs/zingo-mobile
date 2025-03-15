@@ -10,11 +10,6 @@ import ChainTypeToggle from '../components/Components/ChainTypeToggle';
 import { ChainNameEnum } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 
-jest.useFakeTimers();
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-  FontAwesomeIcon: '',
-}));
-
 // test suite
 describe('Component ChainTypeToggle - test', () => {
   //snapshot test

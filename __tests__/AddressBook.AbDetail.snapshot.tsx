@@ -11,43 +11,6 @@ import AbDetail from '../components/AddressBook/components/AbDetail';
 import { AddressBookActionEnum, AddressBookFileClass } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
-import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
-
-jest.useFakeTimers();
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-  FontAwesomeIcon: '',
-}));
-jest.mock('react-native-localize', () => ({
-  getNumberFormatSettings: () => {
-    return {
-      decimalSeparator: '.', // us
-      groupingSeparator: ',', // us
-    };
-  },
-}));
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-jest.mock('@react-native-community/netinfo', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNCNetInfo = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RPCModule = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
-jest.mock('@react-navigation/native', () => ({
-  useScrollToTop: jest.fn(),
-  useTheme: () => mockTheme,
-}));
 
 // test suite
 describe('Component Address Book Details - test', () => {

@@ -104,6 +104,7 @@ data class ValueTransfer (
 
 data class ValueTransfers (
     val value_transfers : List<ValueTransfer>,
+    val total : Long,
 )
 
 data class ParseResult (
@@ -112,8 +113,7 @@ data class ParseResult (
     val address_kind: String?
 )
 
-val reactContext = ReactApplicationContext(MainApplication.getAppContext())
-val rpcModule = RPCModule(reactContext)
+val context = MainApplication.getAppContext()!!
 
 @Category(OfflineTest::class)
 class ExecuteAddressesFromSeed {
@@ -125,7 +125,7 @@ class ExecuteAddressesFromSeed {
         val chainhint = "main"
         val seed = Seeds.ABANDON
         val birthday:ULong = 1u
-        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val datadir = context.filesDir.path
         val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -159,7 +159,7 @@ class ExecuteAddressesFromUfvk {
         val chainhint = "main"
         val ufvk = Ufvk.ABANDON
         val birthday: ULong = 1u
-        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val datadir = context.filesDir.path
         val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -199,7 +199,7 @@ class ExecuteVersionFromSeed {
         val chainhint = "main"
         val seed = Seeds.ABANDON
         val birthday:ULong = 1u
-        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val datadir = context.filesDir.path
         val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -230,7 +230,7 @@ class ExecuteSyncFromSeed {
         val chainhint = "regtest"
         val seed = Seeds.ABANDON
         val birthday:ULong = 1u
-        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val datadir = context.filesDir.path
         val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -286,7 +286,7 @@ class ExecuteSendFromOrchard {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val datadir = context.filesDir.path
         val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -321,10 +321,6 @@ class ExecuteSendFromOrchard {
         println("\nPropose:")
         println(proposeJson)
 
-        val sendProgressJson: String = uniffi.zingo.executeCommand("sendprogress", "")
-        println("\nSend progress:")
-        println(sendProgressJson)
-
         val confirmJson: String = uniffi.zingo.executeCommand("confirm", "")
         println("\nConfirm Txid:")
         println(confirmJson)
@@ -350,7 +346,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val datadir = context.filesDir.path
         val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -371,7 +367,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         println("\nSync:")
         println(syncJson)
 
-        val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
+        val valueTranfersJson: String = uniffi.zingo.getValueTransfers("50")
         println("\nValue Transfers:")
         println(valueTranfersJson)
         val valueTranfers: ValueTransfers = mapper.readValue(valueTranfersJson)
@@ -404,11 +400,13 @@ class ExecuteSaplingBalanceFromSeed {
     fun executeSaplingBalanceFromSeed() {
         val mapper = jacksonObjectMapper()
 
+        val rpcModule = RPCModule(MainApplication.getAppReactContext())
+
         val server = "http://10.0.2.2:20000"
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val datadir = context.filesDir.path
         val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -425,7 +423,7 @@ class ExecuteSaplingBalanceFromSeed {
         println("\nSync:")
         println(syncJson)
         
-        val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
+        val valueTranfersJson: String = uniffi.zingo.getValueTransfers("50")
         println("\nValue Transfers:")
         println(valueTranfersJson)
 
@@ -482,7 +480,7 @@ class ExecuteParseAddresses {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val datadir = context.filesDir.path
         val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
@@ -523,7 +521,7 @@ class ExecuteParseAddresses {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = MainApplication.getAppContext()!!.filesDir.path
+        val datadir = context.filesDir.path
         val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()

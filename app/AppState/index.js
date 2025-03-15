@@ -1,8 +1,6 @@
 import AddressClass from './classes/AddressClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
-import ReceivePageStateClass from './classes/ReceivePageStateClass';
 import SendPageStateClass from './classes/SendPageStateClass';
-import SendProgressClass from './classes/SendProgressClass';
 import SettingsFileClass from './classes/SettingsFileClass';
 import SyncingStatusClass from './classes/SyncingStatusClass';
 import ToAddrClass from './classes/ToAddrClass';
@@ -22,6 +20,7 @@ import ZecPriceType from './types/ZecPriceType';
 import SecurityType from './types/SecurityType';
 import ServerUrisType from './types/ServerUrisType';
 import ValueTransferType from './types/ValueTransferType';
+import ContactType from './types/ContactType';
 
 import { CommandEnum } from './enums/CommandEnum';
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
@@ -51,6 +50,8 @@ import { PrivacyLevelFromEnum } from './enums/PrivacyLevelFromEnum';
 import { SecurityTypeEnum } from './enums/SecurityTypeEnum';
 import { EventListenerEnum } from './enums/EventListenerEnum';
 import { ValueTransferKindEnum } from './enums/ValueTransferKindEnum';
+import { FilterEnum } from './enums/FilterEnum';
+import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
 
 import { GlobalConst } from './const/GlobalConst';
 
@@ -66,9 +67,7 @@ export {
   AppContextLoaded,
   AddressClass,
   AddressBookFileClass,
-  ReceivePageStateClass,
   SendPageStateClass,
-  SendProgressClass,
   SettingsFileClass,
   SyncingStatusClass,
   ToAddrClass,
@@ -87,6 +86,7 @@ export {
   SecurityType,
   ServerUrisType,
   ValueTransferType,
+  ContactType,
   CommandEnum,
   AddressBookActionEnum,
   MenuItemEnum,
@@ -115,5 +115,7 @@ export {
   SecurityTypeEnum,
   EventListenerEnum,
   ValueTransferKindEnum,
+  FilterEnum,
+  RefreshScreenEnum,
   GlobalConst,
 };

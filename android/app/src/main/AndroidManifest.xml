@@ -5,7 +5,6 @@
     <uses-permission android:name="android.permission.CAMERA"
         tools:ignore="PermissionImpliesUnsupportedChromeOsHardware" />
     <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
@@ -18,14 +17,16 @@
       android:largeHeap="true"
       android:usesCleartextTraffic="false"
       android:enableOnBackInvokedCallback="false"
-      android:theme="@style/AppTheme">
+      android:hardwareAccelerated="true"
+      android:theme="@style/AppTheme"
+      android:supportsRtl="true">
       <uses-library android:name="org.apache.http.legacy" android:required="false"/>
       <activity
         android:name=".MainActivity"
         android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
         android:launchMode="singleTask"
         android:screenOrientation="portrait"
-        android:windowSoftInputMode="adjustResize"
+        android:windowSoftInputMode="adjustPan"
         android:exported="true"
         tools:ignore="LockedOrientationActivity">
         <intent-filter>
@@ -37,8 +38,8 @@
             <category android:name="android.intent.category.DEFAULT" />
             <category android:name="android.intent.category.BROWSABLE" />
             <data     android:scheme="zcash"/>
-        </intent-filter>      </activity>
-      <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false" />
+        </intent-filter>
+      </activity>
     </application>
 
     <queries>

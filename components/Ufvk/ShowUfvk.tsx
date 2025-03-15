@@ -1,6 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, Alert, ActivityIndicator } from 'react-native';
+import { View, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { useTheme } from '@react-navigation/native';
 
 import Button from '../Components/Button';
@@ -8,13 +10,15 @@ import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import SingleAddress from '../Components/SingleAddress';
-import RPC from '../../app/rpc';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import RegText from '../Components/RegText';
-import { ButtonTypeEnum, ChainNameEnum, GlobalConst, ModeEnum, UfvkActionEnum } from '../../app/AppState';
+import { ButtonTypeEnum, ChainNameEnum, ModeEnum, UfvkActionEnum } from '../../app/AppState';
+import { useMagicModal } from 'react-native-magic-modal';
+import Snackbars from '../Components/Snackbars';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type TextsType = {
   new: string[];
@@ -33,9 +37,12 @@ type ShowUfvkProps = {
 };
 const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, wallet, server, mode, addLastSnackbar, language } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { translate, wallet, server, mode, addLastSnackbar, language, snackbars, removeFirstSnackbar } = context;
+  const { colors } = useTheme()  as ThemeType;
+  const { hide } = useMagicModal();
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const { clear } = useToast();
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
@@ -51,11 +58,6 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
       action === UfvkActionEnum.change || action === UfvkActionEnum.backup || action === UfvkActionEnum.server ? 1 : 0,
     );
   }, [action, translate]);
-
-  // because this screen is fired from more places than the menu.
-  useEffect(() => {
-    (async () => await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false))();
-  }, []);
 
   const onPressOK = () => {
     Alert.alert(
@@ -74,97 +76,108 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
       [
         {
           text: translate('confirm') as string,
-          onPress: () => onClickOK(),
+          onPress: () => onClickOKHide(),
         },
-        { text: translate('cancel') as string, onPress: () => onClickCancel(), style: 'cancel' },
+        { text: translate('cancel') as string, onPress: () => onClickCancelHide(), style: 'cancel' },
       ],
-      { cancelable: false, userInterfaceStyle: 'light' },
+      { cancelable: false },
     );
   };
 
+  const onClickCancelHide = () => {
+    onClickCancel();
+    clear();
+    hide();
+  };
+
+  const onClickOKHide = () => {
+    onClickOK();
+    clear();
+    hide();
+  };
+
   return (
-    <SafeAreaView
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        height: '100%',
-        backgroundColor: colors.background,
-      }}>
-      <Header
-        title={translate('ufvk.viewkey') + ' (' + translate(`seed.${action}`) + ')'}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        setPrivacyOption={setPrivacyOption}
-        addLastSnackbar={addLastSnackbar}
-      />
-
-      <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-
-      <ScrollView
-        style={{ maxHeight: '85%' }}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
-        }}>
-        <RegText style={{ marginTop: 0, padding: 20, textAlign: 'center', fontWeight: '900' }}>
-          {action === UfvkActionEnum.backup || action === UfvkActionEnum.change || action === UfvkActionEnum.server
-            ? (translate(`ufvk.text-readonly-${action}`) as string)
-            : (translate('ufvk.text-readonly') as string)}
-        </RegText>
-
-        <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
-          {!!wallet.ufvk && (
-            <SingleAddress address={wallet.ufvk} ufvk={true} index={0} total={1} prev={() => null} next={() => null} />
-          )}
-          {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}
-        </View>
-
-        <View style={{ marginBottom: 30 }} />
-      </ScrollView>
+    <ToastProvider>
       <View
         style={{
-          flexGrow: 1,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginVertical: 5,
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
+          backgroundColor: colors.background,
         }}>
-        <Button
-          type={mode === ModeEnum.basic ? ButtonTypeEnum.Secondary : ButtonTypeEnum.Primary}
-          style={{
-            backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
-          }}
-          title={
-            mode === ModeEnum.basic
-              ? (translate('cancel') as string)
-              : !!texts && !!texts[action]
-              ? texts[action][times]
-              : ''
-          }
-          onPress={() => {
-            if (!wallet.ufvk) {
-              return;
-            }
-            if (times === 0) {
-              onClickOK();
-            } else if (times === 1) {
-              onPressOK();
-            }
-          }}
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
         />
-        {times > 0 && (
+
+        <Header
+          title={translate('ufvk.viewkey') + ' (' + translate(`seed.${action}`) + ')'}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar}
+          closeScreen={onClickCancelHide}
+        />
+        <ScrollView
+          style={{ height: '80%', maxHeight: '80%' }}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
+          }}>
+          <RegText style={{ marginTop: 0, padding: 20, textAlign: 'center', fontWeight: '900' }}>
+            {action === UfvkActionEnum.backup || action === UfvkActionEnum.change || action === UfvkActionEnum.server
+              ? (translate(`ufvk.text-readonly-${action}`) as string)
+              : (translate('ufvk.text-readonly') as string)}
+          </RegText>
+
+          <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
+            {!!wallet.ufvk && (
+              <SingleAddress address={wallet.ufvk} ufvk={true} index={0} total={1} prev={() => null} next={() => null} />
+            )}
+            {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}
+          </View>
+
+          <View style={{ marginBottom: 30 }} />
+        </ScrollView>
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 5,
+          }}>
           <Button
-            type={ButtonTypeEnum.Secondary}
-            title={translate('cancel') as string}
-            style={{ marginLeft: 10 }}
-            onPress={onClickCancel}
+            type={mode === ModeEnum.basic ? ButtonTypeEnum.Secondary : ButtonTypeEnum.Primary}
+            style={{
+              backgroundColor: mode === ModeEnum.basic ? colors.background : colors.primary,
+            }}
+            title={
+              mode === ModeEnum.basic
+                ? (translate('cancel') as string)
+                : !!texts && !!texts[action]
+                ? texts[action][times]
+                : ''
+            }
+            onPress={() => {
+              if (!wallet.ufvk) {
+                return;
+              }
+              if (times === 0) {
+                onClickOKHide();
+              } else if (times === 1) {
+                onPressOK();
+              }
+            }}
           />
-        )}
+        </View>
       </View>
-    </SafeAreaView>
+    </ToastProvider>
   );
 };
 

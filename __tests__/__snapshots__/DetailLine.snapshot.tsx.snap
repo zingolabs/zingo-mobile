@@ -12,14 +12,25 @@ exports[`Component DetailLine - test DetailLine children - snapshot 1`] = `
   <Text
     style={
       {
-        "color": "rgb(28, 28, 30)",
+        "color": "#c3c3c3",
         "opacity": 0.65,
       }
     }
   >
     label
   </Text>
-  <View />
+  <Text
+    style={
+      {
+        "color": "#c3c3c3",
+        "fontSize": 18,
+        "fontWeight": "600",
+        "opacity": 1,
+      }
+    }
+  >
+    Hello
+  </Text>
 </View>
 `;
 
@@ -35,7 +46,7 @@ exports[`Component DetailLine - test DetailLine value - snapshot 1`] = `
   <Text
     style={
       {
-        "color": "rgb(28, 28, 30)",
+        "color": "#c3c3c3",
         "opacity": 0.65,
       }
     }
@@ -79,7 +90,7 @@ exports[`Component DetailLine - test DetailLine value - snapshot 1`] = `
     <Text
       style={
         {
-          "color": "rgb(28, 28, 30)",
+          "color": "#c3c3c3",
           "fontSize": 18,
           "fontWeight": "600",
           "opacity": 1,

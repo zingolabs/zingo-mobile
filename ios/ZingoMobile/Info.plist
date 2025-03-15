@@ -50,19 +50,16 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
+	 	<!-- Do not change NSAllowsArbitraryLoads to true, or you will risk app rejection! -->
 		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsLocalNetworking</key>
 		<true/>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>localhost</key>
-			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-			</dict>
-		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Zingo needs access to the camera to scan address QRCodes</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Zingo does not use any Location Features</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

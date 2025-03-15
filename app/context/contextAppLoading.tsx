@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react';
-import { StackScreenProps } from '@react-navigation/stack';
 
 import {
   AppContextLoading,
@@ -19,7 +18,6 @@ import {
 } from '../AppState';
 
 export const defaultAppContextLoading: AppContextLoading = {
-  navigation: {} as StackScreenProps<any>['navigation'],
   netInfo: {} as NetInfoType,
   wallet: {} as WalletType,
   info: {} as InfoType,
@@ -46,6 +44,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
+  removeFirstSnackbar: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
   rescanMenu: false,

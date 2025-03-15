@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.10.3 (205)",
+  "version": "zingo-1.11.1 (225)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -32,9 +32,23 @@
   "email": "zingo@zingolabs.org",
   "subject": "Suporte Zingo...",
   "body": "Preciso de ajuda com...",
+  "connecting": "Conectando",
+  "syncing": "Sincronizando",
+  "synced": "Sincronizada",
   "messages": {
     "title": "Mensagens",
-    "empty": "Nenhuma mensagem ainda."
+    "title-chats": "Mensagens",
+    "empty": "Nenhuma mensagem ainda.",
+    "message-placeholder": "Mensagem",
+    "message-placeholder-error": "Não há fundos disponíveis para gastar",
+    "search-placeholder": "Procurar",
+    "filtro-tudo": "Todos",
+    "filtro-contatos": "Contatos",
+    "filter-no-contacts": "Sem contatos",
+    "clear-filter": "Limpar:",
+    "contacts-empty": "Sem contatos ou endereços.",
+    "link-all": "Global",
+    "link-anonymous": "Anônimo"
   },
   "addressbook": {
     "title": "Address Book",
@@ -57,7 +71,8 @@
     "delete-alert": "Você realmente deseja excluir este Contato/Apelido?",
     "likely": "Provavelmente: ",
     "thiswalletaddress": "Endereço desta Carteira",
-    "addto": "Adicionar à "
+    "addto": "Adicionar à ",
+    "uorchardaddress": "EU Orchard:\n"
   },
   "change-privacy-legend": ".\nToque para revelar os valores ocultos.",
   "txtcopied": "Texto copiado para a Área de Transferência",
@@ -137,7 +152,7 @@
     "send-menu": "ENVIAR",
     "receive-menu": "RECEBER",
     "messages-menu": "MENSAGENS",
-    "syncing": "Pausando a sincronização para concluir a transação.",
+    "syncing": "Parando a sincronização para poder redefinir a carteira.",
     "zcash-url": "Você já possui um endereço na tela de envio",
     "connection-error": "Esta opção requer uma conexão com a Internet para ser executada.",
     "tryingnewserver": "Tentando conectar-se ao novo servidor... Pode levar alguns segundos.",
@@ -346,7 +361,7 @@
     "uk": "Reino Unido",
     "select-placeholder": "Escolha um Servidor...",
     "value-language-ru": "Russo",
-    "walletkeyssaved" : "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo.",
+    "walletkeyssaved": "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo.",
     "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!"
   },
   "info": {
@@ -433,7 +448,6 @@
     "Broadcast": "Transmitido e aguardando confirmação Tx:",
     "sending-error": "Erro ao enviar transação",
     "title": "Enviar",
-    "title-syncing": "Enviar - Sincronizando",
     "more": "mais...",
     "toaddress": "Endereço",
     "invalidaddress": "Endereço Inválido!",
@@ -482,23 +496,28 @@
     "donation-minimum-message": "O valor mínimo para doações é um Zenny (0,01 ZEC), tente novamente e obrigado."
   },
   "receive": {
-    "u-title": "Endereço Unificado",
+    "u-title": "Blindadas",
+    "z-title": "Z-Sapling",
+    "t-title": "Transparente exposto",
     "noaddress": "Sem Endereço",
     "unoprivkey": "Nenhum endereço unificado para importar a Chave de Gastos",
     "unoviewkey": "Nenhum endereço unificado para importar a Chave de Visualização completa",
-    "title": "Receber",
-    "title-syncing": "Receber- Sincronizando",
+    "title-advanced": "Meus Endereços",
+    "title-basic": "Meu Endereço",
+    "title-basic-alone": "Meu Endereço de Recebimento",
     "more": "mais...",
     "newu-option": "Novo Endereço Unificado Diversificado",
     "privkey-option": "Exportar Chave de Gastos",
     "viewkey-option": "Exportar Chave de Visualização Completa",
     "import-option": "Chave de Importação...",
     "title-acc": "Tela de Recebimento",
-    "z-title": "Z-Sapling",
-    "t-title": "Transparente",
     "of": " of ",
     "prev": "Anterior",
-    "next": "Próximo"
+    "next": "Próximo",
+    "shielded-orchard": "Orchard",
+    "shielded-sapling": "Z-Sapling",
+    "shielded-orchard-sapling": "Orchard+Sapling",
+    "shielded-full": "Completa"
   },
   "history": {
     "shield-all": "Blindar Todos os Fundos",
@@ -522,7 +541,6 @@
     "shield-alert-transparent": "Confirme a blindagem dos seus fundos para a pool Orchard.",
     "shield-alert-sapling": "Confirme para atualizar seus fundos para a pool Orchard ",
     "title": "Histórico",
-    "title-syncing": "Histórico - Sincronizando",
     "more": "mais...",
     "refreshing": "Atualizar",
     "end": "FIM",
@@ -564,7 +582,10 @@
     "not-confirmed": "Transação ainda não confirmada",
     "calculated": "Calculada",
     "transmitted": "Transmitida",
-    "mempool": "Em Mempool"
+    "mempool": "Em Mempool",
+    "confirmed": "Confirmada",
+    "filter-withfunds": "Com fundos",
+    "empty": "Nenhuma transação ainda."
   },
   "report": {
     "title": "Relatório de Sincronização / Rescan",
@@ -603,9 +624,9 @@
   },
   "about": {
     "copyright": [
-      "Copyright (c) 2024, ZingoLabs.",
+      "Copyright (c) 2025, ZingoLabs.",
       "Construído com React Native.",
-      "A licença do MIT (MIT) Copyright (c) 2024 Zingo",
+      "A licença do MIT (MIT) Copyright (c) 2025 Zingo",
       "A permissão é concedida gratuitamente a qualquer pessoa que obtenha uma cópia deste software e dos arquivos de documentação associados, para negociá-lo sem restrições, incluindo, sem limitações, direitos de usar, copiar, modificar, mesclar, publicar, distribuir, sublicenciar e/ou vender cópias do Software e permitir que as pessoas a quem o mesmo seja fornecido o façam, sujeito às seguintes condições:",
       "O aviso de direitos autorais acima e este aviso de permissão serão incluídos em todas as cópias ou partes substanciais do Software.",
       "O SOFTWARE É FORNECIDO 'COMO ESTÁ', SEM GARANTIA ALGUMA, SEJA EXPRESSA OU IMPLÍCITA, MAS NÃO SE LIMITANDO ÀS GARANTIAS DE COMERCIALIZAÇÃO, ADEQUAÇÃO A UM DETERMINADO FIM E SEM VIOLAÇÕES. EM HIPÓTESE ALGUMA OS AUTORES OU DETENTORES DE DIREITOS AUTORAIS SERÃO RESPONSÁVEIS POR QUALQUER RECLAMAÇÃO, DANOS OU OUTRAS RESPONSABILIDADES, SEJA EM UMA AÇÃO DE CONTRATO, ATO ILÍCITO OU DE OUTRA FORMA, DECORRENTE A ALGO RELACIONADO A CONEXÃO, A USABILIDADE OU OUTRAS NEGOCIAÇÕES NO SOFTWARE."

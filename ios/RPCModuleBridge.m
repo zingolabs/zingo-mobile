@@ -70,7 +70,8 @@ RCT_EXTERN_METHOD(getZenniesDonationAddress:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getValueTransfersList:
-    (RCTPromiseResolveBlock)resolve
+    (NSString)items 
+                  resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getTransactionSummariesList:
     (RCTPromiseResolveBlock)resolve

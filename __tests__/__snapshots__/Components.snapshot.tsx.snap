@@ -5,7 +5,7 @@ exports[`Component Components - test BoldText - snapshot 1`] = `
   style={
     {
       "backgroundColor": "red",
-      "color": "rgb(28, 28, 30)",
+      "color": "#c3c3c3",
       "fontSize": 18,
       "fontWeight": "bold",
       "opacity": 0.87,
@@ -71,24 +71,13 @@ exports[`Component Components - test CurrencyAmount High Privacy - snapshot 1`] 
         style={
           {
             "backgroundColor": "red",
-            "color": undefined,
-            "fontSize": 20,
-          }
-        }
-      >
-        $
-      </Text>
-      <Text
-        style={
-          {
-            "backgroundColor": "red",
-            "color": undefined,
+            "color": "#ffffff",
             "fontSize": 20,
             "fontWeight": "700",
           }
         }
       >
-         -.--
+        $ -.--
       </Text>
     </View>
   </View>
@@ -124,7 +113,7 @@ exports[`Component Components - test CurrencyAmount Normal Privacy - snapshot 1`
     }
     accessible={true}
     collapsable={false}
-    focusable={true}
+    focusable={false}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -150,24 +139,13 @@ exports[`Component Components - test CurrencyAmount Normal Privacy - snapshot 1`
         style={
           {
             "backgroundColor": "red",
-            "color": undefined,
-            "fontSize": 20,
-          }
-        }
-      >
-        $
-      </Text>
-      <Text
-        style={
-          {
-            "backgroundColor": "red",
-            "color": undefined,
+            "color": "#ffffff",
             "fontSize": 20,
             "fontWeight": "700",
           }
         }
       >
-         44.93
+        $ 44.93
       </Text>
     </View>
   </View>
@@ -179,7 +157,7 @@ exports[`Component Components - test ErrorText - snapshot 1`] = `
   style={
     {
       "backgroundColor": "white",
-      "color": "rgb(0, 122, 255)",
+      "color": "#18bd18",
     }
   }
 >
@@ -192,7 +170,7 @@ exports[`Component Components - test FadeText - snapshot 1`] = `
   style={
     {
       "backgroundColor": "red",
-      "color": "rgb(28, 28, 30)",
+      "color": "#c3c3c3",
       "opacity": 0.65,
     }
   }
@@ -224,7 +202,7 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
     {
       "backgroundColor": "red",
       "flexDirection": "row",
-      "margin": 5,
+      "marginHorizontal": 5,
     }
   }
 >
@@ -274,8 +252,8 @@ exports[`Component Components - test ZecAmount High Privacy - snapshot 1`] = `
     >
       <RNSVGSvgView
         align="xMidYMid"
-        bbHeight="20"
-        bbWidth="40"
+        bbHeight={20}
+        bbWidth={40}
         fill="red"
         focusable={false}
         height={20}
@@ -374,7 +352,7 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
     {
       "backgroundColor": "red",
       "flexDirection": "row",
-      "margin": 5,
+      "marginHorizontal": 5,
     }
   }
 >
@@ -398,7 +376,7 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
     }
     accessible={true}
     collapsable={false}
-    focusable={true}
+    focusable={false}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -424,8 +402,8 @@ exports[`Component Components - test ZecAmount Normal Privacy - snapshot 1`] = `
     >
       <RNSVGSvgView
         align="xMidYMid"
-        bbHeight="20"
-        bbWidth="40"
+        bbHeight={20}
+        bbWidth={40}
         fill="red"
         focusable={false}
         height={20}

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Platform, View, TouchableOpacity } from 'react-native';
+import React, { useContext, useRef } from 'react';
+import { Animated, Platform, View, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -9,7 +9,7 @@ import {
   faRefresh,
   faComment,
   faTriangleExclamation,
-  faComments,
+  //faComments,
   faFileLines,
   faPaperPlane,
 } from '@fortawesome/free-solid-svg-icons';
@@ -35,44 +35,51 @@ import 'moment/locale/ru';
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
-import Utils from '../../../app/utils';
+import { HideReturn } from 'react-native-magic-modal';
+import { isEqual } from 'lodash';
+//import Utils from '../../../app/utils';
 
 type ValueTransferLineProps = {
   index: number;
   month: string;
   vt: ValueTransferType;
-  setValueTransferDetail: (t: ValueTransferType) => void;
-  setValueTransferDetailIndex: (i: number) => void;
-  setValueTransferDetailModalShowing: (b: boolean) => void;
+  setValueTransferDetailModalShow: (i: number, v: ValueTransferType) => Promise<HideReturn<unknown>>;
   nextLineWithSameTxid: boolean;
-  setSendPageState: (s: SendPageStateClass) => void;
-  setMessagesAddressModalShowing: (b: boolean) => void;
+  setMessagesAddressModalShow: (vt: ValueTransferType) => Promise<HideReturn<unknown>>;
   addressProtected?: boolean;
 };
 const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   index,
   vt,
   month,
-  setValueTransferDetail,
-  setValueTransferDetailIndex,
-  setValueTransferDetailModalShowing,
+  setValueTransferDetailModalShow,
   nextLineWithSameTxid,
-  setSendPageState,
-  setMessagesAddressModalShowing,
+  //setMessagesAddressModalShow,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, privacy, info, navigation, showSwipeableIcons, readOnly, selectServer } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const {
+    translate,
+    language,
+    privacy,
+    info,
+    navigationHome,
+    showSwipeableIcons,
+    readOnly,
+    selectServer,
+    setSendPageState,
+    closeAllModals,
+  } = context;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
-  const [messagesAddress, setMessagesAddress] = useState<boolean>(false);
+  //const [messagesAddress, setMessagesAddress] = useState<boolean>(false);
 
-  const dimensions = {
-    width: Dimensions.get('screen').width,
-    height: Dimensions.get('screen').height,
-  };
-  const maxWidthHit = useRef<boolean>(false);
+  //const dimensions = {
+  //  width: Dimensions.get('window').width,
+  //  height: Dimensions.get('window').height,
+  //};
+  //const maxWidthHit = useRef<boolean>(false);
   const swipeableRef = useRef<Swipeable | null>(null);
 
   const getAmountColor = (_vt: ValueTransferType) => {
@@ -93,22 +100,23 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
 
   const getHaveMemo = (_vt: ValueTransferType) => {
     // if have any memo
-    const memos: string[] = _vt.memos ? _vt.memos.filter(m => !!m) : [];
-    return memos.length > 0;
+    return _vt.memos && _vt.memos.length > 0 && !!_vt.memos.join('');
   };
 
-  useEffect(() => {
-    setMessagesAddress(Utils.isMessagesAddress(vt));
-  }, [vt]);
+  //useEffect(() => {
+  //  setMessagesAddress(Utils.isMessagesAddress(vt));
+  //}, [vt]);
 
+  /*
   const handleRenderRightActions = (
     progress: Animated.AnimatedInterpolation<number>,
     dragX: Animated.AnimatedInterpolation<number>,
     swipeable: Swipeable,
   ) => {
+    const width = dimensions.width * 0.7;
     const trans = progress.interpolate({
       inputRange: [0, 1],
-      outputRange: [50, 0],
+      outputRange: [width, 0],
       extrapolate: 'extend',
     });
 
@@ -118,7 +126,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
           //console.log(value);
           setValueTransferDetail(vt);
           setValueTransferDetailIndex(index);
-          setMessagesAddressModalShowing(true);
+          setMessagesAddressModalShow(true);
           swipeable.reset();
         }
         maxWidthHit.current = true;
@@ -133,24 +141,24 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
           <Animated.View
             style={{
               flexDirection: 'row',
-              justifyContent: 'center',
+              justifyContent: 'flex-start',
               alignItems: 'center',
               transform: [{ translateX: trans }],
+              backgroundColor: colors.sideMenuBackground,
             }}>
             {messagesAddress && (
               <View
                 style={{
-                  width: 50,
-                  justifyContent: 'center',
+                  width: width,
+                  justifyContent: 'flex-start',
                   alignItems: 'center',
-                  marginLeft: 20,
                 }}>
                 <TouchableOpacity
-                  style={{ zIndex: 999, padding: 10 }}
+                  style={{ zIndex: 999, padding: 20, alignSelf: 'flex-start' }}
                   onPress={() => {
                     setValueTransferDetail(vt);
                     setValueTransferDetailIndex(index);
-                    setMessagesAddressModalShowing(true);
+                    setMessagesAddressModalShow(true);
                     swipeable.reset();
                   }}>
                   <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faComments} color={colors.money} />
@@ -162,6 +170,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       </>
     );
   };
+  */
 
   const handleRenderLeftActions = (
     progress: Animated.AnimatedInterpolation<number>,
@@ -170,7 +179,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   ) => {
     const trans = progress.interpolate({
       inputRange: [0, 1],
-      outputRange: [-100, 0],
+      outputRange: [-132, 0],
       extrapolate: 'clamp',
     });
 
@@ -183,41 +192,40 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               justifyContent: 'center',
               alignItems: 'center',
               transform: [{ translateX: trans }],
-              marginRight: 20,
+              backgroundColor: colors.sideMenuBackground,
             }}>
-            <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ width: 65, justifyContent: 'center', alignItems: 'center' }}>
               <TouchableOpacity
-                style={{ zIndex: 999, padding: 10 }}
+                style={{ zIndex: 999, padding: 20 }}
                 onPress={() => {
-                  setValueTransferDetail(vt);
-                  setValueTransferDetailIndex(index);
-                  setValueTransferDetailModalShowing(true);
+                  setValueTransferDetailModalShow(index, vt);
                   swipeable.reset();
                 }}>
-                <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faFileLines} color={colors.money} />
+                <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faFileLines} color={colors.money} />
               </TouchableOpacity>
             </View>
             {!!vt.address && !readOnly && selectServer !== SelectServerEnum.offline && !addressProtected && (
               <View
                 style={{
-                  width: 50,
+                  width: 67,
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
                 <TouchableOpacity
-                  style={{ zIndex: 999, padding: 10 }}
+                  style={{ zIndex: 999, padding: 20 }}
                   onPress={() => {
                     // enviar
                     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                     sendPageState.toaddr.to = vt.address ? vt.address : '';
                     setSendPageState(sendPageState);
-                    navigation.navigate(RouteEnums.LoadedApp, {
+                    closeAllModals();
+                    navigationHome?.navigate(RouteEnums.Home, {
                       screen: translate('loadedapp.send-menu'),
                       initial: false,
                     });
                     swipeable.reset();
                   }}>
-                  <FontAwesomeIcon size={27} icon={faPaperPlane} color={colors.primary} />
+                  <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />
                 </TouchableOpacity>
               </View>
             )}
@@ -261,17 +269,14 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       <TouchableOpacity
         style={{ zIndex: 999 }}
         onPress={() => {
-          setValueTransferDetail(vt);
-          setValueTransferDetailIndex(index);
-          setValueTransferDetailModalShowing(true);
+          setValueTransferDetailModalShow(index, vt);
           swipeableRef?.current?.reset();
         }}>
         <Swipeable
           ref={swipeableRef}
           overshootLeft={false}
-          overshootRight={messagesAddress ? true : false}
+          overshootRight={false}
           overshootFriction={1}
-          renderRightActions={handleRenderRightActions}
           renderLeftActions={handleRenderLeftActions}>
           <View
             style={{
@@ -309,7 +314,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               <View style={{ display: 'flex' }}>
                 {!!vt.address && vt.confirmations > 0 && (
                   <View>
-                    <AddressItem address={vt.address} oneLine={true} closeModal={() => {}} openModal={() => {}} />
+                    <AddressItem address={vt.address} oneLine={true} />
                   </View>
                 )}
                 <View
@@ -422,4 +427,9 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   );
 };
 
-export default React.memo(ValueTransferLine);
+export default React.memo(
+  ValueTransferLine,
+  (prev: ValueTransferLineProps, next: ValueTransferLineProps) => {
+    return isEqual(prev.vt, next.vt);
+  }
+);

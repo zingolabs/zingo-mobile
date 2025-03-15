@@ -7,27 +7,26 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
-
-//import android.util.Log
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
-import kotlin.concurrent.thread
 import org.ZingoLabs.Zingo.Constants.*
+import kotlinx.coroutines.*
 
+class RPCModule internal constructor(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext) {
+    private val applicationContext: Context = reactContext?.applicationContext ?: MainApplication.getAppContext()!!
 
-class RPCModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
     override fun getName(): String {
         return "RPCModule"
     }
 
     private fun getDocumentDirectory(): String {
-        return reactContext.applicationContext.filesDir.absolutePath
+        return applicationContext.filesDir.absolutePath
     }
 
     fun fileExists(fileName: String): Boolean {
         // Check if a file already exists
-        val file = File(MainApplication.getAppContext()?.filesDir, fileName)
+        val file = File(applicationContext.filesDir, fileName)
         return if (file.exists()) {
             Log.i("MAIN", "File $fileName exists")
             true
@@ -38,18 +37,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     private fun readFile(fileName: String): ByteArray {
-        val file = MainApplication.getAppContext()!!.openFileInput(fileName)
+        val file = applicationContext.openFileInput(fileName)
         return file.readBytes()
     }
 
     private fun writeFile(fileName: String, fileBytes: ByteArray) {
-        val file = MainApplication.getAppContext()?.openFileOutput(fileName, Context.MODE_PRIVATE)
+        val file = applicationContext.openFileOutput(fileName, Context.MODE_PRIVATE)
         file?.write(fileBytes)
         file?.close()
     }
 
     private fun deleteFile(fileName: String): Boolean {
-        val file = MainApplication.getAppContext()?.getFileStreamPath(fileName)
+        val file = applicationContext.getFileStreamPath(fileName)
         return file!!.delete()
     }
 
@@ -167,7 +166,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         uniffi.zingo.initLogging()
 
-        val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), reactContext.applicationContext.filesDir.absolutePath, chainhint, true)
+        val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), applicationContext.filesDir.absolutePath, chainhint, true)
         // Log.i("MAIN", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -346,7 +345,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return uniffi.zingo.initFromB64(
             server,
             fileb64.toString(),
-            reactContext.applicationContext.filesDir.absolutePath,
+            applicationContext.filesDir.absolutePath,
             chainhint, true
         )
     }
@@ -425,105 +424,156 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun execute(cmd: String, args: String, promise: Promise) {
-        thread {
-            uniffi.zingo.initLogging()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
 
-            // Log.i("execute", "Executing $cmd with $args")
-            val resp = uniffi.zingo.executeCommand(cmd, args)
-            // Log.i("execute", "Response to $cmd : $resp")
+                val resp = uniffi.zingo.executeCommand(cmd, args)
 
-            // And save it if it was a sync
-            if (cmd == "sync" && !resp.lowercase().startsWith(ErrorPrefix.value)) {
-                saveWalletFile()
+                if (cmd == "sync" && !resp.lowercase().startsWith(ErrorPrefix.value)) {
+                    saveWalletFile()
+                }
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: executing command '$cmd': ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                promise.resolve(errorMessage)
             }
-
-            promise.resolve(resp)
         }
     }
 
     @ReactMethod
     fun doSave(promise: Promise) {
-        thread {
-            promise.resolve(saveWalletFile())
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val result = saveWalletFile()
+
+                promise.resolve(result)
+            } catch (e: Exception) {
+                val errorMessage = "Error: saving wallet: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                promise.resolve(errorMessage)
+            }
         }
     }
 
     @ReactMethod
     fun doSaveBackup(promise: Promise) {
-        thread {
-            promise.resolve(saveWalletBackupFile())
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val result = saveWalletBackupFile()
+
+                promise.resolve(result)
+            } catch (e: Exception) {
+                val errorMessage = "Error: saving wallet backup: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                promise.resolve(errorMessage)
+            }
         }
     }
 
     @ReactMethod
     fun getLatestBlock(server: String, promise: Promise) {
-        thread {
-            uniffi.zingo.initLogging()
-            
-            // Initialize Light Client
-            val resp = uniffi.zingo.getLatestBlockServer(server)
-            promise.resolve(resp)
-        }
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getLatestBlockServer(server)
 
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: getting latest block: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                promise.resolve(errorMessage)
+            }
+        }
     }
 
     @ReactMethod
     fun getDonationAddress(promise: Promise) {
-        thread {
-            uniffi.zingo.initLogging()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getDeveloperDonationAddress()
 
-            // Initialize Light Client
-            val resp = uniffi.zingo.getDeveloperDonationAddress()
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: getting donation address: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
 
-            promise.resolve(resp)
+                promise.resolve(errorMessage)
+            }
         }
     }
 
     @ReactMethod
     fun getZenniesDonationAddress(promise: Promise) {
-        thread {
-            uniffi.zingo.initLogging()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getZenniesForZingoDonationAddress()
 
-            // Initialize Light Client
-            val resp = uniffi.zingo.getZenniesForZingoDonationAddress()
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: getting Zennies donation address: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
 
-            promise.resolve(resp)
+                promise.resolve(errorMessage)
+            }
         }
     }
 
     @ReactMethod
-    fun getValueTransfersList(promise: Promise) {
-        thread {
-            uniffi.zingo.initLogging()
+    fun getValueTransfersList(items: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getValueTransfers(items)
 
-            // Initialize Light Client
-            val resp = uniffi.zingo.getValueTransfers()
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: getting value transfers list: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
 
-            promise.resolve(resp)
+                promise.resolve(errorMessage)
+            }
         }
     }
 
     @ReactMethod
     fun getTransactionSummariesList(promise: Promise) {
-        thread {
-            uniffi.zingo.initLogging()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getTransactionSummaries()
 
-            // Initialize Light Client
-            val resp = uniffi.zingo.getTransactionSummaries()
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: getting transaction summaries list: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
 
-            promise.resolve(resp)
+                promise.resolve(errorMessage)
+            }
         }
     }
 
     @ReactMethod
     fun setCryptoDefaultProvider(promise: Promise) {
-        thread {
-            uniffi.zingo.initLogging()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.setCryptoDefaultProviderToRing()
 
-            // Initialize Light Client
-            val resp = uniffi.zingo.setCryptoDefaultProviderToRing()
-
-            promise.resolve(resp)
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: setting crypto default provider: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
         }
     }
 

@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
-import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 
 class MainActivity : ReactActivity() {
@@ -14,19 +14,20 @@ class MainActivity : ReactActivity() {
      */
 
     private var isStarting = true
-    override fun getMainComponentName(): String {
-        return "Zingo"
-    }
+
+    override fun getMainComponentName(): String = "Zingo"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("ON_CREATE", "Starting main activity")
-        super.onCreate(null)
+        super.onCreate(savedInstanceState)
     }
 
-    override fun createReactActivityDelegate(): ReactActivityDelegate? {
+    override fun createReactActivityDelegate(): ReactActivityDelegate {
+        Log.i("CREATE_REACT_ACTIVITY_DELEGATE", "Created!")
         return DefaultReactActivityDelegate(
             this,
             mainComponentName,  // If you opted-in for the New Architecture, we enable the Fabric Renderer.
-            DefaultNewArchitectureEntryPoint.fabricEnabled
+            fabricEnabled
         )
     }
     override fun onPause() {
@@ -38,6 +39,12 @@ class MainActivity : ReactActivity() {
         super.onPause()
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        Log.w("ON_WINDOW_FOCUS_CHANGE", "trying to focus.")
+        // RN fires a soft exception here if the Context is not available
+        // seems harmless.
+        super.onWindowFocusChanged(hasFocus)
+    }
 
     override fun onResume() {
         Log.i("ON_RESUME", "Resuming main activity - Foreground")

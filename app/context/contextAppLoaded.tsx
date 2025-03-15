@@ -1,10 +1,7 @@
 import React, { ReactNode } from 'react';
-import { StackScreenProps } from '@react-navigation/stack';
 
 import {
   SyncingStatusClass,
-  ReceivePageStateClass,
-  SendProgressClass,
   WalletSettingsClass,
   InfoType,
   WalletType,
@@ -26,20 +23,21 @@ import {
 } from '../AppState';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
-  navigation: {} as StackScreenProps<any>['navigation'],
+  navigationHome: null,
   netInfo: {} as NetInfoType,
   syncingStatus: new SyncingStatusClass(),
   totalBalance: null,
   addresses: null,
   valueTransfers: null,
+  valueTransfersTotal: null,
   messages: null,
+  messagesTotal: null,
   sendPageState: new SendPageStateClass(new ToAddrClass(0)),
-  receivePageState: new ReceivePageStateClass(''),
+  setSendPageState: () => {},
   info: {} as InfoType,
   walletSettings: new WalletSettingsClass(),
-  sendProgress: new SendProgressClass(0, 0, 0),
   wallet: {} as WalletType,
-  uaAddress: '',
+  uOrchardAddress: '',
   server: {} as ServerType,
   currency: CurrencyEnum.noCurrency,
   language: LanguageEnum.en,
@@ -63,18 +61,26 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},
+  removeFirstSnackbar: () => {},
   restartApp: () => {},
   somePending: false,
   addressBook: [] as AddressBookFileClass[],
-  launchAddressBook: () => {},
+  launchAddressBook: () => new Promise(resolve => resolve),
   addressBookCurrentAddress: '',
-  addressBookOpenPriorModal: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
   rescanMenu: false,
   recoveryWalletInfoOnDevice: false,
   shieldingAmount: 0,
   showSwipeableIcons: true,
+  doRefresh: () => {},
+  setZecPrice: () => {},
+  zenniesDonationAddress: '',
+  setComputingModalShow: () => new Promise(resolve => resolve),
+  closeAllModals: () => {},
+  setUfvkViewModalShow: () => new Promise(resolve => resolve),
+  setSyncReportModalShow: () => new Promise(resolve => resolve),
+  setPoolsModalShow: () => new Promise(resolve => resolve),
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

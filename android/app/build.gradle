@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.facebook.react'
-apply plugin: 'kotlin-android'
-
+apply plugin: "org.jetbrains.kotlin.android"
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -9,14 +8,14 @@ apply plugin: 'kotlin-android'
  */
 react {
     /* Folders */
-    //   The root of your project, i.e. where "package.json" lives. Default is '..'
-    // root = file("../")
-    //   The folder where the react-native NPM package is. Default is ../node_modules/react-native
-    // reactNativeDir = file("../node_modules/react-native")
-    //   The folder where the react-native Codegen package is. Default is ../node_modules/@react-native/codegen
-    // codegenDir = file("../node_modules/@react-native/codegen")
-    //   The cli.js file which is the React Native CLI entrypoint. Default is ../node_modules/react-native/cli.js
-    // cliFile = file("../node_modules/react-native/cli.js")
+    //   The root of your project, i.e. where "package.json" lives. Default is '../..'
+    // root = file("../../")
+    //   The folder where the react-native NPM package is. Default is ../../node_modules/react-native
+    // reactNativeDir = file("../../node_modules/react-native")
+    //   The folder where the react-native Codegen package is. Default is ../../node_modules/@react-native/codegen
+    // codegenDir = file("../../node_modules/@react-native/codegen")
+    //   The cli.js file which is the React Native CLI entrypoint. Default is ../../node_modules/react-native/cli.js
+    // cliFile = file("../../node_modules/react-native/cli.js")
  
     /* Variants */
     //   The list of variants to that are debuggable. For those we're going to
@@ -50,6 +49,9 @@ react {
     //
     //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
     // hermesFlags = ["-O", "-output-source-map"]
+
+    /* Autolinking */
+    autolinkLibrariesWithApp()
 }
  
 /**
@@ -61,14 +63,14 @@ def enableProguardInReleaseBuilds = false
  * The preferred build flavor of JavaScriptCore (JSC).
  *
  * For example, to use the international variant, you can use:
- * `def jscFlavor = 'org.webkit:android-jsc-intl:+'`
+ * `def jscFlavor = io.github.react-native-community:jsc-android-intl:2026004.+`
  *
  * The international variant includes ICU i18n library and necessary data
  * allowing to use e.g. `Date.toLocaleString` and `String.localeCompare` that
  * give correct results when using with locales other than en-US.  Note that
  * this variant is about 6MiB larger per architecture than default.
  */
-def jscFlavor = 'org.webkit:android-jsc:+'
+def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
 /**
  * Whether to enable building a separate APK for each ABI.
@@ -85,7 +87,8 @@ ext.includeUniversalApk = project.properties['includeUniversalApk'] ?: false
 android {
     ndkVersion rootProject.ext.ndkVersion
 
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdk rootProject.ext.compileSdkVersion
 
     namespace 'org.ZingoLabs.Zingo'
     compileOptions {
@@ -97,13 +100,18 @@ android {
         jvmTarget = '17'
     }
 
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+
     defaultConfig {
         applicationId 'org.ZingoLabs.Zingo' // Real
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 205 // Real
-        versionName "zingo-1.10.3" // Real
-        missingDimensionStrategy 'react-native-camera', 'general'
+        versionCode 225 // Real
+        versionName "zingo-1.11.1" // Real
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
@@ -123,12 +131,6 @@ android {
             storePassword 'android'
             keyAlias 'androiddebugkey'
             keyPassword 'android'
-        }
-    }
-
-    packagingOptions {
-        jniLibs {
-            pickFirsts += ['lib/armeabi-v7a/libc++_shared.so', 'lib/arm64-v8a/libc++_shared.so', 'lib/x86/libc++_shared.so', 'lib/x86_64/libc++_shared.so']
         }
     }
 
@@ -220,7 +222,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
-    androidTestImplementation('com.wix:detox:20.27.2')
+    androidTestImplementation('com.wix:detox:+')
     implementation 'androidx.appcompat:appcompat:1.7.0'
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
@@ -229,13 +231,6 @@ dependencies {
     
     // Detox tests getAttributes() needs this
     debugImplementation('com.google.android.material:material:1.12.0')
-
-    debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
-    debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
-        exclude group:'com.squareup.okhttp3', module:'okhttp'
-    }
-
-    debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
@@ -246,7 +241,7 @@ dependencies {
 	implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.5.0"
 
-    def work_version = "2.9.1"
+    def work_version = "2.10.0"
 
     // (Java only)
     implementation "androidx.work:work-runtime:$work_version"
@@ -258,7 +253,8 @@ dependencies {
     implementation "androidx.work:work-rxjava2:$work_version"
 
     // optional - GCMNetworkManager support
-    implementation "androidx.work:work-gcm:$work_version"
+    // GCM is deprecated
+    //implementation "androidx.work:work-gcm:$work_version"
 
     // optional - Test helpers
     androidTestImplementation "androidx.work:work-testing:$work_version"
@@ -270,7 +266,7 @@ dependencies {
     androidTestImplementation "com.google.truth:truth:1.1.3"
     
     // JSON parsing
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.14.3"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3"
     
     // JUnit test runners
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
@@ -282,7 +278,5 @@ dependencies {
     implementation "net.java.dev.jna:jna:5.9.0@aar"
 
     // back navigation implementation
-    implementation "androidx.activity:activity:1.6.0-alpha05"
+    implementation 'androidx.activity:activity:1.10.1'
 }
-
-apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

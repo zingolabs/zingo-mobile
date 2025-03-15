@@ -1,0 +1,25 @@
+diff --git a/node_modules/@react-native-community/netinfo/ios/RNCNetInfo.mm b/node_modules/@react-native-community/netinfo/ios/RNCNetInfo.mm
+index 6b81648..c077fe9 100644
+--- a/node_modules/@react-native-community/netinfo/ios/RNCNetInfo.mm
++++ b/node_modules/@react-native-community/netinfo/ios/RNCNetInfo.mm
+@@ -99,7 +99,7 @@ RCT_EXPORT_MODULE()
+ 
+ #pragma mark - Public API
+ 
+-RCT_EXPORT_METHOD(getCurrentState:(nullable NSString *)requestedInterface resolve:(RCTPromiseResolveBlock)resolve
++RCT_EXPORT_METHOD(getCurrentState:(NSString *)requestedInterface resolve:(RCTPromiseResolveBlock)resolve
+                   reject:(__unused RCTPromiseRejectBlock)reject)
+ {
+   RNCConnectionState *state = [self.connectionStateWatcher currentState];
+diff --git a/node_modules/@react-native-community/netinfo/src/internal/internetReachability.ts b/node_modules/@react-native-community/netinfo/src/internal/internetReachability.ts
+index f9940a5..b69ae63 100644
+--- a/node_modules/@react-native-community/netinfo/src/internal/internetReachability.ts
++++ b/node_modules/@react-native-community/netinfo/src/internal/internetReachability.ts
+@@ -75,7 +75,6 @@ export default class InternetReachability {
+     const responsePromise = fetch(this._configuration.reachabilityUrl, {
+       headers: this._configuration.reachabilityHeaders,
+       method: this._configuration.reachabilityMethod,
+-      cache: 'no-cache',
+       signal: controller.signal,
+     });
+ 

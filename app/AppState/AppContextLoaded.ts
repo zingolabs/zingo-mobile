@@ -1,10 +1,6 @@
-import { StackScreenProps } from '@react-navigation/stack';
-
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import AddressClass from './classes/AddressClass';
 import SendPageStateClass from './classes/SendPageStateClass';
-import SendProgressClass from './classes/SendProgressClass';
-import ReceivePageStateClass from './classes/ReceivePageStateClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
 import SyncingStatusClass from './classes/SyncingStatusClass';
@@ -25,9 +21,12 @@ import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import ValueTransferType from './types/ValueTransferType';
+import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
+import { HideReturn } from 'react-native-magic-modal';
+import { DrawerContentComponentProps } from '@react-navigation/drawer';
 
 export default interface AppContextLoaded {
-  navigation: StackScreenProps<any>['navigation'];
+  navigationHome: DrawerContentComponentProps['navigation'] | null;
   netInfo: NetInfoType;
 
   // The total confirmed and pending balance in this wallet
@@ -39,15 +38,15 @@ export default interface AppContextLoaded {
 
   // List of all T and Z and O value transfers
   valueTransfers: ValueTransferType[] | null;
+  valueTransfersTotal: number | null;
 
   // List of messages
   messages: ValueTransferType[] | null;
+  messagesTotal: number | null;
 
   // The state of the send page
   sendPageState: SendPageStateClass;
-
-  // Any state for the receive page
-  receivePageState: ReceivePageStateClass;
+  setSendPageState: (s: SendPageStateClass) => void;
 
   // getinfo and getblockchaininfo result
   info: InfoType;
@@ -58,14 +57,11 @@ export default interface AppContextLoaded {
   // syncing Info about the status of the process
   syncingStatus: SyncingStatusClass;
 
-  // Build progress from Tx
-  sendProgress: SendProgressClass;
-
   // wallet recovery info
   wallet: WalletType;
 
   // active UA in the wallet
-  uaAddress: string;
+  uOrchardAddress: string;
 
   // zec price in USD from internet
   zecPrice: ZecPriceType;
@@ -83,6 +79,39 @@ export default interface AppContextLoaded {
   // this wallet is watch-only (Readonly)
   readOnly: boolean;
 
+  // snackbar queue
+  snackbars: SnackbarType[];
+  addLastSnackbar: (snackbar: SnackbarType) => void;
+  removeFirstSnackbar: () => void;
+
+  // if the App is stalled - restart is fired
+  restartApp: (s: any) => void;
+
+  // some ValueTransfer is pending?
+  somePending: boolean;
+
+  // List of our contacts - Address book
+  addressBook: AddressBookFileClass[];
+
+  // helpers to open the address book modal from different places in the App
+  launchAddressBook: (add: string) => Promise<HideReturn<unknown>>;
+  addressBookCurrentAddress: string;
+
+  // is calculated in the header & needed in the send screen
+  shieldingAmount: number;
+
+  // indicate if the swipeable icons are visible or not.
+  showSwipeableIcons: boolean;
+
+  // refresh the different list in the App: history & messages
+  doRefresh: (s: RefreshScreenEnum) => void;
+
+  // fetch the ZEC price in USD
+  setZecPrice: (p: number, d: number) => void;
+
+  // donation address
+  zenniesDonationAddress: string;
+
   // settings
   server: ServerType;
   currency: CurrencyEnum;
@@ -96,29 +125,12 @@ export default interface AppContextLoaded {
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
 
-  // snackbar queue
-  snackbars: SnackbarType[];
-  addLastSnackbar: (snackbar: SnackbarType) => void;
-
-  // if the App is stalled - restart is fired
-  restartApp: (s: any) => void;
-
-  // some ValueTransfer is pending?
-  somePending: boolean;
-
-  // List of our contacts - Address book
-  addressBook: AddressBookFileClass[];
-
-  // helpers to open the address book modal from different places in the App
-  launchAddressBook: (add: string, close: () => void, open: () => void) => void;
-  addressBookCurrentAddress: string;
-  addressBookOpenPriorModal: () => void;
-
-  // is calculated in the header & needed in the send screen
-  shieldingAmount: number;
-
-  // indicate if the swipeable icons are visible or not.
-  showSwipeableIcons: boolean;
+  // modals
+  setComputingModalShow: () => Promise<HideReturn<unknown>>;
+  closeAllModals: () => void;
+  setUfvkViewModalShow: () => Promise<HideReturn<unknown>>;
+  setSyncReportModalShow: () => Promise<HideReturn<unknown>>;
+  setPoolsModalShow: () => Promise<HideReturn<unknown>>;
 
   // eslint-disable-next-line semi
 }

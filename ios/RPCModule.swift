@@ -65,20 +65,30 @@ class RPCModule: NSObject {
   @objc(walletExists:reject:)
   func walletExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      resolve(try fileExists(Constants.WalletFileName.rawValue))
+      let result = try fileExists(Constants.WalletFileName.rawValue)
+      DispatchQueue.main.async {
+        resolve(result)
+      }
     } catch {
       NSLog("wallet exists error: \(error.localizedDescription)")
-      resolve("false")
+      DispatchQueue.main.async {
+        resolve("false")
+      }
     }
   }
 
   @objc(walletBackupExists:reject:)
   func walletBackupExists(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      resolve(try fileExists(Constants.WalletBackupFileName.rawValue))
+      let result = try fileExists(Constants.WalletBackupFileName.rawValue)
+      DispatchQueue.main.async {
+        resolve(result)
+      }
     } catch {
       NSLog("wallet backup exists error: \(error.localizedDescription)")
-      resolve("false")
+      DispatchQueue.main.async {
+        resolve("false")
+      }
     }
   }
 
@@ -136,13 +146,19 @@ class RPCModule: NSObject {
     do {
       if try fileExists(Constants.WalletFileName.rawValue) == "true" {
         try self.fnDeleteExistingWallet()
-        resolve("true")
+        DispatchQueue.main.async {
+          resolve("true")
+        }
       } else {
-        resolve("false")
+        DispatchQueue.main.async {
+          resolve("false")
+        }
       }
     } catch {
       NSLog("\(error.localizedDescription)")
-      resolve("false")
+      DispatchQueue.main.async {
+        resolve("false")
+      }
     }
   }
   
@@ -159,13 +175,19 @@ class RPCModule: NSObject {
     do {
       if try fileExists(Constants.WalletBackupFileName.rawValue) == "true" {
         try self.fnDeleteExistingWalletBackup()
-        resolve("true")
+        DispatchQueue.main.async {
+          resolve("true")
+        }
       } else {
-        resolve("false")
+        DispatchQueue.main.async {
+          resolve("false")
+        }
       }
     } catch {
       NSLog("\(error.localizedDescription)")
-      resolve("false")
+      DispatchQueue.main.async {
+        resolve("false")
+      }
     }
   }
 
@@ -196,11 +218,15 @@ class RPCModule: NSObject {
   func createNewWallet(_ server: String, chainhint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
       let seedStr = try self.fnCreateNewWallet(server: server, chainhint: chainhint)
-      resolve(seedStr)
+      DispatchQueue.main.async {
+        resolve(seedStr)
+      }
     } catch {
       let err = "Error: [Native] Creating a new wallet. \(error.localizedDescription)"
       NSLog(err)
-      resolve(err)
+      DispatchQueue.main.async {
+        resolve(err)
+      }
     }
   }
   
@@ -217,11 +243,15 @@ class RPCModule: NSObject {
   func restoreWalletFromSeed(_ restoreSeed: String, birthday: String, server: String, chainhint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
       let seedStr = try self.fnRestoreWalletFromSeed(server: server, chainhint: chainhint, restoreSeed: restoreSeed, birthday: birthday)
-      resolve(seedStr)
+      DispatchQueue.main.async {
+        resolve(seedStr)
+      }
     } catch {
       let err = "Error: [Native] Restoring a wallet with seed. \(error.localizedDescription)"
       NSLog(err)
-      resolve(err)
+      DispatchQueue.main.async {
+        resolve(err)
+      }
     }
   }
   
@@ -238,11 +268,15 @@ class RPCModule: NSObject {
   func restoreWalletFromUfvk(_ restoreUfvk: String, birthday: String, server: String, chainhint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
       let ufvkStr = try self.fnRestoreWalletFromUfvk(server: server, chainhint: chainhint, restoreUfvk: restoreUfvk, birthday: birthday)
-      resolve(ufvkStr)
+      DispatchQueue.main.async {
+        resolve(ufvkStr)
+      }
     } catch {
       let err = "Error: [Native] Restoring a wallet with ufvk. \(error.localizedDescription)"
       NSLog(err)
-      resolve(err)
+      DispatchQueue.main.async {
+        resolve(err)
+      }
     }
   }
 
@@ -256,11 +290,15 @@ class RPCModule: NSObject {
   func loadExistingWallet(_ server: String, chainhint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
       let seedStr = try self.fnLoadExistingWallet(server: server, chainhint: chainhint)
-      resolve(seedStr)
+      DispatchQueue.main.async {
+        resolve(seedStr)
+      }
     } catch {
       let err = "Error: [Native] Loading existing wallet. \(error.localizedDescription)"
       NSLog(err)
-      resolve(err)
+      DispatchQueue.main.async {
+        resolve(err)
+      }
     }
   }
 
@@ -271,10 +309,14 @@ class RPCModule: NSObject {
       let walletData = try self.readWalletUtf8String()
       try self.saveWalletFile(backupData)
       try self.saveWalletBackupFile(walletData)
-      resolve("true")
+      DispatchQueue.main.async {
+        resolve("true")
+      }
     } catch {
       NSLog("Restoring existing wallet backup error: \(error.localizedDescription)")
-      resolve("false")
+      DispatchQueue.main.async {
+        resolve("false")
+      }
     }
   }
 
@@ -282,16 +324,22 @@ class RPCModule: NSObject {
     if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       do {
         try self.saveWalletInternal()
-        resolve("true")
+        DispatchQueue.main.async {
+          resolve("true")
+        }
       } catch {
         NSLog("Saving wallet error: \(error.localizedDescription)")
-        resolve("false")
+        DispatchQueue.main.async {
+          resolve("false")
+        }
       }
     } else {
       let err = "Error: [Native] Save wallet. Argument problem."
       NSLog(err)
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          resolve(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
       }
     }
   }
@@ -299,7 +347,7 @@ class RPCModule: NSObject {
   @objc(doSave:reject:)
   func doSave(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     let dict: [String: Any] = ["resolve": resolve]
-    DispatchQueue.global().async { [weak self] in
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fnDoSave(dict)
           }
@@ -310,16 +358,22 @@ class RPCModule: NSObject {
     if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       do {
         try self.saveWalletBackupInternal()
-        resolve("true")
+        DispatchQueue.main.async {
+          resolve("true")
+        }
       } catch {
         NSLog("Saving wallet backup error: \(error.localizedDescription)")
-        resolve("false")
+        DispatchQueue.main.async {
+          resolve("false")
+        }
       }
     } else {
       let err = "Error: [Native] Save wallet backup. Argument problem."
       NSLog(err)
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          resolve(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
       }
     }
   }
@@ -327,7 +381,7 @@ class RPCModule: NSObject {
   @objc(doSaveBackup:reject:)
   func doSaveBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     let dict: [String: Any] = ["resolve": resolve]
-    DispatchQueue.global().async { [weak self] in
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fndoSaveBackup(dict)
           }
@@ -347,15 +401,22 @@ class RPCModule: NSObject {
         } catch {
           let err = "Error: [Native] Executing command. Saving wallet. \(error.localizedDescription)"
           NSLog(err)
-          resolve(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+          return
         }
       }
-      resolve(respStr)
+      DispatchQueue.main.async {
+        resolve(respStr)
+      }
     } else {
       let err = "Error: [Native] Executing command. Command argument problem."
       NSLog(err)
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        resolve(err)
+        DispatchQueue.main.async {
+          resolve(err)
+        }
       }
     }
   }
@@ -363,7 +424,7 @@ class RPCModule: NSObject {
   @objc(execute:args:resolve:reject:)
   func execute(_ method: String, args: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let dict: [String: Any] = ["method": method, "args": args, "resolve": resolve]
-      DispatchQueue.global().async { [weak self] in
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.doExecuteOnThread(dict)
           }
@@ -375,12 +436,16 @@ class RPCModule: NSObject {
        let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       let resp = getLatestBlockServer(serveruri: server)
       let respStr = String(resp)
-      resolve(respStr)
+      DispatchQueue.main.async {
+        resolve(respStr)
+      }
     } else {
       let err = "Error: [Native] Getting server latest block. Argument problem."
       NSLog(err)
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          resolve(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
       }
     }
   }
@@ -388,7 +453,7 @@ class RPCModule: NSObject {
   @objc(getLatestBlock:resolve:reject:)
   func getLatestBlock(_ server: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let dict: [String: Any] = ["server": server, "resolve": resolve]
-      DispatchQueue.global().async { [weak self] in
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fnGetLatestBlock(dict)
           }
@@ -399,12 +464,16 @@ class RPCModule: NSObject {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           let resp = getDeveloperDonationAddress()
           let respStr = String(resp)
-          resolve(respStr)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
       } else {
         let err = "Error: [Native] Getting developer donation address. Command arguments problem."
         NSLog(err)
         if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-              resolve(err)
+              DispatchQueue.main.async {
+                resolve(err)
+              }
           }
       }
   }
@@ -412,7 +481,7 @@ class RPCModule: NSObject {
   @objc(getDonationAddress:reject:)
   func getDonationAddress(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global().async { [weak self] in
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fnGetDonationAddress(dict)
           }
@@ -423,12 +492,16 @@ class RPCModule: NSObject {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           let resp = getZenniesForZingoDonationAddress()
           let respStr = String(resp)
-          resolve(respStr)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
       } else {
         let err = "Error: [Native] Getting zennies donation address. Command arguments problem."
         NSLog(err)
         if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
               resolve(err)
+            }
           }
       }
   }
@@ -436,7 +509,7 @@ class RPCModule: NSObject {
   @objc(getZenniesDonationAddress:reject:)
   func getZenniesDonationAddress(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global().async { [weak self] in
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fnGetZenniesDonationAddress(dict)
           }
@@ -444,23 +517,28 @@ class RPCModule: NSObject {
   }
 
   func fnGetValueTransfersList(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = getValueTransfers()
+      if let items = dict["items"] as? String,
+         let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getValueTransfers(recentVtsToRetrive: items)
           let respStr = String(resp)
-          resolve(respStr)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
       } else {
           let err = "Error: [Native] Getting value transfers. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
               resolve(err)
+            }
           }
       }
   }
 
-  @objc(getValueTransfersList:reject:)
-  func getValueTransfersList(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global().async { [weak self] in
+  @objc(getValueTransfersList:resolve:reject:)
+  func getValueTransfersList(_ items: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["items": items, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fnGetValueTransfersList(dict)
           }
@@ -471,12 +549,16 @@ class RPCModule: NSObject {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           let resp = getTransactionSummaries()
           let respStr = String(resp)
-          resolve(respStr)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
       } else {
           let err = "Error: [Native] Getting transaction summaries list. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
               resolve(err)
+            }
           }
       }
   }
@@ -484,7 +566,7 @@ class RPCModule: NSObject {
   @objc(getTransactionSummariesList:reject:)
   func getTransactionSummariesList(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global().async { [weak self] in
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fnGetTransactionSummariesList(dict)
           }
@@ -495,12 +577,16 @@ class RPCModule: NSObject {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           let resp = setCryptoDefaultProviderToRing()
           let respStr = String(resp)
-          resolve(respStr)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
       } else {
           let err = "Error: [Native] Setting the crypto provider to ring by default. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
               resolve(err)
+            }
           }
       }
   }
@@ -508,10 +594,10 @@ class RPCModule: NSObject {
   @objc(setCryptoDefaultProvider:reject:)
   func setCryptoDefaultProvider(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global().async { [weak self] in
-          if let self = self {
-              self.fnSetCryptoDefaultProvider(dict)
-          }
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnSetCryptoDefaultProvider(dict)
+        }
       }
   }
 }

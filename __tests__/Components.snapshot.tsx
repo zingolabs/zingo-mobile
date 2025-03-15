@@ -14,16 +14,6 @@ import ErrorText from '../components/Components/ErrorText';
 import RegText from '../components/Components/RegText';
 import { CurrencyEnum, CurrencyNameEnum } from '../app/AppState';
 
-jest.mock('react-native-localize', () => ({
-  getNumberFormatSettings: () => {
-    return {
-      decimalSeparator: '.',
-      groupingSeparator: ',',
-    };
-  },
-}));
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-
 // test suite
 describe('Component Components - test', () => {
   //snapshot test

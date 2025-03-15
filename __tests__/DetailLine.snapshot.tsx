@@ -7,7 +7,7 @@ import React from 'react';
 
 import { render } from '@testing-library/react-native';
 import DetailLine from '../components/Components/DetailLine';
-import { View } from 'react-native';
+import RegText from '../components/Components/RegText';
 
 // test suite
 describe('Component DetailLine - test', () => {
@@ -17,7 +17,7 @@ describe('Component DetailLine - test', () => {
     expect(detail.toJSON()).toMatchSnapshot();
   });
   test('DetailLine children - snapshot', () => {
-    const children = <View />;
+    const children = <RegText>{'Hello'}</RegText>;
     const detail = render(<DetailLine label="label" children={children} />);
     expect(detail.toJSON()).toMatchSnapshot();
   });

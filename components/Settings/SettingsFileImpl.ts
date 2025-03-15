@@ -40,7 +40,7 @@ export default class SettingsFileImpl {
     const fileName = await this.getFileName();
 
     try {
-      const settings: SettingsFileClass = JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
+      const settings: SettingsFileClass = await JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
       // If server as string is found, I need to convert to: ServerType
       // if not, I'm losing the value
       if (!settings.hasOwnProperty(SettingsNameEnum.server)) {

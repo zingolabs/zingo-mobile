@@ -28,10 +28,14 @@ type AbSummaryLineProps = {
   item: AddressBookFileClass;
   setCurrentItem: (b: number) => void;
   setAction: (action: AddressBookActionEnum) => void;
-  setSendPageState: (s: SendPageStateClass) => void;
-  closeModal: () => void;
   handleScrollToTop: () => void;
-  doAction: (action: AddressBookActionEnum, label: string, address: string) => void;
+  doAction: (
+    action: AddressBookActionEnum,
+    label: string,
+    address: string,
+    uOrchardAddress: string,
+    color: string,
+  ) => void;
   addressProtected?: boolean;
 };
 const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
@@ -39,15 +43,13 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   item,
   setCurrentItem,
   setAction,
-  setSendPageState,
-  closeModal,
   handleScrollToTop,
   doAction,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, navigation, readOnly, mode, totalBalance, language, selectServer } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { translate, navigationHome, readOnly, mode, totalBalance, language, selectServer, setSendPageState, closeAllModals } = context;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const displayAddress = item.address ? Utils.trimToSmall(item.address, 7) : 'Unknown';
@@ -64,11 +66,18 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
       [
         {
           text: translate('confirm') as string,
-          onPress: () => doAction(AddressBookActionEnum.Delete, item.label, item.address),
+          onPress: () =>
+            doAction(
+              AddressBookActionEnum.Delete,
+              item.label,
+              item.address,
+              item.uOrchardAddress ? item.uOrchardAddress : '',
+              item.color ? item.color : '',
+            ),
         },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
-      { cancelable: false, userInterfaceStyle: 'light' },
+      { cancelable: false },
     );
   };
 
@@ -100,7 +109,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 style={{ marginHorizontal: 10 }}
                 size={24}
                 icon={faAddressCard}
-                color={addressProtected ? colors.zingo : colors.primaryDisabled}
+                color={addressProtected ? colors.zingo : item.color ? item.color : colors.primarydisabled}
               />
               <FadeText
                 style={{
@@ -150,8 +159,8 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
-                  closeModal();
-                  navigation.navigate(RouteEnums.LoadedApp, {
+                  closeAllModals();
+                  navigationHome?.navigate(RouteEnums.Home, {
                     screen: translate('loadedapp.send-menu'),
                     initial: false,
                   });

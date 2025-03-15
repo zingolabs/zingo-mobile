@@ -21,4 +21,5 @@ export const GlobalConst = {
   background: '@background',
   keyKeyChain: 'ZINGO_SEED_BIRTHDAY',
   serviceKeyChain: 'ZINGO',
+  replyTo: '\nReply to: \n',
 };

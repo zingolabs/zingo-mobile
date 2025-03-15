@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.10.3 (205)",
+  "version": "zingo-1.11.1 (225)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
@@ -32,9 +32,23 @@
   "email": "zingo@zingolabs.org",
   "subject": "Zingo Support...",
   "body": "I need help with...",
+  "connecting": "Connecting",
+  "syncing": "Syncing",
+  "synced": "Synced",
   "messages": {
     "title": "Messages",
-    "empty": "No Messages yet."
+    "title-chats": "Messages",
+    "empty": "No Messages yet.",
+    "message-placeholder": "Message",
+    "message-placeholder-error": "No spendable funds available",
+    "search-placeholder": "Search",
+    "filter-all": "All",
+    "filter-contacts": "Contacts",
+    "filter-no-contacts": "No contacts",
+    "clear-filter": "Clear:",
+    "contacts-empty": "No Contacts or Addresses.",
+    "link-all": "Global",
+    "link-anonymous": "Anonymous"
   },
   "addressbook": {
     "title": "Address Book",
@@ -57,13 +71,14 @@
     "delete-alert": "Do you really want to delete this Contact/Nickname/Label/Tag?",
     "likely": "Likely: ",
     "thiswalletaddress": "This Wallet's Address",
-    "addto": "Add to "
+    "addto": "Add to ",
+    "uorchardaddress": "Orchard UA:\n"
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",
   "insight": {
     "title": "Financial Insight",
-    "no-data": "There is no data in your Wallet that fit the graph selected.",
+    "no-data": "There is no data in your Wallet that fits the graph selected.",
     "sent": "Sent",
     "sends": "# sends",
     "memobytes": "# bytes",
@@ -137,7 +152,7 @@
     "send-menu": "SEND",
     "receive-menu": "RECEIVE",
     "messages-menu": "MESSAGES",
-    "syncing": "Pausing the Synchronization to be able to Complete the Transaction.",
+    "syncing": "Stopping the Synchronization to be able to reset the wallet.",
     "zcash-url": "You already have an address in the send screen",
     "connection-error": "This option requires an internet connection to be executed.",
     "tryingnewserver": "Trying to connect to the new Server... Can take a few seconds.",
@@ -346,7 +361,7 @@
     "uk": "UK",
     "select-placeholder": "Choose a Server...",
     "value-language-ru": "Russian",
-    "walletkeyssaved" : "The last Wallet Recovery Info stored safely in the device.",
+    "walletkeyssaved": "The last Wallet Recovery Info stored safely in the device.",
     "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!"
   },
   "info": {
@@ -373,33 +388,12 @@
   },
   "seed": {
     "buttontexts": {
-      "new": [
-        "I have saved \n the seed"
-      ],
-      "change": [
-        "",
-        "Open New",
-        "You really want \n to change your \n actual wallet",
-        "Are you certain?"
-      ],
-      "server": [
-        "",
-        "Change Server",
-        "You really want \n to change your \n actual server",
-        "Are you certain?"
-      ],
-      "view": [
-        "I have saved \n the seed"
-      ],
-      "restore": [
-        "Restore Wallet"
-      ],
-      "backup": [
-        "",
-        "Restore",
-        "You really want \n to restore your \n backup wallet",
-        "Are you certain?"
-      ]
+      "new": ["I have saved \n the seed"],
+      "change": ["", "Open New", "You really want \n to change your \n actual wallet", "Are you certain?"],
+      "server": ["", "Change Server", "You really want \n to change your \n actual server", "Are you certain?"],
+      "view": ["I have saved \n the seed"],
+      "restore": ["Restore Wallet"],
+      "backup": ["", "Restore", "You really want \n to restore your \n backup wallet", "Are you certain?"]
     },
     "title": "Seed",
     "new": "New",
@@ -433,7 +427,6 @@
     "Broadcast": "Broadcasted and awaiting confirmation Tx:",
     "sending-error": "Error sending transaction",
     "title": "Send",
-    "title-syncing": "Send - Syncing",
     "more": "more...",
     "toaddress": "To Address",
     "invalidaddress": "Invalid Address!",
@@ -482,23 +475,28 @@
     "donation-minimum-message": "The minimum amount for donations is a Zenny (0.01 ZEC), Try again and Thanks."
   },
   "receive": {
-    "u-title": "Unified Address",
+    "u-title": "Shielded",
+    "z-title": "Z-Sapling",
+    "t-title": "Exposed transparent",
     "noaddress": "No Address",
     "unoprivkey": "No Unified address to import the Spending Key",
     "unoviewkey": "No Unified address to import the Full Viewing Key",
-    "title": "Receive",
-    "title-syncing": "Receive - Syncing",
+    "title-advanced": "My Addresses",
+    "title-basic": "My Address",
+    "title-basic-alone": "My Receiving Address",
     "more": "more...",
     "newu-option": "New Diversified Unified Address",
     "privkey-option": "Export Spending Key",
     "viewkey-option": "Export Full Viewing Key",
     "import-option": "Import Key...",
     "title-acc": "Receive Screen",
-    "z-title": "Z-Sapling",
-    "t-title": "Transparent",
     "of": " of ",
     "prev": "Prev",
-    "next": "Next"
+    "next": "Next",
+    "shielded-orchard": "Orchard",
+    "shielded-sapling": "Z-Sapling",
+    "shielded-orchard-sapling": "Orchard+Sapling",
+    "shielded-full": "Full"
   },
   "history": {
     "shield-all": "Shield All funds",
@@ -522,7 +520,6 @@
     "shield-alert-transparent": "Confirm to shield your funds to the latest Orchard shielded pool.",
     "shield-alert-sapling": "Confirm to upgrade your funds to the latest Orchard shielded pool",
     "title": "History",
-    "title-syncing": "History - Syncing",
     "more": "more...",
     "refreshing": "Refreshing",
     "end": "END",
@@ -564,7 +561,10 @@
     "not-confirmed": "Transaction not yet confirmed",
     "calculated": "Calculated",
     "transmitted": "Transmitted",
-    "mempool": "In Mempool"
+    "mempool": "In Mempool",
+    "confirmed": "Confirmed",
+    "filter-withfunds": "With funds",
+    "empty": "No Transactions yet."
   },
   "report": {
     "title": "Sync / Rescan Report",
@@ -603,9 +603,9 @@
   },
   "about": {
     "copyright": [
-      "Copyright (c) 2024, ZingoLabs.",
+      "Copyright (c) 2025, ZingoLabs.",
       "Built with React Native.",
-      "The MIT License (MIT) Copyright (c) 2024 Zingo",
+      "The MIT License (MIT) Copyright (c) 2025 Zingo",
       "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:",
       "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
       "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
@@ -620,33 +620,12 @@
   },
   "ufvk": {
     "buttontexts": {
-      "new": [
-        "I have saved \n the Viewing Key"
-      ],
-      "change": [
-        "",
-        "Open New",
-        "You really want \n to change your \n actual wallet",
-        "Are you certain?"
-      ],
-      "server": [
-        "",
-        "Change Server",
-        "You really want \n to change your \n actual server",
-        "Are you certain?"
-      ],
-      "view": [
-        "I have saved \n the Viewing Key"
-      ],
-      "restore": [
-        "Restore Wallet"
-      ],
-      "backup": [
-        "",
-        "Restore",
-        "You really want \n to restore your \n backup wallet",
-        "Are you certain?"
-      ]
+      "new": ["I have saved \n the Viewing Key"],
+      "change": ["", "Open New", "You really want \n to change your \n actual wallet", "Are you certain?"],
+      "server": ["", "Change Server", "You really want \n to change your \n actual server", "Are you certain?"],
+      "view": ["I have saved \n the Viewing Key"],
+      "restore": ["Restore Wallet"],
+      "backup": ["", "Restore", "You really want \n to restore your \n backup wallet", "Are you certain?"]
     },
     "privkey": "Spending/Private ",
     "viewkey": "Viewing Key ",

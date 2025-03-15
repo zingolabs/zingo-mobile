@@ -1,7 +1,7 @@
 export enum MenuItemEnum {
   WalletSeedUfvk = 'Wallet Seed Ufvk',
   Rescan = 'Rescan',
-  Settings = 'Settings',
+  //Settings = 'Settings',
   ChangeWallet = 'Change Wallet',
   RestoreWalletBackup = 'Restore Wallet Backup',
   SyncReport = 'Sync Report',
@@ -14,4 +14,5 @@ export enum MenuItemEnum {
   Info = 'Info',
   VoteForNym = 'Vote For Nym',
   Support = 'Support',
+  //Chats = 'Chats',
 }

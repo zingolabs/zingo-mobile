@@ -12,10 +12,7 @@ import { CurrencyEnum } from '../app/AppState';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 
-jest.useFakeTimers();
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-  FontAwesomeIcon: '',
-}));
+// don't delete -> mocking in Spanish.
 jest.mock('react-native-localize', () => ({
   getNumberFormatSettings: () => {
     return {
@@ -24,25 +21,6 @@ jest.mock('react-native-localize', () => ({
     };
   },
 }));
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-jest.mock('@react-native-community/netinfo', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNCNetInfo = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RPCModule = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
 
 // test suite
 describe('Component Info - test', () => {
@@ -52,13 +30,11 @@ describe('Component Info - test', () => {
     state.info = mockInfo;
     state.zecPrice = mockZecPrice;
     state.currency = CurrencyEnum.USDCurrency;
-    const onClose = jest.fn();
-    const onSet = jest.fn();
     render(
       <ContextAppLoadedProvider value={state}>
-        <Info closeModal={onClose} setZecPrice={onSet} />
+        <Info />
       </ContextAppLoadedProvider>,
     );
-    screen.getByText('33,33');
+    screen.getByText('$ 33,33');
   });
 });

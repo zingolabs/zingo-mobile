@@ -4,13 +4,14 @@ import {
   faCheck,
   faInfoCircle,
   faPlay,
-  faPause,
   faCloudDownload,
   faLockOpen,
   faLock,
   faSnowflake,
   //faXmark,
   faWifi,
+  faChevronLeft,
+  faGear,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
@@ -28,6 +29,7 @@ import {
   GlobalConst,
   CommandEnum,
   SelectServerEnum,
+  RouteEnums,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
@@ -35,7 +37,7 @@ import CurrencyAmount from '../Components/CurrencyAmount';
 import PriceFetcher from '../Components/PriceFetcher';
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
-import { NetInfoStateType } from '@react-native-community/netinfo';
+import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import Button from '../Components/Button';
 import RPC from '../../app/rpc';
 import { RPCShieldType } from '../../app/rpc/types/RPCShieldType';
@@ -52,35 +54,38 @@ import { RPCShieldProposeType } from '../../app/rpc/types/RPCShieldProposeType';
 import RPCModule from '../../app/RPCModule';
 
 type HeaderProps = {
-  poolsMoreInfoOnClick?: () => void;
-  syncingStatusMoreInfoOnClick?: () => void;
-  toggleMenuDrawer?: () => void;
-  setZecPrice?: (p: number, d: number) => void;
-  title: string;
-  noBalance?: boolean;
-  noSyncingStatus?: boolean;
-  noDrawMenu?: boolean;
+  // general
   testID?: string;
-  translate?: (key: string) => TranslateType;
-  netInfo?: NetInfoType;
-  mode?: ModeEnum;
-  setComputingModalVisible?: (visible: boolean) => void;
-  setBackgroundError?: (title: string, error: string) => void;
+  title: string;
+  // side menu
+  noDrawMenu?: boolean;
+  toggleMenuDrawer?: () => void;
+  closeScreen?: () => void;
+  // balance
+  noBalance?: boolean;
+  // syncing icons
+  noSyncingStatus?: boolean;
+  // privacy
   noPrivacy?: boolean;
   setPrivacyOption?: (value: boolean) => Promise<void>;
-  setUfvkViewModalVisible?: (v: boolean) => void;
   addLastSnackbar?: (snackbar: SnackbarType) => void;
-  receivedLegend?: boolean;
+  // shielding
   setShieldingAmount?: (value: number) => void;
   setScrollToTop?: (value: boolean) => void;
   setScrollToBottom?: (value: boolean) => void;
+  // seed screen - shared between AppLoading & AppLoadad - different contexts
+  translate?: (key: string) => TranslateType;
+  netInfo?: NetInfoType;
+  mode?: ModeEnum;
+  privacy?: boolean;
+  // store the error if the App is in background
+  setBackgroundError?: (title: string, error: string) => void;
+  // first funds received legend for the Seed screen
+  receivedLegend?: boolean;
 };
 
 const Header: React.FunctionComponent<HeaderProps> = ({
-  poolsMoreInfoOnClick,
-  syncingStatusMoreInfoOnClick,
   toggleMenuDrawer,
-  setZecPrice,
   title,
   noBalance,
   noSyncingStatus,
@@ -89,16 +94,16 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   translate: translateProp,
   netInfo: netInfoProp,
   mode: modeProp,
-  setComputingModalVisible,
+  privacy: privacyProp,
   setBackgroundError,
   noPrivacy,
   setPrivacyOption,
-  setUfvkViewModalVisible,
   addLastSnackbar,
   receivedLegend,
   setShieldingAmount,
   setScrollToTop,
   setScrollToBottom,
+  closeScreen,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -107,20 +112,25 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     syncingStatus,
     currency,
     zecPrice,
-    privacy,
     readOnly,
-    valueTransfers,
+    valueTransfersTotal,
     wallet,
     restartApp,
     somePending,
     security,
     language,
     shieldingAmount,
-    navigation,
+    navigationHome,
     selectServer,
+    setZecPrice,
+    setComputingModalShow,
+    closeAllModals,
+    setUfvkViewModalShow,
+    setSyncReportModalShow,
+    setPoolsModalShow,
   } = context;
 
-  let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum;
+  let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum, privacy: boolean;
   if (translateProp) {
     translate = translateProp;
   } else {
@@ -136,8 +146,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   } else {
     mode = context.mode;
   }
+  if (privacyProp) {
+    privacy = privacyProp;
+  } else {
+    privacy = context.privacy;
+  }
 
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
 
   const opacityValue = useRef(new Animated.Value(1)).current;
@@ -145,6 +160,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
   const [blocksRemaining, setBlocksRemaining] = useState<number>(0);
   const [shieldingFee, setShieldingFee] = useState<number>(0);
+  const [viewSyncStatus, setViewSyncStatus] = useState<boolean>(false);
 
   useEffect(() => {
     let currentBl, lastBlockSe;
@@ -160,7 +176,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // if the syncing is still inProgress and this value is cero -> it is better for UX to see 1.
     // this use case is really rare.
     if (blocksRe <= 0) {
-      blocksRe = 1;
+      blocksRe = 0;
     }
     setBlocksRemaining(blocksRe);
   }, [syncingStatus.currentBlock, syncingStatus.lastBlockServer, wallet.birthday]);
@@ -177,22 +193,33 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }, [addLastSnackbar, restartApp, syncingStatus.syncProcessStalled, translate]);
 
   useEffect(() => {
+    // when the App is syncing this can fired a lot of times
+    // with no so much sense...
+    let runShieldProposeLock = false;
     const runShieldPropose = async (): Promise<string> => {
       try {
+        if (runShieldProposeLock) {
+          return 'Error: shield propose already running...';
+        }
+        runShieldProposeLock = true;
         const proposeStr: string = await RPCModule.execute(CommandEnum.shield, '');
         if (proposeStr) {
           if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error propose ${proposeStr}`);
+            runShieldProposeLock = false;
             return proposeStr;
           }
         } else {
           console.log('Internal Error propose');
+          runShieldProposeLock = false;
           return 'Error: Internal RPC Error: propose';
         }
 
+        runShieldProposeLock = false;
         return proposeStr;
       } catch (error) {
         console.log(`Critical Error propose ${error}`);
+        runShieldProposeLock = false;
         return `Error: ${error}`;
       }
     };
@@ -208,7 +235,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           //Alert.alert('Calculating the FEE', runProposeStr);
         } else {
           try {
-            const runProposeJson: RPCShieldProposeType = JSON.parse(runProposeStr);
+            const runProposeJson: RPCShieldProposeType = await JSON.parse(runProposeStr);
             if (runProposeJson.error) {
               // snack with error
               console.log('Error shield proposing', runProposeJson.error);
@@ -243,8 +270,22 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     );
   }, [readOnly, shieldingAmount, somePending, selectServer]);
 
+  useEffect(() => {
+    const showIt = () => {
+      setViewSyncStatus(true);
+      setTimeout(() => {
+        setViewSyncStatus(false);
+      }, 5 * 1000);
+    };
+    const inter = setInterval(() => {
+      showIt();
+    }, 30 * 1000);
+
+    return () => clearInterval(inter);
+  }, []);
+
   const shieldFunds = async () => {
-    if (!setComputingModalVisible || !setBackgroundError || !addLastSnackbar) {
+    if (!setBackgroundError || !addLastSnackbar) {
       return;
     }
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
@@ -255,7 +296,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     // now zingolib only can shield `transparent`.
     let pools: PoolToShieldEnum = PoolToShieldEnum.transparentPoolToShield;
 
-    setComputingModalVisible(true);
+    // not use await here.
+    setComputingModalShow();
     // We need to activate this flag because if the App is syncing
     // while shielding, then it going to finish the current batch
     // and after that it run the shield process.
@@ -311,9 +353,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       }
       await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
       // change to the history screen, just in case.
-      if (navigation) {
-        navigation.navigate(translate('loadedapp.history-menu') as string);
-      }
+      navigationHome?.navigate(RouteEnums.Home, {
+        screen: translate('loadedapp.history-menu') as string,
+        initial: false,
+      });
       // scroll to top in history, just in case.
       if (setScrollToTop) {
         setScrollToTop(true);
@@ -322,28 +365,29 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       if (setScrollToBottom) {
         setScrollToBottom(true);
       }
-      setComputingModalVisible(false);
+      closeAllModals();
     }
   };
 
   useEffect(() => {
-    const animation = Animated.loop(
-      Animated.sequence([
-        Animated.delay(2000),
-        Animated.timing(opacityValue, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacityValue, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]),
-    );
-
-    animationRef.current = animation;
+    // Inicializa la animación solo una vez
+    if (!animationRef.current) {
+      animationRef.current = Animated.loop(
+        Animated.sequence([
+          Animated.delay(2000),
+          Animated.timing(opacityValue, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacityValue, {
+            toValue: 1,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+        ]),
+      );
+    }
 
     if (!noSyncingStatus) {
       if (syncingStatus.inProgress) {
@@ -381,7 +425,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         { text: translate('confirm') as string, onPress: () => shieldFunds() },
         { text: translate('cancel') as string, style: 'cancel' },
       ],
-      { cancelable: false, userInterfaceStyle: 'light' },
+      { cancelable: false },
     );
   };
 
@@ -398,9 +442,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         addLastSnackbar({ message: translate('biometrics-error') as string });
       }
     } else {
-      if (setUfvkViewModalVisible) {
-        setUfvkViewModalVisible(true);
-      }
+      await setUfvkViewModalShow();
     }
   };
 
@@ -433,7 +475,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             justifyContent: 'center',
             backgroundColor: colors.card,
             margin: 0,
-            marginRight: 5,
+            marginHorizontal: 2.5,
             padding: 0,
             minWidth: 25,
             minHeight: 25,
@@ -448,357 +490,443 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     </TouchableOpacity>
   );
 
-  //console.log('render header &&&&&&&&&&&&&&&&&&&&& syncstatus', syncingStatus);
+  //console.log('render header &&&&&&&&&&&&&&&&&&&&&', privacy);
 
   return (
-    <View
-      testID="header"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        paddingBottom: 0,
-        backgroundColor: colors.card,
-        zIndex: -1,
-        paddingTop: 10,
-      }}>
-      <View
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-          marginTop: 12,
-          marginHorizontal: 5,
-          height: 40,
-        }}>
-        {!noSyncingStatus && selectServer !== SelectServerEnum.offline && (
-          <>
-            {netInfo.isConnected && !!syncingStatus.lastBlockServer && syncingStatus.syncID >= 0 ? (
-              <>
-                {!syncingStatus.inProgress && syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet && (
-                  <View
-                    style={{
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      margin: 0,
-                      marginRight: 5,
-                      padding: 1,
-                      borderColor: colors.primary,
-                      borderWidth: 1,
-                      borderRadius: 10,
-                      minWidth: 25,
-                      minHeight: 25,
-                    }}>
-                    <View testID="header.checkicon" style={{ margin: 0, padding: 0 }}>
-                      <FontAwesomeIcon icon={faCheck} color={colors.primary} size={20} />
-                    </View>
-                  </View>
-                )}
-                {!syncingStatus.inProgress &&
-                  syncingStatus.lastBlockServer !== syncingStatus.lastBlockWallet &&
-                  mode === ModeEnum.advanced && (
-                    <View
-                      style={{
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: 0,
-                        marginRight: 5,
-                        padding: 1,
-                        borderColor: colors.zingo,
-                        borderWidth: 1,
-                        borderRadius: 10,
-                        minWidth: 25,
-                        minHeight: 25,
-                      }}>
-                      <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                        <FontAwesomeIcon icon={faPause} color={colors.zingo} size={17} />
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                {syncingStatus.inProgress && blocksRemaining > 0 && (
-                  <View
-                    style={{
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      margin: 0,
-                      marginRight: 5,
-                      padding: 1,
-                      borderColor: colors.syncing,
-                      borderWidth: 1,
-                      borderRadius: 10,
-                      minWidth: 25,
-                      minHeight: 25,
-                    }}>
-                    <Animated.View
-                      style={{
-                        opacity: opacityValue,
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        paddingHorizontal: 3,
-                      }}>
-                      {mode === ModeEnum.basic ? (
-                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                          <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
-                          <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
+    <>
+      <View>
+        <View
+          testID="header"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            paddingBottom: 0,
+            backgroundColor: colors.card,
+            paddingTop: 10,
+            minHeight: !noDrawMenu ? 60 : 25,
+          }}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              marginTop: 12,
+              marginHorizontal: 5,
+            }}>
+            {!noSyncingStatus && selectServer !== SelectServerEnum.offline && (
+              <View style={{ minHeight: 29, flexDirection: 'row' }}>
+                {netInfo.isConnected && !!syncingStatus.lastBlockServer && syncingStatus.syncID >= 0 ? (
+                  <>
+                    {!syncingStatus.inProgress && syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet && (
+                      <View
+                        style={{
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          margin: 0,
+                          marginHorizontal: 2.5,
+                          padding: 1,
+                          borderColor: colors.primary,
+                          borderWidth: 1,
+                          borderRadius: 10,
+                          minWidth: 25,
+                          minHeight: 25,
+                        }}>
+                        <View
+                          testID="header.checkicon"
+                          style={{
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            padding: 3,
+                          }}>
+                          <FontAwesomeIcon icon={faCheck} color={colors.primary} size={19} />
+                          {viewSyncStatus && (
+                            <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{translate('synced') as string}</FadeText>
+                          )}
                         </View>
-                      ) : (
+                      </View>
+                    )}
+                    {syncingStatus.inProgress && (
+                      <View
+                        style={{
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          margin: 0,
+                          marginHorizontal: 2.5,
+                          padding: 1,
+                          borderColor: colors.syncing,
+                          borderWidth: 1,
+                          borderRadius: 10,
+                          minWidth: 25,
+                          minHeight: 25,
+                        }}>
+                        <Animated.View
+                          style={{
+                            opacity: opacityValue,
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            padding: 3,
+                          }}>
+                          {mode === ModeEnum.basic ? (
+                            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                              <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={19} />
+                              {viewSyncStatus && (
+                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                                  {translate('syncing') as string}
+                                </FadeText>
+                              )}
+                              {viewSyncStatus && blocksRemaining > 0 && (
+                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
+                              )}
+                              {blocksRemaining > 0 && (
+                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${blocksRemaining}`}</FadeText>
+                              )}
+                            </View>
+                          ) : (
+                            <TouchableOpacity
+                              testID="header.playicon"
+                              onPress={() => setSyncReportModalShow()}>
+                              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={19} />
+                                {viewSyncStatus && (
+                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                                    {translate('syncing') as string}
+                                  </FadeText>
+                                )}
+                                {viewSyncStatus && blocksRemaining > 0 && (
+                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
+                                )}
+                                {blocksRemaining > 0 && (
+                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${blocksRemaining}`}</FadeText>
+                                )}
+                              </View>
+                            </TouchableOpacity>
+                          )}
+                        </Animated.View>
+                      </View>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {netInfo.isConnected && mode === ModeEnum.advanced && (
+                      <View
+                        style={{
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          margin: 0,
+                          marginHorizontal: 2.5,
+                          padding: 1,
+                          borderColor: colors.primaryDisabled,
+                          borderWidth: 1,
+                          borderRadius: 10,
+                          minWidth: 25,
+                          minHeight: 25,
+                        }}>
                         <TouchableOpacity
-                          testID="header.playicon"
-                          onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                            <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={17} />
-                            <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{`${blocksRemaining}`}</FadeText>
+                          onPress={() => setSyncReportModalShow()}>
+                          <View
+                            testID="header.wifiicon"
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              padding: 3,
+                            }}>
+                            <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={19} />
+                            <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                              {translate('connecting') as string}
+                            </FadeText>
                           </View>
                         </TouchableOpacity>
-                      )}
-                    </Animated.View>
-                  </View>
+                      </View>
+                    )}
+                  </>
                 )}
-              </>
-            ) : (
-              <>
-                {netInfo.isConnected && mode === ModeEnum.advanced && (
+                {(!netInfo.isConnected ||
+                  netInfo.type === NetInfoStateType.cellular ||
+                  netInfo.isConnectionExpensive) && (
                   <View
                     style={{
                       alignItems: 'center',
                       justifyContent: 'center',
                       margin: 0,
-                      marginRight: 5,
-                      padding: 1,
-                      borderColor: colors.primaryDisabled,
-                      borderWidth: 1,
-                      borderRadius: 10,
+                      marginHorizontal: 2.5,
+                      padding: 0,
                       minWidth: 25,
                       minHeight: 25,
                     }}>
-                    <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                      <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={18} />
-                    </TouchableOpacity>
+                    {mode === ModeEnum.basic ? (
+                      <FontAwesomeIcon
+                        icon={faCloudDownload}
+                        color={!netInfo.isConnected ? 'red' : 'yellow'}
+                        size={20}
+                      />
+                    ) : (
+                      <TouchableOpacity onPress={() => setSyncReportModalShow()}>
+                        <FontAwesomeIcon
+                          icon={faCloudDownload}
+                          color={!netInfo.isConnected ? 'red' : 'yellow'}
+                          size={20}
+                        />
+                      </TouchableOpacity>
+                    )}
                   </View>
                 )}
-              </>
+              </View>
             )}
-            {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
+            {selectServer === SelectServerEnum.offline && (
               <View
                 style={{
                   alignItems: 'center',
                   justifyContent: 'center',
                   margin: 0,
-                  marginRight: 5,
-                  padding: 0,
+                  marginHorizontal: 2.5,
+                  paddingHorizontal: 5,
+                  paddingVertical: 1,
+                  borderColor: colors.zingo,
+                  borderWidth: 1,
+                  borderRadius: 10,
                   minWidth: 25,
                   minHeight: 25,
                 }}>
-                {mode === ModeEnum.basic ? (
-                  <FontAwesomeIcon icon={faCloudDownload} color={!netInfo.isConnected ? 'red' : 'yellow'} size={20} />
-                ) : (
-                  <TouchableOpacity onPress={() => syncingStatusMoreInfoOnClick && syncingStatusMoreInfoOnClick()}>
-                    <FontAwesomeIcon icon={faCloudDownload} color={!netInfo.isConnected ? 'red' : 'yellow'} size={20} />
-                  </TouchableOpacity>
-                )}
+                <View
+                  testID="header.offlineicon"
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    paddingHorizontal: 3,
+                  }}>
+                  <FontAwesomeIcon icon={faWifi} color={'red'} size={18} />
+                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                    {translate('settings.server-offline') as string}
+                  </FadeText>
+                </View>
               </View>
             )}
-          </>
-        )}
-        {selectServer === SelectServerEnum.offline && (
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: 0,
-              marginRight: 5,
-              paddingHorizontal: 5,
-              paddingVertical: 1,
-              borderColor: colors.zingo,
-              borderWidth: 1,
-              borderRadius: 10,
-              minWidth: 25,
-              minHeight: 25,
-            }}>
-            <View style={{ flexDirection: 'row', margin: 0, padding: 0 }}>
-              <FontAwesomeIcon icon={faWifi} color={'red'} size={18} />
-              <FadeText style={{ marginLeft: 10, marginRight: 5 }}>
-                {translate('settings.server-offline') as string}
-              </FadeText>
-            </View>
+            {mode !== ModeEnum.basic &&
+              !noPrivacy &&
+              setPrivacyOption &&
+              addLastSnackbar &&
+              noBalance &&
+              privacyComponent()}
           </View>
-        )}
-        {mode !== ModeEnum.basic &&
-          !noPrivacy &&
-          setPrivacyOption &&
-          addLastSnackbar &&
-          noBalance &&
-          privacyComponent()}
-      </View>
 
-      {noBalance && !receivedLegend && <View style={{ height: 20 }} />}
-      {!noBalance && (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: 0,
-            marginTop: readOnly ? 15 : 0,
-          }}>
-          {mode !== ModeEnum.basic && !noPrivacy && setPrivacyOption && addLastSnackbar && privacyComponent()}
-          <ZecAmount
-            currencyName={info.currencyName}
-            color={colors.text}
-            size={36}
-            amtZec={totalBalance ? totalBalance.total : 0}
-            privacy={privacy}
-            smallPrefix={true}
-          />
-          {mode !== ModeEnum.basic &&
-            totalBalance &&
-            (totalBalance.orchardBal !== totalBalance.spendableOrchard ||
-              totalBalance.privateBal > 0 ||
-              totalBalance.transparentBal > 0) && (
-              <TouchableOpacity onPress={() => poolsMoreInfoOnClick && poolsMoreInfoOnClick()}>
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: colors.card,
-                    borderRadius: 10,
-                    margin: 0,
-                    marginLeft: 5,
-                    padding: 0,
-                    minWidth: 25,
-                    minHeight: 25,
-                  }}>
-                  <FontAwesomeIcon icon={faInfoCircle} size={25} color={colors.primary} />
+          {!noBalance && (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: 0,
+              }}>
+              {mode !== ModeEnum.basic && !noPrivacy && setPrivacyOption && addLastSnackbar && privacyComponent()}
+              <ZecAmount
+                currencyName={info.currencyName}
+                color={colors.text}
+                size={36}
+                amtZec={totalBalance ? totalBalance.total : 0}
+                privacy={privacy}
+                smallPrefix={true}
+              />
+              {mode !== ModeEnum.basic &&
+                totalBalance &&
+                (totalBalance.orchardBal !== totalBalance.spendableOrchard ||
+                  totalBalance.privateBal > 0 ||
+                  totalBalance.transparentBal > 0) && (
+                  <TouchableOpacity onPress={() => setPoolsModalShow()}>
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: colors.card,
+                        borderRadius: 10,
+                        margin: 0,
+                        marginLeft: 5,
+                        padding: 0,
+                        minWidth: 25,
+                        minHeight: 25,
+                      }}>
+                      <FontAwesomeIcon icon={faInfoCircle} size={25} color={colors.primary} />
+                    </View>
+                  </TouchableOpacity>
+                )}
+            </View>
+          )}
+
+          {receivedLegend && totalBalance && totalBalance.total > 0 && (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: 0,
+              }}>
+              <RegText color={colors.primary}>{translate('seed.youreceived') as string}</RegText>
+              <ZecAmount
+                currencyName={info.currencyName}
+                color={colors.primary}
+                size={18}
+                amtZec={totalBalance.total}
+                privacy={privacy}
+              />
+              <RegText color={colors.primary}>!!!</RegText>
+            </View>
+          )}
+
+          {currency === CurrencyEnum.USDCurrency && !noBalance && selectServer !== SelectServerEnum.offline && (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <CurrencyAmount
+                style={{ marginTop: 0, marginBottom: 0 }}
+                price={zecPrice.zecPrice}
+                amtZec={totalBalance ? totalBalance.total : 0}
+                currency={currency}
+                privacy={privacy}
+              />
+              <View style={{ marginLeft: 5 }}>
+                <PriceFetcher setZecPrice={setZecPrice} />
+              </View>
+            </View>
+          )}
+
+          {showShieldButton &&
+            !noBalance &&
+            !calculateDisableButtonToShield() &&
+            valueTransfersTotal !== null && (
+              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <FadeText style={{ fontSize: 8 }}>
+                  {(translate(`history.shield-legend-${calculatePoolsToShield()}`) as string) +
+                    ` ${calculateAmountToShield()} ` +
+                    (translate('send.fee') as string) +
+                    ': ' +
+                    Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
+                    ' '}
+                </FadeText>
+                <View style={{ margin: 5, flexDirection: 'row' }}>
+                  <Button
+                    testID="header.shield"
+                    type={ButtonTypeEnum.Primary}
+                    title={translate(`history.shield-${calculatePoolsToShield()}`) as string}
+                    onPress={onPressShieldFunds}
+                    disabled={calculateDisableButtonToShield()}
+                  />
                 </View>
-              </TouchableOpacity>
+              </View>
             )}
         </View>
-      )}
-
-      {receivedLegend && totalBalance && totalBalance.total > 0 && (
         <View
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: 0,
-            marginTop: readOnly ? 15 : 0,
+            padding: 11.5,
+            position: 'absolute',
+            left: 0,
           }}>
-          <RegText color={colors.primary}>{translate('seed.youreceived') as string}</RegText>
-          <ZecAmount
-            currencyName={info.currencyName}
-            color={colors.primary}
-            size={18}
-            amtZec={totalBalance.total}
-            privacy={privacy}
-          />
-          <RegText color={colors.primary}>!!!</RegText>
-        </View>
-      )}
-
-      {currency === CurrencyEnum.USDCurrency && !noBalance && (
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <CurrencyAmount
-            style={{ marginTop: 0, marginBottom: 5 }}
-            price={zecPrice.zecPrice}
-            amtZec={totalBalance ? totalBalance.total : 0}
-            currency={currency}
-            privacy={privacy}
-          />
-          <View style={{ marginLeft: 5 }}>
-            <PriceFetcher setZecPrice={setZecPrice} />
+          <View style={{ alignItems: 'center', flexDirection: 'row', height: 40 }}>
+            {!noDrawMenu && (
+              <TouchableOpacity
+                style={{ marginRight: 5 }}
+                testID="header.drawmenu"
+                accessible={true}
+                accessibilityLabel={translate('menudrawer-acc') as string}
+                onPress={toggleMenuDrawer}>
+                <FontAwesomeIcon icon={faBars} size={40} color={colors.border} />
+              </TouchableOpacity>
+            )}
+            {readOnly && (
+              <>
+                {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal <= 0) &&
+                !(mode === ModeEnum.basic && totalBalance && totalBalance.total <= 0) ? (
+                  <TouchableOpacity onPress={() => ufvkShowModal()}>
+                    <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
+                  </TouchableOpacity>
+                ) : (
+                  <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
+                )}
+              </>
+            )}
           </View>
         </View>
-      )}
 
-      {showShieldButton && !calculateDisableButtonToShield() && setComputingModalVisible && valueTransfers !== null && (
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <FadeText style={{ fontSize: 8 }}>
-            {(translate(`history.shield-legend-${calculatePoolsToShield()}`) as string) +
-              ` ${calculateAmountToShield()} ` +
-              (translate('send.fee') as string) +
-              ': ' +
-              Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
-              ' '}
-          </FadeText>
-          <View style={{ margin: 5, flexDirection: 'row' }}>
-            <Button
-              testID="header.shield"
-              type={ButtonTypeEnum.Primary}
-              title={translate(`history.shield-${calculatePoolsToShield()}`) as string}
-              onPress={onPressShieldFunds}
-              disabled={calculateDisableButtonToShield()}
-            />
-          </View>
-        </View>
-      )}
-
-      <View
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-        }}>
-        <RegText testID={testID} color={colors.money} style={{ paddingHorizontal: 5, marginBottom: 3 }}>
-          {title}
-        </RegText>
-      </View>
-
-      <View
-        style={{
-          padding: 11.5,
-          position: 'absolute',
-          left: 0,
-          alignItems: 'flex-start',
-        }}>
-        <View style={{ alignItems: 'center', flexDirection: 'row' }}>
-          {!noDrawMenu && (
+        <View
+          style={{
+            padding: 13,
+            position: 'absolute',
+            right: 0,
+          }}>
+          {!noDrawMenu ? (
             <TouchableOpacity
               style={{ marginRight: 5 }}
               testID="header.drawmenu"
-              accessible={true}
-              accessibilityLabel={translate('menudrawer-acc') as string}
-              onPress={toggleMenuDrawer}>
-              <FontAwesomeIcon icon={faBars} size={45} color={colors.border} />
+              onPress={async () => {
+                const resultBio = security.settingsScreen ? await simpleBiometrics({ translate: translate }) : true;
+                // can be:
+                // - true      -> the user do pass the authentication
+                // - false     -> the user do NOT pass the authentication
+                // - undefined -> no biometric authentication available -> Passcode.
+                //console.log('BIOMETRIC --------> ', resultBio);
+                if (resultBio === false) {
+                  // snack with Error & closing the menu.
+                  if (addLastSnackbar) {
+                    addLastSnackbar({ message: translate('biometrics-error') as string });
+                  }
+                } else {
+                  navigationHome?.navigate(RouteEnums.Settings);
+                }
+            }}>
+              <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
             </TouchableOpacity>
-          )}
-          {readOnly && (
-            <>
-              {setUfvkViewModalVisible &&
-              !(mode === ModeEnum.basic && valueTransfers !== null && valueTransfers.length <= 0) &&
-              !(mode === ModeEnum.basic && totalBalance && totalBalance.total <= 0) ? (
-                <TouchableOpacity onPress={() => ufvkShowModal()}>
-                  <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
-                </TouchableOpacity>
-              ) : (
-                <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
-              )}
-            </>
+          ) : (
+            <Image
+              source={require('../../assets/img/logobig-zingo.png')}
+              style={{ width: 38, height: 38, resizeMode: 'contain', borderRadius: 10 }}
+            />
           )}
         </View>
       </View>
+      <View>
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            width: '100%',
+            marginVertical: 5,
+          }}>
+          {noDrawMenu && closeScreen ? (
+            <>
+              <TouchableOpacity onPress={() => closeScreen()}>
+                <FontAwesomeIcon
+                  style={{ marginHorizontal: 10 }}
+                  size={30}
+                  icon={faChevronLeft}
+                  color={colors.primary}
+                />
+              </TouchableOpacity>
+              <RegText testID={testID} color={colors.money} style={{ paddingHorizontal: 5 }}>
+                {title}
+              </RegText>
+              <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
+            </>
+          ) : (
+            <>
+              <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
+              <RegText testID={testID} color={colors.money} style={{ paddingHorizontal: 5, textAlign: 'center' }}>
+                {title}
+              </RegText>
+              <View style={{ width: 30, height: 30, marginHorizontal: 10 }} />
+            </>
+          )}
+        </View>
 
-      <View
-        style={{
-          padding: 15,
-          position: 'absolute',
-          right: 0,
-          alignItems: 'flex-end',
-        }}>
-        <Image
-          source={require('../../assets/img/logobig-zingo.png')}
-          style={{ width: 38, height: 38, resizeMode: 'contain', borderRadius: 10 }}
-        />
+        <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
       </View>
-
-      <View style={{ width: '100%', height: 1, backgroundColor: colors.primary }} />
-    </View>
+    </>
   );
 };
 

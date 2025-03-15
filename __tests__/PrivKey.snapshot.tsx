@@ -12,38 +12,6 @@ import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
-jest.useFakeTimers();
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-  FontAwesomeIcon: '',
-}));
-jest.mock('react-native-localize', () => ({
-  getNumberFormatSettings: () => {
-    return {
-      decimalSeparator: '.',
-      groupingSeparator: ',',
-    };
-  },
-}));
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-jest.mock('@react-native-community/netinfo', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNCNetInfo = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RPCModule = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
-
 // test suite
 describe('Component PrivKey - test', () => {
   //snapshot test
@@ -51,7 +19,6 @@ describe('Component PrivKey - test', () => {
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
-  const onClose = jest.fn();
   test('PrivKey Private - snapshot', () => {
     const privKey = render(
       <ContextAppLoadedProvider value={state}>
@@ -59,7 +26,6 @@ describe('Component PrivKey - test', () => {
           address={'UA-12345678901234567890'}
           keyType={0}
           privKey={'priv-key-12345678901234567890'}
-          closeModal={onClose}
         />
       </ContextAppLoadedProvider>,
     );
@@ -72,7 +38,6 @@ describe('Component PrivKey - test', () => {
           address={'UA-12345678901234567890'}
           keyType={1}
           privKey={'view-key-12345678901234567890'}
-          closeModal={onClose}
         />
       </ContextAppLoadedProvider>,
     );

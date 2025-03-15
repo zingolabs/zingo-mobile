@@ -19,5 +19,9 @@ export const mockNavigation: StackScreenProps<any>['navigation'] = {
   push: jest.fn(),
   pop: jest.fn(),
   popToTop: jest.fn(),
+  popTo: jest.fn(),
+  preload: jest.fn(),
+  setStateForNextRouteNamesChange: jest.fn(),
+  navigateDeprecated: jest.fn(),
   // Agrega cualquier otra propiedad o método necesario para tu caso
 };

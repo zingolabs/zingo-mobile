@@ -13,8 +13,7 @@ describe('Component Scanner - test', () => {
   //snapshot test
   test('Scanner - snapshot', () => {
     const onRead = jest.fn();
-    const doCancel = jest.fn();
-    const scanner = render(<Scanner onRead={onRead} doCancel={doCancel} title="title" button="button" />);
+    const scanner = render(<Scanner onRead={onRead} />);
     expect(scanner.toJSON()).toMatchSnapshot();
   });
 });

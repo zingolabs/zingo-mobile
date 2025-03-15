@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from './RegText';
 import Utils from '../../app/utils';
@@ -25,13 +25,10 @@ import 'moment/locale/ru';
 
 type AddressItemProps = {
   address: string;
-  closeModal: () => void;
-  openModal: () => void;
   oneLine?: boolean;
   onlyContact?: boolean;
   withIcon?: boolean;
   withSendIcon?: boolean;
-  setSendPageState?: (s: SendPageStateClass) => void;
   addressProtected?: boolean;
 };
 
@@ -41,9 +38,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   onlyContact,
   withIcon,
   withSendIcon,
-  closeModal,
-  openModal,
-  setSendPageState,
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -53,14 +47,16 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     addressBook,
     launchAddressBook,
     privacy,
-    navigation,
+    navigationHome,
     readOnly,
     mode,
     totalBalance,
     language,
     selectServer,
+    setSendPageState,
+    closeAllModals,
   } = context;
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [expandAddress, setExpandAddress] = useState<boolean>(false);
@@ -71,10 +67,16 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
 
   useEffect(() => {
     const numLinesAdd = address ? (address.length < 50 ? 2 : address.length / 30) : 0;
-    const cont: string = addressBook
+    let cont: string = addressBook
       .filter((ab: AddressBookFileClass) => ab.address === address)
       .map((ab: AddressBookFileClass) => ab.label)
       .join(' ');
+    if (!cont) {
+      cont = addressBook
+        .filter((ab: AddressBookFileClass) => ab.uOrchardAddress === address)
+        .map((ab: AddressBookFileClass) => ab.label)
+        .join(' ');
+    }
     const numLinesCon = cont ? (cont.length < 20 ? 1 : cont.length / 20) : 0;
     setNumLinesAddress(numLinesAdd);
     setNumLinesContact(numLinesCon);
@@ -152,7 +154,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         )}
       </View>
       {withIcon && !contact && oneLine && (
-        <TouchableOpacity onPress={() => launchAddressBook(address, closeModal, openModal)}>
+        <TouchableOpacity onPress={() => launchAddressBook(address)}>
           <View
             style={{
               flexDirection: 'row',
@@ -166,12 +168,11 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         </TouchableOpacity>
       )}
       {withIcon && !contact && !oneLine && (
-        <TouchableOpacity onPress={() => launchAddressBook(address, closeModal, openModal)}>
+        <TouchableOpacity onPress={() => launchAddressBook(address)}>
           <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faUserPlus} color={colors.primary} />
         </TouchableOpacity>
       )}
       {withSendIcon &&
-        setSendPageState &&
         !addressProtected &&
         contact &&
         !readOnly &&
@@ -188,8 +189,8 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               const sendPageState = new SendPageStateClass(new ToAddrClass(0));
               sendPageState.toaddr.to = address;
               setSendPageState(sendPageState);
-              closeModal();
-              navigation.navigate(RouteEnums.LoadedApp, {
+              closeAllModals();
+              navigationHome?.navigate(RouteEnums.Home, {
                 screen: translate('loadedapp.send-menu'),
                 initial: false,
               });

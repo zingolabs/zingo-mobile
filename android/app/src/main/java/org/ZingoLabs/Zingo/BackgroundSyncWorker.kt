@@ -32,13 +32,13 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
 import org.ZingoLabs.Zingo.Constants.*
+import java.io.FileInputStream
 
-class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
+class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
+    private val rpcModule = RPCModule(MainApplication.getAppReactContext())
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun doWork(): Result {
-        val reactContext = ReactApplicationContext(MainApplication.getAppContext())
-        val rpcModule = RPCModule(reactContext)
 
         Log.i("SCHEDULED_TASK_RUN", "Task running")
 
@@ -60,7 +60,7 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
             Log.i("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
             if (balance.lowercase().startsWith(ErrorPrefix.value)) {
                 // this means this task is running with the App closed
-                loadWalletFile(rpcModule)
+                loadWalletFile()
             } else {
                 // this means the App is open,
                 // stop syncing first, just in case.
@@ -104,10 +104,10 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
         return Result.success()
     }
 
-    private fun loadWalletFile(rpcModule: RPCModule) {
+    private fun loadWalletFile() {
         // I have to init from wallet file in order to do the sync
         // and I need to read the settings.json to find the server & chain type
-        MainApplication.getAppContext()?.openFileInput("settings.json")?.use { file ->
+        context.openFileInput("settings.json")?.use { file: FileInputStream ->
             val settingsBytes = file.readBytes()
             file.close()
             val settingsString = settingsBytes.toString(Charsets.UTF_8)
@@ -160,15 +160,14 @@ class BackgroundSyncWorker(context: Context, workerParams: WorkerParameters) : W
 
 class BSCompanion {
     companion object {
-        private const val taskID = "Zingo_Processing_Task_ID"
+        private const val TASKID = "Zingo_Processing_Task_ID"
         private val SYNC_PERIOD = 24.hours
         private val SYNC_DAY_SHIFT = 1.days // Move to tomorrow
         private val SYNC_START_TIME_HOURS = 3.hours // Start around 3 a.m. at night
         private val SYNC_START_TIME_MINUTES = 60.minutes // Randomize with minutes until 4 a.m.
         @RequiresApi(Build.VERSION_CODES.O)
         fun scheduleBackgroundTask() {
-            val reactContext = ReactApplicationContext(MainApplication.getAppContext())
-
+            val context = MainApplication.getAppContext() as Context
             // zancas requeriment, not plug-in, reverted.
             val constraints = Constraints.Builder()
                 .setRequiresStorageNotLow(false) // less restricted
@@ -187,15 +186,15 @@ class BSCompanion {
                 .build()
 
             Log.i("SCHEDULING_TASK", "Enqueuing the background task - Background")
-            WorkManager.getInstance(reactContext)
+            WorkManager.getInstance(context)
                 .enqueueUniquePeriodicWork(
-                    taskID,
-                    ExistingPeriodicWorkPolicy.REPLACE,
+                    TASKID,
+                    ExistingPeriodicWorkPolicy.UPDATE,
                     workRequest
                 )
 
-            Log.i("SCHEDULING_TASK", "Task info ${WorkManager.getInstance(reactContext).getWorkInfosForUniqueWork(
-                taskID).get()}")
+            Log.i("SCHEDULING_TASK", "Task info ${WorkManager.getInstance(context).getWorkInfosForUniqueWork(
+                TASKID).get()}")
         }
 
         private fun calculateTargetTimeDifference(): Duration {
@@ -228,15 +227,14 @@ class BSCompanion {
         }
 
         fun cancelExecutingTask() {
-            val reactContext = ReactApplicationContext(MainApplication.getAppContext())
-
+            val context = MainApplication.getAppContext() as Context
             // run interrupt sync, just in case.
             val interrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "true")
             Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $interrupting")
 
             Log.i("SCHEDULING_TASK", "Cancel background Task")
-            WorkManager.getInstance(reactContext)
-                .cancelUniqueWork(taskID)
+            WorkManager.getInstance(context)
+                .cancelUniqueWork(TASKID)
         }
 
     }

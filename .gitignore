@@ -20,6 +20,7 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
+**/.xcode.env.local
 
 # Exclude compiled libs
 android/app/src/main/jniLibs
@@ -37,6 +38,7 @@ rust/lib/Generated/zingoFFI.modulemap
 build/
 .idea
 .gradle
+.kotlin
 local.properties
 *.iml
 
@@ -76,7 +78,7 @@ buck-out/
 *.jsbundle
 
 # CocoaPods
-/ios/Pods/
+**/Pods/
 /ios/Podfile.lock
 
 # e2e test logs
@@ -91,3 +93,5 @@ buck-out/
 
 # Binaries
 /rust/test_binaries/bins/
+
+.cxx

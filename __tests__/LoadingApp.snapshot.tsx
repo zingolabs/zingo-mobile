@@ -20,97 +20,6 @@ import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockBackground } from '../__mocks__/dataMocks/mockBackground';
 import { mockSecurity } from '../__mocks__/dataMocks/mockSecurity';
 
-// Crea un mock para el constructor de I18n
-jest.mock('i18n-js', () => ({
-  __esModule: true,
-  I18n: jest.fn().mockImplementation(() => ({
-    t: jest.fn(),
-    // Agrega otros métodos y propiedades según sea necesario para tus pruebas
-  })),
-}));
-
-jest.useFakeTimers();
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-  FontAwesomeIcon: '',
-}));
-jest.mock('react-native-localize', () => ({
-  getNumberFormatSettings: () => {
-    return {
-      decimalSeparator: '.',
-      groupingSeparator: ',',
-    };
-  },
-}));
-jest.mock('react-native-tab-view', () => ({
-  TabView: '',
-  TabBar: '',
-}));
-jest.mock('react-native-option-menu', () => '');
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-jest.mock('@react-native-community/netinfo', () => {
-  return {
-    addEventListener: jest.fn(),
-    fetch: jest.fn().mockImplementation(() =>
-      Promise.resolve({
-        isConnected: true,
-        isInternetReachable: true,
-      }),
-    ),
-  };
-});
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RPCModule = {
-    execute: jest.fn(() => '{}'),
-    getLatestBlock: jest.fn(() => '{}'),
-    walletExists: jest.fn(() => 'false'),
-    getValueTransfersList: jest.fn(() => '{ "value_transfers": [] }'),
-    setCryptoDefaultProvider: jest.fn(() => 'true'),
-  };
-
-  return RN;
-});
-jest.mock('react-native-simple-biometrics', () => ({
-  requestBioAuth: jest.fn(() => Promise.resolve(true)),
-}));
-jest.mock('react-native-fs', () => ({
-  readFile: jest.fn(() => Promise.resolve('{}')), // o Promise.reject(new Error('File not found'))
-  writeFile: jest.fn(() => Promise.resolve()), // o Promise.reject(new Error('Write failed'))
-  // Agrega más funciones mockeadas según sea necesario
-}));
-jest.mock('react-native-device-info', () => ({
-  getSystemName: jest.fn(() => 'Mocked System Name'),
-  getSystemVersion: jest.fn(() => 'Mocked System Version'),
-  getManufacturer: jest.fn(() => 'Mocked Manufacturer'),
-  getModel: jest.fn(() => 'Mocked Model'),
-}));
-jest.mock('react-native-keychain', () => ({
-  ACCESS_CONTROL: {
-    BIOMETRY_CURRENT_SET: 'biometryCurrentSet',
-  },
-  ACCESSIBLE: {
-    WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'whenUnlockedThisDeviceOnly',
-  },
-  AUTHENTICATION_TYPE: {
-    BIOMETRICS: 'biometrics',
-  },
-  SECURITY_LEVEL: {
-    SECURE_SOFTWARE: 'secureSoftware',
-  },
-  SECURITY_RULES: {
-    NONE: 'none',
-  },
-  STORAGE_TYPE: {
-    AES: 'AES',
-  },
-  setGenericPassword: jest.fn(),
-  getGenericPassword: jest.fn(),
-  resetGenericPassword: jest.fn(),
-  hasGenericPassword: jest.fn(),
-  getSupportedBiometryType: jest.fn(),
-}));
-
 // test suite
 describe('Component LoadingApp - test', () => {
   //snapshot test
@@ -129,7 +38,7 @@ describe('Component LoadingApp - test', () => {
     const donationAlert = false;
     const loadingapp = render(
       <LoadingAppClass
-        navigation={mockNavigation}
+        navigationApp={mockNavigation}
         route={mockRoute}
         toggleTheme={toggleTheme}
         translate={mockTranslate}

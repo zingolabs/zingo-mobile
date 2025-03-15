@@ -9,7 +9,6 @@ import { render } from '@testing-library/react-native';
 import Send from '../components/Send';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
 import { ModeEnum, CurrencyEnum } from '../app/AppState';
-import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
@@ -18,56 +17,12 @@ import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
 
-jest.useFakeTimers();
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-  FontAwesomeIcon: '',
-}));
-jest.mock('react-native-localize', () => ({
-  getNumberFormatSettings: () => {
-    return {
-      decimalSeparator: '.', // us
-      groupingSeparator: ',', // us
-    };
-  },
-}));
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RPCModule = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
-jest.mock('@react-native-community/netinfo', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNCNetInfo = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
-jest.mock('@react-navigation/native', () => ({
-  useScrollToTop: jest.fn(),
-  useIsFocused: jest.fn(),
-  useTheme: () => mockTheme,
-}));
-jest.mock('react-native-picker-select', () => 'RNPickerSelect');
-jest.mock('react-native-device-info', () => ({
-  getSystemName: jest.fn(() => 'Mocked System Name'),
-  getSystemVersion: jest.fn(() => 'Mocked System Version'),
-  getManufacturer: jest.fn(() => 'Mocked Manufacturer'),
-  getModel: jest.fn(() => 'Mocked Model'),
-}));
-
 // test suite
 describe('Component Send - test', () => {
   //snapshot test
   const state = defaultAppContextLoaded;
   state.valueTransfers = mockValueTransfers;
-  state.uaAddress = mockAddresses[0].uaAddress;
+  state.uOrchardAddress = mockAddresses[0].uOrchardAddress;
   state.addresses = mockAddresses;
   state.translate = mockTranslate;
   state.info = mockInfo;
@@ -86,22 +41,14 @@ describe('Component Send - test', () => {
     const send = render(
       <ContextAppLoadedProvider value={state}>
         <Send
-          setSendPageState={onFunction}
           sendTransaction={onFunction}
           clearToAddr={onFunction}
-          setSendProgress={onFunction}
           toggleMenuDrawer={onFunction}
-          setComputingModalVisible={onFunction}
-          poolsMoreInfoOnClick={onFunction}
-          syncingStatusMoreInfoOnClick={onFunction}
-          setZecPrice={onFunction}
           setPrivacyOption={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           setScrollToBottom={onFunction}
           setServerOption={onFunction}
-          clearTimers={onFunction}
-          configure={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
@@ -118,22 +65,14 @@ describe('Component Send - test', () => {
     const send = render(
       <ContextAppLoadedProvider value={state}>
         <Send
-          setSendPageState={onFunction}
           sendTransaction={onFunction}
           clearToAddr={onFunction}
-          setSendProgress={onFunction}
           toggleMenuDrawer={onFunction}
-          setComputingModalVisible={onFunction}
-          poolsMoreInfoOnClick={onFunction}
-          syncingStatusMoreInfoOnClick={onFunction}
-          setZecPrice={onFunction}
           setPrivacyOption={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           setScrollToBottom={onFunction}
           setServerOption={onFunction}
-          clearTimers={onFunction}
-          configure={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

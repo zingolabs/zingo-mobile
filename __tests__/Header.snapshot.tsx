@@ -12,47 +12,23 @@ import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 
-jest.useFakeTimers();
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-  FontAwesomeIcon: '',
-}));
-jest.mock('react-native-localize', () => ({
-  getNumberFormatSettings: () => {
-    return {
-      decimalSeparator: '.',
-      groupingSeparator: ',',
-    };
-  },
-}));
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-jest.mock('@react-native-community/netinfo', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RNCNetInfo = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.RPCModule = {
-    execute: jest.fn(() => '{}'),
-  };
-
-  return RN;
-});
-
 // test suite
 describe('Component Header - test', () => {
   //snapshot test
   test('Header Simple - snapshot', () => {
     const state = defaultAppContextLoaded;
     state.translate = mockTranslate;
+    const close = jest.fn();
     const about = render(
       <ContextAppLoadedProvider value={state}>
-        <Header title="title" noBalance={true} noSyncingStatus={true} noDrawMenu={true} noPrivacy={true} />
+        <Header
+          title="title"
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          closeScreen={close}
+        />
       </ContextAppLoadedProvider>,
     );
     expect(about.toJSON()).toMatchSnapshot();
@@ -66,16 +42,11 @@ describe('Component Header - test', () => {
     const header = render(
       <ContextAppLoadedProvider value={state}>
         <Header
-          testID="valuetransfer text"
-          poolsMoreInfoOnClick={onFunction}
-          syncingStatusMoreInfoOnClick={onFunction}
-          toggleMenuDrawer={onFunction}
-          setZecPrice={onFunction}
           title="title"
-          setComputingModalVisible={onFunction}
+          testID="valuetransfer text"
+          toggleMenuDrawer={onFunction}
           setBackgroundError={onFunction}
           setPrivacyOption={onFunction}
-          setUfvkViewModalVisible={onFunction}
           addLastSnackbar={onFunction}
           setShieldingAmount={onFunction}
         />

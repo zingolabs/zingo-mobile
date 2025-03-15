@@ -1,38 +1,49 @@
 import React from 'react';
-import { SendPageStateClass } from '../../app/AppState';
-import MessageList from './components/MessageList';
+import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppState';
+import ContactList from './components/ContactList';
 
 type MessagesProps = {
-  doRefresh: () => void;
+  // side menu
   toggleMenuDrawer: () => void;
-  syncingStatusMoreInfoOnClick: () => void;
+  // balance
+  // privacy
   setPrivacyOption: (value: boolean) => Promise<void>;
-  setUfvkViewModalVisible?: (v: boolean) => void;
-  setSendPageState: (s: SendPageStateClass) => void;
+  // addLastSnackbar from context
+  // shielding / sending
+  setScrollToTop: (value: boolean) => void;
+  scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
+  // for messages
+  sendTransaction: (s: SendPageStateClass) => Promise<String>;
+  setServerOption: (
+    value: ServerType,
+    selectServer: SelectServerEnum,
+    toast: boolean,
+    sameServerChainName: boolean,
+  ) => Promise<void>;
 };
 
 const Messages: React.FunctionComponent<MessagesProps> = ({
-  doRefresh,
   toggleMenuDrawer,
-  syncingStatusMoreInfoOnClick,
   setPrivacyOption,
-  setUfvkViewModalVisible,
-  setSendPageState,
+  setScrollToTop,
+  scrollToTop,
   setScrollToBottom,
   scrollToBottom,
+  sendTransaction,
+  setServerOption,
 }) => {
   return (
-    <MessageList
-      doRefresh={doRefresh}
+    <ContactList
       toggleMenuDrawer={toggleMenuDrawer}
-      syncingStatusMoreInfoOnClick={syncingStatusMoreInfoOnClick}
       setPrivacyOption={setPrivacyOption}
-      setUfvkViewModalVisible={setUfvkViewModalVisible}
-      setSendPageState={setSendPageState}
+      setScrollToTop={setScrollToTop}
+      scrollToTop={scrollToTop}
       setScrollToBottom={setScrollToBottom}
       scrollToBottom={scrollToBottom}
+      sendTransaction={sendTransaction}
+      setServerOption={setServerOption}
     />
   );
 };
