@@ -104,7 +104,8 @@
     "typescript": "5.0.4"
   },
   "resolutions": {
-    "@react-native/codegen": "0.78.0"
+    "@react-native/codegen": "0.78.0",
+    "glob": "^11.0.0"
   },
   "transformIgnorePatterns": [
     "node_modules/(?!((jest-)?react-native|react-navigation|@react-navigation/.*))"
