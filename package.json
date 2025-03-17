@@ -54,11 +54,9 @@
     "react-native-gesture-handler": "^2.23.1",
     "react-native-gifted-charts": "^1.4.58",
     "react-native-keychain": "^9.2.2",
-    "react-native-linear-gradient": "^2.8.3",
     "react-native-localize": "^3.1.0",
     "react-native-magic-modal": "^6.0.3",
-    "react-native-magic-toast": "^0.3.1",
-    "react-native-pager-view": "^6.0.1",
+    "react-native-pager-view": "^6.7.0",
     "react-native-permissions": "^5.2.5",
     "react-native-picker-select": "^9.1.3",
     "react-native-qrcode-svg": "^6.3.12",
@@ -104,6 +102,9 @@
     "react-test-renderer": "^19.0.0",
     "rimraf": "^6.0.1",
     "typescript": "5.0.4"
+  },
+  "resolutions": {
+    "@react-native/codegen": "0.78.0"
   },
   "transformIgnorePatterns": [
     "node_modules/(?!((jest-)?react-native|react-navigation|@react-navigation/.*))"
