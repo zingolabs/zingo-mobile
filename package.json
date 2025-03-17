@@ -103,6 +103,9 @@
     "rimraf": "^6.0.1",
     "typescript": "5.0.4"
   },
+  "resolutions": {
+    "@react-native/codegen": "0.78.0"
+  },
   "transformIgnorePatterns": [
     "node_modules/(?!((jest-)?react-native|react-navigation|@react-navigation/.*))"
   ]
