@@ -3,6 +3,7 @@
 set -e
 
 android_ndk_ver="r27c"
+pwd_old="${pwd}"
 
 apt update
 apt install -y --no-install-recommends --no-install-suggests \
@@ -123,8 +124,7 @@ apt autoremove -y \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 
-mkdir -p /opt/zingo/rust/lib/
-cd /opt/zingo/rust/lib/
+cd ${pwd_old}/build/com.zingolabs.zingo/rust/lib
 
 rustup default nightly
 
