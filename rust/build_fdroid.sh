@@ -29,7 +29,7 @@ apt install -y --no-install-recommends --no-install-suggests \
     pkg-config
 update-ca-certificates
 
-curl -vfL -o /tmp/android-ndk.zip https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip
+curl -fL -o /tmp/android-ndk.zip https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip
 unzip /tmp/android-ndk.zip -d /usr/local/ > /dev/null
 rm -rf /tmp/android-ndk.zip
 
@@ -71,8 +71,8 @@ echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "linker = \"x86_64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
 
-curl -LO https://www.openssl.org/source/openssl-3.3.2.tar.gz -o /opt/openssl-3.3.2.tar.gz
-tar xvf /opt/openssl-3.3.2.tar.gz > /dev/null
+curl -fL -o /opt/openssl-3.3.2.tar.gz https://www.openssl.org/source/openssl-3.3.2.tar.gz
+tar xvf /opt/openssl-3.3.2.tar.gz -C /opt/openssl-3.3.2 > /dev/null
 rm -rf /opt/openssl-3.3.2.tar.gz
 
 export OPENSSL_STATIC="yes"
