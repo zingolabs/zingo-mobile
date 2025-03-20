@@ -3,7 +3,6 @@
 set -e
 
 android_ndk_ver="r27c"
-pwd_old="${pwd}"
 
 apt update
 apt install -y --no-install-recommends --no-install-suggests \
@@ -72,18 +71,16 @@ echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "linker = \"x86_64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
 
-cd /opt
-curl -LO https://www.openssl.org/source/openssl-3.3.2.tar.gz -o openssl-3.3.2.tar.gz
-tar xvf openssl-3.3.2.tar.gz > /dev/null
-rm -rf openssl-3.3.2.tar.gz
+curl -LO https://www.openssl.org/source/openssl-3.3.2.tar.gz -o /opt/openssl-3.3.2.tar.gz
+tar xvf /opt/openssl-3.3.2.tar.gz > /dev/null
+rm -rf /opt/openssl-3.3.2.tar.gz
 
 export OPENSSL_STATIC="yes"
 
-cd /opt/openssl-3.3.2 
-mkdir x86 \
-    && mkdir aarch64 \
-    && mkdir armv7 \
-    && mkdir x86_64
+mkdir /opt/openssl-3.3.2/x86 \
+    && mkdir /opt/openssl-3.3.2/aarch64 \
+    && mkdir /opt/openssl-3.3.2/armv7 \
+    && mkdir /opt/openssl-3.3.2/x86_64
 
 ./Configure --prefix=/opt/openssl-3.3.2/aarch64 android-arm64 \
     -mno-outline-atomics \
@@ -120,8 +117,6 @@ make -j$(nproc) install > /dev/null
 make clean > /dev/null
 make distclean > /dev/null
 
-cd ${pwd_old}
-echo ${pwd}
 cd lib
 
 rustup default nightly
