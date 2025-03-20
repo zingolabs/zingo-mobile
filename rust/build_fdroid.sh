@@ -124,7 +124,7 @@ apt autoremove -y \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 
-cd ${pwd_old}/build/com.zingolabs.zingo/rust/lib
+cd ${pwd_old}/lib
 
 rustup default nightly
 
