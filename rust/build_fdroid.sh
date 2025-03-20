@@ -30,7 +30,7 @@ apt update && apt install -y --no-install-recommends --no-install-suggests \
 
 curl -vfL -o /tmp/android-ndk.zip https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip \
     && unzip /tmp/android-ndk.zip -d /usr/local/ \
-    && rm -rf /tmp/android-ndk.zip
+    && rm -rf /tmp/android-ndk.zip > /dev/null
 
 export ANDROID_NDK_HOME="/usr/local/android-ndk-${android_ndk_ver}"
 export NDK_HOME="/usr/local/android-ndk-${android_ndk_ver}"
@@ -74,7 +74,7 @@ cd /opt
 
 curl -LO https://www.openssl.org/source/openssl-3.3.2.tar.gz -o openssl-3.3.2.tar.gz \
     && tar xvf openssl-3.3.2.tar.gz \
-    && rm -rf openssl-3.3.2.tar.gz
+    && rm -rf openssl-3.3.2.tar.gz > /dev/null
 export OPENSSL_STATIC="yes"
 cd /opt/openssl-3.3.2 
 mkdir x86 \
@@ -133,17 +133,17 @@ cargo install --version ^3 cargo-ndk
 
 export CARGO_FEATURE_STD="true"
 export OPENSSL_DIR=/opt/openssl-3.3.2/aarch64
-cargo ndk --target arm64-v8a build --release -Z build-std
+cargo ndk --target arm64-v8a build --release -Z build-std > /dev/null
 llvm-strip ../target/aarch64-linux-android/release/libzingo.so
 
 export OPENSSL_DIR=/opt/openssl-3.3.2/x86_64
-cargo ndk --target x86_64 build --release -Z build-std
+cargo ndk --target x86_64 build --release -Z build-std > /dev/null
 llvm-strip ../target/x86_64-linux-android/release/libzingo.so
 
 export OPENSSL_DIR=/opt/openssl-3.3.2/armv7
-cargo ndk --target armeabi-v7a build --release -Z build-std
+cargo ndk --target armeabi-v7a build --release -Z build-std > /dev/null
 llvm-strip ../target/armv7-linux-androideabi/release/libzingo.so
 
 export OPENSSL_DIR=/opt/openssl-3.3.2/x86
-cargo ndk --target x86 build --release -Z build-std
+cargo ndk --target x86 build --release -Z build-std > /dev/null
 llvm-strip ../target/i686-linux-android/release/libzingo.so
