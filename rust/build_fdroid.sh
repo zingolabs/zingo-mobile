@@ -8,7 +8,7 @@ apt update
 apt install -y --no-install-recommends --no-install-suggests \
     ca-certificates \
     build-essential \
-    gcc-10-aarch64-linux-gnu \
+    gcc-aarch64-linux-gnu \
     libc6-dev \
     cmake \
     golang \
