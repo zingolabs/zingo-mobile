@@ -90,16 +90,16 @@ mkdir x86 \
     -D__ANDROID_API__=24 > /dev/null
 make -j$(nproc) > /dev/null
 make -j$(nproc) install > /dev/null
-make clean
-make distclean
+make clean > /dev/null
+make distclean > /dev/null
 
 ./Configure --prefix=/opt/openssl-3.3.2/armv7 android-arm \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 > /dev/null
 make -j$(nproc) > /dev/null
 make -j$(nproc) install > /dev/null
-make clean
-make distclean
+make clean > /dev/null
+make distclean > /dev/null
 
 #-latomic \
 ./Configure --prefix=/opt/openssl-3.3.2/x86 android-x86 \
@@ -108,22 +108,22 @@ make distclean
     -D__ANDROID_API__=24 > /dev/null
 make -j$(nproc) > /dev/null
 make -j$(nproc) install > /dev/null
-make clean
-make distclean
+make clean > /dev/null
+make distclean > /dev/null
 
 ./Configure --prefix=/opt/openssl-3.3.2/x86_64 android-x86_64 \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 > /dev/null
 make -j$(nproc) > /dev/null
 make -j$(nproc) install > /dev/null
-make clean
-make distclean
+make clean > /dev/null
+make distclean > /dev/null
 
 apt autoremove -y \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 
-mkdir /opt/zingo/rust/lib/
+mkdir -p /opt/zingo/rust/lib/
 cd /opt/zingo/rust/lib/
 
 rustup default nightly
