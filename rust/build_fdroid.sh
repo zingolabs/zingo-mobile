@@ -120,9 +120,7 @@ rustup default nightly
 
 cargo install --force --locked bindgen-cli
 
-cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
-    generate ./src/zingo.udl --language kotlin \ 
-    --out-dir ./src
+cargo run --release --features=uniffi/cli --bin uniffi-bindgen generate ./src/zingo.udl --language kotlin --out-dir ./src
 
 cargo install --version ^3 cargo-ndk
 
