@@ -89,14 +89,14 @@ mkdir x86 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
-    && make distclean
+    && make distclean > /dev/null
 ./Configure --prefix=/opt/openssl-3.3.2/armv7 android-arm \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
-    && make distclean
+    && make distclean > /dev/null
 ./Configure --prefix=/opt/openssl-3.3.2/x86 android-x86 \
     -DBROKEN_CLANG_ATOMICS \
     #-latomic \
@@ -105,14 +105,14 @@ mkdir x86 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
-    && make distclean
+    && make distclean > /dev/null
 ./Configure --prefix=/opt/openssl-3.3.2/x86_64 android-x86_64 \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
-    && make distclean
+    && make distclean > /dev/null
 
 apt autoremove -y \
     && apt clean \
@@ -132,14 +132,18 @@ cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
 cargo install --version ^3 cargo-ndk
 
 export CARGO_FEATURE_STD="true"
-OPENSSL_DIR=/opt/openssl-3.3.2/aarch64 cargo ndk --target arm64-v8a build --release -Z build-std
+export OPENSSL_DIR=/opt/openssl-3.3.2/aarch64
+cargo ndk --target arm64-v8a build --release -Z build-std
 llvm-strip ../target/aarch64-linux-android/release/libzingo.so
 
-OPENSSL_DIR=/opt/openssl-3.3.2/x86_64 cargo ndk --target x86_64 build --release -Z build-std
+export OPENSSL_DIR=/opt/openssl-3.3.2/x86_64
+cargo ndk --target x86_64 build --release -Z build-std
 llvm-strip ../target/x86_64-linux-android/release/libzingo.so
 
-OPENSSL_DIR=/opt/openssl-3.3.2/armv7 cargo ndk --target armeabi-v7a build --release -Z build-std
+export OPENSSL_DIR=/opt/openssl-3.3.2/armv7
+cargo ndk --target armeabi-v7a build --release -Z build-std
 llvm-strip ../target/armv7-linux-androideabi/release/libzingo.so
 
-OPENSSL_DIR=/opt/openssl-3.3.2/x86 cargo ndk --target x86 build --release -Z build-std
+export OPENSSL_DIR=/opt/openssl-3.3.2/x86
+cargo ndk --target x86 build --release -Z build-std
 llvm-strip ../target/i686-linux-android/release/libzingo.so
