@@ -114,8 +114,6 @@ mkdir /opt/openssl-3.3.2/x86 \
     && make clean > /dev/null \
     && make distclean > /dev/null
 
-cd lib
-
 rustup default nightly
 
 cargo install --force --locked bindgen-cli
