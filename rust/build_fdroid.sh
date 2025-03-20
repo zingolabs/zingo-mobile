@@ -83,40 +83,37 @@ mkdir /opt/openssl-3.3.2/x86 \
     && mkdir /opt/openssl-3.3.2/armv7 \
     && mkdir /opt/openssl-3.3.2/x86_64
 
-./Configure --prefix=/opt/openssl-3.3.2/aarch64 android-arm64 \
+/opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/aarch64 android-arm64 \
     -mno-outline-atomics \
     -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 > /dev/null
-make -j$(nproc) > /dev/null
-make -j$(nproc) install > /dev/null
-make clean > /dev/null
-make distclean > /dev/null
-
-./Configure --prefix=/opt/openssl-3.3.2/armv7 android-arm \
+    -D__ANDROID_API__=24 \
+    && make -j$(nproc) \
+    && make -j$(nproc) install \
+    && make clean \
+    && make distclean
+/opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/armv7 android-arm \
     -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 > /dev/null
-make -j$(nproc) > /dev/null
-make -j$(nproc) install > /dev/null
-make clean > /dev/null
-make distclean > /dev/null
-
-#-latomic \
-./Configure --prefix=/opt/openssl-3.3.2/x86 android-x86 \
+    -D__ANDROID_API__=24 \
+    && make -j$(nproc) \
+    && make -j$(nproc) install \
+    && make clean \
+    && make distclean
+/opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/x86 android-x86 \
     -DBROKEN_CLANG_ATOMICS \
+    #-latomic \
     -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 > /dev/null
-make -j$(nproc) > /dev/null
-make -j$(nproc) install > /dev/null
-make clean > /dev/null
-make distclean > /dev/null
-
-./Configure --prefix=/opt/openssl-3.3.2/x86_64 android-x86_64 \
+    -D__ANDROID_API__=24 \
+    && make -j$(nproc) \
+    && make -j$(nproc) install \
+    && make clean \
+    && make distclean
+/opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/x86_64 android-x86_64 \
     -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 > /dev/null
-make -j$(nproc) > /dev/null
-make -j$(nproc) install > /dev/null
-make clean > /dev/null
-make distclean > /dev/null
+    -D__ANDROID_API__=24 \
+    && make -j$(nproc) \
+    && make -j$(nproc) install \
+    && make clean \
+    && make distclean
 
 cd lib
 
