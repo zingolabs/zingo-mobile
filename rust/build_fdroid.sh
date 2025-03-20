@@ -120,11 +120,9 @@ make -j$(nproc) install > /dev/null
 make clean > /dev/null
 make distclean > /dev/null
 
-apt autoremove -y \
-    && apt clean \
-    && rm -rf /var/lib/apt/lists/*
-
-cd ${pwd_old}/lib
+cd ${pwd_old}
+echo ${pwd}
+cd lib
 
 rustup default nightly
 
