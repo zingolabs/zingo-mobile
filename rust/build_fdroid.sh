@@ -71,8 +71,9 @@ echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "linker = \"x86_64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
 
+mkdir -p /opt/openssl-3.3.2
 curl -fL -o /opt/openssl-3.3.2.tar.gz https://www.openssl.org/source/openssl-3.3.2.tar.gz
-tar xvf /opt/openssl-3.3.2.tar.gz -C /opt/openssl-3.3.2 > /dev/null
+tar xvf /opt/openssl-3.3.2.tar.gz -C /opt/openssl-3.3.2 --strip-components=1 > /dev/null
 rm -rf /opt/openssl-3.3.2.tar.gz
 
 export OPENSSL_STATIC="yes"
