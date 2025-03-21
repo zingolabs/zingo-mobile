@@ -78,10 +78,10 @@ rm -rf /opt/openssl-3.3.2.tar.gz
 
 export OPENSSL_STATIC="yes"
 
-mkdir /opt/openssl-3.3.2/x86 \
-    && mkdir /opt/openssl-3.3.2/aarch64 \
-    && mkdir /opt/openssl-3.3.2/armv7 \
-    && mkdir /opt/openssl-3.3.2/x86_64
+mkdir -p /opt/openssl-3.3.2/x86 \
+    && mkdir -p /opt/openssl-3.3.2/aarch64 \
+    && mkdir -p /opt/openssl-3.3.2/armv7 \
+    && mkdir -p /opt/openssl-3.3.2/x86_64
 
 /opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/aarch64 android-arm64 \
     -mno-outline-atomics \
@@ -139,11 +139,11 @@ export OPENSSL_DIR=/opt/openssl-3.3.2/x86
 cargo ndk --target x86 build --release -Z build-std > /dev/null
 llvm-strip ../target/i686-linux-android/release/libzingo.so
 
-mkdir /opt/jniLibs/x86 \
-    && mkdir /opt/jniLibs/aarch64 \
-    && mkdir /opt/jniLibs/armv7 \
-    && mkdir /opt/jniLibs/x86_64 \
-    && mkdir /opt/jniLibs/kotlin
+mkdir -p /opt/jniLibs/x86 \
+    && mkdir -p /opt/jniLibs/aarch64 \
+    && mkdir -p /opt/jniLibs/armv7 \
+    && mkdir -p /opt/jniLibs/x86_64 \
+    && mkdir -p /opt/jniLibs/kotlin
 
 cp ../target/x86_64-linux-android/release/libzingo.so /opt/jniLibs/x86_64/libuniffi_zingo.so
 cp ../target/i686-linux-android/release/libzingo.so /opt/jniLibs/x86/libuniffi_zingo.so
