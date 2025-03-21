@@ -153,3 +153,6 @@ cp ./src/uniffi/zingo/zingo.kt /opt/jniLibs/kotlin/zingo.kt
 
 rm -rf ../target
 rm -rf /opt/openssl-3.3.2
+rm -rf ./src/uniffi
+rm -rf Makefile.in
+rm -rf *.tmp
