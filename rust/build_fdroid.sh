@@ -138,3 +138,18 @@ llvm-strip ../target/armv7-linux-androideabi/release/libzingo.so
 export OPENSSL_DIR=/opt/openssl-3.3.2/x86
 cargo ndk --target x86 build --release -Z build-std > /dev/null
 llvm-strip ../target/i686-linux-android/release/libzingo.so
+
+mkdir /opt/jniLibs/x86 \
+    && mkdir /opt/jniLibs/aarch64 \
+    && mkdir /opt/jniLibs/armv7 \
+    && mkdir /opt/jniLibs/x86_64 \
+    && mkdir /opt/jniLibs/kotlin
+
+cp ../target/x86_64-linux-android/release/libzingo.so /opt/jniLibs/x86_64/libuniffi_zingo.so
+cp ../target/i686-linux-android/release/libzingo.so /opt/jniLibs/x86/libuniffi_zingo.so
+cp ../target/armv7-linux-androideabi/release/libzingo.so /opt/jniLibs/armeabi-v7a/libuniffi_zingo.so
+cp ../target/aarch64-linux-android/release/libzingo.so /opt/jniLibs/arm64-v8a/libuniffi_zingo.so
+cp ./src/uniffi/zingo/zingo.kt /opt/jniLibs/zingo.kt
+
+rm -rf ../target
+rm -rf /opt/openssl-3.3.2
