@@ -140,8 +140,8 @@ cargo ndk --target x86 build --release -Z build-std > /dev/null
 llvm-strip ../target/i686-linux-android/release/libzingo.so
 
 mkdir -p /opt/jniLibs/x86 \
-    && mkdir -p /opt/jniLibs/aarch64 \
-    && mkdir -p /opt/jniLibs/armv7 \
+    && mkdir -p /opt/jniLibs/arm64-v8a \
+    && mkdir -p /opt/jniLibs/armeabi-v7a \
     && mkdir -p /opt/jniLibs/x86_64 \
     && mkdir -p /opt/jniLibs/kotlin
 
