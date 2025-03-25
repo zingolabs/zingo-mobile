@@ -240,6 +240,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
+          noUfvkIcon={true}
           closeScreen={() => {
             clear();
             hide();

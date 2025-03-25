@@ -68,6 +68,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
+          noUfvkIcon={true}
           closeScreen={() => {
             clear();
             hide();

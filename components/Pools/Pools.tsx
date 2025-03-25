@@ -80,6 +80,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
+          noUfvkIcon={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
           closeScreen={() => {

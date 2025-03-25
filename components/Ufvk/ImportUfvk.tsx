@@ -151,6 +151,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
             noSyncingStatus={true}
             noDrawMenu={true}
             noPrivacy={true}
+            noUfvkIcon={true}
             translate={translate}
             netInfo={netInfo}
             mode={mode}

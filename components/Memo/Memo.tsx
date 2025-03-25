@@ -88,6 +88,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
             noSyncingStatus={true}
             noDrawMenu={true}
             noPrivacy={true}
+            noUfvkIcon={true}
             closeScreen={() => {
               clear();
               hide();

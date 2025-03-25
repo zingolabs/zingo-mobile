@@ -56,6 +56,7 @@ const Info: React.FunctionComponent<InfoProps> = () => {
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
+          noUfvkIcon={true}
           closeScreen={() => {
             clear();
             hide();

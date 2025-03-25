@@ -27,6 +27,7 @@ describe('Component Header - test', () => {
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
+          noUfvkIcon={true}
           closeScreen={close}
         />
       </ContextAppLoadedProvider>,

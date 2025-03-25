@@ -65,6 +65,8 @@ type HeaderProps = {
   noBalance?: boolean;
   // syncing icons
   noSyncingStatus?: boolean;
+  // ufvk
+  noUfvkIcon?: boolean
   // privacy
   noPrivacy?: boolean;
   setPrivacyOption?: (value: boolean) => Promise<void>;
@@ -104,6 +106,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   setScrollToTop,
   setScrollToBottom,
   closeScreen,
+  noUfvkIcon,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -836,7 +839,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 <FontAwesomeIcon icon={faBars} size={40} color={colors.border} />
               </TouchableOpacity>
             )}
-            {readOnly && (
+            {readOnly && !noUfvkIcon && (
               <>
                 {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal <= 0) &&
                 !(mode === ModeEnum.basic && totalBalance && totalBalance.total <= 0) ? (

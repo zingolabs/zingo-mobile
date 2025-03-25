@@ -296,6 +296,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
+          noUfvkIcon={true}
           closeScreen={() => {
             clear();
             hide();
