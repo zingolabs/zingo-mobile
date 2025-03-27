@@ -87,10 +87,6 @@ buck-out/
 # bundle file
 /**/index.android.bundle
 
-# firebase
-/**/google-services.json
-/**/GoogleService-Info.plist
-
 # Binaries
 /rust/test_binaries/bins/
 
