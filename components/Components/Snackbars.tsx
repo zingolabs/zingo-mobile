@@ -107,15 +107,15 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
   }, [duration, handleSnackbarClose, snackbars, snackbars.length]);
 
   useEffect(() => {
-    console.log('MOUNTING - snackbar');
+    //console.log('MOUNTING - snackbar');
     return () => {
       setTimeout(() => {
-        console.log('CLOSING - waiting for some message');
+        //console.log('CLOSING - waiting for some message');
       }, 2000);
     };
   }, [toast]);
 
-  console.log('snackbars', snackbars, duration, snacking);
+  //console.log('snackbars', snackbars, duration, snacking);
 
   return <View />;
 };

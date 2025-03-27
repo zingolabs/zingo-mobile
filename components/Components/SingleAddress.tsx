@@ -32,7 +32,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
-  const [expandQRAddress, setExpandQRAddress] = useState<boolean>(false);
+  const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
   const [multi, setMulti] = useState<boolean>(false);
 
   useEffect(() => {

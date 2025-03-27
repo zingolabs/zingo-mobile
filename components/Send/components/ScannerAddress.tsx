@@ -84,6 +84,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
+          noUfvkIcon={true}
           closeScreen={() => {
             clear();
             hide();

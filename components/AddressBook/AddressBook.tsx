@@ -176,6 +176,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
+          noUfvkIcon={true}
           closeScreen={() => {
             clear();
             hide();
