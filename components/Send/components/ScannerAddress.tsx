@@ -2,7 +2,7 @@
 import React, { useContext } from 'react';
 
 import { ContextAppLoaded } from '../../../app/context';
-import Scanner from '../../Components/Scanner';
+import Scanner from '../../Scanner';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -14,7 +14,6 @@ import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Code } from 'react-native-vision-camera';
 import { useMagicModal } from 'react-native-magic-modal';
 import { View } from 'react-native';
 import Snackbars from '../../Components/Snackbars';
@@ -51,8 +50,8 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
     }
   };
 
-  const onRead = (codes: Code[]) => {
-    const scandata = codes[0].value?.trim();
+  const onRead = (value: string) => {
+    const scandata = value;
 
     if (!scandata) {
       return;
