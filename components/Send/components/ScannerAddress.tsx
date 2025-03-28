@@ -2,7 +2,7 @@
 import React, { useContext } from 'react';
 
 import { ContextAppLoaded } from '../../../app/context';
-import Scanner from '../../Components/Scanner.ios';
+import Scanner from '../../Scanner';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';

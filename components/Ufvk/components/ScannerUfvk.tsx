@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { ContextAppLoading } from '../../../app/context';
-import Scanner from '../../Components/Scanner.ios';
+import Scanner from '../../Scanner';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
