@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { ContextAppLoading } from '../../../app/context';
-import Scanner from '../../Components/Scanner';
+import Scanner from '../../Components/Scanner.ios';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -11,7 +11,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
-import { Code } from 'react-native-vision-camera';
 import { View } from 'react-native';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
@@ -27,8 +26,8 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, c
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
 
-  const onRead = async (codes: Code[]) => {
-    const scandata = codes[0].value?.trim();
+  const onRead = async (value: string) => {
+    const scandata = value;
 
     if (!scandata) {
       return;
