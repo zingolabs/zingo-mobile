@@ -30,6 +30,8 @@ import 'moment/locale/ru';
 import { ButtonTypeEnum, GlobalConst, SelectServerEnum } from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
+// @ts-ignore
+import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
 
 type ImportUfvkProps = {
   onClickCancel: () => void;
@@ -113,6 +115,16 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     Keyboard.dismiss();
   };
 
+  const showQrcodeModalVisible = () => {
+    if (Platform.OS === GlobalConst.platformOSandroid) {
+      BarcodeZxingScan.showQrReader(async (a: string) => {
+        setSeedufvkText(a);
+      });
+    } else {
+      setQrcodeModalVisible(true);
+    }
+  };
+
   return (
     <ToastProvider>
       <KeyboardAvoidingView
@@ -151,6 +163,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
             noSyncingStatus={true}
             noDrawMenu={true}
             noPrivacy={true}
+            noUfvkIcon={true}
             translate={translate}
             netInfo={netInfo}
             mode={mode}
@@ -216,7 +229,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
               )}
               <TouchableOpacity
                 onPress={() => {
-                  setQrcodeModalVisible(true);
+                  showQrcodeModalVisible();
                 }}>
                 <FontAwesomeIcon size={35} icon={faQrcode} color={colors.border} />
               </TouchableOpacity>

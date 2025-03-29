@@ -261,6 +261,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
+          noUfvkIcon={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
           closeScreen={() => {

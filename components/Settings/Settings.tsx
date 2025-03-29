@@ -660,6 +660,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
+          noUfvkIcon={true}
           closeScreen={() => {
             if (!disabled) {
               navigateToHome(true);

@@ -56,6 +56,7 @@ const Info: React.FunctionComponent<InfoProps> = () => {
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
+          noUfvkIcon={true}
           closeScreen={() => {
             clear();
             hide();
@@ -74,7 +75,7 @@ const Info: React.FunctionComponent<InfoProps> = () => {
               value={translate('zingo') + ' ' + translate('version')}
             />
             <DetailLine label={translate('info.serverversion') as string} value={info.version ? info.version : '-'} />
-            <DetailLine label={translate('info.lightwalletd') as string} value={info.serverUri ? info.serverUri : '-'} />
+            <DetailLine label={translate('info.zainod') as string} value={info.serverUri ? info.serverUri : '-'} />
             <DetailLine
               label={translate('info.network') as string}
               value={

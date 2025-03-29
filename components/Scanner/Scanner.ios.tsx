@@ -8,7 +8,7 @@ import { ThemeType } from '../../app/types';
 import { View } from 'react-native';
 
 type ScannerProps = {
-  onRead: (codes: Code[]) => void;
+  onRead: (value: string) => void;
 };
 
 const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead }) => {
@@ -23,9 +23,9 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead }) => {
 
   const codeScanner = useCodeScanner({
     codeTypes: ['qr', 'ean-13'],
-    onCodeScanned: codes => {
+    onCodeScanned: (codes: Code[]) => {
       setActive(false);
-      onRead(codes);
+      onRead(codes && codes[0] && codes[0].value ? codes[0].value.trim() : '');
     },
   });
 

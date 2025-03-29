@@ -60,6 +60,7 @@ const About: React.FunctionComponent<AboutProps> = () => {
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
+          noUfvkIcon={true}
           closeScreen={() => {
             clear();
             hide();

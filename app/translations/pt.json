@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.11.1 (225)",
+  "version": "zingo-1.11.2 (226)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -160,7 +160,7 @@
     "readingwallet": "Lendo com sucesso a carteira atual com o servidor:",
     "restorewallet-title": "Opção Avançada",
     "restorewallet-alert": "Confirme que você deseja restaurar uma nova carteira usando as suas frases de recuperação.",
-    "selectingserver": "Determinando a melhor lightwalletd.",
+    "selectingserver": "Determinando a melhor zainod.",
     "selectingserversame": "Seu servidor atual já é o mais otimizado.",
     "selectingserverbest": "Neste momento ele é o servidor mais otimizado:",
     "incoming-funds": "Fundos recebidos\n",
@@ -367,7 +367,7 @@
   "info": {
     "version": "Versão",
     "serverversion": "Versão do Servidor",
-    "lightwalletd": "Lightwalletd URL",
+    "zainod": "Zainod URL",
     "network": "Rede",
     "serverblock": "Altura do Bloco do Servidor",
     "zecprice": "Preço do ZEC",
