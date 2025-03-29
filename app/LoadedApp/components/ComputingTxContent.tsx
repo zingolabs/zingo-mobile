@@ -36,6 +36,7 @@ const ComputingTxContent: React.FunctionComponent = () => {
         noSyncingStatus={true}
         noDrawMenu={true}
         noPrivacy={true}
+        noUfvkIcon={true}
       />
       <View
         style={{

@@ -9,6 +9,7 @@ import {
   ButtonTypeEnum,
   GlobalConst,
   ModeEnum,
+  SecurityType,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
@@ -35,6 +36,7 @@ type AbDetailProps = {
     color: string,
   ) => void;
   addressBookCurrentAddress?: string;
+  setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   index,
@@ -43,6 +45,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   action: actionProp,
   doAction,
   addressBookCurrentAddress,
+  setSecurityOption,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, addLastSnackbar, addressBook, language, mode } = context;
@@ -191,6 +194,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         setError={setErrorAddress}
         disabled={action === AddressBookActionEnum.Delete}
         setUOrchardAddress={setUOrchardAddress}
+        setSecurityOption={setSecurityOption}
       />
       {mode === ModeEnum.advanced && uOrchardAddress && (
         <FadeText style={{ marginLeft: 10, marginTop: 0, color: colors.primary }}>

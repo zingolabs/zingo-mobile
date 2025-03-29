@@ -502,18 +502,18 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           const resultJson: RPCSeedType = await JSON.parse(result);
           if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
             // Load the wallet and navigate to the vts screen
+            let readOnly: boolean = false;
             const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
-            //console.log(walletKindStr);
+            //console.log('KIND...', walletKindStr);
             try {
               const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
-              //console.log(walletKindJSON);
+              //console.log('KIND... JSON', walletKindJSON);
               // there are 4 kinds:
               // 1. seed
               // 2. USK
               // 3. UFVK - watch-only wallet
               // 4. No keys - watch-only wallet (possibly an error)
 
-              let readOnly: boolean;
               if (
                 walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
                 walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
@@ -537,14 +537,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 actionButtonsDisabled: false,
               });
             } catch (e) {
-              //console.log(walletKindStr);
+              //console.log('CATCH ERROR', walletKindStr);
               this.setState({
-                readOnly: false,
+                readOnly,
                 actionButtonsDisabled: false,
               });
               this.addLastSnackbar({ message: walletKindStr });
             }
-            this.navigateToLoadedApp();
+            this.navigateToLoadedApp(readOnly);
             //console.log('navigate to LoadedApp');
           } else {
             error = true;
@@ -594,7 +594,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           } else {
             this.createNewWallet(false);
             this.setState({ actionButtonsDisabled: false });
-            this.navigateToLoadedApp();
+            this.navigateToLoadedApp(false);
             //console.log('navigate to LoadedApp');
           }
         }
@@ -966,13 +966,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.setState({ actionButtonsDisabled: false });
   };
 
-  navigateToLoadedApp = () => {
+  navigateToLoadedApp = (readOnly: boolean) => {
     this.props.navigationApp.reset({
       index: 0,
       routes: [
         {
           name: RouteEnums.LoadedApp,
-          params: { readOnly: this.state.readOnly},
+          params: { readOnly },
         },
       ],
     });
@@ -1149,7 +1149,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               actionButtonsDisabled: false,
               readOnly: type === RestoreFromTypeEnum.seedRestoreFrom ? false : true,
             });
-            this.navigateToLoadedApp();
+            this.navigateToLoadedApp(type === RestoreFromTypeEnum.seedRestoreFrom ? false : true);
           } else {
             error = true;
             errorText = resultJson.error;
@@ -1279,6 +1279,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       biometricsFailed,
       translate,
       hasRecoveryWalletInfoSaved,
+      readOnly,
     } = this.state;
 
     //console.log('render loadingAppClass - 3', this.state.privacy);
@@ -1358,10 +1359,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               animationType="slide"
               transparent={true}
               visible={screen === 2}
-              onRequestClose={() => this.navigateToLoadedApp()}>
+              onRequestClose={() => this.navigateToLoadedApp(readOnly)}>
               <Seed
-                onClickOK={() => this.navigateToLoadedApp()}
-                onClickCancel={() => this.navigateToLoadedApp()}
+                onClickOK={() => this.navigateToLoadedApp(readOnly)}
+                onClickCancel={() => this.navigateToLoadedApp(readOnly)}
                 action={SeedActionEnum.new}
                 setPrivacyOption={this.setPrivacyOption}
               />

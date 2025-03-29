@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.11.1 (225)",
+  "version": "zingo-1.11.2 (226)",
   "loading": "загрузка...",
   "connectingserver": "Подключение к серверу...",
   "wait": "Пожалуйста, подождите...",
@@ -160,7 +160,7 @@
     "readingwallet": "Успешное соединение с этим сервером:",
     "restorewallet-title": "Расширенные настройки",
     "restorewallet-alert": "Подтвердите, что вы хотите восстановить новый кошелек с помощью вашей начальной фразы.",
-    "selectingserver": "Определение ближайшего сервера.",
+    "selectingserver": "Определение ближайшего сервера (zainod).",
     "selectingserversame": "Ваш текущий сервер является ближайшим.",
     "selectingserverbest": "В этот момент его самый оптимизированный сервер:",
     "incoming-funds": "Входящие средства\n",
@@ -367,7 +367,7 @@
   "info": {
     "version": "Версия",
     "serverversion": "Версия сервера",
-    "lightwalletd": "URL-адрес Lightwalletd",
+    "zainod": "URL-адрес Zainod",
     "network": "Сеть",
     "serverblock": "Высота блока сервера",
     "zecprice": "Цена ZEC",

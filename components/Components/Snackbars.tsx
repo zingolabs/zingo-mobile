@@ -26,7 +26,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     }
     // we need some time between messages
     setTimeout(() => {
-      console.log('remove first snackbar', snackbars[0]?.message, snackingMessage.current);
+      //console.log('remove first snackbar', snackbars[0]?.message, snackingMessage.current);
       snacking.current = false;
       snackingMessage.current = undefined;
       removeFirstSnackbar();
@@ -50,7 +50,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
           ? 1000
           : 4000,
       );
-      console.log('show snackbar', currentSnackbar);
+      //console.log('show snackbar', currentSnackbar);
       toast.show({
         //message: currentSnackbar.message + 'vhasi  eiofjwf weoi fewo fjpe fwpf f efwp ejpo efjpwoe jp oj peowfjwpoefwpoe wpoefjwpo powe fpwoef jp wow pojfpwoej kjANLK ALCALKDSCLAK CLAK CLAKDC ALKDSCM LAKDSC LAKDC MLAKDA',
         message: currentSnackbar.message,
@@ -107,15 +107,15 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
   }, [duration, handleSnackbarClose, snackbars, snackbars.length]);
 
   useEffect(() => {
-    console.log('MOUNTING - snackbar');
+    //console.log('MOUNTING - snackbar');
     return () => {
       setTimeout(() => {
-        console.log('CLOSING - waiting for some message');
+        //console.log('CLOSING - waiting for some message');
       }, 2000);
     };
   }, [toast]);
 
-  console.log('snackbars', snackbars, duration, snacking);
+  //console.log('snackbars', snackbars, duration, snacking);
 
   return <View />;
 };

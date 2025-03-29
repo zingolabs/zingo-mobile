@@ -15,7 +15,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum } from '../../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, SecurityType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -33,9 +33,10 @@ import { ToastProvider, useToast } from 'react-native-toastier';
 
 type AddressBookProps = {
   setAddressBook: (ab: AddressBookFileClass[]) => void;
+  setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 
-const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook }) => {
+const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook, setSecurityOption }) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -176,6 +177,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
           noSyncingStatus={true}
           noDrawMenu={true}
           noPrivacy={true}
+          noUfvkIcon={true}
           closeScreen={() => {
             clear();
             hide();
@@ -202,6 +204,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
               action={action}
               doAction={doAction}
               addressBookCurrentAddress={addressBookCurrentAddress}
+              setSecurityOption={setSecurityOption}
             />
           )}
           {currentItem !== null && currentItem > -1 && action !== null && (
@@ -212,6 +215,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
               cancel={cancel}
               action={action}
               doAction={doAction}
+              setSecurityOption={setSecurityOption}
             />
           )}
           {!addressBookCurrentAddress && addressBookSorted.length === 0 && currentItem !== -1 && !loading && (
