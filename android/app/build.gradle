@@ -226,6 +226,11 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.0'
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+    implementation(project(':react-native-device-info')) { 
+        exclude group: 'com.google.firebase'
+        exclude group: 'com.google.android.gms'
+        exclude group: 'com.android.installreferrer'
+    }
     implementation 'com.facebook.soloader:soloader:0.10.5'
 
     
