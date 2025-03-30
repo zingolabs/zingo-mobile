@@ -264,7 +264,7 @@ else
     fi
 
     echo -e "\nBuilding APKs..."
-    ./gradlew assembleDebug assembleAndroidTest -PsplitApk=true
+    ./gradlew assembleRelease assembleAndroidTest -PsplitApk=true
 
     # Create integration test report directory
     test_report_dir="app/build/outputs/integration_test_reports/${abi}"
@@ -295,8 +295,8 @@ else
     step_complete=false
     until [[ $step_complete == true ]]; do
         if adb -s emulator-5554 install-multi-package -r -t -d --abi "${abi}" \
-                "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \
-                "app/build/outputs/apk/debug/app-${abi}-debug.apk" &> "${test_report_dir}/apk_installation.txt"; then
+                "app/build/outputs/apk/androidTest/release/app-release-androidTest.apk" \
+                "app/build/outputs/apk/release/app-${abi}-release.apk" &> "${test_report_dir}/apk_installation.txt"; then
             step_complete=true
             echo "Successfully installed APKs"
         fi              
