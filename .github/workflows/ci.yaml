@@ -91,3 +91,10 @@ jobs:
   #  with:
   #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
   #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+
+  android-ubuntu-foss-artifact:
+    uses: ./.github/workflows/android-ubuntu-foss-artifact.yaml
+    needs: [create-timestamp, android-build]
+    with:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
