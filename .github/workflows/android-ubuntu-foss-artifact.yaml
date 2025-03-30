@@ -74,7 +74,10 @@ jobs:
           fail-on-cache-miss: true
 
       - name: Yarn install
-        run: yarn
+        run: npm_config_build_from_source=true yarn install
+
+      - name: Yarn remove vision-camera library
+        run: yarn remove react-native-vision-camera || true
       
       - name: Build the artifact
         run: yarn build:release
