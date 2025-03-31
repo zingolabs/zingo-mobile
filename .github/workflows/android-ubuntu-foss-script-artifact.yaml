@@ -38,7 +38,7 @@ jobs:
           gradle-version: 8.11.1
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
       
-      - name: Node JS
+      - name: Node JS & build script
         working-directory: rust/lib
         run: |
           sudo apt install -y pkg-config build-essential apt-utils libpixman-1-dev \
@@ -72,7 +72,8 @@ jobs:
         run: sudo yarn remove react-native-vision-camera || true
       
       - name: Decoding Keystore & Save
-        run: sudo echo "${{ secrets.ZINGO_JKS_BASE64 }}" | base64 --decode > android/app/Zingo.jks
+        working-directory: android/app
+        run: sudo echo "${{ secrets.ZINGO_JKS_BASE64 }}" | base64 --decode > Zingo.jks
 
       - name: Build release Signed APK Artifact
         env:
