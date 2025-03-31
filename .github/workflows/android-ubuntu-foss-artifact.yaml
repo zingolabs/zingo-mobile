@@ -26,6 +26,12 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
+      - name: Node JS
+        run: |
+          nvm install 20.18.2
+          nvm use 20.18.2
+          npm install --global yarn
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
