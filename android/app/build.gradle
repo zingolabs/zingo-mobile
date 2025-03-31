@@ -140,16 +140,19 @@ android {
         }
         release {
             if (System.getenv("KEYSTORE_PASSWORD")) {
+                println "****** ENV SIGNING APK ******"
                 storeFile file("Zingo.jks")
                 storePassword System.getenv("KEYSTORE_PASSWORD")
                 keyAlias System.getenv("KEY_ALIAS")
                 keyPassword System.getenv("KEY_PASSWORD")
             } else if (keystoreProperties['KEYSTORE_PASSWORD']) {
+                println "****** LOCAL SIGNING APK ******"
                 storeFile file("Zingo.jks")
                 storePassword keystoreProperties['KEYSTORE_PASSWORD']
                 keyAlias keystoreProperties['KEY_ALIAS']
                 keyPassword keystoreProperties['KEY_PASSWORD']
             } else {
+                println "****** DEBUG SIGNING APK ******"
                 storeFile file('debug.keystore')
                 storePassword 'android'
                 keyAlias 'androiddebugkey'

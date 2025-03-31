@@ -1,4 +1,4 @@
-name: Android Ubuntu FOSS Artifact
+name: Android Ubuntu FOSS Script Artifact
 
 on:
   workflow_call:
@@ -15,8 +15,8 @@ env:
   TIMESTAMP: ${{ inputs.timestamp }}
 
 jobs:
-  android-ubuntu-foss-artifact:
-    name: Android Ubuntu Foss Artifact
+  android-ubuntu-foss-script-artifact:
+    name: Android Ubuntu Foss Script Artifact
     runs-on: ubuntu-24.04
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
@@ -74,7 +74,7 @@ jobs:
       - name: Decoding Keystore & Save
         run: sudo echo "${{ secrets.ZINGO_JKS_BASE64 }}" | base64 --decode > android/app/Zingo.jks
 
-      - name: Build release Signed APK Artefact
+      - name: Build release Signed APK Artifact
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
