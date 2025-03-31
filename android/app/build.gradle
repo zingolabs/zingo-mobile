@@ -84,9 +84,11 @@ def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 ext.splitApk = project.properties['splitApk'] ?: false
 ext.includeUniversalApk = project.properties['includeUniversalApk'] ?: false
 
-def keystorePropertiesFile = rootProject.file("local.zingo.jks.properties")
 def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+def keystorePropertiesFile = rootProject.file("local.zingo.jks.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
 
 android {
     ndkVersion rootProject.ext.ndkVersion
