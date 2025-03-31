@@ -84,6 +84,10 @@ def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 ext.splitApk = project.properties['splitApk'] ?: false
 ext.includeUniversalApk = project.properties['includeUniversalApk'] ?: false
 
+def keystorePropertiesFile = rootProject.file("local.zingo.jks.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
     ndkVersion rootProject.ext.ndkVersion
 
@@ -132,6 +136,18 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            storeFile file("Zingo.jks")
+            if (System.getenv("KEYSTORE_PASSWORD")) {
+                storePassword System.getenv("KEYSTORE_PASSWORD")
+                keyAlias System.getenv("KEY_ALIAS")
+                keyPassword System.getenv("KEY_PASSWORD")
+            } else {
+                storePassword keystoreProperties['KEYSTORE_PASSWORD']
+                keyAlias keystoreProperties['KEY_ALIAS']
+                keyPassword keystoreProperties['KEY_PASSWORD']
+            }
+        }
     }
 
     buildTypes {
@@ -141,7 +157,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
