@@ -41,7 +41,7 @@ jobs:
       - name: Node JS
         working-directory: rust/lib
         run: |
-          sudo apt update && apt install -y pkg-config build-essential apt-utils libpixman-1-dev \
+          sudo apt install -y pkg-config build-essential apt-utils libpixman-1-dev \
             libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev librsvg2-dev
           sudo curl -Lo node.tar.gz https://nodejs.org/dist/v20.18.2/node-v20.18.2-linux-x64.tar.gz
           sudo echo "eb5b031bdd728871c3b9a82655dbfa533bc262c0b6da1d09a86842430cef07d4 node.tar.gz" | sha256sum -c -
