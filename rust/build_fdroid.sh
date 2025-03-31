@@ -26,7 +26,7 @@ apt update \
     libc6-dev-arm64-cross \
     protobuf-compiler \
     libssl-dev \
-    pkg-config
+    pkg-config \
     && update-ca-certificates
 
 # Install Android NDK
