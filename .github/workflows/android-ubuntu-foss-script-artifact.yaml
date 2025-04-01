@@ -13,6 +13,10 @@ on:
 env:
   REPO-OWNER: ${{ github.repository_owner }}
   TIMESTAMP: ${{ inputs.timestamp }}
+  ZINGO_JKS_BASE64: ${{ secrets.ZINGO_JKS_BASE64 }}
+  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+  KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
 jobs:
   android-ubuntu-foss-script-artifact:
@@ -73,19 +77,15 @@ jobs:
       
       - name: Decoding Keystore File & Save
         working-directory: android/app
-        run: sudo echo "${{ secrets.ZINGO_JKS_BASE64 }}" | base64 --decode > Zingo.jks
+        run: sudo echo "${{ env.ZINGO_JKS_BASE64 }}" | base64 --decode > Zingo.jks
 
       - name: Set up Keystore properties
         working-directory: android
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          echo "keyAlias=$KEY_ALIAS"
-          echo "storePassword=$KEYSTORE_PASSWORD" > local.zingo.jks.properties
-          echo "keyAlias=$KEY_ALIAS" >> local.zingo.jks.properties
-          echo "keyPassword=$KEY_PASSWORD" >> local.zingo.jks.properties
+          echo "keyAlias=${{ env.KEY_ALIAS }}"
+          echo "storePassword=${{ env.KEYSTORE_PASSWORD }}" > local.zingo.jks.properties
+          echo "keyAlias=${{ env.KEY_ALIAS }}" >> local.zingo.jks.properties
+          echo "keyPassword=${{ env.KEY_PASSWORD }}" >> local.zingo.jks.properties
 
       - name: Build release Signed APK Artifact
         working-directory: android
