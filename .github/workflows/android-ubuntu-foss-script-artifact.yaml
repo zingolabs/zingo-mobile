@@ -71,16 +71,24 @@ jobs:
       - name: Yarn remove vision-camera library
         run: sudo yarn remove react-native-vision-camera || true
       
-      - name: Decoding Keystore & Save
+      - name: Decoding Keystore File & Save
         working-directory: android/app
         run: sudo echo "${{ secrets.ZINGO_JKS_BASE64 }}" | base64 --decode > Zingo.jks
 
-      - name: Build release Signed APK Artifact
+      - name: Set up Keystore properties
+        working-directory: android
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: sudo yarn build:release
+        run: |
+          echo "storePassword=$KEYSTORE_PASSWORD" > local.zingo.jks.properties
+          echo "keyAlias=$KEY_ALIAS" >> local.zingo.jks.properties
+          echo "keyPassword=$KEY_PASSWORD" >> local.zingo.jks.properties
+
+      - name: Build release Signed APK Artifact
+        working-directory: android
+        run: sudo ./gradlew assembleRelease
 
       - name: Upload the Artifact
         uses: actions/upload-artifact@v4
