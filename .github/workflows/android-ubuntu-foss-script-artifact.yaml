@@ -86,10 +86,9 @@ jobs:
       - name: Set up Keystore properties
         working-directory: android
         run: |
-          echo "keyAlias=${{ env.KEY_ALIAS }}"
-          echo "storePassword=${{ env.KEYSTORE_PASSWORD }}" > local.zingo.jks.properties
-          echo "keyAlias=${{ env.KEY_ALIAS }}" >> local.zingo.jks.properties
-          echo "keyPassword=${{ env.KEY_PASSWORD }}" >> local.zingo.jks.properties
+          echo "KEYSTORE_PASSWORD=${{ env.KEYSTORE_PASSWORD }}" > local.zingo.jks.properties
+          echo "KEY_ALIAS=${{ env.KEY_ALIAS }}" >> local.zingo.jks.properties
+          echo "KEY_PASSWORD=${{ env.KEY_PASSWORD }}" >> local.zingo.jks.properties
 
       - name: Build release Signed APK Artifact
         working-directory: android
