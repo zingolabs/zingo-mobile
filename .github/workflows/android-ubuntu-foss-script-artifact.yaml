@@ -30,6 +30,10 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
+      - name: Checking secrets
+        run: |
+          echo "keyAlias=${{ env.KEY_ALIAS }}"
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
