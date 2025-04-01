@@ -1,0 +1,102 @@
+name: Android Ubuntu FOSS Script Artifact
+
+on:
+  workflow_call:
+    inputs:
+      timestamp:
+        required: true
+        type: string
+      cache-key:
+        required: true
+        type: string
+
+env:
+  REPO-OWNER: ${{ github.repository_owner }}
+  TIMESTAMP: ${{ inputs.timestamp }}
+  ZINGO_JKS_BASE64: ${{ secrets.ZINGO_JKS_BASE64 }}
+  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+  KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+jobs:
+  android-ubuntu-foss-script-artifact:
+    name: Android Ubuntu Foss Script Artifact
+    runs-on: ubuntu-24.04
+    env:
+      CACHE-KEY: ${{ inputs.cache-key }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+
+      - name: Checking secrets
+        run: |
+          echo "keyAlias=${{ env.KEY_ALIAS }}"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.11.1
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
+      
+      - name: Node JS & build script
+        working-directory: rust/lib
+        run: |
+          sudo apt install -y pkg-config build-essential apt-utils libpixman-1-dev \
+            libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev librsvg2-dev
+          sudo curl -Lo node.tar.gz https://nodejs.org/dist/v20.18.2/node-v20.18.2-linux-x64.tar.gz
+          sudo echo "eb5b031bdd728871c3b9a82655dbfa533bc262c0b6da1d09a86842430cef07d4 node.tar.gz" | sha256sum -c -
+          sudo tar xzf node.tar.gz --strip-components=1 -C /usr/local/
+          sudo npm install --global yarn
+          sudo bash ../build_fdroid.sh
+
+      - name: Copy native & kotlin libs
+        working-directory: rust/lib
+        run: |
+          sudo mkdir -p ../../android/app/src/main/jniLibs/arm64-v8a
+          sudo mkdir -p ../../android/app/src/main/jniLibs/armeabi-v7a
+          sudo mkdir -p ../../android/app/src/main/jniLibs/x86
+          sudo mkdir -p ../../android/app/src/main/jniLibs/x86_64
+          sudo mkdir -p ../../android/app/build/generated/source/uniffi/debug/java/uniffi/zingo
+          sudo mkdir -p ../../android/app/build/generated/source/uniffi/release/java/uniffi/zingo
+          sudo cp /opt/jniLibs/x86_64/libuniffi_zingo.so ../../android/app/src/main/jniLibs/x86_64/libuniffi_zingo.so
+          sudo cp /opt/jniLibs/x86/libuniffi_zingo.so ../../android/app/src/main/jniLibs/x86/libuniffi_zingo.so
+          sudo cp /opt/jniLibs/armeabi-v7a/libuniffi_zingo.so ../../android/app/src/main/jniLibs/armeabi-v7a/libuniffi_zingo.so
+          sudo cp /opt/jniLibs/arm64-v8a/libuniffi_zingo.so ../../android/app/src/main/jniLibs/arm64-v8a/libuniffi_zingo.so
+          sudo cp /opt/jniLibs/kotlin/zingo.kt ../../android/app/build/generated/source/uniffi/debug/java/uniffi/zingo/zingo.kt
+          sudo cp /opt/jniLibs/kotlin/zingo.kt ../../android/app/build/generated/source/uniffi/release/java/uniffi/zingo/zingo.kt
+
+      - name: Yarn install
+        run: npm_config_build_from_source=true sudo yarn install
+
+      - name: Yarn remove vision-camera library
+        run: sudo yarn remove react-native-vision-camera || true
+      
+      - name: Decoding Keystore File & Save
+        working-directory: android/app
+        run: sudo echo "${{ env.ZINGO_JKS_BASE64 }}" | base64 --decode > Zingo.jks
+
+      - name: Set up Keystore properties
+        working-directory: android
+        run: |
+          echo "keyAlias=${{ env.KEY_ALIAS }}"
+          echo "storePassword=${{ env.KEYSTORE_PASSWORD }}" > local.zingo.jks.properties
+          echo "keyAlias=${{ env.KEY_ALIAS }}" >> local.zingo.jks.properties
+          echo "keyPassword=${{ env.KEY_PASSWORD }}" >> local.zingo.jks.properties
+
+      - name: Build release Signed APK Artifact
+        working-directory: android
+        run: sudo ./gradlew assembleRelease
+
+      - name: Upload the Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.apk
+          path: android/app/build/outputs/apk/release/app-release.apk

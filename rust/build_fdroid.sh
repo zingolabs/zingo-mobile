@@ -1,11 +1,11 @@
 #!/bin/bash
-
 set -e
 
 android_ndk_ver="r27c"
 
-apt update
-apt install -y --no-install-recommends --no-install-suggests \
+apt update \
+    && apt upgrade -y \
+    && apt install -y --no-install-recommends --no-install-suggests \
     ca-certificates \
     build-essential \
     gcc-aarch64-linux-gnu \
@@ -26,18 +26,19 @@ apt install -y --no-install-recommends --no-install-suggests \
     libc6-dev-arm64-cross \
     protobuf-compiler \
     libssl-dev \
-    pkg-config
-update-ca-certificates
+    pkg-config \
+    && update-ca-certificates
 
+# Install Android NDK
 curl -fL -o /tmp/android-ndk.zip https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip
 unzip /tmp/android-ndk.zip -d /usr/local/ > /dev/null
 rm -rf /tmp/android-ndk.zip
-
 export ANDROID_NDK_HOME="/usr/local/android-ndk-${android_ndk_ver}"
 export NDK_HOME="/usr/local/android-ndk-${android_ndk_ver}"
 export ANDROID_NDK_ROOT="/usr/local/android-ndk-${android_ndk_ver}"
 export PATH="/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH"
 
+# Install and setup Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 export HOME="/root"
 export CARGO_HOME="$HOME/.cargo"
@@ -47,13 +48,11 @@ rustup toolchain install stable --profile minimal
 rustup toolchain install nightly --component rust-src
 rustup update
 rustup default stable
-
 rustup target add \
     aarch64-linux-android \
     armv7-linux-androideabi \
     i686-linux-android \
     x86_64-linux-android
-
 echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
     && echo "linker = \"aarch64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
@@ -71,11 +70,11 @@ echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "linker = \"x86_64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
 
+# Install and setup OpenSSL
 mkdir -p /opt/openssl-3.3.2
 curl -fL -o /opt/openssl-3.3.2.tar.gz https://www.openssl.org/source/openssl-3.3.2.tar.gz
 tar xvf /opt/openssl-3.3.2.tar.gz -C /opt/openssl-3.3.2 --strip-components=1 > /dev/null
 rm -rf /opt/openssl-3.3.2.tar.gz
-
 export OPENSSL_STATIC="yes"
 
 mkdir -p /opt/openssl-3.3.2/x86 \
@@ -106,6 +105,7 @@ mkdir -p /opt/openssl-3.3.2/x86 \
     && make -j$(nproc) install > /dev/null \
     && make clean  > /dev/null \
     && make distclean > /dev/null
+
 /opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/x86_64 android-x86_64 \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 > /dev/null \
@@ -118,7 +118,9 @@ rustup default nightly
 
 cargo install --force --locked bindgen-cli
 
-cargo run --release --features=uniffi/cli --bin uniffi-bindgen generate ./src/zingo.udl --language kotlin --out-dir ./src
+cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
+    generate ./src/zingo.udl --language kotlin \
+    --out-dir ./src
 
 cargo install --version ^3 cargo-ndk
 

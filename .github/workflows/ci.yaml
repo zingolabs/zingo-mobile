@@ -45,7 +45,7 @@ jobs:
           - { abi: x86_64, api-level: 34, target: default }
           - { abi: x86, api-level: 29, target: default }
     uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
-    needs: [create-timestamp, android-build]
+    needs: [create-timestamp, create-cache-key, android-build]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
@@ -78,7 +78,7 @@ jobs:
 
   ios-integration-test:
     uses: ./.github/workflows/ios-integration-test.yaml
-    needs: [create-timestamp, ios-build]
+    needs: [create-timestamp, create-cache-key, ios-build]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}

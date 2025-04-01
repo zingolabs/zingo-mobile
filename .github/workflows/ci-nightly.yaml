@@ -46,7 +46,7 @@ jobs:
           - { abi: x86, api-level: 29, target: default }
       fail-fast: false
     uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
-    needs: [create-timestamp, android-build]
+    needs: [create-timestamp, create-cache-key, android-build]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
@@ -66,7 +66,14 @@ jobs:
     strategy:
       fail-fast: false
     uses: ./.github/workflows/ios-integration-test.yaml
-    needs: [ create-timestamp, ios-build ]
+    needs: [ create-timestamp, create-cache-key, ios-build ]
+    with:
+      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+
+  android-ubuntu-foss-script-artifact:
+    uses: ./.github/workflows/android-ubuntu-foss-script-artifact.yaml
+    needs: [create-timestamp, create-cache-key]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
