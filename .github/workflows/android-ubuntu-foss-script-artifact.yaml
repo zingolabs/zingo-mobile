@@ -22,8 +22,8 @@ jobs:
   android-ubuntu-foss-script-artifact:
     name: Android Ubuntu Foss Script Artifact
     runs-on: ubuntu-24.04
-        container:
-    image: registry.gitlab.com/fdroid/fdroidserver:buildserver-bookworm
+    container:
+      image: registry.gitlab.com/fdroid/fdroidserver:buildserver-bookworm
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
