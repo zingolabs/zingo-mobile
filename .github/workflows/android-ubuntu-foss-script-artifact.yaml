@@ -82,6 +82,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
+          echo "keyAlias=$KEY_ALIAS"
           echo "storePassword=$KEYSTORE_PASSWORD" > local.zingo.jks.properties
           echo "keyAlias=$KEY_ALIAS" >> local.zingo.jks.properties
           echo "keyPassword=$KEY_PASSWORD" >> local.zingo.jks.properties
