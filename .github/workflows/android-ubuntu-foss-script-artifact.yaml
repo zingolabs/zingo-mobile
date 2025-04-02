@@ -41,6 +41,20 @@ jobs:
           sudo apt-get install -y openjdk-17-jdk-headless
           sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      
+      - name: Add android sdk to PATH
+        run: |
+          echo "${ANDROID_SDK_ROOT}/sdk" >> $GITHUB_PATH
+          export PATH=$PATH:${ANDROID_SDK_ROOT}/sdk
+
+      - name: Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.11.1
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
+
       - name: Node JS & build script
         working-directory: rust/lib
         run: |
