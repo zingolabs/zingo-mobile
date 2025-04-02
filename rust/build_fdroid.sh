@@ -156,3 +156,8 @@ cp ./src/uniffi/zingo/zingo.kt /opt/jniLibs/kotlin/zingo.kt
 rm -rf ../target
 rm -rf /opt/openssl-3.3.2
 rm -rf ./src/uniffi
+
+# Apt clean up
+apt autoremove -y \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/*
