@@ -38,7 +38,7 @@ jobs:
           sudo apt-get update
           sudo apt-get dist-upgrade
           sudo sdkmanager "platform-tools" "build-tools;31.0.0"
-          export PATH=$PATH:/opt/android-sdk/build-tools/31.0.0
+          sudo --preserve-env --user $(whoami) env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/android-sdk/tools:/opt/android-sdk/platform-tools:/opt/gradle/bin
           sudo apt-get install -y openjdk-17-jdk-headless
           sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
 
