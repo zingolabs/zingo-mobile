@@ -6,9 +6,6 @@ on:
       timestamp:
         required: true
         type: string
-      cache-key:
-        required: true
-        type: string
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
@@ -22,40 +19,61 @@ jobs:
   android-ubuntu-foss-script-artifact:
     name: Android Ubuntu Foss Script Artifact
     runs-on: ubuntu-24.04
-    env:
-      CACHE-KEY: ${{ inputs.cache-key }}
+    container:
+      image: registry.gitlab.com/fdroid/fdroidserver:buildserver-bookworm
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Checking secrets
+      - name: Remove unnecessary directories to free up space
         run: |
-          echo "keyAlias=${{ env.KEY_ALIAS }}"
+          echo "Disk space before post-build cleanup:"
+          df -h
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo apt-get clean
+          echo "Disk space after post-build cleanup:"
+          df -h
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-      
-      - name: Gradle cache
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.11.1
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
-      
+      - name: init
+        run: |
+          sudo chown -R $(whoami) .
+          sudo apt-get update
+          sudo apt-get dist-upgrade
+          sudo sdkmanager "platform-tools" "build-tools;31.0.0"
+          sudo apt-get install -y openjdk-17-jdk-headless
+          sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
+
       - name: Node JS & build script
         working-directory: rust/lib
         run: |
-          sudo apt install -y pkg-config build-essential apt-utils libpixman-1-dev \
+          sudo apt-get update && apt-get install pkg-config build-essential apt-utils libpixman-1-dev \
             libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev librsvg2-dev
           sudo curl -Lo node.tar.gz https://nodejs.org/dist/v20.18.2/node-v20.18.2-linux-x64.tar.gz
           sudo echo "eb5b031bdd728871c3b9a82655dbfa533bc262c0b6da1d09a86842430cef07d4 node.tar.gz" | sha256sum -c -
           sudo tar xzf node.tar.gz --strip-components=1 -C /usr/local/
           sudo npm install --global yarn
           sudo bash ../build_fdroid.sh
+
+      - name: Yarn install
+        run: npm_config_build_from_source=true sudo yarn install
+
+      - name: Yarn remove vision-camera library
+        run: sudo yarn remove react-native-vision-camera || true
+
+      - name: local.properties Android SDK path
+        working-directory: android
+        run: sudo echo "sdk.dir=/opt/android-sdk" > local.properties
+
+      - name: Gradle clean
+        working-directory: android
+        run: sudo ./gradlew clean
 
       - name: Copy native & kotlin libs
         working-directory: rust/lib
@@ -73,12 +91,6 @@ jobs:
           sudo cp /opt/jniLibs/kotlin/zingo.kt ../../android/app/build/generated/source/uniffi/debug/java/uniffi/zingo/zingo.kt
           sudo cp /opt/jniLibs/kotlin/zingo.kt ../../android/app/build/generated/source/uniffi/release/java/uniffi/zingo/zingo.kt
 
-      - name: Yarn install
-        run: npm_config_build_from_source=true sudo yarn install
-
-      - name: Yarn remove vision-camera library
-        run: sudo yarn remove react-native-vision-camera || true
-      
       - name: Decoding Keystore File & Save
         working-directory: android/app
         run: sudo echo "${{ env.ZINGO_JKS_BASE64 }}" | base64 --decode > Zingo.jks
@@ -86,9 +98,9 @@ jobs:
       - name: Set up Keystore properties
         working-directory: android
         run: |
-          echo "KEYSTORE_PASSWORD=${{ env.KEYSTORE_PASSWORD }}" > local.zingo.jks.properties
-          echo "KEY_ALIAS=${{ env.KEY_ALIAS }}" >> local.zingo.jks.properties
-          echo "KEY_PASSWORD=${{ env.KEY_PASSWORD }}" >> local.zingo.jks.properties
+          sudo echo "KEYSTORE_PASSWORD=${{ env.KEYSTORE_PASSWORD }}" > local.zingo.jks.properties
+          sudo echo "KEY_ALIAS=${{ env.KEY_ALIAS }}" >> local.zingo.jks.properties
+          sudo echo "KEY_PASSWORD=${{ env.KEY_PASSWORD }}" >> local.zingo.jks.properties
 
       - name: Build release Signed APK Artifact
         working-directory: android

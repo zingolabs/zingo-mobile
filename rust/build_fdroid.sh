@@ -153,6 +153,16 @@ cp ../target/armv7-linux-androideabi/release/libzingo.so /opt/jniLibs/armeabi-v7
 cp ../target/aarch64-linux-android/release/libzingo.so /opt/jniLibs/arm64-v8a/libuniffi_zingo.so
 cp ./src/uniffi/zingo/zingo.kt /opt/jniLibs/kotlin/zingo.kt
 
+yes | rustup self uninstall
+
 rm -rf ../target
 rm -rf /opt/openssl-3.3.2
 rm -rf ./src/uniffi
+rm -rf $NDK_HOME
+rm -rf $RUSTUP_HOME
+rm -rf $CARGO_HOME
+
+# Apt clean up
+apt autoremove -y \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/*
