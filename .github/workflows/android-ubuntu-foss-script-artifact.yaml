@@ -49,12 +49,6 @@ jobs:
           echo "${ANDROID_SDK_ROOT}/sdk" >> $GITHUB_PATH
           export PATH=$PATH:${ANDROID_SDK_ROOT}/sdk
 
-      - name: Gradle cache
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.11.1
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
-
       - name: Node JS & build script
         working-directory: rust/lib
         run: |
