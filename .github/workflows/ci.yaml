@@ -97,5 +97,4 @@ jobs:
     needs: [create-timestamp, create-cache-key]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
     secrets: inherit

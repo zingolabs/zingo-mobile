@@ -6,9 +6,6 @@ on:
       timestamp:
         required: true
         type: string
-      cache-key:
-        required: true
-        type: string
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
@@ -24,8 +21,6 @@ jobs:
     runs-on: ubuntu-24.04
     container:
       image: registry.gitlab.com/fdroid/fdroidserver:buildserver-bookworm
-    env:
-      CACHE-KEY: ${{ inputs.cache-key }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -40,13 +35,6 @@ jobs:
           sudo sdkmanager "platform-tools" "build-tools;31.0.0"
           sudo apt-get install -y openjdk-17-jdk-headless
           sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
-
-      - name: Info 1
-        run: |
-          pwd
-          ls -la
-          env
-          ls -la /opt/android-sdk
 
       - name: Node JS & build script
         working-directory: rust/lib
@@ -65,12 +53,13 @@ jobs:
       - name: Yarn remove vision-camera library
         run: sudo yarn remove react-native-vision-camera || true
 
+      - name: local.properties Android SDK path
+        working-directory: android
+        run: sudo echo "sdk.dir=/opt/android-sdk" > local.properties
+
       - name: Gradle clean
         working-directory: android
-        run: |
-          export ANDROID_SDK_ROOT=/opt/android-sdk
-          export PATH=$PATH:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/build-tools/31.0.0
-          sudo ./gradlew clean
+        run: sudo ./gradlew clean
 
       - name: Copy native & kotlin libs
         working-directory: rust/lib
@@ -95,9 +84,9 @@ jobs:
       - name: Set up Keystore properties
         working-directory: android
         run: |
-          echo "KEYSTORE_PASSWORD=${{ env.KEYSTORE_PASSWORD }}" > local.zingo.jks.properties
-          echo "KEY_ALIAS=${{ env.KEY_ALIAS }}" >> local.zingo.jks.properties
-          echo "KEY_PASSWORD=${{ env.KEY_PASSWORD }}" >> local.zingo.jks.properties
+          sudo echo "KEYSTORE_PASSWORD=${{ env.KEYSTORE_PASSWORD }}" > local.zingo.jks.properties
+          sudo echo "KEY_ALIAS=${{ env.KEY_ALIAS }}" >> local.zingo.jks.properties
+          sudo echo "KEY_PASSWORD=${{ env.KEY_PASSWORD }}" >> local.zingo.jks.properties
 
       - name: Build release Signed APK Artifact
         working-directory: android
