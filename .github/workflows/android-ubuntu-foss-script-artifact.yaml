@@ -43,6 +43,7 @@ jobs:
 
       - name: Info 1
         run: |
+          which sdkmanager
           pwd
           ls -la
           cd ~
