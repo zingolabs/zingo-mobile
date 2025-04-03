@@ -1,0 +1,12 @@
+Zingo! Wallet te permite usar Dinero Seguro Real (RSM), basado en Zcash, para transacciones inbloqueables, incensurables e indetectables.
+
+Gracias a la Criptografía de Conocimiento Cero, tienes total control y privacidad sobre tu dinero y tus mensajes.
+
+¿Qué puedes hacer con Zingo?
+* Enviar ZEC y mensajes de forma rápida, privada y segura.
+* Añadir direcciones a tu libreta de direcciones y guardarlas como contactos.
+* Blindar tus fondos transparentes y garantizar un gasto seguro para mayor privacidad.
+* Uso básico y avanzado para todos los usuarios.
+* Gestión automática del servidor que mantiene tu monedero sincronizado.
+
+Descarga Zingo! para experimentar la libertad financiera con RSM.
