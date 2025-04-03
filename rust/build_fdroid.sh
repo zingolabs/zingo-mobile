@@ -2,14 +2,15 @@
 set -e
 
 export SOURCE_DATE_EPOCH=1700000000
-export RUSTFLAGS="\
-    -C opt-level=z \
-    -C link-arg=-Wl,--build-id=none \
+export RUSTFLAGS=" \
     --remap-path-prefix=$(pwd)=. \
+    -C opt-level=z \
     -C debuginfo=0 \
-    -C codegen-units=1"
+    -C codegen-units=1 \
+    -C link-arg=-Wl,--build-id=none,--sort-common \
+    -C linker-plugin-lto=no"
 export CFLAGS="-ffile-prefix-map=$(pwd)=. -g0 -O2"
-export LDFLAGS="-Wl,--build-id=none"
+export LDFLAGS="-Wl,--build-id=none,--sort-common"
 
 android_ndk_ver="r27c"
 
@@ -149,12 +150,6 @@ llvm-strip --strip-unneeded ../target/aarch64-linux-android/release/libzingo.so
 llvm-objcopy --remove-section .comment ../target/aarch64-linux-android/release/libzingo.so
 sha256sum ../target/aarch64-linux-android/release/libzingo.so
 
-export OPENSSL_DIR=/opt/openssl-3.3.2/x86_64
-cargo ndk --target x86_64 build --release -Z build-std > /dev/null
-llvm-strip --strip-unneeded ../target/x86_64-linux-android/release/libzingo.so
-llvm-objcopy --remove-section .comment ../target/x86_64-linux-android/release/libzingo.so
-sha256sum ../target/x86_64-linux-android/release/libzingo.so
-
 export OPENSSL_DIR=/opt/openssl-3.3.2/armv7
 cargo ndk --target armeabi-v7a build --release -Z build-std > /dev/null
 llvm-strip --strip-unneeded ../target/armv7-linux-androideabi/release/libzingo.so
@@ -166,6 +161,12 @@ cargo ndk --target x86 build --release -Z build-std > /dev/null
 llvm-strip --strip-unneeded ../target/i686-linux-android/release/libzingo.so
 llvm-objcopy --remove-section .comment ../target/i686-linux-android/release/libzingo.so
 sha256sum ../target/i686-linux-android/release/libzingo.so
+
+export OPENSSL_DIR=/opt/openssl-3.3.2/x86_64
+cargo ndk --target x86_64 build --release -Z build-std > /dev/null
+llvm-strip --strip-unneeded ../target/x86_64-linux-android/release/libzingo.so
+llvm-objcopy --remove-section .comment ../target/x86_64-linux-android/release/libzingo.so
+sha256sum ../target/x86_64-linux-android/release/libzingo.so
 
 mkdir -p /opt/jniLibs/x86 \
     && mkdir -p /opt/jniLibs/arm64-v8a \

@@ -38,6 +38,10 @@ ENV NDK_HOME=/usr/local/android-ndk-${android_ndk_ver}
 ENV ANDROID_NDK_ROOT=/usr/local/android-ndk-${android_ndk_ver}
 ENV PATH=/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 
+ENV SOURCE_DATE_EPOCH=1700000000
+ENV CFLAGS="-ffile-prefix-map=$(pwd)=. -g0 -O2"
+ENV LDFLAGS="-Wl,--build-id=none,--sort-common"
+
 # Install and setup Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV HOME=/root
@@ -84,29 +88,39 @@ RUN mkdir x86 \
 
 RUN ./Configure --prefix=/opt/openssl-3.3.2/aarch64 android-arm64 \
     -mno-outline-atomics \
+    -fno-ident \
+    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
+
 RUN ./Configure --prefix=/opt/openssl-3.3.2/armv7 android-arm \
+    -fno-ident \
+    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
+
 RUN ./Configure --prefix=/opt/openssl-3.3.2/x86 android-x86 \
     -DBROKEN_CLANG_ATOMICS \
-    #-latomic \
+    -fno-ident \
+    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
+
 RUN ./Configure --prefix=/opt/openssl-3.3.2/x86_64 android-x86_64 \
+    -fno-ident \
+    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
