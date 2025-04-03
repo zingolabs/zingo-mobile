@@ -31,24 +31,24 @@ ENV RUSTFLAGS=" \
 ENV CARGO_FEATURE_STD=true
 ENV OPENSSL_DIR=/opt/openssl-3.3.2/aarch64
 RUN cargo ndk --target arm64-v8a build --release -Z build-std
-RUN llvm-strip --strip-unneeded ../target/aarch64-linux-android/release/libzingo.so
+RUN llvm-strip --strip-all ../target/aarch64-linux-android/release/libzingo.so
 RUN llvm-objcopy --remove-section .comment ../target/aarch64-linux-android/release/libzingo.so
 RUN sha256sum ../target/aarch64-linux-android/release/libzingo.so
 
 ENV OPENSSL_DIR=/opt/openssl-3.3.2/armv7
 RUN cargo ndk --target armeabi-v7a build --release -Z build-std
-RUN llvm-strip --strip-unneeded ../target/armv7-linux-androideabi/release/libzingo.so
+RUN llvm-strip --strip-all ../target/armv7-linux-androideabi/release/libzingo.so
 RUN llvm-objcopy --remove-section .comment ../target/armv7-linux-androideabi/release/libzingo.so
 RUN sha256sum ../target/armv7-linux-androideabi/release/libzingo.so
 
 ENV OPENSSL_DIR=/opt/openssl-3.3.2/x86
 RUN cargo ndk --target x86 build --release -Z build-std
-RUN llvm-strip --strip-unneeded ../target/i686-linux-android/release/libzingo.so
+RUN llvm-strip --strip-all ../target/i686-linux-android/release/libzingo.so
 RUN llvm-objcopy --remove-section .comment ../target/i686-linux-android/release/libzingo.so
 RUN sha256sum ../target/i686-linux-android/release/libzingo.so
 
 ENV OPENSSL_DIR=/opt/openssl-3.3.2/x86_64
 RUN cargo ndk --target x86_64 build --release -Z build-std
-RUN llvm-strip --strip-unneeded ../target/x86_64-linux-android/release/libzingo.so
+RUN llvm-strip --strip-all ../target/x86_64-linux-android/release/libzingo.so
 RUN llvm-objcopy --remove-section .comment ../target/x86_64-linux-android/release/libzingo.so
 RUN sha256sum ../target/x86_64-linux-android/release/libzingo.so

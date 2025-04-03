@@ -146,25 +146,25 @@ cargo install --version ^3 cargo-ndk
 export CARGO_FEATURE_STD="true"
 export OPENSSL_DIR=/opt/openssl-3.3.2/aarch64
 cargo ndk --target arm64-v8a build --release -Z build-std > /dev/null
-llvm-strip --strip-unneeded ../target/aarch64-linux-android/release/libzingo.so
+llvm-strip --strip-all ../target/aarch64-linux-android/release/libzingo.so
 llvm-objcopy --remove-section .comment ../target/aarch64-linux-android/release/libzingo.so
 sha256sum ../target/aarch64-linux-android/release/libzingo.so
 
 export OPENSSL_DIR=/opt/openssl-3.3.2/armv7
 cargo ndk --target armeabi-v7a build --release -Z build-std > /dev/null
-llvm-strip --strip-unneeded ../target/armv7-linux-androideabi/release/libzingo.so
+llvm-strip --strip-all ../target/armv7-linux-androideabi/release/libzingo.so
 llvm-objcopy --remove-section .comment ../target/armv7-linux-androideabi/release/libzingo.so
 sha256sum ../target/armv7-linux-androideabi/release/libzingo.so
 
 export OPENSSL_DIR=/opt/openssl-3.3.2/x86
 cargo ndk --target x86 build --release -Z build-std > /dev/null
-llvm-strip --strip-unneeded ../target/i686-linux-android/release/libzingo.so
+llvm-strip --strip-all ../target/i686-linux-android/release/libzingo.so
 llvm-objcopy --remove-section .comment ../target/i686-linux-android/release/libzingo.so
 sha256sum ../target/i686-linux-android/release/libzingo.so
 
 export OPENSSL_DIR=/opt/openssl-3.3.2/x86_64
 cargo ndk --target x86_64 build --release -Z build-std > /dev/null
-llvm-strip --strip-unneeded ../target/x86_64-linux-android/release/libzingo.so
+llvm-strip --strip-all ../target/x86_64-linux-android/release/libzingo.so
 llvm-objcopy --remove-section .comment ../target/x86_64-linux-android/release/libzingo.so
 sha256sum ../target/x86_64-linux-android/release/libzingo.so
 
