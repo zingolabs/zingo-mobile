@@ -1,6 +1,16 @@
 #!/bin/bash
 set -e
 
+export SOURCE_DATE_EPOCH=1700000000
+export RUSTFLAGS="\
+    -C opt-level=z \
+    -C link-arg=-Wl,--build-id=none \
+    --remap-path-prefix=$(pwd)=. \
+    -C debuginfo=0 \
+    -C codegen-units=1"
+export CFLAGS="-ffile-prefix-map=$(pwd)=. -g0 -O2"
+export LDFLAGS="-Wl,--build-id=none"
+
 android_ndk_ver="r27c"
 
 apt update \
@@ -84,6 +94,8 @@ mkdir -p /opt/openssl-3.3.2/x86 \
 
 /opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/aarch64 android-arm64 \
     -mno-outline-atomics \
+    -fno-ident \
+    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 > /dev/null \
     && make -j$(nproc) > /dev/null \
@@ -91,6 +103,8 @@ mkdir -p /opt/openssl-3.3.2/x86 \
     && make clean > /dev/null \
     && make distclean > /dev/null
 /opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/armv7 android-arm \
+    -fno-ident \
+    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 > /dev/null \
     && make -j$(nproc) > /dev/null \
@@ -99,6 +113,8 @@ mkdir -p /opt/openssl-3.3.2/x86 \
     && make distclean > /dev/null
 /opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/x86 android-x86 \
     -DBROKEN_CLANG_ATOMICS \
+    -fno-ident \
+    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24  > /dev/null \
     && make -j$(nproc) > /dev/null \
@@ -107,6 +123,8 @@ mkdir -p /opt/openssl-3.3.2/x86 \
     && make distclean > /dev/null
 
 /opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/x86_64 android-x86_64 \
+    -fno-ident \
+    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 > /dev/null \
     && make -j$(nproc) > /dev/null \
@@ -127,19 +145,27 @@ cargo install --version ^3 cargo-ndk
 export CARGO_FEATURE_STD="true"
 export OPENSSL_DIR=/opt/openssl-3.3.2/aarch64
 cargo ndk --target arm64-v8a build --release -Z build-std > /dev/null
-llvm-strip ../target/aarch64-linux-android/release/libzingo.so
+llvm-strip --strip-unneeded ../target/aarch64-linux-android/release/libzingo.so
+llvm-objcopy --remove-section .comment ../target/aarch64-linux-android/release/libzingo.so
+sha256sum ../target/aarch64-linux-android/release/libzingo.so
 
 export OPENSSL_DIR=/opt/openssl-3.3.2/x86_64
 cargo ndk --target x86_64 build --release -Z build-std > /dev/null
-llvm-strip ../target/x86_64-linux-android/release/libzingo.so
+llvm-strip --strip-unneeded ../target/x86_64-linux-android/release/libzingo.so
+llvm-objcopy --remove-section .comment ../target/x86_64-linux-android/release/libzingo.so
+sha256sum ../target/x86_64-linux-android/release/libzingo.so
 
 export OPENSSL_DIR=/opt/openssl-3.3.2/armv7
 cargo ndk --target armeabi-v7a build --release -Z build-std > /dev/null
-llvm-strip ../target/armv7-linux-androideabi/release/libzingo.so
+llvm-strip --strip-unneeded ../target/armv7-linux-androideabi/release/libzingo.so
+llvm-objcopy --remove-section .comment ../target/armv7-linux-androideabi/release/libzingo.so
+sha256sum ../target/armv7-linux-androideabi/release/libzingo.so
 
 export OPENSSL_DIR=/opt/openssl-3.3.2/x86
 cargo ndk --target x86 build --release -Z build-std > /dev/null
-llvm-strip ../target/i686-linux-android/release/libzingo.so
+llvm-strip --strip-unneeded ../target/i686-linux-android/release/libzingo.so
+llvm-objcopy --remove-section .comment ../target/i686-linux-android/release/libzingo.so
+sha256sum ../target/i686-linux-android/release/libzingo.so
 
 mkdir -p /opt/jniLibs/x86 \
     && mkdir -p /opt/jniLibs/arm64-v8a \
