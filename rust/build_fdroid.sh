@@ -35,14 +35,12 @@ apt update \
     openssl \
     libssl-dev \
     golang \
-    clang-18 \
-    libclang-18-dev \
+    clang-16 \
+    libclang-16-dev \
     gcc \
     g++ \
     pkg-config \
     && update-ca-certificates
-
-pkg-config --libs openssl
 
 # Install Android NDK
 curl -fL -o /tmp/android-ndk.zip https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip
@@ -146,7 +144,8 @@ cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
 
 cargo install --version ^3 cargo-ndk
 
-export LIBCLANG_PATH=/usr/lib/llvm-18/lib
+export LIBCLANG_PATH=/usr/lib/llvm-16/lib
+export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
 
 export CARGO_FEATURE_STD="true"
 export OPENSSL_DIR=/opt/openssl-3.3.2/aarch64
