@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 ARG android_ndk_ver=r27c
-# 27.2.12479018
+# 27.2.12479018 CLANG/LLVM 18
 
 # Install dependencies
 RUN apt update \
@@ -8,22 +8,12 @@ RUN apt update \
     && apt install -y --no-install-recommends --no-install-suggests \
     ca-certificates \
     build-essential \
-    gcc-10-aarch64-linux-gnu \
-    libc6-dev \
     cmake \
-    golang \
-    libclang1 \
-    llvm-dev \
-    libclang-dev \
-    libatomic1 \
-    clang \
     make \
     curl \
     automake \
     unzip \
     git \
-    g++-aarch64-linux-gnu \
-    libc6-dev-arm64-cross \
     protobuf-compiler \
     libssl-dev \
     pkg-config \
@@ -40,7 +30,8 @@ ENV PATH=/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linu
 
 ENV SOURCE_DATE_EPOCH=1700000000
 ENV CFLAGS="-ffile-prefix-map=$(pwd)=. -g0 -O2"
-ENV LDFLAGS="-Wl,--build-id=none,--sort-common"
+ENV LDFLAGS="-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name \
+    -fuse-ld=lld"
 
 # Install and setup Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
