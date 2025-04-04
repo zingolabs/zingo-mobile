@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 ARG android_ndk_ver=r27c
-# 27.2.12479018
+# 27.2.12479018 CLANG/LLVM 18
 
 # Install dependencies
 RUN apt update \
@@ -8,22 +8,12 @@ RUN apt update \
     && apt install -y --no-install-recommends --no-install-suggests \
     ca-certificates \
     build-essential \
-    gcc-10-aarch64-linux-gnu \
-    libc6-dev \
     cmake \
-    golang \
-    libclang1 \
-    llvm-dev \
-    libclang-dev \
-    libatomic1 \
-    clang \
     make \
     curl \
     automake \
     unzip \
     git \
-    g++-aarch64-linux-gnu \
-    libc6-dev-arm64-cross \
     protobuf-compiler \
     libssl-dev \
     pkg-config \
@@ -37,6 +27,11 @@ ENV ANDROID_NDK_HOME=/usr/local/android-ndk-${android_ndk_ver}
 ENV NDK_HOME=/usr/local/android-ndk-${android_ndk_ver}
 ENV ANDROID_NDK_ROOT=/usr/local/android-ndk-${android_ndk_ver}
 ENV PATH=/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
+
+ENV SOURCE_DATE_EPOCH=1700000000
+ENV CFLAGS="-ffile-prefix-map=$(pwd)=. -g0 -O2"
+ENV LDFLAGS="-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name \
+    -fuse-ld=lld"
 
 # Install and setup Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -84,29 +79,39 @@ RUN mkdir x86 \
 
 RUN ./Configure --prefix=/opt/openssl-3.3.2/aarch64 android-arm64 \
     -mno-outline-atomics \
+    -fno-ident \
+    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
+
 RUN ./Configure --prefix=/opt/openssl-3.3.2/armv7 android-arm \
+    -fno-ident \
+    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
+
 RUN ./Configure --prefix=/opt/openssl-3.3.2/x86 android-x86 \
     -DBROKEN_CLANG_ATOMICS \
-    #-latomic \
+    -fno-ident \
+    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
     && make -j$(nproc) install \
     && make clean \
     && make distclean
+
 RUN ./Configure --prefix=/opt/openssl-3.3.2/x86_64 android-x86_64 \
+    -fno-ident \
+    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
