@@ -32,14 +32,17 @@ apt update \
     unzip \
     git \
     protobuf-compiler \
+    openssl \
     libssl-dev \
-    pkg-config \
     golang \
     clang-18 \
     libclang-18-dev \
     gcc \
     g++ \
+    pkg-config \
     && update-ca-certificates
+
+pkg-config --libs openssl
 
 # Install Android NDK
 curl -fL -o /tmp/android-ndk.zip https://dl.google.com/android/repository/android-ndk-${android_ndk_ver}-linux.zip
