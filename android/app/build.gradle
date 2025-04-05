@@ -213,9 +213,6 @@ android {
             }
         }
     }
-    packagingOptions {
-        doNotStrip '**/*.so'
-    }
 }
 
 
