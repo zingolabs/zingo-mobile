@@ -68,7 +68,7 @@ jobs:
     steps:
       - name: Install libraries
         run: |
-          sudo apt update \
+          apt update \
             && apt upgrade -y \
             && apt install -y --no-install-recommends --no-install-suggests \
             build-essential \
