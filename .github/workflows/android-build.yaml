@@ -66,6 +66,19 @@ jobs:
     env:
       RUSTUP_HOME: /root/.rustup
     steps:
+      - name: Install libraries
+        run: |
+          sudo apt update \
+            && apt upgrade -y \
+            && apt install -y --no-install-recommends --no-install-suggests \
+            build-essential \
+            cmake \
+            golang \
+            clang-18 \
+            libclang-18-dev \
+            gcc \
+            g++ 
+
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
@@ -156,8 +169,7 @@ jobs:
           CC: ${{ env.CC }}24-clang
           OPENSSL_DIR: /opt/openssl-3.3.2/${{ env.OPENSSL_PATH }}
           CARGO_FEATURE_STD: ${{ env.CARGO_FEATURE_STD }}
-          LIBCLANG_PATH: /usr/lib/llvm-16/lib
-          PKG_CONFIG_PATH: /usr/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
+          LIBCLANG_PATH: /usr/lib/llvm-18/lib
 
       - name: LLVM Strip
         working-directory: ./rust/target
