@@ -114,6 +114,7 @@ jobs:
           echo "TARGET=x86_64-linux-android" >> $GITHUB_ENV
           echo "CC=x86_64-linux-android" >> $GITHUB_ENV
           echo "OPENSSL_PATH=x86_64" >> $GITHUB_ENV
+          echo "CARGO_FEATURE_STD=false" >> $GITHUB_ENV
 
       - name: Set envs for x86
         if: ${{ env.ARCH == 'x86' }}
@@ -121,6 +122,7 @@ jobs:
           echo "TARGET=i686-linux-android" >> $GITHUB_ENV
           echo "CC=i686-linux-android" >> $GITHUB_ENV
           echo "OPENSSL_PATH=x86" >> $GITHUB_ENV
+          echo "CARGO_FEATURE_STD=false" >> $GITHUB_ENV
 
       - name: Set envs for arm64-v8a
         if: ${{ env.ARCH == 'arm64-v8a' }}
@@ -128,6 +130,7 @@ jobs:
           echo "TARGET=aarch64-linux-android" >> $GITHUB_ENV
           echo "CC=aarch64-linux-android" >> $GITHUB_ENV
           echo "OPENSSL_PATH=aarch64" >> $GITHUB_ENV
+          echo "CARGO_FEATURE_STD=true" >> $GITHUB_ENV
 
       - name: Set envs for armeabi-v7a
         if: ${{ env.ARCH == 'armeabi-v7a' }}
@@ -135,6 +138,7 @@ jobs:
           echo "TARGET=armv7-linux-androideabi" >> $GITHUB_ENV
           echo "CC=armv7a-linux-androideabi" >> $GITHUB_ENV
           echo "OPENSSL_PATH=armv7" >> $GITHUB_ENV
+          echo "CARGO_FEATURE_STD=false" >> $GITHUB_ENV
 
       - name: Cargo NDK
         run: cargo install --version ^3 cargo-ndk
@@ -151,11 +155,17 @@ jobs:
           RANLIB: llvm-ranlib
           CC: ${{ env.CC }}24-clang
           OPENSSL_DIR: /opt/openssl-3.3.2/${{ env.OPENSSL_PATH }}
-          CARGO_FEATURE_STD: true
+          CARGO_FEATURE_STD: ${{ env.CARGO_FEATURE_STD }}
+          LIBCLANG_PATH: /usr/lib/llvm-16/lib
+          PKG_CONFIG_PATH: /usr/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
 
       - name: LLVM Strip
         working-directory: ./rust/target
         run: llvm-strip ./${{ env.TARGET }}/release/libzingo.so
+
+      - name: LLVM Obj Copy
+        working-directory: ./rust/target
+        run: llvm-objcopy --remove-section .comment ./${{ env.TARGET }}/release/libzingo.so
 
       - name: Rename the rust lib for uniffi compatibility
         working-directory: ./rust/target/${{ env.TARGET }}/release
