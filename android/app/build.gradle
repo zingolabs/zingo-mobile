@@ -120,6 +120,15 @@ android {
         versionName "zingo-1.11.2" // Real
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        externalNativeBuild {
+            ndkBuild {
+                arguments "LOCAL_LDFLAGS+=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu -fuse-ld=lld"
+            }
+            cmake {
+                cFlags "-ffile-prefix-map=${rootDir}=."
+                cppFlags "-ffile-prefix-map=${rootDir}=."
+            }
+        }
     }
 
     splits {
@@ -169,6 +178,8 @@ android {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.release
+            // this may cause problems
+            //vcsInfo.include false
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -202,6 +213,9 @@ android {
                 }
             }
         }
+    }
+    packagingOptions {
+        doNotStrip '**/*.so'
     }
 }
 

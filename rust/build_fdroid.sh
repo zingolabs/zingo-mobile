@@ -3,7 +3,7 @@ set -e
 
 export SOURCE_DATE_EPOCH=1700000000
 export CFLAGS="-ffile-prefix-map=$(pwd)=. -g0 -O2"
-export LDFLAGS="-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name \
+export LDFLAGS="-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu \
     -fuse-ld=lld"
 export RUSTFLAGS=" \
     --remap-path-prefix=$(pwd)=. \
@@ -12,11 +12,13 @@ export RUSTFLAGS=" \
     -C codegen-units=1 \
     -C linker-plugin-lto=no \
     -C link-arg=-fuse-ld=lld \
+    -C link-arg=-Wl,--hash-style=gnu \
     -C link-arg=-Wl,--build-id=none \
     -C link-arg=-Wl,--no-relax \
     -C link-arg=-Wl,--pack-dyn-relocs=none \
     -C link-arg=-Wl,--sort-common \
     -C link-arg=-Wl,--sort-section=name"
+export CGO_LDFLAGS="-trimpath -buildvcs=false -buildid= "
 
 android_ndk_ver="r27c"
 

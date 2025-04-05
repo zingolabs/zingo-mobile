@@ -37,11 +37,14 @@ ENV RUSTFLAGS=" \
     -C codegen-units=1 \
     -C linker-plugin-lto=no \
     -C link-arg=-fuse-ld=lld \
+    -C link-arg=-Wl,--hash-style=gnu \
     -C link-arg=-Wl,--build-id=none \
     -C link-arg=-Wl,--no-relax \
     -C link-arg=-Wl,--pack-dyn-relocs=none \
     -C link-arg=-Wl,--sort-common \
     -C link-arg=-Wl,--sort-section=name"
+
+ENV CGO_LDFLAGS="-trimpath -buildvcs=false -buildid= "
 
 ENV LIBCLANG_PATH=/usr/lib/llvm-18/lib
 
