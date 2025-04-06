@@ -202,8 +202,3 @@ rm -rf ./src/uniffi
 rm -rf $NDK_HOME
 rm -rf $RUSTUP_HOME
 rm -rf $CARGO_HOME
-
-# Apt clean up
-apt autoremove -y \
-    && apt clean \
-    && rm -rf /var/lib/apt/lists/*
