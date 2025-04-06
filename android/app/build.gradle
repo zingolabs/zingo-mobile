@@ -122,8 +122,12 @@ android {
         externalNativeBuild {
             ndkBuild {
                 arguments "LOCAL_LDFLAGS+=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu -fuse-ld=lld"
+                arguments "LOCAL_CFLAGS+=-ffile-prefix-map=${rootDir}=."
+                cFlags "-ffile-prefix-map=${rootDir}=."
+                cppFlags "-ffile-prefix-map=${rootDir}=."
             }
             cmake {
+                arguments "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu -fuse-ld=lld"
                 cFlags "-ffile-prefix-map=${rootDir}=."
                 cppFlags "-ffile-prefix-map=${rootDir}=."
             }
