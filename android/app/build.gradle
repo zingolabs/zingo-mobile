@@ -121,15 +121,11 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         externalNativeBuild {
             ndkBuild {
-                arguments "LOCAL_LDFLAGS+=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu -fuse-ld=lld"
-                arguments "LOCAL_CFLAGS+=-ffile-prefix-map=${rootDir}=."
-                cFlags "-ffile-prefix-map=${rootDir}=."
-                cppFlags "-ffile-prefix-map=${rootDir}=."
+                arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=."
+                arguments "APP_LDFLAGS+=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
             }
             cmake {
-                arguments "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu -fuse-ld=lld"
-                cFlags "-ffile-prefix-map=${rootDir}=."
-                cppFlags "-ffile-prefix-map=${rootDir}=."
+                arguments "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
             }
         }
     }
@@ -185,6 +181,15 @@ android {
             //vcsInfo.include false
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            externalNativeBuild {
+                ndkBuild {
+                    arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=."
+                    arguments "APP_LDFLAGS+=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
+                }
+                cmake {
+                    arguments "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
+                }
+            }
         }
     }
 

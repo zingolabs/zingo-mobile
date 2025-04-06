@@ -36,7 +36,6 @@ ENV RUSTFLAGS=" \
     -C debuginfo=0 \
     -C codegen-units=1 \
     -C linker-plugin-lto=no \
-    -C link-arg=-fuse-ld=lld \
     -C link-arg=-Wl,--hash-style=gnu \
     -C link-arg=-Wl,--build-id=none \
     -C link-arg=-Wl,--no-relax \

@@ -30,8 +30,7 @@ ENV PATH=/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linu
 
 ENV SOURCE_DATE_EPOCH=1700000000
 ENV CFLAGS="-ffile-prefix-map=$(pwd)=. -g0 -O2"
-ENV LDFLAGS="-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu \
-    -fuse-ld=lld"
+ENV LDFLAGS="-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
 
 # Install and setup Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y

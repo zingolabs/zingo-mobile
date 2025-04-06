@@ -3,15 +3,13 @@ set -e
 
 export SOURCE_DATE_EPOCH=1700000000
 export CFLAGS="-ffile-prefix-map=$(pwd)=. -g0 -O2"
-export LDFLAGS="-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu \
-    -fuse-ld=lld"
+export LDFLAGS="-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
 export RUSTFLAGS=" \
     --remap-path-prefix=$(pwd)=. \
     -C opt-level=z \
     -C debuginfo=0 \
     -C codegen-units=1 \
     -C linker-plugin-lto=no \
-    -C link-arg=-fuse-ld=lld \
     -C link-arg=-Wl,--hash-style=gnu \
     -C link-arg=-Wl,--build-id=none \
     -C link-arg=-Wl,--no-relax \
