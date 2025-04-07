@@ -3,7 +3,7 @@ set -e
 
 export SOURCE_DATE_EPOCH=1700000000
 export CFLAGS="-ffile-prefix-map=$(pwd)=. -g0 -O2"
-export LDFLAGS="-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
+export LDFLAGS="-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
 export RUSTFLAGS=" \
     --remap-path-prefix=$(pwd)=. \
     -C opt-level=z \

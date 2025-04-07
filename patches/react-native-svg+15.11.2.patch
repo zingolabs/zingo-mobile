@@ -1,0 +1,18 @@
+diff --git a/node_modules/react-native-svg/android/build.gradle b/node_modules/react-native-svg/android/build.gradle
+index c02400f..f278d9d 100644
+--- a/node_modules/react-native-svg/android/build.gradle
++++ b/node_modules/react-native-svg/android/build.gradle
+@@ -104,6 +104,13 @@ android {
+         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+ 
+         consumerProguardFiles 'proguard-rules.pro'
++        externalNativeBuild {
++            cmake {
++                arguments "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=.",
++                        "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=.",
++                        "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
++            }
++        }
+     }
+     lintOptions {
+         abortOnError false

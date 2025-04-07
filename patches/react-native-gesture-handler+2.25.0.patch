@@ -1,13 +1,13 @@
 diff --git a/node_modules/react-native-gesture-handler/android/build.gradle b/node_modules/react-native-gesture-handler/android/build.gradle
-index 99475ac..8b7cb33 100644
+index 99475ac..a3e6aa7 100644
 --- a/node_modules/react-native-gesture-handler/android/build.gradle
 +++ b/node_modules/react-native-gesture-handler/android/build.gradle
 @@ -143,6 +143,9 @@ android {
                              "-DREACT_NATIVE_MINOR_VERSION=${REACT_NATIVE_MINOR_VERSION}",
                              "-DANDROID_STL=c++_shared",
                              "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
-+                    arguments "-DCMAKE_C_FLAGS+=-ffile-prefix-map=${rootDir}=.",
-+                            "-DCMAKE_CXX_FLAGS+=-ffile-prefix-map=${rootDir}=.",
++                    arguments "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=.",
++                            "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=.",
 +                            "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
                      abiFilters(*reactNativeArchitectures())
                  }

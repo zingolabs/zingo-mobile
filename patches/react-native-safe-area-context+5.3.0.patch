@@ -1,0 +1,18 @@
+diff --git a/node_modules/react-native-safe-area-context/android/build.gradle b/node_modules/react-native-safe-area-context/android/build.gradle
+index f324b9a..c59377f 100644
+--- a/node_modules/react-native-safe-area-context/android/build.gradle
++++ b/node_modules/react-native-safe-area-context/android/build.gradle
+@@ -68,6 +68,13 @@ android {
+         ndk {
+             abiFilters (*reactNativeArchitectures())
+         }
++        externalNativeBuild {
++            cmake {
++                arguments "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=.",
++                        "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=.",
++                        "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
++            }
++        }
+     }
+ 
+     lintOptions{
