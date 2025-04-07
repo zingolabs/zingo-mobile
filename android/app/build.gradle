@@ -121,11 +121,13 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         externalNativeBuild {
             ndkBuild {
-                arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=."
-                arguments "APP_LDFLAGS+=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
+                arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=.",
+                    "APP_LDFLAGS+=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
             }
             cmake {
-                arguments "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
+                arguments "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=.",
+                    "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=.",
+                    "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
             }
         }
     }
@@ -183,10 +185,12 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             externalNativeBuild {
                 ndkBuild {
+                    arguments "V=1"
                     arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=."
                     arguments "APP_LDFLAGS+=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
                 }
                 cmake {
+                    arguments "-DCMAKE_VERBOSE_MAKEFILE=ON"
                     arguments "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
                 }
             }
