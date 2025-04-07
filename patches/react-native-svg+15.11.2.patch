@@ -16,3 +16,25 @@ index c02400f..f278d9d 100644
      }
      lintOptions {
          abortOnError false
+diff --git a/node_modules/react-native-svg/android/src/main/jni/CMakeLists.txt b/node_modules/react-native-svg/android/src/main/jni/CMakeLists.txt
+index 21352d2..8c92ccb 100644
+--- a/node_modules/react-native-svg/android/src/main/jni/CMakeLists.txt
++++ b/node_modules/react-native-svg/android/src/main/jni/CMakeLists.txt
+@@ -83,6 +83,17 @@ target_compile_options(
+   -frtti
+   -std=c++20
+   -Wall
++  -ffile-prefix-map=${CMAKE_SOURCE_DIR}=.
++)
++
++# FLAGS DE LINKER
++target_link_options(react_codegen_rnsvg PRIVATE
++    "-Wl,--build-id=none"
++    "-Wl,--no-relax"
++    "-Wl,--pack-dyn-relocs=none"
++    "-Wl,--sort-common"
++    "-Wl,--sort-section=name"
++    "-Wl,--hash-style=gnu"
+ )
+ 
+ target_include_directories(
