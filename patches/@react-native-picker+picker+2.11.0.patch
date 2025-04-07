@@ -1,16 +1,13 @@
 diff --git a/node_modules/@react-native-picker/picker/android/build.gradle b/node_modules/@react-native-picker/picker/android/build.gradle
-index 155b3a8..9628bc3 100644
+index 155b3a8..270a9b8 100644
 --- a/node_modules/@react-native-picker/picker/android/build.gradle
 +++ b/node_modules/@react-native-picker/picker/android/build.gradle
-@@ -86,6 +86,16 @@ android {
+@@ -86,6 +86,13 @@ android {
          targetSdkVersion safeExtGet('targetSdkVersion', 31)
          vectorDrawables.useSupportLibrary=getExtOrDefault('vector_drawable_use_support_library')
          buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString())
 +        externalNativeBuild {
 +            cmake {
-+                arguments "-DANDROID_STL=c++_shared",
-+                        "-DRNS_NEW_ARCH_ENABLED=${IS_NEW_ARCHITECTURE_ENABLED}",
-+                        "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
 +                arguments "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=.",
 +                        "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=.",
 +                        "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
