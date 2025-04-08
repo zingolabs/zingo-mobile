@@ -42,8 +42,11 @@ ENV RUSTFLAGS=" \
     -C link-arg=-Wl,--pack-dyn-relocs=none \
     -C link-arg=-Wl,--sort-common \
     -C link-arg=-Wl,--sort-section=name"
-
 ENV CGO_LDFLAGS="-trimpath -buildvcs=false -buildid= "
+ENV CMAKE_C_FLAGS=$CFLAGS
+ENV CMAKE_CXX_FLAGS=$CFLAGS
+ENV CMAKE_SHARED_LINKER_FLAGS=$LDFLAGS
+
 
 ENV LIBCLANG_PATH=/usr/lib/llvm-18/lib
 

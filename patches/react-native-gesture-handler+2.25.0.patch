@@ -1,14 +1,26 @@
 diff --git a/node_modules/react-native-gesture-handler/android/build.gradle b/node_modules/react-native-gesture-handler/android/build.gradle
-index 99475ac..a3e6aa7 100644
+index 99475ac..930c007 100644
 --- a/node_modules/react-native-gesture-handler/android/build.gradle
 +++ b/node_modules/react-native-gesture-handler/android/build.gradle
-@@ -143,6 +143,9 @@ android {
+@@ -137,12 +137,20 @@ android {
+         if (isNewArchitectureEnabled()) {
+             var appProject = rootProject.allprojects.find { it.plugins.hasPlugin('com.android.application') }
+             externalNativeBuild {
++                ndkBuild {
++                    arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=.",
++                            "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=.",
++                            "APP_LDFLAGS+=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
++                }
+                 cmake {
+                     cppFlags "-O2", "-frtti", "-fexceptions", "-Wall", "-Werror", "-std=c++20", "-DANDROID"
+                     arguments "-DREACT_NATIVE_DIR=${REACT_NATIVE_DIR}",
                              "-DREACT_NATIVE_MINOR_VERSION=${REACT_NATIVE_MINOR_VERSION}",
                              "-DANDROID_STL=c++_shared",
-                             "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
-+                    arguments "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=.",
+-                            "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
++                            "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON",
++                            "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=.",
 +                            "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=.",
-+                            "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
++                            "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
                      abiFilters(*reactNativeArchitectures())
                  }
              }

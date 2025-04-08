@@ -1,14 +1,28 @@
 diff --git a/node_modules/react-native-reanimated/android/build.gradle b/node_modules/react-native-reanimated/android/build.gradle
-index 2de3ca1..7c5421a 100644
+index 2de3ca1..c847efd 100644
 --- a/node_modules/react-native-reanimated/android/build.gradle
 +++ b/node_modules/react-native-reanimated/android/build.gradle
-@@ -257,6 +257,9 @@ android {
+@@ -246,6 +246,11 @@ android {
+         buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", IS_NEW_ARCHITECTURE_ENABLED.toString())
+         buildConfigField("String", "REANIMATED_VERSION_JAVA", "\"${REANIMATED_VERSION}\"")
+         externalNativeBuild {
++            ndkBuild {
++                arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=.",
++                        "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=.",
++                        "APP_LDFLAGS+=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
++            }
+             cmake {
+                 arguments "-DANDROID_STL=c++_shared",
+                         "-DREACT_NATIVE_MINOR_VERSION=${REACT_NATIVE_MINOR_VERSION}",
+@@ -256,7 +261,10 @@ android {
+                         "-DIS_NEW_ARCHITECTURE_ENABLED=${IS_NEW_ARCHITECTURE_ENABLED}",
                          "-DIS_REANIMATED_EXAMPLE_APP=${IS_REANIMATED_EXAMPLE_APP}",
                          "-DREANIMATED_VERSION=${REANIMATED_VERSION}",
-                         "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
-+                arguments "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=.",
+-                        "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
++                        "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON",
++                        "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=.",
 +                        "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=.",
-+                        "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
++                        "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
                  abiFilters (*reactNativeArchitectures())
                  targets("reanimated", "worklets")
              }

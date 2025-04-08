@@ -1,23 +1,28 @@
 diff --git a/node_modules/react-native-safe-area-context/android/build.gradle b/node_modules/react-native-safe-area-context/android/build.gradle
-index f324b9a..c59377f 100644
+index f324b9a..1f6d7c2 100644
 --- a/node_modules/react-native-safe-area-context/android/build.gradle
 +++ b/node_modules/react-native-safe-area-context/android/build.gradle
-@@ -68,6 +68,13 @@ android {
+@@ -68,6 +68,18 @@ android {
          ndk {
              abiFilters (*reactNativeArchitectures())
          }
 +        externalNativeBuild {
++            ndkBuild {
++                arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=.",
++                        "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=.",
++                        "APP_LDFLAGS+=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
++            }
 +            cmake {
 +                arguments "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=.",
 +                        "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=.",
-+                        "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
++                        "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
 +            }
 +        }
      }
  
      lintOptions{
 diff --git a/node_modules/react-native-safe-area-context/android/src/main/jni/CMakeLists.txt b/node_modules/react-native-safe-area-context/android/src/main/jni/CMakeLists.txt
-index 66bb972..3fc716c 100644
+index 66bb972..e510bdf 100644
 --- a/node_modules/react-native-safe-area-context/android/src/main/jni/CMakeLists.txt
 +++ b/node_modules/react-native-safe-area-context/android/src/main/jni/CMakeLists.txt
 @@ -69,7 +69,6 @@ else()
@@ -28,7 +33,7 @@ index 66bb972..3fc716c 100644
  target_compile_options(
    ${LIB_TARGET_NAME}
    PRIVATE
-@@ -78,6 +77,17 @@ target_compile_options(
+@@ -78,6 +77,19 @@ target_compile_options(
    -frtti
    -std=c++20
    -Wall
@@ -36,13 +41,15 @@ index 66bb972..3fc716c 100644
 +)
 +
 +# FLAGS DE LINKER
-+target_link_options(${LIB_TARGET_NAME} PRIVATE
-+    "-Wl,--build-id=none"
-+    "-Wl,--no-relax"
-+    "-Wl,--pack-dyn-relocs=none"
-+    "-Wl,--sort-common"
-+    "-Wl,--sort-section=name"
-+    "-Wl,--hash-style=gnu"
++target_link_options(
++  ${LIB_TARGET_NAME}
++  PRIVATE
++  -Wl,--build-id=none
++  -Wl,--no-relax
++  -Wl,--pack-dyn-relocs=none
++  -Wl,--sort-common
++  -Wl,--sort-section=name
++  -Wl,--hash-style=gnu
  )
  
  target_include_directories(

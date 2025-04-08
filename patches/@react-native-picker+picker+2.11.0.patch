@@ -1,40 +1,46 @@
 diff --git a/node_modules/@react-native-picker/picker/android/build.gradle b/node_modules/@react-native-picker/picker/android/build.gradle
-index 155b3a8..270a9b8 100644
+index 155b3a8..da63a24 100644
 --- a/node_modules/@react-native-picker/picker/android/build.gradle
 +++ b/node_modules/@react-native-picker/picker/android/build.gradle
-@@ -86,6 +86,13 @@ android {
+@@ -86,6 +86,18 @@ android {
          targetSdkVersion safeExtGet('targetSdkVersion', 31)
          vectorDrawables.useSupportLibrary=getExtOrDefault('vector_drawable_use_support_library')
          buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString())
 +        externalNativeBuild {
++            ndkBuild {
++                arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=.",
++                    "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=.",
++                    "APP_LDFLAGS+=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
++            }
 +            cmake {
 +                arguments "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=.",
-+                        "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=.",
-+                        "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name,--hash-style=gnu"
++                    "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=.",
++                    "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
 +            }
 +        }
      }
  
      sourceSets.main {
 diff --git a/node_modules/@react-native-picker/picker/android/src/main/jni/CMakeLists.txt b/node_modules/@react-native-picker/picker/android/src/main/jni/CMakeLists.txt
-index 4d1eb14..8357433 100644
+index 4d1eb14..38fd029 100644
 --- a/node_modules/@react-native-picker/picker/android/src/main/jni/CMakeLists.txt
 +++ b/node_modules/@react-native-picker/picker/android/src/main/jni/CMakeLists.txt
-@@ -72,6 +72,17 @@ target_compile_options(
+@@ -72,6 +72,18 @@ target_compile_options(
    -frtti
    -std=c++20
    -Wall
 +  -ffile-prefix-map=${CMAKE_SOURCE_DIR}=.
 +)
 +
-+# FLAGS DE LINKER
-+target_link_options(${LIB_TARGET_NAME} PRIVATE
-+    "-Wl,--build-id=none"
-+    "-Wl,--no-relax"
-+    "-Wl,--pack-dyn-relocs=none"
-+    "-Wl,--sort-common"
-+    "-Wl,--sort-section=name"
-+    "-Wl,--hash-style=gnu"
++target_link_options(
++  ${LIB_TARGET_NAME} 
++  PRIVATE
++  -Wl,--build-id=none
++  -Wl,--no-relax
++  -Wl,--pack-dyn-relocs=none
++  -Wl,--sort-common
++  -Wl,--sort-section=name
++  -Wl,--hash-style=gnu
  )
  
  target_include_directories(

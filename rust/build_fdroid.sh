@@ -17,6 +17,9 @@ export RUSTFLAGS=" \
     -C link-arg=-Wl,--sort-common \
     -C link-arg=-Wl,--sort-section=name"
 export CGO_LDFLAGS="-trimpath -buildvcs=false -buildid= "
+export CMAKE_C_FLAGS=$CFLAGS
+export CMAKE_CXX_FLAGS=$CFLAGS
+export CMAKE_SHARED_LINKER_FLAGS=$LDFLAGS
 
 android_ndk_ver="r27c"
 
