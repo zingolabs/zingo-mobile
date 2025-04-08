@@ -1,0 +1,41 @@
+diff --git a/node_modules/@react-native-picker/picker/android/src/main/jni/CMakeLists.txt b/node_modules/@react-native-picker/picker/android/src/main/jni/CMakeLists.txt
+index 4d1eb14..2f91bd5 100644
+--- a/node_modules/@react-native-picker/picker/android/src/main/jni/CMakeLists.txt
++++ b/node_modules/@react-native-picker/picker/android/src/main/jni/CMakeLists.txt
+@@ -17,6 +17,15 @@ add_compile_options(
+   -Wno-gnu-zero-variadic-macro-arguments
+ )
+ 
++add_link_options(
++  -Wl,--build-id=none
++  -Wl,--no-relax
++  -Wl,--pack-dyn-relocs=none
++  -Wl,--sort-common
++  -Wl,--sort-section=name
++  -Wl,--hash-style=gnu
++)
++
+ file(GLOB LIB_CUSTOM_SRCS CONFIGURE_DEPENDS *.cpp)
+ file(GLOB LIB_CODEGEN_SRCS CONFIGURE_DEPENDS ${LIB_ANDROID_GENERATED_COMPONENTS_DIR}/*.cpp)
+ 
+@@ -72,6 +81,20 @@ target_compile_options(
+   -frtti
+   -std=c++20
+   -Wall
++  -ffile-prefix-map=${CMAKE_SOURCE_DIR}=.
++  -fno-ident
++  -g0
++)
++
++target_link_options(
++  ${LIB_TARGET_NAME} 
++  PRIVATE
++  -Wl,--build-id=none
++  -Wl,--no-relax
++  -Wl,--pack-dyn-relocs=none
++  -Wl,--sort-common
++  -Wl,--sort-section=name
++  -Wl,--hash-style=gnu
+ )
+ 
+ target_include_directories(

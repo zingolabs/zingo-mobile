@@ -1,0 +1,121 @@
+diff --git a/node_modules/react-native-svg/android/.gradle/7.5.1/checksums/checksums.lock b/node_modules/react-native-svg/android/.gradle/7.5.1/checksums/checksums.lock
+deleted file mode 100644
+index ed17961..0000000
+Binary files a/node_modules/react-native-svg/android/.gradle/7.5.1/checksums/checksums.lock and /dev/null differ
+diff --git a/node_modules/react-native-svg/android/.gradle/7.5.1/checksums/md5-checksums.bin b/node_modules/react-native-svg/android/.gradle/7.5.1/checksums/md5-checksums.bin
+deleted file mode 100644
+index ee2af10..0000000
+Binary files a/node_modules/react-native-svg/android/.gradle/7.5.1/checksums/md5-checksums.bin and /dev/null differ
+diff --git a/node_modules/react-native-svg/android/.gradle/7.5.1/checksums/sha1-checksums.bin b/node_modules/react-native-svg/android/.gradle/7.5.1/checksums/sha1-checksums.bin
+deleted file mode 100644
+index 4fbf8fd..0000000
+Binary files a/node_modules/react-native-svg/android/.gradle/7.5.1/checksums/sha1-checksums.bin and /dev/null differ
+diff --git a/node_modules/react-native-svg/android/.gradle/7.5.1/dependencies-accessors/dependencies-accessors.lock b/node_modules/react-native-svg/android/.gradle/7.5.1/dependencies-accessors/dependencies-accessors.lock
+deleted file mode 100644
+index e6334d4..0000000
+Binary files a/node_modules/react-native-svg/android/.gradle/7.5.1/dependencies-accessors/dependencies-accessors.lock and /dev/null differ
+diff --git a/node_modules/react-native-svg/android/.gradle/7.5.1/dependencies-accessors/gc.properties b/node_modules/react-native-svg/android/.gradle/7.5.1/dependencies-accessors/gc.properties
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/node_modules/react-native-svg/android/.gradle/7.5.1/executionHistory/executionHistory.bin b/node_modules/react-native-svg/android/.gradle/7.5.1/executionHistory/executionHistory.bin
+deleted file mode 100644
+index dd053cb..0000000
+Binary files a/node_modules/react-native-svg/android/.gradle/7.5.1/executionHistory/executionHistory.bin and /dev/null differ
+diff --git a/node_modules/react-native-svg/android/.gradle/7.5.1/executionHistory/executionHistory.lock b/node_modules/react-native-svg/android/.gradle/7.5.1/executionHistory/executionHistory.lock
+deleted file mode 100644
+index 9cecd29..0000000
+Binary files a/node_modules/react-native-svg/android/.gradle/7.5.1/executionHistory/executionHistory.lock and /dev/null differ
+diff --git a/node_modules/react-native-svg/android/.gradle/7.5.1/fileChanges/last-build.bin b/node_modules/react-native-svg/android/.gradle/7.5.1/fileChanges/last-build.bin
+deleted file mode 100644
+index f76dd23..0000000
+Binary files a/node_modules/react-native-svg/android/.gradle/7.5.1/fileChanges/last-build.bin and /dev/null differ
+diff --git a/node_modules/react-native-svg/android/.gradle/7.5.1/fileHashes/fileHashes.bin b/node_modules/react-native-svg/android/.gradle/7.5.1/fileHashes/fileHashes.bin
+deleted file mode 100644
+index 4ad57cd..0000000
+Binary files a/node_modules/react-native-svg/android/.gradle/7.5.1/fileHashes/fileHashes.bin and /dev/null differ
+diff --git a/node_modules/react-native-svg/android/.gradle/7.5.1/fileHashes/fileHashes.lock b/node_modules/react-native-svg/android/.gradle/7.5.1/fileHashes/fileHashes.lock
+deleted file mode 100644
+index f0168f9..0000000
+Binary files a/node_modules/react-native-svg/android/.gradle/7.5.1/fileHashes/fileHashes.lock and /dev/null differ
+diff --git a/node_modules/react-native-svg/android/.gradle/7.5.1/gc.properties b/node_modules/react-native-svg/android/.gradle/7.5.1/gc.properties
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/node_modules/react-native-svg/android/.gradle/buildOutputCleanup/buildOutputCleanup.lock b/node_modules/react-native-svg/android/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+deleted file mode 100644
+index 912b0ac..0000000
+Binary files a/node_modules/react-native-svg/android/.gradle/buildOutputCleanup/buildOutputCleanup.lock and /dev/null differ
+diff --git a/node_modules/react-native-svg/android/.gradle/buildOutputCleanup/cache.properties b/node_modules/react-native-svg/android/.gradle/buildOutputCleanup/cache.properties
+deleted file mode 100644
+index baa94dd..0000000
+--- a/node_modules/react-native-svg/android/.gradle/buildOutputCleanup/cache.properties
++++ /dev/null
+@@ -1,2 +0,0 @@
+-#Wed May 08 16:56:06 CEST 2024
+-gradle.version=7.5.1
+diff --git a/node_modules/react-native-svg/android/.gradle/buildOutputCleanup/outputFiles.bin b/node_modules/react-native-svg/android/.gradle/buildOutputCleanup/outputFiles.bin
+deleted file mode 100644
+index 4f9bdd7..0000000
+Binary files a/node_modules/react-native-svg/android/.gradle/buildOutputCleanup/outputFiles.bin and /dev/null differ
+diff --git a/node_modules/react-native-svg/android/.gradle/config.properties b/node_modules/react-native-svg/android/.gradle/config.properties
+deleted file mode 100644
+index 6b9360b..0000000
+--- a/node_modules/react-native-svg/android/.gradle/config.properties
++++ /dev/null
+@@ -1,2 +0,0 @@
+-#Wed May 08 17:02:19 CEST 2024
+-java.home=/Applications/Android Studio.app/Contents/jbr/Contents/Home
+diff --git a/node_modules/react-native-svg/android/.gradle/file-system.probe b/node_modules/react-native-svg/android/.gradle/file-system.probe
+deleted file mode 100644
+index 29ee59e..0000000
+Binary files a/node_modules/react-native-svg/android/.gradle/file-system.probe and /dev/null differ
+diff --git a/node_modules/react-native-svg/android/.gradle/vcs-1/gc.properties b/node_modules/react-native-svg/android/.gradle/vcs-1/gc.properties
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/node_modules/react-native-svg/android/src/main/jni/CMakeLists.txt b/node_modules/react-native-svg/android/src/main/jni/CMakeLists.txt
+index 21352d2..68b099b 100644
+--- a/node_modules/react-native-svg/android/src/main/jni/CMakeLists.txt
++++ b/node_modules/react-native-svg/android/src/main/jni/CMakeLists.txt
+@@ -1,5 +1,6 @@
+ cmake_minimum_required(VERSION 3.13)
+ set(CMAKE_VERBOSE_MAKEFILE on)
++set(ENV{SOURCE_DATE_EPOCH} "1710000000")
+ 
+ set(RNS_ANDROID_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
+ set(RNS_COMMON_DIR ${RNS_ANDROID_DIR}/../common/cpp)
+@@ -21,6 +22,15 @@ add_compile_options(
+   -Wno-gnu-zero-variadic-macro-arguments
+ )
+ 
++add_link_options(
++  -Wl,--build-id=none
++  -Wl,--no-relax
++  -Wl,--pack-dyn-relocs=none
++  -Wl,--sort-common
++  -Wl,--sort-section=name
++  -Wl,--hash-style=gnu
++)
++
+ file(GLOB rnsvg_SRCS CONFIGURE_DEPENDS *.cpp ${RNS_COMMON_DIR}/react/renderer/components/rnsvg/*.cpp)
+ file(GLOB rnsvg_codegen_SRCS CONFIGURE_DEPENDS ${RNS_GENERATED_REACT_DIR}/*cpp)
+ 
+@@ -83,6 +93,20 @@ target_compile_options(
+   -frtti
+   -std=c++20
+   -Wall
++  -ffile-prefix-map=${CMAKE_SOURCE_DIR}=.
++  -fno-ident
++  -g0
++)
++
++target_link_options(
++  react_codegen_rnsvg 
++  PRIVATE
++  -Wl,--build-id=none
++  -Wl,--no-relax
++  -Wl,--pack-dyn-relocs=none
++  -Wl,--sort-common
++  -Wl,--sort-section=name
++  -Wl,--hash-style=gnu
+ )
+ 
+ target_include_directories(

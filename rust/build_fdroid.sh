@@ -3,20 +3,23 @@ set -e
 
 export SOURCE_DATE_EPOCH=1700000000
 export CFLAGS="-ffile-prefix-map=$(pwd)=. -g0 -O2"
-export LDFLAGS="-Wl,--build-id=none,--no-relax,--pack-dyn-relocs=none,--sort-common,--sort-section=name \
-    -fuse-ld=lld"
+export LDFLAGS="-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
 export RUSTFLAGS=" \
     --remap-path-prefix=$(pwd)=. \
     -C opt-level=z \
     -C debuginfo=0 \
     -C codegen-units=1 \
     -C linker-plugin-lto=no \
-    -C link-arg=-fuse-ld=lld \
+    -C link-arg=-Wl,--hash-style=gnu \
     -C link-arg=-Wl,--build-id=none \
     -C link-arg=-Wl,--no-relax \
     -C link-arg=-Wl,--pack-dyn-relocs=none \
     -C link-arg=-Wl,--sort-common \
     -C link-arg=-Wl,--sort-section=name"
+export CGO_LDFLAGS="-trimpath -buildvcs=false -buildid= "
+export CMAKE_C_FLAGS=$CFLAGS
+export CMAKE_CXX_FLAGS=$CFLAGS
+export CMAKE_SHARED_LINKER_FLAGS=$LDFLAGS
 
 android_ndk_ver="r27c"
 
@@ -145,7 +148,6 @@ cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
 cargo install --version ^3 cargo-ndk
 
 export LIBCLANG_PATH=/usr/lib/llvm-16/lib
-export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
 
 export CARGO_FEATURE_STD="true"
 export OPENSSL_DIR=/opt/openssl-3.3.2/aarch64
