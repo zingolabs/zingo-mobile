@@ -1,28 +1,29 @@
-diff --git a/node_modules/react-native-reanimated/android/build.gradle b/node_modules/react-native-reanimated/android/build.gradle
-index 2de3ca1..c847efd 100644
---- a/node_modules/react-native-reanimated/android/build.gradle
-+++ b/node_modules/react-native-reanimated/android/build.gradle
-@@ -246,6 +246,11 @@ android {
-         buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", IS_NEW_ARCHITECTURE_ENABLED.toString())
-         buildConfigField("String", "REANIMATED_VERSION_JAVA", "\"${REANIMATED_VERSION}\"")
-         externalNativeBuild {
-+            ndkBuild {
-+                arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=.",
-+                        "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=.",
-+                        "APP_LDFLAGS+=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
-+            }
-             cmake {
-                 arguments "-DANDROID_STL=c++_shared",
-                         "-DREACT_NATIVE_MINOR_VERSION=${REACT_NATIVE_MINOR_VERSION}",
-@@ -256,7 +261,10 @@ android {
-                         "-DIS_NEW_ARCHITECTURE_ENABLED=${IS_NEW_ARCHITECTURE_ENABLED}",
-                         "-DIS_REANIMATED_EXAMPLE_APP=${IS_REANIMATED_EXAMPLE_APP}",
-                         "-DREANIMATED_VERSION=${REANIMATED_VERSION}",
--                        "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
-+                        "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON",
-+                        "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=.",
-+                        "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=.",
-+                        "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
-                 abiFilters (*reactNativeArchitectures())
-                 targets("reanimated", "worklets")
-             }
+diff --git a/node_modules/react-native-reanimated/android/CMakeLists.txt b/node_modules/react-native-reanimated/android/CMakeLists.txt
+index 967272c..b46c2de 100644
+--- a/node_modules/react-native-reanimated/android/CMakeLists.txt
++++ b/node_modules/react-native-reanimated/android/CMakeLists.txt
+@@ -11,6 +11,15 @@ set(CMAKE_CXX_STANDARD 20)
+ include("${REACT_NATIVE_DIR}/ReactAndroid/cmake-utils/folly-flags.cmake")
+ add_compile_options(${folly_FLAGS})
+ 
++add_link_options(
++  -Wl,--build-id=none
++  -Wl,--no-relax
++  -Wl,--pack-dyn-relocs=none
++  -Wl,--sort-common
++  -Wl,--sort-section=name
++  -Wl,--hash-style=gnu
++)
++
+ string(
+   APPEND
+   CMAKE_CXX_FLAGS
+@@ -20,7 +29,7 @@ string(
+ 
+ string(APPEND CMAKE_CXX_FLAGS
+        " -fexceptions -fno-omit-frame-pointer -frtti -fstack-protector-all\
+-   -std=c++${CMAKE_CXX_STANDARD} -Wall -Werror")
++   -std=c++${CMAKE_CXX_STANDARD} -Wall -Werror -ffile-prefix-map=${CMAKE_SOURCE_DIR}=. -fno-ident -g0")
+ 
+ if(${IS_NEW_ARCHITECTURE_ENABLED})
+   string(APPEND CMAKE_CXX_FLAGS " -DRCT_NEW_ARCH_ENABLED")

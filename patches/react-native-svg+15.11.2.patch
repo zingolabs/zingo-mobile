@@ -71,41 +71,42 @@ Binary files a/node_modules/react-native-svg/android/.gradle/file-system.probe a
 diff --git a/node_modules/react-native-svg/android/.gradle/vcs-1/gc.properties b/node_modules/react-native-svg/android/.gradle/vcs-1/gc.properties
 deleted file mode 100644
 index e69de29..0000000
-diff --git a/node_modules/react-native-svg/android/build.gradle b/node_modules/react-native-svg/android/build.gradle
-index c02400f..29f7050 100644
---- a/node_modules/react-native-svg/android/build.gradle
-+++ b/node_modules/react-native-svg/android/build.gradle
-@@ -104,6 +104,18 @@ android {
-         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
- 
-         consumerProguardFiles 'proguard-rules.pro'
-+        externalNativeBuild {
-+            ndkBuild {
-+                arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=.",
-+                        "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=.",
-+                        "APP_LDFLAGS+=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
-+            }
-+            cmake {
-+                arguments "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=.",
-+                        "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=.",
-+                        "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
-+            }
-+        }
-     }
-     lintOptions {
-         abortOnError false
 diff --git a/node_modules/react-native-svg/android/src/main/jni/CMakeLists.txt b/node_modules/react-native-svg/android/src/main/jni/CMakeLists.txt
-index 21352d2..eb84447 100644
+index 21352d2..68b099b 100644
 --- a/node_modules/react-native-svg/android/src/main/jni/CMakeLists.txt
 +++ b/node_modules/react-native-svg/android/src/main/jni/CMakeLists.txt
-@@ -83,6 +83,19 @@ target_compile_options(
+@@ -1,5 +1,6 @@
+ cmake_minimum_required(VERSION 3.13)
+ set(CMAKE_VERBOSE_MAKEFILE on)
++set(ENV{SOURCE_DATE_EPOCH} "1710000000")
+ 
+ set(RNS_ANDROID_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
+ set(RNS_COMMON_DIR ${RNS_ANDROID_DIR}/../common/cpp)
+@@ -21,6 +22,15 @@ add_compile_options(
+   -Wno-gnu-zero-variadic-macro-arguments
+ )
+ 
++add_link_options(
++  -Wl,--build-id=none
++  -Wl,--no-relax
++  -Wl,--pack-dyn-relocs=none
++  -Wl,--sort-common
++  -Wl,--sort-section=name
++  -Wl,--hash-style=gnu
++)
++
+ file(GLOB rnsvg_SRCS CONFIGURE_DEPENDS *.cpp ${RNS_COMMON_DIR}/react/renderer/components/rnsvg/*.cpp)
+ file(GLOB rnsvg_codegen_SRCS CONFIGURE_DEPENDS ${RNS_GENERATED_REACT_DIR}/*cpp)
+ 
+@@ -83,6 +93,20 @@ target_compile_options(
    -frtti
    -std=c++20
    -Wall
 +  -ffile-prefix-map=${CMAKE_SOURCE_DIR}=.
++  -fno-ident
++  -g0
 +)
 +
-+# FLAGS DE LINKER
 +target_link_options(
 +  react_codegen_rnsvg 
 +  PRIVATE
