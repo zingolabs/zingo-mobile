@@ -93,7 +93,6 @@ if (keystorePropertiesFile.exists()) {
 android {
     ndkVersion rootProject.ext.ndkVersion
 
-    buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
     namespace 'org.ZingoLabs.Zingo'
@@ -120,6 +119,20 @@ android {
         versionName "zingo-1.11.2" // Real
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        externalNativeBuild {
+            ndkBuild {
+                arguments "V=1",
+                    "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0",
+                    "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0",
+                    "APP_LDFLAGS+=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
+            }
+            cmake {
+                arguments "-DCMAKE_VERBOSE_MAKEFILE=ON",
+                    "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0",
+                    "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0",
+                    "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
+            }
+        }
     }
 
     splits {
@@ -169,6 +182,8 @@ android {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.release
+            // this may cause problems
+            //vcsInfo.include false
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
