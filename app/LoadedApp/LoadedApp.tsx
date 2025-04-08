@@ -506,6 +506,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       newSelectServer: null,
       scrollToTop: false,
       scrollToBottom: false,
+      isSeedViewModalOpen: false,
     };
 
     this.rpc = new RPC(
@@ -790,6 +791,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           action={SeedActionEnum.view}
           setPrivacyOption={this.setPrivacyOption}
           keepAwake={this.keepAwake}
+          setIsSeedViewModalOpen={this.setIsSeedViewModalOpen}
         />
       ),
       { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
@@ -839,6 +841,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
+  setIsSeedViewModalOpen = (value: boolean) => {
+    this.setState({
+      isSeedViewModalOpen: value,
+    });
+  };
+
   setValueTransfersList = async (valueTransfers: ValueTransferType[], valueTransfersTotal: number) => {
     const basicFirstViewSeed = (await SettingsFileImpl.readSettings()).basicFirstViewSeed;
     // only for basic mode
@@ -850,7 +858,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         // only if the wallet have some ValueTransfers
         if (background === GlobalConst.no && valueTransfersTotal > 0) {
           // I need to check this out in the seed screen.
-          await this.setSeedViewModalShow();
+          if (!this.state.isSeedViewModalOpen) {
+            this.setIsSeedViewModalOpen(true);
+            await this.setSeedViewModalShow();
+          }
         }
       }
     } else {

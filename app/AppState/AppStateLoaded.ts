@@ -16,5 +16,8 @@ export default interface AppStateLoaded {
   // to do scroll to bottom in messages
   scrollToBottom: boolean;
 
+  // to know if the modal is open or not
+  isSeedViewModalOpen: boolean;
+
   // eslint-disable-next-line semi
 }
