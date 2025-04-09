@@ -122,15 +122,15 @@ android {
         externalNativeBuild {
             ndkBuild {
                 arguments "V=1",
-                    "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0",
-                    "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0",
+                    "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches",
+                    "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches",
                     "APP_LDFLAGS+=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
             }
             cmake {
-                cppFlags "-ffile-prefix-map=${rootDir}=.", "-fno-ident", "-g0"
+                cppFlags "-ffile-prefix-map=${rootDir}=.", "-fno-ident", "-g0 -gno-record-gcc-switches"
                 arguments "-DCMAKE_VERBOSE_MAKEFILE=ON",
-                    "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0",
-                    "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0",
+                    "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches",
+                    "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches",
                     "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
             }
         }

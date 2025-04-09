@@ -28,8 +28,8 @@ ENV NDK_HOME=/usr/local/android-ndk-${android_ndk_ver}
 ENV ANDROID_NDK_ROOT=/usr/local/android-ndk-${android_ndk_ver}
 ENV PATH=/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 
-ENV SOURCE_DATE_EPOCH=1700000000
-ENV CFLAGS="-ffile-prefix-map=$(pwd)=. -g0 -O2"
+ENV SOURCE_DATE_EPOCH=1710000000
+ENV CFLAGS="-ffile-prefix-map=$(pwd)=. -fno-ident -g0 -gno-record-gcc-switches"
 ENV LDFLAGS="-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
 
 # Install and setup Rust

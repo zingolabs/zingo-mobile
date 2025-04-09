@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-gesture-handler/android/build.gradle b/node_modules/react-native-gesture-handler/android/build.gradle
-index 99475ac..930c007 100644
+index 99475ac..1d9eb18 100644
 --- a/node_modules/react-native-gesture-handler/android/build.gradle
 +++ b/node_modules/react-native-gesture-handler/android/build.gradle
 @@ -137,12 +137,20 @@ android {
@@ -7,8 +7,8 @@ index 99475ac..930c007 100644
              var appProject = rootProject.allprojects.find { it.plugins.hasPlugin('com.android.application') }
              externalNativeBuild {
 +                ndkBuild {
-+                    arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=.",
-+                            "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=.",
++                    arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches",
++                            "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches",
 +                            "APP_LDFLAGS+=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
 +                }
                  cmake {
@@ -18,8 +18,8 @@ index 99475ac..930c007 100644
                              "-DANDROID_STL=c++_shared",
 -                            "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
 +                            "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON",
-+                            "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=.",
-+                            "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=.",
++                            "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches",
++                            "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches",
 +                            "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
                      abiFilters(*reactNativeArchitectures())
                  }

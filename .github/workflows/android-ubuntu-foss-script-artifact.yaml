@@ -91,7 +91,7 @@ jobs:
       - name: Build release Signed APK Artifact
         working-directory: android
         run: |
-          sudo export SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
+          export SOURCE_DATE_EPOCH=1710000000
           sudo ./gradlew assembleRelease
 
       - name: Strip Non-determinstic Metadata
