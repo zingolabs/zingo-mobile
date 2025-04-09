@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-reanimated/android/CMakeLists.txt b/node_modules/react-native-reanimated/android/CMakeLists.txt
-index aff1f83..aaa6fc7 100644
+index aff1f83..4945787 100644
 --- a/node_modules/react-native-reanimated/android/CMakeLists.txt
 +++ b/node_modules/react-native-reanimated/android/CMakeLists.txt
 @@ -1,5 +1,7 @@
@@ -15,7 +15,7 @@ index aff1f83..aaa6fc7 100644
  string(APPEND CMAKE_CXX_FLAGS
         " -fexceptions -fno-omit-frame-pointer -frtti -fstack-protector-all\
 -   -std=c++${CMAKE_CXX_STANDARD} -Wall -Werror -ffile-prefix-map=${CMAKE_SOURCE_DIR}=. -fno-ident -g0 -gno-record-gcc-switches")
-+   -std=c++${CMAKE_CXX_STANDARD} -Wall -Werror -ffile-prefix-map=${CMAKE_SOURCE_DIR}=. -fno-ident -g0 -gno-record-gcc-switches -frandom_seed=1")
++   -std=c++${CMAKE_CXX_STANDARD} -Wall -Werror -ffile-prefix-map=${CMAKE_SOURCE_DIR}=. -fno-ident -g0 -gno-record-gcc-switches -frandom-seed=1 -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -no-canonical-prefixes")
  
  if(${IS_NEW_ARCHITECTURE_ENABLED})
    string(APPEND CMAKE_CXX_FLAGS " -DRCT_NEW_ARCH_ENABLED")

@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-safe-area-context/android/src/main/jni/CMakeLists.txt b/node_modules/react-native-safe-area-context/android/src/main/jni/CMakeLists.txt
-index 66bb972..a67626c 100644
+index 66bb972..633403e 100644
 --- a/node_modules/react-native-safe-area-context/android/src/main/jni/CMakeLists.txt
 +++ b/node_modules/react-native-safe-area-context/android/src/main/jni/CMakeLists.txt
 @@ -1,5 +1,7 @@
@@ -18,7 +18,7 @@ index 66bb972..a67626c 100644
  target_compile_options(
    ${LIB_TARGET_NAME}
    PRIVATE
-@@ -78,6 +79,11 @@ target_compile_options(
+@@ -78,6 +79,13 @@ target_compile_options(
    -frtti
    -std=c++20
    -Wall
@@ -26,7 +26,9 @@ index 66bb972..a67626c 100644
 +  -fno-ident
 +  -g0
 +  -gno-record-gcc-switches
-+  -frandom_seed=1
++  -frandom-seed=1
++  -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__=
++  -no-canonical-prefixes
  )
  
  target_include_directories(

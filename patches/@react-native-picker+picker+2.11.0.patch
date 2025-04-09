@@ -1,5 +1,5 @@
 diff --git a/node_modules/@react-native-picker/picker/android/src/main/jni/CMakeLists.txt b/node_modules/@react-native-picker/picker/android/src/main/jni/CMakeLists.txt
-index 4d1eb14..34e3d26 100644
+index 4d1eb14..50988a7 100644
 --- a/node_modules/@react-native-picker/picker/android/src/main/jni/CMakeLists.txt
 +++ b/node_modules/@react-native-picker/picker/android/src/main/jni/CMakeLists.txt
 @@ -1,5 +1,7 @@
@@ -10,7 +10,7 @@ index 4d1eb14..34e3d26 100644
  
  set(LIB_LITERAL rnpicker)
  set(LIB_TARGET_NAME react_codegen_${LIB_LITERAL})
-@@ -72,6 +74,11 @@ target_compile_options(
+@@ -72,6 +74,13 @@ target_compile_options(
    -frtti
    -std=c++20
    -Wall
@@ -18,7 +18,9 @@ index 4d1eb14..34e3d26 100644
 +  -fno-ident
 +  -g0
 +  -gno-record-gcc-switches
-+  -frandom_seed=1
++  -frandom-seed=1
++  -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__=
++  -no-canonical-prefixes
  )
  
  target_include_directories(

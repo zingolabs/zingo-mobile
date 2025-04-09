@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-gesture-handler/android/build.gradle b/node_modules/react-native-gesture-handler/android/build.gradle
-index 99475ac..32d06bc 100644
+index 99475ac..2d47c06 100644
 --- a/node_modules/react-native-gesture-handler/android/build.gradle
 +++ b/node_modules/react-native-gesture-handler/android/build.gradle
 @@ -137,12 +137,20 @@ android {
@@ -7,8 +7,8 @@ index 99475ac..32d06bc 100644
              var appProject = rootProject.allprojects.find { it.plugins.hasPlugin('com.android.application') }
              externalNativeBuild {
 +                ndkBuild {
-+                    arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches -frandom_seed=1",
-+                            "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches -frandom_seed=1",
++                    arguments "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches -frandom-seed=1 -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -no-canonical-prefixes",
++                            "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches -frandom-seed=1 -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -no-canonical-prefixes",
 +                            "APP_LDFLAGS+=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
 +                }
                  cmake {
@@ -18,8 +18,8 @@ index 99475ac..32d06bc 100644
                              "-DANDROID_STL=c++_shared",
 -                            "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
 +                            "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON",
-+                            "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches -frandom_seed=1",
-+                            "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches -frandom_seed=1",
++                            "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches -frandom-seed=1 -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -no-canonical-prefixes",
++                            "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches -frandom-seed=1 -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -no-canonical-prefixes",
 +                            "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
                      abiFilters(*reactNativeArchitectures())
                  }
