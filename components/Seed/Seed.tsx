@@ -51,6 +51,7 @@ type SeedProps = {
   action: SeedActionEnum;
   setPrivacyOption: (value: boolean) => Promise<void>;
   keepAwake?: (v: boolean) => void;
+  setIsSeedViewModalOpen?: (v: boolean) => void;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({
   onClickOK,
@@ -58,6 +59,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   action,
   setPrivacyOption,
   keepAwake,
+  setIsSeedViewModalOpen,
 }) => {
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
@@ -190,19 +192,25 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const onClickCancelHide = () => {
     onClickCancel();
     clear();
-    // when this screen is open from LoadingApp (new wallet)
-    // is using the standard modal from react-native
-    if (action !== SeedActionEnum.new) {
-      hide();
-    }
+    hiding();
   };
 
   const onClickOKHide = (seedPhraseParm: string, birthdayNumberParm: number) => {
     onClickOK(seedPhraseParm, birthdayNumberParm);
     clear();
+    hiding();
+  };
+
+  const hiding = async () => {
     // when this screen is open from LoadingApp (new wallet)
     // is using the standard modal from react-native
     if (action !== SeedActionEnum.new) {
+      setIsSeedViewModalOpen && setIsSeedViewModalOpen(false);
+      // the user just see the seed for the first time.
+      if (mode === ModeEnum.basic && !basicFirstViewSeed) {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
+        keepAwake && keepAwake(false);
+      }
       hide();
     }
   };
@@ -374,11 +382,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             onPress={async () => {
               if (!seedPhrase) {
                 return;
-              }
-              // the user just see the seed for the first time.
-              if (mode === ModeEnum.basic && !basicFirstViewSeed && keepAwake) {
-                await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
-                keepAwake(false);
               }
               if (times === 0) {
                 onClickOKHide(seedPhrase, Number(birthdayNumber));
