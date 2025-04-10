@@ -122,14 +122,15 @@ android {
         externalNativeBuild {
             ndkBuild {
                 arguments "V=1",
-                    "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0",
-                    "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0",
+                    "APP_CFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches -frandom-seed=1 -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -no-canonical-prefixes",
+                    "APP_CXXFLAGS+=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches -frandom-seed=1 -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -no-canonical-prefixes",
                     "APP_LDFLAGS+=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
             }
             cmake {
+                cppFlags "-ffile-prefix-map=${rootDir}=.", "-fno-ident", "-g0 -gno-record-gcc-switches"
                 arguments "-DCMAKE_VERBOSE_MAKEFILE=ON",
-                    "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0",
-                    "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0",
+                    "-DCMAKE_C_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches -frandom-seed=1 -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -no-canonical-prefixes",
+                    "-DCMAKE_CXX_FLAGS=-ffile-prefix-map=${rootDir}=. -fno-ident -g0 -gno-record-gcc-switches -frandom-seed=1 -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -no-canonical-prefixes",
                     "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
             }
         }
@@ -190,7 +191,12 @@ android {
     }
 
     buildFeatures {
+        buildConfig = false // Avoids build timestamp in BuildConfig.java
         viewBinding = true
+    }
+
+    packagingOptions {
+        jniLibs.useLegacyPackaging = true  // Ensures stable binary layout
     }
 
     testOptions {
@@ -220,6 +226,11 @@ android {
     }
 }
 
+// to make the build reproducible...
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
 
 // Map for the version code that gives each ABI a value.
 ext.abiCodes = ['armeabi-v7a':1, 'x86':2, 'arm64-v8a': 3, 'x86_64':4]

@@ -30,6 +30,8 @@ RUN cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
 
 RUN cargo install --version ^3 cargo-ndk
 
+ENV SOURCE_DATE_EPOCH=1710000000
+ENV ZERO_AR_DATE=1
 ENV RUSTFLAGS=" \
     --remap-path-prefix=$(pwd)=. \
     -C opt-level=z \

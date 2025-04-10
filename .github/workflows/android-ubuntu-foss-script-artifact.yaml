@@ -90,8 +90,17 @@ jobs:
 
       - name: Build release Signed APK Artifact
         working-directory: android
-        run: sudo ./gradlew assembleRelease
+        run: |
+          export SOURCE_DATE_EPOCH=1710000000
+          export ZERO_AR_DATE=1
+          sudo ./gradlew assembleRelease
 
+      - name: Strip Non-determinstic Metadata
+        working-directory: android/app/build/outputs/apk/release
+        run: |
+          sudo apt-get install strip-nondeterminism
+          sudo strip-nondeterminism app-release.apk
+          
       - name: Upload the Artifact
         uses: actions/upload-artifact@v4
         with:
