@@ -2,6 +2,7 @@
 set -e
 
 export SOURCE_DATE_EPOCH=1710000000
+export ZERO_AR_DATE=1
 export CFLAGS="-ffile-prefix-map=$(pwd)=. -fno-ident -g0 -gno-record-gcc-switches -frandom-seed=1 -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -no-canonical-prefixes"
 export LDFLAGS="-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
 export RUSTFLAGS=" \
