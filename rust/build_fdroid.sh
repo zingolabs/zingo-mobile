@@ -2,7 +2,7 @@
 set -e
 
 export SOURCE_DATE_EPOCH=1710000000
-export CFLAGS="-ffile-prefix-map=$(pwd)=. -fno-ident -g0 -gno-record-gcc-switches"
+export CFLAGS="-ffile-prefix-map=$(pwd)=. -fno-ident -g0 -gno-record-gcc-switches -frandom-seed=1 -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -no-canonical-prefixes"
 export LDFLAGS="-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
 export RUSTFLAGS=" \
     --remap-path-prefix=$(pwd)=. \
@@ -100,8 +100,6 @@ mkdir -p /opt/openssl-3.3.2/x86 \
 
 /opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/aarch64 android-arm64 \
     -mno-outline-atomics \
-    -fno-ident \
-    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 > /dev/null \
     && make -j$(nproc) > /dev/null \
@@ -109,8 +107,6 @@ mkdir -p /opt/openssl-3.3.2/x86 \
     && make clean > /dev/null \
     && make distclean > /dev/null
 /opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/armv7 android-arm \
-    -fno-ident \
-    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 > /dev/null \
     && make -j$(nproc) > /dev/null \
@@ -119,8 +115,6 @@ mkdir -p /opt/openssl-3.3.2/x86 \
     && make distclean > /dev/null
 /opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/x86 android-x86 \
     -DBROKEN_CLANG_ATOMICS \
-    -fno-ident \
-    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24  > /dev/null \
     && make -j$(nproc) > /dev/null \
@@ -128,8 +122,6 @@ mkdir -p /opt/openssl-3.3.2/x86 \
     && make clean  > /dev/null \
     && make distclean > /dev/null
 /opt/openssl-3.3.2/Configure --prefix=/opt/openssl-3.3.2/x86_64 android-x86_64 \
-    -fno-ident \
-    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 > /dev/null \
     && make -j$(nproc) > /dev/null \

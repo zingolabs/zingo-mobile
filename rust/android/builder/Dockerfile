@@ -28,7 +28,7 @@ ENV NDK_HOME=/usr/local/android-ndk-${android_ndk_ver}
 ENV ANDROID_NDK_ROOT=/usr/local/android-ndk-${android_ndk_ver}
 ENV PATH=/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 
-ENV CFLAGS="-ffile-prefix-map=$(pwd)=. -fno-ident -g0 -gno-record-gcc-switches"
+ENV CFLAGS="-ffile-prefix-map=$(pwd)=. -fno-ident -g0 -gno-record-gcc-switches -frandom-seed=1 -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -no-canonical-prefixes"
 ENV LDFLAGS="-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
 
 # Install and setup Rust
@@ -77,8 +77,6 @@ RUN mkdir x86 \
 
 RUN ./Configure --prefix=/opt/openssl-3.3.2/aarch64 android-arm64 \
     -mno-outline-atomics \
-    -fno-ident \
-    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
@@ -87,8 +85,6 @@ RUN ./Configure --prefix=/opt/openssl-3.3.2/aarch64 android-arm64 \
     && make distclean
 
 RUN ./Configure --prefix=/opt/openssl-3.3.2/armv7 android-arm \
-    -fno-ident \
-    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
@@ -98,8 +94,6 @@ RUN ./Configure --prefix=/opt/openssl-3.3.2/armv7 android-arm \
 
 RUN ./Configure --prefix=/opt/openssl-3.3.2/x86 android-x86 \
     -DBROKEN_CLANG_ATOMICS \
-    -fno-ident \
-    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
@@ -108,8 +102,6 @@ RUN ./Configure --prefix=/opt/openssl-3.3.2/x86 android-x86 \
     && make distclean
 
 RUN ./Configure --prefix=/opt/openssl-3.3.2/x86_64 android-x86_64 \
-    -fno-ident \
-    -fno-record-gcc-switches \
     -U__ANDROID_API__ \
     -D__ANDROID_API__=24 \
     && make -j$(nproc) \
