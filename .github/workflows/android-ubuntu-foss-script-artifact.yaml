@@ -40,7 +40,7 @@ jobs:
         working-directory: rust/lib
         run: |
           sudo apt-get update && apt-get install pkg-config build-essential apt-utils libpixman-1-dev \
-            libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev librsvg2-dev
+            libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev librsvg2-dev wget
           sudo curl -Lo node.tar.gz https://nodejs.org/dist/v20.18.2/node-v20.18.2-linux-x64.tar.gz
           sudo echo "eb5b031bdd728871c3b9a82655dbfa533bc262c0b6da1d09a86842430cef07d4 node.tar.gz" | sha256sum -c -
           sudo tar xzf node.tar.gz --strip-components=1 -C /usr/local/
