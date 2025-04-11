@@ -47,6 +47,11 @@ jobs:
           sudo npm install --global yarn
           sudo bash ../build_fdroid.sh
 
+      - name: Install gradle manually
+        run: |
+          wget https://services.gradle.org/distributions/gradle-8.11.1-bin.zip -P /tmp
+          sudo unzip -d /opt/gradle /tmp/gradle-8.11.1-bin.zip
+      
       - name: Yarn install
         run: npm_config_build_from_source=true sudo yarn install
 
@@ -59,7 +64,7 @@ jobs:
 
       - name: Gradle clean
         working-directory: android
-        run: sudo ./gradlew clean
+        run: sudo /opt/gradle/gradle-8.11.1/bin/gradle clean
 
       - name: Copy native & kotlin libs
         working-directory: rust/lib
@@ -93,7 +98,7 @@ jobs:
         run: |
           export SOURCE_DATE_EPOCH=1710000000
           export ZERO_AR_DATE=1
-          sudo ./gradlew assembleRelease
+          sudo /opt/gradle/gradle-8.11.1/bin/gradle assembleRelease
 
       - name: Strip Non-determinstic Metadata
         working-directory: android/app/build/outputs/apk/release
