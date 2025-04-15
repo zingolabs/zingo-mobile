@@ -134,7 +134,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         uniffi.zingo.initLogging()
 
         // Create a seed
-        val resp = uniffi.zingo.initNew(server, getDocumentDirectory(), chainhint, true)
+        val resp = uniffi.zingo.initNew(server, getDocumentDirectory(), chainhint)
         // Log.i("MAIN-Seed", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -150,7 +150,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         uniffi.zingo.initLogging()
 
-        val resp = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), getDocumentDirectory(), chainhint, true)
+        val resp = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), getDocumentDirectory(), chainhint)
         // Log.i("MAIN", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -166,7 +166,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         uniffi.zingo.initLogging()
 
-        val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), applicationContext.filesDir.absolutePath, chainhint, true)
+        val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), applicationContext.filesDir.absolutePath, chainhint)
         // Log.i("MAIN", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -346,7 +346,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             server,
             fileb64.toString(),
             applicationContext.filesDir.absolutePath,
-            chainhint, true
+            chainhint
         )
     }
 
@@ -528,11 +528,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun getValueTransfersList(items: String, promise: Promise) {
+    fun getValueTransfersList(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getValueTransfers(items)
+                val resp = uniffi.zingo.getValueTransfers()
 
                 promise.resolve(resp)
             } catch (e: Exception) {

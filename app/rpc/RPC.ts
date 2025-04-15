@@ -1218,7 +1218,7 @@ export default class RPC {
       }
       this.fetchTandZandOValueTransfersLock = true;
       //const start = Date.now();
-      const valueTransfersStr: string = await RPCModule.getValueTransfersList('100000000');
+      const valueTransfersStr: string = await RPCModule.getValueTransfersList();
       //console.log('=========================================== > value transfers - ', Date.now() - start);
       //console.log(valueTransfersStr);
       if (valueTransfersStr) {

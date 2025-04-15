@@ -206,7 +206,7 @@ class RPCModule: NSObject {
   }
 
   func fnCreateNewWallet(server: String, chainhint: String) throws -> String {
-    let seed = initNew(serveruri: server, datadir: try getDocumentsDirectory(), chainhint: chainhint, monitorMempool: true)
+    let seed = initNew(serveruri: server, datadir: try getDocumentsDirectory(), chainhint: chainhint)
     let seedStr = String(seed)
     if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -231,7 +231,7 @@ class RPCModule: NSObject {
   }
   
   func fnRestoreWalletFromSeed(server: String, chainhint: String, restoreSeed: String, birthday: String) throws -> String {
-    let seed = initFromSeed(serveruri: server, seed: restoreSeed, birthday: UInt64(birthday) ?? 0, datadir: try getDocumentsDirectory(), chainhint: chainhint, monitorMempool: true)
+    let seed = initFromSeed(serveruri: server, seed: restoreSeed, birthday: UInt64(birthday) ?? 0, datadir: try getDocumentsDirectory(), chainhint: chainhint)
     let seedStr = String(seed)
     if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -256,7 +256,7 @@ class RPCModule: NSObject {
   }
   
   func fnRestoreWalletFromUfvk(server: String, chainhint: String, restoreUfvk: String, birthday: String) throws -> String {
-    let ufvk = initFromUfvk(serveruri: server, ufvk: restoreUfvk, birthday: UInt64(birthday) ?? 0, datadir: try getDocumentsDirectory(), chainhint: chainhint, monitorMempool: true)
+    let ufvk = initFromUfvk(serveruri: server, ufvk: restoreUfvk, birthday: UInt64(birthday) ?? 0, datadir: try getDocumentsDirectory(), chainhint: chainhint)
     let ufvkStr = String(ufvk)
     if !ufvkStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -281,7 +281,7 @@ class RPCModule: NSObject {
   }
 
   func fnLoadExistingWallet(server: String, chainhint: String) throws -> String {
-    let seed = initFromB64(serveruri: server, datab64: try self.readWalletUtf8String(), datadir: try getDocumentsDirectory(), chainhint: chainhint, monitorMempool: true)
+    let seed = initFromB64(serveruri: server, datab64: try self.readWalletUtf8String(), datadir: try getDocumentsDirectory(), chainhint: chainhint)
     let seedStr = String(seed)
     return seedStr
   }
@@ -517,9 +517,8 @@ class RPCModule: NSObject {
   }
 
   func fnGetValueTransfersList(_ dict: [AnyHashable: Any]) {
-      if let items = dict["items"] as? String,
-         let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = getValueTransfers(recentVtsToRetrive: items)
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getValueTransfers()
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
@@ -535,9 +534,9 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(getValueTransfersList:resolve:reject:)
-  func getValueTransfersList(_ items: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["items": items, "resolve": resolve]
+  @objc(getValueTransfersList:reject:)
+  func getValueTransfersList(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fnGetValueTransfersList(dict)
