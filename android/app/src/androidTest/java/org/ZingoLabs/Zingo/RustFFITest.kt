@@ -275,7 +275,7 @@ class ExecuteSyncFromSeed {
             println(syncStatusJson)
             syncStatus = mapper.readValue(syncStatusJson)
 
-            if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned >= null) {
+            if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned == null) {
                 println("Sync completed!")
                 break
             }
@@ -323,7 +323,7 @@ class ExecuteSendFromOrchard {
             println(syncStatusJson)
             syncStatus = mapper.readValue(syncStatusJson)
 
-            if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned >= null) {
+            if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned == null) {
                 println("Sync completed!")
                 break
             }
@@ -363,7 +363,7 @@ class ExecuteSendFromOrchard {
             println(syncStatusJson)
             syncStatus = mapper.readValue(syncStatusJson)
 
-            if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned >= null) {
+            if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned == null) {
                 println("Sync completed!")
                 break
             }
@@ -415,7 +415,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
             println(syncStatusJson)
             syncStatus = mapper.readValue(syncStatusJson)
 
-            if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned >= null) {
+            if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned == null) {
                 println("Sync completed!")
                 break
             }
@@ -485,7 +485,7 @@ class ExecuteSaplingBalanceFromSeed {
             println(syncStatusJson)
             syncStatus = mapper.readValue(syncStatusJson)
 
-            if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned >= null) {
+            if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned == null) {
                 println("Sync completed!")
                 break
             }
