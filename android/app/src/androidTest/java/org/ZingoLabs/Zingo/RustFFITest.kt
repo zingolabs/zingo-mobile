@@ -69,12 +69,12 @@ data class SyncStatus (
   val sync_start_height : Long,
   val scanned_blocks : Long,
   val unscanned_blocks : Long,
-  val percentage_blocks_scanned : Long,
+  val percentage_blocks_scanned : Long?,
   val scanned_sapling_outputs : Long,
   val unscanned_sapling_outputs : Long,
   val scanned_orchard_outputs : Long,
   val unscanned_orchard_outputs : Long,
-  val percentage_outputs_scanned : Long
+  val percentage_outputs_scanned : Long?
 )
 
 data class Sync (
@@ -276,11 +276,11 @@ class ExecuteSyncFromSeed {
             syncStatus = mapper.readValue(syncStatusJson)
 
             if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned >= null) {
-                println("Sync completado!")
+                println("Sync completed!")
                 break
             }
 
-            Thread.sleep(1000) // espera 1 segundo antes de volver a consultar
+            Thread.sleep(1000)
         }
 
         heightJson = uniffi.zingo.executeCommand("height", "")
@@ -324,11 +324,11 @@ class ExecuteSendFromOrchard {
             syncStatus = mapper.readValue(syncStatusJson)
 
             if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned >= null) {
-                println("Sync completado!")
+                println("Sync completed!")
                 break
             }
 
-            Thread.sleep(1000) // espera 1 segundo antes de volver a consultar
+            Thread.sleep(1000)
         }
 
         var balanceJson: String = uniffi.zingo.executeCommand("balance", "")
@@ -364,11 +364,11 @@ class ExecuteSendFromOrchard {
             syncStatus = mapper.readValue(syncStatusJson)
 
             if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned >= null) {
-                println("Sync completado!")
+                println("Sync completed!")
                 break
             }
 
-            Thread.sleep(1000) // espera 1 segundo antes de volver a consultar
+            Thread.sleep(1000)
         }
 
         balanceJson = uniffi.zingo.executeCommand("balance", "")
@@ -416,11 +416,11 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
             syncStatus = mapper.readValue(syncStatusJson)
 
             if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned >= null) {
-                println("Sync completado!")
+                println("Sync completed!")
                 break
             }
 
-            Thread.sleep(1000) // espera 1 segundo antes de volver a consultar
+            Thread.sleep(1000)
         }
 
         val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
@@ -486,11 +486,11 @@ class ExecuteSaplingBalanceFromSeed {
             syncStatus = mapper.readValue(syncStatusJson)
 
             if (syncStatus.percentage_outputs_scanned >= 100 || syncStatus.percentage_outputs_scanned >= null) {
-                println("Sync completado!")
+                println("Sync completed!")
                 break
             }
 
-            Thread.sleep(1000) // espera 1 segundo antes de volver a consultar
+            Thread.sleep(1000)
         }
 
         val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
