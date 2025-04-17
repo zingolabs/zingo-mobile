@@ -270,7 +270,7 @@ class ExecuteSyncFromSeed {
 
         var syncStatus: SyncStatus
         while (true) {
-            val syncStatusJson: String = uniffi.zingo.executeCommand("syncstatus", "")
+            val syncStatusJson: String = uniffi.zingo.executeCommand("sync", "status")
             println("\nSync status:")
             println(syncStatusJson)
             syncStatus = mapper.readValue(syncStatusJson)
@@ -319,7 +319,7 @@ class ExecuteSendFromOrchard {
 
         var syncStatus: SyncStatus
         while (true) {
-            val syncStatusJson: String = uniffi.zingo.executeCommand("syncstatus", "")
+            val syncStatusJson: String = uniffi.zingo.executeCommand("sync", "status")
             println("\nSync status:")
             println(syncStatusJson)
             syncStatus = mapper.readValue(syncStatusJson)
@@ -360,7 +360,7 @@ class ExecuteSendFromOrchard {
         println(syncJson)
 
         while (true) {
-            val syncStatusJson: String = uniffi.zingo.executeCommand("syncstatus", "")
+            val syncStatusJson: String = uniffi.zingo.executeCommand("sync", "status")
             println("\nSync status:")
             println(syncStatusJson)
             syncStatus = mapper.readValue(syncStatusJson)
@@ -413,7 +413,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
 
         var syncStatus: SyncStatus
         while (true) {
-            val syncStatusJson: String = uniffi.zingo.executeCommand("syncstatus", "")
+            val syncStatusJson: String = uniffi.zingo.executeCommand("sync", "status")
             println("\nSync status:")
             println(syncStatusJson)
             syncStatus = mapper.readValue(syncStatusJson)
@@ -484,7 +484,7 @@ class ExecuteSaplingBalanceFromSeed {
 
         var syncStatus: SyncStatus
         while (true) {
-            val syncStatusJson: String = uniffi.zingo.executeCommand("syncstatus", "")
+            val syncStatusJson: String = uniffi.zingo.executeCommand("sync", "status")
             println("\nSync status:")
             println(syncStatusJson)
             syncStatus = mapper.readValue(syncStatusJson)
