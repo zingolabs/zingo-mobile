@@ -108,6 +108,15 @@ jobs:
       - name: AWS libcrypto rust building
         run: cargo install --force --locked bindgen-cli
 
+      - name: Run dummy Gradle task to install NDK
+        run: ./gradlew tasks
+
+      - name: Locate Android NDK path
+        id: locate-ndk
+        run: |
+          echo "ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/$(ls $ANDROID_SDK_ROOT/ndk | sort -V | tail -n1)" >> $GITHUB_ENV
+          echo "BINDGEN_EXTRA_CLANG_ARGS=--sysroot=$ANDROID_SDK_ROOT/ndk/$(ls $ANDROID_SDK_ROOT/ndk | sort -V | tail -n1)/toolchains/llvm/prebuilt/linux-x86_64/sysroot" >> $GITHUB_ENV
+
       - name: Cargo uniffi kotlin
         working-directory: ./rust/lib
         run: |
