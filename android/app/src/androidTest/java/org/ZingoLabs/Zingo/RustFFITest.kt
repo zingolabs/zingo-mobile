@@ -78,15 +78,15 @@ data class SyncStatus (
 )
 
 data class SyncComplete (
-    sync_start_height : Long,
-    sync_end_height : Long,
-    scanned_blocks : Long,
-    scanned_sapling_outputs : Long,
-    scanned_orchard_outputs : Long
+    val sync_start_height : Long,
+    val sync_end_height : Long,
+    val scanned_blocks : Long,
+    val scanned_sapling_outputs : Long,
+    val scanned_orchard_outputs : Long
 )
 
 data class SyncPoll (
-    sync_complete : SyncComplete
+    val sync_complete : SyncComplete
 )
 
 data class Sync (
