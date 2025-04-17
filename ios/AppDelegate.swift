@@ -160,8 +160,8 @@ extension AppDelegate {
             NSLog("BGTask startBackgroundTask - expirationHandler called")
             // stop the sync process, can't wait to check if the process is over.
             // have no time here
-            let interruptStr = executeCommand(cmd: "interrupt_sync_after_batch", args: "true")
-            NSLog("BGTask startBackgroundTask - expirationHandler interrupt syncing \(interruptStr)")
+            let pauseStr = executeCommand(cmd: "sync", args: "pause")
+            NSLog("BGTask startBackgroundTask - expirationHandler pause syncing \(pauseStr)")
             
             let rpcmodule = RPCModule()
 
@@ -253,44 +253,12 @@ extension AppDelegate {
 
     func stopSyncingProcess() {
         NSLog("BGTask stopSyncingProcess")
-        let statusStr = executeCommand(cmd: "syncstatus", args: "")
+        let statusStr = executeCommand(cmd: "sync", args: "pause")
         if statusStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
             NSLog("BGTask stopSyncingProcess - no lightwalled likely")
             return
         }
         NSLog("BGTask stopSyncingProcess - status response \(statusStr)")
-
-        guard let data = statusStr.data(using: .utf8),
-              let jsonResp = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-              var inProgress = jsonResp["in_progress"] as? Bool else {
-            NSLog("BGTask stopSyncingProcess - error parsing JSON response")
-            return
-        }
-
-        while inProgress {
-            let interruptStr = executeCommand(cmd: "interrupt_sync_after_batch", args: "true")
-            NSLog("BGTask stopSyncingProcess - interrupt syncing \(interruptStr)")
-
-            Thread.sleep(forTimeInterval: 0.5)
-
-            let newStatusStr = executeCommand(cmd: "syncstatus", args: "")
-            if newStatusStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-                NSLog("BGTask stopSyncingProcess - error getting new status")
-                return
-            }
-            NSLog("BGTask stopSyncingProcess - status response \(newStatusStr)")
-
-            guard let newData = newStatusStr.data(using: .utf8),
-                  let newJsonResp = try? JSONSerialization.jsonObject(with: newData, options: []) as? [String: Any],
-                  let newInProgress = newJsonResp["in_progress"] as? Bool else {
-                NSLog("BGTask stopSyncingProcess - error parsing new JSON response")
-                return
-            }
-
-            inProgress = newInProgress
-        }
-
-        NSLog("BGTask stopSyncingProcess - syncing process STOPPED")
     }
 
     func syncingProcessBackgroundTask() {
@@ -328,14 +296,9 @@ extension AppDelegate {
                 self.stopSyncingProcess()
             }
 
-            // deactivate the flag for interrupting the sync process.
-            let noInterrupt = executeCommand(cmd: "interrupt_sync_after_batch", args: "false")
-            let noInterruptStr = String(noInterrupt)
-            NSLog("BGTask syncingProcessBackgroundTask - no interrupt syncing \(noInterruptStr)")
-
             // run the sync process.
             NSLog("BGTask syncingProcessBackgroundTask - sync BEGIN")
-            let syncing = executeCommand(cmd: "sync", args: "")
+            let syncing = executeCommand(cmd: "sync", args: "run")
             let syncingStr = String(syncing)
             NSLog("BGTask syncingProcessBackgroundTask - sync END \(syncingStr)")
 

@@ -33,6 +33,8 @@ import {
 import {
   AddressBookFileClass,
   ButtonTypeEnum,
+  CommandEnum,
+  CommandSyncEnum,
   GlobalConst,
   RefreshScreenEnum,
   SelectServerEnum,
@@ -51,13 +53,13 @@ import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import AddressItem from '../../Components/AddressItem';
 import Memo from '../../Memo';
-import RPC from '../../../app/rpc';
 import { sendEmail } from '../../../app/sendEmail';
 import { createAlert } from '../../../app/createAlert';
 import selectingServer from '../../../app/selectingServer';
 import { serverUris } from '../../../app/uris';
 import Utils from '../../../app/utils';
 import { magicModal } from 'react-native-magic-modal';
+import RPCModule from '../../../app/RPCModule';
 
 type MessageListProps = {
   toggleMenuDrawer: () => void;
@@ -365,8 +367,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     }
     setDisableSend(true);
 
-    // first interrupt syncing Just in case...
-    await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
+    // first pause syncing Just in case...
+    await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.pause);
 
     // call the sendTransaction method in a timeout, allowing the modals to show properly
     setTimeout(async () => {
@@ -385,7 +387,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         setDisableSend(false);
 
         // the sync process can continue
-        await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
+        await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
         return;
       } catch (err1) {
         error = err1 as string;
@@ -413,8 +415,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           console.log(fasterServer);
           if (fasterServer.uri !== server.uri) {
             setServerOption(fasterServer, selectServer, false, true);
-            // first interrupt syncing Just in case...
-            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
+            // first pause syncing Just in case...
+            await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.pause);
           }
 
           try {
@@ -430,7 +432,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             setDisableSend(false);
 
             // the sync process can continue
-            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
+            await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
             return;
           } catch (err2) {
             error = err2 as string;
@@ -441,7 +443,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       }
 
       // the sync process can continue
-      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
+      await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
 
       //console.log('sendtx error', error);
       // if the App is in background I need to store the error

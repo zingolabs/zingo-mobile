@@ -78,5 +78,8 @@ RCT_EXTERN_METHOD(getTransactionSummariesList:
 RCT_EXTERN_METHOD(setCryptoDefaultProvider:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(pollSyncInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

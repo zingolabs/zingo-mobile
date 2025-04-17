@@ -32,7 +32,7 @@ import { RPCValueTransfersKindEnum } from './enums/RPCValueTransfersKindEnum';
 import { RPCValueTransferType } from './types/RPCValueTransferType';
 import { ValueTransferKindEnum } from '../AppState/enums/ValueTransferKindEnum';
 import { RPCValueTransfersStatusEnum } from './enums/RPCValueTransfersStatusEnum';
-import { CommandAddressesEnum } from '../AppState/enums/CommandAddressesEnum';
+import { CommandAddressesEnum, CommandSyncEnum } from '../AppState';
 import { RPCSendProposeType } from './types/RPCSendProposeType';
 
 export default class RPC {
@@ -141,24 +141,6 @@ export default class RPC {
     this.timers = [];
 
     this.readOnly = readOnly;
-  }
-
-  static async rpcSetInterruptSyncAfterBatch(value: string): Promise<void> {
-    try {
-      //const start = Date.now();
-      const resultStr: string = await RPCModule.execute(CommandEnum.interruptSyncAfterBatch, value);
-      //console.log('=========================================== > sync flag - ', Date.now() - start);
-
-      if (resultStr) {
-        if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error setting interruptSyncAfterBatch ${resultStr}`);
-        }
-      } else {
-        console.log('Internal Error setting interruptSyncAfterBatch');
-      }
-    } catch (error) {
-      console.log(`Critical Error setting interruptSyncAfterBatch ${error}`);
-    }
   }
 
   static async rpcGetZecPrice(): Promise<number> {
@@ -421,45 +403,15 @@ export default class RPC {
   sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
   async stopSyncProcess(): Promise<void> {
-    let returnStatus: string = await RPCModule.execute(CommandEnum.syncstatus, '');
-    if (!returnStatus || returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
-      console.log('STOP - SYNC STATUS ERROR', returnStatus);
+    let returnPause: string = await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.pause);
+    if (!returnPause || returnPause.toLowerCase().startsWith(GlobalConst.error)) {
+      console.log('STOP - SYNC PAUSE ERROR', returnPause);
       return;
     }
-    let ss = {} as RPCSyncStatusType;
-    try {
-      ss = await JSON.parse(returnStatus);
-    } catch (e) {
-      console.log('SYNC STATUS ERROR - PARSE JSON', returnStatus);
-      return;
-    }
-
-    // interrupting sync process
-    await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
-
-    while (ss.in_progress) {
-      // sleep for half second
-      await this.sleep(500);
-
-      returnStatus = await RPCModule.execute(CommandEnum.syncstatus, '');
-      if (!returnStatus || returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log('STOP - SYNC STATUS ERROR', returnStatus);
-        return;
-      }
-      try {
-        ss = await JSON.parse(returnStatus);
-      } catch (e) {
-        console.log('SYNC STATUS ERROR - PARSE JSON', returnStatus);
-        return;
-      }
-    }
-    console.log('stop sync process. STOPPED');
+    console.log('stop sync process. STOPPED', returnPause);
 
     // deactivate the sync flag just in case.
     this.setInRefresh(false);
-
-    // NOT interrupting sync process
-    await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
   }
 
   async clearTimers(): Promise<void> {
@@ -583,7 +535,7 @@ export default class RPC {
         });
       } else {
         promise = new Promise<void>(async resolve => {
-          const syncStr: string = await RPCModule.execute(CommandEnum.sync, '');
+          const syncStr: string = await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
           console.log('sync finished', syncStr);
           if (syncStr && !syncStr.toLowerCase().startsWith(GlobalConst.error)) {
             try {
@@ -648,7 +600,7 @@ export default class RPC {
       return;
     }
     this.fetchSyncStatusLock = true;
-    const returnStatus: string = await RPCModule.execute(CommandEnum.syncstatus, '');
+    const returnStatus: string = await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.status);
     if (!returnStatus || returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC STATUS ERROR', returnStatus);
       this.fetchSyncStatusLock = false;

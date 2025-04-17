@@ -67,15 +67,11 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 stopSyncingProcess()
             }
 
-            // interrupt sync to false, just in case it is true.
-            val noInterrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "false")
-            Log.i("SCHEDULED_TASK_RUN", "Not interrupting sync: $noInterrupting")
-
             // the task is running here blocking this execution until this process finished:
             // 1. finished the syncing.
 
             Log.i("SCHEDULED_TASK_RUN", "sync BEGIN")
-            val syncing = uniffi.zingo.executeCommand("sync", "")
+            val syncing = uniffi.zingo.executeCommand("sync", "run")
             Log.i("SCHEDULED_TASK_RUN", "sync END: $syncing")
 
         } else {
@@ -123,37 +119,13 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
     }
 
     private fun stopSyncingProcess() {
-        var status = uniffi.zingo.executeCommand("syncstatus", "")
-        Log.i("SCHEDULED_TASK_RUN", "status response $status")
-
-        var data: ByteArray = status.toByteArray(StandardCharsets.UTF_8)
-        var jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
-        var inProgressStr: String = jsonResp.optString("in_progress")
-        var inProgress: Boolean = inProgressStr.toBoolean()
-
-        Log.i("SCHEDULED_TASK_RUN", "in progress value $inProgress")
-
-        while (inProgress) {
-            // interrupt
-            val interrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "true")
-            Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $interrupting")
-
-            // blocking the thread for 0.5 seconds.
-            Thread.sleep(500)
-
-            status = uniffi.zingo.executeCommand("syncstatus", "")
-            Log.i("SCHEDULED_TASK_RUN", "status response $status")
-
-            data = status.toByteArray(StandardCharsets.UTF_8)
-            jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
-            inProgressStr = jsonResp.optString("in_progress")
-            inProgress = inProgressStr.toBoolean()
-
-            Log.i("SCHEDULED_TASK_RUN", "in progress value $inProgress")
+        var status = uniffi.zingo.executeCommand("sync", "pause")
+        if (status.lowercase().startsWith(ErrorPrefix.value)) {
+            // this means this task not have a valid lightclient
+            Log.i("SCHEDULED_TASK_RUN", "no lightwalled likely")
+            return
         }
-
-        Log.i("SCHEDULED_TASK_RUN", "sync process STOPPED")
-
+        Log.i("SCHEDULED_TASK_RUN", "status response $status")
     }
 
 }
@@ -228,9 +200,9 @@ class BSCompanion {
 
         fun cancelExecutingTask() {
             val context = MainApplication.getAppContext() as Context
-            // run interrupt sync, just in case.
-            val interrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "true")
-            Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $interrupting")
+            // run pause sync, just in case.
+            val pause = uniffi.zingo.executeCommand("sync", "pause")
+            Log.i("SCHEDULED_TASK_RUN", "Pausing sync: $pause")
 
             Log.i("SCHEDULING_TASK", "Cancel background Task")
             WorkManager.getInstance(context)

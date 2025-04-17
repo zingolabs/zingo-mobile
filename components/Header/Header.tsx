@@ -52,6 +52,7 @@ import 'moment/locale/ru';
 import Utils from '../../app/utils';
 import { RPCShieldProposeType } from '../../app/rpc/types/RPCShieldProposeType';
 import RPCModule from '../../app/RPCModule';
+import { CommandSyncEnum } from '../../app/AppState';
 
 type HeaderProps = {
   // general
@@ -301,10 +302,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
     // not use await here.
     setComputingModalShow();
-    // We need to activate this flag because if the App is syncing
-    // while shielding, then it going to finish the current batch
-    // and after that it run the shield process.
-    await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
+    // we need to pause the sync process in order to shield
+    await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.pause);
     // because I don't what the user is doing, I need to the re-run the shield
     // command right before the confirmation
     await RPCModule.execute(CommandEnum.shield, '');
@@ -354,7 +353,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           );
         }
       }
-      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
+      // run again the sync process
+      await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
       // change to the history screen, just in case.
       navigationHome?.navigate(RouteEnums.Home, {
         screen: translate('loadedapp.history-menu') as string,

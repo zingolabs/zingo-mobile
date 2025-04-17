@@ -1,7 +1,6 @@
 export enum CommandEnum {
   changeserver = 'changeserver',
   walletKind = 'wallet_kind',
-  interruptSyncAfterBatch = 'interrupt_sync_after_batch',
   updatecurrentprice = 'updatecurrentprice',
   notes = 'notes',
   height = 'height',
@@ -14,7 +13,6 @@ export enum CommandEnum {
   import = 'import',
   exportufvk = 'exportufvk',
   sync = 'sync',
-  syncstatus = 'syncstatus',
   addresses = 'addresses',
   parseAddress = 'parse_address',
   parseViewkey = 'parse_viewkey',

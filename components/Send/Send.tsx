@@ -37,6 +37,7 @@ import {
   SelectServerEnum,
   RouteEnums,
   SecurityType,
+  CommandSyncEnum,
 } from '../../app/AppState';
 import { parseZcashURI, serverUris, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
@@ -704,8 +705,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
-    // first interrupt syncing Just in case...
-    await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
+    // first pause syncing Just in case...
+    await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.pause);
 
     // not use await here.
     setComputingModalShow();
@@ -741,7 +742,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         // the app send successfully on the first attemp.
 
         // the sync process can continue
-        await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
+        await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
         return;
       } catch (err1) {
         error = err1 as string;
@@ -769,8 +770,8 @@ const Send: React.FunctionComponent<SendProps> = ({
           console.log(fasterServer);
           if (fasterServer.uri !== server.uri) {
             setServerOption(fasterServer, selectServer, false, true);
-            // first interrupt syncing Just in case...
-            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
+            // first pause syncing Just in case...
+            await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.pause);
           }
 
           try {
@@ -800,7 +801,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             // the app send successfully on the second attemp.
 
             // the sync process can continue
-            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
+            await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
             return;
           } catch (err2) {
             error = err2 as string;
@@ -811,7 +812,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
 
       // the sync process can continue
-      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
+      await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
 
       setTimeout(() => {
         //console.log('sendtx error', error);
