@@ -77,6 +77,18 @@ data class SyncStatus (
   val percentage_outputs_scanned : Long?
 )
 
+data class SyncComplete (
+    sync_start_height : Long,
+    sync_end_height : Long,
+    scanned_blocks : Long,
+    scanned_sapling_outputs : Long,
+    scanned_orchard_outputs : Long
+)
+
+data class SyncPoll (
+    sync_complete : SyncComplete
+)
+
 data class Sync (
 	val result : String,
     val latest_block : Long,
@@ -268,15 +280,18 @@ class ExecuteSyncFromSeed {
         println("\nSync:")
         println(syncJson)
 
-        var syncStatus: SyncStatus
+        var syncPoll: SyncPoll
         while (true) {
-            val syncStatusJson: String = uniffi.zingo.executeCommand("sync", "status")
-            println("\nSync status:")
-            println(syncStatusJson)
-            syncStatus = mapper.readValue(syncStatusJson)
+            val syncPollJson: String = uniffi.zingo.pollSync()
+            println("\nSync poll:")
+            println(syncPollJson)
+            if (syncPollJson.lowercase().startsWith("error")) {
+                println("Sync Error!")
+                break
+            }
+            syncPoll = mapper.readValue(syncPollJson)
 
-            if (syncStatus.percentage_outputs_scanned == null ||
-                syncStatus.percentage_outputs_scanned!! >= 100) {
+            if (syncPoll.sync_complete.sync_end_height > 0) {
                 println("Sync completed!")
                 break
             }
@@ -317,15 +332,18 @@ class ExecuteSendFromOrchard {
         println("\nSync:")
         println(syncJson)
 
-        var syncStatus: SyncStatus
+        var syncPoll: SyncPoll
         while (true) {
-            val syncStatusJson: String = uniffi.zingo.executeCommand("sync", "status")
-            println("\nSync status:")
-            println(syncStatusJson)
-            syncStatus = mapper.readValue(syncStatusJson)
+            val syncPollJson: String = uniffi.zingo.pollSync()
+            println("\nSync poll:")
+            println(syncPollJson)
+            if (syncPollJson.lowercase().startsWith("error")) {
+                println("Sync Error!")
+                break
+            }
+            syncPoll = mapper.readValue(syncPollJson)
 
-            if (syncStatus.percentage_outputs_scanned == null ||
-                syncStatus.percentage_outputs_scanned!! >= 100) {
+            if (syncPoll.sync_complete.sync_end_height > 0) {
                 println("Sync completed!")
                 break
             }
@@ -360,13 +378,16 @@ class ExecuteSendFromOrchard {
         println(syncJson)
 
         while (true) {
-            val syncStatusJson: String = uniffi.zingo.executeCommand("sync", "status")
-            println("\nSync status:")
-            println(syncStatusJson)
-            syncStatus = mapper.readValue(syncStatusJson)
+            val syncPollJson: String = uniffi.zingo.pollSync()
+            println("\nSync poll:")
+            println(syncPollJson)
+            if (syncPollJson.lowercase().startsWith("error")) {
+                println("Sync Error!")
+                break
+            }
+            syncPoll = mapper.readValue(syncPollJson)
 
-            if (syncStatus.percentage_outputs_scanned == null ||
-                syncStatus.percentage_outputs_scanned!! >= 100) {
+            if (syncPoll.sync_complete.sync_end_height > 0) {
                 println("Sync completed!")
                 break
             }
@@ -411,15 +432,18 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         println("\nSync:")
         println(syncJson)
 
-        var syncStatus: SyncStatus
+        var syncPoll: SyncPoll
         while (true) {
-            val syncStatusJson: String = uniffi.zingo.executeCommand("sync", "status")
-            println("\nSync status:")
-            println(syncStatusJson)
-            syncStatus = mapper.readValue(syncStatusJson)
+            val syncPollJson: String = uniffi.zingo.pollSync()
+            println("\nSync poll:")
+            println(syncPollJson)
+            if (syncPollJson.lowercase().startsWith("error")) {
+                println("Sync Error!")
+                break
+            }
+            syncPoll = mapper.readValue(syncPollJson)
 
-            if (syncStatus.percentage_outputs_scanned == null ||
-                syncStatus.percentage_outputs_scanned!! >= 100) {
+            if (syncPoll.sync_complete.sync_end_height > 0) {
                 println("Sync completed!")
                 break
             }
@@ -482,15 +506,18 @@ class ExecuteSaplingBalanceFromSeed {
         println("\nSync:")
         println(syncJson)
 
-        var syncStatus: SyncStatus
+        var syncPoll: SyncPoll
         while (true) {
-            val syncStatusJson: String = uniffi.zingo.executeCommand("sync", "status")
-            println("\nSync status:")
-            println(syncStatusJson)
-            syncStatus = mapper.readValue(syncStatusJson)
+            val syncPollJson: String = uniffi.zingo.pollSync()
+            println("\nSync poll:")
+            println(syncPollJson)
+            if (syncPollJson.lowercase().startsWith("error")) {
+                println("Sync Error!")
+                break
+            }
+            syncPoll = mapper.readValue(syncPollJson)
 
-            if (syncStatus.percentage_outputs_scanned == null ||
-                syncStatus.percentage_outputs_scanned!! >= 100) {
+            if (syncPoll.sync_complete.sync_end_height > 0) {
                 println("Sync completed!")
                 break
             }
