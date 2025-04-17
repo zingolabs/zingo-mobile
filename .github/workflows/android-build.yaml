@@ -109,7 +109,9 @@ jobs:
         run: cargo install --force --locked bindgen-cli
 
       - name: Run dummy Gradle task to install NDK
-        run: ./gradlew tasks
+        run: |
+          cd android
+          ./gradlew tasks
 
       - name: Locate Android NDK path
         id: locate-ndk
