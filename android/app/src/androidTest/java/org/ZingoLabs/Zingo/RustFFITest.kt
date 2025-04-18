@@ -289,11 +289,13 @@ class ExecuteSyncFromSeed {
                 println("Sync Error!")
                 break
             }
-            syncPoll = mapper.readValue(syncPollJson)
+            if (!syncPollJson.lowercase().startsWith("sync task")) {
+                syncPoll = mapper.readValue(syncPollJson)
 
-            if (syncPoll.sync_complete.sync_end_height > 0) {
-                println("Sync completed!")
-                break
+                if (syncPoll.sync_complete.sync_end_height > 0) {
+                    println("Sync completed!")
+                    break
+                }
             }
 
             Thread.sleep(1000)
@@ -341,11 +343,13 @@ class ExecuteSendFromOrchard {
                 println("Sync Error!")
                 break
             }
-            syncPoll = mapper.readValue(syncPollJson)
+            if (!syncPollJson.lowercase().startsWith("sync task")) {
+                syncPoll = mapper.readValue(syncPollJson)
 
-            if (syncPoll.sync_complete.sync_end_height > 0) {
-                println("Sync completed!")
-                break
+                if (syncPoll.sync_complete.sync_end_height > 0) {
+                    println("Sync completed!")
+                    break
+                }
             }
 
             Thread.sleep(1000)
@@ -385,11 +389,13 @@ class ExecuteSendFromOrchard {
                 println("Sync Error!")
                 break
             }
-            syncPoll = mapper.readValue(syncPollJson)
+            if (!syncPollJson.lowercase().startsWith("sync task")) {
+                syncPoll = mapper.readValue(syncPollJson)
 
-            if (syncPoll.sync_complete.sync_end_height > 0) {
-                println("Sync completed!")
-                break
+                if (syncPoll.sync_complete.sync_end_height > 0) {
+                    println("Sync completed!")
+                    break
+                }
             }
 
             Thread.sleep(1000)
@@ -441,11 +447,13 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
                 println("Sync Error!")
                 break
             }
-            syncPoll = mapper.readValue(syncPollJson)
+            if (!syncPollJson.lowercase().startsWith("sync task")) {
+                syncPoll = mapper.readValue(syncPollJson)
 
-            if (syncPoll.sync_complete.sync_end_height > 0) {
-                println("Sync completed!")
-                break
+                if (syncPoll.sync_complete.sync_end_height > 0) {
+                    println("Sync completed!")
+                    break
+                }
             }
 
             Thread.sleep(1000)
@@ -515,11 +523,13 @@ class ExecuteSaplingBalanceFromSeed {
                 println("Sync Error!")
                 break
             }
-            syncPoll = mapper.readValue(syncPollJson)
+            if (!syncPollJson.lowercase().startsWith("sync task")) {
+                syncPoll = mapper.readValue(syncPollJson)
 
-            if (syncPoll.sync_complete.sync_end_height > 0) {
-                println("Sync completed!")
-                break
+                if (syncPoll.sync_complete.sync_end_height > 0) {
+                    println("Sync completed!")
+                    break
+                }
             }
 
             Thread.sleep(1000)
