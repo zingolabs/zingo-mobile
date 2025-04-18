@@ -85,7 +85,7 @@ jobs:
 
       - name: Set envs for NDK
         run: |
-          echo $ANDROID_HOME >> $GITHUB_ENV
+          echo $ANDROID_HOME
 
       - name: Checkout repository
         uses: actions/checkout@v4
