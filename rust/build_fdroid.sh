@@ -138,7 +138,7 @@ cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
     generate ./src/zingo.udl --language kotlin \
     --out-dir ./src
 
-cargo install --version ^3 cargo-ndk
+cargo install --version 3.5.4 cargo-ndk
 
 export LIBCLANG_PATH=/usr/lib/llvm-16/lib
 
