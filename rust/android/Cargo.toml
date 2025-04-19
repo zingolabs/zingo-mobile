@@ -17,4 +17,3 @@ json = "0.12.4"
 env_logger = "0.10.0"
 tokio = { workspace = true }
 rustls = { workspace = true }
-zcash_primitives = { workspace = true }
