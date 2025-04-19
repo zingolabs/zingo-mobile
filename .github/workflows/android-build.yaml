@@ -83,10 +83,6 @@ jobs:
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
 
-      - name: Set envs for NDK
-        run: |
-          echo $ANDROID_HOME
-
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
