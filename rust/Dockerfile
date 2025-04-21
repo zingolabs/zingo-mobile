@@ -28,7 +28,7 @@ RUN cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
     generate ./src/zingo.udl --language kotlin \ 
     --out-dir ./src
 
-RUN cargo install --version ^3 cargo-ndk
+RUN cargo install --version 3.5.4 cargo-ndk
 
 ENV SOURCE_DATE_EPOCH=1710000000
 ENV ZERO_AR_DATE=1
