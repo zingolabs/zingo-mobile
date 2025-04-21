@@ -543,27 +543,27 @@ class ExecuteSaplingBalanceFromSeed {
         // 1. Received in orchard pool =     +500_000
         // 2. Received in sapling pool =     +250_000
         // 3. Received in transparent pool = +250_000
-        // 4. Send - 100_000 + 20_000fee =   -120_000
+        // 4. Send - 100_000 + 20_000fee =   -110_000
         // 5. MemoToSelf orchard pool =       -10_000 (send-to-self)
-        // 6. MemoToSelf sapling pool =       -20_000 (send-to-self)
+        // 6. MemoToSelf sapling pool =       -10_000 (send-to-self)
         // 7. MemoToSelf transparent pool =   -15_000 (send-to-self)
-        // 9. Upgrading sapling pool =        -20_000 (shield)
+        // 8. Upgrading sapling pool =        -20_000 (shield)
         //
-        // orchard pool = 840_000
-        // sapling pool = 0
-        // transparent =  0
+        // orchard pool     = 710_000
+        // sapling pool     = 125_000
+        // transparent pool = 0
 
         val balanceJson:String = uniffi.zingo.executeCommand("balance", "")
         println("\nBalance:")
         println(balanceJson)
         val balance: Balance = mapper.readValue(balanceJson)
 
-        assertThat(balance.orchard_balance).isEqualTo(715000)
-        assertThat(balance.verified_orchard_balance).isEqualTo(715000)
-        assertThat(balance.spendable_orchard_balance).isEqualTo(715000)
-        assertThat(balance.sapling_balance).isEqualTo(100000)
-        assertThat(balance.verified_sapling_balance).isEqualTo(100000)
-        assertThat(balance.spendable_sapling_balance).isEqualTo(100000)
+        assertThat(balance.orchard_balance).isEqualTo(710000)
+        assertThat(balance.verified_orchard_balance).isEqualTo(710000)
+        assertThat(balance.spendable_orchard_balance).isEqualTo(710000)
+        assertThat(balance.sapling_balance).isEqualTo(125000)
+        assertThat(balance.verified_sapling_balance).isEqualTo(125000)
+        assertThat(balance.spendable_sapling_balance).isEqualTo(125000)
         assertThat(balance.transparent_balance).isEqualTo(0)
 
         // save the wallet file
