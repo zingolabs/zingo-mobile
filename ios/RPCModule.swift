@@ -394,19 +394,6 @@ class RPCModule: NSObject {
        let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       let resp = executeCommand(cmd: method, args: args)
       let respStr = String(resp)
-      if method == "sync" && !respStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-        // Also save the wallet after sync
-        do {
-          try self.saveWalletInternal()
-        } catch {
-          let err = "Error: [Native] Executing command. Saving wallet. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-          return
-        }
-      }
       DispatchQueue.main.async {
         resolve(respStr)
       }
@@ -632,6 +619,15 @@ class RPCModule: NSObject {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           let resp = runSync()
           let respStr = String(resp)
+          if !respStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
+            // Also save the wallet after sync
+            do {
+              try self.saveWalletInternal()
+            } catch {
+              let err = "Error: [Native] Executing command. Saving wallet. \(error.localizedDescription)"
+              NSLog(err)
+            }
+          }
           DispatchQueue.main.async {
             resolve(respStr)
           }

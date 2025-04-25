@@ -160,7 +160,7 @@ extension AppDelegate {
             NSLog("BGTask startBackgroundTask - expirationHandler called")
             // stop the sync process, can't wait to check if the process is over.
             // have no time here
-            let pauseStr = executeCommand(cmd: "sync", args: "pause")
+            let pauseStr = pauseSync()
             NSLog("BGTask startBackgroundTask - expirationHandler pause syncing \(pauseStr)")
             
             let rpcmodule = RPCModule()
@@ -253,7 +253,7 @@ extension AppDelegate {
 
     func stopSyncingProcess() {
         NSLog("BGTask stopSyncingProcess")
-        let statusStr = executeCommand(cmd: "sync", args: "pause")
+        let statusStr = pauseSync()
         if statusStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
             NSLog("BGTask stopSyncingProcess - no lightwalled likely")
             return
@@ -298,7 +298,7 @@ extension AppDelegate {
 
             // run the sync process.
             NSLog("BGTask syncingProcessBackgroundTask - sync BEGIN")
-            let syncing = runSyncProcess()
+            let syncing = runSync()
             let syncingStr = String(syncing)
             NSLog("BGTask syncingProcessBackgroundTask - sync END \(syncingStr)")
 

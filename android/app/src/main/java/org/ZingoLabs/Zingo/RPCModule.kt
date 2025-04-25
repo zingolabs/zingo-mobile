@@ -430,10 +430,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
                 val resp = uniffi.zingo.executeCommand(cmd, args)
 
-                if (cmd == "sync" && !resp.lowercase().startsWith(ErrorPrefix.value)) {
-                    saveWalletFile()
-                }
-
                 promise.resolve(resp)
             } catch (e: Exception) {
                 val errorMessage = "Error: executing command '$cmd': ${e.localizedMessage}"
@@ -599,6 +595,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             try {
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.runSync()
+
+                if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
+                    saveWalletFile()
+                }
 
                 promise.resolve(resp)
             } catch (e: Exception) {
