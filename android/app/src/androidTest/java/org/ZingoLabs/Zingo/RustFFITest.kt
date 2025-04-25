@@ -59,7 +59,7 @@ data class Height (
 )
 
 data class ScanRange (
-    val priority : Long,
+    val priority : String,
     val start_block : Long,
     val end_block : Long
 )

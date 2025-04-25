@@ -1,6 +1,6 @@
-import { SyncingStatusClass } from '../../app/AppState';
+import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 
-export const mockSyncingStatus: SyncingStatusClass = new SyncingStatusClass();
+export const mockSyncingStatus: RPCSyncStatusType = {} as RPCSyncStatusType;
 
 mockSyncingStatus.syncID = 1;
 mockSyncingStatus.inProgress = true;

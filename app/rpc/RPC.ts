@@ -6,7 +6,6 @@ import {
   WalletType,
   WalletSettingsClass,
   TranslateType,
-  SyncingStatusClass,
   CommandEnum,
   ChainNameEnum,
   WalletOptionEnum,
@@ -24,7 +23,6 @@ import { RPCWalletHeight } from './types/RPCWalletHeightType';
 import { RPCSeedType } from './types/RPCSeedType';
 import { RPCSyncStatusType } from './types/RPCSyncStatusType';
 import { RPCGetOptionType } from './types/RPCGetOptionType';
-import { RPCSyncRescan } from './types/RPCSyncRescanType';
 import { RPCUfvkType } from './types/RPCUfvkType';
 import { RPCSendType } from './types/RPCSendType';
 import { RPCValueTransfersType } from './types/RPCValueTransfersType';
@@ -34,6 +32,7 @@ import { ValueTransferKindEnum } from '../AppState/enums/ValueTransferKindEnum';
 import { RPCValueTransfersStatusEnum } from './enums/RPCValueTransfersStatusEnum';
 import { CommandAddressesEnum, CommandSyncEnum } from '../AppState';
 import { RPCSendProposeType } from './types/RPCSendProposeType';
+import { RPCSyncPollType } from './types/RPCSyncPollType';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -41,7 +40,7 @@ export default class RPC {
   fnSetValueTransfersList: (vtList: ValueTransferType[], total: number) => void;
   fnSetMessagesList: (mList: ValueTransferType[], total: number) => void;
   fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
-  fnSetSyncingStatus: (syncingStatus: SyncingStatusClass) => void;
+  fnSetSyncingStatus: (syncingStatus: RPCSyncStatusType) => void;
   fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string) => TranslateType;
   keepAwake: (keep: boolean) => void;
@@ -64,20 +63,11 @@ export default class RPC {
   fetchAddressesLock: boolean;
   refreshSyncLock: boolean;
   fetchSyncStatusLock: boolean;
+  fetchSyncPollLock: boolean;
   fetchZingolibVersionLock: boolean;
 
   inRefresh: boolean;
   inSend: boolean;
-  blocksPerBatch: number;
-
-  prevBatchNum: number;
-  prevSyncId: number;
-  prevCurrentBlock: number;
-  secondsBatch: number;
-  secondsBlock: number;
-  batches: number;
-  latestBlock: number;
-  syncId: number;
 
   timers: NodeJS.Timeout[];
 
@@ -90,7 +80,7 @@ export default class RPC {
     fnSetAllAddresses: (addresses: AddressClass[]) => void,
     fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
-    fnSetSyncingStatus: (syncingStatus: SyncingStatusClass) => void,
+    fnSetSyncingStatus: (syncingStatus: RPCSyncStatusType) => void,
     translate: (key: string) => TranslateType,
     keepAwake: (keep: boolean) => void,
     fnSetZingolib: (zingolib: string) => void,
@@ -123,20 +113,11 @@ export default class RPC {
     this.fetchAddressesLock = false;
     this.refreshSyncLock = false;
     this.fetchSyncStatusLock = false;
+    this.fetchSyncPollLock = false;
     this.fetchZingolibVersionLock = false;
 
     this.inRefresh = false;
     this.inSend = false;
-    this.blocksPerBatch = GlobalConst.blocksPerBatch;
-
-    this.prevBatchNum = -1;
-    this.prevSyncId = -1;
-    this.prevCurrentBlock = -1;
-    this.secondsBatch = -1;
-    this.secondsBlock = 0;
-    this.batches = 0;
-    this.latestBlock = -1;
-    this.syncId = -1;
 
     this.timers = [];
 
@@ -150,9 +131,9 @@ export default class RPC {
       // -1  - error in Gemini/zingolib.
       // -2  - error in RPCModule, likely.
       // > 0 - real value
-      //const start = Date.now();
+      const start = Date.now();
       const resultStr: string = await RPCModule.execute(CommandEnum.updatecurrentprice, '');
-      //console.log('=========================================== > get ZEC price - ', Date.now() - start);
+      console.log('=========================================== > get ZEC price - ', Date.now() - start);
       //console.log(resultStr);
 
       if (resultStr) {
@@ -222,9 +203,9 @@ export default class RPC {
     if (readOnly) {
       // only viewing key & birthday
       try {
-        //const start = Date.now();
+        const start = Date.now();
         const ufvkStr: string = await RPCModule.execute(CommandEnum.exportufvk, '');
-        //console.log('=========================================== > get ufvk - ', Date.now() - start);
+        console.log('=========================================== > get ufvk - ', Date.now() - start);
         if (ufvkStr) {
           if (ufvkStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error ufvk ${ufvkStr}`);
@@ -252,9 +233,9 @@ export default class RPC {
     } else {
       // only seed & birthday
       try {
-        //const start2 = Date.now();
+        const start2 = Date.now();
         const seedStr: string = await RPCModule.execute(CommandEnum.seed, '');
-        //console.log('=========================================== > get seed - ', Date.now() - start2);
+        console.log('=========================================== > get seed - ', Date.now() - start2);
         if (seedStr) {
           if (seedStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error seed ${seedStr}`);
@@ -288,76 +269,78 @@ export default class RPC {
 
     const taskPromises: Promise<void>[] = [];
 
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        //const s = Date.now();
-        await this.fetchWalletHeight();
-        //console.log('wallet height - ', Date.now() - s);
-        resolve();
-      }),
-    );
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        //const s = Date.now();
-        await this.fetchWalletBirthdaySeedUfvk();
-        //console.log('wallet birthday - ', Date.now() - s);
-        resolve();
-      }),
-    );
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        //const s = Date.now();
-        await this.fetchInfoAndServerHeight();
-        //console.log('info & server height - ', Date.now() - s);
-        resolve();
-      }),
-    );
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        //const s = Date.now();
-        await this.fetchTandZandOValueTransfers();
-        //console.log('value transfers - ', Date.now() - s);
-        resolve();
-      }),
-    );
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        //const s = Date.now();
-        await this.fetchTandZandOMessages();
-        //console.log('messages - ', Date.now() - s);
-        resolve();
-      }),
-    );
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        //const s = Date.now();
-        await this.fetchTotalBalance();
-        //console.log('balance - ', Date.now() - s);
-        resolve();
-      }),
-    );
+    //taskPromises.push(
+    //  new Promise<void>(async resolve => {
+    //    //const s = Date.now();
+    //    await this.fetchWalletHeight();
+    //    //console.log('wallet height - ', Date.now() - s);
+    //    resolve();
+    //  }),
+    //);
+    //taskPromises.push(
+    //  new Promise<void>(async resolve => {
+    //    //const s = Date.now();
+    //    await this.fetchWalletBirthdaySeedUfvk();
+    //    //console.log('wallet birthday - ', Date.now() - s);
+    //    resolve();
+    //  }),
+    //);
+    //taskPromises.push(
+    //  new Promise<void>(async resolve => {
+    //    //const s = Date.now();
+    //    await this.fetchInfoAndServerHeight();
+    //    //console.log('info & server height - ', Date.now() - s);
+    //    resolve();
+    //  }),
+    //);
+    //taskPromises.push(
+    //  new Promise<void>(async resolve => {
+    //    //const s = Date.now();
+    //    await this.fetchTandZandOValueTransfers();
+    //    //console.log('value transfers - ', Date.now() - s);
+    //    resolve();
+    //  }),
+    //);
+    //taskPromises.push(
+    //  new Promise<void>(async resolve => {
+    //    //const s = Date.now();
+    //    await this.fetchTandZandOMessages();
+    //    //console.log('messages - ', Date.now() - s);
+    //    resolve();
+    //  }),
+    //);
+    //taskPromises.push(
+    //  new Promise<void>(async resolve => {
+    //    //const s = Date.now();
+    //    await this.fetchTotalBalance();
+    //    //console.log('balance - ', Date.now() - s);
+    //    resolve();
+    //  }),
+    //);
     if (!this.inRefresh) {
       // try to sync.
       taskPromises.push(
         new Promise<void>(async resolve => {
-          //const s = Date.now();
           this.refreshSync(false);
-          //console.log('sync - ', Date.now() - s);
+          console.log('INTERVAL refresh sync');
           resolve();
         }),
       );
     }
-    // only if the wallet is syncing...
-    if (this.inRefresh) {
-      taskPromises.push(
-        new Promise<void>(async resolve => {
-          //const s = Date.now();
-          await this.fetchSyncStatus();
-          //console.log('sync status - ', Date.now() - s);
-          resolve();
-        }),
-      );
-    }
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        await this.fetchSyncStatus();
+        console.log('INTERVAL status sync');
+        resolve();
+      }),
+    );
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        await this.fetchSyncPoll();
+        console.log('INTERVAL poll sync');
+        resolve();
+      }),
+    );
 
     Promise.allSettled(taskPromises);
   }
@@ -374,9 +357,7 @@ export default class RPC {
 
     // First things first, I need to stop an existing sync process (if any)
     // clean start.
-    const start = Date.now();
     await this.stopSyncProcess();
-    console.log('STOPPED syncing - ', Date.now() - start);
 
     await this.fetchAddresses();
     await this.fetchWalletSettings();
@@ -447,7 +428,9 @@ export default class RPC {
     }
   }
 
-  refreshSync(fullRefresh: boolean, fullRescan?: boolean) {
+  async refreshSync(fullRefresh: boolean, fullRescan?: boolean) {
+    console.log(fullRefresh, fullRescan, 'WALLET', this.lastWalletBlockHeight, 'SERVER', this.lastServerBlockHeight, this.inRefresh);
+
     if (this.refreshSyncLock) {
       console.log('REFRESH ----> in execution already');
       return;
@@ -460,11 +443,11 @@ export default class RPC {
       return;
     }
 
-    if (!this.lastServerBlockHeight) {
-      console.log('REFRESH ----> the last server block is zero');
-      this.refreshSyncLock = false;
-      return;
-    }
+    //if (!this.lastServerBlockHeight) {
+    //  console.log('REFRESH ----> the last server block is zero');
+    //  this.refreshSyncLock = false;
+    //  return;
+    //}
 
     // if it's sending now, don't fire the sync process.
     if (
@@ -477,16 +460,7 @@ export default class RPC {
       this.setInRefresh(true);
       this.keepAwake(true);
 
-      this.prevBatchNum = -1;
-      this.prevSyncId = -1;
-      this.secondsBatch = -1;
-      this.secondsBlock = 0;
-      this.batches = 0;
-      this.latestBlock = -1;
-      this.prevCurrentBlock = -1;
-
       // This is async, so when it is done, we finish the refresh.
-      let promise: Promise<void>;
       if (fullRescan) {
         // clean the ValueTransfer list before.
         this.fnSetValueTransfersList([], 0);
@@ -499,97 +473,28 @@ export default class RPC {
           spendablePrivate: 0,
           total: 0,
         } as TotalBalanceClass);
-        promise = new Promise<void>(async resolve => {
-          const rescanStr: string = await RPCModule.execute(CommandEnum.rescan, '');
-          console.log('rescan finished', rescanStr);
-          if (rescanStr && !rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
-            try {
-              const resultJSON: RPCSyncRescan = await JSON.parse(rescanStr);
-              if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
-                this.latestBlock = resultJSON.latest_block;
-                // Already finished
-                console.log('REFRESH ----> Already Rescan Finished');
-                // Here I know the sync process is over, I need to inform to the UI.
-                this.fnSetSyncingStatus({
-                  syncID: this.syncId < 0 ? 0 : this.syncId,
-                  totalBatches: 0,
-                  currentBatch: 0,
-                  lastBlockWallet: this.lastWalletBlockHeight,
-                  currentBlock: this.lastWalletBlockHeight,
-                  inProgress: false,
-                  lastError: '',
-                  blocksPerBatch: this.blocksPerBatch,
-                  secondsPerBatch: 0,
-                  processEndBlock: this.lastServerBlockHeight,
-                  lastBlockServer: this.lastServerBlockHeight,
-                  syncProcessStalled: false,
-                } as SyncingStatusClass);
-              }
-            } catch (error) {
-              console.log(`Critical Error rescan ${error}`);
-            }
-          }
-          this.setInRefresh(false);
-          this.keepAwake(false);
-          resolve();
-        });
+        const s = Date.now();
+        const rescanStr: string = await RPCModule.execute(CommandEnum.rescan, '');
+        console.log('rescan run command - ', Date.now() - s);
+        console.log('rescan', rescanStr);
+        if (!rescanStr || rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error rescan ${rescanStr}`);
+        }
       } else {
-        promise = new Promise<void>(async resolve => {
-          const syncStr: string = await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
-          console.log('sync finished', syncStr);
-          if (syncStr && !syncStr.toLowerCase().startsWith(GlobalConst.error)) {
-            try {
-              const resultJSON: RPCSyncRescan = await JSON.parse(syncStr);
-              if (resultJSON.result === GlobalConst.success && resultJSON.latest_block) {
-                this.latestBlock = resultJSON.latest_block;
-                // Already finished
-                console.log('REFRESH ----> Already Sync Finished');
-                // Here I know the sync process is over, I need to inform to the UI.
-                this.fnSetSyncingStatus({
-                  syncID: this.syncId < 0 ? 0 : this.syncId,
-                  totalBatches: 0,
-                  currentBatch: 0,
-                  lastBlockWallet: this.lastWalletBlockHeight,
-                  currentBlock: this.lastWalletBlockHeight,
-                  inProgress: false,
-                  lastError: '',
-                  blocksPerBatch: this.blocksPerBatch,
-                  secondsPerBatch: 0,
-                  processEndBlock: this.lastServerBlockHeight,
-                  lastBlockServer: this.lastServerBlockHeight,
-                  syncProcessStalled: false,
-                } as SyncingStatusClass);
-              }
-            } catch (error) {
-              console.log(`Critical Error sync ${error}`);
-            }
-          }
-          this.setInRefresh(false);
-          this.keepAwake(false);
-          resolve();
-        });
+        const s = Date.now();
+        const syncStr: string = await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
+        console.log('sync run command - ', Date.now() - s);
+        console.log('sync', syncStr);
+        if (!syncStr || syncStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error sync ${syncStr}`);
+        }
       }
-      // run the Promise directly
-      promise;
     } else {
       // Already at the latest block
       console.log('REFRESH ----> Already have latest block, waiting for next refresh');
       // Here I know the sync process is over, I need to inform to the UI.
       //const start = Date.now();
-      this.fnSetSyncingStatus({
-        syncID: this.syncId < 0 ? 0 : this.syncId,
-        totalBatches: 0,
-        currentBatch: 0,
-        lastBlockWallet: this.lastWalletBlockHeight,
-        currentBlock: this.lastWalletBlockHeight,
-        inProgress: false,
-        lastError: '',
-        blocksPerBatch: this.blocksPerBatch,
-        secondsPerBatch: 0,
-        processEndBlock: this.lastServerBlockHeight,
-        lastBlockServer: this.lastServerBlockHeight,
-        syncProcessStalled: false,
-      } as SyncingStatusClass);
+      //this.fnSetSyncingStatus(ss as RPCSyncStatusType);
       //console.log('=========================================== > set sync status - ', Date.now() - start);
     }
     this.refreshSyncLock = false;
@@ -597,10 +502,13 @@ export default class RPC {
 
   async fetchSyncStatus(): Promise<void> {
     if (this.fetchSyncStatusLock) {
+      console.log('sync status locked');
       return;
     }
     this.fetchSyncStatusLock = true;
+    const s = Date.now();
     const returnStatus: string = await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.status);
+    console.log('sync status run command - ', Date.now() - s);
     if (!returnStatus || returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC STATUS ERROR', returnStatus);
       this.fetchSyncStatusLock = false;
@@ -615,161 +523,16 @@ export default class RPC {
       return;
     }
 
-    //console.log('sync wallet birthday', this.walletBirthday);
-    //console.log('sync', this.syncStatusTimerID);
-    console.log(
-      'in progress',
-      ss.in_progress,
-      'synced',
-      ss.synced_blocks,
-      'trialDecryptions',
-      ss.trial_decryptions_blocks,
-      'txnScan',
-      ss.txn_scan_blocks,
-      'witnesses',
-      ss.witnesses_updated,
-      'TOTAL',
-      ss.total_blocks,
-      'batchNum',
-      ss.batch_num,
-      'batchTotal',
-      ss.batch_total,
-      'endBlock',
-      ss.end_block,
-      'startBlock',
-      ss.start_block,
-    );
-    //console.log('--------------------------------------');
+    console.log('SYNC STATUS', ss);
 
     // synchronize status
-    this.setInRefresh(ss.in_progress);
-
-    this.syncId = ss.sync_id;
-
-    // if the syncId change then reset the %
-    if (this.prevSyncId !== this.syncId) {
-      if (this.prevSyncId !== -1) {
-        //const start = Date.now();
-        await RPCModule.doSave();
-        //console.log('=========================================== > save wallet - ', Date.now() - start);
-
-        //console.log('sync status', ss);
-        //console.log(`new sync process id: ${this.syncId}. Save the wallet.`);
-        this.prevBatchNum = -1;
-        this.secondsBatch = -1;
-        this.secondsBlock = 0;
-        this.batches = 0;
-      }
-      this.prevSyncId = this.syncId;
-    }
-
-    // Post sync updates
-    let syncedBlocks: number = ss.synced_blocks || 0;
-    let trialDecryptionsBlocks: number = ss.trial_decryptions_blocks || 0;
-    let txnScanBlocks: number = ss.txn_scan_blocks || 0;
-    let witnessesUpdated: number = ss.witnesses_updated || 0;
-
-    // just in case
-    if (syncedBlocks < 0) {
-      syncedBlocks = 0;
-    }
-    if (syncedBlocks > this.blocksPerBatch) {
-      syncedBlocks = this.blocksPerBatch;
-    }
-    if (trialDecryptionsBlocks < 0) {
-      trialDecryptionsBlocks = 0;
-    }
-    if (trialDecryptionsBlocks > this.blocksPerBatch) {
-      trialDecryptionsBlocks = this.blocksPerBatch;
-    }
-    if (txnScanBlocks < 0) {
-      txnScanBlocks = 0;
-    }
-    if (txnScanBlocks > this.blocksPerBatch) {
-      txnScanBlocks = this.blocksPerBatch;
-    }
-    if (witnessesUpdated < 0) {
-      witnessesUpdated = 0;
-    }
-    if (witnessesUpdated > this.blocksPerBatch) {
-      witnessesUpdated = this.blocksPerBatch;
-    }
-
-    const batchTotal: number = ss.batch_total || 0;
-    const batchNum: number = ss.batch_num || 0;
-
-    const endBlock: number = ss.end_block || 0; // lower
-
-    // I want to know what was the first block of the current sync process
-    let processEndBlock: number = 0;
-    // when the App is syncing the new blocks and sync finished really fast
-    // the synstatus have almost all of the fields undefined.
-    // if we have latestBlock means that the sync process finished in that block
-    if (endBlock === 0 && batchNum === 0) {
-      processEndBlock = this.latestBlock !== -1 ? this.latestBlock : this.lastServerBlockHeight;
-    } else {
-      processEndBlock = endBlock - batchNum * this.blocksPerBatch;
-    }
-
-    const progressBlocks: number = (syncedBlocks + trialDecryptionsBlocks + witnessesUpdated) / 3;
-
-    let currentBlock = endBlock + progressBlocks;
-    if (currentBlock > this.lastServerBlockHeight) {
-      currentBlock = this.lastServerBlockHeight;
-    }
-    currentBlock = Number(currentBlock.toFixed(0));
-
-    // if the current block is stalled I need to restart the App
-    let syncProcessStalled = false;
-    if (this.prevCurrentBlock !== -1) {
-      if (currentBlock > 0 && this.prevCurrentBlock === currentBlock) {
-        this.secondsBlock += 5;
-        // 5 minutes
-        if (this.secondsBlock >= 300) {
-          this.secondsBlock = 0;
-          syncProcessStalled = true;
-        }
-      }
-      if (currentBlock > 0 && this.prevCurrentBlock !== currentBlock) {
-        this.secondsBlock = 0;
-        syncProcessStalled = false;
-      }
-    }
-
-    // if current block is lower than the previous current block
-    // The user need to see something not confusing.
-    if (currentBlock > 0 && this.prevCurrentBlock !== -1 && currentBlock < this.prevCurrentBlock) {
-      // I decided to add only one fake block because otherwise could seems stalled
-      // the user expect every 5 seconds the blocks change...
-      currentBlock = this.prevCurrentBlock + 1;
-    }
-
-    this.prevCurrentBlock = currentBlock;
-
-    if (this.secondsBatch === -1) {
-      this.secondsBatch = 0;
-    } else {
-      this.secondsBatch += 5;
-    }
+    this.setInRefresh(ss.scan_ranges.length > 0 && ss.percentage_outputs_scanned !== null && ss.percentage_outputs_scanned < 100);
 
     //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
 
     // store SyncStatus object for a new screen
     //const start = Date.now();
-    this.fnSetSyncingStatus({
-      syncID: this.syncId,
-      totalBatches: batchTotal,
-      currentBatch: ss.in_progress ? batchNum + 1 : 0,
-      lastBlockWallet: this.lastWalletBlockHeight,
-      currentBlock: currentBlock,
-      inProgress: ss.in_progress,
-      lastError: ss.last_error,
-      blocksPerBatch: this.blocksPerBatch,
-      secondsPerBatch: this.secondsBatch,
-      processEndBlock: processEndBlock,
-      lastBlockServer: this.lastServerBlockHeight,
-      syncProcessStalled: syncProcessStalled,
-    } as SyncingStatusClass);
+    this.fnSetSyncingStatus(ss as RPCSyncStatusType);
     //console.log('=========================================== > set sync status - ', Date.now() - start);
 
     // Close the poll timer if the sync finished(checked via promise above)
@@ -783,46 +546,44 @@ export default class RPC {
 
       // store SyncStatus object for a new screen
       //const start3 = Date.now();
-      this.fnSetSyncingStatus({
-        syncID: this.syncId,
-        totalBatches: 0,
-        currentBatch: 0,
-        lastBlockWallet: this.lastWalletBlockHeight,
-        currentBlock: currentBlock,
-        inProgress: false,
-        lastError: ss.last_error,
-        blocksPerBatch: this.blocksPerBatch,
-        secondsPerBatch: 0,
-        processEndBlock: processEndBlock,
-        lastBlockServer: this.lastServerBlockHeight,
-        syncProcessStalled: false,
-      } as SyncingStatusClass);
+      this.fnSetSyncingStatus(ss as RPCSyncStatusType);
       //console.log('=========================================== > set sync status - ', Date.now() - start3);
 
       //console.log('sync status', ss);
       //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${this.syncId}`);
     } else {
-      // If we're doing a long sync, every time the batchNum changes, save the wallet
-      if (this.prevBatchNum !== batchNum) {
-        // if finished batches really fast, the App have to save the wallet delayed.
-        if (this.prevBatchNum !== -1 && this.batches >= 1) {
-          //const start4 = Date.now();
-          await RPCModule.doSave();
-          //console.log('=========================================== > save wallet - ', Date.now() - start4);
-
-          this.batches = 0;
-
-          //console.log('sync status', ss);
-          //console.log(
-          //  `@@@@@@@@@@@ Saving because batch num changed ${this.prevBatchNum} - ${batchNum}. seconds: ${this.secondsBatch}`,
-          //);
-        }
-        this.batches += batchNum - this.prevBatchNum;
-        this.prevBatchNum = batchNum;
-        this.secondsBatch = -1;
-      }
+      // maybe is too many saving process... let's see.
+      await RPCModule.doSave();
     }
     this.fetchSyncStatusLock = false;
+  }
+
+  async fetchSyncPoll(): Promise<void> {
+    if (this.fetchSyncPollLock) {
+      console.log('sync poll locked');
+      return;
+    }
+    this.fetchSyncPollLock = true;
+    const s = Date.now();
+    const returnPoll: string = await RPCModule.pollSyncInfo();
+    console.log('sync poll run command - ', Date.now() - s);
+    if (!returnPoll || returnPoll.toLowerCase().startsWith(GlobalConst.error) || returnPoll.toLowerCase().startsWith('sync task')) {
+      console.log('SYNC POLL ERROR', returnPoll);
+      this.fetchSyncPollLock = false;
+      return;
+    }
+    let sp = {} as RPCSyncPollType;
+    try {
+      sp = await JSON.parse(returnPoll);
+    } catch (e) {
+      console.log('SYNC POLL ERROR - PARSE JSON', returnPoll);
+      this.fetchSyncPollLock = false;
+      return;
+    }
+
+    console.log('SYNC POLL', sp);
+
+    this.fetchSyncPollLock = false;
   }
 
   async fetchWalletSettings(): Promise<void> {

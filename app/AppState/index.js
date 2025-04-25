@@ -2,7 +2,6 @@ import AddressClass from './classes/AddressClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import SettingsFileClass from './classes/SettingsFileClass';
-import SyncingStatusClass from './classes/SyncingStatusClass';
 import ToAddrClass from './classes/ToAddrClass';
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
@@ -71,7 +70,6 @@ export {
   AddressBookFileClass,
   SendPageStateClass,
   SettingsFileClass,
-  SyncingStatusClass,
   ToAddrClass,
   TotalBalanceClass,
   WalletSettingsClass,

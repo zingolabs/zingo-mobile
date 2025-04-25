@@ -31,7 +31,6 @@ import {
   SendPageStateClass,
   InfoType,
   ToAddrClass,
-  SyncingStatusClass,
   WalletSettingsClass,
   AddressClass,
   ZecPriceType,
@@ -92,6 +91,7 @@ import Drawer from '../../components/Drawer';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import MessageList from '../../components/Messages/components/MessageList';
 import { ToastProvider } from 'react-native-toastier';
+import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -456,7 +456,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       setSendPageState: this.setSendPageState,
       info: {} as InfoType,
       walletSettings: {} as WalletSettingsClass,
-      syncingStatus: {} as SyncingStatusClass,
+      syncingStatus: {} as RPCSyncStatusType,
       wallet: {} as WalletType,
       uOrchardAddress: '',
       zecPrice: {
@@ -570,7 +570,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           this.rpc.setInRefresh(false);
           await this.rpc.clearTimers();
           //console.log('clear timers IOS');
-          this.setSyncingStatus(new SyncingStatusClass());
+          this.setSyncingStatus({} as RPCSyncStatusType);
           //console.log('clear sync status state');
           //console.log('LOADED SAVED IOS background', nextAppState);
           // We need to save the wallet file here because
@@ -631,7 +631,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.rpc.setInRefresh(false);
         await this.rpc.clearTimers();
         //console.log('clear timers');
-        this.setSyncingStatus(new SyncingStatusClass());
+        this.setSyncingStatus({} as RPCSyncStatusType);
         //console.log('clear sync status state');
         // We need to save the wallet file here because
         // sometimes the App can lose the last synced chunk
@@ -832,7 +832,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setSyncingStatus = (syncingStatus: SyncingStatusClass) => {
+  setSyncingStatus = (syncingStatus: RPCSyncStatusType) => {
     if (!isEqual(this.state.syncingStatus, syncingStatus)) {
       //console.log('fetch syncing status report');
       //const start = Date.now();
@@ -1314,7 +1314,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     // here I know the server was changed, clean all the tasks before anything.
     this.rpc.setInRefresh(false);
     await this.rpc.clearTimers();
-    this.setSyncingStatus(new SyncingStatusClass());
+    this.setSyncingStatus({} as RPCSyncStatusType);
     this.rpc.setInRefresh(false);
     this.keepAwake(false);
     // First we need to check the `chainName` between servers, if this is different

@@ -1,15 +1,14 @@
+import { RPCSyncScanRangeStatusType } from './RPCSyncScanRangeStatusType';
+
 export type RPCSyncStatusType = {
-  sync_id: number;
-  in_progress: boolean;
-  last_error: string;
-  start_block?: number;
-  end_block?: number;
-  synced_blocks?: number;
-  trial_decryptions_blocks?: number;
-  txn_scan_blocks?: number;
-  witnesses_updated?: number;
-  total_blocks?: number;
-  batch_num?: number;
-  batch_total?: number;
-  sync_interrupt?: boolean;
+  scan_ranges: RPCSyncScanRangeStatusType[],
+  sync_start_height: number,
+  scanned_blocks: number,
+  unscanned_blocks: number,
+  percentage_blocks_scanned: number,
+  scanned_sapling_outputs: number,
+  unscanned_sapling_outputs: number,
+  scanned_orchard_outputs: number,
+  unscanned_orchard_outputs: number,
+  percentage_outputs_scanned: number,
 };
