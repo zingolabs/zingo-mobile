@@ -627,4 +627,88 @@ class RPCModule: NSObject {
         }
       }
   }
+
+  func fnRunSyncProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = runSync()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] Sync run process. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(runSyncProcess:reject:)
+  func runSyncProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnRunSyncProcess(dict)
+        }
+      }
+  }
+
+  func fnPauseSyncProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = pauseSync()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] Sync pause process. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(pauseSyncProcess:reject:)
+  func pauseSyncProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnPauseSyncProcess(dict)
+        }
+      }
+  }
+
+  func fnStatusSyncInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = statusSync()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] Sync poll info. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(statusSyncInfo:reject:)
+  func statusSyncInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnStatusSyncInfo(dict)
+        }
+      }
+  }
 }

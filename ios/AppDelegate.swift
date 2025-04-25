@@ -298,7 +298,7 @@ extension AppDelegate {
 
             // run the sync process.
             NSLog("BGTask syncingProcessBackgroundTask - sync BEGIN")
-            let syncing = executeCommand(cmd: "sync", args: "run")
+            let syncing = runSyncProcess()
             let syncingStr = String(syncing)
             NSLog("BGTask syncingProcessBackgroundTask - sync END \(syncingStr)")
 

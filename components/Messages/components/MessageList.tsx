@@ -33,8 +33,6 @@ import {
 import {
   AddressBookFileClass,
   ButtonTypeEnum,
-  CommandEnum,
-  CommandSyncEnum,
   GlobalConst,
   RefreshScreenEnum,
   SelectServerEnum,
@@ -368,7 +366,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     setDisableSend(true);
 
     // first pause syncing Just in case...
-    await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.pause);
+    await RPCModule.pauseSyncProcess();
 
     // call the sendTransaction method in a timeout, allowing the modals to show properly
     setTimeout(async () => {
@@ -387,7 +385,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         setDisableSend(false);
 
         // the sync process can continue
-        await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
+        await RPCModule.runSyncProcess();
         return;
       } catch (err1) {
         error = err1 as string;
@@ -416,7 +414,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           if (fasterServer.uri !== server.uri) {
             setServerOption(fasterServer, selectServer, false, true);
             // first pause syncing Just in case...
-            await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.pause);
+            await RPCModule.pauseSyncProcess();
           }
 
           try {
@@ -432,7 +430,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             setDisableSend(false);
 
             // the sync process can continue
-            await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
+            await RPCModule.runSyncProcess();
             return;
           } catch (err2) {
             error = err2 as string;
@@ -443,7 +441,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       }
 
       // the sync process can continue
-      await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
+      await RPCModule.runSyncProcess();
 
       //console.log('sendtx error', error);
       // if the App is in background I need to store the error

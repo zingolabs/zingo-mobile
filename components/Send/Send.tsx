@@ -37,7 +37,6 @@ import {
   SelectServerEnum,
   RouteEnums,
   SecurityType,
-  CommandSyncEnum,
 } from '../../app/AppState';
 import { parseZcashURI, serverUris, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
@@ -706,7 +705,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       return;
     }
     // first pause syncing Just in case...
-    await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.pause);
+    await RPCModule.pauseSyncProcess();
 
     // not use await here.
     setComputingModalShow();
@@ -742,7 +741,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         // the app send successfully on the first attemp.
 
         // the sync process can continue
-        await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
+        await RPCModule.runSyncProcess();
         return;
       } catch (err1) {
         error = err1 as string;
@@ -771,7 +770,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           if (fasterServer.uri !== server.uri) {
             setServerOption(fasterServer, selectServer, false, true);
             // first pause syncing Just in case...
-            await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.pause);
+            await RPCModule.pauseSyncProcess();
           }
 
           try {
@@ -801,7 +800,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             // the app send successfully on the second attemp.
 
             // the sync process can continue
-            await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
+            await RPCModule.runSyncProcess();
             return;
           } catch (err2) {
             error = err2 as string;
@@ -812,7 +811,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       }
 
       // the sync process can continue
-      await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
+      await RPCModule.runSyncProcess();
 
       setTimeout(() => {
         //console.log('sendtx error', error);

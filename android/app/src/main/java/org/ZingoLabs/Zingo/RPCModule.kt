@@ -592,4 +592,52 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             }
         }
     }
+
+    @ReactMethod
+    fun runSyncProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.runSync()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: sync run process: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun pauseSyncProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.pauseSync()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: sync pause process: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun statusSyncInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.statusSync()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: sync status info: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
 }

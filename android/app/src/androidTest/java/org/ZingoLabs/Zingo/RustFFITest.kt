@@ -276,7 +276,7 @@ class ExecuteSyncFromSeed {
         val heightPreSync: Height = mapper.readValue(heightJson)
         assertThat(heightPreSync.height).isEqualTo(0)
 
-        val syncJson: String = uniffi.zingo.executeCommand("sync", "run")
+        val syncJson: String = uniffi.zingo.runSyncProcess()
         println("\nSync:")
         println(syncJson)
 
@@ -330,7 +330,7 @@ class ExecuteSendFromOrchard {
         assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        var syncJson: String = uniffi.zingo.executeCommand("sync", "run")
+        var syncJson: String = uniffi.zingo.runSyncProcess()
         println("\nSync:")
         println(syncJson)
 
@@ -377,7 +377,7 @@ class ExecuteSendFromOrchard {
         println("\nConfirm Txid:")
         println(confirmJson)
 
-        syncJson = uniffi.zingo.executeCommand("sync", "run")
+        syncJson = uniffi.zingo.runSyncProcess()
         println("\nSync:")
         println(syncJson)
 
@@ -434,7 +434,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         println("\nPrice:")
         println(price)
 
-        val syncJson: String = uniffi.zingo.executeCommand("sync", "run")
+        val syncJson: String = uniffi.zingo.runSyncProcess()
         println("\nSync:")
         println(syncJson)
 
@@ -510,7 +510,7 @@ class ExecuteSaplingBalanceFromSeed {
         assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val syncJson:String = uniffi.zingo.executeCommand("sync", "run")
+        val syncJson:String = uniffi.zingo.runSyncProcess()
         println("\nSync:")
         println(syncJson)
 

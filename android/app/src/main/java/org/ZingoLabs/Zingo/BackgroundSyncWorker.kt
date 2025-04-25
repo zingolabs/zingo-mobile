@@ -71,7 +71,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             // 1. finished the syncing.
 
             Log.i("SCHEDULED_TASK_RUN", "sync BEGIN")
-            val syncing = uniffi.zingo.executeCommand("sync", "run")
+            val syncing = uniffi.zingo.runSyncProcess()
             Log.i("SCHEDULED_TASK_RUN", "sync END: $syncing")
 
         } else {

@@ -81,5 +81,14 @@ RCT_EXTERN_METHOD(setCryptoDefaultProvider:
 RCT_EXTERN_METHOD(pollSyncInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(runSyncProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(pauseSyncProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(statusSyncInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

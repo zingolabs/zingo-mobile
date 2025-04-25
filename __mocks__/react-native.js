@@ -10,6 +10,9 @@ jest.mock('react-native', () => {
     createNewWallet: jest.fn(() => '{ "seed": "seed phrase test", "birthday": 0 }'),
     doSave: jest.fn(),
     pollSyncInfo: jest.fn(() => '{}'),
+    runSyncProcess: jest.fn(() => '{}'),
+    pauseSyncProcess: jest.fn(() => '{}'),
+    statusSyncInfo: jest.fn(() => '{}'),
   };
   RN.View = jest.fn();
 

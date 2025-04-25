@@ -30,7 +30,7 @@ import { RPCValueTransfersKindEnum } from './enums/RPCValueTransfersKindEnum';
 import { RPCValueTransferType } from './types/RPCValueTransferType';
 import { ValueTransferKindEnum } from '../AppState/enums/ValueTransferKindEnum';
 import { RPCValueTransfersStatusEnum } from './enums/RPCValueTransfersStatusEnum';
-import { CommandAddressesEnum, CommandSyncEnum } from '../AppState';
+import { CommandAddressesEnum } from '../AppState';
 import { RPCSendProposeType } from './types/RPCSendProposeType';
 import { RPCSyncPollType } from './types/RPCSyncPollType';
 
@@ -384,7 +384,7 @@ export default class RPC {
   sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
   async stopSyncProcess(): Promise<void> {
-    let returnPause: string = await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.pause);
+    let returnPause: string = await RPCModule.pauseSyncProcess();
     if (!returnPause || returnPause.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('STOP - SYNC PAUSE ERROR', returnPause);
       return;
@@ -482,7 +482,7 @@ export default class RPC {
         }
       } else {
         const s = Date.now();
-        const syncStr: string = await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.run);
+        const syncStr: string = await RPCModule.runSyncProcess();
         console.log('sync run command - ', Date.now() - s);
         console.log('sync', syncStr);
         if (!syncStr || syncStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -507,7 +507,7 @@ export default class RPC {
     }
     this.fetchSyncStatusLock = true;
     const s = Date.now();
-    const returnStatus: string = await RPCModule.execute(CommandEnum.sync, CommandSyncEnum.status);
+    const returnStatus: string = await RPCModule.statusSyncInfo();
     console.log('sync status run command - ', Date.now() - s);
     if (!returnStatus || returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC STATUS ERROR', returnStatus);
