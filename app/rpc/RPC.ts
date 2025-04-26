@@ -131,9 +131,9 @@ export default class RPC {
       // -1  - error in Gemini/zingolib.
       // -2  - error in RPCModule, likely.
       // > 0 - real value
-      const start = Date.now();
+      //const start = Date.now();
       const resultStr: string = await RPCModule.execute(CommandEnum.updatecurrentprice, '');
-      console.log('=========================================== > get ZEC price - ', Date.now() - start);
+      //console.log('=========================================== > get ZEC price - ', Date.now() - start);
       //console.log(resultStr);
 
       if (resultStr) {
@@ -203,9 +203,9 @@ export default class RPC {
     if (readOnly) {
       // only viewing key & birthday
       try {
-        const start = Date.now();
+        //const start = Date.now();
         const ufvkStr: string = await RPCModule.execute(CommandEnum.exportufvk, '');
-        console.log('=========================================== > get ufvk - ', Date.now() - start);
+        //console.log('=========================================== > get ufvk - ', Date.now() - start);
         if (ufvkStr) {
           if (ufvkStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error ufvk ${ufvkStr}`);
@@ -233,9 +233,9 @@ export default class RPC {
     } else {
       // only seed & birthday
       try {
-        const start2 = Date.now();
+        //const start2 = Date.now();
         const seedStr: string = await RPCModule.execute(CommandEnum.seed, '');
-        console.log('=========================================== > get seed - ', Date.now() - start2);
+        //console.log('=========================================== > get seed - ', Date.now() - start2);
         if (seedStr) {
           if (seedStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error seed ${seedStr}`);
@@ -269,54 +269,54 @@ export default class RPC {
 
     const taskPromises: Promise<void>[] = [];
 
-    //taskPromises.push(
-    //  new Promise<void>(async resolve => {
-    //    //const s = Date.now();
-    //    await this.fetchWalletHeight();
-    //    //console.log('wallet height - ', Date.now() - s);
-    //    resolve();
-    //  }),
-    //);
-    //taskPromises.push(
-    //  new Promise<void>(async resolve => {
-    //    //const s = Date.now();
-    //    await this.fetchWalletBirthdaySeedUfvk();
-    //    //console.log('wallet birthday - ', Date.now() - s);
-    //    resolve();
-    //  }),
-    //);
-    //taskPromises.push(
-    //  new Promise<void>(async resolve => {
-    //    //const s = Date.now();
-    //    await this.fetchInfoAndServerHeight();
-    //    //console.log('info & server height - ', Date.now() - s);
-    //    resolve();
-    //  }),
-    //);
-    //taskPromises.push(
-    //  new Promise<void>(async resolve => {
-    //    //const s = Date.now();
-    //    await this.fetchTandZandOValueTransfers();
-    //    //console.log('value transfers - ', Date.now() - s);
-    //    resolve();
-    //  }),
-    //);
-    //taskPromises.push(
-    //  new Promise<void>(async resolve => {
-    //    //const s = Date.now();
-    //    await this.fetchTandZandOMessages();
-    //    //console.log('messages - ', Date.now() - s);
-    //    resolve();
-    //  }),
-    //);
-    //taskPromises.push(
-    //  new Promise<void>(async resolve => {
-    //    //const s = Date.now();
-    //    await this.fetchTotalBalance();
-    //    //console.log('balance - ', Date.now() - s);
-    //    resolve();
-    //  }),
-    //);
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        const s = Date.now();
+        await this.fetchWalletHeight();
+        console.log('wallet height - ', Date.now() - s);
+        resolve();
+      }),
+    );
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        const s = Date.now();
+        await this.fetchWalletBirthdaySeedUfvk();
+        console.log('wallet birthday - ', Date.now() - s);
+        resolve();
+      }),
+    );
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        const s = Date.now();
+        await this.fetchInfoAndServerHeight();
+        console.log('info & server height - ', Date.now() - s);
+        resolve();
+      }),
+    );
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        const s = Date.now();
+        await this.fetchTandZandOValueTransfers();
+        console.log('value transfers - ', Date.now() - s);
+        resolve();
+      }),
+    );
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        const s = Date.now();
+        await this.fetchTandZandOMessages();
+        console.log('messages - ', Date.now() - s);
+        resolve();
+      }),
+    );
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        const s = Date.now();
+        await this.fetchTotalBalance();
+        console.log('balance - ', Date.now() - s);
+        resolve();
+      }),
+    );
     if (!this.inRefresh) {
       // try to sync.
       taskPromises.push(

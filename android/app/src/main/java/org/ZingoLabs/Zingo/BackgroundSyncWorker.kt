@@ -71,7 +71,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             // 1. finished the syncing.
 
             Log.i("SCHEDULED_TASK_RUN", "sync BEGIN")
-            val syncing = uniffi.zingo.runSyncProcess()
+            val syncing = uniffi.zingo.runSync()
             Log.i("SCHEDULED_TASK_RUN", "sync END: $syncing")
 
         } else {
@@ -119,7 +119,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
     }
 
     private fun stopSyncingProcess() {
-        var status = uniffi.zingo.pauseSyncProcess()
+        val status = uniffi.zingo.pauseSync()
         if (status.lowercase().startsWith(ErrorPrefix.value)) {
             // this means this task not have a valid lightclient
             Log.i("SCHEDULED_TASK_RUN", "no lightwalled likely")
@@ -201,7 +201,7 @@ class BSCompanion {
         fun cancelExecutingTask() {
             val context = MainApplication.getAppContext() as Context
             // run pause sync, just in case.
-            val pause = uniffi.zingo.pauseSyncProcess()
+            val pause = uniffi.zingo.pauseSync()
             Log.i("SCHEDULED_TASK_RUN", "Pausing sync: $pause")
 
             Log.i("SCHEDULING_TASK", "Cancel background Task")
