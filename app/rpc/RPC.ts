@@ -963,7 +963,7 @@ export default class RPC {
           currentValueTransferList.kind =
             vt.kind === RPCValueTransfersKindEnum.memoToSelf
               ? ValueTransferKindEnum.MemoToSelf
-              : vt.kind === RPCValueTransfersKindEnum.basic
+              : vt.kind === RPCValueTransfersKindEnum.sendToSelf
               ? ValueTransferKindEnum.SendToSelf
               : vt.kind === RPCValueTransfersKindEnum.received
               ? ValueTransferKindEnum.Received
@@ -971,7 +971,9 @@ export default class RPC {
               ? ValueTransferKindEnum.Sent
               : vt.kind === RPCValueTransfersKindEnum.shield
               ? ValueTransferKindEnum.Shield
-              : ValueTransferKindEnum.Rejection;
+              : vt.kind === RPCValueTransfersKindEnum.rejection
+              ? ValueTransferKindEnum.Rejection
+              : vt.kind;
           currentValueTransferList.fee = (!vt.transaction_fee ? 0 : vt.transaction_fee) / 10 ** 8;
           currentValueTransferList.zecPrice = !vt.zec_price ? 0 : vt.zec_price;
           if (
@@ -1071,7 +1073,7 @@ export default class RPC {
           currentMessageList.kind =
             m.kind === RPCValueTransfersKindEnum.memoToSelf
               ? ValueTransferKindEnum.MemoToSelf
-              : m.kind === RPCValueTransfersKindEnum.basic
+              : m.kind === RPCValueTransfersKindEnum.sendToSelf
               ? ValueTransferKindEnum.SendToSelf
               : m.kind === RPCValueTransfersKindEnum.received
               ? ValueTransferKindEnum.Received
@@ -1079,7 +1081,9 @@ export default class RPC {
               ? ValueTransferKindEnum.Sent
               : m.kind === RPCValueTransfersKindEnum.shield
               ? ValueTransferKindEnum.Shield
-              : ValueTransferKindEnum.Rejection;
+              : m.kind === RPCValueTransfersKindEnum.rejection
+              ? ValueTransferKindEnum.Rejection
+              : m.kind;
           currentMessageList.fee = (!m.transaction_fee ? 0 : m.transaction_fee) / 10 ** 8;
           currentMessageList.zecPrice = !m.zec_price ? 0 : m.zec_price;
           if (
