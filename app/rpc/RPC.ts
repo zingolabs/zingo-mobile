@@ -474,7 +474,7 @@ export default class RPC {
           total: 0,
         } as TotalBalanceClass);
         const s = Date.now();
-        const rescanStr: string = await RPCModule.execute(CommandEnum.rescan, '');
+        const rescanStr: string = await RPCModule.runRescanProcess();
         console.log('rescan run command - ', Date.now() - s);
         console.log('rescan', rescanStr);
         if (!rescanStr || rescanStr.toLowerCase().startsWith(GlobalConst.error)) {

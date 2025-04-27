@@ -640,4 +640,20 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             }
         }
     }
+
+    @ReactMethod
+    fun runRescanProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.runRescan()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: rescan run process: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
 }

@@ -13,6 +13,7 @@ jest.mock('react-native', () => {
     runSyncProcess: jest.fn(() => '{}'),
     pauseSyncProcess: jest.fn(() => '{}'),
     statusSyncInfo: jest.fn(() => '{}'),
+    runRescanProcess: jest.fn(() => '{}'),
   };
   RN.View = jest.fn();
 

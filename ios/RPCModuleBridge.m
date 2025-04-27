@@ -90,5 +90,8 @@ RCT_EXTERN_METHOD(pauseSyncProcess:
 RCT_EXTERN_METHOD(statusSyncInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(runRescanProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

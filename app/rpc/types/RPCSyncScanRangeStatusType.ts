@@ -1,5 +1,7 @@
+import { RPCSyncScanRangePriorityStatusEnum } from '../enums/RPCSyncScanRangePriorityStatusEnum';
+
 export type RPCSyncScanRangeStatusType = {
-  priority: string,
+  priority: RPCSyncScanRangePriorityStatusEnum,
   start_block: number,
   end_block: number,
 };

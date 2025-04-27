@@ -1,15 +1,23 @@
+import { RPCSyncScanRangePriorityStatusEnum } from '../../app/rpc/enums/RPCSyncScanRangePriorityStatusEnum';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 
 export const mockSyncingStatus: RPCSyncStatusType = {} as RPCSyncStatusType;
 
-mockSyncingStatus.syncID = 1;
-mockSyncingStatus.inProgress = true;
-mockSyncingStatus.currentBatch = 5;
-mockSyncingStatus.totalBatches = 50;
-mockSyncingStatus.currentBlock = 1800100;
-mockSyncingStatus.lastBlockWallet = 1800000;
-mockSyncingStatus.lastBlockServer = 1900100;
-mockSyncingStatus.secondsPerBatch = 122;
-mockSyncingStatus.processEndBlock = 1600100;
+mockSyncingStatus.scan_ranges = [
+  {
+    priority: RPCSyncScanRangePriorityStatusEnum.Scanned,
+    start_block: 2000000,
+    end_block: 2500000,
+  },
+];
+mockSyncingStatus.sync_start_height = 2000000;
+mockSyncingStatus.scanned_blocks = 0;
+mockSyncingStatus.unscanned_blocks = 0;
+mockSyncingStatus.percentage_blocks_scanned = null;
+mockSyncingStatus.scanned_sapling_outputs = 0;
+mockSyncingStatus.unscanned_sapling_outputs = 0;
+mockSyncingStatus.scanned_orchard_outputs = 0;
+mockSyncingStatus.unscanned_orchard_outputs = 0;
+mockSyncingStatus.percentage_outputs_scanned = 0;
 
 export default mockSyncingStatus;
