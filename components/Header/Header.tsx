@@ -485,7 +485,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     </TouchableOpacity>
   );
 
-  console.log('render header &&&&&&&&&&&&&&&&&&&&&', percentageOutputsScanned, syncInProgress, syncingStatus.scan_ranges?.length, syncingStatus.percentage_outputs_scanned);
+  //console.log('render header &&&&&&&&&&&&&&&&&&&&&', percentageOutputsScanned, syncInProgress);
 
   return (
     <>

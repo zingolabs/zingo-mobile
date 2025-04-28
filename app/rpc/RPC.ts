@@ -523,7 +523,7 @@ export default class RPC {
       return;
     }
 
-    console.log('SYNC STATUS', ss);
+    console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_outputs_scanned);
 
     // synchronize status
     this.setInRefresh(ss.scan_ranges.length > 0 && ss.percentage_outputs_scanned !== null && ss.percentage_outputs_scanned < 100);
