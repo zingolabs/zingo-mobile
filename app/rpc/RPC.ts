@@ -526,7 +526,7 @@ export default class RPC {
     console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_outputs_scanned);
 
     // synchronize status
-    this.setInRefresh(ss.scan_ranges.length > 0 && ss.percentage_outputs_scanned !== null && ss.percentage_outputs_scanned < 100);
+    this.setInRefresh(!!ss.scan_ranges && ss.scan_ranges.length > 0 && ss.percentage_outputs_scanned !== null && ss.percentage_outputs_scanned < 100);
 
     //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
 
