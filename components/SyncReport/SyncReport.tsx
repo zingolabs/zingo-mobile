@@ -22,13 +22,15 @@ import Utils from '../../app/utils';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { isEqual } from 'lodash';
+import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 
 type SyncReportProps = {
 };
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { syncingStatus, wallet, translate, background, language, netInfo, snackbars, removeFirstSnackbar } = context;
+  const { syncingStatus, wallet, translate, background, language, netInfo, snackbars, removeFirstSnackbar, info } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -44,16 +46,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   const [server1Percent, setServer1Percent] = useState<number>(0);
   const [server2Percent, setServer2Percent] = useState<number>(0);
   const [server3Percent, setServer3Percent] = useState<number>(0);
-  const [processEndBlockFixed, setProcessEndBlockFixed] = useState<number>(0);
   const [walletOldSyncedPercent, setWalletOldSyncedPercent] = useState<number>(0);
   const [walletNewSyncedPercent, setWalletNewSyncedPercent] = useState<number>(0);
   const [walletForSyncedPercent, setWalletForSyncedPercent] = useState<number>(0);
-  const [wallet1, setWallet1] = useState<number>(0);
-  const [wallet2, setWallet2] = useState<number>(0);
-  const [wallet3, setWallet3] = useState<number>(0);
+
+  const [syncInProgress, setSyncInProgress] = useState<boolean>(true);
 
   useEffect(() => {
-    if (syncingStatus.lastBlockServer) {
+    if (info.latestBlock) {
       (async () => {
         const a = [
           0, 500000, 1000000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000, 5000000, 5500000, 6000000,
@@ -83,7 +83,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
           '10M',
         ];
         for (let i = 0; i < a.length; i++) {
-          if (syncingStatus.lastBlockServer < a[i]) {
+          if (info.latestBlock < a[i]) {
             setMaxBlocks(a[i]);
             setPoints(a.slice(0, i));
             setLabels(l.slice(0, i + 1));
@@ -92,7 +92,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
         }
       })();
     }
-  }, [syncingStatus.lastBlockServer]);
+  }, [info.latestBlock]);
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
@@ -100,21 +100,17 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   }, []);
 
   useEffect(() => {
-    // ref: https://github.com/zingolabs/zingo-mobile/issues/327
-    // I have to subtract 1 here, almost always.
-    // when end block process & last block wallet are equal, don't subtract anything.
-    // when end block process & wallet birthday are equal, don't subtract anything.
-    let processEndBlockFi = 0;
-    if (
-      syncingStatus.processEndBlock &&
-      syncingStatus.processEndBlock !== wallet.birthday &&
-      syncingStatus.processEndBlock < syncingStatus.lastBlockWallet
-    ) {
-      processEndBlockFi = syncingStatus.processEndBlock - 1;
+    if (!syncingStatus || isEqual(syncingStatus, {} as RPCSyncStatusType) || (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0)) {
+      // if the App is waiting for the first fetching, let's put 0.
+      setWalletNewSyncedPercent(0);
+      setSyncInProgress(true);
     } else {
-      processEndBlockFi = syncingStatus.processEndBlock;
+      setWalletNewSyncedPercent(syncingStatus.percentage_outputs_scanned === null ? 100 : syncingStatus.percentage_outputs_scanned < 1 ? 1 : Number(syncingStatus.percentage_outputs_scanned?.toFixed(0)));
+      setSyncInProgress(!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length > 0 && syncingStatus.percentage_outputs_scanned !== null && syncingStatus.percentage_outputs_scanned < 100);
     }
+  }, [syncingStatus, syncingStatus.percentage_outputs_scanned, syncingStatus.scan_ranges]);
 
+  useEffect(() => {
     /*
     SERVER points:
     - server0 : first block of the server -> 0
@@ -125,7 +121,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
 
     const serv1: number = wallet.birthday || 0;
     const serv2: number =
-      syncingStatus.lastBlockServer && wallet.birthday ? syncingStatus.lastBlockServer - wallet.birthday : 0;
+      info.latestBlock && wallet.birthday ? info.latestBlock - wallet.birthday : 0;
     const serv3: number = maxBlocks ? maxBlocks - serv1 - serv2 : 0;
     const serv1Percent: number = (serv1 * 100) / maxBlocks;
     const serv2Percent: number = (serv2 * 100) / maxBlocks;
@@ -136,82 +132,18 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
       serverWallet : blocks of the wallet
     */
 
-    const servServer: number = syncingStatus.lastBlockServer || 0;
+    const servServer: number = info.latestBlock || 0;
     const servWallet: number =
-      syncingStatus.lastBlockServer && wallet.birthday ? syncingStatus.lastBlockServer - wallet.birthday : 0;
-
-    /*
-      WALLET points:
-      - wallet0 : birthday of the wallet
-      - wallet1 : first block of the sync process (endBlock)
-      - wallet2 : current block of the sync process
-      - wallet3 : empty part of the wallet bar
-
-      EDGE case: sometimes when you restore from seed & you don't remember the
-      birthday the sync process have to start from 419200... so your wallet have
-      this birthday. But sometimes in some point of the sync process the server can
-      give you the real birthday... so the process start point is older than the
-      birthday, even if it seems wrong/weird, this screen show the right info.
-    */
-
-    let wall1: number =
-      processEndBlockFi && wallet.birthday
-        ? processEndBlockFi >= wallet.birthday
-          ? processEndBlockFi - wallet.birthday
-          : processEndBlockFi
-        : 0;
-    let wall2: number =
-      syncingStatus.currentBlock && processEndBlockFi ? syncingStatus.currentBlock - processEndBlockFi : 0;
-
-    // It is really weird, but don't want any negative values in the UI.
-    if (wall1 < 0) {
-      wall1 = 0;
-    }
-    if (wall2 < 0) {
-      wall2 = 0;
-    }
-
-    const wall3: number =
-      syncingStatus.lastBlockServer && wallet.birthday
-        ? processEndBlockFi >= wallet.birthday
-          ? syncingStatus.lastBlockServer - wallet.birthday - wall1 - wall2
-          : syncingStatus.lastBlockServer - processEndBlockFi - wall1 - wall2
-        : 0;
-
-    let walletOldSyncedPer: number = (wall1 * 100) / servWallet;
-    let walletNewSyncedPer: number = (wall2 * 100) / servWallet;
-    if (walletOldSyncedPer < 0.01 && walletOldSyncedPer > 0) {
-      walletOldSyncedPer = 0.01;
-    }
-    if (walletOldSyncedPer > 100) {
-      walletOldSyncedPer = 100;
-    }
-    if (walletNewSyncedPer < 0.01 && walletNewSyncedPer > 0) {
-      walletNewSyncedPer = 0.01;
-    }
-    if (walletNewSyncedPer > 100) {
-      walletNewSyncedPer = 100;
-    }
-    const walletForSyncedPer: number = 100 - walletOldSyncedPer - walletNewSyncedPer;
+      info.latestBlock && wallet.birthday ? info.latestBlock - wallet.birthday : 0;
 
     setServerServer(servServer);
     setServerWallet(servWallet);
     setServer1Percent(serv1Percent);
     setServer2Percent(serv2Percent);
     setServer3Percent(serv3Percent);
-    setProcessEndBlockFixed(processEndBlockFi);
-    setWalletOldSyncedPercent(walletOldSyncedPer);
-    setWalletNewSyncedPercent(walletNewSyncedPer);
-    setWalletForSyncedPercent(walletForSyncedPer);
-    setWallet1(wall1);
-    setWallet2(wall2);
-    setWallet3(wall3);
   }, [
     maxBlocks,
-    syncingStatus.currentBlock,
-    syncingStatus.lastBlockServer,
-    syncingStatus.lastBlockWallet,
-    syncingStatus.processEndBlock,
+    info.latestBlock,
     wallet.birthday,
   ]);
 
@@ -310,25 +242,15 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                 <DetailLine
                   label="Sync ID"
                   value={
-                    syncingStatus.syncID >= 0
-                      ? syncingStatus.syncID +
-                        ' - (' +
-                        (syncingStatus.inProgress
+                    !(walletNewSyncedPercent === 0)
+                      ? '(' +
+                        (syncInProgress
                           ? (translate('report.running') as string)
-                          : syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet
-                          ? (translate('report.finished') as string)
-                          : (translate('report.paused') as string)) +
+                          : (translate('report.finished') as string)) +
                         ')'
                       : (translate('connectingserver') as string)
                   }
                 />
-                {!!syncingStatus.lastError && (
-                  <>
-                    <View style={{ height: 2, width: '100%', backgroundColor: 'red', marginTop: 10 }} />
-                    <DetailLine label="Last Error" value={syncingStatus.lastError} />
-                    <View style={{ height: 2, width: '100%', backgroundColor: 'red', marginBottom: 10 }} />
-                  </>
-                )}
 
                 <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
 
