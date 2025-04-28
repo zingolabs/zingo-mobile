@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, Text, ActivityIndicator } from 'react-native';
+import { View, ScrollView, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
@@ -18,7 +18,6 @@ import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import RegText from '../Components/RegText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';
-import Utils from '../../app/utils';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -240,7 +239,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
             <>
               <View style={{ display: 'flex', marginHorizontal: 20, marginBottom: 30 }}>
                 <DetailLine
-                  label="Sync ID"
+                  label="Sync Status"
                   value={
                     !(walletNewSyncedPercent === 0)
                       ? '(' +
@@ -394,7 +393,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                   </>
                 )}
 
-                {!!maxBlocks && syncingStatus.syncID >= 0 && (
+                {!!maxBlocks && !(walletNewSyncedPercent === 0) && (
                   <>
                     <View
                       style={{
@@ -406,9 +405,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                       }}>
                       <>
                         <Text style={{ color: colors.primary }}>
-                          {processEndBlockFixed >= wallet.birthday ? wallet.birthday : processEndBlockFixed}
+                          {wallet.birthday}
                         </Text>
-                        <Text style={{ color: colors.primary }}>{syncingStatus.lastBlockServer}</Text>
+                        <Text style={{ color: colors.primary }}>{info.latestBlock}</Text>
                       </>
                     </View>
                     <View
@@ -476,139 +475,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                         />
                       )}
                     </View>
-                    {wallet1 > 0 && (
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '100%',
-                          justifyContent: 'flex-start',
-                          alignItems: 'center',
-                          marginTop: 5,
-                        }}>
-                        <Text style={{ color: colors.primary }}>{translate('report.syncedbefore') as string}</Text>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: 'lightyellow',
-                            margin: 5,
-                          }}
-                        />
-                        <Text style={{ color: colors.text }}>
-                          {wallet1 +
-                            (translate('report.blocks') as string) +
-                            Utils.parseNumberFloatToStringLocale(walletOldSyncedPercent, 2) +
-                            '%'}
-                        </Text>
-                      </View>
-                    )}
-                    {wallet2 > 0 && (
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '100%',
-                          justifyContent: 'flex-start',
-                          alignItems: 'center',
-                          marginTop: 5,
-                        }}>
-                        <Text style={{ color: colors.primary }}>{translate('report.syncednow') as string}</Text>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: 'orange',
-                            margin: 5,
-                          }}
-                        />
-                        <Text testID="syncreport.syncednow" style={{ color: colors.text }}>
-                          {wallet2 +
-                            (translate('report.blocks') as string) +
-                            Utils.parseNumberFloatToStringLocale(walletNewSyncedPercent, 2) +
-                            '%'}
-                        </Text>
-                      </View>
-                    )}
-                    {wallet3 > 0 && (
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '100%',
-                          justifyContent: 'flex-start',
-                          alignItems: 'center',
-                          marginTop: 5,
-                        }}>
-                        <Text style={{ color: colors.primary }}>{translate('report.notyetsynced') as string}</Text>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: '#333333',
-                            margin: 5,
-                          }}
-                        />
-                        <Text testID="syncreport.notyetsynced" style={{ color: colors.text }}>
-                          {wallet3 +
-                            (translate('report.blocks') as string) +
-                            Utils.parseNumberFloatToStringLocale(walletForSyncedPercent, 2) +
-                            '%'}
-                        </Text>
-                      </View>
-                    )}
 
                     <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15 }} />
-                  </>
-                )}
-
-                {syncingStatus.inProgress && syncingStatus.currentBatch > 0 && (
-                  <>
-                    <DetailLine
-                      testID="syncreport.currentbatch"
-                      label={translate('report.batches') as string}
-                      value={
-                        (translate('report.processingbatch') as string) +
-                        syncingStatus.currentBatch +
-                        (translate('report.totalbatches') as string) +
-                        syncingStatus.totalBatches
-                      }
-                    />
-                    <DetailLine
-                      testID="syncreport.blocksperbatch"
-                      label={translate('report.blocksperbatch') as string}
-                      value={syncingStatus.blocksPerBatch.toString()}
-                    />
-                    <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                      <DetailLine
-                        label={translate('report.secondsperbatch') as string}
-                        value={syncingStatus.secondsPerBatch.toString()}
-                      />
-                      <ActivityIndicator size="large" color={colors.primary} />
-                    </View>
-                  </>
-                )}
-                {syncingStatus.inProgress && syncingStatus.currentBlock > 0 && !!syncingStatus.lastBlockServer && (
-                  <>
-                    <View style={{ height: 2, width: '100%', backgroundColor: colors.primary, marginTop: 10 }} />
-                    <DetailLine
-                      label={translate('report.blocks-title') as string}
-                      value={
-                        (translate('report.processingblock') as string) +
-                        syncingStatus.currentBlock +
-                        (translate('report.totalblocks') as string) +
-                        syncingStatus.lastBlockServer
-                      }
-                    />
                   </>
                 )}
               </View>
