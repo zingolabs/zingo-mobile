@@ -405,7 +405,10 @@ class ExecuteSendFromOrchard {
         println("\nBalance post-send:")
         println(balanceJson)
         val balancePostSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePostSend.transparent_balance).isEqualTo(100000)
+        assertThat(balancePostSend.orchard_balance).isEqualTo(885000)
+        // the transparent funds are unconfirmed...
+        // when we have this new field, we will cnage this properly.
+        assertThat(balancePostSend.transparent_balance).isEqualTo(0)
     }
 }
 
