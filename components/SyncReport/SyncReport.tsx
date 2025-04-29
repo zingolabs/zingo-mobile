@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, Text } from 'react-native';
+import { View, ScrollView, Text, ActivityIndicator, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
@@ -23,6 +23,8 @@ import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { isEqual } from 'lodash';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
+import { RPCSyncScanRangeStatusType } from '../../app/rpc/types/RPCSyncScanRangeStatusType';
+import { RPCSyncScanRangePriorityStatusEnum } from '../../app/rpc/enums/RPCSyncScanRangePriorityStatusEnum';
 
 type SyncReportProps = {
 };
@@ -45,10 +47,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   const [server1Percent, setServer1Percent] = useState<number>(0);
   const [server2Percent, setServer2Percent] = useState<number>(0);
   const [server3Percent, setServer3Percent] = useState<number>(0);
-  const [walletOldSyncedPercent, setWalletOldSyncedPercent] = useState<number>(0);
-  const [walletNewSyncedPercent, setWalletNewSyncedPercent] = useState<number>(0);
-  const [walletForSyncedPercent, setWalletForSyncedPercent] = useState<number>(0);
 
+  const [percentageOutputsScanned, setPercentageOutputsScanned] = useState<number>(0);
   const [syncInProgress, setSyncInProgress] = useState<boolean>(true);
 
   useEffect(() => {
@@ -101,10 +101,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   useEffect(() => {
     if (!syncingStatus || isEqual(syncingStatus, {} as RPCSyncStatusType) || (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0)) {
       // if the App is waiting for the first fetching, let's put 0.
-      setWalletNewSyncedPercent(0);
+      setPercentageOutputsScanned(0);
       setSyncInProgress(true);
     } else {
-      setWalletNewSyncedPercent(syncingStatus.percentage_outputs_scanned === null ? 100 : syncingStatus.percentage_outputs_scanned < 1 ? 1 : Number(syncingStatus.percentage_outputs_scanned?.toFixed(0)));
+      setPercentageOutputsScanned(syncingStatus.percentage_outputs_scanned === null ? 100 : syncingStatus.percentage_outputs_scanned < 1 ? 1 : Number(syncingStatus.percentage_outputs_scanned?.toFixed(0)));
       setSyncInProgress(!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length > 0 && syncingStatus.percentage_outputs_scanned !== null && syncingStatus.percentage_outputs_scanned < 100);
     }
   }, [syncingStatus, syncingStatus.percentage_outputs_scanned, syncingStatus.scan_ranges]);
@@ -235,19 +235,17 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                 {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
               </View>
             )}
-          {maxBlocks && netInfo.isConnected ? (
+          {!!maxBlocks && netInfo.isConnected ? (
             <>
               <View style={{ display: 'flex', marginHorizontal: 20, marginBottom: 30 }}>
                 <DetailLine
                   label="Sync Status"
                   value={
-                    !(walletNewSyncedPercent === 0)
-                      ? '(' +
+                      '(' +
                         (syncInProgress
-                          ? (translate('report.running') as string)
+                          ? ((translate('report.running') as string) + ` ${percentageOutputsScanned}%`)
                           : (translate('report.finished') as string)) +
                         ')'
-                      : (translate('connectingserver') as string)
                   }
                 />
 
@@ -393,97 +391,170 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                   </>
                 )}
 
-                {!!maxBlocks && !(walletNewSyncedPercent === 0) && (
+                {!!maxBlocks && (
                   <>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        width: '100%',
-                        justifyContent: 'space-between',
-                        marginTop: 10,
-                      }}>
-                      <>
-                        <Text style={{ color: colors.primary }}>
-                          {wallet.birthday}
+                    <DetailLine
+                      label="Nonlinear Scanning Map"
+                    >
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          width: '100%',
+                          justifyContent: 'space-between',
+                          marginTop: 5,
+                        }}>
+                        <>
+                          <Text style={{ color: colors.text }}>
+                            {wallet.birthday}
+                          </Text>
+                          <Text style={{ color: colors.text }}>{info.latestBlock}</Text>
+                        </>
+                      </View>
+                      <View
+                        style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+                        <>
+                          <View
+                            style={{
+                              height: 10,
+                              borderLeftColor: colors.primary,
+                              borderLeftWidth: 1,
+                            }}
+                          />
+                          <View
+                            style={{
+                              height: 10,
+                              borderRightColor: colors.primary,
+                              borderRightWidth: 1,
+                            }}
+                          />
+                        </>
+                      </View>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'flex-start',
+                          width: '100%',
+                          borderBottomColor: 'green',
+                          borderBottomWidth: 0,
+                          marginBottom: 0,
+                        }}>
+                        {!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.map((range: RPCSyncScanRangeStatusType) => {
+                          const percent: number = ((range.end_block - range.start_block) * 100) / (info.latestBlock - wallet.birthday);
+                          const pixels: number = (Dimensions.get('window').width - 40) * (percent / 100);
+                          if (range.priority === RPCSyncScanRangePriorityStatusEnum.Ignored ||
+                              range.priority === RPCSyncScanRangePriorityStatusEnum.OpenAdjacent ||
+                              range.priority === RPCSyncScanRangePriorityStatusEnum.FoundNote ||
+                              range.priority === RPCSyncScanRangePriorityStatusEnum.ChainTip ||
+                              range.priority === RPCSyncScanRangePriorityStatusEnum.Verify) {
+                            console.log(range, percent, pixels);
+                          }
+                          return <View
+                            key={`${range.start_block.toString() + '-' + range.end_block.toString()}`}
+                            style={{
+                              height: 15,
+                              width: range.priority === RPCSyncScanRangePriorityStatusEnum.Ignored && pixels < 2 ? 2 : `${percent}%`,
+                              backgroundColor:
+                                range.priority === RPCSyncScanRangePriorityStatusEnum.Ignored
+                                  ? 'orange' /* Scanning */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.Scanned
+                                  ? 'green'  /* Scanned  */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.Historic
+                                  ? 'gray'   /* Historic */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.OpenAdjacent
+                                  ? 'blue'   /* Miscelanea */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.FoundNote
+                                  ? 'blue'   /* Miscelanea */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.ChainTip
+                                  ? 'blue'   /* Miscelanea */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.Verify
+                                  ? 'blue'   /* Miscelanea */
+                                  : 'red',   /* error somehow */
+                            }}
+                          />;
+                        }
+                        )}
+                      </View>
+                    </DetailLine>
+                    <DetailLine
+                      label="Legend"
+                    >
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          width: '100%',
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                          marginTop: 5,
+                        }}>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            width: 10,
+                            height: 10,
+                            justifyContent: 'flex-start',
+                            backgroundColor: 'green',
+                            margin: 5,
+                          }}
+                        />
+                        <Text style={{ color: colors.text, marginRight: 10 }}>
+                          {'Scanned'}
                         </Text>
-                        <Text style={{ color: colors.primary }}>{info.latestBlock}</Text>
-                      </>
-                    </View>
-                    <View
-                      style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
-                      <>
                         <View
                           style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            width: 10,
                             height: 10,
-                            borderLeftColor: colors.primary,
-                            borderLeftWidth: 1,
-                          }}
-                        />
-                        <View
-                          style={{
-                            height: 10,
-                            borderRightColor: colors.primary,
-                            borderRightWidth: 1,
-                          }}
-                        />
-                      </>
-                    </View>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        width: '100%',
-                        borderBottomColor: colors.primary,
-                        borderBottomWidth: 2,
-                        marginBottom: 0,
-                      }}>
-                      {walletOldSyncedPercent >= 0 && (
-                        <View
-                          style={{
-                            height: 10,
-                            width: `${walletOldSyncedPercent}%`,
-                            backgroundColor: 'lightyellow',
-                            borderLeftColor: colors.primary,
-                            borderLeftWidth: 1,
-                            borderRightColor: walletOldSyncedPercent === 100 ? colors.primary : 'lightyellow',
-                            borderRightWidth: walletOldSyncedPercent > 0 ? 1 : 0,
-                          }}
-                        />
-                      )}
-                      {walletNewSyncedPercent >= 0 && (
-                        <View
-                          style={{
-                            height: 10,
-                            width: `${walletNewSyncedPercent}%`,
+                            justifyContent: 'flex-start',
                             backgroundColor: 'orange',
-                            borderRightColor: 'orange',
-                            borderRightWidth: walletNewSyncedPercent > 0 ? 1 : 0,
+                            margin: 5,
                           }}
                         />
-                      )}
-                      {walletForSyncedPercent >= 0 && (
+                        <Text style={{ color: colors.text, marginRight: 10 }}>
+                          {'Scanning...'}
+                        </Text>
                         <View
                           style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            width: 10,
                             height: 10,
-                            backgroundColor: '#333333',
-                            borderRightColor: colors.primary,
-                            borderRightWidth: 1,
-                            width: `${walletForSyncedPercent}%`,
+                            justifyContent: 'flex-start',
+                            backgroundColor: 'gray',
+                            margin: 5,
                           }}
                         />
-                      )}
-                    </View>
+                        <Text style={{ color: colors.text, marginRight: 10 }}>
+                          {'Historic'}
+                        </Text>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            width: 10,
+                            height: 10,
+                            justifyContent: 'flex-start',
+                            backgroundColor: 'blue',
+                            margin: 5,
+                          }}
+                        />
+                        <Text style={{ color: colors.text, marginRight: 10 }}>
+                          {'Miscelanea'}
+                        </Text>
+                      </View>
+                    </DetailLine>
 
-                    <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15 }} />
                   </>
                 )}
               </View>
             </>
           ) : (
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-              {netInfo.isConnected && <DetailLine label="" value={translate('connectingserver') as string} />}
+            <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
+              <ActivityIndicator size="large" color={colors.primary} />
             </View>
           )}
         </ScrollView>

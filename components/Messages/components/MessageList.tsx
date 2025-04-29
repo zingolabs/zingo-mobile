@@ -413,9 +413,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           console.log(fasterServer);
           if (fasterServer.uri !== server.uri) {
             setServerOption(fasterServer, selectServer, false, true);
-            // first pause syncing Just in case...
-            await RPCModule.pauseSyncProcess();
           }
+
+          // first pause syncing Just in case...
+          await RPCModule.pauseSyncProcess();
 
           try {
             await sendTransaction(buildSendState(memo));

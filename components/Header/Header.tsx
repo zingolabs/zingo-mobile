@@ -577,7 +577,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                 <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
                               )}
                               {percentageOutputsScanned > 0 && (
-                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned} %`}</FadeText>
+                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned}%`}</FadeText>
                               )}
                             </View>
                           ) : (
@@ -595,7 +595,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                   <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
                                 )}
                                 {percentageOutputsScanned > 0 && (
-                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned} %`}</FadeText>
+                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned}%`}</FadeText>
                                 )}
                               </View>
                             </TouchableOpacity>

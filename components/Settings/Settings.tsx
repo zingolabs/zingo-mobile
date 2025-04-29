@@ -384,14 +384,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       addLastSnackbar({ message: translate('settings.nochanges') as string });
       return;
     }
-    if (!memos) {
-      addLastSnackbar({ message: translate('settings.ismemo') as string });
-      return;
-    }
-    if (!filter) {
-      addLastSnackbar({ message: translate('settings.isthreshold') as string });
-      return;
-    }
+    //if (!memos) {
+    //  addLastSnackbar({ message: translate('settings.ismemo') as string });
+    //  return;
+    //}
+    //if (!filter) {
+    //  addLastSnackbar({ message: translate('settings.isthreshold') as string });
+    //  return;
+    //}
     if ((!serverUriParsed || !chainNameParsed) && selectServer !== SelectServerEnum.offline) {
       addLastSnackbar({ message: translate('settings.isserver') as string });
       return;
@@ -1056,58 +1056,62 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 translate('settings.security-restorewalletbackupscreen') as string,
               )}
 
-              <View style={{ display: 'flex', margin: 10 }}>
-                <BoldText>{translate('settings.threshold-title') as string}</BoldText>
-              </View>
+              {false && (
+                <>
+                  <View style={{ display: 'flex', margin: 10 }}>
+                    <BoldText>{translate('settings.threshold-title') as string}</BoldText>
+                  </View>
 
-              <View style={{ display: 'flex', marginLeft: 25 }}>
-                <View
-                  accessible={true}
-                  accessibilityLabel={translate('settings.threshold-acc') as string}
-                  style={{
-                    borderColor: colors.border,
-                    borderWidth: 1,
-                    marginLeft: 5,
-                    width: 'auto',
-                    maxWidth: '60%',
-                    maxHeight: 48,
-                    minWidth: '30%',
-                    minHeight: 48,
-                  }}>
-                  <TextInput
-                    placeholder={translate('settings.number') as string}
-                    placeholderTextColor={colors.placeholder}
-                    keyboardType="numeric"
-                    style={{
-                      color: colors.text,
-                      fontWeight: '600',
-                      fontSize: 18,
-                      minWidth: '30%',
-                      minHeight: 48,
-                      marginLeft: 5,
-                      backgroundColor: 'transparent',
-                    }}
-                    value={filter}
-                    onChangeText={(text: string) => setFilter(text)}
-                    editable={!disabled}
-                    maxLength={6}
-                  />
-                </View>
-              </View>
+                  <View style={{ display: 'flex', marginLeft: 25 }}>
+                    <View
+                      accessible={true}
+                      accessibilityLabel={translate('settings.threshold-acc') as string}
+                      style={{
+                        borderColor: colors.border,
+                        borderWidth: 1,
+                        marginLeft: 5,
+                        width: 'auto',
+                        maxWidth: '60%',
+                        maxHeight: 48,
+                        minWidth: '30%',
+                        minHeight: 48,
+                      }}>
+                      <TextInput
+                        placeholder={translate('settings.number') as string}
+                        placeholderTextColor={colors.placeholder}
+                        keyboardType="numeric"
+                        style={{
+                          color: colors.text,
+                          fontWeight: '600',
+                          fontSize: 18,
+                          minWidth: '30%',
+                          minHeight: 48,
+                          marginLeft: 5,
+                          backgroundColor: 'transparent',
+                        }}
+                        value={filter}
+                        onChangeText={(text: string) => setFilter(text)}
+                        editable={!disabled}
+                        maxLength={6}
+                      />
+                    </View>
+                  </View>
 
-              <View style={{ display: 'flex', margin: 10 }}>
-                <BoldText>{translate('settings.memo-title') as string}</BoldText>
-              </View>
+                  <View style={{ display: 'flex', margin: 10 }}>
+                    <BoldText>{translate('settings.memo-title') as string}</BoldText>
+                  </View>
 
-              <View style={{ display: 'flex', marginLeft: 25 }}>
-                {optionsRadio(
-                  MEMOS,
-                  setMemos as React.Dispatch<React.SetStateAction<string | boolean>>,
-                  String,
-                  memos,
-                  'memo',
-                )}
-              </View>
+                  <View style={{ display: 'flex', marginLeft: 25 }}>
+                    {optionsRadio(
+                      MEMOS,
+                      setMemos as React.Dispatch<React.SetStateAction<string | boolean>>,
+                      String,
+                      memos,
+                      'memo',
+                    )}
+                  </View>
+                </>
+              )}
 
               <View style={{ display: 'flex', margin: 10 }}>
                 <BoldText>{translate('settings.recoverywalletinfoondevice-title') as string}</BoldText>

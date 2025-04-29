@@ -290,7 +290,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
                   }
                 }
               >
-                (text translated)
+                (text translated 1%)
               </Text>
             </View>
           </View>
@@ -596,120 +596,227 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             style={
               {
                 "display": "flex",
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginTop": 10,
-                "width": "100%",
+                "marginTop": 20,
               }
             }
           >
             <Text
               style={
                 {
-                  "color": "#18bd18",
+                  "color": "#c3c3c3",
+                  "opacity": 0.65,
                 }
               }
             >
-              1900100
+              Nonlinear Scanning Map
             </Text>
+            <View
+              style={
+                {
+                  "display": "flex",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "marginTop": 5,
+                  "width": "100%",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                  }
+                }
+              >
+                1900100
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                  }
+                }
+              >
+                2000000
+              </Text>
+            </View>
+            <View
+              style={
+                {
+                  "display": "flex",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "borderLeftColor": "#18bd18",
+                    "borderLeftWidth": 1,
+                    "height": 10,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
+                    "borderRightColor": "#18bd18",
+                    "borderRightWidth": 1,
+                    "height": 10,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                {
+                  "borderBottomColor": "green",
+                  "borderBottomWidth": 0,
+                  "display": "flex",
+                  "flexDirection": "row",
+                  "justifyContent": "flex-start",
+                  "marginBottom": 0,
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "backgroundColor": "green",
+                    "height": 15,
+                    "width": "500.5005005005005%",
+                  }
+                }
+              />
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "display": "flex",
+                "marginTop": 20,
+              }
+            }
+          >
             <Text
               style={
                 {
-                  "color": "#18bd18",
+                  "color": "#c3c3c3",
+                  "opacity": 0.65,
                 }
               }
             >
-              2000000
+              Legend
             </Text>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "display": "flex",
+                  "flexDirection": "row",
+                  "justifyContent": "flex-start",
+                  "marginTop": 5,
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "backgroundColor": "green",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "height": 10,
+                    "justifyContent": "flex-start",
+                    "margin": 5,
+                    "width": 10,
+                  }
+                }
+              />
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "marginRight": 10,
+                  }
+                }
+              >
+                Scanned
+              </Text>
+              <View
+                style={
+                  {
+                    "backgroundColor": "orange",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "height": 10,
+                    "justifyContent": "flex-start",
+                    "margin": 5,
+                    "width": 10,
+                  }
+                }
+              />
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "marginRight": 10,
+                  }
+                }
+              >
+                Scanning...
+              </Text>
+              <View
+                style={
+                  {
+                    "backgroundColor": "gray",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "height": 10,
+                    "justifyContent": "flex-start",
+                    "margin": 5,
+                    "width": 10,
+                  }
+                }
+              />
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "marginRight": 10,
+                  }
+                }
+              >
+                Historic
+              </Text>
+              <View
+                style={
+                  {
+                    "backgroundColor": "blue",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "height": 10,
+                    "justifyContent": "flex-start",
+                    "margin": 5,
+                    "width": 10,
+                  }
+                }
+              />
+              <Text
+                style={
+                  {
+                    "color": "#c3c3c3",
+                    "marginRight": 10,
+                  }
+                }
+              >
+                Miscelanea
+              </Text>
+            </View>
           </View>
-          <View
-            style={
-              {
-                "display": "flex",
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "width": "100%",
-              }
-            }
-          >
-            <View
-              style={
-                {
-                  "borderLeftColor": "#18bd18",
-                  "borderLeftWidth": 1,
-                  "height": 10,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "borderRightColor": "#18bd18",
-                  "borderRightWidth": 1,
-                  "height": 10,
-                }
-              }
-            />
-          </View>
-          <View
-            style={
-              {
-                "borderBottomColor": "#18bd18",
-                "borderBottomWidth": 2,
-                "display": "flex",
-                "flexDirection": "row",
-                "justifyContent": "flex-start",
-                "marginBottom": 0,
-                "width": "100%",
-              }
-            }
-          >
-            <View
-              style={
-                {
-                  "backgroundColor": "lightyellow",
-                  "borderLeftColor": "#18bd18",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "lightyellow",
-                  "borderRightWidth": 0,
-                  "height": 10,
-                  "width": "0%",
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "backgroundColor": "orange",
-                  "borderRightColor": "orange",
-                  "borderRightWidth": 1,
-                  "height": 10,
-                  "width": "1%",
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "backgroundColor": "#333333",
-                  "borderRightColor": "#18bd18",
-                  "borderRightWidth": 1,
-                  "height": 10,
-                  "width": "0%",
-                }
-              }
-            />
-          </View>
-          <View
-            style={
-              {
-                "backgroundColor": "white",
-                "height": 2,
-                "marginTop": 15,
-                "width": "100%",
-              }
-            }
-          />
         </View>
       </View>
     </RCTScrollView>

@@ -4,11 +4,11 @@ import {
   InfoType,
   SendJsonToTypeType,
   WalletType,
-  WalletSettingsClass,
+  //WalletSettingsClass,
   TranslateType,
   CommandEnum,
   ChainNameEnum,
-  WalletOptionEnum,
+  //WalletOptionEnum,
   CurrencyNameEnum,
   AddressKindEnum,
   ReceiverEnum,
@@ -22,7 +22,7 @@ import { RPCInfoType } from './types/RPCInfoType';
 import { RPCWalletHeight } from './types/RPCWalletHeightType';
 import { RPCSeedType } from './types/RPCSeedType';
 import { RPCSyncStatusType } from './types/RPCSyncStatusType';
-import { RPCGetOptionType } from './types/RPCGetOptionType';
+//import { RPCGetOptionType } from './types/RPCGetOptionType';
 import { RPCUfvkType } from './types/RPCUfvkType';
 import { RPCSendType } from './types/RPCSendType';
 import { RPCValueTransfersType } from './types/RPCValueTransfersType';
@@ -41,7 +41,7 @@ export default class RPC {
   fnSetMessagesList: (mList: ValueTransferType[], total: number) => void;
   fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
   fnSetSyncingStatus: (syncingStatus: RPCSyncStatusType) => void;
-  fnSetWalletSettings: (settings: WalletSettingsClass) => void;
+  //fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string) => TranslateType;
   keepAwake: (keep: boolean) => void;
   fnSetZingolib: (zingolib: string) => void;
@@ -59,7 +59,7 @@ export default class RPC {
   fetchTandZandOValueTransfersLock: boolean;
   fetchTandZandOMessagesLock: boolean;
   fetchTotalBalanceLock: boolean;
-  fetchWalletSettingsLock: boolean;
+  //fetchWalletSettingsLock: boolean;
   fetchAddressesLock: boolean;
   refreshSyncLock: boolean;
   fetchSyncStatusLock: boolean;
@@ -78,7 +78,7 @@ export default class RPC {
     fnSetValueTransfersList: (vtlist: ValueTransferType[], total: number) => void,
     fnSetMessagesList: (mlist: ValueTransferType[], total: number) => void,
     fnSetAllAddresses: (addresses: AddressClass[]) => void,
-    fnSetWalletSettings: (settings: WalletSettingsClass) => void,
+    //fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
     fnSetSyncingStatus: (syncingStatus: RPCSyncStatusType) => void,
     translate: (key: string) => TranslateType,
@@ -91,7 +91,7 @@ export default class RPC {
     this.fnSetValueTransfersList = fnSetValueTransfersList;
     this.fnSetMessagesList = fnSetMessagesList;
     this.fnSetAllAddresses = fnSetAllAddresses;
-    this.fnSetWalletSettings = fnSetWalletSettings;
+    //this.fnSetWalletSettings = fnSetWalletSettings;
     this.fnSetInfo = fnSetInfo;
     this.fnSetSyncingStatus = fnSetSyncingStatus;
     this.translate = translate;
@@ -109,7 +109,7 @@ export default class RPC {
     this.fetchTandZandOValueTransfersLock = false;
     this.fetchTandZandOMessagesLock = false;
     this.fetchTotalBalanceLock = false;
-    this.fetchWalletSettingsLock = false;
+    //this.fetchWalletSettingsLock = false;
     this.fetchAddressesLock = false;
     this.refreshSyncLock = false;
     this.fetchSyncStatusLock = false;
@@ -271,62 +271,60 @@ export default class RPC {
 
     taskPromises.push(
       new Promise<void>(async resolve => {
-        const s = Date.now();
+        //const s = Date.now();
         await this.fetchWalletHeight();
-        console.log('wallet height - ', Date.now() - s);
+        //console.log('wallet height - ', Date.now() - s);
         resolve();
       }),
     );
     taskPromises.push(
       new Promise<void>(async resolve => {
-        const s = Date.now();
+        //const s = Date.now();
         await this.fetchWalletBirthdaySeedUfvk();
-        console.log('wallet birthday - ', Date.now() - s);
+        //console.log('wallet birthday - ', Date.now() - s);
         resolve();
       }),
     );
     taskPromises.push(
       new Promise<void>(async resolve => {
-        const s = Date.now();
+        //const s = Date.now();
         await this.fetchInfoAndServerHeight();
-        console.log('info & server height - ', Date.now() - s);
+        //console.log('info & server height - ', Date.now() - s);
         resolve();
       }),
     );
     taskPromises.push(
       new Promise<void>(async resolve => {
-        const s = Date.now();
+        //const s = Date.now();
         await this.fetchTandZandOValueTransfers();
-        console.log('value transfers - ', Date.now() - s);
+        //console.log('value transfers - ', Date.now() - s);
         resolve();
       }),
     );
     taskPromises.push(
       new Promise<void>(async resolve => {
-        const s = Date.now();
+        //const s = Date.now();
         await this.fetchTandZandOMessages();
-        console.log('messages - ', Date.now() - s);
+        //console.log('messages - ', Date.now() - s);
         resolve();
       }),
     );
     taskPromises.push(
       new Promise<void>(async resolve => {
-        const s = Date.now();
+        //const s = Date.now();
         await this.fetchTotalBalance();
-        console.log('balance - ', Date.now() - s);
+        //console.log('balance - ', Date.now() - s);
         resolve();
       }),
     );
-    if (!this.inRefresh) {
-      // try to sync.
-      taskPromises.push(
-        new Promise<void>(async resolve => {
-          this.refreshSync(false);
-          console.log('INTERVAL refresh sync');
-          resolve();
-        }),
-      );
-    }
+    // try to sync, no matter what.
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        this.refreshSync();
+        console.log('INTERVAL refresh sync');
+        resolve();
+      }),
+    );
     taskPromises.push(
       new Promise<void>(async resolve => {
         await this.fetchSyncStatus();
@@ -359,8 +357,9 @@ export default class RPC {
     // clean start.
     await this.stopSyncProcess();
 
+    // fetching only once
     await this.fetchAddresses();
-    await this.fetchWalletSettings();
+    //await this.fetchWalletSettings();
 
     this.runTaskPromises();
 
@@ -377,7 +376,7 @@ export default class RPC {
     // to allow the UI to render first
     setTimeout(() => {
       //console.log('FIRST sync run');
-      this.refreshSync(true);
+      this.refreshSync();
     }, 1000);
   }
 
@@ -428,75 +427,57 @@ export default class RPC {
     }
   }
 
-  async refreshSync(fullRefresh: boolean, fullRescan?: boolean) {
-    console.log(fullRefresh, fullRescan, 'WALLET', this.lastWalletBlockHeight, 'SERVER', this.lastServerBlockHeight, this.inRefresh);
+  async refreshSync(fullRescan?: boolean) {
+    console.log('WALLET', this.lastWalletBlockHeight, 'SERVER', this.lastServerBlockHeight, 'in refresh', this.inRefresh);
 
     if (this.refreshSyncLock) {
       console.log('REFRESH ----> in execution already');
       return;
     }
     this.refreshSyncLock = true;
-    // If we're in refresh, we don't overlap
-    if (this.inRefresh) {
-      console.log('REFRESH ----> in refresh is true');
-      this.refreshSyncLock = false;
-      return;
-    }
 
-    //if (!this.lastServerBlockHeight) {
-    //  console.log('REFRESH ----> the last server block is zero');
-    //  this.refreshSyncLock = false;
-    //  return;
-    //}
+    // the App can called `sync run` no matter what
+    // this is handy to have the wallet fully synced
+    // anytime.
+    this.keepAwake(true);
 
-    // if it's sending now, don't fire the sync process.
-    if (
-      fullRefresh ||
-      fullRescan ||
-      !this.lastWalletBlockHeight ||
-      this.lastWalletBlockHeight < this.lastServerBlockHeight
-    ) {
-      // If the latest block height has changed, make sure to sync. This will happen in a new thread
+    // This is async, so when it is done, we finish the refresh.
+    if (fullRescan) {
+      // clean the ValueTransfer list before.
+      this.fnSetValueTransfersList([], 0);
+      this.fnSetMessagesList([], 0);
+      this.fnSetTotalBalance({
+        orchardBal: 0,
+        privateBal: 0,
+        transparentBal: 0,
+        spendableOrchard: 0,
+        spendablePrivate: 0,
+        total: 0,
+      } as TotalBalanceClass);
+      // first pause the existing sync process
+      await this.stopSyncProcess();
+      // set this flag here
       this.setInRefresh(true);
-      this.keepAwake(true);
 
-      // This is async, so when it is done, we finish the refresh.
-      if (fullRescan) {
-        // clean the ValueTransfer list before.
-        this.fnSetValueTransfersList([], 0);
-        this.fnSetMessagesList([], 0);
-        this.fnSetTotalBalance({
-          orchardBal: 0,
-          privateBal: 0,
-          transparentBal: 0,
-          spendableOrchard: 0,
-          spendablePrivate: 0,
-          total: 0,
-        } as TotalBalanceClass);
-        const s = Date.now();
-        const rescanStr: string = await RPCModule.runRescanProcess();
-        console.log('rescan run command - ', Date.now() - s);
-        console.log('rescan', rescanStr);
-        if (!rescanStr || rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error rescan ${rescanStr}`);
-        }
-      } else {
-        const s = Date.now();
-        const syncStr: string = await RPCModule.runSyncProcess();
-        console.log('sync run command - ', Date.now() - s);
-        console.log('sync', syncStr);
-        if (!syncStr || syncStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error sync ${syncStr}`);
-        }
+      // now we can run the rescan process
+      //const s = Date.now();
+      const rescanStr: string = await RPCModule.runRescanProcess();
+      //console.log('rescan run command - ', Date.now() - s);
+      console.log('rescan RUN', rescanStr);
+      if (!rescanStr || rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error rescan ${rescanStr}`);
       }
     } else {
-      // Already at the latest block
-      console.log('REFRESH ----> Already have latest block, waiting for next refresh');
-      // Here I know the sync process is over, I need to inform to the UI.
-      //const start = Date.now();
-      //this.fnSetSyncingStatus(ss as RPCSyncStatusType);
-      //console.log('=========================================== > set sync status - ', Date.now() - start);
+      this.setInRefresh(true);
+      //const s = Date.now();
+      const syncStr: string = await RPCModule.runSyncProcess();
+      //console.log('sync run command - ', Date.now() - s);
+      console.log('sync RUN', syncStr);
+      if (!syncStr || syncStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error sync ${syncStr}`);
+      }
     }
+
     this.refreshSyncLock = false;
   }
 
@@ -506,9 +487,9 @@ export default class RPC {
       return;
     }
     this.fetchSyncStatusLock = true;
-    const s = Date.now();
+    //const s = Date.now();
     const returnStatus: string = await RPCModule.statusSyncInfo();
-    console.log('sync status run command - ', Date.now() - s);
+    //console.log('sync status run command - ', Date.now() - s);
     if (!returnStatus || returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC STATUS ERROR', returnStatus);
       this.fetchSyncStatusLock = false;
@@ -523,10 +504,13 @@ export default class RPC {
       return;
     }
 
+    //console.log('SYNC STATUS', ss);
     console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_outputs_scanned);
 
     // synchronize status
-    this.setInRefresh(!!ss.scan_ranges && ss.scan_ranges.length > 0 && ss.percentage_outputs_scanned !== null && ss.percentage_outputs_scanned < 100);
+    const inR: boolean = !!ss.scan_ranges && ss.scan_ranges.length > 0 && ss.percentage_outputs_scanned !== null && ss.percentage_outputs_scanned < 100;
+    this.setInRefresh(inR);
+    console.log('SYNC STATUS IN-REFRESH', inR);
 
     //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
 
@@ -553,6 +537,8 @@ export default class RPC {
       //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${this.syncId}`);
     } else {
       // maybe is too many saving process... let's see.
+      // need to evaluate this carefully because do not want to
+      // call dosave all the time.
       await RPCModule.doSave();
     }
     this.fetchSyncStatusLock = false;
@@ -564,9 +550,9 @@ export default class RPC {
       return;
     }
     this.fetchSyncPollLock = true;
-    const s = Date.now();
+    //const s = Date.now();
     const returnPoll: string = await RPCModule.pollSyncInfo();
-    console.log('sync poll run command - ', Date.now() - s);
+    //console.log('sync poll run command - ', Date.now() - s);
     if (!returnPoll || returnPoll.toLowerCase().startsWith(GlobalConst.error) || returnPoll.toLowerCase().startsWith('sync task')) {
       console.log('SYNC POLL ERROR', returnPoll);
       this.fetchSyncPollLock = false;
@@ -586,6 +572,7 @@ export default class RPC {
     this.fetchSyncPollLock = false;
   }
 
+  /*
   async fetchWalletSettings(): Promise<void> {
     try {
       if (this.fetchWalletSettingsLock) {
@@ -641,6 +628,7 @@ export default class RPC {
       return;
     }
   }
+  */
 
   async fetchInfoAndServerHeight(): Promise<void> {
     try {
@@ -1146,7 +1134,6 @@ export default class RPC {
   async sendTransaction(sendJson: Array<SendJsonToTypeType>): Promise<string> {
     const sendTxPromise = new Promise<string>(async (resolve, reject) => {
       // clear the timers - Tasks.
-      this.setInRefresh(false);
       await this.clearTimers();
       // sending
       this.setInSend(true);
@@ -1214,7 +1201,7 @@ export default class RPC {
 
       if (sendTxids) {
         // And refresh data (full refresh)
-        this.refreshSync(true);
+        this.refreshSync();
         //console.log('00000000 RESOLVE send');
         resolve(sendTxids);
         return;
