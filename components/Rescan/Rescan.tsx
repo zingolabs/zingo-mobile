@@ -20,7 +20,7 @@ import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 
 type RescanProps = {
-  doRescan: () => void;
+  doRescan: () => Promise<void>;
 };
 
 const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
@@ -32,12 +32,12 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
   moment.locale(language);
   const { clear } = useToast();
 
-  const doRescanAndClose = () => {
+  const doRescanAndClose = async () => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
-    doRescan();
+    await doRescan();
     hide();
     addLastSnackbar({
       message: translate('loadedapp.syncing') as string,

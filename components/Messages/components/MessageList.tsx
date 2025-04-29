@@ -57,7 +57,6 @@ import selectingServer from '../../../app/selectingServer';
 import { serverUris } from '../../../app/uris';
 import Utils from '../../../app/utils';
 import { magicModal } from 'react-native-magic-modal';
-import RPCModule from '../../../app/RPCModule';
 
 type MessageListProps = {
   toggleMenuDrawer: () => void;
@@ -365,9 +364,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     }
     setDisableSend(true);
 
-    // first pause syncing Just in case...
-    await RPCModule.pauseSyncProcess();
-
     // call the sendTransaction method in a timeout, allowing the modals to show properly
     setTimeout(async () => {
       let error = '';
@@ -384,8 +380,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         // the app send successfully on the first attemp.
         setDisableSend(false);
 
-        // the sync process can continue
-        await RPCModule.runSyncProcess();
         return;
       } catch (err1) {
         error = err1 as string;
@@ -415,9 +409,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             setServerOption(fasterServer, selectServer, false, true);
           }
 
-          // first pause syncing Just in case...
-          await RPCModule.pauseSyncProcess();
-
           try {
             await sendTransaction(buildSendState(memo));
 
@@ -430,8 +421,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             // the app send successfully on the second attemp.
             setDisableSend(false);
 
-            // the sync process can continue
-            await RPCModule.runSyncProcess();
             return;
           } catch (err2) {
             error = err2 as string;
@@ -440,9 +429,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           }
         }
       }
-
-      // the sync process can continue
-      await RPCModule.runSyncProcess();
 
       //console.log('sendtx error', error);
       // if the App is in background I need to store the error

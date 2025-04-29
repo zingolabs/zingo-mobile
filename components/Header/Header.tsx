@@ -294,8 +294,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
     // not use await here.
     setComputingModalShow();
-    // we need to pause the sync process in order to shield
-    await RPCModule.pauseSyncProcess();
     // because I don't what the user is doing, I need to the re-run the shield
     // command right before the confirmation
     await RPCModule.execute(CommandEnum.shield, '');
@@ -345,8 +343,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           );
         }
       }
-      // run again the sync process
-      await RPCModule.runSyncProcess();
       // change to the history screen, just in case.
       navigationHome?.navigate(RouteEnums.Home, {
         screen: translate('loadedapp.history-menu') as string,

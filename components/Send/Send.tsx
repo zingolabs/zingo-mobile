@@ -704,8 +704,6 @@ const Send: React.FunctionComponent<SendProps> = ({
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
-    // first pause syncing Just in case...
-    await RPCModule.pauseSyncProcess();
 
     // not use await here.
     setComputingModalShow();
@@ -740,8 +738,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         closeAllModals();
         // the app send successfully on the first attemp.
 
-        // the sync process can continue
-        await RPCModule.runSyncProcess();
         return;
       } catch (err1) {
         error = err1 as string;
@@ -771,9 +767,6 @@ const Send: React.FunctionComponent<SendProps> = ({
             setServerOption(fasterServer, selectServer, false, true);
           }
 
-          // first pause syncing Just in case...
-          await RPCModule.pauseSyncProcess();
-
           try {
             const txid = await sendTransaction(sendPageStatePar);
 
@@ -800,8 +793,6 @@ const Send: React.FunctionComponent<SendProps> = ({
             closeAllModals();
             // the app send successfully on the second attemp.
 
-            // the sync process can continue
-            await RPCModule.runSyncProcess();
             return;
           } catch (err2) {
             error = err2 as string;
@@ -810,9 +801,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           }
         }
       }
-
-      // the sync process can continue
-      await RPCModule.runSyncProcess();
 
       setTimeout(() => {
         //console.log('sendtx error', error);

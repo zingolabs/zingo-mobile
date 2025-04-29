@@ -320,7 +320,7 @@ export default class RPC {
     // try to sync, no matter what.
     taskPromises.push(
       new Promise<void>(async resolve => {
-        this.refreshSync();
+        await this.refreshSync();
         console.log('INTERVAL refresh sync');
         resolve();
       }),
@@ -371,13 +371,6 @@ export default class RPC {
     }
 
     await this.sanitizeTimers();
-
-    // Call the refresh after configure to update the UI. Do it in a timeout
-    // to allow the UI to render first
-    setTimeout(() => {
-      //console.log('FIRST sync run');
-      this.refreshSync();
-    }, 1000);
   }
 
   sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
@@ -1201,7 +1194,7 @@ export default class RPC {
 
       if (sendTxids) {
         // And refresh data (full refresh)
-        this.refreshSync();
+        await this.refreshSync();
         //console.log('00000000 RESOLVE send');
         resolve(sendTxids);
         return;

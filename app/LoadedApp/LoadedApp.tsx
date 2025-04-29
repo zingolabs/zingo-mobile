@@ -1130,7 +1130,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   doRescan = async () => {
-    this.rpc.refreshSync(true);
+    // in the rescan case if the shield button is visible
+    // we need to hide fast.
+    this.setShieldingAmount(0);
+    await this.rpc.refreshSync(true);
   };
 
   setWallet = async (wallet: WalletType) => {
