@@ -611,9 +611,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
           console.log('&&&&& background no in storage &&&&&');
-          this.rpc.setInRefresh(false);
-          await this.rpc.clearTimers();
-          await this.rpc.configure();
+          // IDK why the App have to do this here...
+          // commenting for now.
+          //this.rpc.setInRefresh(false);
+          //await this.rpc.clearTimers();
+          //await this.rpc.configure();
           //console.log('configure start timers Android & IOS');
           if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
             Alert.alert(this.state.backgroundError.title, this.state.backgroundError.error);

@@ -375,8 +375,9 @@ export default class RPC {
 
   sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
+  // revisit this about pause vs stop
   async stopSyncProcess(): Promise<void> {
-    let returnPause: string = await RPCModule.pauseSyncProcess();
+    let returnPause: string = await RPCModule.stopSyncProcess();
     if (!returnPause || returnPause.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('STOP - SYNC PAUSE ERROR', returnPause);
       return;
@@ -433,9 +434,11 @@ export default class RPC {
     // this is handy to have the wallet fully synced
     // anytime.
     this.keepAwake(true);
+    this.setInRefresh(true);
 
     // This is async, so when it is done, we finish the refresh.
     if (fullRescan) {
+      await this.clearTimers();
       // clean the ValueTransfer list before.
       this.fnSetValueTransfersList([], 0);
       this.fnSetMessagesList([], 0);
@@ -447,12 +450,15 @@ export default class RPC {
         spendablePrivate: 0,
         total: 0,
       } as TotalBalanceClass);
-      // first pause the existing sync process
-      await this.stopSyncProcess();
-      // set this flag here
-      this.setInRefresh(true);
 
-      // now we can run the rescan process
+      const s = Date.now();
+      const stopStr: string = await RPCModule.runStopProcess();
+      console.log('stop run command - ', Date.now() - s);
+      console.log('stop RUN', stopStr);
+      if (!stopStr || stopStr.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Error rescan ${stopStr}`);
+      }
+
       //const s = Date.now();
       const rescanStr: string = await RPCModule.runRescanProcess();
       //console.log('rescan run command - ', Date.now() - s);
@@ -460,8 +466,8 @@ export default class RPC {
       if (!rescanStr || rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
         console.log(`Error rescan ${rescanStr}`);
       }
+      await this.configure();
     } else {
-      this.setInRefresh(true);
       //const s = Date.now();
       const syncStr: string = await RPCModule.runSyncProcess();
       //console.log('sync run command - ', Date.now() - s);

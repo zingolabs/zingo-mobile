@@ -12,6 +12,7 @@ jest.mock('react-native', () => {
     pollSyncInfo: jest.fn(() => '{}'),
     runSyncProcess: jest.fn(() => '{}'),
     pauseSyncProcess: jest.fn(() => '{}'),
+    stopSyncProcess: jest.fn(() => '{}'),
     statusSyncInfo: jest.fn(() => '{}'),
     runRescanProcess: jest.fn(() => '{}'),
   };

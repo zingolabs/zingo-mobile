@@ -171,7 +171,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       setPercentageOutputsScanned(0);
       setSyncInProgress(true);
     } else {
-      setPercentageOutputsScanned(syncingStatus.percentage_total_outputs_scanned < 1 ? 1 : Number(syncingStatus.percentage_total_outputs_scanned.toFixed(0)));
+      setPercentageOutputsScanned(syncingStatus.percentage_total_outputs_scanned < 1 ? 1 : Math.floor(syncingStatus.percentage_total_outputs_scanned));
       setSyncInProgress(!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length > 0 && syncingStatus.percentage_total_outputs_scanned < 100);
     }
   }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);
