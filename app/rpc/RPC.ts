@@ -423,7 +423,7 @@ export default class RPC {
   async refreshSync(fullRescan?: boolean) {
     console.log('WALLET', this.lastWalletBlockHeight, 'SERVER', this.lastServerBlockHeight, 'in refresh', this.inRefresh);
 
-    if (this.refreshSyncLock) {
+    if (this.refreshSyncLock && !fullRescan) {
       console.log('REFRESH ----> in execution already');
       return;
     }
@@ -497,11 +497,11 @@ export default class RPC {
       return;
     }
 
-    //console.log('SYNC STATUS', ss);
-    console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_outputs_scanned);
+    console.log('SYNC STATUS', ss);
+    console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_total_outputs_scanned);
 
     // synchronize status
-    const inR: boolean = !!ss.scan_ranges && ss.scan_ranges.length > 0 && ss.percentage_outputs_scanned !== null && ss.percentage_outputs_scanned < 100;
+    const inR: boolean = !!ss.scan_ranges && ss.scan_ranges.length > 0 && ss.percentage_total_outputs_scanned < 100;
     this.setInRefresh(inR);
     console.log('SYNC STATUS IN-REFRESH', inR);
 

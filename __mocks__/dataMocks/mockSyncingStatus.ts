@@ -11,13 +11,15 @@ mockSyncingStatus.scan_ranges = [
   },
 ];
 mockSyncingStatus.sync_start_height = 2000000;
-mockSyncingStatus.scanned_blocks = 0;
-mockSyncingStatus.unscanned_blocks = 0;
-mockSyncingStatus.percentage_blocks_scanned = null;
-mockSyncingStatus.scanned_sapling_outputs = 0;
-mockSyncingStatus.unscanned_sapling_outputs = 0;
-mockSyncingStatus.scanned_orchard_outputs = 0;
-mockSyncingStatus.unscanned_orchard_outputs = 0;
-mockSyncingStatus.percentage_outputs_scanned = 0;
+mockSyncingStatus.session_blocks_scanned = 0;
+mockSyncingStatus.total_blocks_scanned = 0;
+mockSyncingStatus.percentage_session_blocks_scanned = 0;
+mockSyncingStatus.percentage_total_blocks_scanned = 100;
+mockSyncingStatus.session_sapling_outputs_scanned = 0;
+mockSyncingStatus.total_sapling_outputs_scanned = 0;
+mockSyncingStatus.session_orchard_outputs_scanned = 0;
+mockSyncingStatus.total_orchard_outputs_scanned = 0;
+mockSyncingStatus.percentage_session_outputs_scanned = 0;
+mockSyncingStatus.percentage_total_outputs_scanned = 100;
 
 export default mockSyncingStatus;

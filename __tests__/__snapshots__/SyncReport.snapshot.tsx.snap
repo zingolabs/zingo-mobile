@@ -290,7 +290,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
                   }
                 }
               >
-                (text translated 1%)
+                (text translated)
               </Text>
             </View>
           </View>

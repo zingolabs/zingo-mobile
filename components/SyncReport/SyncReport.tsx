@@ -104,10 +104,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
       setPercentageOutputsScanned(0);
       setSyncInProgress(true);
     } else {
-      setPercentageOutputsScanned(syncingStatus.percentage_outputs_scanned === null ? 100 : syncingStatus.percentage_outputs_scanned < 1 ? 1 : Number(syncingStatus.percentage_outputs_scanned?.toFixed(0)));
-      setSyncInProgress(!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length > 0 && syncingStatus.percentage_outputs_scanned !== null && syncingStatus.percentage_outputs_scanned < 100);
+      setPercentageOutputsScanned(syncingStatus.percentage_total_outputs_scanned < 1 ? 1 : Number(syncingStatus.percentage_total_outputs_scanned.toFixed(0)));
+      setSyncInProgress(!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length > 0 && syncingStatus.percentage_total_outputs_scanned < 100);
     }
-  }, [syncingStatus, syncingStatus.percentage_outputs_scanned, syncingStatus.scan_ranges]);
+  }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);
 
   useEffect(() => {
     /*
@@ -443,13 +443,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                         {!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.map((range: RPCSyncScanRangeStatusType) => {
                           const percent: number = ((range.end_block - range.start_block) * 100) / (info.latestBlock - wallet.birthday);
                           const pixels: number = (Dimensions.get('window').width - 40) * (percent / 100);
-                          if (range.priority === RPCSyncScanRangePriorityStatusEnum.Ignored ||
-                              range.priority === RPCSyncScanRangePriorityStatusEnum.OpenAdjacent ||
-                              range.priority === RPCSyncScanRangePriorityStatusEnum.FoundNote ||
-                              range.priority === RPCSyncScanRangePriorityStatusEnum.ChainTip ||
-                              range.priority === RPCSyncScanRangePriorityStatusEnum.Verify) {
-                            console.log(range, percent, pixels);
-                          }
                           return <View
                             key={`${range.start_block.toString() + '-' + range.end_block.toString()}`}
                             style={{

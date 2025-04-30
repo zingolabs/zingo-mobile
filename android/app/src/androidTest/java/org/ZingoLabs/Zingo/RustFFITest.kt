@@ -67,22 +67,24 @@ data class ScanRange (
 data class SyncStatus (
   val scan_ranges : List<ScanRange>,
   val sync_start_height : Long,
-  val scanned_blocks : Long,
-  val unscanned_blocks : Long,
-  val percentage_blocks_scanned : Long?,
-  val scanned_sapling_outputs : Long,
-  val unscanned_sapling_outputs : Long,
-  val scanned_orchard_outputs : Long,
-  val unscanned_orchard_outputs : Long,
-  val percentage_outputs_scanned : Long?
+  val session_blocks_scanned : Long,
+  val total_blocks_scanned : Long,
+  val percentage_session_blocks_scanned : Long?,
+  val percentage_total_blocks_scanned : Long,
+  val session_sapling_outputs_scanned : Long,
+  val total_sapling_outputs_scanned : Long,
+  val session_orchard_outputs_scanned : Long,
+  val total_orchard_outputs_scanned : Long,
+  val percentage_session_outputs_scanned : Long?,
+  val percentage_total_outputs_scanned : Long
 )
 
 data class SyncComplete (
     val sync_start_height : Long,
     val sync_end_height : Long,
-    val scanned_blocks : Long,
-    val scanned_sapling_outputs : Long,
-    val scanned_orchard_outputs : Long
+    val blocks_scanned : Long,
+    val sapling_outputs_scanned : Long,
+    val orchard_outputs_scanned : Long
 )
 
 data class SyncPoll (

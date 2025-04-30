@@ -1131,7 +1131,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
   doRescan = async () => {
     // in the rescan case if the shield button is visible
-    // we need to hide fast.
+    // we need to hide it fast.
     this.setShieldingAmount(0);
     await this.rpc.refreshSync(true);
   };

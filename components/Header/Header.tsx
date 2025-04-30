@@ -171,10 +171,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       setPercentageOutputsScanned(0);
       setSyncInProgress(true);
     } else {
-      setPercentageOutputsScanned(syncingStatus.percentage_outputs_scanned === null ? 100 : syncingStatus.percentage_outputs_scanned < 1 ? 1 : Number(syncingStatus.percentage_outputs_scanned?.toFixed(0)));
-      setSyncInProgress(!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length > 0 && syncingStatus.percentage_outputs_scanned !== null && syncingStatus.percentage_outputs_scanned < 100);
+      setPercentageOutputsScanned(syncingStatus.percentage_total_outputs_scanned < 1 ? 1 : Number(syncingStatus.percentage_total_outputs_scanned.toFixed(0)));
+      setSyncInProgress(!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length > 0 && syncingStatus.percentage_total_outputs_scanned < 100);
     }
-  }, [syncingStatus, syncingStatus.percentage_outputs_scanned, syncingStatus.scan_ranges]);
+  }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);
 
   // the new sync engine doesn't stalled... for now.
   //useEffect(() => {
