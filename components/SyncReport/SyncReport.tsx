@@ -447,7 +447,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                             key={`${range.start_block.toString() + '-' + range.end_block.toString()}`}
                             style={{
                               height: 15,
-                              width: range.priority === RPCSyncScanRangePriorityStatusEnum.Ignored && pixels < 2 ? 2 : `${percent}%`,
+                              width: ((range.priority === RPCSyncScanRangePriorityStatusEnum.Ignored && pixels < 2) ||
+                                      (range.priority === RPCSyncScanRangePriorityStatusEnum.Scanned && pixels < 2)) ? 2 : `${percent}%`,
                               backgroundColor:
                                 range.priority === RPCSyncScanRangePriorityStatusEnum.Ignored
                                   ? 'orange' /* Scanning */
