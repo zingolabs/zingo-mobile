@@ -46,7 +46,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
         message: translate('loadedapp.syncing') as string,
         duration: SnackbarDurationEnum.longer,
       });
-    }, 5 * 1000);
+    }, 3 * 1000);
   };
 
   return (

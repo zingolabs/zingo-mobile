@@ -1627,7 +1627,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       const timeoutServerPromise = new Promise((_, reject) => {
         setTimeout(() => {
           reject(new Error('Promise changeserver Timeout 30 seconds'));
-        }, 30000);
+        }, 30 * 1000);
       });
 
       const resultStrServer: string = await Promise.race([resultStrServerPromise, timeoutServerPromise]);

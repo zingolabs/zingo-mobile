@@ -95,7 +95,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    setTimeout(() => setShowBackgroundLegend(false), 10000); // 10 seconds only
+    setTimeout(() => setShowBackgroundLegend(false), 10 * 1000); // 10 seconds only
   }, []);
 
   useEffect(() => {

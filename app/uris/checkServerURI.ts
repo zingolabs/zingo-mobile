@@ -16,7 +16,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
     const timeoutServerPromise = new Promise((_, reject) => {
       setTimeout(() => {
         reject(new Error('Promise changeserver Timeout 30 seconds'));
-      }, 30000);
+      }, 30 * 1000);
     });
 
     const resultStrServer: string = await Promise.race([resultStrServerPromise, timeoutServerPromise]);
@@ -36,7 +36,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
         const timeoutInfoPromise = new Promise((resolve, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 30 seconds'));
-          }, 30000);
+          }, 30 * 1000);
         });
 
         const infoStr: string = await Promise.race([infoStrPromise, timeoutInfoPromise]);
@@ -66,7 +66,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
         const timeoutInfoPromise = new Promise((resolve, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 30 seconds'));
-          }, 30000);
+          }, 30 * 1000);
         });
 
         const balanceStr: string = await Promise.race([balanceStrPromise, timeoutInfoPromise]);

@@ -78,7 +78,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                   if (privacy) {
                     setTimeout(() => {
                       setExpandQRAddress(false);
-                    }, 5000);
+                    }, 5 * 1000);
                   }
                 }}>
                 {ufvk ? (

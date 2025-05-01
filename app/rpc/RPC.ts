@@ -370,7 +370,7 @@ export default class RPC {
     await this.sanitizeTimers();
   }
 
-  sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+  //sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
   // this is not used for now...
   async stopSyncProcess(): Promise<void> {

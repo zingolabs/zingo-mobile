@@ -1251,7 +1251,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           // IOS needs time to close the biometric screen.
           // but Android I don't think so, a little bit Just in case.
         },
-        Platform.OS === GlobalConst.platformOSios ? 2000 : 100,
+        Platform.OS === GlobalConst.platformOSios ? 2 * 1000 : 100,
       );
     }
   };

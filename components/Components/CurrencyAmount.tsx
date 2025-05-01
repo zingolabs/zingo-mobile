@@ -58,7 +58,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
 
   const onPress = () => {
     setPrivacyHigh(false);
-    setTimeout(() => setPrivacyHigh(true), 5000);
+    setTimeout(() => setPrivacyHigh(true), 5 * 1000);
   };
 
   if (currency === CurrencyEnum.USDCurrency) {

@@ -111,7 +111,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               if (privacy) {
                 setTimeout(() => {
                   setExpandContact(false);
-                }, 5000);
+                }, 5 * 1000);
               }
             }}>
             <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
@@ -137,7 +137,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                 if (privacy) {
                   setTimeout(() => {
                     setExpandAddress(false);
-                  }, 5000);
+                  }, 5 * 1000);
                 }
               }
             }}>

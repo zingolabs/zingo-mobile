@@ -287,7 +287,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                   if (privacy) {
                     setTimeout(() => {
                       setExpandSeed(false);
-                    }, 5000);
+                    }, 5 * 1000);
                   }
                 }
               }}>
@@ -345,7 +345,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                   if (privacy) {
                     setTimeout(() => {
                       setExpandBithday(false);
-                    }, 5000);
+                    }, 5 * 1000);
                   }
                 }
               }}>
