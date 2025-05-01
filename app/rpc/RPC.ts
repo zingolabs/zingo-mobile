@@ -332,13 +332,14 @@ export default class RPC {
         resolve();
       }),
     );
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        await this.fetchSyncPoll();
-        console.log('INTERVAL poll sync');
-        resolve();
-      }),
-    );
+    // do not need this for now...
+    //taskPromises.push(
+    //  new Promise<void>(async resolve => {
+    //    await this.fetchSyncPoll();
+    //    console.log('INTERVAL poll sync');
+    //    resolve();
+    //  }),
+    //);
 
     Promise.allSettled(taskPromises);
   }
@@ -352,10 +353,6 @@ export default class RPC {
   async configure(): Promise<void> {
     // I need to fetch this quickly.
     this.fetchZingolibVersion();
-
-    // First things first, I need to stop an existing sync process (if any)
-    // clean start. No longer necessary...
-    //await this.stopSyncProcess();
 
     // fetching only once
     await this.fetchAddresses();
@@ -375,6 +372,7 @@ export default class RPC {
 
   sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
+  // this is not used for now...
   async stopSyncProcess(): Promise<void> {
     let returnStop: string = await RPCModule.stopSyncProcess();
     if (!returnStop || returnStop.toLowerCase().startsWith(GlobalConst.error)) {
@@ -463,9 +461,12 @@ export default class RPC {
       } as TotalBalanceClass);
       this.fnSetSyncingStatus({} as RPCSyncStatusType);
 
-      const s = Date.now();
+      // the rescan in zingolib do two tasks:
+      // 1. stop the sync.
+      // 2. launch the rescan.
+      //const s = Date.now();
       const rescanStr: string = await RPCModule.runRescanProcess();
-      console.log('rescan run command - ', Date.now() - s);
+      //console.log('rescan run command - ', Date.now() - s);
       console.log('rescan RUN', rescanStr);
       if (!rescanStr || rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
         console.log(`Error rescan ${rescanStr}`);
@@ -547,6 +548,7 @@ export default class RPC {
     this.fetchSyncStatusLock = false;
   }
 
+  // do not use it for now...
   async fetchSyncPoll(): Promise<void> {
     if (this.fetchSyncPollLock) {
       console.log('sync poll locked');
