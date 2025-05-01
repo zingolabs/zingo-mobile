@@ -611,7 +611,14 @@
     "networkstatus": "Status da Rede (Internet)",
     "nointernet": "Sem Conexão com a Internet.",
     "cellulardata": "Apenas Dados Móveis.",
-    "connectionexpensive": "Conexão com os Dados Móveis ."
+    "connectionexpensive": "Conexão com os Dados Móveis .",
+    "syncstatus": "Status de Sincronização",
+    "map": "Mapa de Varredura Não Linear",
+    "legend": "Legenda",
+    "scanned": "Varredura",
+    "scanning": "Varredura...",
+    "historic": "Histórico",
+    "miscelanea": "Diversos"
   },
   "import": {
     "title": "Frases de recuperação / Chave de Visualização",

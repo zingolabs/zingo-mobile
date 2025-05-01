@@ -239,7 +239,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
             <>
               <View style={{ display: 'flex', marginHorizontal: 20, marginBottom: 30 }}>
                 <DetailLine
-                  label="Sync Status"
+                  label={translate('report.syncstatus') as string}
                   value={
                       '(' +
                         (syncInProgress
@@ -386,7 +386,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                     )}
 
                     <View
-                      style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }}
+                      style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }}
                     />
                   </>
                 )}
@@ -394,7 +394,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                 {!!maxBlocks && (
                   <>
                     <DetailLine
-                      label="Nonlinear Scanning Map"
+                      label={translate('report.map') as string}
                     >
                       <View
                         style={{
@@ -471,7 +471,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                       </View>
                     </DetailLine>
                     <DetailLine
-                      label="Legend"
+                      label={translate('report.legend') as string}
                     >
                       <View
                         style={{
@@ -494,7 +494,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                           }}
                         />
                         <Text style={{ color: colors.text, marginRight: 10 }}>
-                          {'Scanned'}
+                          {translate('report.scanned') as string}
                         </Text>
                         <View
                           style={{
@@ -508,7 +508,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                           }}
                         />
                         <Text style={{ color: colors.text, marginRight: 10 }}>
-                          {'Scanning...'}
+                          {translate('report.scanning') as string}
                         </Text>
                         <View
                           style={{
@@ -522,7 +522,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                           }}
                         />
                         <Text style={{ color: colors.text, marginRight: 10 }}>
-                          {'Historic'}
+                          {translate('report.historic') as string}
                         </Text>
                         <View
                           style={{
@@ -536,7 +536,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                           }}
                         />
                         <Text style={{ color: colors.text, marginRight: 10 }}>
-                          {'Miscelanea'}
+                          {translate('report.miscelanea') as string}
                         </Text>
                       </View>
                     </DetailLine>

@@ -611,7 +611,14 @@
     "networkstatus": "Estado de la Red (Internet)",
     "nointernet": "Sin conexión a Internet.",
     "cellulardata": "Usando solo Datos del Móvil.",
-    "connectionexpensive": "Conexión Costosa"
+    "connectionexpensive": "Conexión Costosa",
+    "syncstatus": "Estado de sincronización",
+    "map": "Mapa de escaneo no lineal",
+    "legend": "Leyenda",
+    "scanned": "Escaneado",
+    "scanning": "Escaneando...",
+    "historic": "Histórico",
+    "miscelanea": "Miscelánea"
   },
   "import": {
     "title": "Semilla / Clave de Visualización",
