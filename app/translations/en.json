@@ -152,7 +152,7 @@
     "send-menu": "SEND",
     "receive-menu": "RECEIVE",
     "messages-menu": "MESSAGES",
-    "syncing": "Stopping the Synchronization to be able to reset the wallet.",
+    "syncing": "Stopping the Synchronization to be able to reset the wallet... Can take a few seconds.",
     "zcash-url": "You already have an address in the send screen",
     "connection-error": "This option requires an internet connection to be executed.",
     "tryingnewserver": "Trying to connect to the new Server... Can take a few seconds.",

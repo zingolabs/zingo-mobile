@@ -461,18 +461,11 @@ export default class RPC {
         spendablePrivate: 0,
         total: 0,
       } as TotalBalanceClass);
+      this.fnSetSyncingStatus({} as RPCSyncStatusType);
 
       const s = Date.now();
-      const stopStr: string = await RPCModule.stopSyncProcess();
-      console.log('stop run command - ', Date.now() - s);
-      console.log('stop RUN', stopStr);
-      if (!stopStr || stopStr.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Error stop ${stopStr}`);
-      }
-
-      //const s = Date.now();
       const rescanStr: string = await RPCModule.runRescanProcess();
-      //console.log('rescan run command - ', Date.now() - s);
+      console.log('rescan run command - ', Date.now() - s);
       console.log('rescan RUN', rescanStr);
       if (!rescanStr || rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
         console.log(`Error rescan ${rescanStr}`);

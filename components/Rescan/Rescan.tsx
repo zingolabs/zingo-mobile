@@ -37,12 +37,16 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
-    addLastSnackbar({
-      message: translate('loadedapp.syncing') as string,
-      duration: SnackbarDurationEnum.longer,
-    });
+    // was removed the `await` here because launching the rescan can
+    // take a lot of time and it's better the App responsive.
+    doRescan();
     hide();
-    await doRescan();
+    setTimeout(() => {
+      addLastSnackbar({
+        message: translate('loadedapp.syncing') as string,
+        duration: SnackbarDurationEnum.longer,
+      });
+    }, 5 * 1000);
   };
 
   return (
