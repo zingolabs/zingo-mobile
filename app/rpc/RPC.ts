@@ -354,8 +354,8 @@ export default class RPC {
     this.fetchZingolibVersion();
 
     // First things first, I need to stop an existing sync process (if any)
-    // clean start.
-    await this.stopSyncProcess();
+    // clean start. No longer necessary...
+    //await this.stopSyncProcess();
 
     // fetching only once
     await this.fetchAddresses();
@@ -375,14 +375,25 @@ export default class RPC {
 
   sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
-  // revisit this about pause vs stop
   async stopSyncProcess(): Promise<void> {
-    let returnPause: string = await RPCModule.stopSyncProcess();
-    if (!returnPause || returnPause.toLowerCase().startsWith(GlobalConst.error)) {
-      console.log('STOP - SYNC PAUSE ERROR', returnPause);
+    let returnStop: string = await RPCModule.stopSyncProcess();
+    if (!returnStop || returnStop.toLowerCase().startsWith(GlobalConst.error)) {
+      console.log('SYNC STOP ERROR', returnStop);
       return;
     }
-    console.log('stop sync process. STOPPED', returnPause);
+    console.log('stop sync process. STOPPED', returnStop);
+
+    // deactivate the sync flag just in case.
+    this.setInRefresh(false);
+  }
+
+  async pauseSyncProcess(): Promise<void> {
+    let returnPause: string = await RPCModule.pauseSyncProcess();
+    if (!returnPause || returnPause.toLowerCase().startsWith(GlobalConst.error)) {
+      console.log('SYNC PAUSE ERROR', returnPause);
+      return;
+    }
+    console.log('pause sync process. PAUSED', returnPause);
 
     // deactivate the sync flag just in case.
     this.setInRefresh(false);
@@ -452,11 +463,11 @@ export default class RPC {
       } as TotalBalanceClass);
 
       const s = Date.now();
-      const stopStr: string = await RPCModule.runStopProcess();
+      const stopStr: string = await RPCModule.stopSyncProcess();
       console.log('stop run command - ', Date.now() - s);
       console.log('stop RUN', stopStr);
       if (!stopStr || stopStr.toLowerCase().startsWith(GlobalConst.error)) {
-        console.log(`Error rescan ${stopStr}`);
+        console.log(`Error stop ${stopStr}`);
       }
 
       //const s = Date.now();
@@ -1220,7 +1231,7 @@ export default class RPC {
 
     //console.log('jc change wallet', exists);
     if (exists && exists !== GlobalConst.false) {
-      await this.stopSyncProcess();
+      await this.pauseSyncProcess();
       await RPCModule.doSaveBackup();
       const result = await RPCModule.deleteExistingWallet();
 
@@ -1238,7 +1249,7 @@ export default class RPC {
 
     //console.log('jc change wallet', exists);
     if (exists && exists !== GlobalConst.false) {
-      await this.stopSyncProcess();
+      await this.pauseSyncProcess();
       const result = await RPCModule.deleteExistingWallet();
 
       if (!(result && result !== GlobalConst.false)) {
@@ -1259,7 +1270,7 @@ export default class RPC {
 
       //console.log('jc restore wallet', existsWallet);
       if (existsWallet && existsWallet !== GlobalConst.false) {
-        await this.stopSyncProcess();
+        await this.pauseSyncProcess();
         await RPCModule.restoreExistingWalletBackup();
       } else {
         return this.translate('rpc.walletnotfound-error');

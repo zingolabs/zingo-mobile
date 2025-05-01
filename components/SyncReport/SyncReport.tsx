@@ -99,7 +99,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   }, []);
 
   useEffect(() => {
-    if (!syncingStatus || isEqual(syncingStatus, {} as RPCSyncStatusType) || (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0)) {
+    if (!syncingStatus || isEqual(syncingStatus, {} as RPCSyncStatusType) || (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) || syncingStatus.percentage_total_outputs_scanned === 0) {
       // if the App is waiting for the first fetching, let's put 0.
       setPercentageOutputsScanned(0);
       setSyncInProgress(true);
