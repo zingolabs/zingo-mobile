@@ -617,8 +617,8 @@
     "legend": "Legenda",
     "scanned": "Varredura",
     "scanning": "Varredura...",
-    "historic": "Histórico",
-    "miscelanea": "Diversos"
+    "lowpriority": "Baixa prioridade",
+    "highpriority": "Alta prioridade"
   },
   "import": {
     "title": "Frases de recuperação / Chave de Visualização",

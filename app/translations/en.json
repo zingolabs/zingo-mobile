@@ -617,8 +617,8 @@
     "legend": "Legend",
     "scanned": "Scanned",
     "scanning": "Scanning...",
-    "historic": "Historic",
-    "miscelanea": "Miscelanea"
+    "lowpriority": "Low priority",
+    "highpriority": "High priority"
   },
   "import": {
     "title": "Seed Phrase / Viewing Key",

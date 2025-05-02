@@ -107,7 +107,8 @@ data class Balance (
     val verified_orchard_balance : Long,
     val spendable_orchard_balance : Long,
     val unverified_orchard_balance : Long,
-    val transparent_balance : Long
+    val confirmed_transparent_balance : Long
+    val unconfirmed_transparent_balance : Long
 )
 
 data class Send (
@@ -363,7 +364,7 @@ class ExecuteSendFromOrchard {
         println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
         assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(1000000)
-        assertThat(balancePreSend.transparent_balance).isEqualTo(0)
+        assertThat(balancePreSend.confirmed_transparent_balance).isEqualTo(0)
 
         val addressesJson: String = uniffi.zingo.executeCommand("addresses", "")
         println("\nAddresses:")
@@ -410,8 +411,8 @@ class ExecuteSendFromOrchard {
         val balancePostSend: Balance = mapper.readValue(balanceJson)
         assertThat(balancePostSend.orchard_balance).isEqualTo(885000)
         // the transparent funds are unconfirmed...
-        // when we have this new field, we will cnage this properly.
-        assertThat(balancePostSend.transparent_balance).isEqualTo(0)
+        assertThat(balancePostSend.confirmed_transparent_balance).isEqualTo(0)
+        assertThat(balancePostSend.unconfirmed_transparent_balance).isEqualTo(100000)
     }
 }
 
@@ -570,7 +571,7 @@ class ExecuteSaplingBalanceFromSeed {
         assertThat(balance.sapling_balance).isEqualTo(125000)
         assertThat(balance.verified_sapling_balance).isEqualTo(125000)
         assertThat(balance.spendable_sapling_balance).isEqualTo(125000)
-        assertThat(balance.transparent_balance).isEqualTo(0)
+        assertThat(balance.confirmed_transparent_balance).isEqualTo(0)
 
         // save the wallet file
         rpcModule.saveWalletFile()

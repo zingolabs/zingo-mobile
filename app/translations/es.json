@@ -617,8 +617,8 @@
     "legend": "Leyenda",
     "scanned": "Escaneado",
     "scanning": "Escaneando...",
-    "historic": "Histórico",
-    "miscelanea": "Miscelánea"
+    "lowpriority": "Baja prioridad",
+    "highpriority": "Alta prioridad"
   },
   "import": {
     "title": "Semilla / Clave de Visualización",

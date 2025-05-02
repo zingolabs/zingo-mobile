@@ -455,15 +455,15 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                                   : range.priority === RPCSyncScanRangePriorityStatusEnum.Scanned
                                   ? 'green'  /* Scanned  */
                                   : range.priority === RPCSyncScanRangePriorityStatusEnum.Historic
-                                  ? 'gray'   /* Historic */
+                                  ? 'gray'   /* Low priority */
                                   : range.priority === RPCSyncScanRangePriorityStatusEnum.OpenAdjacent
-                                  ? 'blue'   /* Miscelanea */
+                                  ? 'blue'   /* High priority */
                                   : range.priority === RPCSyncScanRangePriorityStatusEnum.FoundNote
-                                  ? 'blue'   /* Miscelanea */
+                                  ? 'blue'   /* High priority */
                                   : range.priority === RPCSyncScanRangePriorityStatusEnum.ChainTip
-                                  ? 'blue'   /* Miscelanea */
+                                  ? 'blue'   /* High priority */
                                   : range.priority === RPCSyncScanRangePriorityStatusEnum.Verify
-                                  ? 'blue'   /* Miscelanea */
+                                  ? 'blue'   /* High priority */
                                   : 'red',   /* error somehow */
                             }}
                           />;
@@ -523,7 +523,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                           }}
                         />
                         <Text style={{ color: colors.text, marginRight: 10 }}>
-                          {translate('report.historic') as string}
+                          {translate('report.lowpriority') as string}
                         </Text>
                         <View
                           style={{
@@ -537,7 +537,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                           }}
                         />
                         <Text style={{ color: colors.text, marginRight: 10 }}>
-                          {translate('report.miscelanea') as string}
+                          {translate('report.highpriority') as string}
                         </Text>
                       </View>
                     </DetailLine>

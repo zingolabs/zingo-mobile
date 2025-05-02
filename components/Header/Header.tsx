@@ -220,7 +220,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       }
     };
 
-    if (!readOnly && setShieldingAmount && selectServer !== SelectServerEnum.offline) {
+    if (!readOnly &&
+        setShieldingAmount &&
+        selectServer !== SelectServerEnum.offline &&
+        somePending ? 0 : (totalBalance?.transparentBal ? totalBalance.transparentBal : 0) > 0
+    ) {
       (async () => {
         let proposeFee = 0;
         let proposeAmount = 0;
@@ -252,11 +256,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             //Alert.alert('Calculating the FEE', runProposeJson.error);
           }
         }
-
         setShieldingFee(proposeFee);
-        setShieldingAmount(proposeAmount);
+        setShieldingAmount && setShieldingAmount(proposeAmount);
         //console.log(proposeFee, proposeAmount);
       })();
+    } else {
+      setShieldingFee(0);
+      setShieldingAmount && setShieldingAmount(0);
     }
   }, [readOnly, setShieldingAmount, totalBalance?.transparentBal, somePending, selectServer]);
 

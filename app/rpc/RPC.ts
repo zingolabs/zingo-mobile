@@ -203,9 +203,9 @@ export default class RPC {
     if (readOnly) {
       // only viewing key & birthday
       try {
-        //const start = Date.now();
+        const start = Date.now();
         const ufvkStr: string = await RPCModule.execute(CommandEnum.exportufvk, '');
-        //console.log('=========================================== > get ufvk - ', Date.now() - start);
+        console.log('=========================================== > get ufvk - ', Date.now() - start);
         if (ufvkStr) {
           if (ufvkStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error ufvk ${ufvkStr}`);
@@ -233,9 +233,9 @@ export default class RPC {
     } else {
       // only seed & birthday
       try {
-        //const start2 = Date.now();
+        const start2 = Date.now();
         const seedStr: string = await RPCModule.execute(CommandEnum.seed, '');
-        //console.log('=========================================== > get seed - ', Date.now() - start2);
+        console.log('=========================================== > get seed - ', Date.now() - start2);
         if (seedStr) {
           if (seedStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error seed ${seedStr}`);
@@ -321,14 +321,14 @@ export default class RPC {
     taskPromises.push(
       new Promise<void>(async resolve => {
         await this.refreshSync();
-        console.log('INTERVAL refresh sync');
+        //console.log('INTERVAL refresh sync');
         resolve();
       }),
     );
     taskPromises.push(
       new Promise<void>(async resolve => {
         await this.fetchSyncStatus();
-        console.log('INTERVAL status sync');
+        //console.log('INTERVAL status sync');
         resolve();
       }),
     );
@@ -354,6 +354,9 @@ export default class RPC {
     // I need to fetch this quickly.
     this.fetchZingolibVersion();
 
+    // takes a while to start
+    await this.refreshSync();
+
     // fetching only once
     await this.fetchAddresses();
     //await this.fetchWalletSettings();
@@ -362,7 +365,7 @@ export default class RPC {
 
     // every 5 seconds the App update part of the data
     if (!this.updateTimerID) {
-      this.updateTimerID = setInterval(() => this.runTaskPromises(), 5 * 1000); // 5 secs
+      this.updateTimerID = setInterval(() => this.runTaskPromises(), 2 * 1000); // 2 secs
       //console.log('create update timer', this.updateVTTimerID);
       this.timers.push(this.updateTimerID);
     }
@@ -378,8 +381,9 @@ export default class RPC {
     if (!returnStop || returnStop.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC STOP ERROR', returnStop);
       return;
+    } else {
+      console.log('stop sync process. STOPPED', returnStop);
     }
-    console.log('stop sync process. STOPPED', returnStop);
 
     // deactivate the sync flag just in case.
     this.setInRefresh(false);
@@ -390,8 +394,9 @@ export default class RPC {
     if (!returnPause || returnPause.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC PAUSE ERROR', returnPause);
       return;
+    } else {
+      console.log('pause sync process. PAUSED', returnPause);
     }
-    console.log('pause sync process. PAUSED', returnPause);
 
     // deactivate the sync flag just in case.
     this.setInRefresh(false);
@@ -431,10 +436,10 @@ export default class RPC {
   }
 
   async refreshSync(fullRescan?: boolean) {
-    console.log('WALLET', this.lastWalletBlockHeight, 'SERVER', this.lastServerBlockHeight, 'in refresh', this.inRefresh);
+    //console.log('WALLET', this.lastWalletBlockHeight, 'SERVER', this.lastServerBlockHeight, 'in refresh', this.inRefresh);
 
     if (this.refreshSyncLock && !fullRescan) {
-      console.log('REFRESH ----> in execution already');
+      //console.log('REFRESH ----> in execution already');
       return;
     }
     this.refreshSyncLock = true;
@@ -464,19 +469,19 @@ export default class RPC {
       // the rescan in zingolib do two tasks:
       // 1. stop the sync.
       // 2. launch the rescan.
-      //const s = Date.now();
+      const s = Date.now();
       const rescanStr: string = await RPCModule.runRescanProcess();
-      //console.log('rescan run command - ', Date.now() - s);
-      console.log('rescan RUN', rescanStr);
+      console.log('=========================================== > rescan run command - ', Date.now() - s);
+      //console.log('rescan RUN', rescanStr);
       if (!rescanStr || rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
         console.log(`Error rescan ${rescanStr}`);
       }
       await this.configure();
     } else {
-      //const s = Date.now();
+      const s = Date.now();
       const syncStr: string = await RPCModule.runSyncProcess();
-      //console.log('sync run command - ', Date.now() - s);
-      console.log('sync RUN', syncStr);
+      console.log('=========================================== > sync run command - ', Date.now() - s);
+      //console.log('sync RUN', syncStr);
       if (!syncStr || syncStr.toLowerCase().startsWith(GlobalConst.error)) {
         console.log(`Error sync ${syncStr}`);
       }
@@ -487,13 +492,13 @@ export default class RPC {
 
   async fetchSyncStatus(): Promise<void> {
     if (this.fetchSyncStatusLock) {
-      console.log('sync status locked');
+      //console.log('sync status locked');
       return;
     }
     this.fetchSyncStatusLock = true;
-    //const s = Date.now();
+    const s = Date.now();
     const returnStatus: string = await RPCModule.statusSyncInfo();
-    //console.log('sync status run command - ', Date.now() - s);
+    console.log('=========================================== > sync status command - ', Date.now() - s);
     if (!returnStatus || returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC STATUS ERROR', returnStatus);
       this.fetchSyncStatusLock = false;
@@ -508,13 +513,13 @@ export default class RPC {
       return;
     }
 
-    console.log('SYNC STATUS', ss);
-    console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_total_outputs_scanned);
+    //console.log('SYNC STATUS', ss);
+    //console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_total_outputs_scanned);
 
     // synchronize status
     const inR: boolean = !!ss.scan_ranges && ss.scan_ranges.length > 0 && ss.percentage_total_outputs_scanned < 100;
     this.setInRefresh(inR);
-    console.log('SYNC STATUS IN-REFRESH', inR);
+    //console.log('SYNC STATUS IN-REFRESH', inR);
 
     //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
 
@@ -527,37 +532,24 @@ export default class RPC {
     if (!this.inRefresh) {
       // here we can release the screen...
       this.keepAwake(false);
-
-      //const start2 = Date.now();
-      await RPCModule.doSave();
-      //console.log('=========================================== > save wallet - ', Date.now() - start2);
-
-      // store SyncStatus object for a new screen
-      //const start3 = Date.now();
-      this.fnSetSyncingStatus(ss as RPCSyncStatusType);
-      //console.log('=========================================== > set sync status - ', Date.now() - start3);
-
-      //console.log('sync status', ss);
-      //console.log(`Finished refresh at ${this.lastWalletBlockHeight} id: ${this.syncId}`);
-    } else {
-      // maybe is too many saving process... let's see.
-      // need to evaluate this carefully because do not want to
-      // call dosave all the time.
-      await RPCModule.doSave();
     }
+    const start2 = Date.now();
+    await RPCModule.doSave();
+    console.log('=========================================== > save wallet - ', Date.now() - start2);
+
     this.fetchSyncStatusLock = false;
   }
 
   // do not use it for now...
   async fetchSyncPoll(): Promise<void> {
     if (this.fetchSyncPollLock) {
-      console.log('sync poll locked');
+      //console.log('sync poll locked');
       return;
     }
     this.fetchSyncPollLock = true;
     //const s = Date.now();
     const returnPoll: string = await RPCModule.pollSyncInfo();
-    //console.log('sync poll run command - ', Date.now() - s);
+    //console.log('=========================================== > sync poll command - ', Date.now() - s);
     if (!returnPoll || returnPoll.toLowerCase().startsWith(GlobalConst.error) || returnPoll.toLowerCase().startsWith('sync task')) {
       console.log('SYNC POLL ERROR', returnPoll);
       this.fetchSyncPollLock = false;
@@ -642,9 +634,9 @@ export default class RPC {
       }
       this.fetchInfoAndServerHeightLock = true;
       let infoError: boolean = false;
-      //const start = Date.now();
+      const start = Date.now();
       const infoStr: string = await RPCModule.execute(CommandEnum.info, '');
-      //console.log('=========================================== > info - ', Date.now() - start);
+      console.log('=========================================== > info - ', Date.now() - start);
       if (infoStr) {
         if (infoStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error info & server block height ${infoStr}`);
@@ -701,9 +693,9 @@ export default class RPC {
         return;
       }
       this.fetchZingolibVersionLock = true;
-      //const start = Date.now();
+      const start = Date.now();
       let zingolibStr: string = await RPCModule.execute(CommandEnum.version, '');
-      //console.log('=========================================== > zingolib version - ', Date.now() - start);
+      console.log('=========================================== > zingolib version - ', Date.now() - start);
       if (zingolibStr) {
         if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error zingolib version ${zingolibStr}`);
@@ -732,9 +724,9 @@ export default class RPC {
         return;
       }
       this.fetchTotalBalanceLock = true;
-      //const start = Date.now();
+      const start = Date.now();
       const balanceStr: string = await RPCModule.execute(CommandEnum.balance, '');
-      //console.log('=========================================== > balance - ', Date.now() - start);
+      console.log('=========================================== > balance - ', Date.now() - start);
       if (balanceStr) {
         if (balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error balance ${balanceStr}`);
@@ -750,7 +742,7 @@ export default class RPC {
 
       const orchardBal: number = balanceJSON.orchard_balance || 0;
       const privateBal: number = balanceJSON.sapling_balance || 0;
-      const transparentBal: number = balanceJSON.transparent_balance || 0;
+      const transparentBal: number = balanceJSON.confirmed_transparent_balance || 0;
 
       const total = orchardBal + privateBal + transparentBal;
 
@@ -785,9 +777,9 @@ export default class RPC {
         return;
       }
       this.fetchAddressesLock = true;
-      //const start = Date.now();
+      const start = Date.now();
       const addressesStr: string = await RPCModule.execute(CommandEnum.addresses, CommandAddressesEnum.full);
-      //console.log('=========================================== > addresses full - ', Date.now() - start);
+      console.log('=========================================== > addresses full - ', Date.now() - start);
       if (addressesStr) {
         if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error addresses ${addressesStr}`);
@@ -801,9 +793,9 @@ export default class RPC {
       }
       const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr) || [];
 
-      //const start2 = Date.now();
+      const start2 = Date.now();
       const orchardAddressesStr: string = await RPCModule.execute(CommandEnum.addresses, CommandAddressesEnum.orchard);
-      //console.log('=========================================== > addresses orchard - ', Date.now() - start2);
+      console.log('=========================================== > addresses orchard - ', Date.now() - start2);
       if (addressesStr) {
         if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error addresses ${addressesStr}`);
@@ -863,9 +855,9 @@ export default class RPC {
         return;
       }
       this.fetchWalletHeightLock = true;
-      //const start = Date.now();
+      const start = Date.now();
       const heightStr: string = await RPCModule.execute(CommandEnum.height, '');
-      //console.log('=========================================== > wallet height - ', Date.now() - start);
+      console.log('=========================================== > wallet height - ', Date.now() - start);
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error wallet height ${heightStr}`);
@@ -923,9 +915,9 @@ export default class RPC {
         return;
       }
       this.fetchTandZandOValueTransfersLock = true;
-      //const start = Date.now();
+      const start = Date.now();
       const valueTransfersStr: string = await RPCModule.getValueTransfersList();
-      //console.log('=========================================== > value transfers - ', Date.now() - start);
+      console.log('=========================================== > value transfers - ', Date.now() - start);
       //console.log(valueTransfersStr);
       if (valueTransfersStr) {
         if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1033,9 +1025,9 @@ export default class RPC {
         return;
       }
       this.fetchTandZandOMessagesLock = true;
-      //const start = Date.now();
+      const start = Date.now();
       const messagesStr: string = await RPCModule.execute(CommandEnum.messages, '');
-      //console.log('=========================================== > messages - ', Date.now() - start);
+      console.log('=========================================== > messages - ', Date.now() - start);
       //console.log(messagesStr);
       if (messagesStr) {
         if (messagesStr.toLowerCase().startsWith(GlobalConst.error)) {
