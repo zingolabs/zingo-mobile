@@ -107,7 +107,7 @@ data class Balance (
     val verified_orchard_balance : Long,
     val spendable_orchard_balance : Long,
     val unverified_orchard_balance : Long,
-    val confirmed_transparent_balance : Long
+    val confirmed_transparent_balance : Long,
     val unconfirmed_transparent_balance : Long
 )
 
