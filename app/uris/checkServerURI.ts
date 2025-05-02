@@ -12,7 +12,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
   let newChainName: ChainNameEnum | undefined;
 
   try {
-    const resultStrServerPromise = RPCModule.execute(CommandEnum.changeserver, uri);
+    const resultStrServerPromise = RPCModule.changeServerProcess(uri);
     const timeoutServerPromise = new Promise((_, reject) => {
       setTimeout(() => {
         reject(new Error('Promise changeserver Timeout 30 seconds'));
@@ -25,14 +25,14 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
     if (!resultStrServer || resultStrServer.toLowerCase().startsWith(GlobalConst.error)) {
       // I have to restore the old server again. Just in case.
       //console.log('changeserver', resultStrServer);
-      await RPCModule.execute(CommandEnum.changeserver, oldUri);
+      await RPCModule.changeServerProcess(oldUri);
       // error, no timeout
       return { result: false, timeout: false, newChainName };
     } else {
       // the server is changed
       if (uri) {
         // the new server is not Offline mode.
-        const infoStrPromise = RPCModule.execute(CommandEnum.info, '');
+        const infoStrPromise = RPCModule.infoServerInfo();
         const timeoutInfoPromise = new Promise((resolve, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 30 seconds'));
@@ -45,7 +45,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
         if (!infoStr || infoStr.toLowerCase().startsWith(GlobalConst.error)) {
           //console.log('info', infoStr);
           // I have to restore the old server again.
-          await RPCModule.execute(CommandEnum.changeserver, oldUri);
+          await RPCModule.changeServerProcess(oldUri);
           // error, no timeout
           return { result: false, timeout: false, newChainName };
         } else {
@@ -55,7 +55,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
           } catch (e) {
             //console.log(infoStr);
             // I have to restore the old server again.
-            await RPCModule.execute(CommandEnum.changeserver, oldUri);
+            await RPCModule.changeServerProcess(oldUri);
             // error, no timeout
             return { result: false, timeout: false, newChainName };
           }
@@ -75,7 +75,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
         if (!balanceStr || balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
           //console.log('info', infoStr);
           // I have to restore the old server again.
-          await RPCModule.execute(CommandEnum.changeserver, oldUri);
+          await RPCModule.changeServerProcess(oldUri);
           // error, no timeout
           return { result: false, timeout: false, newChainName };
         } else {
@@ -86,7 +86,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
   } catch (error: any) {
     //console.log('catch', error);
     // I have to restore the old server again. Just in case.
-    await RPCModule.execute(CommandEnum.changeserver, oldUri);
+    await RPCModule.changeServerProcess(oldUri);
     // error, YES timeout
     return { result: false, timeout: true, newChainName };
   }

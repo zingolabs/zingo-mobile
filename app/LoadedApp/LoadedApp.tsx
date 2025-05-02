@@ -39,7 +39,6 @@ import {
   ServerType,
   AddressBookFileClass,
   SecurityType,
-  CommandEnum,
   MenuItemEnum,
   LanguageEnum,
   ModeEnum,
@@ -1419,7 +1418,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
       // we need to restore the old server because the new one doesn't have the seed of the current wallet.
       const oldSettings = await SettingsFileImpl.readSettings();
-      await RPCModule.execute(CommandEnum.changeserver, oldSettings.server.uri);
+      await RPCModule.changeServerProcess(oldSettings.server.uri);
 
       // go to the seed screen for changing the wallet for another in the new server or cancel this action.
       this.setState({
@@ -1623,7 +1622,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (this.state.newServer && this.state.newSelectServer) {
       const beforeServer = this.state.server;
 
-      const resultStrServerPromise = RPCModule.execute(CommandEnum.changeserver, this.state.newServer.uri);
+      const resultStrServerPromise = RPCModule.changeServerProcess(this.state.newServer.uri);
       const timeoutServerPromise = new Promise((_, reject) => {
         setTimeout(() => {
           reject(new Error('Promise changeserver Timeout 30 seconds'));

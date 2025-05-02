@@ -577,7 +577,7 @@ class ExecuteSaplingBalanceFromSeed {
         rpcModule.saveWalletFile()
 
         // change to Offline mode
-        val changeServerJson:String = uniffi.zingo.executeCommand("changeserver", "")
+        val changeServerJson:String = uniffi.zingo.changeServer("")
         println("\nChange Server:")
         println(changeServerJson)
         assertThat(changeServerJson.lowercase().startsWith("error")).isFalse()

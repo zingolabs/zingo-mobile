@@ -689,4 +689,68 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             }
         }
     }
+
+    @ReactMethod
+    fun infoServerInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.infoServer()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: info server: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getSeedInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getSeed()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: seed: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getUfvkInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getUfvk()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: ufvk: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun changeServerProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.changeServer()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: change server: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
 }

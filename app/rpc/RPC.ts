@@ -204,7 +204,7 @@ export default class RPC {
       // only viewing key & birthday
       try {
         const start = Date.now();
-        const ufvkStr: string = await RPCModule.execute(CommandEnum.exportufvk, '');
+        const ufvkStr: string = await RPCModule.getUfvkInfo();
         console.log('=========================================== > get ufvk - ', Date.now() - start);
         if (ufvkStr) {
           if (ufvkStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -234,7 +234,7 @@ export default class RPC {
       // only seed & birthday
       try {
         const start2 = Date.now();
-        const seedStr: string = await RPCModule.execute(CommandEnum.seed, '');
+        const seedStr: string = await RPCModule.getSeedInfo();
         console.log('=========================================== > get seed - ', Date.now() - start2);
         if (seedStr) {
           if (seedStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -635,7 +635,7 @@ export default class RPC {
       this.fetchInfoAndServerHeightLock = true;
       let infoError: boolean = false;
       const start = Date.now();
-      const infoStr: string = await RPCModule.execute(CommandEnum.info, '');
+      const infoStr: string = await RPCModule.infoServerInfo();
       console.log('=========================================== > info - ', Date.now() - start);
       if (infoStr) {
         if (infoStr.toLowerCase().startsWith(GlobalConst.error)) {

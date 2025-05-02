@@ -791,4 +791,116 @@ class RPCModule: NSObject {
         }
       }
   }
+
+  func fnInfoServerInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = infoServer()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] info server. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(infoServerInfo:reject:)
+  func infoServerInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnInfoServerInfo(dict)
+        }
+      }
+  }
+
+  func fnGetSeedInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getSeed()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] seed. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getSeedInfo:reject:)
+  func getSeedInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetSeedInfo(dict)
+        }
+      }
+  }
+
+  func fnGetUfvkInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getUfvk()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] ufvk. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getUfvkInfo:reject:)
+  func getUfvkInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetUfvkInfo(dict)
+        }
+      }
+  }
+
+  func fnChangeServerProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = changeServer()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] change server. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(changeServerProcess:reject:)
+  func changeServerProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnChangeServerProcess(dict)
+        }
+      }
+  }
 }
