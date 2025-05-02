@@ -418,7 +418,7 @@ class RPCModule: NSObject {
       }
   }
 
-  func fnGetLatestBlock(_ dict: [AnyHashable: Any]) {
+  func fnGetLatestBlockServerInfo(_ dict: [AnyHashable: Any]) {
     if let server = dict["server"] as? String,
        let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       let resp = getLatestBlockServer(serveruri: server)
@@ -437,12 +437,40 @@ class RPCModule: NSObject {
     }
   }
   
-  @objc(getLatestBlock:resolve:reject:)
-  func getLatestBlock(_ server: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(getLatestBlockServerInfo:resolve:reject:)
+  func getLatestBlockServerInfo(_ server: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let dict: [String: Any] = ["server": server, "resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
-              self.fnGetLatestBlock(dict)
+              self.fnGetLatestBlockServerInfo(dict)
+          }
+      }
+  }
+
+  func fnGetLatestBlockWalletInfo(_ dict: [AnyHashable: Any]) {
+    if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+      let resp = getLatestBlockWallet()
+      let respStr = String(resp)
+      DispatchQueue.main.async {
+        resolve(respStr)
+      }
+    } else {
+      let err = "Error: [Native] Getting wallet latest block. Argument problem."
+      NSLog(err)
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+      }
+    }
+  }
+  
+  @objc(getLatestBlockWalletInfo:reject:)
+  func getLatestBlockWalletInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+          if let self = self {
+              self.fnGetLatestBlockWalletInfo(dict)
           }
       }
   }

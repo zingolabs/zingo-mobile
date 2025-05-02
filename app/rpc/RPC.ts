@@ -856,7 +856,7 @@ export default class RPC {
       }
       this.fetchWalletHeightLock = true;
       const start = Date.now();
-      const heightStr: string = await RPCModule.execute(CommandEnum.height, '');
+      const heightStr: string = await RPCModule.getLatestBlockWalletInfo();
       console.log('=========================================== > wallet height - ', Date.now() - start);
       if (heightStr) {
         if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {

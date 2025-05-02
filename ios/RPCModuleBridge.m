@@ -59,9 +59,12 @@ RCT_EXTERN_METHOD(execute:
                   args:(NSString)args
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(getLatestBlock:
+RCT_EXTERN_METHOD(getLatestBlockServer:
     (NSString)server 
                   resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getLatestBlockWallet:
+    (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getDonationAddress:
     (RCTPromiseResolveBlock)resolve

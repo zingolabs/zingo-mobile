@@ -473,7 +473,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun getLatestBlock(server: String, promise: Promise) {
+    fun getLatestBlockServerInfo(server: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
@@ -481,7 +481,24 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
                 promise.resolve(resp)
             } catch (e: Exception) {
-                val errorMessage = "Error: getting latest block: ${e.localizedMessage}"
+                val errorMessage = "Error: getting latest block server: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getLatestBlockWalletInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getLatestBlockWallet()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: getting latest block wallet: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 promise.resolve(errorMessage)

@@ -3,7 +3,8 @@ jest.mock('react-native', () => {
 
   RN.NativeModules.RPCModule = {
     execute: jest.fn(() => '{}'),
-    getLatestBlock: jest.fn(() => '{}'),
+    getLatestBlockServerInfo: jest.fn(() => '{}'),
+    getLatestBlockWalletInfo: jest.fn(() => '{}'),
     walletExists: jest.fn(() => 'false'),
     getValueTransfersList: jest.fn(() => '{ "value_transfers": [], "total": 0 }'),
     setCryptoDefaultProvider: jest.fn(() => 'true'),

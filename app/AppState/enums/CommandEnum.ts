@@ -2,8 +2,6 @@ export enum CommandEnum {
   changeserver = 'changeserver',
   walletKind = 'wallet_kind',
   updatecurrentprice = 'updatecurrentprice',
-  notes = 'notes',
-  height = 'height',
   setoption = 'setoption',
   getoption = 'getoption',
   info = 'info',
