@@ -725,7 +725,7 @@ export default class RPC {
       }
       this.fetchTotalBalanceLock = true;
       const start = Date.now();
-      const balanceStr: string = await RPCModule.execute(CommandEnum.balance, '');
+      const balanceStr: string = await RPCModule.getBalanceInfo();
       console.log('=========================================== > balance - ', Date.now() - start);
       if (balanceStr) {
         if (balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1026,7 +1026,7 @@ export default class RPC {
       }
       this.fetchTandZandOMessagesLock = true;
       const start = Date.now();
-      const messagesStr: string = await RPCModule.execute(CommandEnum.messages, '');
+      const messagesStr: string = await RPCModule.getMessagesInfo('');
       console.log('=========================================== > messages - ', Date.now() - start);
       //console.log(messagesStr);
       if (messagesStr) {

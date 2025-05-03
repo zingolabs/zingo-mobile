@@ -3,7 +3,6 @@ export enum CommandEnum {
   setoption = 'setoption',
   getoption = 'getoption',
   addresses = 'addresses',
-  balance = 'balance',
   valueToAddress = 'value_to_address',
   sendsToAddress = 'sends_to_address',
   memobytesToAddress = 'memobytes_to_address',
@@ -16,5 +15,4 @@ export enum CommandEnum {
   shield = 'shield',
   // this works for all: send, sendall & shield
   confirm = 'confirm',
-  messages = 'messages',
 }

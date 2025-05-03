@@ -24,6 +24,8 @@ jest.mock('react-native', () => {
     parseAddressInfo: jest.fn(() => '{}'),
     parseUfvkInfo: jest.fn(() => '{}'),
     getVersionInfo: jest.fn(() => '{}'),
+    getMessagesInfo: jest.fn(() => '{}'),
+    getBalanceInfo: jest.fn(() => '{}'),
   };
   RN.View = jest.fn();
 

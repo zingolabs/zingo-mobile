@@ -1,4 +1,4 @@
-import { ChainNameEnum, CommandEnum, GlobalConst } from '../AppState';
+import { ChainNameEnum, GlobalConst } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCInfoType } from '../rpc/types/RPCInfoType';
 
@@ -62,7 +62,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
         }
       } else {
         // the new server is empty -> means Offline mode.
-        const balanceStrPromise = RPCModule.execute(CommandEnum.balance, '');
+        const balanceStrPromise = RPCModule.getBalanceInfo();
         const timeoutInfoPromise = new Promise((resolve, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 30 seconds'));

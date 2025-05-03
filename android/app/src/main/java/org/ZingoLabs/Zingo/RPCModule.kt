@@ -769,7 +769,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             }
         }
     }
-}
 
     @ReactMethod
     fun parseAddressInfo(address: String, promise: Promise) {
@@ -818,3 +817,37 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             }
         }
     }
+
+    @ReactMethod
+    fun getMessagesInfo(address: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getMessages(address)
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: messages: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getBalanceInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getBalance()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: balance: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
+}
