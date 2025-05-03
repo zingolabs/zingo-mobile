@@ -56,7 +56,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             uniffi.zingo.initLogging()
 
             // check the Server, because the task can run without the App.
-            val balance = uniffi.zingo.executeCommand("balance", "")
+            val balance = uniffi.zingo.getBalance()
             Log.i("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
             if (balance.lowercase().startsWith(ErrorPrefix.value)) {
                 // this means this task is running with the App closed
