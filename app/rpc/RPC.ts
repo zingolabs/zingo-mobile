@@ -760,7 +760,7 @@ export default class RPC {
       //console.log('=========================================== > set balance - ', Date.now() - start2);
       this.fetchTotalBalanceLock = false;
     } catch (error) {
-      console.log(`Critical Error addresses balances notes ${error}`);
+      console.log(`Critical Error balances ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       this.setInRefresh(false);
       await this.clearTimers();

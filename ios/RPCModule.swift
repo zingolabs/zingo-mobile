@@ -1100,7 +1100,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       let dict: [String: Any] = ["receivers": receivers, "resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
-          self.fnGetAddressInfo(dict)
+          self.fnGetAddressesInfo(dict)
         }
       }
   }
