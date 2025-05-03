@@ -877,8 +877,9 @@ class RPCModule: NSObject {
   }
 
   func fnChangeServerProcess(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = changeServer()
+      if let server = dict["server"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = changeServer(serveruri: server)
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
@@ -894,9 +895,9 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(changeServerProcess:reject:)
-  func changeServerProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+  @objc(changeServerProcess:resolve:reject:)
+  func changeServerProcess(_ server: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["server": server, "resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnChangeServerProcess(dict)

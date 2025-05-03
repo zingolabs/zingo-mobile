@@ -739,11 +739,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun changeServerProcess(promise: Promise) {
+    fun changeServerProcess(server: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.changeServer()
+                val resp = uniffi.zingo.changeServer(server)
 
                 promise.resolve(resp)
             } catch (e: Exception) {
