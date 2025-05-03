@@ -133,5 +133,9 @@ RCT_EXTERN_METHOD(getMessagesInfo:
 RCT_EXTERN_METHOD(getBalanceInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getAddressesInfo:
+    (NSString)receivers 
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

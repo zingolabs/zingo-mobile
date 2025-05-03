@@ -778,7 +778,7 @@ export default class RPC {
       }
       this.fetchAddressesLock = true;
       const start = Date.now();
-      const addressesStr: string = await RPCModule.execute(CommandEnum.addresses, CommandAddressesEnum.full);
+      const addressesStr: string = await RPCModule.getAddressesInfo(CommandAddressesEnum.full);
       console.log('=========================================== > addresses full - ', Date.now() - start);
       if (addressesStr) {
         if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -794,7 +794,7 @@ export default class RPC {
       const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr) || [];
 
       const start2 = Date.now();
-      const orchardAddressesStr: string = await RPCModule.execute(CommandEnum.addresses, CommandAddressesEnum.orchard);
+      const orchardAddressesStr: string = await RPCModule.getAddressesInfo(CommandAddressesEnum.orchard);
       console.log('=========================================== > addresses orchard - ', Date.now() - start2);
       if (addressesStr) {
         if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
