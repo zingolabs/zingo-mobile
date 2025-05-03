@@ -18,7 +18,6 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { CommandEnum } from '../../app/AppState';
 import RPCModule from '../../app/RPCModule';
 import { RPCWalletKindType } from '../../app/rpc/types/RPCWalletKindType';
 import { useMagicModal } from 'react-native-magic-modal';
@@ -45,7 +44,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
   useEffect(() => {
     (async () => {
       // checking the pools of this wallet
-      const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
+      const walletKindStr: string = await RPCModule.walletKindInfo();
       try {
         const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
         //console.log(walletKindJSON);

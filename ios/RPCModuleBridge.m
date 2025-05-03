@@ -111,5 +111,8 @@ RCT_EXTERN_METHOD(getUfvkInfo:
 RCT_EXTERN_METHOD(changeServerProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(walletKindInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

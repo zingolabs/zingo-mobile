@@ -27,7 +27,6 @@ import {
   ServerType,
   SecurityType,
   ServerUrisType,
-  CommandEnum,
   LanguageEnum,
   CurrencyEnum,
   ModeEnum,
@@ -503,7 +502,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
             // Load the wallet and navigate to the vts screen
             let readOnly: boolean = false;
-            const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
+            const walletKindStr: string = await RPCModule.walletKindInfo();
             //console.log('KIND...', walletKindStr);
             try {
               const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);

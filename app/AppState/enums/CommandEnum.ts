@@ -1,5 +1,4 @@
 export enum CommandEnum {
-  walletKind = 'wallet_kind',
   updatecurrentprice = 'updatecurrentprice',
   setoption = 'setoption',
   getoption = 'getoption',
