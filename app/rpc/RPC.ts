@@ -332,14 +332,14 @@ export default class RPC {
         resolve();
       }),
     );
-    // do not need this for now...
-    //taskPromises.push(
-    //  new Promise<void>(async resolve => {
-    //    await this.fetchSyncPoll();
-    //    console.log('INTERVAL poll sync');
-    //    resolve();
-    //  }),
-    //);
+    // do need this because of the sync process
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        await this.fetchSyncPoll();
+        //console.log('INTERVAL poll sync');
+        resolve();
+      }),
+    );
 
     Promise.allSettled(taskPromises);
   }
@@ -547,9 +547,9 @@ export default class RPC {
       return;
     }
     this.fetchSyncPollLock = true;
-    //const s = Date.now();
+    const s = Date.now();
     const returnPoll: string = await RPCModule.pollSyncInfo();
-    //console.log('=========================================== > sync poll command - ', Date.now() - s);
+    console.log('=========================================== > sync poll command - ', Date.now() - s);
     if (!returnPoll || returnPoll.toLowerCase().startsWith(GlobalConst.error) || returnPoll.toLowerCase().startsWith('sync task')) {
       console.log('SYNC POLL ERROR', returnPoll);
       this.fetchSyncPollLock = false;

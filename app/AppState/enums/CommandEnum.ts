@@ -2,9 +2,6 @@ export enum CommandEnum {
   updatecurrentprice = 'updatecurrentprice',
   setoption = 'setoption',
   getoption = 'getoption',
-  valueToAddress = 'value_to_address',
-  sendsToAddress = 'sends_to_address',
-  memobytesToAddress = 'memobytes_to_address',
 
   // calculate the max spendable amount in the wallet
   spendablebalance = 'spendablebalance',

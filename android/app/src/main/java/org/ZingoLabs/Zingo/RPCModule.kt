@@ -866,4 +866,52 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    @ReactMethod
+    fun getTotalMemobytesToAddressInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getTotalMemobytesToAddress()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: memobyes to address: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getTotalValueToAddressInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getTotalValueToAddress()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: value to address: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getTotalSpendsToAddressInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getTotalSpendsToAddress()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: spends to address: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
 }

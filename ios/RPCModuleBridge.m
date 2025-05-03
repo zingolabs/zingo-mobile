@@ -137,5 +137,14 @@ RCT_EXTERN_METHOD(getAddressesInfo:
     (NSString)receivers 
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getTotalMemobytesToAddressInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getTotalValueToAddressInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getTotalSpendsToAddressInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

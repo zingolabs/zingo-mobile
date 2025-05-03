@@ -1105,4 +1105,88 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
+  func fnGetTotalMemobytesToAddressInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getTotalMemobytesToAddress()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] memobytes to address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getTotalMemobytesToAddressInfo:reject:)
+  func getTotalMemobytesToAddressInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetTotalMemobytesToAddressInfo(dict)
+        }
+      }
+  }
+
+  func fnGetTotalValueToAddressInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getTotalValueToAddress()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] value to address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getTotalValueToAddressInfo:reject:)
+  func getTotalValueToAddressInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetTotalValueToAddressInfo(dict)
+        }
+      }
+  }
+
+  func fnGetTotalSpendsToAddressInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getTotalSpendsToAddress()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] spends to address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getTotalSpendsToAddressInfo:reject:)
+  func getTotalSpendsToAddressInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetTotalSpendsToAddressInfo(dict)
+        }
+      }
+  }
+
 }
