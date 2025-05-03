@@ -770,3 +770,35 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 }
+
+    @ReactMethod
+    fun parseAddressInfo(address: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.parseAddress(address)
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: parse address: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun parseUfvkInfo(ufvk: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.parseUfvk(ufvk)
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: parse ufvk: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }

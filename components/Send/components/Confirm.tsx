@@ -132,7 +132,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       return '-';
     }
 
-    const result: string = await RPCModule.execute(CommandEnum.parseAddress, sendPageState.toaddr.to);
+    const result: string = await RPCModule.parseAddressInfo(sendPageState.toaddr.to);
     if (result) {
       if (result.toLowerCase().startsWith(GlobalConst.error)) {
         return '-';

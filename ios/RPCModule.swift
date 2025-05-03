@@ -932,4 +932,62 @@ class RPCModule: NSObject {
         }
       }
   }
+
+  func fnParseAddressInfo(_ dict: [AnyHashable: Any]) {
+      if let address = dict["address"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = parseAddress(address: address)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] parse address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(parseAddressInfo:resolve:reject:)
+  func parseAddressInfo(_ address: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["address": address, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnParseAddressInfo(dict)
+        }
+      }
+  }
+
+  func fnParseUfvkInfo(_ dict: [AnyHashable: Any]) {
+      if let ufvk = dict["ufvk"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = parseUfvk(ufvk: ufvk)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] parse ufvk. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(parseUfvkInfo:resolve:reject:)
+  func parseUfvkInfo(_ ufvk: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["ufvk": ufvk, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnParseUfvkInfo(dict)
+        }
+      }
+  }
 }
