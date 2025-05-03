@@ -2,7 +2,6 @@ export enum CommandEnum {
   updatecurrentprice = 'updatecurrentprice',
   setoption = 'setoption',
   getoption = 'getoption',
-  version = 'version',
   addresses = 'addresses',
   balance = 'balance',
   valueToAddress = 'value_to_address',

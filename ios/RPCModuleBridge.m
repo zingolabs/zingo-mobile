@@ -123,5 +123,8 @@ RCT_EXTERN_METHOD(parseUfvkInfo:
     (NSString)ufvk 
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getVersionInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

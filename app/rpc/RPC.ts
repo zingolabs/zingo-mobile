@@ -694,7 +694,7 @@ export default class RPC {
       }
       this.fetchZingolibVersionLock = true;
       const start = Date.now();
-      let zingolibStr: string = await RPCModule.execute(CommandEnum.version, '');
+      let zingolibStr: string = await RPCModule.getVersionInfo();
       console.log('=========================================== > zingolib version - ', Date.now() - start);
       if (zingolibStr) {
         if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
