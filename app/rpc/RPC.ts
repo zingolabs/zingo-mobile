@@ -30,7 +30,7 @@ import { RPCValueTransfersKindEnum } from './enums/RPCValueTransfersKindEnum';
 import { RPCValueTransferType } from './types/RPCValueTransferType';
 import { ValueTransferKindEnum } from '../AppState/enums/ValueTransferKindEnum';
 import { RPCValueTransfersStatusEnum } from './enums/RPCValueTransfersStatusEnum';
-import { CommandAddressesEnum } from '../AppState';
+import { AddressesReceiversEnum } from '../AppState';
 import { RPCSendProposeType } from './types/RPCSendProposeType';
 import { RPCSyncPollType } from './types/RPCSyncPollType';
 
@@ -778,7 +778,7 @@ export default class RPC {
       }
       this.fetchAddressesLock = true;
       const start = Date.now();
-      const addressesStr: string = await RPCModule.getAddressesInfo(CommandAddressesEnum.full);
+      const addressesStr: string = await RPCModule.getAddressesInfo(AddressesReceiversEnum.full);
       console.log('=========================================== > addresses full - ', Date.now() - start);
       if (addressesStr) {
         if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -794,7 +794,7 @@ export default class RPC {
       const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr) || [];
 
       const start2 = Date.now();
-      const orchardAddressesStr: string = await RPCModule.getAddressesInfo(CommandAddressesEnum.orchard);
+      const orchardAddressesStr: string = await RPCModule.getAddressesInfo(AddressesReceiversEnum.orchard);
       console.log('=========================================== > addresses orchard - ', Date.now() - start2);
       if (addressesStr) {
         if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {

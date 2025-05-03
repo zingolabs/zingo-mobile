@@ -22,7 +22,7 @@ import ValueTransferType from './types/ValueTransferType';
 import ContactType from './types/ContactType';
 
 import { CommandEnum } from './enums/CommandEnum';
-import { CommandAddressesEnum } from './enums/CommandAddressesEnum';
+import { AddressesReceiversEnum } from './enums/AddressesReceiversEnum';
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
@@ -87,7 +87,7 @@ export {
   ValueTransferType,
   ContactType,
   CommandEnum,
-  CommandAddressesEnum,
+  AddressesReceiversEnum,
   AddressBookActionEnum,
   MenuItemEnum,
   LanguageEnum,
