@@ -1220,7 +1220,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   func fnResendTransactionProcess(_ dict: [AnyHashable: Any]) {
       if let txid = dict["txid"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = getAddresses(txid: txid)
+        let resp = resendTransaction(txid: txid)
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
@@ -1249,7 +1249,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   func fnRemoveTransactionProcess(_ dict: [AnyHashable: Any]) {
       if let txid = dict["txid"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = getAddresses(txid: txid)
+        let resp = removeTransaction(txid: txid)
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
