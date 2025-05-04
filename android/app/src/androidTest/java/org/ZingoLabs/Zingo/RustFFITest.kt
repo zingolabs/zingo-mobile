@@ -166,7 +166,7 @@ class ExecuteAddressesFromSeed {
         assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val addressesJson: String = uniffi.zingo.getAddresses()
+        val addressesJson: String = uniffi.zingo.getAddresses('')
         println("\nAddresses:")
         println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
@@ -205,7 +205,7 @@ class ExecuteAddressesFromUfvk {
         assertThat(exportUfvk.ufvk).isEqualTo(Ufvk.ABANDON)
         assertThat(exportUfvk.birthday).isEqualTo(1)
 
-        val addressesJson: String = uniffi.zingo.getAddresses()
+        val addressesJson: String = uniffi.zingo.getAddresses('')
         println("\nAddresses:")
         println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
@@ -366,7 +366,7 @@ class ExecuteSendFromOrchard {
         assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(1000000)
         assertThat(balancePreSend.confirmed_transparent_balance).isEqualTo(0)
 
-        val addressesJson: String = uniffi.zingo.getAddresses()
+        val addressesJson: String = uniffi.zingo.getAddresses('')
         println("\nAddresses:")
         println(addressesJson)
         val addresses: List<Addresses> = mapper.readValue(addressesJson)
