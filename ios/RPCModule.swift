@@ -1275,4 +1275,34 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
+  func fnGetSpendableBalanceInfo(_ dict: [AnyHashable: Any]) {
+      if let address = dict["address"] as? String,
+          let zennies = dict["zennies"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getSpendableBalance(address: address, zennies: zennies)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] spendable balance. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getSpendableBalanceInfo:zennies:resolve:reject:)
+  func getSpendableBalanceInfo(_ txid: String, zennies: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["txid": txid, "zennies": zennies, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetSpendableBalanceInfo(dict)
+        }
+      }
+  }
+
 }

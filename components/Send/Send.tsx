@@ -330,13 +330,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       // spendable
       let spendableBalance = totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0;
       let zenniesForZingo = donationAddress ? false : donation;
-      const spendableBalanceJSON = { address: addressPar, zennies_for_zingo: zenniesForZingo };
-      console.log('SPENDABLEBALANCE', spendableBalanceJSON);
-      const runSpendableBalanceStr = await RPCModule.execute(
-        CommandEnum.spendablebalance,
-        JSON.stringify(spendableBalanceJSON),
-      );
-      console.log(runSpendableBalanceStr);
+      console.log('SPENDABLEBALANCE', addressPar, zenniesForZingo);
+      const runSpendableBalanceStr = await RPCModule.getSpendableBalanceInfo(addressPar, zenniesForZingo ? 'true' : 'false');
       if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
         console.log(runSpendableBalanceStr);
