@@ -930,4 +930,36 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    @ReactMethod
+    fun resendTransactionProcess(txid: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.resendTransaction(txid)
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: resend transaction: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun removeTransactionProcess(txid: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.removeTransaction(txid)
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: remove transaction: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
 }

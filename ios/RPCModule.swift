@@ -1085,7 +1085,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
             resolve(respStr)
           }
       } else {
-          let err = "Error: [Native] receivers. Command arguments problem."
+          let err = "Error: [Native] addresses. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
             DispatchQueue.main.async {
@@ -1213,6 +1213,64 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnZecPriceInfo(dict)
+        }
+      }
+  }
+
+  func fnResendTransactionProcess(_ dict: [AnyHashable: Any]) {
+      if let txid = dict["txid"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getAddresses(txid: txid)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] resend transaction. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(resendTransactionProcess:resolve:reject:)
+  func resendTransactionProcess(_ txid: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["txid": txid, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnResendTransactionProcess(dict)
+        }
+      }
+  }
+
+  func fnRemoveTransactionProcess(_ dict: [AnyHashable: Any]) {
+      if let txid = dict["txid"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getAddresses(txid: txid)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] remove transaction. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(removeTransactionProcess:resolve:reject:)
+  func removeTransactionProcess(_ txid: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["txid": txid, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnRemoveTransactionProcess(dict)
         }
       }
   }
