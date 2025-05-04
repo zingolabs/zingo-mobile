@@ -978,4 +978,36 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         }
     }
 
+    @ReactMethod
+    fun getOptionWalletInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.getOptionWallet()
+                val resp = uniffi.zingo.getTotalSpendsToAddress()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: get option wallet: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun setOptionWalletProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.setOptionWallet()
+                val resp = uniffi.zingo.getTotalSpendsToAddress()
+
+                promise.resolve(resp)
+            } catch (e: Exception) {
+                val errorMessage = "Error: set option wallet: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+                promise.resolve(errorMessage)
+            }
+        }
+    }
+
 }

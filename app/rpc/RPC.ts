@@ -155,8 +155,9 @@ export default class RPC {
 
   static async rpcSetWalletSettingOption(name: string, value: string): Promise<string> {
     try {
+      console.log(`${name}=${value}`);
       //const start = Date.now();
-      const resultStr: string = await RPCModule.execute(CommandEnum.setoption, `${name}=${value}`);
+      const resultStr: string = await RPCModule.setOptionWalletProcess(); //`${name}=${value}`);
       //console.log('=========================================== > set wallet setting - ', Date.now() - start);
 
       if (resultStr) {
@@ -577,7 +578,7 @@ export default class RPC {
       }
       this.fetchWalletSettingsLock = true;
       //const start = Date.now();
-      const downloadMemosStr: string = await RPCModule.execute(CommandEnum.getoption, WalletOptionEnum.downloadMemos);
+      const downloadMemosStr: string = await RPCModule.getOptionWalletInfo(); //CommandEnum.getoption, WalletOptionEnum.downloadMemos);
       //console.log('=========================================== > dowload memos - ', Date.now() - start);
       if (downloadMemosStr) {
         if (downloadMemosStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -593,10 +594,10 @@ export default class RPC {
       const downloadMemosJson: RPCGetOptionType = await JSON.parse(downloadMemosStr);
 
       //const start2 = Date.now();
-      const transactionFilterThresholdStr: string = await RPCModule.execute(
-        CommandEnum.getoption,
-        WalletOptionEnum.transactionFilterThreshold,
-      );
+      const transactionFilterThresholdStr: string = await RPCModule.getOptionWalletInfo();
+      //  CommandEnum.getoption,
+      //  WalletOptionEnum.transactionFilterThreshold,
+      //);
       //console.log('=========================================== > filter threshold - ', Date.now() - start2);
       if (transactionFilterThresholdStr) {
         if (transactionFilterThresholdStr.toLowerCase().startsWith(GlobalConst.error)) {
