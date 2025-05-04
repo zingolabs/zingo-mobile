@@ -1,5 +1,5 @@
 export enum AddressesReceiversEnum {
-  full = '',
+  full = 'full',
   shielded = 'shielded',
   orchard = 'orchard',
 }
