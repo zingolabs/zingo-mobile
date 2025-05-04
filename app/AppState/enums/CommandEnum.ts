@@ -1,6 +1,5 @@
 export enum CommandEnum {
   // commands to migrate when they are stable
-  updatecurrentprice = 'updatecurrentprice',
   setoption = 'setoption',
   getoption = 'getoption',
 

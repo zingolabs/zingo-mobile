@@ -30,6 +30,7 @@ jest.mock('react-native', () => {
     getTotalMemobytesToAddressInfo: jest.fn(() => '{}'),
     getTotalValueToAddressInfo: jest.fn(() => '{}'),
     getTotalSpendsToAddressInfo: jest.fn(() => '{}'),
+    zecPriceInfo: jest.fn(() => '{}'),
   };
   RN.View = jest.fn();
 

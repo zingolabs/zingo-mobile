@@ -146,5 +146,8 @@ RCT_EXTERN_METHOD(getTotalValueToAddressInfo:
 RCT_EXTERN_METHOD(getTotalSpendsToAddressInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(zecPriceInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

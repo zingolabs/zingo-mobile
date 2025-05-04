@@ -437,7 +437,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val price: String = uniffi.zingo.executeCommand("updatecurrentprice", "")
+        val price: String = uniffi.zingo.zecPrice()
         println("\nPrice:")
         println(price)
 

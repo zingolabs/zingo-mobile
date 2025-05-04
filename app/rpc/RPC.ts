@@ -132,7 +132,7 @@ export default class RPC {
       // -2  - error in RPCModule, likely.
       // > 0 - real value
       //const start = Date.now();
-      const resultStr: string = await RPCModule.execute(CommandEnum.updatecurrentprice, '');
+      const resultStr: string = await RPCModule.zecPriceInfo();
       //console.log('=========================================== > get ZEC price - ', Date.now() - start);
       //console.log(resultStr);
 
