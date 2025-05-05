@@ -427,15 +427,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
-
                 val resp = uniffi.zingo.executeCommand(cmd, args)
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: executing command '$cmd': ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -444,14 +447,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun doSave(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val result = saveWalletFile()
+                uniffi.zingo.initLogging()
+                val resp = saveWalletFile()
 
-                promise.resolve(result)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: saving wallet: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -460,14 +468,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun doSaveBackup(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val result = saveWalletBackupFile()
+                uniffi.zingo.initLogging()
+                val resp = saveWalletBackupFile()
 
-                promise.resolve(result)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: saving wallet backup: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -479,12 +492,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getLatestBlockServer(server)
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: getting latest block server: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -496,12 +513,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getLatestBlockWallet()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: getting latest block wallet: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -513,12 +534,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getDeveloperDonationAddress()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: getting donation address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -530,12 +555,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getZenniesForZingoDonationAddress()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: getting Zennies donation address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -547,12 +576,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getValueTransfers()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: getting value transfers list: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -564,12 +597,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getTransactionSummaries()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: getting transaction summaries list: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -581,11 +618,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.setCryptoDefaultProviderToRing()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: setting crypto default provider: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -597,11 +639,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.pollSync()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: sync poll info: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -617,11 +664,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     saveWalletFile()
                 }
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: sync run process: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -633,11 +685,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.pauseSync()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: sync pause process: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -649,11 +706,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.stopSync()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: sync stop process: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -665,11 +727,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.statusSync()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: sync status info: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -681,11 +748,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.runRescan()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: rescan run process: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -697,11 +769,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.infoServer()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: info server: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -713,11 +790,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getSeed()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: seed: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -729,11 +811,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getUfvk()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: ufvk: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -745,11 +832,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.changeServer(server)
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: change server: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -761,11 +853,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.walletKind()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: wallet kind: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -777,11 +874,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.parseAddress(address)
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: parse address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -793,11 +895,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.parseUfvk(ufvk)
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: parse ufvk: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -809,11 +916,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getVersion()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: version: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -825,11 +937,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getMessages(address)
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: messages: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -841,11 +958,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getBalance()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: balance: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -857,11 +979,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getAddresses(receivers)
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: addresses: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -873,11 +1000,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getTotalMemobytesToAddress()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: memobyes to address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -889,11 +1021,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getTotalValueToAddress()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: value to address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -905,11 +1042,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getTotalSpendsToAddress()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: spends to address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -918,14 +1060,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun zecPriceInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.zecPrice()
-                val resp = uniffi.zingo.getTotalSpendsToAddress()
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.zecPrice()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: zec price: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -937,11 +1084,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.resendTransaction(txid)
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: resend transaction: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -953,11 +1105,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.removeTransaction(txid)
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: remove transaction: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -969,11 +1126,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getSpendableBalance(address, zennies)
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: spendable balance: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -982,14 +1144,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun getOptionWalletInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.getOptionWallet()
-                val resp = uniffi.zingo.getTotalSpendsToAddress()
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getOptionWallet()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: get option wallet: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -998,14 +1165,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun setOptionWalletProcess(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                uniffi.zingo.setOptionWallet()
-                val resp = uniffi.zingo.getTotalSpendsToAddress()
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.setOptionWallet()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: set option wallet: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }

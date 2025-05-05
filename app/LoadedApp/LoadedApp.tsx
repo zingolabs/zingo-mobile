@@ -543,7 +543,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.clearToAddr();
 
     // Configure the RPC to start doing refreshes
-    this.rpc.setInRefresh(false);
     await this.rpc.clearTimers();
     await this.rpc.configure();
 
@@ -566,7 +565,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
           console.log('&&&&& background yes in storage &&&&&');
-          this.rpc.setInRefresh(false);
           await this.rpc.clearTimers();
           //console.log('clear timers IOS');
           this.setSyncingStatus({} as RPCSyncStatusType);
@@ -612,7 +610,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           console.log('&&&&& background no in storage &&&&&');
           // needs this because when the App go from back to fore
           // it have to re-launch all the tasks.
-          this.rpc.setInRefresh(false);
           await this.rpc.clearTimers();
           await this.rpc.configure();
           //console.log('configure start timers Android & IOS');
@@ -629,7 +626,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
         console.log('&&&&& background yes in storage &&&&&');
-        this.rpc.setInRefresh(false);
         await this.rpc.clearTimers();
         //console.log('clear timers');
         this.setSyncingStatus({} as RPCSyncStatusType);
@@ -689,15 +685,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             //console.log('EVENT Loaded: No internet connection.');
           } else {
             //console.log('EVENT Loaded: YES internet connection.');
-            if (this.rpc.getInRefresh()) {
-              // I need to start again the App only if it is Syncing...
-              this.navigateToLoadingApp({ startingApp: false });
-            } else {
-              // restart the interval process again if it is not syncing...
-              this.rpc.setInRefresh(false);
-              await this.rpc.clearTimers();
-              await this.rpc.configure();
-            }
+            // restart the interval process again...
+            await this.rpc.clearTimers();
+            await this.rpc.configure();
           }
         }
       }
@@ -705,7 +695,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   componentWillUnmount = async () => {
-    this.rpc.setInRefresh(false);
     await this.rpc.clearTimers();
     this.appstate && typeof this.appstate.remove === 'function' && this.appstate.remove();
     this.linking && typeof this.linking === 'function' && this.linking.remove();
@@ -1317,7 +1306,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   ): Promise<void> => {
     const { colors } = this.props.theme;
     // here I know the server was changed, clean all the tasks before anything.
-    this.rpc.setInRefresh(false);
     await this.rpc.clearTimers();
     this.setSyncingStatus({} as RPCSyncStatusType);
     this.keepAwake(false);
@@ -1356,7 +1344,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               selectServer: selectServer,
             });
             // the server is changed, the App needs to restart the timeout tasks from the beginning
-            this.rpc.setInRefresh(false);
             await this.rpc.clearTimers();
             await this.rpc.configure();
             return;
@@ -1381,7 +1368,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               onClickOK={async () => await this.onClickOKServerWallet()}
               onClickCancel={async () => {
                 // restart all the tasks again, nothing happen.
-                this.rpc.setInRefresh(false);
                 await this.rpc.clearTimers();
                 await this.rpc.configure();
               }}
@@ -1398,7 +1384,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               onClickOK={async () => await this.onClickOKServerWallet()}
               onClickCancel={async () => {
                 // restart all the tasks again, nothing happen.
-                this.rpc.setInRefresh(false);
                 await this.rpc.clearTimers();
                 await this.rpc.configure();
               }}
@@ -1543,7 +1528,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   navigateToLoadingApp = async (state: any) => {
-    this.rpc.setInRefresh(false);
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
       await this.setModeOption(ModeEnum.advanced);
@@ -1589,7 +1573,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       return;
     }
 
-    this.rpc.setInRefresh(false);
     this.keepAwake(false);
     this.navigateToLoadingApp(state);
   };
@@ -1613,7 +1596,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       return;
     }
 
-    this.rpc.setInRefresh(false);
     this.keepAwake(false);
     this.navigateToLoadingApp({ startingApp: false });
   };

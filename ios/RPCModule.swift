@@ -348,10 +348,10 @@ class RPCModule: NSObject {
   func doSave(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     let dict: [String: Any] = ["resolve": resolve]
     DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-          if let self = self {
-              self.fnDoSave(dict)
-          }
-      }
+        if let self = self {
+            self.fnDoSave(dict)
+        }
+    }
   }
 
   func fndoSaveBackup(_ dict: [AnyHashable: Any]) {
@@ -382,10 +382,10 @@ class RPCModule: NSObject {
   func doSaveBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     let dict: [String: Any] = ["resolve": resolve]
     DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-          if let self = self {
-              self.fndoSaveBackup(dict)
-          }
-      }    
+        if let self = self {
+            self.fndoSaveBackup(dict)
+        }
+    }
   }
 
   func doExecuteOnThread(_ dict: [String: Any]) {

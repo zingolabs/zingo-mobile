@@ -66,7 +66,6 @@ export default class RPC {
   fetchSyncPollLock: boolean;
   fetchZingolibVersionLock: boolean;
 
-  inRefresh: boolean;
   inSend: boolean;
 
   timers: NodeJS.Timeout[];
@@ -116,7 +115,6 @@ export default class RPC {
     this.fetchSyncPollLock = false;
     this.fetchZingolibVersionLock = false;
 
-    this.inRefresh = false;
     this.inSend = false;
 
     this.timers = [];
@@ -318,21 +316,6 @@ export default class RPC {
         resolve();
       }),
     );
-    // try to sync, no matter what.
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        await this.refreshSync();
-        //console.log('INTERVAL refresh sync');
-        resolve();
-      }),
-    );
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        await this.fetchSyncStatus();
-        //console.log('INTERVAL status sync');
-        resolve();
-      }),
-    );
     // do need this because of the sync process
     taskPromises.push(
       new Promise<void>(async resolve => {
@@ -366,7 +349,7 @@ export default class RPC {
 
     // every 5 seconds the App update part of the data
     if (!this.updateTimerID) {
-      this.updateTimerID = setInterval(() => this.runTaskPromises(), 2 * 1000); // 2 secs
+      this.updateTimerID = setInterval(() => this.runTaskPromises(), 5 * 1000); // 5 secs
       //console.log('create update timer', this.updateVTTimerID);
       this.timers.push(this.updateTimerID);
     }
@@ -385,9 +368,6 @@ export default class RPC {
     } else {
       console.log('stop sync process. STOPPED', returnStop);
     }
-
-    // deactivate the sync flag just in case.
-    this.setInRefresh(false);
   }
 
   async pauseSyncProcess(): Promise<void> {
@@ -398,9 +378,6 @@ export default class RPC {
     } else {
       console.log('pause sync process. PAUSED', returnPause);
     }
-
-    // deactivate the sync flag just in case.
-    this.setInRefresh(false);
   }
 
   async clearTimers(): Promise<void> {
@@ -437,7 +414,7 @@ export default class RPC {
   }
 
   async refreshSync(fullRescan?: boolean) {
-    //console.log('WALLET', this.lastWalletBlockHeight, 'SERVER', this.lastServerBlockHeight, 'in refresh', this.inRefresh);
+    //console.log('WALLET', this.lastWalletBlockHeight, 'SERVER', this.lastServerBlockHeight);
 
     if (this.refreshSyncLock && !fullRescan) {
       //console.log('REFRESH ----> in execution already');
@@ -449,7 +426,6 @@ export default class RPC {
     // this is handy to have the wallet fully synced
     // anytime.
     this.keepAwake(true);
-    this.setInRefresh(true);
 
     // This is async, so when it is done, we finish the refresh.
     if (fullRescan) {
@@ -517,11 +493,6 @@ export default class RPC {
     //console.log('SYNC STATUS', ss);
     //console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_total_outputs_scanned);
 
-    // synchronize status
-    const inR: boolean = !!ss.scan_ranges && ss.scan_ranges.length > 0 && ss.percentage_total_outputs_scanned < 100;
-    this.setInRefresh(inR);
-    //console.log('SYNC STATUS IN-REFRESH', inR);
-
     //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
 
     // store SyncStatus object for a new screen
@@ -530,7 +501,8 @@ export default class RPC {
     //console.log('=========================================== > set sync status - ', Date.now() - start);
 
     // Close the poll timer if the sync finished(checked via promise above)
-    if (!this.inRefresh) {
+    const inR: boolean = !!ss.scan_ranges && ss.scan_ranges.length > 0 && ss.percentage_total_outputs_scanned < 100;
+    if (!inR) {
       // here we can release the screen...
       this.keepAwake(false);
     }
@@ -551,18 +523,43 @@ export default class RPC {
     const s = Date.now();
     const returnPoll: string = await RPCModule.pollSyncInfo();
     console.log('=========================================== > sync poll command - ', Date.now() - s);
-    if (!returnPoll || returnPoll.toLowerCase().startsWith(GlobalConst.error) || returnPoll.toLowerCase().startsWith('sync task')) {
+    if (!returnPoll || returnPoll.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC POLL ERROR', returnPoll);
       this.fetchSyncPollLock = false;
       return;
     }
+
+    if (returnPoll.toLowerCase().startsWith('sync task has not been launched')) {
+      console.log('SYNC POLL -> RUN SYNC', returnPoll);
+      setTimeout(async () => {
+        await this.refreshSync();
+      }, 0);
+      this.fetchSyncPollLock = false;
+      return;
+    }
+
+    if (returnPoll.toLowerCase().startsWith('sync task is not complete')) {
+      console.log('SYNC POLL -> FETCH STATUS', returnPoll);
+      setTimeout(async () => {
+        await this.fetchSyncStatus();
+      }, 0);
+      this.fetchSyncPollLock = false;
+      return;
+    }
+
     let sp = {} as RPCSyncPollType;
     try {
       sp = await JSON.parse(returnPoll);
     } catch (e) {
-      console.log('SYNC POLL ERROR - PARSE JSON', returnPoll);
+      console.log('SYNC POLL ERROR - PARSE JSON', e, returnPoll);
       this.fetchSyncPollLock = false;
       return;
+    }
+
+    if (sp.sync_complete && sp.sync_complete.percentage_total_outputs_scanned === 100) {
+      this.keepAwake(false);
+    } else {
+      this.keepAwake(true);
     }
 
     console.log('SYNC POLL', sp);
@@ -680,7 +677,6 @@ export default class RPC {
     } catch (error) {
       console.log(`Critical Error info & server block height ${error}`);
       // relaunch the interval tasks just in case they are aborted.
-      this.setInRefresh(false);
       await this.clearTimers();
       await this.configure();
       this.fetchInfoAndServerHeightLock = false;
@@ -763,7 +759,6 @@ export default class RPC {
     } catch (error) {
       console.log(`Critical Error balances ${error}`);
       // relaunch the interval tasks just in case they are aborted.
-      this.setInRefresh(false);
       await this.clearTimers();
       await this.configure();
       this.fetchTotalBalanceLock = false;
@@ -842,7 +837,6 @@ export default class RPC {
     } catch (error) {
       console.log(`Critical Error addresses ${error}`);
       // relaunch the interval tasks just in case they are aborted.
-      this.setInRefresh(false);
       await this.clearTimers();
       await this.configure();
       this.fetchAddressesLock = false;
@@ -877,7 +871,6 @@ export default class RPC {
     } catch (error) {
       console.log(`Critical Error wallet height ${error}`);
       // relaunch the interval tasks just in case they are aborted.
-      this.setInRefresh(false);
       await this.clearTimers();
       await this.configure();
       this.fetchWalletHeightLock = false;
@@ -901,7 +894,6 @@ export default class RPC {
     } catch (error) {
       console.log(`Critical Error wallet birthday ${error}`);
       // relaunch the interval tasks just in case they are aborted.
-      this.setInRefresh(false);
       await this.clearTimers();
       await this.configure();
       this.fetchWalletBirthdayLock = false;
@@ -1011,7 +1003,6 @@ export default class RPC {
     } catch (error) {
       console.log(`Critical Error txs list value transfers ${error}`);
       // relaunch the interval tasks just in case they are aborted.
-      this.setInRefresh(false);
       await this.clearTimers();
       await this.configure();
       this.fetchTandZandOValueTransfersLock = false;
@@ -1120,7 +1111,6 @@ export default class RPC {
     } catch (error) {
       console.log(`Critical Error txs list value transfers messages ${error}`);
       // relaunch the interval tasks just in case they are aborted.
-      this.setInRefresh(false);
       await this.clearTimers();
       await this.configure();
       this.fetchTandZandOMessagesLock = false;
@@ -1190,16 +1180,8 @@ export default class RPC {
       // create the tasks
       await this.configure();
       this.setInSend(false);
-      if (!this.inRefresh) {
-        // if not syncing, then not keep awake the screen/device when the send is finished.
-        this.keepAwake(false);
-      } else {
-        this.keepAwake(true);
-      }
 
       if (sendTxids) {
-        // And refresh data (full refresh)
-        await this.refreshSync();
         //console.log('00000000 RESOLVE send');
         resolve(sendTxids);
         return;
@@ -1267,14 +1249,6 @@ export default class RPC {
       return this.translate('rpc.backupnotfound-error');
     }
     return '';
-  }
-
-  setInRefresh(value: boolean): void {
-    this.inRefresh = value;
-  }
-
-  getInRefresh(): boolean {
-    return this.inRefresh;
   }
 
   setInSend(value: boolean): void {
