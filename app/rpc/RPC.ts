@@ -437,6 +437,7 @@ export default class RPC {
         orchardBal: 0,
         privateBal: 0,
         transparentBal: 0,
+        confirmedTransparent: 0,
         spendableOrchard: 0,
         spendablePrivate: 0,
         total: 0,
@@ -739,7 +740,7 @@ export default class RPC {
 
       const orchardBal: number = balanceJSON.orchard_balance || 0;
       const privateBal: number = balanceJSON.sapling_balance || 0;
-      const transparentBal: number = balanceJSON.confirmed_transparent_balance || 0;
+      const transparentBal: number = balanceJSON.confirmed_transparent_balance + balanceJSON.unconfirmed_transparent_balance || 0;
 
       const total = orchardBal + privateBal + transparentBal;
 
@@ -750,6 +751,7 @@ export default class RPC {
         transparentBal: transparentBal / 10 ** 8,
         spendableOrchard: (balanceJSON.spendable_orchard_balance || 0) / 10 ** 8,
         spendablePrivate: (balanceJSON.spendable_sapling_balance || 0) / 10 ** 8,
+        confirmedTransparent: (balanceJSON.confirmed_transparent_balance || 0) / 10 ** 8,
         total: total / 10 ** 8,
       };
       //const start2 = Date.now();

@@ -701,6 +701,7 @@
     "sapling-spendable-balance": "Saldo Disponível",
     "transparent-title": "TRANSPARENTE",
     "transparent-balance": "Saldo Total",
+    "transparent-confirmed-balance": "Saldo Confirmado",
     "dust": "A quantidade transparente é muito pequena para ser protegida."
   },
   "uris": {

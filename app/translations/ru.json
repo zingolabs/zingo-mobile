@@ -701,6 +701,7 @@
     "sapling-spendable-balance": "Доступный баланс",
     "transparent-title": "ПРОЗРАЧНЫЙ (T-адрес)",
     "transparent-balance": "Общий баланс",
+    "transparent-confirmed-balance": "Подтвержденный баланс",
     "dust": "Сумма прозрачных ZEC недостаточна для экранирования."
   },
   "uris": {

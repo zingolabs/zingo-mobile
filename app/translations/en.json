@@ -701,6 +701,7 @@
     "sapling-spendable-balance": "Spendable Balance",
     "transparent-title": "TRANSPARENT",
     "transparent-balance": "Total Balance",
+    "transparent-confirmed-balance": "Confirmed Balance",
     "dust": "The transparent amount is too small to be shielded."
   },
   "uris": {

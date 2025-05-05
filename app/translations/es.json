@@ -701,6 +701,7 @@
     "sapling-spendable-balance": "Cantidad para Gastar",
     "transparent-title": "TRANSPARENTE",
     "transparent-balance": "Cantidad Total",
+    "transparent-confirmed-balance": "Cantidad Confirmada",
     "dust": "La cantidad transparente es demasiado pequeña para ser blindada."
   },
   "uris": {
