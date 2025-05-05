@@ -196,7 +196,7 @@ class RPCModule: NSObject {
     if !walletEncodedString.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletFile(walletEncodedString)
     } else {
-      throw FileError.saveFileError("Error saving wallet error: \(walletEncodedString)")
+      throw FileError.saveFileError("Couldn't save the wallet. \(walletEncodedString)")
     }
   }
 
@@ -1296,8 +1296,8 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   }
 
   @objc(getSpendableBalanceInfo:zennies:resolve:reject:)
-  func getSpendableBalanceInfo(_ txid: String, zennies: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["txid": txid, "zennies": zennies, "resolve": resolve]
+  func getSpendableBalanceInfo(_ address: String, zennies: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["address": address, "zennies": zennies, "resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnGetSpendableBalanceInfo(dict)
