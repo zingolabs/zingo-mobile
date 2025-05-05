@@ -79,6 +79,11 @@ export default interface AppContextLoaded {
   // this wallet is watch-only (Readonly)
   readOnly: boolean;
 
+  // pools available
+  orchardPool: boolean;
+  saplingPool: boolean;
+  transparentPool: boolean;
+
   // snackbar queue
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;

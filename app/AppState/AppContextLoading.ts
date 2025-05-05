@@ -25,6 +25,9 @@ export default interface AppContextLoading {
   backgroundError: BackgroundErrorType;
   setBackgroundError: (title: string, error: string) => void;
   readOnly: boolean;
+  orchardPool: boolean;
+  saplingPool: boolean;
+  transparentPool: boolean;
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
   removeFirstSnackbar: () => void;

@@ -162,6 +162,9 @@ export default function LoadedApp(props: LoadedAppProps) {
 
   const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
   const readOnly = props.route.params ? props.route.params.readOnly : false;
+  const orchardPool = props.route.params ? props.route.params.orchardPool : false;
+  const saplingPool = props.route.params ? props.route.params.saplingPool : false;
+  const transparentPool = props.route.params ? props.route.params.transparentPool : false;
 
   useEffect(() => {
     (async () => {
@@ -369,6 +372,9 @@ export default function LoadedApp(props: LoadedAppProps) {
         mode={mode}
         background={background}
         readOnly={readOnly}
+        orchardPool={orchardPool}
+        saplingPool={saplingPool}
+        transparentPool={transparentPool}
         addressBook={addressBook}
         security={security}
         selectServer={selectServer}
@@ -415,6 +421,9 @@ type LoadedAppClassProps = {
   mode: ModeEnum;
   background: BackgroundType;
   readOnly: boolean;
+  orchardPool: boolean;
+  saplingPool: boolean;
+  transparentPool: boolean;
   addressBook: AddressBookFileClass[];
   security: SecurityType;
   selectServer: SelectServerEnum;
@@ -467,6 +476,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       backgroundError: {} as BackgroundErrorType,
       setBackgroundError: this.setBackgroundError,
       readOnly: props.readOnly,
+      orchardPool: props.orchardPool,
+      saplingPool: props.saplingPool,
+      transparentPool: props.transparentPool,
       snackbars: [] as SnackbarType[],
       addLastSnackbar: this.addLastSnackbar,
       removeFirstSnackbar: this.removeFirstSnackbar,
@@ -1771,6 +1783,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       backgroundError: this.state.backgroundError,
       setBackgroundError: this.state.setBackgroundError,
       readOnly: this.state.readOnly,
+      orchardPool: this.state.orchardPool,
+      saplingPool: this.state.saplingPool,
+      transparentPool: this.state.transparentPool,
       snackbars: this.state.snackbars,
       addLastSnackbar: this.state.addLastSnackbar,
       removeFirstSnackbar: this.state.removeFirstSnackbar,
