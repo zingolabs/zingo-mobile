@@ -13,7 +13,6 @@ import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
-import RPCModule from '../../../app/RPCModule';
 import AddressItem from '../../Components/AddressItem';
 import simpleBiometrics from '../../../app/simpleBiometrics';
 import moment from 'moment';
@@ -40,6 +39,7 @@ import { ToastProvider, useToast } from 'react-native-toastier';
 
 type ConfirmProps = {
   calculatedFee: number;
+  parseAddressInfoJSON: RPCParseAddressType;
   donationAmount: number;
   confirmSend: (s: SendPageStateClass) => void;
   sendAllAmount: boolean;
@@ -55,6 +55,7 @@ type ConfirmProps = {
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
   confirmSend,
   calculatedFee,
+  parseAddressInfoJSON,
   donationAmount,
   sendAllAmount,
   calculateFeeWithPropose,
@@ -132,27 +133,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       return '-';
     }
 
-    const result: string = await RPCModule.parseAddressInfo(sendPageState.toaddr.to);
-    if (result) {
-      if (result.toLowerCase().startsWith(GlobalConst.error)) {
-        return '-';
-      }
-    } else {
-      return '-';
-    }
-    let resultJSON = {} as RPCParseAddressType;
-    try {
-      resultJSON = await JSON.parse(result);
-    } catch (e) {
-      //console.log(e);
-      return '-';
-    }
-
     //console.log('parse-address', sendPageState.toaddr.to, resultJSON.status === RPCParseStatusEnum.successParse);
 
     if (
-      resultJSON.status !== RPCParseAddressStatusEnum.successAddressParse ||
-      resultJSON.chain_name !== server.chainName
+      parseAddressInfoJSON.status !== RPCParseAddressStatusEnum.successAddressParse ||
+      parseAddressInfoJSON.chain_name !== server.chainName
     ) {
       return '-';
     }
@@ -162,8 +147,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Private -> orchard to orchard (UA with orchard receiver)
     if (
       from === PrivacyLevelFromEnum.orchardPrivacyLevel &&
-      resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
-      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)
+      parseAddressInfoJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
+      parseAddressInfoJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)
     ) {
       return translate('send.private') as string;
     }
@@ -171,10 +156,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Private -> sapling to sapling (ZA or UA with sapling receiver and NO orchard receiver)
     if (
       from === PrivacyLevelFromEnum.saplingPrivacyLevel &&
-      (resultJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
-        (resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
-          resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver) &&
-          !resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)))
+      (parseAddressInfoJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
+        (parseAddressInfoJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
+          parseAddressInfoJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver) &&
+          !parseAddressInfoJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)))
     ) {
       return translate('send.private') as string;
     }
@@ -182,9 +167,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Amount Revealed -> orchard to sapling (ZA or UA with sapling receiver)
     if (
       from === PrivacyLevelFromEnum.orchardPrivacyLevel &&
-      (resultJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
-        (resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
-          resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver)))
+      (parseAddressInfoJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
+        (parseAddressInfoJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
+          parseAddressInfoJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver)))
     ) {
       return translate('send.amountrevealed') as string;
     }
@@ -192,8 +177,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Amount Revealed -> sapling to orchard (UA with orchard receiver)
     if (
       from === PrivacyLevelFromEnum.saplingPrivacyLevel &&
-      resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
-      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)
+      parseAddressInfoJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
+      parseAddressInfoJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)
     ) {
       return translate('send.amountrevealed') as string;
     }
@@ -202,10 +187,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // UA with sapling receiver)
     if (
       from === PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel &&
-      (resultJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
-        (resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
-          (resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver) ||
-            resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver))))
+      (parseAddressInfoJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
+        (parseAddressInfoJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
+          (parseAddressInfoJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver) ||
+          parseAddressInfoJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver))))
     ) {
       return translate('send.amountrevealed') as string;
     }
@@ -215,8 +200,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       (from === PrivacyLevelFromEnum.orchardPrivacyLevel ||
         from === PrivacyLevelFromEnum.saplingPrivacyLevel ||
         from === PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel) &&
-      (resultJSON.address_kind === RPCAddressKindEnum.transparentAddressKind ||
-        resultJSON.address_kind === RPCAddressKindEnum.texAddressKind)
+      (parseAddressInfoJSON.address_kind === RPCAddressKindEnum.transparentAddressKind ||
+        parseAddressInfoJSON.address_kind === RPCAddressKindEnum.texAddressKind)
     ) {
       return translate('send.deshielded') as string;
     }

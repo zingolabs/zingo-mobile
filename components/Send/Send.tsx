@@ -64,6 +64,7 @@ import selectingServer from '../../app/selectingServer';
 import { magicModal } from 'react-native-magic-modal';
 // @ts-ignore
 import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
+import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 
 type SendProps = {
   // side menu
@@ -894,9 +895,10 @@ const Send: React.FunctionComponent<SendProps> = ({
     ).promise;
   };
 
-  const setConfirmModalShow = () => {
+  const setConfirmModalShow = (parseAddressInfoJSON: RPCParseAddressType) => {
     return magicModal.show(() => <Confirm
         calculatedFee={fee}
+        parseAddressInfoJSON={parseAddressInfoJSON}
         donationAmount={
           donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
             ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
@@ -1716,7 +1718,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                     : (translate('send.button') as string)
                 }
                 disabled={!sendButtonEnabled}
-                onPress={() => {
+                onPress={async () => {
+                  setSendButtonEnabled(false);
                   updateToField(null, null, null, memoText, null);
                   // donation - a Zenny is the minimum
                   if (
@@ -1747,11 +1750,26 @@ const Send: React.FunctionComponent<SendProps> = ({
                     setMemoText('');
                     updateToField(null, null, null, '', false);
                   }
-                  // waiting while closing the keyboard, just in case.
-                  setTimeout(async () => {
-                    setConfirmModalShow();
-                    Keyboard.dismiss();
-                  }, 100);
+                  // calculating for Privacy Level
+                  let parseAddressInfoJSON: RPCParseAddressType;
+                  const result: string = await RPCModule.parseAddressInfo(addressText);
+                  if (result) {
+                    if (result.toLowerCase().startsWith(GlobalConst.error)) {
+                      parseAddressInfoJSON = {} as RPCParseAddressType;
+                    } else {
+                      try {
+                        parseAddressInfoJSON = await JSON.parse(result);
+                      } catch (e) {
+                        //console.log(e);
+                        parseAddressInfoJSON = {} as RPCParseAddressType;
+                      }
+                    }
+                  } else {
+                    parseAddressInfoJSON = {} as RPCParseAddressType;
+                  }
+                  setConfirmModalShow(parseAddressInfoJSON);
+                  Keyboard.dismiss();
+                  setSendButtonEnabled(true);
                 }}
                 twoButtons={true}
               />
