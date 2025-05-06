@@ -12,7 +12,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
   let newChainName: ChainNameEnum | undefined;
 
   try {
-    const resultStrServerPromise = RPCModule.changeServerProcess(uri);
+    const resultStrServerPromise = await RPCModule.changeServerProcess(uri);
     const timeoutServerPromise = new Promise((_, reject) => {
       setTimeout(() => {
         reject(new Error('Promise changeserver Timeout 30 seconds'));
@@ -32,7 +32,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
       // the server is changed
       if (uri) {
         // the new server is not Offline mode.
-        const infoStrPromise = RPCModule.infoServerInfo();
+        const infoStrPromise = await RPCModule.infoServerInfo();
         const timeoutInfoPromise = new Promise((resolve, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 30 seconds'));
@@ -62,7 +62,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
         }
       } else {
         // the new server is empty -> means Offline mode.
-        const balanceStrPromise = RPCModule.getBalanceInfo();
+        const balanceStrPromise = await RPCModule.getBalanceInfo();
         const timeoutInfoPromise = new Promise((resolve, reject) => {
           setTimeout(() => {
             reject(new Error('Promise info Timeout 30 seconds'));

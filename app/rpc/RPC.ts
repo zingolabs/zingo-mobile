@@ -971,6 +971,7 @@ export default class RPC {
             // impossible case... I guess.
             currentValueTransferList.confirmations = 0;
           }
+          currentValueTransferList.blockheight = vt.blockheight;
           currentValueTransferList.status = vt.status;
           currentValueTransferList.address = !vt.recipient_address ? undefined : vt.recipient_address;
           currentValueTransferList.amount = (!vt.value ? 0 : vt.value) / 10 ** 8;
@@ -1080,6 +1081,7 @@ export default class RPC {
             // impossible case... I guess.
             currentMessageList.confirmations = 0;
           }
+          currentMessageList.blockheight = m.blockheight;
           currentMessageList.status = m.status;
           currentMessageList.address = !m.recipient_address ? undefined : m.recipient_address;
           currentMessageList.amount = (!m.value ? 0 : m.value) / 10 ** 8;

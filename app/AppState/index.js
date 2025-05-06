@@ -52,6 +52,7 @@ import { EventListenerEnum } from './enums/EventListenerEnum';
 import { ValueTransferKindEnum } from './enums/ValueTransferKindEnum';
 import { FilterEnum } from './enums/FilterEnum';
 import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
+import { TransactionActionEnum } from './enums/TransactionActionEnum';
 
 import { GlobalConst } from './const/GlobalConst';
 
@@ -117,5 +118,6 @@ export {
   ValueTransferKindEnum,
   FilterEnum,
   RefreshScreenEnum,
+  TransactionActionEnum,
   GlobalConst,
 };

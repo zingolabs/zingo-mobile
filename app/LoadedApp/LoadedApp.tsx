@@ -1616,7 +1616,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (this.state.newServer && this.state.newSelectServer) {
       const beforeServer = this.state.server;
 
-      const resultStrServerPromise = RPCModule.changeServerProcess(this.state.newServer.uri);
+      const resultStrServerPromise = await RPCModule.changeServerProcess(this.state.newServer.uri);
       const timeoutServerPromise = new Promise((_, reject) => {
         setTimeout(() => {
           reject(new Error('Promise changeserver Timeout 30 seconds'));

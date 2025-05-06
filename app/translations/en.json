@@ -585,7 +585,17 @@
     "mempool": "In Mempool",
     "confirmed": "Confirmed",
     "filter-withfunds": "With funds",
-    "empty": "No Transactions yet."
+    "empty": "No Transactions yet.",
+    "resend": "Resend transaction",
+    "remove": "Remove transaction",
+    "resend-title": "Resend",
+    "remove-title": "Remove",
+    "resend-error": "Error Resending :",
+    "remove-error": "Error Removing :",
+    "resend-message": "",
+    "remove-message": "",
+    "resend-alert": "Confirm to Resend this transaction again.",
+    "remove-alert": "Confirm to completely Remove this transaction from the device."
   },
   "report": {
     "title": "Sync / Rescan Report",

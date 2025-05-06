@@ -585,7 +585,17 @@
     "mempool": "En Mempool",
     "confirmed": "Confirmada",
     "filter-withfunds": "Con fondos",
-    "empty": "Todavía no hay transacciones."
+    "empty": "Todavía no hay transacciones.",
+    "resend": "Reenviar transacción",
+    "remove": "Eliminar transacción",
+    "resend-title": "Reenviar",
+    "remove-title": "Eliminar",
+    "resend-error": "Error Reenviando :",
+    "remove-error": "Error Eliminando :",
+    "resend-message": "",
+    "remove-message": "",
+    "resend-alert": "Confirmar para reenviar esta transacción de nuevo.",
+    "remove-alert": "Confirmar para eliminar por completo esta transaccion del dispositivo."
   },
   "report": {
     "title": "Informe de Sincronización",
