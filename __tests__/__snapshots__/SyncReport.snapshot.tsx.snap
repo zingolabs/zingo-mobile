@@ -717,6 +717,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
                   "alignItems": "center",
                   "display": "flex",
                   "flexDirection": "row",
+                  "flexWrap": "wrap",
                   "justifyContent": "flex-start",
                   "marginTop": 5,
                   "width": "100%",
