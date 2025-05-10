@@ -243,7 +243,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                   value={
                       '(' +
                         (syncInProgress
-                          ? ((translate('report.running') as string) + ` ${percentageOutputsScanned}%`)
+                          ? ((translate('report.running') as string) + ` ${percentageOutputsScanned > 0 ? percentageOutputsScanned : ''}%`)
                           : (translate('report.finished') as string)) +
                         ')'
                   }
@@ -391,7 +391,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                   </>
                 )}
 
-                {!!maxBlocks && (
+                {!!maxBlocks && percentageOutputsScanned > 0 && (
                   <>
                     <DetailLine
                       label={translate('report.map') as string}
@@ -478,6 +478,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                         style={{
                           display: 'flex',
                           flexDirection: 'row',
+                          flexWrap: 'wrap',
                           width: '100%',
                           justifyContent: 'flex-start',
                           alignItems: 'center',
@@ -541,7 +542,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                         </Text>
                       </View>
                     </DetailLine>
-
                   </>
                 )}
               </View>

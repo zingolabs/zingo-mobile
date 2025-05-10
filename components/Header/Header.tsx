@@ -391,13 +391,16 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         animationRef.current?.start();
       } else {
         animationRef.current?.stop();
+        opacityValue.setValue(1);
       }
     } else {
       animationRef.current?.stop();
+      opacityValue.setValue(1);
     }
 
     return () => {
       animationRef.current?.stop();
+      opacityValue.setValue(1);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncInProgress, noSyncingStatus]);
