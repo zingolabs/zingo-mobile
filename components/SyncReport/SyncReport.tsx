@@ -484,62 +484,90 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                           alignItems: 'center',
                           marginTop: 5,
                         }}>
-                        <View
+                        <View 
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: 'green',
-                            margin: 5,
-                          }}
-                        />
-                        <Text style={{ color: colors.text, marginRight: 10 }}>
-                          {translate('report.scanned') as string}
-                        </Text>
-                        <View
+                            flexWrap: 'nowrap',
+                            }}>
+                          <View
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              width: 10,
+                              height: 10,
+                              justifyContent: 'flex-start',
+                              backgroundColor: 'green',
+                              margin: 5,
+                            }}
+                          />
+                          <Text style={{ color: colors.text, marginRight: 10 }}>
+                            {translate('report.scanned') as string}
+                          </Text>
+                        </View>
+                        <View 
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: 'orange',
-                            margin: 5,
-                          }}
-                        />
-                        <Text style={{ color: colors.text, marginRight: 10 }}>
-                          {translate('report.scanning') as string}
-                        </Text>
-                        <View
+                            flexWrap: 'nowrap',
+                            }}>
+                          <View
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              width: 10,
+                              height: 10,
+                              justifyContent: 'flex-start',
+                              backgroundColor: 'orange',
+                              margin: 5,
+                            }}
+                          />
+                          <Text style={{ color: colors.text, marginRight: 10 }}>
+                            {translate('report.scanning') as string}
+                          </Text>
+                        </View>
+                        <View 
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: 'gray',
-                            margin: 5,
-                          }}
-                        />
-                        <Text style={{ color: colors.text, marginRight: 10 }}>
-                          {translate('report.lowpriority') as string}
-                        </Text>
-                        <View
+                            flexWrap: 'nowrap',
+                            }}>
+                          <View
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              width: 10,
+                              height: 10,
+                              justifyContent: 'flex-start',
+                              backgroundColor: 'gray',
+                              margin: 5,
+                            }}
+                          />
+                          <Text style={{ color: colors.text, marginRight: 10 }}>
+                            {translate('report.lowpriority') as string}
+                          </Text>
+                        </View>
+                        <View 
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: 'blue',
-                            margin: 5,
-                          }}
-                        />
-                        <Text style={{ color: colors.text, marginRight: 10 }}>
-                          {translate('report.highpriority') as string}
-                        </Text>
+                            flexWrap: 'nowrap',
+                            }}>
+                          <View
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              width: 10,
+                              height: 10,
+                              justifyContent: 'flex-start',
+                              backgroundColor: 'blue',
+                              margin: 5,
+                            }}
+                          />
+                          <Text style={{ color: colors.text, marginRight: 10 }}>
+                            {translate('report.highpriority') as string}
+                          </Text>
+                        </View>
                       </View>
                     </DetailLine>
                   </>
