@@ -363,6 +363,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         setScrollToBottom(true);
       }
       closeAllModals();
+      setShieldingFee(0);
+      setShieldingAmount && setShieldingAmount(0);
     }
   };
 
