@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 as android-stage
+FROM ubuntu:22.04 AS android-stage
 
 # Install Android SDK tools and Java (required for Android SDK)
 RUN apt-get update && \
@@ -12,7 +12,7 @@ RUN apt-get update && \
 
 # Set environment variables for Android SDK
 ENV ANDROID_HOME=/usr/local/android-sdk
-ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$CARGO_HOME/bin:/usr/local/bin
+ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
 
 RUN ls -l /usr/local/android-sdk/cmdline-tools/latest/bin
 
@@ -24,7 +24,7 @@ RUN yes | sdkmanager --licenses && \
 RUN sdkmanager --version
 
 # Install Node.js
-FROM node:20 as node-stage
+FROM node:20 AS node-stage
 
 # Install necessary dependencies for Node.js environment
 WORKDIR /home
@@ -36,7 +36,7 @@ RUN corepack enable
 RUN yarn --version
 
 # Install Rust and Nextest
-FROM docker.io/rust:latest as rust-stage
+FROM docker.io/rust:latest AS rust-stage
 
 # Install cargo-nextest
 RUN cargo install cargo-nextest
@@ -49,7 +49,7 @@ RUN which rustc
 RUN cargo nextest --version
 
 # Combine all dependencies in one image
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS runtime
 
 # Install essential dependencies like build tools
 RUN apt-get update -y && apt-get install -y build-essential curl git unzip openjdk-17-jdk net-tools iproute2 libssl-dev pkg-config
