@@ -1,21 +1,4 @@
 # Android
-## Prerequisites
-1. Yarn
-2. NodeJS (recommended version 17+)
-3. Rust (https://www.rust-lang.org/tools/install)
-4. Docker (Docker Engine)
-5. OpenJDK 18 (https://jdk.java.net/archive/)
-
-    1. curl https://download.java.net/java/GA/jdk18.0.2/f6ad4b4450fd4d298113270ec84f30ee/9/GPL/openjdk-18.0.2_linux-x64_bin.tar.gz -o openjdk-18.0.2_linux-x64_bin.tar.gz
-    2. tar -xzvf openjdk-18.0.2_linux-x64_bin.tar.gz
-
-6. Android SDK Command-line Tools <br />
-   Install via Android Studio SDK Manager: <br />
-   https://developer.android.com/studio/install <br />
-   or as standalone: <br />
-   https://developer.android.com/tools  
-7. Cargo nextest (https://nexte.st/book/installing-from-source.html)
-
 The React Native tools require some environment variables to be set up in order to build apps with
 native code. <br />
 Add the following lines to your `$HOME/.bash_profile` or `$HOME/.profile` config file: <br />
