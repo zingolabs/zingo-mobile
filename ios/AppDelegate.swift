@@ -12,6 +12,19 @@ import Network
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 
+struct SyncComplete: Decodable {
+    let sync_start_height: Int64
+    let sync_end_height: Int64
+    let blocks_scanned: Int64
+    let sapling_outputs_scanned: Int64
+    let orchard_outputs_scanned: Int64
+    let percentage_total_outputs_scanned: Int64
+}
+
+struct SyncPoll: Decodable {
+    let sync_complete: SyncComplete
+}
+
 @UIApplicationMain
 class AppDelegate: RCTAppDelegate {
   private let bcgTaskId = "Zingo_Processing_Task_ID"
@@ -297,10 +310,37 @@ extension AppDelegate {
             }
 
             // run the sync process.
-            NSLog("BGTask syncingProcessBackgroundTask - sync BEGIN")
             let syncing = runSync()
             let syncingStr = String(syncing)
-            NSLog("BGTask syncingProcessBackgroundTask - sync END \(syncingStr)")
+            NSLog("BGTask syncingProcessBackgroundTask - sync LAUNCH \(syncingStr)")
+
+            var syncPoll: SyncPoll?
+            while true {
+                let syncPollJson = pollSync()
+                NSLog("BGTask syncingProcessBackgroundTask - sync POLL \(syncPollJson)")
+                
+                if syncPollJson.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
+                    NSLog("BGTask syncingProcessBackgroundTask - sync POLL ERROR")
+                    break
+                }
+
+                if !syncPollJson.lowercased().hasPrefix(Constants.SyncPrefix.rawValue) {
+                    do {
+                        let data = syncPollJson.data(using: .utf8)!
+                        syncPoll = try JSONDecoder().decode(SyncPoll.self, from: data)
+
+                        if syncPoll?.sync_complete.sync_end_height ?? 0 > 0 {
+                            NSLog("BGTask syncingProcessBackgroundTask - sync COMPLETED")
+                            break
+                        }
+                    } catch {
+                        NSLog("BGTask syncingProcessBackgroundTask - sync POLL - parsing ERROR \(error)")
+                        break
+                    }
+                }
+
+                Thread.sleep(forTimeInterval: 1)
+            }
 
         } else {
             // no wallet file
