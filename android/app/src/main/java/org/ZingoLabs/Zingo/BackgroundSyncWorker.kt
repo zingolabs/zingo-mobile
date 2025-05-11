@@ -13,8 +13,6 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import java.util.*
 import org.json.JSONObject
-import java.nio.charset.StandardCharsets
-import com.facebook.react.bridge.ReactApplicationContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
@@ -33,6 +31,21 @@ import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
 import org.ZingoLabs.Zingo.Constants.*
 import java.io.FileInputStream
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+
+data class SyncComplete (
+    val sync_start_height : Long,
+    val sync_end_height : Long,
+    val blocks_scanned : Long,
+    val sapling_outputs_scanned : Long,
+    val orchard_outputs_scanned : Long,
+    val percentage_total_outputs_scanned : Long
+)
+
+data class SyncPoll (
+    val sync_complete : SyncComplete
+)
 
 class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     private val rpcModule = RPCModule(MainApplication.getAppReactContext())
@@ -41,6 +54,8 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
     override fun doWork(): Result {
 
         Log.i("SCHEDULED_TASK_RUN", "Task running")
+
+        val mapper = jacksonObjectMapper()
 
         // save the background JSON file
         val timeStampStart = Date().time / 1000
@@ -70,9 +85,28 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             // the task is running here blocking this execution until this process finished:
             // 1. finished the syncing.
 
-            Log.i("SCHEDULED_TASK_RUN", "sync BEGIN")
             val syncing = uniffi.zingo.runSync()
-            Log.i("SCHEDULED_TASK_RUN", "sync END: $syncing")
+            Log.i("SCHEDULED_TASK_RUN", "sync LAUNCH: $syncing")
+
+            var syncPoll: SyncPoll
+            while (true) {
+                val syncPollJson: String = uniffi.zingo.pollSync()
+                Log.i("SCHEDULED_TASK_RUN", "sync POLL: $syncPollJson")
+                if (syncPollJson.lowercase().startsWith(ErrorPrefix.value)) {
+                    Log.i("SCHEDULED_TASK_RUN", "sync ERROR")
+                    break
+                }
+                if (!syncPollJson.lowercase().startsWith(SyncPrefix.value)) {
+                    syncPoll = mapper.readValue(syncPollJson)
+
+                    if (syncPoll.sync_complete.sync_end_height > 0) {
+                        Log.i("SCHEDULED_TASK_RUN", "sync COMPLETE")
+                        break
+                    }
+                }
+
+                Thread.sleep(1000)
+            }
 
         } else {
             Log.i("SCHEDULED_TASK_RUN", "No exists wallet file END")

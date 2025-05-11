@@ -243,7 +243,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                   value={
                       '(' +
                         (syncInProgress
-                          ? ((translate('report.running') as string) + ` ${percentageOutputsScanned > 0 ? percentageOutputsScanned : ''}%`)
+                          ? ((translate('report.running') as string) + ` ${percentageOutputsScanned > 0 ? percentageOutputsScanned + '%' : ''}`)
                           : (translate('report.finished') as string)) +
                         ')'
                   }
