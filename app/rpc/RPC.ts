@@ -565,6 +565,11 @@ export default class RPC {
 
     console.log('SYNC POLL', sp);
 
+    console.log('SYNC POLL -> FETCH STATUS');
+      setTimeout(async () => {
+        await this.fetchSyncStatus();
+      }, 0);
+
     this.fetchSyncPollLock = false;
   }
 
