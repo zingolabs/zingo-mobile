@@ -40,7 +40,6 @@
     "lodash": "4.17.21",
     "moment": "2.29.4",
     "patch-package": "8.0.0",
-    "postinstall-postinstall": "2.1.0",
     "prop-types": "15.8.1",
     "randomcolor": "0.6.2",
     "react": "19.0.0",
