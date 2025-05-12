@@ -14,6 +14,7 @@
   "biometricsfailed-button": "Desbloquear",
   "biometrics-title": "Autenticación",
   "biometrics-message": "Por favor autenticar",
+  "biometrics-message-ios": "Por favor autenticar con la clave",
   "biometrics-error": "Por seguridad necesitas autenticarte de nuevo para realizar esta acción. Siempre puedes cambiarlo en Parámetros",
   "close": "Cerrar",
   "cancel": "Cancelar",

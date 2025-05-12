@@ -14,13 +14,14 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import { AddressClass, AddressKindEnum, ModeEnum, ReceiverEnum } from '../../app/AppState';
+import { AddressClass, AddressKindEnum, ModeEnum, ReceiverEnum, SecurityType } from '../../app/AppState';
 import FadeText from '../Components/FadeText';
 import { ShieldedEnum } from '../../app/AppState/enums/ShieldedEnum';
 
 type ReceiveProps = {
   toggleMenuDrawer: () => void;
   alone: boolean;
+  setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
@@ -31,6 +32,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   // shielding
   // for receive
   alone,
+  setSecurityOption,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addresses, uOrchardAddress, mode, language } = context;
@@ -126,16 +128,16 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             {!!addresses && !!uOrchardAddress && (
               <>
                 {shielded === ShieldedEnum.uFull && (
-                  <SingleAddress address={uFull} index={0} total={1} prev={() => {}} next={() => {}} />
+                  <SingleAddress address={uFull} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
                 )}
                 {shielded === ShieldedEnum.uOrchardSapling && (
-                  <SingleAddress address={uOrchardSapling} index={0} total={1} prev={() => {}} next={() => {}} />
+                  <SingleAddress address={uOrchardSapling} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
                 )}
                 {shielded === ShieldedEnum.uOrchard && (
-                  <SingleAddress address={uOrchard} index={0} total={1} prev={() => {}} next={() => {}} />
+                  <SingleAddress address={uOrchard} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
                 )}
                 {shielded === ShieldedEnum.sapling && (
-                  <SingleAddress address={sapling} index={0} total={1} prev={() => {}} next={() => {}} />
+                  <SingleAddress address={sapling} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
                 )}
               </>
             )}
@@ -259,7 +261,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
         return (
           !!addresses &&
-          !!uOrchardAddress && <SingleAddress address={taddr} index={0} total={1} prev={() => {}} next={() => {}} />
+          !!uOrchardAddress && <SingleAddress address={taddr} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
         );
       }
     }

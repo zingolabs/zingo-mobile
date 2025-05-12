@@ -402,6 +402,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                     style={
                       {
                         "alignItems": "center",
+                        "flexDirection": "row",
                         "justifyContent": "center",
                         "width": 150,
                       }
@@ -441,18 +442,93 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                         }
                       }
                     >
-                      <Text
-                        style={
+                      <
+                        color="#ffffff"
+                        icon={
                           {
-                            "color": "#c3c3c3",
-                            "marginTop": 15,
-                            "minHeight": 48,
-                            "textDecorationLine": "underline",
+                            "icon": [
+                              448,
+                              512,
+                              [],
+                              "f0c5",
+                              "M208 0L332.1 0c12.7 0 24.9 5.1 33.9 14.1l67.9 67.9c9 9 14.1 21.2 14.1 33.9L448 336c0 26.5-21.5 48-48 48l-192 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48zM48 128l80 0 0 64-64 0 0 256 192 0 0-32 64 0 0 48c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 176c0-26.5 21.5-48 48-48z",
+                            ],
+                            "iconName": "copy",
+                            "prefix": "fas",
                           }
                         }
-                      >
-                        text translated
-                      </Text>
+                        size={35}
+                        style={
+                          {
+                            "margin": 10,
+                            "marginHorizontal": 20,
+                            "marginTop": 20,
+                            "opacity": 0.9,
+                          }
+                        }
+                      />
+                    </View>
+                    <View
+                      accessibilityState={
+                        {
+                          "busy": undefined,
+                          "checked": undefined,
+                          "disabled": undefined,
+                          "expanded": undefined,
+                          "selected": undefined,
+                        }
+                      }
+                      accessibilityValue={
+                        {
+                          "max": undefined,
+                          "min": undefined,
+                          "now": undefined,
+                          "text": undefined,
+                        }
+                      }
+                      accessible={true}
+                      collapsable={false}
+                      focusable={true}
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                      style={
+                        {
+                          "opacity": 1,
+                        }
+                      }
+                    >
+                      <
+                        color="#ffffff"
+                        icon={
+                          {
+                            "icon": [
+                              512,
+                              512,
+                              [
+                                "mail-forward",
+                              ],
+                              "f064",
+                              "M307 34.8c-11.5 5.1-19 16.6-19 29.2l0 64-112 0C78.8 128 0 206.8 0 304C0 417.3 81.5 467.9 100.2 478.1c2.5 1.4 5.3 1.9 8.1 1.9c10.9 0 19.7-8.9 19.7-19.7c0-7.5-4.3-14.4-9.8-19.5C108.8 431.9 96 414.4 96 384c0-53 43-96 96-96l96 0 0 64c0 12.6 7.4 24.1 19 29.2s25 3 34.4-5.4l160-144c6.7-6.1 10.6-14.7 10.6-23.8s-3.8-17.7-10.6-23.8l-160-144c-9.4-8.5-22.9-10.6-34.4-5.4z",
+                            ],
+                            "iconName": "share",
+                            "prefix": "fas",
+                          }
+                        }
+                        size={35}
+                        style={
+                          {
+                            "margin": 10,
+                            "marginHorizontal": 20,
+                            "marginTop": 20,
+                            "opacity": 0.9,
+                          }
+                        }
+                      />
                     </View>
                   </View>
                 </View>

@@ -14,6 +14,7 @@
   "biometricsfailed-button": "Unlock",
   "biometrics-title": "Authentication",
   "biometrics-message": "Please authenticate",
+  "biometrics-message-ios": "Please authenticate with your passcode",
   "biometrics-error": "For security you need to authenticate again to perform this action. You Always can change this in Settings",
   "close": "Close",
   "cancel": "Cancel",

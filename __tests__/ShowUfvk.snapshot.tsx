@@ -27,7 +27,7 @@ describe('Component ShowUfvk - test', () => {
   test('ShowUfvk - snapshot', () => {
     const ufvk = render(
       <ContextAppLoadedProvider value={state}>
-        <ShowUfvk onClickCancel={onClose} onClickOK={onOK} action={UfvkActionEnum.view} setPrivacyOption={jest.fn()} />
+        <ShowUfvk onClickCancel={onClose} onClickOK={onOK} action={UfvkActionEnum.view} setPrivacyOption={jest.fn()} setSecurityOption={jest.fn()} />
       </ContextAppLoadedProvider>,
     );
     expect(ufvk.toJSON()).toMatchSnapshot();

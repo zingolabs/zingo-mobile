@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@react-navigation/native';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faCopy, faShare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import Share from 'react-native-share';
 
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -14,8 +15,12 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { SnackbarDurationEnum } from '../../app/AppState';
+import { SecurityType, SnackbarDurationEnum } from '../../app/AppState';
 import RegText from './RegText';
+
+type QRCodeRef = {
+  toDataURL: (callback: (data: string) => void) => void;
+};
 
 type SingleAddressProps = {
   address: string;
@@ -24,16 +29,19 @@ type SingleAddressProps = {
   prev: () => void;
   next: () => void;
   ufvk?: boolean;
+  setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 
-const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, index, total, prev, next, ufvk }) => {
+const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, index, total, prev, next, ufvk, setSecurityOption }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, privacy, addLastSnackbar, language } = context;
+  const { translate, privacy, addLastSnackbar, language, security } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
   const [multi, setMulti] = useState<boolean>(false);
+
+  const qrCodeRef = useRef<QRCodeRef | null>(null);
 
   useEffect(() => {
     if (privacy) {
@@ -60,6 +68,51 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
       message: translate('history.addresscopied') as string,
       duration: SnackbarDurationEnum.short,
     });
+  };
+
+  const doShare = () => {
+    if (qrCodeRef.current) {
+      let changed: boolean = false;
+      if (security.foregroundApp) {
+        // deactivate temporarily this
+        changed = true;
+        const newSecurity = {
+          startApp: security.startApp,
+          foregroundApp: false,
+          sendConfirm: security.sendConfirm,
+          seedUfvkScreen: security.seedUfvkScreen,
+          rescanScreen: security.rescanScreen,
+          settingsScreen: security.settingsScreen,
+          changeWalletScreen: security.changeWalletScreen,
+          restoreWalletBackupScreen: security.restoreWalletBackupScreen,
+        } as SecurityType;
+        setSecurityOption(newSecurity);
+      }
+      qrCodeRef.current.toDataURL((data) => {
+        const shareImage = {
+          title: 'QR',
+          url: `data:image/png;base64,${data}`,
+          type: 'image/png',
+        };
+        Share.open(shareImage).catch((err) => console.log(err));
+      });
+      if (changed) {
+        // activate again in 5 seconds
+        setTimeout(() => {
+          const newSecurity = {
+            startApp: security.startApp,
+            foregroundApp: true,
+            sendConfirm: security.sendConfirm,
+            seedUfvkScreen: security.seedUfvkScreen,
+            rescanScreen: security.rescanScreen,
+            settingsScreen: security.settingsScreen,
+            changeWalletScreen: security.changeWalletScreen,
+            restoreWalletBackupScreen: security.restoreWalletBackupScreen,
+          } as SecurityType;
+          setSecurityOption(newSecurity);
+        }, 5 * 1000);
+      }
+    }
   };
 
   return (
@@ -94,6 +147,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                         logoBackgroundColor={colors.text}
                         logoBorderRadius={5} /* android not soported */
                         logoMargin={3}
+                        getRef={(c) => (qrCodeRef.current = c)}
                       />
                     ) : (
                       <View
@@ -128,6 +182,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                     logoBackgroundColor={colors.text}
                     logoBorderRadius={5} /* android not soported */
                     logoMargin={3}
+                    getRef={(c) => (qrCodeRef.current = c)}
                   />
                 )}
               </TouchableOpacity>
@@ -156,11 +211,12 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                   </TouchableOpacity>
                 </View>
               )}
-              <View style={{ width: 150, justifyContent: 'center', alignItems: 'center' }}>
+              <View style={{ width: 150, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                 <TouchableOpacity onPress={doCopy}>
-                  <Text style={{ color: colors.text, textDecorationLine: 'underline', marginTop: 15, minHeight: 48 }}>
-                    {translate('seed.tapcopy') as string}
-                  </Text>
+                  <FontAwesomeIcon style={{ margin: 10, marginTop: 20, marginHorizontal: 20, opacity: 0.9 }} size={35} icon={faCopy} color={colors.money} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={doShare}>
+                  <FontAwesomeIcon style={{ margin: 10, marginTop: 20, marginHorizontal: 20, opacity: 0.9 }} size={35} icon={faShare} color={colors.money} />
                 </TouchableOpacity>
                 {multi && (
                   <Text style={{ color: colors.primary, marginTop: -25 }}>

@@ -101,7 +101,8 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
           } as SecurityType;
           setSecurityOption(newSecurity);
         }, 5 * 1000);
-      }      return;
+      }
+      return;
     } else {
       return magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
             setAddress(a);
