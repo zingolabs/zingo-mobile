@@ -66,6 +66,7 @@ type SettingsProps = {
   setSelectServerOption: (value: string) => Promise<void>;
   setRescanMenuOption: (value: boolean) => Promise<void>;
   setRecoveryWalletInfoOnDeviceOption: (value: boolean) => Promise<void>;
+  toggleMenuDrawer: () => void;
 };
 
 type Options = {
@@ -86,6 +87,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setSelectServerOption,
   setRescanMenuOption,
   setRecoveryWalletInfoOnDeviceOption,
+  toggleMenuDrawer,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -658,7 +660,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
           title={translate('settings.title') as string}
           noBalance={true}
           noSyncingStatus={true}
-          noDrawMenu={true}
+          toggleMenuDrawer={toggleMenuDrawer}
           noPrivacy={true}
           noUfvkIcon={true}
           closeScreen={() => {

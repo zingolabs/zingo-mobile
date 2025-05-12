@@ -31,6 +31,7 @@ describe('Component Settings - test', () => {
   state.donation = false;
   state.walletSettings = mockWalletSettings;
   const onSetOption = jest.fn();
+  const toggle = jest.fn();
   test('Settings - snapshot', () => {
     const settings = render(
       <ContextAppLoadedProvider value={state}>
@@ -47,6 +48,7 @@ describe('Component Settings - test', () => {
           setSelectServerOption={onSetOption}
           setRescanMenuOption={onSetOption}
           setRecoveryWalletInfoOnDeviceOption={onSetOption}
+          toggleMenuDrawer={toggle}
         />
       </ContextAppLoadedProvider>,
     );

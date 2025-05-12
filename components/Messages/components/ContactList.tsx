@@ -278,7 +278,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         address={Utils.messagesAddress(c)}
         sendTransaction={sendTransaction}
         setServerOption={setServerOption}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -287,7 +287,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         setPrivacyOption={setPrivacyOption}
         setScrollToBottom={setScrollToBottom}
         scrollToBottom={scrollToBottom}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 

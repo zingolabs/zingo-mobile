@@ -470,7 +470,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         message={memo}
         includeUAMessage={true}
         setMessage={setMemo}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -481,7 +481,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         valueTransfersSliced={messagesSliced}
         totalLength={messagesFiltered ? messagesFiltered.length : 0}
         setPrivacyOption={setPrivacyOption}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 

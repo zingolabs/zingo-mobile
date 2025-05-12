@@ -881,7 +881,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       return magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
             updateToField(a, null, null, null, null);
           }}
-        />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+        />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
       ).promise;
     }
   };
@@ -891,7 +891,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         message={memoText}
         includeUAMessage={includeUAMemoBoolean}
         setMessage={setMemoText}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -912,7 +912,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         }
         calculateFeeWithPropose={calculateFeeWithPropose}
         sendPageState={buildSendState()}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 

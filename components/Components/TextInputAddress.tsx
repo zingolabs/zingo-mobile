@@ -106,7 +106,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
       return magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
             setAddress(a);
           }}
-        />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+        />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
       ).promise;
     }
   };
