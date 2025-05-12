@@ -1,3 +1,15 @@
+# The Four Requirements
+
+1. A development environment with a fixed set of resources.
+   * We currently offer that as a devcontainer that can be built locally.
+        #TODO:  Publish devcontainer images
+2. The Android Studio IDE to develop the App with a full set of standard tools
+   * This runs...   uhhh  *INSIDE*, *ADJACENT TO*, *UNDERNEATH* the devcontainer?
+3. The compiled Rust "kernel" a rustc binary linked against Android Native libnraries
+4. An Android Virtual Device Emulator, this is connected to other pieces via spaghetti noodles of
+darkmatter, woven into our reality with arrays of quantum-calibrated tachyon beams.
+
+
 # Android
 The React Native tools require some environment variables to be set up in order to build apps with
 native code. <br />
@@ -10,7 +22,7 @@ Add the following lines to your `$HOME/.bashrc` config file: <br />
 Also, make sure your JAVA_HOME is set, for example: <br />
 `export JAVA_HOME="/usr/lib/jvm/jdk-18.0.2"`
 
-## Building
+## Build The Core Rust Binary With Statically Linked Android Native Libraries
 1. Clone the repository.
 2. Go to the cloned repo `cd zingo-mobile`.
 3. In the `rust` directory, run: <br />
