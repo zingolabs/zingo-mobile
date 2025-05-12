@@ -226,9 +226,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                   value={
                     //background.batches.toString() +
                     //translate('report.batches-date') +
-                    moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a') +
-                    (Number(background.dateEnd) > 0
-                      ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
+                    moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a') +
+                    (Number(background.dateEnd) > 0 && Number(background.date) !== Number(background.dateEnd)
+                      ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
                       : '')
                   }
                 />
@@ -484,7 +484,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                           alignItems: 'center',
                           marginTop: 5,
                         }}>
-                        <View 
+                        <View
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
@@ -505,7 +505,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                             {translate('report.scanned') as string}
                           </Text>
                         </View>
-                        <View 
+                        <View
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
@@ -526,7 +526,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                             {translate('report.scanning') as string}
                           </Text>
                         </View>
-                        <View 
+                        <View
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
@@ -547,7 +547,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                             {translate('report.lowpriority') as string}
                           </Text>
                         </View>
-                        <View 
+                        <View
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
