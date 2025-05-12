@@ -156,7 +156,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         val stop = uniffi.zingo.stopSync()
         if (stop.lowercase().startsWith(ErrorPrefix.value)) {
             // this means this task not have a valid lightclient
-            Log.i("SCHEDULED_TASK_RUN", "no lightwalled likely")
+            Log.i("SCHEDULED_TASK_RUN", "no lightwalled likely - $stop")
             return
         }
         Log.i("SCHEDULED_TASK_RUN", "Stopping sync: $stop")
