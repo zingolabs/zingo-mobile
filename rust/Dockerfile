@@ -1,4 +1,5 @@
-FROM zingodevops/android_builder:014 as build_android
+FROM zingodevops/android_builder:014 AS build_android
+RUN echo "### Building Dockerfile build_android ###"
 
 RUN apt update \
     && apt upgrade -y \
@@ -9,7 +10,8 @@ RUN apt update \
     clang-18 \
     libclang-18-dev \
     gcc \
-    g++ 
+    g++ \
+    tree
 
 WORKDIR /opt/zingo/rust/lib/
 
