@@ -268,7 +268,7 @@ extension AppDelegate {
         NSLog("BGTask stopSyncingProcess")
         let stopStr = stopSync()
         if stopStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-            NSLog("BGTask stopSyncingProcess - no lightwalled likely - \(stopStr)")
+            NSLog("BGTask stopSyncingProcess - \(stopStr)")
             return
         }
         NSLog("BGTask stopSyncingProcess - status response \(stopStr)")
