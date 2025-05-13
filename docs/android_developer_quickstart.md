@@ -1,5 +1,25 @@
-# The Four Requirements
+# Build the development environment
 
+[With docker in place](https://www.docker.com/) run:
+  `docker build -t zingoapp-dev ./.devcontainer`
+
+
+
+## Prerequisites
+
+Start by installing docker, and Android studio on your dev system.
+
+* https://developer.android.com/studio
+* https://www.docker.com/
+
+### Next, build a development container with fixed resources:
+
+From the root directoty of the project run:
+`docker build -t zingoapp-dev ./.devcontainer`
+
+Note: Order is not strict, you can build the app independently of the dev-environment
+
+## The "devcontainer"
 1. A development environment with a fixed set of resources.
    * We currently offer that as a devcontainer that can be built locally.
         #TODO:  Publish devcontainer images
@@ -9,12 +29,6 @@
 4. (Optional) An Android Virtual Device Emulator, this is connected to other pieces via spaghetti noodles of
 darkmatter, woven into our reality with arrays of quantum-calibrated tachyon beams.
 
-## Prerequisites
-
-Start by installing docker, and Android studio on your dev system.
-
-* https://developer.android.com/studio
-* https://www.docker.com/
 # Android
 The React Native tools require some environment variables to be set up in order to build apps with
 native code. <br />
@@ -27,7 +41,7 @@ Add the following lines to your `$HOME/.bashrc` config file: <br />
 Also, make sure your JAVA_HOME is set, for example: <br />
 `export JAVA_HOME="/usr/lib/jvm/jdk-18.0.2"`
 
-## Build The Core Rust Binary With Statically Linked Android Native Libraries
+### 3 Build The Core Rust Binary With Statically Linked Android Native Libraries
 1. Clone the repository.
 2. Go to the cloned repo `cd zingo-mobile`.
 3. In the `rust` directory, run: <br />

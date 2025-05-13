@@ -10,7 +10,11 @@ zingodisclosure@proton.me
 
 ## Building The App
 
- Please see the platform specific [iOS](./docs/ios_developer_quickstart.md) and [Android](./docs/android_developer_quickstart.md) "quickstart" documentation.
+ For development we assume that this repository has been cloned and the root directory is the directory the developer is starting from.  The get to this base state:
+
+   `git clone git@github.com:zingolabs/zingo-mobile.git && cd zingo-mobile`
+
+ From here please follow the platform specific instructions for [iOS](./docs/ios_developer_quickstart.md) or [Android](./docs/android_developer_quickstart.md).
 
 ## Testing
 ### Prerequisites
