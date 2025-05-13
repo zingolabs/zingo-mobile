@@ -55,7 +55,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
 
   const [numAb, setNumAb] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
-  const [addressBookSorted, setAddressBookSorted] = useState<AddressBookFileClass[]>([]);
+  //const [addressBookFiltered, setAddressBookFiltered] = useState<AddressBookFileClass[]>([]);
+  const [addressBookSliced, setAddressBookSliced] = useState<AddressBookFileClass[]>([]);
   const [addressBookProtected, setAddressBookProtected] = useState<AddressBookFileClass[]>([]);
 
   const [currentItem, setCurrentItem] = useState<number | null>(null);
@@ -67,10 +68,10 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
 
   useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
 
-  const fetchAddressBookSorted = useMemo(async () => {
+  const fetchAddressBookFiltered = useMemo(async () => {
     // excluding this address from the list
-    return addressBook.filter((ab: AddressBookFileClass) => ab.address !== zenniesDonationAddress).slice(0, numAb);
-  }, [addressBook, numAb, zenniesDonationAddress]);
+    return addressBook.filter((ab: AddressBookFileClass) => ab.address !== zenniesDonationAddress);
+  }, [addressBook, zenniesDonationAddress]);
 
   const fetchAddressBookProtected = useMemo(async () => {
     // only protected address to use internally ZingoLabs.
@@ -79,14 +80,15 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
 
   useEffect(() => {
     (async () => {
-      const abs = await fetchAddressBookSorted;
+      const abf = await fetchAddressBookFiltered;
       const abp = await fetchAddressBookProtected;
-      setLoadMoreButton(numAb < (abs.length || 0));
-      setAddressBookSorted(abs);
+      //setAddressBookFiltered(abf);
+      setLoadMoreButton(numAb < abf.length);
+      setAddressBookSliced(abf.slice(0, numAb));
       setAddressBookProtected(abp);
       // find the current address
       if (addressBookCurrentAddress) {
-        const index: number = abs.findIndex((i: AddressBookFileClass) => i.address === addressBookCurrentAddress);
+        const index: number = abf.findIndex((i: AddressBookFileClass) => i.address === addressBookCurrentAddress);
         if (index === -1) {
           setAction(AddressBookActionEnum.Add);
         } else {
@@ -96,7 +98,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
       }
       setLoading(false);
     })();
-  }, [addressBookCurrentAddress, fetchAddressBookProtected, fetchAddressBookSorted, numAb]);
+  }, [addressBookCurrentAddress, fetchAddressBookProtected, fetchAddressBookFiltered, numAb, addressBook]);
 
   const loadMoreClicked = useCallback(() => {
     setNumAb(numAb + 50);
@@ -210,15 +212,15 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
           {currentItem !== null && currentItem > -1 && action !== null && (
             <AbDetail
               index={currentItem}
-              key={`detail-${currentItem}-${addressBookSorted[currentItem].label}`}
-              item={addressBookSorted[currentItem]}
+              key={`detail-${currentItem}-${addressBookSliced[currentItem].label}`}
+              item={addressBookSliced[currentItem]}
               cancel={cancel}
               action={action}
               doAction={doAction}
               setSecurityOption={setSecurityOption}
             />
           )}
-          {!addressBookCurrentAddress && addressBookSorted.length === 0 && currentItem !== -1 && !loading && (
+          {!addressBookCurrentAddress && addressBookSliced.length === 0 && currentItem !== -1 && !loading && (
             <View
               style={{
                 height: 150,
@@ -234,7 +236,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
             <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
           )}
           {!addressBookCurrentAddress &&
-            addressBookSorted.map((aBItem, index) => {
+            addressBookSliced.map((aBItem, index) => {
               return (
                 <View key={`container-${index}-${aBItem.label}`}>
                   {currentItem === index && (
@@ -252,7 +254,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
               );
             })}
           {!addressBookCurrentAddress &&
-            addressBookSorted.map((aBItem, index) => {
+            addressBookSliced.map((aBItem, index) => {
               return (
                 <View key={`container-${index}-${aBItem.label}`}>
                   {currentItem !== index && (
@@ -304,7 +306,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
             </View>
           ) : (
             <>
-              {!addressBookCurrentAddress && !!addressBookSorted && !!addressBookSorted.length && (
+              {!addressBookCurrentAddress && !!addressBookSliced && !!addressBookSliced.length && (
                 <View
                   style={{
                     height: 150,
