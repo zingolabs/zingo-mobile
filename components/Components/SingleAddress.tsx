@@ -7,6 +7,7 @@ import { useTheme } from '@react-navigation/native';
 import { faChevronLeft, faChevronRight, faCopy, faShare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Share from 'react-native-share';
+import RNFS from 'react-native-fs';
 
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -88,13 +89,26 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
         } as SecurityType;
         setSecurityOption(newSecurity);
       }
-      qrCodeRef.current.toDataURL((data) => {
-        const shareImage = {
-          title: 'QR',
-          url: `data:image/png;base64,${data}`,
-          type: 'image/png',
-        };
-        Share.open(shareImage).catch((err) => console.log(err));
+      qrCodeRef.current.toDataURL(async (data) => {
+        const filePath = `${RNFS.CachesDirectoryPath}/qrcode.png`;
+        try {
+          await RNFS.writeFile(filePath, data, 'base64');
+          const shareOptions = {
+            title: 'QR',
+            url: `file://${filePath}`,
+            type: 'image/png',
+            failOnCancel: false,
+          };
+          await Share.open(shareOptions);
+        } catch (err) {
+          console.error('Error sharing QR image:', err);
+        } finally {
+          RNFS.exists(filePath).then((exists) => {
+            if (exists) {
+              RNFS.unlink(filePath).catch((e) => console.log('Error removing temp QR image:', e));
+            }
+          });
+        }
       });
       if (changed) {
         // activate again in 5 seconds
