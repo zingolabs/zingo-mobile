@@ -6,10 +6,15 @@
 2. The Android Studio IDE to develop the App with a full set of standard tools
    * This runs...   uhhh  *INSIDE*, *ADJACENT TO*, *UNDERNEATH* the devcontainer?
 3. The compiled Rust "kernel" a rustc binary linked against Android Native libnraries
-4. An Android Virtual Device Emulator, this is connected to other pieces via spaghetti noodles of
+4. (Optional) An Android Virtual Device Emulator, this is connected to other pieces via spaghetti noodles of
 darkmatter, woven into our reality with arrays of quantum-calibrated tachyon beams.
 
+## Prerequisites
 
+Start by installing docker, and Android studio on your dev system.
+
+* https://developer.android.com/studio
+* https://www.docker.com/
 # Android
 The React Native tools require some environment variables to be set up in order to build apps with
 native code. <br />
