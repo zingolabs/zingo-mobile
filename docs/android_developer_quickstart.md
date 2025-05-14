@@ -10,11 +10,9 @@ e.g. `paru -S android-studio`
 
 # Run the image as an interactive container
 
-`docker run -it -v "$(pwd):/workspace" -w /workspace zingoapp-dev bash`
+  `docker run -it -v "$(pwd):/workspace" -w /workspace zingoapp-dev bash`
 
-# Install JavaScript packages with yarn
-
-`docker run -v "$(pwd):/workspace" -w /workspace zingoapp-dev corepack enable && yarn`
+## yarn
 
 # Build the application Rust kernel
 
