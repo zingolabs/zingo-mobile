@@ -1,3 +1,7 @@
+# Build the Rust kernel for the application
+
+`pushd rust && ./build.sh && popd`
+
 # Install android-studio using your distro's package manager
 
 e.g. `paru -S android-studio`
@@ -15,7 +19,6 @@ e.g. `paru -S android-studio`
 # Manage development dependencies
 
 1. `corepack yarn install`
-2. `pushd rust && ./build.sh && popd`
 
 # Set environment variables to allow React Native tools to build apps with native code
 
