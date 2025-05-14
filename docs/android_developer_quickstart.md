@@ -20,6 +20,10 @@ e.g. `paru -S android-studio`
 
 1. `corepack yarn install`
 
+#### In a new terminal
+
+`android-studio`
+
 # Set environment variables to allow React Native tools to build apps with native code
 
 `source ./scripts/set_env.sh`
