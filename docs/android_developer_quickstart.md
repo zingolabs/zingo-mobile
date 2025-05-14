@@ -14,7 +14,7 @@ e.g. `paru -S android-studio`
 
 # Manage development dependencies
 
-1. `corepack enable && yarn`
+1. `corepack yarn install`
 2. `pushd rust && ./build.sh && popd`
 
 # Set environment variables to allow React Native tools to build apps with native code
