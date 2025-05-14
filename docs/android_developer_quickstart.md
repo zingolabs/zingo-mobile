@@ -16,7 +16,7 @@ e.g. `paru -S android-studio`
 
   `docker run -it -v "$(pwd):/workspace" -w /workspace zingoapp-dev bash`
 
-#### Manage development dependencies
+##### Manage development dependencies
 
 1. `corepack yarn install`
 
