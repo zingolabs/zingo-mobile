@@ -1,6 +1,7 @@
 # Build the development environment
 
 [With docker in place](https://www.docker.com/) run:
+
   `docker build -t zingoapp-dev ./.devcontainer`
 
 
