@@ -1,4 +1,4 @@
-# Build the devcontainer development environment "zingoapp-dev"
+# Build the devcontainer environment "zingoapp-dev"
 
 [With docker in place](https://www.docker.com/) run:
 
