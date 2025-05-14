@@ -1,8 +1,16 @@
-# Build the development environment
+# Build the devcontainer development environment "zingoapp-dev"
 
 [With docker in place](https://www.docker.com/) run:
 
   `docker build -t zingoapp-dev ./.devcontainer`
+
+# Build the application Rust kernel
+
+1. `pushd rust && ./build.sh && popd`
+
+
+###############################################
+Earlier draft
 
 
 
@@ -42,14 +50,6 @@ Add the following lines to your `$HOME/.bashrc` config file: <br />
 Also, make sure your JAVA_HOME is set, for example: <br />
 `export JAVA_HOME="/usr/lib/jvm/jdk-18.0.2"`
 
-### 3 Build The Core Rust Binary With Statically Linked Android Native Libraries
-1. Clone the repository.
-2. Go to the cloned repo `cd zingo-mobile`.
-3. In the `rust` directory, run: <br />
-   `./build.sh` <br />
-   This step may take a long time.
-4. From the root of the project, run: <br />
-   `yarn`
 
 ## Launching the app
 ### Android Studio
@@ -73,3 +73,14 @@ You can also emulate android from the command line without using Android Studio.
 2. From the root directory run: <br />
    `scripts/start_interactive.sh -a x86` <br />
    Outputs are generated in `android/app/build/outputs/emulator_output`
+
+
+## Check The State of An Environment
+
+Confirm utilities are available in a "zingo-app" devcontainer:
+
+`docker run -it --rm zingoapp-dev which sdkmanager`
+
+Should be:
+
+`/usr/local/android-sdk/cmdline-tools/latest/bin/sdkmanager`
