@@ -24,9 +24,13 @@ e.g. `paru -S android-studio`
 
 `android-studio`
 
-# Set environment variables to allow React Native tools to build apps with native code
+Setup the environemnt to emulate a React Native app:
 
-`source ./scripts/set_env.sh`
+https://reactnative.dev/docs/0.78/set-up-your-environment?os=linux
+
+Go to the "Install Android Studio" section
+
+# Set environment variables to allow React Native tools to build apps with native code
 
 ###############################################
 Earlier draft
