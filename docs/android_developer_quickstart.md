@@ -4,10 +4,17 @@
 
   `docker build -t zingoapp-dev ./.devcontainer`
 
+# Install JavaScript packages with yarn
+
+`docker run -it --rm -v "$(pwd):/workspace" -w /workspace zingoapp-dev corepack enable && yarn`
+
 # Build the application Rust kernel
 
-1. `pushd rust && ./build.sh && popd`
+`pushd rust && ./build.sh && popd`
 
+# Set environment variables to allow React Native tools to build apps with native code
+
+`source ./scripts/set_env.sh`
 
 ###############################################
 Earlier draft
