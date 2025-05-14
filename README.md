@@ -1,7 +1,9 @@
 
 ## Building The App
 
- For development we assume that this repository has been cloned and the root directory is the directory the developer is starting from.  To get to this state:
+ For development we assume that this repository has been cloned and the root directory is the directory the developer is starting from.
+
+ To get to this state:
 
    `git clone git@github.com:zingolabs/zingo-mobile.git && cd zingo-mobile`
 
