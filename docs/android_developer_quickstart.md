@@ -1,12 +1,12 @@
-# Build the Rust kernel for the application
+#### Build the Rust kernel for the application
 
 `pushd rust && ./build.sh && popd`
 
-# Install android-studio using your distro's package manager
+#### Install android-studio using your distro's package manager
 
 e.g. `paru -S android-studio`
 
-# Build the devcontainer environment "zingoapp-dev"
+#### Build the devcontainer environment "zingoapp-dev"
 
 [With docker in place](https://www.docker.com/) run:
 
