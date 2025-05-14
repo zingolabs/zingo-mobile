@@ -1,3 +1,7 @@
+# Install android-studio using your distros package manager
+
+e.g. `paru -S android-studio`
+
 # Build the devcontainer environment "zingoapp-dev"
 
 [With docker in place](https://www.docker.com/) run:
