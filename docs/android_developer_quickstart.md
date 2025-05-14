@@ -1,4 +1,4 @@
-# Install android-studio using your distros package manager
+# Install android-studio using your distro's package manager
 
 e.g. `paru -S android-studio`
 
