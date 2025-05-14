@@ -4,6 +4,10 @@
 
   `docker build -t zingoapp-dev ./.devcontainer`
 
+# Enter the devcontainer
+
+`docker run -it -v "$(pwd):/workspace" -w /workspace zingoapp-dev bash`
+
 # Install JavaScript packages with yarn
 
 `docker run -v "$(pwd):/workspace" -w /workspace zingoapp-dev corepack enable && yarn`
