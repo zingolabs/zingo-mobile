@@ -6,7 +6,7 @@
 
 # Install JavaScript packages with yarn
 
-`docker run -it --rm -v "$(pwd):/workspace" -w /workspace zingoapp-dev corepack enable && yarn`
+`docker run -v "$(pwd):/workspace" -w /workspace zingoapp-dev corepack enable && yarn`
 
 # Build the application Rust kernel
 
