@@ -1,7 +1,7 @@
 
 ## Building The App
 
- For development we assume that this repository has been cloned and the root directory is the directory the developer is starting from.
+ For development we assume that this repository has been cloned into a linux environment, and the root directory is the directory the developer is starting from.
 
  To get to this state:
 
