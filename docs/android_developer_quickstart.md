@@ -12,11 +12,10 @@ e.g. `paru -S android-studio`
 
   `docker run -it -v "$(pwd):/workspace" -w /workspace zingoapp-dev bash`
 
-## yarn
+# Manage development dependencies
 
-# Build the application Rust kernel
-
-`pushd rust && ./build.sh && popd`
+1. yarn
+2. `pushd rust && ./build.sh && popd`
 
 # Set environment variables to allow React Native tools to build apps with native code
 
