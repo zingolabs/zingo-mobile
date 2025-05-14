@@ -7,7 +7,7 @@ import { useTheme } from '@react-navigation/native';
 import { faChevronLeft, faChevronRight, faCopy, faShare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Share from 'react-native-share';
-import RNFS from 'react-native-fs';
+import ViewShot from 'react-native-view-shot';
 
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -18,10 +18,6 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { SecurityType, SnackbarDurationEnum } from '../../app/AppState';
 import RegText from './RegText';
-
-type QRCodeRef = {
-  toDataURL: (callback: (data: string) => void) => void;
-};
 
 type SingleAddressProps = {
   address: string;
@@ -42,7 +38,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
   const [multi, setMulti] = useState<boolean>(false);
 
-  const qrCodeRef = useRef<QRCodeRef | null>(null);
+  const qrCodeRef = useRef<ViewShot>(null);
 
   useEffect(() => {
     if (privacy) {
@@ -71,8 +67,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
     });
   };
 
-  const doShare = () => {
-    if (qrCodeRef.current) {
+  const doShare = async () => {
+    if (qrCodeRef.current && qrCodeRef.current.capture) {
       let changed: boolean = false;
       if (security.foregroundApp) {
         // deactivate temporarily this
@@ -89,27 +85,18 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
         } as SecurityType;
         setSecurityOption(newSecurity);
       }
-      qrCodeRef.current.toDataURL(async (data) => {
-        const filePath = `${RNFS.CachesDirectoryPath}/qrcode.png`;
-        try {
-          await RNFS.writeFile(filePath, data, 'base64');
-          const shareOptions = {
-            title: 'QR',
-            url: `file://${filePath}`,
-            type: 'image/png',
-            failOnCancel: false,
-          };
-          await Share.open(shareOptions);
-        } catch (err) {
-          console.error('Error sharing QR image:', err);
-        } finally {
-          RNFS.exists(filePath).then((exists) => {
-            if (exists) {
-              RNFS.unlink(filePath).catch((e) => console.log('Error removing temp QR image:', e));
-            }
-          });
-        }
-      });
+      try {
+        const uri = await qrCodeRef.current.capture(); // Capture the QR code as an image URI
+        const shareOptions = {
+          title: 'QR',
+          url: uri,
+          type: 'image/png',
+        };
+        await Share.open(shareOptions);
+      } catch (error) {
+        // https://github.com/react-native-share/react-native-share/issues/1664
+        console.log('Error sharing QR code:', error);
+      }
       if (changed) {
         // activate again in 5 seconds
         setTimeout(() => {
@@ -151,18 +138,19 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                 {ufvk ? (
                   <>
                     {expandQRAddress ? (
-                      <QRCode
-                        value={address}
-                        size={200}
-                        ecl="L"
-                        backgroundColor={colors.text}
-                        logo={require('../../assets/img/logobig-zingo.png')}
-                        logoSize={30}
-                        logoBackgroundColor={colors.text}
-                        logoBorderRadius={5} /* android not soported */
-                        logoMargin={3}
-                        getRef={(c) => (qrCodeRef.current = c)}
-                      />
+                      <ViewShot ref={qrCodeRef} options={{ format: 'png', quality: 1 }}>
+                        <QRCode
+                          value={address}
+                          size={200}
+                          ecl="L"
+                          backgroundColor={colors.text}
+                          logo={require('../../assets/img/logobig-zingo.png')}
+                          logoSize={30}
+                          logoBackgroundColor={colors.text}
+                          logoBorderRadius={5} /* android not soported */
+                          logoMargin={3}
+                        />
+                      </ViewShot>
                     ) : (
                       <View
                         style={{
@@ -186,18 +174,19 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                     )}
                   </>
                 ) : (
-                  <QRCode
-                    value={address}
-                    size={200}
-                    ecl="L"
-                    backgroundColor={colors.text}
-                    logo={require('../../assets/img/logobig-zingo.png')}
-                    logoSize={30}
-                    logoBackgroundColor={colors.text}
-                    logoBorderRadius={5} /* android not soported */
-                    logoMargin={3}
-                    getRef={(c) => (qrCodeRef.current = c)}
-                  />
+                  <ViewShot ref={qrCodeRef} options={{ format: 'png', quality: 1 }}>
+                    <QRCode
+                      value={address}
+                      size={200}
+                      ecl="L"
+                      backgroundColor={colors.text}
+                      logo={require('../../assets/img/logobig-zingo.png')}
+                      logoSize={30}
+                      logoBackgroundColor={colors.text}
+                      logoBorderRadius={5} /* android not soported */
+                      logoMargin={3}
+                    />
+                  </ViewShot>
                 )}
               </TouchableOpacity>
             </View>

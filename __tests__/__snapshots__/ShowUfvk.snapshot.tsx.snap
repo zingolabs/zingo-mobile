@@ -384,7 +384,9 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                       }
                     }
                   >
-                    <mockQRCode />
+                    <View>
+                      <mockQRCode />
+                    </View>
                   </View>
                 </View>
                 <View

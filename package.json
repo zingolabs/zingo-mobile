@@ -66,6 +66,7 @@
     "react-native-svg": "15.11.2",
     "react-native-tab-view": "4.0.5",
     "react-native-toastier": "2.0.1",
+    "react-native-view-shot": "^4.0.3",
     "react-native-vision-camera": "4.6.4",
     "recyclerlistview": "4.2.1",
     "url-parse": "1.5.10"
