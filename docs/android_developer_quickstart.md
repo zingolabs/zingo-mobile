@@ -8,7 +8,7 @@ e.g. `paru -S android-studio`
 
   `docker build -t zingoapp-dev ./.devcontainer`
 
-# Enter the running interactive devcontainer
+# Run the image as an interactive container
 
 `docker run -it -v "$(pwd):/workspace" -w /workspace zingoapp-dev bash`
 
