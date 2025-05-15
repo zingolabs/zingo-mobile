@@ -797,11 +797,11 @@ export default class RPC {
       const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr) || [];
 
       const start2 = Date.now();
-      const orchardAddressesStr: string = await RPCModule.getAddressesInfo(AddressesReceiversEnum.orchard);
+      const orchardAddressStr: string = await RPCModule.getAddressesInfo(AddressesReceiversEnum.orchard);
       console.log('=========================================== > addresses orchard - ', Date.now() - start2);
-      if (addressesStr) {
-        if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error addresses ${addressesStr}`);
+      if (orchardAddressStr) {
+        if (orchardAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error addresses ${orchardAddressStr}`);
           this.fetchAddressesLock = false;
           return;
         }
@@ -810,32 +810,49 @@ export default class RPC {
         this.fetchAddressesLock = false;
         return;
       }
-      const orchardAddressesJSON: RPCAddressType[] = await JSON.parse(orchardAddressesStr) || [];
+      const orchardAddressesJSON: RPCAddressType[] = await JSON.parse(orchardAddressStr) || [];
       const uOrchardAddress: string =
         orchardAddressesJSON && orchardAddressesJSON.length > 0 ? orchardAddressesJSON[0].address : '';
+
+      const start3 = Date.now();
+      const orchardSaplingAddressStr: string = await RPCModule.getAddressesInfo(AddressesReceiversEnum.shielded);
+      console.log('=========================================== > addresses shielded - ', Date.now() - start3);
+      if (orchardSaplingAddressStr) {
+        if (orchardSaplingAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error addresses ${orchardSaplingAddressStr}`);
+          this.fetchAddressesLock = false;
+          return;
+        }
+      } else {
+        console.log('Internal Error addresses');
+        this.fetchAddressesLock = false;
+        return;
+      }
+      const orchardSaplingAddressesJSON: RPCAddressType[] = await JSON.parse(orchardSaplingAddressStr) || [];
 
       let allAddresses: AddressClass[] = [];
 
       (addressesJSON || orchardAddressesJSON) &&
-        [...addressesJSON, ...orchardAddressesJSON].forEach((u: RPCAddressType) => {
-          // If this has any pending txns, show that in the UI
+        [...addressesJSON, ...orchardAddressesJSON, ...orchardSaplingAddressesJSON].forEach((u: RPCAddressType) => {
           const receivers: string =
             (u.receivers.orchard_exists ? ReceiverEnum.o : '') +
             (u.receivers.sapling ? ReceiverEnum.z : '') +
             (u.receivers.transparent ? ReceiverEnum.t : '');
-          if (u.address) {
+          if (u.address && allAddresses.filter((a: AddressClass) => a.address === u.address).length === 0) {
             const abu = new AddressClass(uOrchardAddress, u.address, AddressKindEnum.u, receivers);
             allAddresses.push(abu);
           }
-          if (u.address && u.receivers.sapling) {
+          if (u.address && u.receivers.sapling && allAddresses.filter((a: AddressClass) => a.address === u.receivers.sapling).length === 0) {
             const abz = new AddressClass(uOrchardAddress, u.receivers.sapling, AddressKindEnum.z, ReceiverEnum.z);
             allAddresses.push(abz);
           }
-          if (u.address && u.receivers.transparent) {
+          if (u.address && u.receivers.transparent && allAddresses.filter((a: AddressClass) => a.address === u.receivers.transparent).length === 0) {
             const abt = new AddressClass(uOrchardAddress, u.receivers.transparent, AddressKindEnum.t, ReceiverEnum.t);
             allAddresses.push(abt);
           }
         });
+
+      //console.log(allAddresses);
 
       //const start3 = Date.now();
       this.fnSetAllAddresses(allAddresses);

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, ReactNode, useEffect } from 'react';
-import { Dimensions, TouchableOpacity, View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, Route, NavigationState, TabBarItem } from 'react-native-tab-view';
 import { useTheme } from '@react-navigation/native';
 
@@ -15,7 +15,6 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 
 import { AddressClass, AddressKindEnum, ModeEnum, ReceiverEnum, SecurityType } from '../../app/AppState';
-import FadeText from '../Components/FadeText';
 import { ShieldedEnum } from '../../app/AppState/enums/ShieldedEnum';
 
 type ReceiveProps = {
@@ -42,7 +41,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [index, setIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
 
-  const [uFullAddr, setUFulladdr] = useState<AddressClass>({} as AddressClass);
   const [uOrcharSaplingdAddr, setUOrcharSaplingdAddr] = useState<AddressClass>({} as AddressClass);
   const [uOrchardAddr, setUOrchardAddr] = useState<AddressClass>({} as AddressClass);
   const [zAddr, setZAddr] = useState<AddressClass>({} as AddressClass);
@@ -56,17 +54,10 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   useEffect(() => {
     if (addresses && addresses.length > 0) {
-      const uFullAdd =
-        addresses.filter(
-          a =>
-            a.addressKind === AddressKindEnum.u &&
-            a.receivers.length === 3 &&
-            a.receivers.includes(ReceiverEnum.o) &&
-            a.receivers.includes(ReceiverEnum.z) &&
-            a.receivers.includes(ReceiverEnum.t),
-        ) || [];
-      // this is a edge case but possible
-      // if you restore from ufvk with NO transparent receiver.
+      // we offreing now three options for Shielded:
+      // 1. orchard UA
+      // 2. orchard+sapling UA
+      // 3. z-sapling
       const uOrchardSaplingAdd =
         addresses.filter(
           a =>
@@ -81,7 +72,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         ) || [];
       const zAdd = addresses.filter(a => a.addressKind === AddressKindEnum.z) || [];
       const tAdd = addresses.filter(a => a.addressKind === AddressKindEnum.t) || [];
-      setUFulladdr(uFullAdd[0]);
       setUOrcharSaplingdAddr(uOrchardSaplingAdd[0]);
       setUOrchardAddr(uOrchardAdd[0]);
       setZAddr(zAdd[0]);
@@ -106,10 +96,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   ) => ReactNode = ({ route }) => {
     switch (route.key) {
       case 'uorchardaddr': {
-        let uFull = translate('receive.noaddress') as string;
-        if (uFullAddr) {
-          uFull = uFullAddr.address;
-        }
         let uOrchardSapling = translate('receive.noaddress') as string;
         if (uOrcharSaplingdAddr) {
           uOrchardSapling = uOrcharSaplingdAddr.address;
@@ -127,128 +113,16 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           <>
             {!!addresses && !!uOrchardAddress && (
               <>
-                {shielded === ShieldedEnum.uFull && (
-                  <SingleAddress address={uFull} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
-                )}
                 {shielded === ShieldedEnum.uOrchardSapling && (
-                  <SingleAddress address={uOrchardSapling} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
+                  <SingleAddress setShielded={setShielded} shielded={shielded} address={uOrchardSapling} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
                 )}
                 {shielded === ShieldedEnum.uOrchard && (
-                  <SingleAddress address={uOrchard} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
+                  <SingleAddress setShielded={setShielded} shielded={shielded} address={uOrchard} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
                 )}
                 {shielded === ShieldedEnum.sapling && (
-                  <SingleAddress address={sapling} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
+                  <SingleAddress setShielded={setShielded} shielded={shielded} address={sapling} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
                 )}
               </>
-            )}
-            {mode === ModeEnum.advanced && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 'auto',
-                  marginHorizontal: 5,
-                }}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setShielded(ShieldedEnum.uOrchard);
-                  }}>
-                  <View
-                    style={{
-                      backgroundColor: shielded === ShieldedEnum.uOrchard ? colors.primary : colors.sideMenuBackground,
-                      borderRadius: 15,
-                      borderColor: shielded === ShieldedEnum.uOrchard ? colors.primary : colors.zingo,
-                      borderWidth: 1,
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
-                      marginHorizontal: 5,
-                    }}>
-                    <FadeText
-                      style={{
-                        color: shielded === ShieldedEnum.uOrchard ? colors.sideMenuBackground : colors.zingo,
-                        fontWeight: 'bold',
-                      }}>
-                      {translate('receive.shielded-orchard') as string}
-                    </FadeText>
-                  </View>
-                </TouchableOpacity>
-                {uOrchardSapling && uOrcharSaplingdAddr && uOrcharSaplingdAddr.address && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setShielded(ShieldedEnum.uOrchardSapling);
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor:
-                          shielded === ShieldedEnum.uOrchardSapling ? colors.primary : colors.sideMenuBackground,
-                        borderRadius: 15,
-                        borderColor: shielded === ShieldedEnum.uOrchardSapling ? colors.primary : colors.zingo,
-                        borderWidth: 1,
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                        marginHorizontal: 5,
-                      }}>
-                      <FadeText
-                        style={{
-                          color: shielded === ShieldedEnum.uOrchardSapling ? colors.sideMenuBackground : colors.zingo,
-                          fontWeight: 'bold',
-                        }}>
-                        {translate('receive.shielded-orchard-sapling') as string}
-                      </FadeText>
-                    </View>
-                  </TouchableOpacity>
-                )}
-                <TouchableOpacity
-                  onPress={() => {
-                    setShielded(ShieldedEnum.uFull);
-                  }}>
-                  <View
-                    style={{
-                      backgroundColor: shielded === ShieldedEnum.uFull ? colors.primary : colors.sideMenuBackground,
-                      borderRadius: 15,
-                      borderColor: shielded === ShieldedEnum.uFull ? colors.primary : colors.zingo,
-                      borderWidth: 1,
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
-                      marginHorizontal: 5,
-                    }}>
-                    <FadeText
-                      style={{
-                        color: shielded === ShieldedEnum.uFull ? colors.sideMenuBackground : colors.zingo,
-                        fontWeight: 'bold',
-                      }}>
-                      {translate('receive.shielded-full') as string}
-                    </FadeText>
-                  </View>
-                </TouchableOpacity>
-                {sapling && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setShielded(ShieldedEnum.sapling);
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor:
-                          shielded === ShieldedEnum.sapling ? colors.primaryDisabled : colors.sideMenuBackground,
-                        borderRadius: 15,
-                        borderColor: shielded === ShieldedEnum.sapling ? colors.primaryDisabled : colors.zingo,
-                        borderWidth: 1,
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                        marginHorizontal: 10,
-                      }}>
-                      <FadeText
-                        style={{
-                          color: shielded === ShieldedEnum.sapling ? colors.sideMenuBackground : colors.zingo,
-                          fontWeight: 'bold',
-                        }}>
-                        {translate('receive.shielded-sapling') as string}
-                      </FadeText>
-                    </View>
-                  </TouchableOpacity>
-                )}
-              </View>
             )}
           </>
         );
