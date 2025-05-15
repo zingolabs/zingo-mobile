@@ -139,7 +139,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               style={
                 {
                   "margin": 10,
-                  "marginHorizontal": 20,
+                  "marginHorizontal": 15,
                   "marginTop": 20,
                   "opacity": 0.9,
                 }
@@ -201,7 +201,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               style={
                 {
                   "margin": 10,
-                  "marginHorizontal": 20,
+                  "marginLeft": 15,
                   "marginTop": 20,
                   "opacity": 0.9,
                 }
