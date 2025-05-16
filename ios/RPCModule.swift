@@ -1217,6 +1217,35 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
+  func fnZecPriceApiKeyProcess(_ dict: [AnyHashable: Any]) {
+      if let key = dict["key"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let resp = zecPriceApiKey(key: key)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] resend transaction. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(zecPriceApiKeyProcess:resolve:reject:)
+  func zecPriceApiKeyProcess(_ key: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["key": key, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnZecPriceApiKeyProcess(dict)
+        }
+      }
+  }
+
   func fnResendTransactionProcess(_ dict: [AnyHashable: Any]) {
       if let txid = dict["txid"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {

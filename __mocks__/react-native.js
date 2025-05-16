@@ -31,6 +31,7 @@ jest.mock('react-native', () => {
     getTotalValueToAddressInfo: jest.fn(() => '{}'),
     getTotalSpendsToAddressInfo: jest.fn(() => '{}'),
     zecPriceInfo: jest.fn(() => '{}'),
+    zecPriceApiKeyProcess: jest.fn(() => '{}'),
     resendTransactionProcess: jest.fn(() => '{}'),
     removeTransactionProcess: jest.fn(() => '{}'),
     getSpendableBalanceInfo: jest.fn(() => '{}'),

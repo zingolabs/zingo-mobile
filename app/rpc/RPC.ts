@@ -33,6 +33,7 @@ import { RPCValueTransfersStatusEnum } from './enums/RPCValueTransfersStatusEnum
 import { AddressesReceiversEnum } from '../AppState';
 import { RPCSendProposeType } from './types/RPCSendProposeType';
 import { RPCSyncPollType } from './types/RPCSyncPollType';
+import { RPCZecPrice } from './types/RPCZecPrice';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -126,20 +127,34 @@ export default class RPC {
     try {
       // values:
       // 0   - initial/default value
-      // -1  - error in Gemini/zingolib.
+      // -1  - error in CoinCap API/zingolib.
       // -2  - error in RPCModule, likely.
       // > 0 - real value
       //const start = Date.now();
       const resultStr: string = await RPCModule.zecPriceInfo();
       //console.log('=========================================== > get ZEC price - ', Date.now() - start);
-      //console.log(resultStr);
+      console.log(resultStr);
 
       if (resultStr) {
-        if (resultStr.toLowerCase().startsWith(GlobalConst.error) || isNaN(parseFloat(resultStr))) {
+        if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error fetching price ${resultStr}`);
           return -1;
         } else {
-          return parseFloat(resultStr);
+          const resultJSON: RPCZecPrice = await JSON.parse(resultStr);
+          if (resultJSON.error) {
+            console.log(resultJSON.error);
+            return -1;
+          }
+          if (!resultJSON.current_price) {
+            // if no exists the field or is empty
+            return 0;
+          }
+          if (resultJSON.current_price && isNaN(resultJSON.current_price)) {
+            console.log(`Error fetching price ${resultJSON.current_price}`);
+            return -1;
+          } else {
+            return resultJSON.current_price;
+          }
         }
       } else {
         console.log('Internal Error fetching price');
