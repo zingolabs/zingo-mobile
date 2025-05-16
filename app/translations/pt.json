@@ -204,7 +204,7 @@
       },
       {
         "value": "USD",
-        "text": "Você pode obter o preço em USD além do ZEC."
+        "text": "Você pode obter o preço em USD além do ZEC.\nVocê precisa obter uma chave de API da CoinCap para buscar o preço (https://pro.coincap.io/signup)."
       }
     ],
     "languages": [
@@ -363,7 +363,8 @@
     "select-placeholder": "Escolha um Servidor...",
     "value-language-ru": "Russo",
     "walletkeyssaved": "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo.",
-    "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!"
+    "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!",
+    "coincap-placeholder": "Chave API CoinCap"
   },
   "info": {
     "version": "Versão",
@@ -515,10 +516,11 @@
     "of": " of ",
     "prev": "Anterior",
     "next": "Próximo",
-    "shielded-orchard": "Orchard",
-    "shielded-sapling": "Z-Sapling",
+    "shielded-orchard": "Apenas Orchard",
+    "shielded-sapling": "Apenas Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
-    "shielded-full": "Completa"
+    "shielded-full": "Completa",
+    "showtip": "Toque para selecionar outro endereço."
   },
   "history": {
     "shield-all": "Blindar Todos os Fundos",

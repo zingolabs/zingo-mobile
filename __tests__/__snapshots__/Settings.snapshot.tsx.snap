@@ -582,6 +582,43 @@ exports[`Component Settings - test Settings - snapshot 1`] = `
             </Text>
           </View>
         </View>
+        <View>
+          <View
+            style={
+              {
+                "borderColor": "#ffffff",
+                "borderWidth": 1,
+                "marginLeft": 10,
+                "marginTop": 5,
+                "maxWidth": "90%",
+                "minHeight": 48,
+                "minWidth": "50%",
+                "width": "auto",
+              }
+            }
+          >
+            <TextInput
+              editable={true}
+              maxLength={150}
+              onChangeText={[Function]}
+              placeholder="text translated"
+              placeholderTextColor="#888888"
+              style={
+                {
+                  "backgroundColor": "transparent",
+                  "color": "#c3c3c3",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "marginLeft": 5,
+                  "maxWidth": "90%",
+                  "minHeight": 48,
+                  "minWidth": "50%",
+                }
+              }
+              value=""
+            />
+          </View>
+        </View>
         <View
           style={
             {

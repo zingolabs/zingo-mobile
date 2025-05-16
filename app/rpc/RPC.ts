@@ -123,7 +123,7 @@ export default class RPC {
     this.readOnly = readOnly;
   }
 
-  static async rpcGetZecPrice(): Promise<number> {
+  static async rpcGetZecPrice(): Promise<{price: number, error: string}> {
     try {
       // values:
       // 0   - initial/default value
@@ -138,31 +138,31 @@ export default class RPC {
       if (resultStr) {
         if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error fetching price ${resultStr}`);
-          return -1;
+          return {price: -1, error: resultStr};
         } else {
           const resultJSON: RPCZecPrice = await JSON.parse(resultStr);
           if (resultJSON.error) {
             console.log(resultJSON.error);
-            return -1;
+            return {price: -1, error: resultJSON.error};
           }
           if (!resultJSON.current_price) {
             // if no exists the field or is empty
-            return 0;
+            return {price: 0, error: ''};
           }
           if (resultJSON.current_price && isNaN(resultJSON.current_price)) {
             console.log(`Error fetching price ${resultJSON.current_price}`);
-            return -1;
+            return {price: -1, error: `Error fetching price ${resultJSON.current_price}`};
           } else {
-            return resultJSON.current_price;
+            return {price: resultJSON.current_price, error: ''};
           }
         }
       } else {
         console.log('Internal Error fetching price');
-        return -2;
+        return {price: -2, error: 'Internal Error fetching price'};
       }
     } catch (error) {
       console.log(`Critical Error fetching price ${error}`);
-      return -2;
+      return {price: -2, error: `Critical Error fetching price ${error}`};
     }
   }
 

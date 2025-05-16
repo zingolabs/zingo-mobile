@@ -204,7 +204,7 @@
       },
       {
         "value": "USD",
-        "text": "Вы можете получить цену в долларах США помимо ZEC."
+        "text": "Вы можете получить цену в долларах США помимо ZEC.\nЧтобы получить цену, вам необходимо получить API-ключ от CoinCap (https://pro.coincap.io/signup)."
       }
     ],
     "languages": [
@@ -363,7 +363,8 @@
     "select-placeholder": "Выберите сервер...",
     "value-language-ru": "Русский",
     "walletkeyssaved": "Ключи для восстановления кошелька сохранены на устройстве в зашифрованном виде.",
-    "walletkeyswarning": "Эта экспериментальная функция! Не рекомендуется использовать её для хранения резервной фразы с крупными суммами средств!"
+    "walletkeyswarning": "Эта экспериментальная функция! Не рекомендуется использовать её для хранения резервной фразы с крупными суммами средств!",
+    "coincap-placeholder": "API-ключ CoinCap"
   },
   "info": {
     "version": "Версия",
@@ -515,10 +516,11 @@
     "of": " из ",
     "prev": "Назад",
     "next": "Далее",
-    "shielded-orchard": "Orchard",
-    "shielded-sapling": "Z-Sapling",
+    "shielded-orchard": "Только Orchard",
+    "shielded-sapling": "Только Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
-    "shielded-full": "Полный"
+    "shielded-full": "Полный",
+    "showtip": "Нажмите, чтобы выбрать другой адрес."
   },
   "history": {
     "shield-all": "Экранирование всех средств",

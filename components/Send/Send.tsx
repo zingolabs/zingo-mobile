@@ -46,7 +46,6 @@ import Confirm from './components/Confirm';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
-import RPC from '../../app/rpc';
 import Header from '../Header';
 import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
@@ -128,6 +127,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     closeAllModals,
     setPoolsModalShow,
     security,
+    currency,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -600,24 +600,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         !(!memoEnabled && Utils.parseStringLocaleToNumberFloat(amountText) === 0),
     );
   }, [memoEnabled, amountText, validAddress, validAmount, validMemo, fee]);
-
-  useEffect(() => {
-    (async () => {
-      if (mode === ModeEnum.basic) {
-        const price = await RPC.rpcGetZecPrice();
-        // values:
-        // 0   - initial/default value
-        // -1  - error in Gemini/zingolib.
-        // -2  - error in RPCModule, likely.
-        // > 0 - real value
-        if (price <= 0) {
-          setZecPrice(price, 0);
-        } else {
-          setZecPrice(price, Date.now());
-        }
-      }
-    })();
-  }, [mode, setZecPrice]);
 
   useEffect(() => {
     (async () => {
@@ -1435,7 +1417,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </View>
               </View>
 
-              {(!zecPrice.zecPrice || zecPrice.zecPrice <= 0) && (
+              {(!zecPrice.zecPrice || zecPrice.zecPrice <= 0) && currency === CurrencyEnum.USDCurrency && (
                 <View
                   style={{
                     width: '35%',
@@ -1445,7 +1427,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </View>
               )}
 
-              {!!zecPrice.zecPrice && zecPrice.zecPrice > 0 && (
+              {!!zecPrice.zecPrice && zecPrice.zecPrice > 0 && currency === CurrencyEnum.USDCurrency && (
                 <View
                   style={{
                     display: 'flex',
@@ -1507,11 +1489,11 @@ const Send: React.FunctionComponent<SendProps> = ({
 
                   <View style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-                      <RegText style={{ marginTop: 5, fontSize: 12.5 }}>
+                      <RegText style={{ marginTop: 0, fontSize: 12.5 }}>
                         {translate('send.spendable') as string}
                       </RegText>
                       <CurrencyAmount
-                        style={{ marginTop: 5, fontSize: 12.5 }}
+                        style={{ marginTop: 1, fontSize: 12.5 }}
                         price={zecPrice.zecPrice}
                         amtZec={maxAmount}
                         currency={CurrencyEnum.USDCurrency}
@@ -1787,7 +1769,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 twoButtons={true}
               />
             </View>
-            {server.chainName === ChainNameEnum.mainChainName && (
+            {server.chainName === ChainNameEnum.mainChainName && Platform.OS === GlobalConst.platformOSandroid && (
               <>
                 {donation ? (
                   <View

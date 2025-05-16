@@ -204,7 +204,7 @@
       },
       {
         "value": "USD",
-        "text": "Puedes consultar el precio para US Dólares aparte de ZEC."
+        "text": "Puedes consultar el precio para US Dólares aparte de ZEC.\nNecesita obtener una clave API de CoinCap para obtener el precio (https://pro.coincap.io/signup)."
       }
     ],
     "languages": [
@@ -363,7 +363,8 @@
     "select-placeholder": "Elige un Servidor...",
     "value-language-ru": "Ruso",
     "walletkeyssaved": "La ultima información de recuperacion del Monedero almacenada de forma segura en el dispositivo.",
-    "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!"
+    "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!",
+    "coincap-placeholder": "Clave API de CoinCap"
   },
   "info": {
     "version": "Versión",
@@ -515,10 +516,11 @@
     "of": " de ",
     "prev": "Anterior",
     "next": "Siguiente",
-    "shielded-orchard": "Orchard",
-    "shielded-sapling": "Z-Sapling",
+    "shielded-orchard": "Solo Orchard",
+    "shielded-sapling": "Solo Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
-    "shielded-full": "Completa"
+    "shielded-full": "Completa",
+    "showtip": "Tocar para seleccionar otra dirección."
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",

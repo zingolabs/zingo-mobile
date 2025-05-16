@@ -68,6 +68,7 @@
     "react-native-toastier": "2.0.1",
     "react-native-view-shot": "^4.0.3",
     "react-native-vision-camera": "4.6.4",
+    "react-native-walkthrough-tooltip": "^1.6.0",
     "recyclerlistview": "4.2.1",
     "url-parse": "1.5.10"
   },

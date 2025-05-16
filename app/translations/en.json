@@ -204,7 +204,7 @@
       },
       {
         "value": "USD",
-        "text": "You can fetch the price for US Dollars besides ZEC."
+        "text": "You can fetch the price for US Dollars besides ZEC.\nYou need to get an API Key from CoinCap in order to fetch the Price (https://pro.coincap.io/signup)."
       }
     ],
     "languages": [
@@ -363,7 +363,8 @@
     "select-placeholder": "Choose a Server...",
     "value-language-ru": "Russian",
     "walletkeyssaved": "The last Wallet Recovery Info stored safely in the device.",
-    "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!"
+    "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!",
+    "coincap-placeholder": "CoinCap API Key"
   },
   "info": {
     "version": "Version",
@@ -515,10 +516,11 @@
     "of": " of ",
     "prev": "Prev",
     "next": "Next",
-    "shielded-orchard": "Orchard",
-    "shielded-sapling": "Z-Sapling",
+    "shielded-orchard": "Only Orchard",
+    "shielded-sapling": "Only Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
-    "shielded-full": "Full"
+    "shielded-full": "Full",
+    "showtip": "Tap to select another address."
   },
   "history": {
     "shield-all": "Shield All funds",

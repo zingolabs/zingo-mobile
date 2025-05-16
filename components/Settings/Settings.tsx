@@ -47,6 +47,8 @@ import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
 import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfo';
+import RPCModule from '../../app/RPCModule';
+import RPC from '../../app/rpc';
 
 type SettingsProps = {
   setWalletOption: (walletOption: string, value: string) => Promise<void>;
@@ -108,6 +110,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     readOnly,
     navigationHome,
+    setZecPrice,
   } = context;
 
   const memosArray = translate('settings.memos');
@@ -208,6 +211,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
   const [hasRecoveryWalletInfoSaved, setHasRecoveryWalletInfoSaved] = useState<boolean>(false);
   const [storageRecoveryWalletInfo, setStorageRecoveryWalletInfo] = useState<string>('');
+  const [coinCapApiKey, setCoinCapApiKey] = useState<string>('');
 
   useEffect(() => {
     (async () => {
@@ -307,7 +311,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer &&
       rescanMenuContext === rescanMenu &&
-      recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice
+      recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
+      coinCapApiKey === ''
     ) {
       setDisabledButton(true);
     } else {
@@ -347,6 +352,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     walletSettings.downloadMemos,
     walletSettings.transactionFilterThreshold,
     securityObject,
+    coinCapApiKey,
   ]);
 
   const saveSettings = async () => {
@@ -381,7 +387,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer &&
       rescanMenuContext === rescanMenu &&
-      recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice
+      recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
+      coinCapApiKey === ''
     ) {
       addLastSnackbar({ message: translate('settings.nochanges') as string });
       return;
@@ -492,6 +499,29 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (currencyContext !== currency) {
       await setCurrencyOption(currency);
     }
+    // store coincap api key with zingolib in the wallet file
+    if (coinCapApiKey !== '') {
+      await RPCModule.zecPriceApiKeyProcess(coinCapApiKey);
+      const {price, error} = await RPC.rpcGetZecPrice();
+      // values:
+      // 0   - initial/default value
+      // -1  - error in Gemini/zingolib.
+      // -2  - error in RPCModule, likely.
+      // > 0 - real value
+      if (price === -1) {
+        addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}` });
+      }
+      if (price === -2) {
+        addLastSnackbar({ message: `${translate('info.errorrpcmodule')} - ${error}` });
+      }
+      if (price <= 0) {
+        addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}` });
+        setZecPrice(price, 0);
+      } else {
+        setZecPrice(price, Date.now());
+      }
+      setCoinCapApiKey('');
+    }
     if (sendAllContext !== sendAll) {
       await setSendAllOption(sendAll);
     }
@@ -547,6 +577,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       // reset all settings - no save changes
       setMode(modeContext);
       setCurrency(currencyContext);
+      setCoinCapApiKey('');
       setLanguage(languageContext);
       setDonation(donationContext);
       setPrivacy(privacyContext);
@@ -705,6 +736,41 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
               'currency',
             )}
           </View>
+
+          {currency === CurrencyEnum.USDCurrency && (
+            <View>
+              <View
+                style={{
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                  marginLeft: 10,
+                  width: 'auto',
+                  maxWidth: '90%',
+                  minWidth: '50%',
+                  minHeight: 48,
+                  marginTop: 5,
+                }}>
+                <TextInput
+                  placeholder={translate('settings.coincap-placeholder') as string}
+                  placeholderTextColor={colors.placeholder}
+                  style={{
+                    color: colors.text,
+                    fontWeight: '600',
+                    fontSize: 18,
+                    minWidth: '50%',
+                    maxWidth: '90%',
+                    minHeight: 48,
+                    marginLeft: 5,
+                    backgroundColor: 'transparent',
+                  }}
+                  value={coinCapApiKey}
+                  onChangeText={(text: string) => setCoinCapApiKey(text)}
+                  editable={!disabled}
+                  maxLength={150}
+                />
+              </View>
+            </View>
+          )}
 
           <View style={{ display: 'flex', margin: 10 }}>
             <BoldText>{translate('settings.language-title') as string}</BoldText>

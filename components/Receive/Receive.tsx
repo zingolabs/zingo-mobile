@@ -46,6 +46,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [zAddr, setZAddr] = useState<AddressClass>({} as AddressClass);
   const [tAddr, setTAddr] = useState<AddressClass>({} as AddressClass);
   const [shielded, setShielded] = useState<ShieldedEnum>(ShieldedEnum.uOrchard);
+  const [showTip, setShowTip] = useState<boolean>(false);
 
   const dimensions = {
     width: Dimensions.get('window').width,
@@ -54,7 +55,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   useEffect(() => {
     if (addresses && addresses.length > 0) {
-      // we offreing now three options for Shielded:
+      // we offering now three options for Shielded:
       // 1. orchard UA
       // 2. orchard+sapling UA
       // 3. z-sapling
@@ -76,6 +77,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       setUOrchardAddr(uOrchardAdd[0]);
       setZAddr(zAdd[0]);
       setTAddr(tAdd[0]);
+      setTimeout(() => {
+        setShowTip(true);
+      }, 2 * 1000);
     }
   }, [addresses]);
 
@@ -85,7 +89,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       { key: 'uorchardaddr', title: translate('receive.u-title') as string },
       { key: 'taddr', title: translate('receive.t-title') as string },
     ];
-    setShielded(ShieldedEnum.uOrchard);
     setRoutes(mode === ModeEnum.basic ? basicModeRoutes : advancedModeRoutes);
   }, [mode, translate]);
 
@@ -114,13 +117,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             {!!addresses && !!uOrchardAddress && (
               <>
                 {shielded === ShieldedEnum.uOrchardSapling && (
-                  <SingleAddress setShielded={setShielded} shielded={shielded} address={uOrchardSapling} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
+                  <SingleAddress setShielded={setShielded} shielded={shielded} setShowTip={setShowTip} showTip={showTip} address={uOrchardSapling} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
                 )}
                 {shielded === ShieldedEnum.uOrchard && (
-                  <SingleAddress setShielded={setShielded} shielded={shielded} address={uOrchard} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
+                  <SingleAddress setShielded={setShielded} shielded={shielded} setShowTip={setShowTip} showTip={showTip} address={uOrchard} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
                 )}
                 {shielded === ShieldedEnum.sapling && (
-                  <SingleAddress setShielded={setShielded} shielded={shielded} address={sapling} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
+                  <SingleAddress setShielded={setShielded} shielded={shielded} setShowTip={setShowTip} showTip={showTip} address={sapling} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
                 )}
               </>
             )}
