@@ -95,6 +95,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [numVt, setNumVt] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   const [valueTransfersSliced, setValueTransfersSliced] = useState<ValueTransferType[]>([]);
+  const [valueTransfersFiltered, setValueTransfersFiltered] = useState<ValueTransferType[]>([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
@@ -135,27 +136,33 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   const [dataProvider, setDataProvider] = useState<DataProvider>(_dataProvider);
 
-  const fetchValueTransfersSliced = useMemo(() => {
+  const fetchValueTransfersFiltered = useMemo(() => {
     if (!valueTransfers) {
       return [] as ValueTransferType[];
     }
     // strictly show VT's with some amount on funds.
     return valueTransfers
-      .filter((vt: ValueTransferType) => (filter === FilterEnum.withFunds ? vt.amount > 0 : true))
-      .slice(0, numVt);
-  }, [valueTransfers, numVt, filter]);
+      .filter((vt: ValueTransferType) => (filter === FilterEnum.withFunds ? vt.amount > 0 : true));
+  }, [valueTransfers, filter]);
 
   useEffect(() => {
     if (valueTransfers !== null) {
-      const vts = fetchValueTransfersSliced;
-      setDataProvider((data) => data.cloneWithRows(vts));
-      setLoadMoreButton(numVt < (vts ? vts.length : 0));
-      setValueTransfersSliced(vts);
+      const vtf = fetchValueTransfersFiltered;
+      setValueTransfersFiltered(vtf);
+      setLoadMoreButton(numVt < vtf.length);
+      setValueTransfersSliced(vtf.slice(0, numVt));
+      setDataProvider((data) => data.cloneWithRows(vtf.slice(0, numVt)));
       setTimeout(() => {
         setLoading(false);
       }, 500);
     }
-  }, [fetchValueTransfersSliced, numVt, valueTransfers, server.chainName]);
+  }, [fetchValueTransfersFiltered, numVt, valueTransfers, server.chainName]);
+
+  useEffect(() => {
+    setLoadMoreButton(numVt < valueTransfersFiltered.length);
+    setValueTransfersSliced(valueTransfersFiltered.slice(0, numVt));
+    setDataProvider((data) => data.cloneWithRows(valueTransfersFiltered.slice(0, numVt)));
+  }, [numVt, valueTransfersFiltered]);
 
   useEffect(() => {
     if (scrollToTop) {
@@ -185,9 +192,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
         index={index}
         vt={vt}
         valueTransfersSliced={valueTransfersSliced}
-        totalLength={valueTransfers !== null ? valueTransfers.length : 0}
+        totalLength={valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0}
         setPrivacyOption={setPrivacyOption}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -199,7 +206,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         address={Utils.messagesAddress(vt)}
         sendTransaction={sendTransaction}
         setServerOption={setServerOption}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -358,8 +365,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'flex-start',
-                            marginTop: 10,
-                            marginBottom: 30,
+                            marginTop: 20,
+                            marginBottom: 60,
                           }}>
                           <Button
                             type={ButtonTypeEnum.Secondary}
@@ -375,8 +382,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'flex-start',
-                                marginTop: 10,
-                                marginBottom: 30,
+                                marginTop: 20,
+                                marginBottom: 60,
                               }}>
                               <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
                             </View>
@@ -387,7 +394,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
                                 alignItems: 'center',
                                 justifyContent: 'flex-start',
                                 marginTop: 10,
-                                marginBottom: 10,
                               }}>
                               <FadeText style={{ color: colors.primary }}>{translate('history.empty') as string}</FadeText>
                             </View>

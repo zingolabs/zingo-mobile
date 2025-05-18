@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { View, ScrollView, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -18,9 +18,6 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { CommandEnum } from '../../app/AppState';
-import RPCModule from '../../app/RPCModule';
-import { RPCWalletKindType } from '../../app/rpc/types/RPCWalletKindType';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -31,32 +28,14 @@ type PoolsProps = {
 
 const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language, shieldingAmount, snackbars, removeFirstSnackbar } = context;
+  const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language, shieldingAmount, snackbars, removeFirstSnackbar, orchardPool, saplingPool, transparentPool } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
 
-  const [orchardPool, setOrchardPool] = useState<boolean>(false);
-  const [saplingPool, setSaplingPool] = useState<boolean>(false);
-  const [transparentPool, setTransparentPool] = useState<boolean>(false);
-
-  useEffect(() => {
-    (async () => {
-      // checking the pools of this wallet
-      const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
-      try {
-        const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
-        //console.log(walletKindJSON);
-        setOrchardPool(walletKindJSON.orchard);
-        setSaplingPool(walletKindJSON.sapling);
-        setTransparentPool(walletKindJSON.transparent);
-      } catch (e) {}
-    })();
-  }, []);
-
-  //console.log('render pools. Balance:', totalBalance);
+  console.log('render pools. Balance:', totalBalance, orchardPool, saplingPool, transparentPool);
 
   return (
     <ToastProvider>
@@ -202,11 +181,21 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
                           privacy={privacy}
                         />
                       </DetailLine>
+                      <DetailLine label={translate('pools.transparent-confirmed-balance') as string}>
+                        <ZecAmount
+                          testID="transparent-confirmed-balance"
+                          amtZec={totalBalance.confirmedTransparent}
+                          size={18}
+                          currencyName={info.currencyName}
+                          color={'red'}
+                          privacy={privacy}
+                        />
+                      </DetailLine>
                     </View>
                   </>
                 )}
 
-                {transparentPool && totalBalance.transparentBal > 0 && shieldingAmount === 0 && (
+                {transparentPool && totalBalance.confirmedTransparent > 0 && shieldingAmount === 0 && (
                   <View
                     style={{
                       display: 'flex',

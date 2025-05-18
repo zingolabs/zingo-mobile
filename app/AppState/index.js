@@ -2,7 +2,6 @@ import AddressClass from './classes/AddressClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import SettingsFileClass from './classes/SettingsFileClass';
-import SyncingStatusClass from './classes/SyncingStatusClass';
 import ToAddrClass from './classes/ToAddrClass';
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
@@ -23,6 +22,7 @@ import ValueTransferType from './types/ValueTransferType';
 import ContactType from './types/ContactType';
 
 import { CommandEnum } from './enums/CommandEnum';
+import { AddressesReceiversEnum } from './enums/AddressesReceiversEnum';
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
@@ -52,6 +52,7 @@ import { EventListenerEnum } from './enums/EventListenerEnum';
 import { ValueTransferKindEnum } from './enums/ValueTransferKindEnum';
 import { FilterEnum } from './enums/FilterEnum';
 import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
+import { TransactionActionEnum } from './enums/TransactionActionEnum';
 
 import { GlobalConst } from './const/GlobalConst';
 
@@ -69,7 +70,6 @@ export {
   AddressBookFileClass,
   SendPageStateClass,
   SettingsFileClass,
-  SyncingStatusClass,
   ToAddrClass,
   TotalBalanceClass,
   WalletSettingsClass,
@@ -88,6 +88,7 @@ export {
   ValueTransferType,
   ContactType,
   CommandEnum,
+  AddressesReceiversEnum,
   AddressBookActionEnum,
   MenuItemEnum,
   LanguageEnum,
@@ -117,5 +118,6 @@ export {
   ValueTransferKindEnum,
   FilterEnum,
   RefreshScreenEnum,
+  TransactionActionEnum,
   GlobalConst,
 };

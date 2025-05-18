@@ -51,7 +51,6 @@ import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import AddressItem from '../../Components/AddressItem';
 import Memo from '../../Memo';
-import RPC from '../../../app/rpc';
 import { sendEmail } from '../../../app/sendEmail';
 import { createAlert } from '../../../app/createAlert';
 import selectingServer from '../../../app/selectingServer';
@@ -365,9 +364,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     }
     setDisableSend(true);
 
-    // first interrupt syncing Just in case...
-    await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
-
     // call the sendTransaction method in a timeout, allowing the modals to show properly
     setTimeout(async () => {
       let error = '';
@@ -384,8 +380,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         // the app send successfully on the first attemp.
         setDisableSend(false);
 
-        // the sync process can continue
-        await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
         return;
       } catch (err1) {
         error = err1 as string;
@@ -413,8 +407,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           console.log(fasterServer);
           if (fasterServer.uri !== server.uri) {
             setServerOption(fasterServer, selectServer, false, true);
-            // first interrupt syncing Just in case...
-            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
           }
 
           try {
@@ -429,8 +421,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             // the app send successfully on the second attemp.
             setDisableSend(false);
 
-            // the sync process can continue
-            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
             return;
           } catch (err2) {
             error = err2 as string;
@@ -439,9 +429,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
           }
         }
       }
-
-      // the sync process can continue
-      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
 
       //console.log('sendtx error', error);
       // if the App is in background I need to store the error
@@ -483,7 +470,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         message={memo}
         includeUAMessage={true}
         setMessage={setMemo}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -494,7 +481,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         valueTransfersSliced={messagesSliced}
         totalLength={messagesFiltered ? messagesFiltered.length : 0}
         setPrivacyOption={setPrivacyOption}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -719,7 +706,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
             </>
           )}
 
-          {messagesSliced.map((vt, index) => {
+          {messagesSliced && messagesSliced.length > 0 && messagesSliced.map((vt, index) => {
             let txmonth = vt.time ? moment(vt.time * 1000).format('MMM YYYY') : '--- ----';
 
             var month = '';

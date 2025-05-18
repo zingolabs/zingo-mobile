@@ -3,7 +3,6 @@ import AddressClass from './classes/AddressClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
-import SyncingStatusClass from './classes/SyncingStatusClass';
 
 import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
@@ -24,6 +23,7 @@ import ValueTransferType from './types/ValueTransferType';
 import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
 import { HideReturn } from 'react-native-magic-modal';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
+import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 
 export default interface AppContextLoaded {
   navigationHome: DrawerContentComponentProps['navigation'] | null;
@@ -55,7 +55,7 @@ export default interface AppContextLoaded {
   walletSettings: WalletSettingsClass;
 
   // syncing Info about the status of the process
-  syncingStatus: SyncingStatusClass;
+  syncingStatus: RPCSyncStatusType;
 
   // wallet recovery info
   wallet: WalletType;
@@ -78,6 +78,11 @@ export default interface AppContextLoaded {
 
   // this wallet is watch-only (Readonly)
   readOnly: boolean;
+
+  // pools available
+  orchardPool: boolean;
+  saplingPool: boolean;
+  transparentPool: boolean;
 
   // snackbar queue
   snackbars: SnackbarType[];

@@ -54,19 +54,20 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
 
   const onPressFetch = async () => {
     setLoading(true);
-    const price = await RPC.rpcGetZecPrice();
+    const {price, error} = await RPC.rpcGetZecPrice();
     // values:
     // 0   - initial/default value
     // -1  - error in Gemini/zingolib.
     // -2  - error in RPCModule, likely.
     // > 0 - real value
     if (price === -1) {
-      addLastSnackbar({ message: translate('info.errorgemini') as string });
+      addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}` });
     }
     if (price === -2) {
-      addLastSnackbar({ message: translate('info.errorrpcmodule') as string });
+      addLastSnackbar({ message: `${translate('info.errorrpcmodule')} - ${error}` });
     }
     if (price <= 0) {
+      addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}` });
       setZecPrice(price, 0);
     } else {
       setZecPrice(price, Date.now());

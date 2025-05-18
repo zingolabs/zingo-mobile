@@ -92,9 +92,10 @@ jobs:
   #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
   #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
 
-  android-ubuntu-foss-script-artifact:
-    uses: ./.github/workflows/android-ubuntu-foss-script-artifact.yaml
-    needs: [create-timestamp, create-cache-key]
-    with:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-    secrets: inherit
+  # let's create this only in nightly
+  #android-ubuntu-foss-script-artifact:
+  #  uses: ./.github/workflows/android-ubuntu-foss-script-artifact.yaml
+  #  needs: [create-timestamp, create-cache-key]
+  #  with:
+  #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+  #  secrets: inherit

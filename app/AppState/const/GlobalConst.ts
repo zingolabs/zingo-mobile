@@ -22,4 +22,5 @@ export const GlobalConst = {
   keyKeyChain: 'ZINGO_SEED_BIRTHDAY',
   serviceKeyChain: 'ZINGO',
   replyTo: '\nReply to: \n',
+  expireBlocks: 40,
 };

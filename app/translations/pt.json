@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.11.2 (226)",
+  "version": "zingo-2.0.0 (235)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -14,6 +14,7 @@
   "biometricsfailed-button": "Desbloquear",
   "biometrics-title": "Autenticação",
   "biometrics-message": "Por favor, autentique-se",
+  "biometrics-message-ios": "Por favor, autentique-se com sua senha",
   "biometrics-error": "Para sua segurança, você precisa autenticar essa ação novamente para executá-la. Você pode alterar isso em Configurações sempre que desejar.",
   "close": "Fechar",
   "cancel": "Cancelar",
@@ -152,7 +153,7 @@
     "send-menu": "ENVIAR",
     "receive-menu": "RECEBER",
     "messages-menu": "MENSAGENS",
-    "syncing": "Parando a sincronização para poder redefinir a carteira.",
+    "syncing": "Parando a sincronização para poder redefinir a carteira... Pode levar alguns segundos.",
     "zcash-url": "Você já possui um endereço na tela de envio",
     "connection-error": "Esta opção requer uma conexão com a Internet para ser executada.",
     "tryingnewserver": "Tentando conectar-se ao novo servidor... Pode levar alguns segundos.",
@@ -203,7 +204,7 @@
       },
       {
         "value": "USD",
-        "text": "Você pode obter o preço em USD além do ZEC."
+        "text": "Você pode obter o preço em USD além do ZEC.\nVocê precisa obter uma chave de API da CoinCap para buscar o preço (https://pro.coincap.io/signup)."
       }
     ],
     "languages": [
@@ -362,7 +363,8 @@
     "select-placeholder": "Escolha um Servidor...",
     "value-language-ru": "Russo",
     "walletkeyssaved": "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo.",
-    "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!"
+    "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!",
+    "coincap-placeholder": "Chave API CoinCap"
   },
   "info": {
     "version": "Versão",
@@ -514,10 +516,11 @@
     "of": " of ",
     "prev": "Anterior",
     "next": "Próximo",
-    "shielded-orchard": "Orchard",
-    "shielded-sapling": "Z-Sapling",
+    "shielded-orchard": "Apenas Orchard",
+    "shielded-sapling": "Apenas Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
-    "shielded-full": "Completa"
+    "shielded-full": "Completa",
+    "showtip": "Toque para selecionar outro endereço."
   },
   "history": {
     "shield-all": "Blindar Todos os Fundos",
@@ -585,7 +588,17 @@
     "mempool": "Em Mempool",
     "confirmed": "Confirmada",
     "filter-withfunds": "Com fundos",
-    "empty": "Nenhuma transação ainda."
+    "empty": "Nenhuma transação ainda.",
+    "resend": "Reenviar transação",
+    "remove": "Remover transação",
+    "resend-title": "Reenviar",
+    "remove-title": "Remover",
+    "resend-error": "Erro ao reenviar :",
+    "remove-error": "Erro ao remover :",
+    "resend-message": "",
+    "remove-message": "",
+    "resend-alert": "Confirme para reenviar esta transação novamente.",
+    "remove-alert": "Confirme para excluir completamente esta transação do dispositivo."
   },
   "report": {
     "title": "Relatório de Sincronização / Rescan",
@@ -611,7 +624,14 @@
     "networkstatus": "Status da Rede (Internet)",
     "nointernet": "Sem Conexão com a Internet.",
     "cellulardata": "Apenas Dados Móveis.",
-    "connectionexpensive": "Conexão com os Dados Móveis ."
+    "connectionexpensive": "Conexão com os Dados Móveis .",
+    "syncstatus": "Status de Sincronização",
+    "map": "Mapa de Varredura Não Linear",
+    "legend": "Legenda",
+    "scanned": "Varredura",
+    "scanning": "Varredura...",
+    "lowpriority": "Baixa prioridade",
+    "highpriority": "Alta prioridade"
   },
   "import": {
     "title": "Frases de recuperação / Chave de Visualização",
@@ -694,6 +714,7 @@
     "sapling-spendable-balance": "Saldo Disponível",
     "transparent-title": "TRANSPARENTE",
     "transparent-balance": "Saldo Total",
+    "transparent-confirmed-balance": "Saldo Confirmado",
     "dust": "A quantidade transparente é muito pequena para ser protegida."
   },
   "uris": {

@@ -28,6 +28,25 @@ ENV NDK_HOME=/usr/local/android-ndk-${android_ndk_ver}
 ENV ANDROID_NDK_ROOT=/usr/local/android-ndk-${android_ndk_ver}
 ENV PATH=/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 
+ENV SOURCE_DATE_EPOCH=1710000000
+ENV ZERO_AR_DATE=1
+ENV RUSTFLAGS=" \
+    --remap-path-prefix=$(pwd)=. \
+    -C opt-level=z \
+    -C debuginfo=0 \
+    -C codegen-units=1 \
+    -C linker-plugin-lto=no \
+    -C link-arg=-Wl,--hash-style=gnu \
+    -C link-arg=-Wl,--build-id=none \
+    -C link-arg=-Wl,--no-relax \
+    -C link-arg=-Wl,--pack-dyn-relocs=none \
+    -C link-arg=-Wl,--sort-common \
+    -C link-arg=-Wl,--sort-section=name"
+ENV CGO_LDFLAGS="-trimpath -buildvcs=false -buildid= "
+ENV CMAKE_C_FLAGS=$CFLAGS
+ENV CMAKE_CXX_FLAGS=$CFLAGS
+ENV CMAKE_SHARED_LINKER_FLAGS=$LDFLAGS
+
 ENV CFLAGS="-ffile-prefix-map=$(pwd)=. -fno-ident -g0 -gno-record-gcc-switches -frandom-seed=1 -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -no-canonical-prefixes"
 ENV LDFLAGS="-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
 

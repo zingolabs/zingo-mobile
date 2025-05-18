@@ -22,7 +22,6 @@ import {
   TranslateType,
   ModeEnum,
   CurrencyEnum,
-  SnackbarDurationEnum,
   PoolToShieldEnum,
   SnackbarType,
   ButtonTypeEnum,
@@ -52,6 +51,8 @@ import 'moment/locale/ru';
 import Utils from '../../app/utils';
 import { RPCShieldProposeType } from '../../app/rpc/types/RPCShieldProposeType';
 import RPCModule from '../../app/RPCModule';
+import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
+import { isEqual } from 'lodash';
 
 type HeaderProps = {
   // general
@@ -117,8 +118,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     zecPrice,
     readOnly,
     valueTransfersTotal,
-    wallet,
-    restartApp,
     somePending,
     security,
     language,
@@ -161,39 +160,33 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const opacityValue = useRef(new Animated.Value(1)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
-  const [blocksRemaining, setBlocksRemaining] = useState<number>(0);
+  const [percentageOutputsScanned, setPercentageOutputsScanned] = useState<number>(0);
+  const [syncInProgress, setSyncInProgress] = useState<boolean>(true);
   const [shieldingFee, setShieldingFee] = useState<number>(0);
   const [viewSyncStatus, setViewSyncStatus] = useState<boolean>(false);
 
   useEffect(() => {
-    let currentBl, lastBlockSe;
-    if (wallet.birthday < syncingStatus.currentBlock) {
-      currentBl = syncingStatus.currentBlock - wallet.birthday;
-      lastBlockSe = syncingStatus.lastBlockServer - wallet.birthday;
+    if (!syncingStatus || isEqual(syncingStatus, {} as RPCSyncStatusType) || (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) || syncingStatus.percentage_total_outputs_scanned === 0) {
+      // if the App is waiting for the first fetching, let's put 0.
+      setPercentageOutputsScanned(0);
+      setSyncInProgress(true);
     } else {
-      currentBl = syncingStatus.currentBlock;
-      lastBlockSe = syncingStatus.lastBlockServer;
+      setPercentageOutputsScanned(syncingStatus.percentage_total_outputs_scanned < 1 ? 1 : Math.floor(syncingStatus.percentage_total_outputs_scanned));
+      setSyncInProgress(!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length > 0 && syncingStatus.percentage_total_outputs_scanned < 100);
     }
-    let blocksRe = lastBlockSe - currentBl;
-    // just in case, this value is weird...
-    // if the syncing is still inProgress and this value is cero -> it is better for UX to see 1.
-    // this use case is really rare.
-    if (blocksRe <= 0) {
-      blocksRe = 0;
-    }
-    setBlocksRemaining(blocksRe);
-  }, [syncingStatus.currentBlock, syncingStatus.lastBlockServer, wallet.birthday]);
+  }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);
 
-  useEffect(() => {
-    if (syncingStatus.syncProcessStalled && addLastSnackbar && restartApp) {
-      // if the sync process is stalled -> let's restart the App.
-      addLastSnackbar({
-        message: translate('restarting') as string,
-        duration: SnackbarDurationEnum.short,
-      });
-      setTimeout(() => restartApp({ startingApp: false }), 3000);
-    }
-  }, [addLastSnackbar, restartApp, syncingStatus.syncProcessStalled, translate]);
+  // the new sync engine doesn't stalled... for now.
+  //useEffect(() => {
+  //  if (syncingStatus.syncProcessStalled && addLastSnackbar && restartApp) {
+  //    // if the sync process is stalled -> let's restart the App.
+  //    addLastSnackbar({
+  //      message: translate('restarting') as string,
+  //      duration: SnackbarDurationEnum.short,
+  //    });
+  //    setTimeout(() => restartApp({ startingApp: false }), 3000);
+  //  }
+  //}, [addLastSnackbar, restartApp, syncingStatus.syncProcessStalled, translate]);
 
   useEffect(() => {
     // when the App is syncing this can fired a lot of times
@@ -227,7 +220,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       }
     };
 
-    if (!readOnly && setShieldingAmount && selectServer !== SelectServerEnum.offline) {
+    if (!readOnly &&
+        setShieldingAmount &&
+        selectServer !== SelectServerEnum.offline &&
+        somePending ? 0 : (totalBalance?.confirmedTransparent ? totalBalance.confirmedTransparent : 0) > 0
+    ) {
       (async () => {
         let proposeFee = 0;
         let proposeAmount = 0;
@@ -259,13 +256,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             //Alert.alert('Calculating the FEE', runProposeJson.error);
           }
         }
-
         setShieldingFee(proposeFee);
-        setShieldingAmount(proposeAmount);
+        setShieldingAmount && setShieldingAmount(proposeAmount);
         //console.log(proposeFee, proposeAmount);
       })();
+    } else {
+      setShieldingFee(0);
+      setShieldingAmount && setShieldingAmount(0);
     }
-  }, [readOnly, setShieldingAmount, totalBalance?.transparentBal, somePending, selectServer]);
+  }, [readOnly, setShieldingAmount, totalBalance?.confirmedTransparent, somePending, selectServer]);
 
   useEffect(() => {
     setShowShieldButton(
@@ -301,10 +300,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
     // not use await here.
     setComputingModalShow();
-    // We need to activate this flag because if the App is syncing
-    // while shielding, then it going to finish the current batch
-    // and after that it run the shield process.
-    await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
     // because I don't what the user is doing, I need to the re-run the shield
     // command right before the confirmation
     await RPCModule.execute(CommandEnum.shield, '');
@@ -354,7 +349,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           );
         }
       }
-      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
       // change to the history screen, just in case.
       navigationHome?.navigate(RouteEnums.Home, {
         screen: translate('loadedapp.history-menu') as string,
@@ -369,6 +363,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         setScrollToBottom(true);
       }
       closeAllModals();
+      setShieldingFee(0);
+      setShieldingAmount && setShieldingAmount(0);
     }
   };
 
@@ -393,20 +389,23 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     }
 
     if (!noSyncingStatus) {
-      if (syncingStatus.inProgress) {
+      if (syncInProgress) {
         animationRef.current?.start();
       } else {
         animationRef.current?.stop();
+        opacityValue.setValue(1);
       }
     } else {
       animationRef.current?.stop();
+      opacityValue.setValue(1);
     }
 
     return () => {
       animationRef.current?.stop();
+      opacityValue.setValue(1);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [syncingStatus.inProgress, noSyncingStatus]);
+  }, [syncInProgress, noSyncingStatus]);
 
   const calculateAmountToShield = (): string => {
     return Utils.parseNumberFloatToStringLocale(somePending ? 0 : shieldingAmount, 8);
@@ -493,7 +492,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     </TouchableOpacity>
   );
 
-  //console.log('render header &&&&&&&&&&&&&&&&&&&&&', privacy);
+  //console.log('render header &&&&&&&&&&&&&&&&&&&&&', percentageOutputsScanned, syncInProgress);
 
   return (
     <>
@@ -520,9 +519,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             }}>
             {!noSyncingStatus && selectServer !== SelectServerEnum.offline && (
               <View style={{ minHeight: 29, flexDirection: 'row' }}>
-                {netInfo.isConnected && !!syncingStatus.lastBlockServer && syncingStatus.syncID >= 0 ? (
+                {netInfo.isConnected && !(percentageOutputsScanned === 0) ? (
                   <>
-                    {!syncingStatus.inProgress && syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet && (
+                    {!syncInProgress && (
                       <View
                         style={{
                           alignItems: 'center',
@@ -551,7 +550,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         </View>
                       </View>
                     )}
-                    {syncingStatus.inProgress && (
+                    {syncInProgress && (
                       <View
                         style={{
                           alignItems: 'center',
@@ -581,11 +580,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                   {translate('syncing') as string}
                                 </FadeText>
                               )}
-                              {viewSyncStatus && blocksRemaining > 0 && (
+                              {viewSyncStatus && percentageOutputsScanned > 0 && (
                                 <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
                               )}
-                              {blocksRemaining > 0 && (
-                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${blocksRemaining}`}</FadeText>
+                              {percentageOutputsScanned > 0 && (
+                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned}%`}</FadeText>
                               )}
                             </View>
                           ) : (
@@ -599,11 +598,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                     {translate('syncing') as string}
                                   </FadeText>
                                 )}
-                                {viewSyncStatus && blocksRemaining > 0 && (
+                                {viewSyncStatus && percentageOutputsScanned > 0 && (
                                   <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
                                 )}
-                                {blocksRemaining > 0 && (
-                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${blocksRemaining}`}</FadeText>
+                                {percentageOutputsScanned > 0 && (
+                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned}%`}</FadeText>
                                 )}
                               </View>
                             </TouchableOpacity>
@@ -901,7 +900,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             width: '100%',
             marginVertical: 5,
           }}>
-          {noDrawMenu && closeScreen ? (
+          {closeScreen ? (
             <>
               <TouchableOpacity onPress={() => closeScreen()}>
                 <FontAwesomeIcon

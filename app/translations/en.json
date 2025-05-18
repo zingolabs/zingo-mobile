@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.11.2 (226)",
+  "version": "zingo-2.0.0 (235)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
@@ -14,6 +14,7 @@
   "biometricsfailed-button": "Unlock",
   "biometrics-title": "Authentication",
   "biometrics-message": "Please authenticate",
+  "biometrics-message-ios": "Please authenticate with your passcode",
   "biometrics-error": "For security you need to authenticate again to perform this action. You Always can change this in Settings",
   "close": "Close",
   "cancel": "Cancel",
@@ -152,7 +153,7 @@
     "send-menu": "SEND",
     "receive-menu": "RECEIVE",
     "messages-menu": "MESSAGES",
-    "syncing": "Stopping the Synchronization to be able to reset the wallet.",
+    "syncing": "Stopping the Synchronization to be able to reset the wallet... Can take a few seconds.",
     "zcash-url": "You already have an address in the send screen",
     "connection-error": "This option requires an internet connection to be executed.",
     "tryingnewserver": "Trying to connect to the new Server... Can take a few seconds.",
@@ -203,7 +204,7 @@
       },
       {
         "value": "USD",
-        "text": "You can fetch the price for US Dollars besides ZEC."
+        "text": "You can fetch the price for US Dollars besides ZEC.\nYou need to get an API Key from CoinCap in order to fetch the Price (https://pro.coincap.io/signup)."
       }
     ],
     "languages": [
@@ -362,7 +363,8 @@
     "select-placeholder": "Choose a Server...",
     "value-language-ru": "Russian",
     "walletkeyssaved": "The last Wallet Recovery Info stored safely in the device.",
-    "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!"
+    "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!",
+    "coincap-placeholder": "CoinCap API Key"
   },
   "info": {
     "version": "Version",
@@ -388,12 +390,33 @@
   },
   "seed": {
     "buttontexts": {
-      "new": ["I have saved \n the seed"],
-      "change": ["", "Open New", "You really want \n to change your \n actual wallet", "Are you certain?"],
-      "server": ["", "Change Server", "You really want \n to change your \n actual server", "Are you certain?"],
-      "view": ["I have saved \n the seed"],
-      "restore": ["Restore Wallet"],
-      "backup": ["", "Restore", "You really want \n to restore your \n backup wallet", "Are you certain?"]
+      "new": [
+        "I have saved \n the seed"
+      ],
+      "change": [
+        "",
+        "Open New",
+        "You really want \n to change your \n actual wallet",
+        "Are you certain?"
+      ],
+      "server": [
+        "",
+        "Change Server",
+        "You really want \n to change your \n actual server",
+        "Are you certain?"
+      ],
+      "view": [
+        "I have saved \n the seed"
+      ],
+      "restore": [
+        "Restore Wallet"
+      ],
+      "backup": [
+        "",
+        "Restore",
+        "You really want \n to restore your \n backup wallet",
+        "Are you certain?"
+      ]
     },
     "title": "Seed",
     "new": "New",
@@ -493,10 +516,11 @@
     "of": " of ",
     "prev": "Prev",
     "next": "Next",
-    "shielded-orchard": "Orchard",
-    "shielded-sapling": "Z-Sapling",
+    "shielded-orchard": "Only Orchard",
+    "shielded-sapling": "Only Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
-    "shielded-full": "Full"
+    "shielded-full": "Full",
+    "showtip": "Tap to select another address."
   },
   "history": {
     "shield-all": "Shield All funds",
@@ -564,7 +588,17 @@
     "mempool": "In Mempool",
     "confirmed": "Confirmed",
     "filter-withfunds": "With funds",
-    "empty": "No Transactions yet."
+    "empty": "No Transactions yet.",
+    "resend": "Resend transaction",
+    "remove": "Remove transaction",
+    "resend-title": "Resend",
+    "remove-title": "Remove",
+    "resend-error": "Error Resending :",
+    "remove-error": "Error Removing :",
+    "resend-message": "",
+    "remove-message": "",
+    "resend-alert": "Confirm to Resend this transaction again.",
+    "remove-alert": "Confirm to completely Remove this transaction from the device."
   },
   "report": {
     "title": "Sync / Rescan Report",
@@ -590,7 +624,14 @@
     "networkstatus": "Network Status (Internet)",
     "nointernet": "No Internet Connection.",
     "cellulardata": "Only Cellular Data.",
-    "connectionexpensive": "Connection Expensive."
+    "connectionexpensive": "Connection Expensive.",
+    "syncstatus": "Sync Status",
+    "map": "Nonlinear Scanning Map",
+    "legend": "Legend",
+    "scanned": "Scanned",
+    "scanning": "Scanning...",
+    "lowpriority": "Low priority",
+    "highpriority": "High priority"
   },
   "import": {
     "title": "Seed Phrase / Viewing Key",
@@ -620,12 +661,33 @@
   },
   "ufvk": {
     "buttontexts": {
-      "new": ["I have saved \n the Viewing Key"],
-      "change": ["", "Open New", "You really want \n to change your \n actual wallet", "Are you certain?"],
-      "server": ["", "Change Server", "You really want \n to change your \n actual server", "Are you certain?"],
-      "view": ["I have saved \n the Viewing Key"],
-      "restore": ["Restore Wallet"],
-      "backup": ["", "Restore", "You really want \n to restore your \n backup wallet", "Are you certain?"]
+      "new": [
+        "I have saved \n the Viewing Key"
+      ],
+      "change": [
+        "",
+        "Open New",
+        "You really want \n to change your \n actual wallet",
+        "Are you certain?"
+      ],
+      "server": [
+        "",
+        "Change Server",
+        "You really want \n to change your \n actual server",
+        "Are you certain?"
+      ],
+      "view": [
+        "I have saved \n the Viewing Key"
+      ],
+      "restore": [
+        "Restore Wallet"
+      ],
+      "backup": [
+        "",
+        "Restore",
+        "You really want \n to restore your \n backup wallet",
+        "Are you certain?"
+      ]
     },
     "privkey": "Spending/Private ",
     "viewkey": "Viewing Key ",
@@ -652,6 +714,7 @@
     "sapling-spendable-balance": "Spendable Balance",
     "transparent-title": "TRANSPARENT",
     "transparent-balance": "Total Balance",
+    "transparent-confirmed-balance": "Confirmed Balance",
     "dust": "The transparent amount is too small to be shielded."
   },
   "uris": {

@@ -12,6 +12,19 @@ import Network
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 
+struct SyncComplete: Decodable {
+    let sync_start_height: Int64
+    let sync_end_height: Int64
+    let blocks_scanned: Int64
+    let sapling_outputs_scanned: Int64
+    let orchard_outputs_scanned: Int64
+    let percentage_total_outputs_scanned: Int64
+}
+
+struct SyncPoll: Decodable {
+    let sync_complete: SyncComplete
+}
+
 @UIApplicationMain
 class AppDelegate: RCTAppDelegate {
   private let bcgTaskId = "Zingo_Processing_Task_ID"
@@ -160,8 +173,8 @@ extension AppDelegate {
             NSLog("BGTask startBackgroundTask - expirationHandler called")
             // stop the sync process, can't wait to check if the process is over.
             // have no time here
-            let interruptStr = executeCommand(cmd: "interrupt_sync_after_batch", args: "true")
-            NSLog("BGTask startBackgroundTask - expirationHandler interrupt syncing \(interruptStr)")
+            let stopStr = stopSync()
+            NSLog("BGTask startBackgroundTask - expirationHandler pause syncing \(stopStr)")
             
             let rpcmodule = RPCModule()
 
@@ -253,44 +266,12 @@ extension AppDelegate {
 
     func stopSyncingProcess() {
         NSLog("BGTask stopSyncingProcess")
-        let statusStr = executeCommand(cmd: "syncstatus", args: "")
-        if statusStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-            NSLog("BGTask stopSyncingProcess - no lightwalled likely")
+        let stopStr = stopSync()
+        if stopStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
+            NSLog("BGTask stopSyncingProcess - \(stopStr)")
             return
         }
-        NSLog("BGTask stopSyncingProcess - status response \(statusStr)")
-
-        guard let data = statusStr.data(using: .utf8),
-              let jsonResp = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-              var inProgress = jsonResp["in_progress"] as? Bool else {
-            NSLog("BGTask stopSyncingProcess - error parsing JSON response")
-            return
-        }
-
-        while inProgress {
-            let interruptStr = executeCommand(cmd: "interrupt_sync_after_batch", args: "true")
-            NSLog("BGTask stopSyncingProcess - interrupt syncing \(interruptStr)")
-
-            Thread.sleep(forTimeInterval: 0.5)
-
-            let newStatusStr = executeCommand(cmd: "syncstatus", args: "")
-            if newStatusStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-                NSLog("BGTask stopSyncingProcess - error getting new status")
-                return
-            }
-            NSLog("BGTask stopSyncingProcess - status response \(newStatusStr)")
-
-            guard let newData = newStatusStr.data(using: .utf8),
-                  let newJsonResp = try? JSONSerialization.jsonObject(with: newData, options: []) as? [String: Any],
-                  let newInProgress = newJsonResp["in_progress"] as? Bool else {
-                NSLog("BGTask stopSyncingProcess - error parsing new JSON response")
-                return
-            }
-
-            inProgress = newInProgress
-        }
-
-        NSLog("BGTask stopSyncingProcess - syncing process STOPPED")
+        NSLog("BGTask stopSyncingProcess - status response \(stopStr)")
     }
 
     func syncingProcessBackgroundTask() {
@@ -328,16 +309,38 @@ extension AppDelegate {
                 self.stopSyncingProcess()
             }
 
-            // deactivate the flag for interrupting the sync process.
-            let noInterrupt = executeCommand(cmd: "interrupt_sync_after_batch", args: "false")
-            let noInterruptStr = String(noInterrupt)
-            NSLog("BGTask syncingProcessBackgroundTask - no interrupt syncing \(noInterruptStr)")
-
             // run the sync process.
-            NSLog("BGTask syncingProcessBackgroundTask - sync BEGIN")
-            let syncing = executeCommand(cmd: "sync", args: "")
+            let syncing = runSync()
             let syncingStr = String(syncing)
-            NSLog("BGTask syncingProcessBackgroundTask - sync END \(syncingStr)")
+            NSLog("BGTask syncingProcessBackgroundTask - sync LAUNCH \(syncingStr)")
+
+            var syncPoll: SyncPoll?
+            while true {
+                let syncPollJson = pollSync()
+                NSLog("BGTask syncingProcessBackgroundTask - sync POLL \(syncPollJson)")
+                
+                if syncPollJson.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
+                    NSLog("BGTask syncingProcessBackgroundTask - sync POLL ERROR")
+                    break
+                }
+
+                if !syncPollJson.lowercased().hasPrefix(Constants.SyncPrefix.rawValue) {
+                    do {
+                        let data = syncPollJson.data(using: .utf8)!
+                        syncPoll = try JSONDecoder().decode(SyncPoll.self, from: data)
+
+                        if syncPoll?.sync_complete.sync_end_height ?? 0 > 0 {
+                            NSLog("BGTask syncingProcessBackgroundTask - sync COMPLETED")
+                            break
+                        }
+                    } catch {
+                        NSLog("BGTask syncingProcessBackgroundTask - sync POLL - parsing ERROR \(error)")
+                        break
+                    }
+                }
+
+                Thread.sleep(forTimeInterval: 1)
+            }
 
         } else {
             // no wallet file

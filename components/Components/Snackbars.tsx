@@ -111,7 +111,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     return () => {
       setTimeout(() => {
         //console.log('CLOSING - waiting for some message');
-      }, 2000);
+      }, 2 * 1000);
     };
   }, [toast]);
 

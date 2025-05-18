@@ -1,11 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect } from 'react';
-import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
+import React, { useContext, useState, useEffect, useRef, SetStateAction, Dispatch } from 'react';
+import { View, ScrollView, TouchableOpacity, Text, NativeSyntheticEvent } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@react-navigation/native';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronLeft, faChevronRight, faCopy, faShare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import Share from 'react-native-share';
+import ViewShot from 'react-native-view-shot';
 
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -14,26 +16,34 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { SnackbarDurationEnum } from '../../app/AppState';
+import { ModeEnum, SecurityType, SnackbarDurationEnum } from '../../app/AppState';
 import RegText from './RegText';
+import { ShieldedEnum } from '../../app/AppState/enums/ShieldedEnum';
+import FadeText from './FadeText';
+import ContextMenu, { ContextMenuOnPressNativeEvent } from 'react-native-context-menu-view';
 
 type SingleAddressProps = {
+  setShielded?: Dispatch<SetStateAction<ShieldedEnum>>;
+  shielded?: ShieldedEnum;
   address: string;
   index: number;
   total: number;
   prev: () => void;
   next: () => void;
   ufvk?: boolean;
+  setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 
-const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, index, total, prev, next, ufvk }) => {
+const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ setShielded, shielded, address, index, total, prev, next, ufvk, setSecurityOption }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, privacy, addLastSnackbar, language } = context;
+  const { translate, privacy, addLastSnackbar, language, security, mode } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
   const [multi, setMulti] = useState<boolean>(false);
+
+  const qrCodeRef = useRef<ViewShot>(null);
 
   useEffect(() => {
     if (privacy) {
@@ -62,6 +72,55 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
     });
   };
 
+  const doShare = async () => {
+    if (qrCodeRef.current && qrCodeRef.current.capture) {
+      let changed: boolean = false;
+      if (security.foregroundApp) {
+        // deactivate temporarily this
+        changed = true;
+        const newSecurity = {
+          startApp: security.startApp,
+          foregroundApp: false,
+          sendConfirm: security.sendConfirm,
+          seedUfvkScreen: security.seedUfvkScreen,
+          rescanScreen: security.rescanScreen,
+          settingsScreen: security.settingsScreen,
+          changeWalletScreen: security.changeWalletScreen,
+          restoreWalletBackupScreen: security.restoreWalletBackupScreen,
+        } as SecurityType;
+        setSecurityOption(newSecurity);
+      }
+      try {
+        const uri = await qrCodeRef.current.capture(); // Capture the QR code as an image URI
+        const shareOptions = {
+          title: 'QR',
+          url: uri,
+          type: 'image/png',
+        };
+        await Share.open(shareOptions);
+      } catch (error) {
+        // https://github.com/react-native-share/react-native-share/issues/1664
+        console.log('Error sharing QR code:', error);
+      }
+      if (changed) {
+        // activate again in 5 seconds
+        setTimeout(() => {
+          const newSecurity = {
+            startApp: security.startApp,
+            foregroundApp: true,
+            sendConfirm: security.sendConfirm,
+            seedUfvkScreen: security.seedUfvkScreen,
+            rescanScreen: security.rescanScreen,
+            settingsScreen: security.settingsScreen,
+            changeWalletScreen: security.changeWalletScreen,
+            restoreWalletBackupScreen: security.restoreWalletBackupScreen,
+          } as SecurityType;
+          setSecurityOption(newSecurity);
+        }, 5 * 1000);
+      }
+    }
+  };
+
   return (
     <View style={{ flexDirection: 'column' }}>
       <ScrollView
@@ -78,23 +137,25 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                   if (privacy) {
                     setTimeout(() => {
                       setExpandQRAddress(false);
-                    }, 5000);
+                    }, 5 * 1000);
                   }
                 }}>
                 {ufvk ? (
                   <>
                     {expandQRAddress ? (
-                      <QRCode
-                        value={address}
-                        size={200}
-                        ecl="L"
-                        backgroundColor={colors.text}
-                        logo={require('../../assets/img/logobig-zingo.png')}
-                        logoSize={30}
-                        logoBackgroundColor={colors.text}
-                        logoBorderRadius={5} /* android not soported */
-                        logoMargin={3}
-                      />
+                      <ViewShot ref={qrCodeRef} options={{ format: 'png', quality: 1 }}>
+                        <QRCode
+                          value={address}
+                          size={200}
+                          ecl="L"
+                          backgroundColor={colors.text}
+                          logo={require('../../assets/img/logobig-zingo.png')}
+                          logoSize={30}
+                          logoBackgroundColor={colors.text}
+                          logoBorderRadius={5} /* android not soported */
+                          logoMargin={3}
+                        />
+                      </ViewShot>
                     ) : (
                       <View
                         style={{
@@ -118,17 +179,19 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                     )}
                   </>
                 ) : (
-                  <QRCode
-                    value={address}
-                    size={200}
-                    ecl="L"
-                    backgroundColor={colors.text}
-                    logo={require('../../assets/img/logobig-zingo.png')}
-                    logoSize={30}
-                    logoBackgroundColor={colors.text}
-                    logoBorderRadius={5} /* android not soported */
-                    logoMargin={3}
-                  />
+                  <ViewShot ref={qrCodeRef} options={{ format: 'png', quality: 1 }}>
+                    <QRCode
+                      value={address}
+                      size={200}
+                      ecl="L"
+                      backgroundColor={colors.text}
+                      logo={require('../../assets/img/logobig-zingo.png')}
+                      logoSize={30}
+                      logoBackgroundColor={colors.text}
+                      logoBorderRadius={5} /* android not soported */
+                      logoMargin={3}
+                    />
+                  </ViewShot>
                 )}
               </TouchableOpacity>
             </View>
@@ -156,11 +219,95 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                   </TouchableOpacity>
                 </View>
               )}
-              <View style={{ width: 150, justifyContent: 'center', alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 10, marginBottom: 5 }}>
+                {mode === ModeEnum.advanced && setShielded && (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: 10,
+                      marginRight: 20,
+                    }}>
+                    <ContextMenu
+                      title={translate('loadedapp.options') as string}
+                      dropdownMenuMode={true}
+                      actions={
+                        [
+                          { title: translate('receive.shielded-orchard') as string },
+                          { title: translate('receive.shielded-orchard-sapling') as string },
+                          { title: translate('receive.shielded-sapling') as string },
+                        ]
+                      }
+                      onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
+                        if (e.nativeEvent.index === 0) {
+                          setShielded(ShieldedEnum.uOrchard);
+                        } else if (e.nativeEvent.index === 1) {
+                          setShielded(ShieldedEnum.uOrchardSapling);
+                        } else if (e.nativeEvent.index === 2) {
+                          setShielded(ShieldedEnum.sapling);
+                        }
+                      }}
+                    >
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          width: 155,
+                          backgroundColor: colors.primary,
+                          borderRadius: 15,
+                          borderColor: colors.primary,
+                          borderWidth: 1,
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                        }}>
+                        <FadeText
+                          numberOfLines={1}
+                          style={{
+                            color: colors.sideMenuBackground,
+                            fontWeight: 'bold',
+                            opacity: 0.9,
+                            marginRight: 5,
+                          }}>
+                          {(shielded === ShieldedEnum.uOrchard
+                            ? translate('receive.shielded-orchard')
+                            : shielded === ShieldedEnum.uOrchardSapling
+                            ? translate('receive.shielded-orchard-sapling')
+                            : translate('receive.shielded-sapling')) as string}
+                        </FadeText>
+                        <FontAwesomeIcon size={15} icon={faChevronDown} color={colors.sideMenuBackground} />
+                      </View>
+                    </ContextMenu>
+                  </View>
+                )}
                 <TouchableOpacity onPress={doCopy}>
-                  <Text style={{ color: colors.text, textDecorationLine: 'underline', marginTop: 15, minHeight: 48 }}>
-                    {translate('seed.tapcopy') as string}
-                  </Text>
+                <View
+                  style={{
+                    backgroundColor: colors.sideMenuBackground,
+                    borderRadius: 30,
+                    borderColor: colors.zingo,
+                    borderWidth: 1,
+                    paddingHorizontal: 5,
+                    paddingVertical: 5,
+                    marginHorizontal: 10,
+                  }}>
+                    <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faCopy} color={colors.money} />
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={doShare}>
+                  <View
+                    style={{
+                      backgroundColor: colors.sideMenuBackground,
+                      borderRadius: 30,
+                      borderColor: colors.zingo,
+                      borderWidth: 1,
+                      paddingHorizontal: 5,
+                      paddingVertical: 5,
+                      marginHorizontal: 10,
+                    }}>
+                    <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faShare} color={colors.money} />
+                  </View>
                 </TouchableOpacity>
                 {multi && (
                   <Text style={{ color: colors.primary, marginTop: -25 }}>

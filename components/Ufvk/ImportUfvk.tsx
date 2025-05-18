@@ -55,7 +55,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
     } else {
       if (selectServer !== SelectServerEnum.offline) {
         (async () => {
-          const resp: string = await RPCModule.getLatestBlock(server.uri);
+          const resp: string = await RPCModule.getLatestBlockServerInfo(server.uri);
           //console.log(resp);
           if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
             setLatestBlock(Number(resp));

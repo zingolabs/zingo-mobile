@@ -2,7 +2,6 @@ import { getNumberFormatSettings } from 'react-native-localize';
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import {
   ChainNameEnum,
-  CommandEnum,
   ContactType,
   GlobalConst,
   SendJsonToTypeType,
@@ -307,7 +306,7 @@ export default class Utils {
     serverChainName: string,
   ): Promise<{ isValid: boolean; onlyOrchardUA: string }> {
     //const start = Date.now();
-    const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
+    const result: string = await RPCModule.parseAddressInfo(address);
     //console.log('=========================================== > parse address - ', Date.now() - start);
     //console.log(result);
     let isValid: boolean = false;
@@ -348,7 +347,7 @@ export default class Utils {
 
   static async isValidOrchardOrSaplingAddress(address: string, serverChainName: string): Promise<boolean> {
     //const start = Date.now();
-    const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
+    const result: string = await RPCModule.parseAddressInfo(address);
     //console.log('=========================================== > parse address - ', Date.now() - start);
     //console.log(result);
     if (result) {

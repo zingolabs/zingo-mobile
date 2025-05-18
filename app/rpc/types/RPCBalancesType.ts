@@ -1,7 +1,9 @@
 export type RPCBalancesType = {
   orchard_balance: number;
   sapling_balance: number;
-  transparent_balance: number;
+  confirmed_transparent_balance: number;
+
+  unconfirmed_transparent_balance: number;
 
   spendable_orchard_balance: number;
   spendable_sapling_balance: number;

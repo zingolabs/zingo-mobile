@@ -105,13 +105,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   moment.locale(language);
   const { clear } = useToast();
 
-  const [seedPhrase, setSeedPhrase] = useState<string>('');
-  const [birthdayNumber, setBirthdayNumber] = useState<string>('');
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
   const [expandSeed, setExpandSeed] = useState<boolean>(true);
   const [expandBirthday, setExpandBithday] = useState<boolean>(true);
   const [basicFirstViewSeed, setBasicFirstViewSeed] = useState<boolean>(true);
+
+  const seedPhrase = wallet.seed || '';
+  const birthdayNumber = (wallet.birthday && wallet.birthday.toString()) || '';
 
   useEffect(() => {
     if (keepAwake) {
@@ -158,9 +159,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     setTimes(
       action === SeedActionEnum.change || action === SeedActionEnum.backup || action === SeedActionEnum.server ? 1 : 0,
     );
-    setSeedPhrase(wallet.seed || '');
-    setBirthdayNumber((wallet.birthday && wallet.birthday.toString()) || '');
-  }, [action, wallet.seed, wallet.birthday, wallet, translate]);
+  }, [action, translate]);
 
   const onPressOK = () => {
     Alert.alert(
@@ -287,7 +286,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                   if (privacy) {
                     setTimeout(() => {
                       setExpandSeed(false);
-                    }, 5000);
+                    }, 5 * 1000);
                   }
                 }
               }}>
@@ -345,7 +344,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                   if (privacy) {
                     setTimeout(() => {
                       setExpandBithday(false);
-                    }, 5000);
+                    }, 5 * 1000);
                   }
                 }
               }}>

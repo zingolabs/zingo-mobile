@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react';
 
 import {
-  SyncingStatusClass,
   WalletSettingsClass,
   InfoType,
   WalletType,
@@ -22,10 +21,12 @@ import {
   AppContextLoaded,
 } from '../AppState';
 
+import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
+
 export const defaultAppContextLoaded: AppContextLoaded = {
   navigationHome: null,
   netInfo: {} as NetInfoType,
-  syncingStatus: new SyncingStatusClass(),
+  syncingStatus: {} as RPCSyncStatusType,
   totalBalance: null,
   addresses: null,
   valueTransfers: null,
@@ -58,6 +59,9 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   setBackgroundError: () => {},
   privacy: false,
   readOnly: false,
+  orchardPool: true,
+  saplingPool: true,
+  transparentPool: true,
   mode: ModeEnum.advanced,
   snackbars: [] as SnackbarType[],
   addLastSnackbar: () => {},

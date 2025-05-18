@@ -27,7 +27,6 @@ import {
   ServerType,
   SecurityType,
   ServerUrisType,
-  CommandEnum,
   LanguageEnum,
   CurrencyEnum,
   ModeEnum,
@@ -346,6 +345,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       backgroundError: {} as BackgroundErrorType,
       setBackgroundError: this.setBackgroundError,
       readOnly: false,
+      orchardPool: true,
+      saplingPool: true,
+      transparentPool: true,
       snackbars: [] as SnackbarType[],
       addLastSnackbar: this.addLastSnackbar,
       removeFirstSnackbar: this.removeFirstSnackbar,
@@ -503,11 +505,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
             // Load the wallet and navigate to the vts screen
             let readOnly: boolean = false;
-            const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
+            let orchardPool: boolean = false;
+            let saplingPool: boolean = false;
+            let transparentPool: boolean = false;
+            const walletKindStr: string = await RPCModule.walletKindInfo();
             //console.log('KIND...', walletKindStr);
             try {
               const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
-              //console.log('KIND... JSON', walletKindJSON);
+              console.log('KIND... JSON', walletKindJSON);
               // there are 4 kinds:
               // 1. seed
               // 2. USK
@@ -522,6 +527,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               } else {
                 readOnly = false;
               }
+              orchardPool = walletKindJSON.orchard;
+              saplingPool = walletKindJSON.sapling;
+              transparentPool = walletKindJSON.transparent;
               // if the seed & birthday are not stored in Keychain/Keystore, do it now.
               if (this.state.recoveryWalletInfoOnDevice) {
                 const wallet: WalletType = await RPC.rpcFetchWallet(readOnly);
@@ -533,18 +541,24 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 }
               }
               this.setState({
-                readOnly: readOnly,
+                readOnly,
+                orchardPool,
+                saplingPool,
+                transparentPool,
                 actionButtonsDisabled: false,
               });
             } catch (e) {
               //console.log('CATCH ERROR', walletKindStr);
               this.setState({
                 readOnly,
+                orchardPool,
+                saplingPool,
+                transparentPool,
                 actionButtonsDisabled: false,
               });
               this.addLastSnackbar({ message: walletKindStr });
             }
-            this.navigateToLoadedApp(readOnly);
+            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool);
             //console.log('navigate to LoadedApp');
           } else {
             error = true;
@@ -594,7 +608,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           } else {
             this.createNewWallet(false);
             this.setState({ actionButtonsDisabled: false });
-            this.navigateToLoadedApp(false);
+            this.navigateToLoadedApp(false, true, true, true);
             //console.log('navigate to LoadedApp');
           }
         }
@@ -966,13 +980,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.setState({ actionButtonsDisabled: false });
   };
 
-  navigateToLoadedApp = (readOnly: boolean) => {
+  navigateToLoadedApp = (readOnly: boolean, orchardPool: boolean, saplingPool: boolean, transparentPool: boolean) => {
     this.props.navigationApp.reset({
       index: 0,
       routes: [
         {
           name: RouteEnums.LoadedApp,
-          params: { readOnly },
+          params: { readOnly, orchardPool, saplingPool, transparentPool },
         },
       ],
     });
@@ -1145,11 +1159,62 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             }
             // when restore a wallet never the user needs that the seed screen shows up with the first funds received.
             await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
-            this.setState({
-              actionButtonsDisabled: false,
-              readOnly: type === RestoreFromTypeEnum.seedRestoreFrom ? false : true,
-            });
-            this.navigateToLoadedApp(type === RestoreFromTypeEnum.seedRestoreFrom ? false : true);
+            // Load the wallet and navigate to the vts screen
+            let readOnly: boolean = false;
+            let orchardPool: boolean = false;
+            let saplingPool: boolean = false;
+            let transparentPool: boolean = false;
+            const walletKindStr: string = await RPCModule.walletKindInfo();
+            console.log('KIND...', walletKindStr);
+            try {
+              const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
+              //console.log('KIND... JSON', walletKindJSON);
+              // there are 4 kinds:
+              // 1. seed
+              // 2. USK
+              // 3. UFVK - watch-only wallet
+              // 4. No keys - watch-only wallet (possibly an error)
+
+              if (
+                walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
+                walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
+              ) {
+                readOnly = true;
+              } else {
+                readOnly = false;
+              }
+              orchardPool = walletKindJSON.orchard;
+              saplingPool = walletKindJSON.sapling;
+              transparentPool = walletKindJSON.transparent;
+              // if the seed & birthday are not stored in Keychain/Keystore, do it now.
+              if (this.state.recoveryWalletInfoOnDevice) {
+                const wallet: WalletType = await RPC.rpcFetchWallet(readOnly);
+                await createUpdateRecoveryWalletInfo(wallet);
+              } else {
+                // needs to delete the seed from the Keychain/Keystore, do it now.
+                if (this.state.hasRecoveryWalletInfoSaved) {
+                  await removeRecoveryWalletInfo();
+                }
+              }
+              this.setState({
+                readOnly,
+                orchardPool,
+                saplingPool,
+                transparentPool,
+                actionButtonsDisabled: false,
+              });
+            } catch (e) {
+              //console.log('CATCH ERROR', walletKindStr);
+              this.setState({
+                readOnly,
+                orchardPool,
+                saplingPool,
+                transparentPool,
+                actionButtonsDisabled: false,
+              });
+              this.addLastSnackbar({ message: walletKindStr });
+            }
+            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool);
           } else {
             error = true;
             errorText = resultJson.error;
@@ -1251,7 +1316,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           // IOS needs time to close the biometric screen.
           // but Android I don't think so, a little bit Just in case.
         },
-        Platform.OS === GlobalConst.platformOSios ? 2000 : 100,
+        Platform.OS === GlobalConst.platformOSios ? 2 * 1000 : 100,
       );
     }
   };
@@ -1280,6 +1345,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       translate,
       hasRecoveryWalletInfoSaved,
       readOnly,
+      orchardPool,
+      saplingPool,
+      transparentPool,
     } = this.state;
 
     //console.log('render loadingAppClass - 3', this.state.privacy);
@@ -1295,6 +1363,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       backgroundError: this.state.backgroundError,
       setBackgroundError: this.state.setBackgroundError,
       readOnly: this.state.readOnly,
+      orchardPool: this.state.orchardPool,
+      saplingPool: this.state.saplingPool,
+      transparentPool: this.state.transparentPool,
       snackbars: this.state.snackbars,
       addLastSnackbar: this.state.addLastSnackbar,
       removeFirstSnackbar: this.removeFirstSnackbar,
@@ -1359,10 +1430,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               animationType="slide"
               transparent={true}
               visible={screen === 2}
-              onRequestClose={() => this.navigateToLoadedApp(readOnly)}>
+              onRequestClose={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool)}>
               <Seed
-                onClickOK={() => this.navigateToLoadedApp(readOnly)}
-                onClickCancel={() => this.navigateToLoadedApp(readOnly)}
+                onClickOK={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool)}
+                onClickCancel={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool)}
                 action={SeedActionEnum.new}
                 setPrivacyOption={this.setPrivacyOption}
               />

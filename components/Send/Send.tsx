@@ -46,7 +46,6 @@ import Confirm from './components/Confirm';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
-import RPC from '../../app/rpc';
 import Header from '../Header';
 import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
@@ -64,6 +63,7 @@ import selectingServer from '../../app/selectingServer';
 import { magicModal } from 'react-native-magic-modal';
 // @ts-ignore
 import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
+import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 
 type SendProps = {
   // side menu
@@ -127,6 +127,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     closeAllModals,
     setPoolsModalShow,
     security,
+    currency,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -330,13 +331,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       // spendable
       let spendableBalance = totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0;
       let zenniesForZingo = donationAddress ? false : donation;
-      const spendableBalanceJSON = { address: addressPar, zennies_for_zingo: zenniesForZingo };
-      console.log('SPENDABLEBALANCE', spendableBalanceJSON);
-      const runSpendableBalanceStr = await RPCModule.execute(
-        CommandEnum.spendablebalance,
-        JSON.stringify(spendableBalanceJSON),
-      );
-      console.log(runSpendableBalanceStr);
+      console.log('SPENDABLEBALANCE', addressPar, zenniesForZingo);
+      const runSpendableBalanceStr = await RPCModule.getSpendableBalanceInfo(addressPar, zenniesForZingo ? 'true' : 'false');
       if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
         console.log(runSpendableBalanceStr);
@@ -607,24 +603,6 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     (async () => {
-      if (mode === ModeEnum.basic) {
-        const price = await RPC.rpcGetZecPrice();
-        // values:
-        // 0   - initial/default value
-        // -1  - error in Gemini/zingolib.
-        // -2  - error in RPCModule, likely.
-        // > 0 - real value
-        if (price <= 0) {
-          setZecPrice(price, 0);
-        } else {
-          setZecPrice(price, Date.now());
-        }
-      }
-    })();
-  }, [mode, setZecPrice]);
-
-  useEffect(() => {
-    (async () => {
       const items = addressBook
         .filter((item: AddressBookFileClass) => item.address !== zenniesDonationAddress)
         .map((item: AddressBookFileClass) => ({
@@ -704,8 +682,6 @@ const Send: React.FunctionComponent<SendProps> = ({
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
       return;
     }
-    // first interrupt syncing Just in case...
-    await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
 
     // not use await here.
     setComputingModalShow();
@@ -740,8 +716,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         closeAllModals();
         // the app send successfully on the first attemp.
 
-        // the sync process can continue
-        await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
         return;
       } catch (err1) {
         error = err1 as string;
@@ -769,8 +743,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           console.log(fasterServer);
           if (fasterServer.uri !== server.uri) {
             setServerOption(fasterServer, selectServer, false, true);
-            // first interrupt syncing Just in case...
-            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
           }
 
           try {
@@ -799,8 +771,6 @@ const Send: React.FunctionComponent<SendProps> = ({
             closeAllModals();
             // the app send successfully on the second attemp.
 
-            // the sync process can continue
-            await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
             return;
           } catch (err2) {
             error = err2 as string;
@@ -809,9 +779,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           }
         }
       }
-
-      // the sync process can continue
-      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
 
       setTimeout(() => {
         //console.log('sendtx error', error);
@@ -896,7 +863,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       return magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
             updateToField(a, null, null, null, null);
           }}
-        />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+        />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
       ).promise;
     }
   };
@@ -906,13 +873,14 @@ const Send: React.FunctionComponent<SendProps> = ({
         message={memoText}
         includeUAMessage={includeUAMemoBoolean}
         setMessage={setMemoText}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
-  const setConfirmModalShow = () => {
+  const setConfirmModalShow = (parseAddressInfoJSON: RPCParseAddressType) => {
     return magicModal.show(() => <Confirm
         calculatedFee={fee}
+        parseAddressInfoJSON={parseAddressInfoJSON}
         donationAmount={
           donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
             ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
@@ -926,7 +894,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         }
         calculateFeeWithPropose={calculateFeeWithPropose}
         sendPageState={buildSendState()}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -1449,7 +1417,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </View>
               </View>
 
-              {(!zecPrice.zecPrice || zecPrice.zecPrice <= 0) && (
+              {(!zecPrice.zecPrice || zecPrice.zecPrice <= 0) && currency === CurrencyEnum.USDCurrency && (
                 <View
                   style={{
                     width: '35%',
@@ -1459,7 +1427,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </View>
               )}
 
-              {!!zecPrice.zecPrice && zecPrice.zecPrice > 0 && (
+              {!!zecPrice.zecPrice && zecPrice.zecPrice > 0 && currency === CurrencyEnum.USDCurrency && (
                 <View
                   style={{
                     display: 'flex',
@@ -1521,11 +1489,11 @@ const Send: React.FunctionComponent<SendProps> = ({
 
                   <View style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-                      <RegText style={{ marginTop: 5, fontSize: 12.5 }}>
+                      <RegText style={{ marginTop: 0, fontSize: 12.5 }}>
                         {translate('send.spendable') as string}
                       </RegText>
                       <CurrencyAmount
-                        style={{ marginTop: 5, fontSize: 12.5 }}
+                        style={{ marginTop: 1, fontSize: 12.5 }}
                         price={zecPrice.zecPrice}
                         amtZec={maxAmount}
                         currency={CurrencyEnum.USDCurrency}
@@ -1732,7 +1700,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                     : (translate('send.button') as string)
                 }
                 disabled={!sendButtonEnabled}
-                onPress={() => {
+                onPress={async () => {
+                  setSendButtonEnabled(false);
                   updateToField(null, null, null, memoText, null);
                   // donation - a Zenny is the minimum
                   if (
@@ -1763,11 +1732,26 @@ const Send: React.FunctionComponent<SendProps> = ({
                     setMemoText('');
                     updateToField(null, null, null, '', false);
                   }
-                  // waiting while closing the keyboard, just in case.
-                  setTimeout(async () => {
-                    setConfirmModalShow();
-                    Keyboard.dismiss();
-                  }, 100);
+                  // calculating for Privacy Level
+                  let parseAddressInfoJSON: RPCParseAddressType;
+                  const result: string = await RPCModule.parseAddressInfo(addressText);
+                  if (result) {
+                    if (result.toLowerCase().startsWith(GlobalConst.error)) {
+                      parseAddressInfoJSON = {} as RPCParseAddressType;
+                    } else {
+                      try {
+                        parseAddressInfoJSON = await JSON.parse(result);
+                      } catch (e) {
+                        //console.log(e);
+                        parseAddressInfoJSON = {} as RPCParseAddressType;
+                      }
+                    }
+                  } else {
+                    parseAddressInfoJSON = {} as RPCParseAddressType;
+                  }
+                  setConfirmModalShow(parseAddressInfoJSON);
+                  Keyboard.dismiss();
+                  setSendButtonEnabled(true);
                 }}
                 twoButtons={true}
               />
@@ -1785,7 +1769,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 twoButtons={true}
               />
             </View>
-            {server.chainName === ChainNameEnum.mainChainName && (
+            {server.chainName === ChainNameEnum.mainChainName && Platform.OS === GlobalConst.platformOSandroid && (
               <>
                 {donation ? (
                   <View

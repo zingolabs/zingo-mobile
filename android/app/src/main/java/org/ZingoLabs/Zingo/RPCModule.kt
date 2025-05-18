@@ -134,7 +134,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         uniffi.zingo.initLogging()
 
         // Create a seed
-        val resp = uniffi.zingo.initNew(server, getDocumentDirectory(), chainhint, true)
+        val resp = uniffi.zingo.initNew(server, getDocumentDirectory(), chainhint)
         // Log.i("MAIN-Seed", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -150,7 +150,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         uniffi.zingo.initLogging()
 
-        val resp = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), getDocumentDirectory(), chainhint, true)
+        val resp = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), getDocumentDirectory(), chainhint)
         // Log.i("MAIN", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -166,7 +166,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         uniffi.zingo.initLogging()
 
-        val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), applicationContext.filesDir.absolutePath, chainhint, true)
+        val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), applicationContext.filesDir.absolutePath, chainhint)
         // Log.i("MAIN", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -346,7 +346,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             server,
             fileb64.toString(),
             applicationContext.filesDir.absolutePath,
-            chainhint, true
+            chainhint
         )
     }
 
@@ -427,19 +427,18 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
-
                 val resp = uniffi.zingo.executeCommand(cmd, args)
 
-                if (cmd == "sync" && !resp.lowercase().startsWith(ErrorPrefix.value)) {
-                    saveWalletFile()
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
                 }
-
-                promise.resolve(resp)
             } catch (e: Exception) {
                 val errorMessage = "Error: executing command '$cmd': ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -448,14 +447,19 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun doSave(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val result = saveWalletFile()
+                uniffi.zingo.initLogging()
+                val resp = saveWalletFile()
 
-                promise.resolve(result)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: saving wallet: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -464,31 +468,61 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun doSaveBackup(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val result = saveWalletBackupFile()
+                uniffi.zingo.initLogging()
+                val resp = saveWalletBackupFile()
 
-                promise.resolve(result)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: saving wallet backup: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
 
     @ReactMethod
-    fun getLatestBlock(server: String, promise: Promise) {
+    fun getLatestBlockServerInfo(server: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getLatestBlockServer(server)
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
-                val errorMessage = "Error: getting latest block: ${e.localizedMessage}"
+                val errorMessage = "Error: getting latest block server: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getLatestBlockWalletInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getLatestBlockWallet()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: getting latest block wallet: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -500,12 +534,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getDeveloperDonationAddress()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: getting donation address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -517,29 +555,37 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getZenniesForZingoDonationAddress()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: getting Zennies donation address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
 
     @ReactMethod
-    fun getValueTransfersList(items: String, promise: Promise) {
+    fun getValueTransfersList(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getValueTransfers(items)
+                val resp = uniffi.zingo.getValueTransfers()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: getting value transfers list: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -551,12 +597,16 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.getTransactionSummaries()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: getting transaction summaries list: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
-                promise.resolve(errorMessage)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
@@ -568,11 +618,587 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 uniffi.zingo.initLogging()
                 val resp = uniffi.zingo.setCryptoDefaultProviderToRing()
 
-                promise.resolve(resp)
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
             } catch (e: Exception) {
                 val errorMessage = "Error: setting crypto default provider: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
-                promise.resolve(errorMessage)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun pollSyncInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.pollSync()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: sync poll info: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun runSyncProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.runSync()
+
+                if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
+                    saveWalletFile()
+                }
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: sync run process: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun pauseSyncProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.pauseSync()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: sync pause process: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun stopSyncProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.stopSync()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: sync stop process: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun statusSyncInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.statusSync()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: sync status info: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun runRescanProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.runRescan()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: rescan run process: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun infoServerInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.infoServer()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: info server: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getSeedInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getSeed()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: seed: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getUfvkInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getUfvk()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: ufvk: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun changeServerProcess(server: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.changeServer(server)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: change server: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun walletKindInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.walletKind()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: wallet kind: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun parseAddressInfo(address: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.parseAddress(address)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: parse address: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun parseUfvkInfo(ufvk: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.parseUfvk(ufvk)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: parse ufvk: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getVersionInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getVersion()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: version: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getMessagesInfo(address: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getMessages(address)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: messages: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getBalanceInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getBalance()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: balance: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getAddressesInfo(receivers: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getAddresses(receivers)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: addresses: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getTotalMemobytesToAddressInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getTotalMemobytesToAddress()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: memobyes to address: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getTotalValueToAddressInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getTotalValueToAddress()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: value to address: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getTotalSpendsToAddressInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getTotalSpendsToAddress()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: spends to address: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun zecPriceInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.zecPrice()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: zec price: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun zecPriceApiKeyProcess(key: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.zecPriceApiKey(key)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: zec price API key: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun resendTransactionProcess(txid: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.resendTransaction(txid)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: resend transaction: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun removeTransactionProcess(txid: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.removeTransaction(txid)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: remove transaction: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getSpendableBalanceInfo(address: String, zennies: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getSpendableBalance(address, zennies)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: spendable balance: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getOptionWalletInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getOptionWallet()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: get option wallet: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun setOptionWalletProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.setOptionWallet()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: set option wallet: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
             }
         }
     }
