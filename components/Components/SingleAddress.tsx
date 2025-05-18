@@ -8,7 +8,6 @@ import { faChevronDown, faChevronLeft, faChevronRight, faCopy, faShare } from '@
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Share from 'react-native-share';
 import ViewShot from 'react-native-view-shot';
-import Tooltip from 'react-native-walkthrough-tooltip';
 
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -26,8 +25,6 @@ import ContextMenu, { ContextMenuOnPressNativeEvent } from 'react-native-context
 type SingleAddressProps = {
   setShielded?: Dispatch<SetStateAction<ShieldedEnum>>;
   shielded?: ShieldedEnum;
-  setShowTip?: Dispatch<SetStateAction<boolean>>;
-  showTip?: boolean;
   address: string;
   index: number;
   total: number;
@@ -37,7 +34,7 @@ type SingleAddressProps = {
   setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 
-const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ setShielded, shielded, setShowTip, showTip, address, index, total, prev, next, ufvk, setSecurityOption }) => {
+const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ setShielded, shielded, address, index, total, prev, next, ufvk, setSecurityOption }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, language, security, mode } = context;
   const { colors } = useTheme()  as ThemeType;
@@ -223,80 +220,66 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ setShielde
                 </View>
               )}
               <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 10, marginBottom: 5 }}>
-                {mode === ModeEnum.advanced && setShielded && setShowTip && (
-                  <Tooltip
-                    isVisible={showTip}
-                    content={<FadeText>{translate('receive.showtip') as string}</FadeText>}
-                    contentStyle={{ backgroundColor: '#000' }}
-                    placement="top"
-                    onClose={() => {
-                      setTimeout(() => {
-                        setShowTip(false);
-                      }, 0);
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: 10,
-                        marginRight: 20,
-                      }}>
-                      <ContextMenu
-                        disabled={showTip}
-                        title={translate('loadedapp.options') as string}
-                        dropdownMenuMode={true}
-                        actions={
-                          [
-                            { title: translate('receive.shielded-orchard') as string },
-                            { title: translate('receive.shielded-orchard-sapling') as string },
-                            { title: translate('receive.shielded-sapling') as string },
-                          ]
+                {mode === ModeEnum.advanced && setShielded && (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: 10,
+                      marginRight: 20,
+                    }}>
+                    <ContextMenu
+                      title={translate('loadedapp.options') as string}
+                      dropdownMenuMode={true}
+                      actions={
+                        [
+                          { title: translate('receive.shielded-orchard') as string },
+                          { title: translate('receive.shielded-orchard-sapling') as string },
+                          { title: translate('receive.shielded-sapling') as string },
+                        ]
+                      }
+                      onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
+                        if (e.nativeEvent.index === 0) {
+                          setShielded(ShieldedEnum.uOrchard);
+                        } else if (e.nativeEvent.index === 1) {
+                          setShielded(ShieldedEnum.uOrchardSapling);
+                        } else if (e.nativeEvent.index === 2) {
+                          setShielded(ShieldedEnum.sapling);
                         }
-                        onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
-                          setShowTip(false);
-                          if (e.nativeEvent.index === 0) {
-                            setShielded(ShieldedEnum.uOrchard);
-                          } else if (e.nativeEvent.index === 1) {
-                            setShielded(ShieldedEnum.uOrchardSapling);
-                          } else if (e.nativeEvent.index === 2) {
-                            setShielded(ShieldedEnum.sapling);
-                          }
-                        }}
-                      >
-                        <View
+                      }}
+                    >
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          width: 155,
+                          backgroundColor: colors.primary,
+                          borderRadius: 15,
+                          borderColor: colors.primary,
+                          borderWidth: 1,
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                        }}>
+                        <FadeText
+                          numberOfLines={1}
                           style={{
-                            flexDirection: 'row',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            width: 155,
-                            backgroundColor: colors.primary,
-                            borderRadius: 15,
-                            borderColor: colors.primary,
-                            borderWidth: 1,
-                            paddingHorizontal: 10,
-                            paddingVertical: 5,
+                            color: colors.sideMenuBackground,
+                            fontWeight: 'bold',
+                            opacity: 0.9,
+                            marginRight: 5,
                           }}>
-                          <FadeText
-                            numberOfLines={1}
-                            style={{
-                              color: colors.sideMenuBackground,
-                              fontWeight: 'bold',
-                              opacity: 0.9,
-                              marginRight: 5,
-                            }}>
-                            {(shielded === ShieldedEnum.uOrchard
-                              ? translate('receive.shielded-orchard')
-                              : shielded === ShieldedEnum.uOrchardSapling
-                              ? translate('receive.shielded-orchard-sapling')
-                              : translate('receive.shielded-sapling')) as string}
-                          </FadeText>
-                          <FontAwesomeIcon size={15} icon={faChevronDown} color={colors.sideMenuBackground} />
-                        </View>
-                      </ContextMenu>
-                    </View>
-                  </Tooltip>
+                          {(shielded === ShieldedEnum.uOrchard
+                            ? translate('receive.shielded-orchard')
+                            : shielded === ShieldedEnum.uOrchardSapling
+                            ? translate('receive.shielded-orchard-sapling')
+                            : translate('receive.shielded-sapling')) as string}
+                        </FadeText>
+                        <FontAwesomeIcon size={15} icon={faChevronDown} color={colors.sideMenuBackground} />
+                      </View>
+                    </ContextMenu>
+                  </View>
                 )}
                 <TouchableOpacity onPress={doCopy}>
                 <View
