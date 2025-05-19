@@ -1,4 +1,4 @@
-FROM zingodevops/android_builder:014 as build_android
+FROM zingodevops/android_builder:014 AS build_android
 
 RUN apt update \
     && apt upgrade -y \
