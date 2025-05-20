@@ -29,7 +29,6 @@ import {
   GlobalConst,
   SendPageStateClass,
 } from '../../../app/AppState';
-import { CurrencyEnum } from '../../../app/AppState';
 import { RPCAddressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
 import { RPCParseAddressStatusEnum } from '../../../app/rpc/enums/RPCParseAddressStatusEnum';
@@ -333,22 +332,18 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 <RegText>{privacyLevel}</RegText>
               )}
             </View>
-            <View style={{ margin: 10 }}>
-              <FadeText>{translate('send.fee') as string}</FadeText>
-              <ZecAmount currencyName={info.currencyName} size={18} amtZec={calculatedFee} privacy={privacy} />
-            </View>
-            {currency === CurrencyEnum.USDCurrency && (
-              <View style={{ margin: 10, alignItems: 'flex-end' }}>
-                <FadeText style={{ opacity: 0 }}>{translate('send.fee') as string}</FadeText>
-                <CurrencyAmount
-                  style={{ fontSize: 18 }}
-                  amtZec={calculatedFee}
-                  price={zecPrice.zecPrice}
-                  currency={currency}
-                  privacy={privacy}
-                />
-              </View>
-            )}
+          </View>
+
+          <FadeText style={{ marginTop: 0, marginLeft: 10 }}>{translate('send.fee') as string}</FadeText>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10 }}>
+            <ZecAmount currencyName={info.currencyName} size={18} amtZec={calculatedFee} privacy={privacy} />
+            <CurrencyAmount
+              style={{ fontSize: 18 }}
+              amtZec={calculatedFee}
+              price={zecPrice.zecPrice}
+              currency={currency}
+              privacy={privacy}
+            />
           </View>
 
           {[sendPageState.toaddr].map(to => {
