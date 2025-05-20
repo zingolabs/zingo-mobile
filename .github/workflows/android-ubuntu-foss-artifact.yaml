@@ -13,6 +13,7 @@ on:
 env:
   REPO-OWNER: ${{ github.repository_owner }}
   TIMESTAMP: ${{ inputs.timestamp }}
+  ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
 
 jobs:
   android-ubuntu-foss-artifact:
@@ -42,7 +43,28 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      
+
+      - name: Download Android command line tools
+        run: |
+          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
+          cd $ANDROID_SDK_ROOT/cmdline-tools
+          curl -O https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip -q commandlinetools-linux-11076708_latest.zip -d tools
+          rm commandlinetools-linux-11076708_latest.zip
+
+      - name: Install Android SDK components (API 31 only)
+        run: |
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT \
+            "platforms;android-31" \
+            "build-tools;31.0.0" \
+            "platform-tools"
+
+      - name: Accept licenses
+        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/tools/bin/sdkmanager --licenses
+
+      - name: Configure local.properties
+        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -90,11 +112,6 @@ jobs:
       - name: Yarn remove vision-camera library
         run: yarn remove react-native-vision-camera || true
 
-      - name: Install Android SDK newer than 30
-        run: |
-          yes | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
-          /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-31"
-      
       - name: Run Build the artifact
         working-directory: android
         run: ./gradlew assembleRelease -DtestBuildType=release -PsplitApk=false
