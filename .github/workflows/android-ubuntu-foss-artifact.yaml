@@ -85,6 +85,9 @@ jobs:
 
       - name: Yarn remove vision-camera library
         run: yarn remove react-native-vision-camera || true
+
+      - name: Install Android SDK newer than 30
+        run: yes | sdkmanager "platforms;android-31"
       
       - name: Build the artifact
         run: yarn build:release
