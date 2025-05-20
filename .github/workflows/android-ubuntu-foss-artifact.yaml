@@ -31,40 +31,6 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      #- name: Node JS
-      #  run: |
-      #    sudo curl -Lo node.tar.gz https://nodejs.org/dist/v20.18.2/node-v20.18.2-linux-x64.tar.gz
-      #    sudo echo "eb5b031bdd728871c3b9a82655dbfa533bc262c0b6da1d09a86842430cef07d4 node.tar.gz" | sha256sum -c -
-      #    sudo tar xzf node.tar.gz --strip-components=1 -C /usr/local/
-      #    sudo npm install --global yarn
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Download Android command line tools
-        run: |
-          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
-          cd $ANDROID_SDK_ROOT/cmdline-tools
-          curl -O https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q commandlinetools-linux-11076708_latest.zip -d tools
-          rm commandlinetools-linux-11076708_latest.zip
-
-      - name: Install Android SDK components (API 31 only)
-        run: |
-          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT \
-            "platforms;android-31" \
-            "build-tools;31.0.0" \
-            "platform-tools"
-
-      - name: Accept licenses
-        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
-
-      - name: Configure local.properties
-        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
-
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -112,9 +78,17 @@ jobs:
       - name: Yarn remove vision-camera library
         run: yarn remove react-native-vision-camera || true
 
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
       - name: Run Build the artifact
-        working-directory: android
-        run: ./gradlew assembleRelease -DtestBuildType=release -PsplitApk=false
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 31
+          script: ./gradlew assembleRelease -DtestBuildType=release -PsplitApk=false
 
       - name: Upload the Artifact
         uses: actions/upload-artifact@v4
