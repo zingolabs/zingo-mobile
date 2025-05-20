@@ -88,8 +88,8 @@ jobs:
 
       - name: Install Android SDK newer than 30
         run: |
-          ls -la /usr/local/lib/android/sdk/cmdline-tools/
-          yes | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-31"
+          yes | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+          /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-31"
       
       - name: Build the artifact
         run: yarn build:release
