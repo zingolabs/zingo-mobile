@@ -21,17 +21,21 @@ jobs:
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Node JS
-        run: |
-          sudo curl -Lo node.tar.gz https://nodejs.org/dist/v20.18.2/node-v20.18.2-linux-x64.tar.gz
-          sudo echo "eb5b031bdd728871c3b9a82655dbfa533bc262c0b6da1d09a86842430cef07d4 node.tar.gz" | sha256sum -c -
-          sudo tar xzf node.tar.gz --strip-components=1 -C /usr/local/
-          sudo npm install --global yarn
+      #- name: Node JS
+      #  run: |
+      #    sudo curl -Lo node.tar.gz https://nodejs.org/dist/v20.18.2/node-v20.18.2-linux-x64.tar.gz
+      #    sudo echo "eb5b031bdd728871c3b9a82655dbfa533bc262c0b6da1d09a86842430cef07d4 node.tar.gz" | sha256sum -c -
+      #    sudo tar xzf node.tar.gz --strip-components=1 -C /usr/local/
+      #    sudo npm install --global yarn
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -81,7 +85,7 @@ jobs:
           fail-on-cache-miss: true
 
       - name: Yarn install
-        run: npm_config_build_from_source=true yarn install
+        run: yarn
 
       - name: Yarn remove vision-camera library
         run: yarn remove react-native-vision-camera || true
@@ -93,7 +97,7 @@ jobs:
       
       - name: Run Build the artifact
         working-directory: android
-        run: ./gradlew assembleRelease -DtestBuildType=release
+        run: ./gradlew assembleRelease -DtestBuildType=release -PsplitApk=false
 
       - name: Upload the Artifact
         uses: actions/upload-artifact@v4
