@@ -71,6 +71,7 @@ jobs:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
 
+  # we can revisit this when we are working on F-droid again.
   #android-ubuntu-foss-script-artifact:
   #  uses: ./.github/workflows/android-ubuntu-foss-script-artifact.yaml
   #  needs: [create-timestamp, create-cache-key]
@@ -78,10 +79,10 @@ jobs:
   #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
   #  secrets: inherit
 
-  android-ubuntu-foss-artifact:
-    uses: ./.github/workflows/android-ubuntu-foss-artifact.yaml
-    needs: [create-timestamp, create-cache-key]
-    with:
-      timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
-      cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-    secrets: inherit
+  #android-ubuntu-foss-artifact:
+  #  uses: ./.github/workflows/android-ubuntu-foss-artifact.yaml
+  #  needs: [create-timestamp, create-cache-key]
+  #  with:
+  #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+  #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+  #  secrets: inherit
