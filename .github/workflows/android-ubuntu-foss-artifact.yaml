@@ -87,7 +87,9 @@ jobs:
         run: yarn remove react-native-vision-camera || true
 
       - name: Install Android SDK newer than 30
-        run: yes | sdkmanager "platforms;android-31"
+        run: |
+          ls -la /usr/local/lib/android/sdk/cmdline-tools/
+          yes | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-31"
       
       - name: Build the artifact
         run: yarn build:release
