@@ -1,5 +1,5 @@
 # Zingo Android and iOS apps
-App Store: [https://apps.apple.com/app/zingo/id1668209531](https://apps.apple.com/app/zingo/id1668209531)  
+App Store: [https://apps.apple.com/app/zingo/id1668209531](https://apps.apple.com/app/zingo/id1668209531)
 Google Play: [https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo](https://play.google.com/store/apps/details?id=org.ZingoLabs.Zingo)
 
 # Security Vulnerability Disclosure
@@ -22,7 +22,7 @@ From the `rust/android/lightwalletd_bin` directory run: <br />
 `ln -s path/to/lightwalletd/binary ./`
 
 Alternatively, integration tests and end-to-end tests can be run on non-linux hosts with Regchest
-(https://github.com/zingolabs/zingo-regchest). Regchest manages the zcash/lightwalletd regtest 
+(https://github.com/zingolabs/zingo-regchest). Regchest manages the zcash/lightwalletd regtest
 network in a docker container. Before running tests, pull the latest Regchest image from docker: <br />
 `docker pull zingodevops/regchest:010`
 

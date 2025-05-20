@@ -13,7 +13,7 @@
    Install via Android Studio SDK Manager: <br />
    https://developer.android.com/studio/install <br />
    or as standalone: <br />
-   https://developer.android.com/tools  
+   https://developer.android.com/tools
 7. Cargo nextest (https://nexte.st/book/installing-from-source.html)
 
 The React Native tools require some environment variables to be set up in order to build apps with
@@ -38,8 +38,8 @@ Also, make sure your JAVA_HOME is set, for example: <br />
 
 ## Launching the app
 ### Android Studio
-1. For Android emulations, you can create a new AVD, compatible with your CPU architecture 
-   i.e. x86_64 (https://developer.android.com/studio/run/managing-avds). The recommended API is API 
+1. For Android emulations, you can create a new AVD, compatible with your CPU architecture
+   i.e. x86_64 (https://developer.android.com/studio/run/managing-avds). The recommended API is API
    30 (Android 11). Alternatively, you can connect to a physical device
    (https://reactnative.dev/docs/running-on-device).
 2. In `File > Settings`, navigate to `Build, Execution and Deployment > Build Tools > Gradle` and
@@ -49,8 +49,8 @@ Also, make sure your JAVA_HOME is set, for example: <br />
 3. Open the `android` directory in Android Studio as a project, select 'app' and the previously
    created AVD in the upper toolbar and click the "Run 'app'" button.
    Alternatively, launch an AVD and in a separate terminal, run: <br />
-   `yarn android` 
-   
+   `yarn android`
+
 ### Android SDK Command-line Tools (Standalone)
 You can also emulate android from the command line without using Android Studio.
 1. Check that the Android SDK cmdline-tools binaries are in the following directory path: <br />
