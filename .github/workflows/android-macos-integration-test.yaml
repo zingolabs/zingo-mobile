@@ -12,7 +12,7 @@ on:
       abi:
         required: true
         type: string
-    
+
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
   TIMESTAMP: ${{ inputs.timestamp }}
@@ -71,12 +71,12 @@ jobs:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-            
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
-        
+
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
         run: |
@@ -144,29 +144,29 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-      
+
       - name: Add emulator to PATH
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
-            
+
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.11.1
           build-root-directory: ./android
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
-      
+
       - name: AVD cache
         uses: actions/cache@v4
         id: avd-cache
-        with: 
+        with:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
           key: avd-${{ env.AVD-ARCH }}-integ
-          
+
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: nick-fields/retry@v2

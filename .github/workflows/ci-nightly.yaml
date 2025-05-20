@@ -8,13 +8,13 @@ on:
 jobs:
   jest-test:
     uses: ./.github/workflows/jest-test.yaml
-    
+
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
-    
+
   create-cache-key:
     uses: ./.github/workflows/create-cache-key.yaml
-    
+
   android-build:
     strategy:
       matrix:
@@ -61,7 +61,7 @@ jobs:
     needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-       
+
   ios-integration-test:
     strategy:
       fail-fast: false

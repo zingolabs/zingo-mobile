@@ -9,7 +9,7 @@ on:
       cache-key:
         required: true
         type: string
-    
+
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
   TIMESTAMP: ${{ inputs.timestamp }}
@@ -23,7 +23,7 @@ jobs:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-            
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:

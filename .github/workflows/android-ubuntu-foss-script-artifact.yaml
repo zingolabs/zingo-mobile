@@ -103,7 +103,7 @@ jobs:
         run: |
           sudo apt-get install strip-nondeterminism
           sudo strip-nondeterminism app-release.apk
-          
+
       - name: Upload the Artifact
         uses: actions/upload-artifact@v4
         with:

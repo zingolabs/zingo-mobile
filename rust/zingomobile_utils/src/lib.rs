@@ -21,9 +21,8 @@ pub fn android_integration_test(abi: &str, test_name: &str) -> (i32, String, Str
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
-            ./scripts/integration_tests.sh -a {} -e {}
-            "#,
-            abi, test_name
+            ./scripts/integration_tests.sh -a {abi} -e {test_name}
+            "#
         ))
         .output()
         .expect("Failed to execute command");
@@ -68,9 +67,8 @@ pub fn android_integration_test_ci(abi: &str, test_name: &str) -> (i32, String, 
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
-            ./scripts/ci/integration_tests_ci.sh -a {} -e {}
-            "#,
-            abi, test_name
+            ./scripts/ci/integration_tests_ci.sh -a {abi} -e {test_name}
+            "#
         ))
         .output()
         .expect("Failed to execute command");
@@ -103,9 +101,8 @@ pub fn android_e2e_test(abi: &str, test_name: &str) -> (i32, String, String) {
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
-            ./scripts/e2e_tests.sh -a {} -e {}
-            "#,
-            abi, test_name
+            ./scripts/e2e_tests.sh -a {abi} -e {test_name}
+            "#
         ))
         .output()
         .expect("Failed to execute command");
@@ -150,9 +147,8 @@ pub fn android_e2e_test_ci(abi: &str, test_name: &str) -> (i32, String, String) 
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
-            ./scripts/ci/e2e_tests_ci.sh -a {} -e {}
-            "#,
-            abi, test_name
+            ./scripts/ci/e2e_tests_ci.sh -a {abi} -e {test_name}
+            "#
         ))
         .output()
         .expect("Failed to execute command");

@@ -10,8 +10,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - run: yarn
-      
+
       - run: yarn test
 

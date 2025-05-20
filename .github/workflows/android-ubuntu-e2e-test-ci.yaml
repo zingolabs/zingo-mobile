@@ -36,7 +36,7 @@ jobs:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-            
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -77,7 +77,7 @@ jobs:
       - name: Check AVD cache
         uses: actions/cache/restore@v4
         id: avd-cache
-        with: 
+        with:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
@@ -104,7 +104,7 @@ jobs:
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         id: avd-cache-saving
-        with: 
+        with:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
@@ -119,16 +119,16 @@ jobs:
       matrix:
         test: [
           "parse_invalid_address",
-          "tex_send_address", 
-          "reload_while_tx_pending", 
-          "change_custom_server", 
-          "change_custom_regtest_server", 
-          "change_custom_testnet_server", 
-          "change_server_from_list", 
-          "new_wallet", 
-          "screen_awake", 
-          "send", 
-          "sync_report", 
+          "tex_send_address",
+          "reload_while_tx_pending",
+          "change_custom_server",
+          "change_custom_regtest_server",
+          "change_custom_testnet_server",
+          "change_server_from_list",
+          "new_wallet",
+          "screen_awake",
+          "send",
+          "sync_report",
           "transaction_history",
           "shielding"
         ]
@@ -138,7 +138,7 @@ jobs:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-            
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -221,13 +221,13 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      
+
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.11.1
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
-      
+
       - name: Native rust cache
         uses: actions/cache/restore@v4
         with:
@@ -244,7 +244,7 @@ jobs:
 
       - name: Restore AVD cache
         uses: actions/cache/restore@v4
-        with: 
+        with:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
@@ -253,7 +253,7 @@ jobs:
 
       - name: Yarn install
         run: yarn
-      
+
       - name: Run Build
         working-directory: android
         run: ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release -PsplitApk=true

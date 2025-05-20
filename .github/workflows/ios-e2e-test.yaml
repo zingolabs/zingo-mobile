@@ -9,7 +9,7 @@ on:
       cache-key:
         required: true
         type: string
-    
+
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
   TIMESTAMP: ${{ inputs.timestamp }}
@@ -24,16 +24,16 @@ jobs:
       matrix:
         test: [
           "parse_invalid_address",
-          "tex_send_address", 
-          "reload_while_tx_pending", 
-          "change_custom_server", 
-          "change_custom_regtest_server", 
-          "change_custom_testnet_server", 
-          "change_server_from_list", 
-          "new_wallet", 
-          "screen_awake", 
-          "send", 
-          "sync_report", 
+          "tex_send_address",
+          "reload_while_tx_pending",
+          "change_custom_server",
+          "change_custom_regtest_server",
+          "change_custom_testnet_server",
+          "change_server_from_list",
+          "new_wallet",
+          "screen_awake",
+          "send",
+          "sync_report",
           "transaction_history",
           "shielding"
         ]
@@ -41,7 +41,7 @@ jobs:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
-            
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
