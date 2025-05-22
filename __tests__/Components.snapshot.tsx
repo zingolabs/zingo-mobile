@@ -30,13 +30,13 @@ describe('Component Components - test', () => {
     expect(currencyAmount.toJSON()).toMatchSnapshot();
   });
 
-  test('CurrencyAmount Normal Privacy - snapshot', () => {
+  test('CurrencyAmount Normal Privacy with TOR - snapshot', () => {
     const currencyAmount = render(
       <CurrencyAmount
         price={1.12345678}
         amtZec={39.99}
         style={{ backgroundColor: 'red' }}
-        currency={CurrencyEnum.USDCurrency}
+        currency={CurrencyEnum.USDTORCurrency}
       />,
     );
     expect(currencyAmount.toJSON()).toMatchSnapshot();

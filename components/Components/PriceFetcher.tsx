@@ -13,7 +13,7 @@ import 'moment/locale/ru';
 import RPC from '../../app/rpc';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
-import { ModeEnum } from '../../app/AppState';
+import { CurrencyEnum, ModeEnum } from '../../app/AppState';
 
 type PriceFetcherProps = {
   setZecPrice: (p: number, d: number) => void;
@@ -22,7 +22,7 @@ type PriceFetcherProps = {
 
 const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice, textBefore }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, addLastSnackbar, mode, language } = context;
+  const { translate, zecPrice, addLastSnackbar, mode, language, currency } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
@@ -54,7 +54,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
 
   const onPressFetch = async () => {
     setLoading(true);
-    const {price, error} = await RPC.rpcGetZecPrice();
+    const {price, error} = await RPC.rpcGetZecPrice(currency === CurrencyEnum.USDTORCurrency);
     // values:
     // 0   - initial/default value
     // -1  - error in Gemini/zingolib.

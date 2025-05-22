@@ -204,7 +204,11 @@
       },
       {
         "value": "USD",
-        "text": "Puedes consultar el precio para US Dólares aparte de ZEC.\nNecesita obtener una clave API de CoinCap para obtener el precio (https://pro.coincap.io/signup)."
+        "text": "Puedes consultar el precio para US Dólares de internet."
+      },
+      {
+        "value": "USDTOR",
+        "text": "Puedes consultar el precio para US Dólares de internet usando Tor.\nTor se usa para proteger la dirección IP del usuario, pero puede ser ilegal en algunos países. Úsalo bajo tu propio criterio."
       }
     ],
     "languages": [
@@ -320,6 +324,7 @@
     "recoverywalletinfoondevice-title": "Almacenar la información de recuperacion del monedero en el dispositivo",
     "value-currency-": "Sin moneda",
     "value-currency-USD": "US Dólares",
+    "value-currency-USDTOR": "US Dólares con Tor",
     "value-language-en": "Inglés",
     "value-language-es": "Español",
     "value-language-pt": "Portugués",
@@ -363,8 +368,7 @@
     "select-placeholder": "Elige un Servidor...",
     "value-language-ru": "Ruso",
     "walletkeyssaved": "La ultima información de recuperacion del Monedero almacenada de forma segura en el dispositivo.",
-    "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!",
-    "coincap-placeholder": "Clave API de CoinCap"
+    "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!"
   },
   "info": {
     "version": "Versión",

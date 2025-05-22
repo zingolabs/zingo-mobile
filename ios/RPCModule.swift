@@ -1190,8 +1190,9 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   }
 
   func fnZecPriceInfo(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = zecPrice()
+      if let key = dict["tor"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let resp = zecPrice(tor: tor)
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
@@ -1207,41 +1208,12 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
-  @objc(zecPriceInfo:reject:)
-  func zecPriceInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+  @objc(zecPriceInfo:resolve:reject:)
+  func zecPriceInfo(_ tor: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["tor": tor, "resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnZecPriceInfo(dict)
-        }
-      }
-  }
-
-  func fnZecPriceApiKeyProcess(_ dict: [AnyHashable: Any]) {
-      if let key = dict["key"] as? String,
-          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        let resp = zecPriceApiKey(key: key)
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-      } else {
-          let err = "Error: [Native] resend transaction. Command arguments problem."
-          NSLog(err)
-          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
-      }
-  }
-
-  @objc(zecPriceApiKeyProcess:resolve:reject:)
-  func zecPriceApiKeyProcess(_ key: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["key": key, "resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnZecPriceApiKeyProcess(dict)
         }
       }
   }

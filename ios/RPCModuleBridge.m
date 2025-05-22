@@ -147,10 +147,7 @@ RCT_EXTERN_METHOD(getTotalSpendsToAddressInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(zecPriceInfo:
-    (RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(zecPriceApiKeyProcess:
-    (NSString)key 
+    (NSString)tor 
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(resendTransactionProcess:

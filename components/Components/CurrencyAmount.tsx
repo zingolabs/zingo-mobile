@@ -61,7 +61,7 @@ const CurrencyAmount: React.FunctionComponent<CurrencyAmountProps> = ({
     setTimeout(() => setPrivacyHigh(true), 5 * 1000);
   };
 
-  if (currency === CurrencyEnum.USDCurrency) {
+  if (currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) {
     return (
       <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
         <TouchableOpacity disabled={!privacyHigh} onPress={onPress}>

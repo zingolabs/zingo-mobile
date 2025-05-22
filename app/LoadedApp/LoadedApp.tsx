@@ -212,7 +212,9 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
         //console.log('apploaded NO settings', languageTag);
       }
-      if (settings.currency === CurrencyEnum.noCurrency || settings.currency === CurrencyEnum.USDCurrency) {
+      if (settings.currency === CurrencyEnum.noCurrency ||
+          settings.currency === CurrencyEnum.USDCurrency ||
+          settings.currency === CurrencyEnum.USDTORCurrency) {
         setCurrency(settings.currency);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, currency);
