@@ -36,6 +36,7 @@ jest.mock('react-native', () => {
     getSpendableBalanceInfo: jest.fn(() => '{}'),
     getOptionWalletInfo: jest.fn(() => '{}'),
     setOptionWalletProcess: jest.fn(() => '{}'),
+    createTorClientProcess: jest.fn(() => '{}'),
   };
   RN.View = jest.fn();
 

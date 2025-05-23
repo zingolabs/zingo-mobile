@@ -1338,7 +1338,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       //   The App have to go to the initial screen
       // - the seed exists and the App can open the wallet in the new server.
       //   But I have to restart the sync if needed.
-      let result: string = await RPCModule.loadExistingWallet(value.uri, value.chainName);
+      let result: string = await RPCModule.loadExistingWallet(value.uri, value.chainName, this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false');
       //console.log('load existing wallet', result);
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
@@ -1439,6 +1439,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       currency: value as CurrencyEnum,
     });
+
+    if (value === CurrencyEnum.USDTORCurrency) {
+      // when the user select USD with Tor
+      // the App have to create a Tor Client
+      console.log('before CREATE ------------------- TOR CLIENT');
+      const result = await RPCModule.createTorClientProcess();
+      console.log('after CREATE ------------------- TOR CLIENT', result);
+    }
 
     // Refetch the settings to update
     //this.rpc.fetchWalletSettings();

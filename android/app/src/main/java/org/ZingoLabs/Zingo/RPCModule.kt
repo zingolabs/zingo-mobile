@@ -128,13 +128,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun createNewWallet(server: String, chainhint: String, promise: Promise) {
+    fun createNewWallet(server: String, chainhint: String, tor: String, promise: Promise) {
         // Log.i("MAIN", "Creating new wallet")
 
         uniffi.zingo.initLogging()
 
         // Create a seed
-        val resp = uniffi.zingo.initNew(server, getDocumentDirectory(), chainhint)
+        val resp = uniffi.zingo.initNew(server, getDocumentDirectory(), chainhint, tor)
         // Log.i("MAIN-Seed", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -145,12 +145,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun restoreWalletFromSeed(seed: String, birthday: String, server: String, chainhint: String, promise: Promise) {
+    fun restoreWalletFromSeed(seed: String, birthday: String, server: String, chainhint: String, tor: String, promise: Promise) {
         // Log.i("MAIN", "Restoring wallet with seed $seed")
 
         uniffi.zingo.initLogging()
 
-        val resp = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), getDocumentDirectory(), chainhint)
+        val resp = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), getDocumentDirectory(), chainhint, tor)
         // Log.i("MAIN", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -161,12 +161,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, chainhint: String, promise: Promise) {
+    fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, chainhint: String, tor: String, promise: Promise) {
         // Log.i("MAIN", "Restoring wallet with ufvk $ufvk")
 
         uniffi.zingo.initLogging()
 
-        val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), applicationContext.filesDir.absolutePath, chainhint)
+        val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), getDocumentDirectory(), chainhint, tor)
         // Log.i("MAIN", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -177,11 +177,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun loadExistingWallet(server: String, chainhint: String, promise: Promise) {
-        promise.resolve(loadExistingWalletNative(server, chainhint))
+    fun loadExistingWallet(server: String, chainhint: String, tor: String, promise: Promise) {
+        promise.resolve(loadExistingWalletNative(server, chainhint, tor))
     }
 
-    fun loadExistingWalletNative(server: String, chainhint: String): String {
+    fun loadExistingWalletNative(server: String, chainhint: String, tor: String): String {
         // Read the file
         val fileBytes = readFile(WalletFileName.value)
 
@@ -346,7 +346,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             server,
             fileb64.toString(),
             applicationContext.filesDir.absolutePath,
-            chainhint
+            chainhint,
+            tor
         )
     }
 
@@ -1173,6 +1174,27 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: set option wallet: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun createTorClientProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.createTorClient(getDocumentDirectory())
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: tor client: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {

@@ -377,6 +377,7 @@
     "network": "Rede",
     "serverblock": "Altura do Bloco do Servidor",
     "zecprice": "Preço do ZEC",
+    "zecpricetor": "Preço do ZEC com Tor",
     "unknown": "Desconhecido",
     "title": "Informações do Servidor",
     "resolution": "Tela do Dispositivo",

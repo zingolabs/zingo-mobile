@@ -377,6 +377,7 @@
     "network": "Сеть",
     "serverblock": "Высота блока сервера",
     "zecprice": "Цена ZEC",
+    "zecpricetor": "Цена ZEC с Tor",
     "unknown": "Неизвестно",
     "title": "Данные сервера",
     "resolution": "Экран устройства",
