@@ -13,7 +13,7 @@ zingolib = { workspace = true, features = [ "test-elevation" ] }
 pepper-sync = { workspace = true }
 zingomobile_utils = { workspace = true }
 regchest_utils = { workspace = true }
-darkside-tests = { workspace = true }
+#darkside-tests = { workspace = true }
 json = { workspace = true }
 env_logger = { workspace = true }
 tokio = { workspace = true }
