@@ -84,7 +84,7 @@ exports[`Component Components - test CurrencyAmount High Privacy - snapshot 1`] 
 </View>
 `;
 
-exports[`Component Components - test CurrencyAmount Normal Privacy - snapshot 1`] = `
+exports[`Component Components - test CurrencyAmount Normal Privacy with TOR - snapshot 1`] = `
 <View
   style={
     {

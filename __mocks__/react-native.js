@@ -31,12 +31,12 @@ jest.mock('react-native', () => {
     getTotalValueToAddressInfo: jest.fn(() => '{}'),
     getTotalSpendsToAddressInfo: jest.fn(() => '{}'),
     zecPriceInfo: jest.fn(() => '{}'),
-    zecPriceApiKeyProcess: jest.fn(() => '{}'),
     resendTransactionProcess: jest.fn(() => '{}'),
     removeTransactionProcess: jest.fn(() => '{}'),
     getSpendableBalanceInfo: jest.fn(() => '{}'),
     getOptionWalletInfo: jest.fn(() => '{}'),
     setOptionWalletProcess: jest.fn(() => '{}'),
+    createTorClientProcess: jest.fn(() => '{}'),
   };
   RN.View = jest.fn();
 

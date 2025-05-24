@@ -1417,7 +1417,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </View>
               </View>
 
-              {(!zecPrice.zecPrice || zecPrice.zecPrice <= 0) && currency === CurrencyEnum.USDCurrency && (
+              {(!zecPrice.zecPrice || zecPrice.zecPrice <= 0) && (currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && (
                 <View
                   style={{
                     width: '35%',
@@ -1427,7 +1427,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </View>
               )}
 
-              {!!zecPrice.zecPrice && zecPrice.zecPrice > 0 && currency === CurrencyEnum.USDCurrency && (
+              {!!zecPrice.zecPrice && zecPrice.zecPrice > 0 && (currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && (
                 <View
                   style={{
                     display: 'flex',

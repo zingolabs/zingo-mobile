@@ -123,15 +123,15 @@ export default class RPC {
     this.readOnly = readOnly;
   }
 
-  static async rpcGetZecPrice(): Promise<{price: number, error: string}> {
+  static async rpcGetZecPrice(withTOR: boolean): Promise<{price: number, error: string}> {
     try {
       // values:
       // 0   - initial/default value
-      // -1  - error in CoinCap API/zingolib.
+      // -1  - error in zingolib.
       // -2  - error in RPCModule, likely.
       // > 0 - real value
       //const start = Date.now();
-      const resultStr: string = await RPCModule.zecPriceInfo();
+      const resultStr: string = await RPCModule.zecPriceInfo(withTOR ? 'true' : 'false');
       //console.log('=========================================== > get ZEC price - ', Date.now() - start);
       console.log(resultStr);
 

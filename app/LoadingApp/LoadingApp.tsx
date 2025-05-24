@@ -206,7 +206,9 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
         //console.log('apploading NO settings', languageTag);
       }
-      if (settings.currency === CurrencyEnum.noCurrency || settings.currency === CurrencyEnum.USDCurrency) {
+      if (settings.currency === CurrencyEnum.noCurrency ||
+          settings.currency === CurrencyEnum.USDCurrency ||
+          settings.currency === CurrencyEnum.USDTORCurrency) {
         setCurrency(settings.currency);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, currency);
@@ -489,7 +491,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     if (exists && exists !== GlobalConst.false) {
       this.setState({ walletExists: true });
-      let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chainName);
+      let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chainName, this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false');
       //let result = 'Error: pepe es guapo';
 
       // for testing
@@ -999,7 +1001,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     }
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
-      let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chainName);
+      let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chainName, this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false');
 
       if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
         let seedJSON = {} as RPCSeedType;
@@ -1120,6 +1122,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           walletBirthday || '0',
           this.state.server.uri,
           this.state.server.chainName,
+          this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false',
         );
       } else {
         result = await RPCModule.restoreWalletFromUfvk(
@@ -1127,6 +1130,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           walletBirthday || '0',
           this.state.server.uri,
           this.state.server.chainName,
+          this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false',
         );
       }
 

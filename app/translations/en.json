@@ -204,7 +204,11 @@
       },
       {
         "value": "USD",
-        "text": "You can fetch the price for US Dollars besides ZEC.\nYou need to get an API Key from CoinCap in order to fetch the Price (https://pro.coincap.io/signup)."
+        "text": "You can fetch the price for US Dollars from internet."
+      },
+      {
+        "value": "USDTOR",
+        "text": "You can fetch the price for US Dollars from internet using Tor.\nTor is used to protect the user's IP address but may be unlawful in some countries. Use at your own discretion."
       }
     ],
     "languages": [
@@ -320,6 +324,7 @@
     "recoverywalletinfoondevice-title": "Store Wallet Recovery Info in the Device",
     "value-currency-": "No currency",
     "value-currency-USD": "US Dollar",
+    "value-currency-USDTOR": "US Dollar with Tor",
     "value-language-en": "English",
     "value-language-es": "Spanish",
     "value-language-pt": "Portuguese",
@@ -363,8 +368,7 @@
     "select-placeholder": "Choose a Server...",
     "value-language-ru": "Russian",
     "walletkeyssaved": "The last Wallet Recovery Info stored safely in the device.",
-    "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!",
-    "coincap-placeholder": "CoinCap API Key"
+    "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!"
   },
   "info": {
     "version": "Version",
@@ -373,6 +377,7 @@
     "network": "Network",
     "serverblock": "Server Block Height",
     "zecprice": "ZEC Price",
+    "zecpricetor": "ZEC Price with Tor",
     "unknown": "Unknown",
     "title": "Server Info",
     "resolution": "Device Screen",

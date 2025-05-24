@@ -13,7 +13,7 @@ import 'moment/locale/ru';
 import RPC from '../../app/rpc';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
-import { ModeEnum } from '../../app/AppState';
+import { CurrencyEnum, ModeEnum } from '../../app/AppState';
 
 type PriceFetcherProps = {
   setZecPrice: (p: number, d: number) => void;
@@ -22,7 +22,7 @@ type PriceFetcherProps = {
 
 const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice, textBefore }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, zecPrice, addLastSnackbar, mode, language } = context;
+  const { translate, zecPrice, addLastSnackbar, mode, language, currency } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
@@ -54,17 +54,31 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
 
   const onPressFetch = async () => {
     setLoading(true);
-    const {price, error} = await RPC.rpcGetZecPrice();
+    let price: number;
+    let error: string;
+    // first attempt
+    ({price, error} = await RPC.rpcGetZecPrice(currency === CurrencyEnum.USDTORCurrency));
+    console.log('first price fetching', price, error);
     // values:
     // 0   - initial/default value
     // -1  - error in Gemini/zingolib.
     // -2  - error in RPCModule, likely.
     // > 0 - real value
+    if (price <= 0) {
+      // second attempt
+      ({price, error} = await RPC.rpcGetZecPrice(currency === CurrencyEnum.USDTORCurrency));
+      console.log('second price fetching', price, error);
+    }
+
     if (price === -1) {
       addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}` });
+      setLoading(false);
+      return;
     }
     if (price === -2) {
       addLastSnackbar({ message: `${translate('info.errorrpcmodule')} - ${error}` });
+      setLoading(false);
+      return;
     }
     if (price <= 0) {
       addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}` });
@@ -73,7 +87,10 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
       setZecPrice(price, Date.now());
     }
     setRefreshMinutes(0);
-    setLoading(false);
+    // the app needs time to recover the price from the context.
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
   };
 
   const onPressFetchAlert = () => {

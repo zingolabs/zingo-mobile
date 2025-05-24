@@ -94,9 +94,9 @@ const Info: React.FunctionComponent<InfoProps> = () => {
               label={translate('info.serverblock') as string}
               value={info.latestBlock ? info.latestBlock.toString() : '-'}
             />
-            {currency === CurrencyEnum.USDCurrency && (
+            {(currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && (
               <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                <DetailLine label={translate('info.zecprice') as string}>
+                <DetailLine label={(currency === CurrencyEnum.USDTORCurrency ? translate('info.zecpricetor') : translate('info.zecprice')) as string}>
                   {zecPrice.zecPrice === -1 && (
                     <RegText color={colors.text}>{translate('info.errorgemini') as string}</RegText>
                   )}

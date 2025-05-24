@@ -409,7 +409,8 @@ extension AppDelegate {
               let jsonObject = try? JSONSerialization.jsonObject(with: contentData, options: []) as? [String: Any],
               let server = jsonObject["server"] as? [String: Any],
               let serverURI = server["uri"] as? String,
-              let chainhint = server["chain_name"] as? String else {
+              let chainhint = server["chain_name"] as? String,
+              let tor = "false" as? String else {
             NSLog("Error: Unable to parse JSON object from file at path \(fileName)")
             return
         }
@@ -417,7 +418,7 @@ extension AppDelegate {
         NSLog("Opening the wallet file - No App active - server: \(serverURI) chain: \(chainhint)")
         let rpcmodule = RPCModule()
         do {
-          _ = try rpcmodule.fnLoadExistingWallet(server: serverURI, chainhint: chainhint)
+          _ = try rpcmodule.fnLoadExistingWallet(server: serverURI, chainhint: chainhint, tor: tor)
         } catch {
           NSLog("Error: Unable to load the wallet. error: \(error.localizedDescription)")
         }
