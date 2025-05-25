@@ -15,7 +15,6 @@ RUN apt update \
     unzip \
     git \
     protobuf-compiler \
-    libssl-dev \
     pkg-config \
     && update-ca-certificates
 
@@ -27,28 +26,6 @@ ENV ANDROID_NDK_HOME=/usr/local/android-ndk-${android_ndk_ver}
 ENV NDK_HOME=/usr/local/android-ndk-${android_ndk_ver}
 ENV ANDROID_NDK_ROOT=/usr/local/android-ndk-${android_ndk_ver}
 ENV PATH=/usr/local/android-ndk-${android_ndk_ver}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
-
-ENV SOURCE_DATE_EPOCH=1710000000
-ENV ZERO_AR_DATE=1
-ENV RUSTFLAGS=" \
-    --remap-path-prefix=$(pwd)=. \
-    -C opt-level=z \
-    -C debuginfo=0 \
-    -C codegen-units=1 \
-    -C linker-plugin-lto=no \
-    -C link-arg=-Wl,--hash-style=gnu \
-    -C link-arg=-Wl,--build-id=none \
-    -C link-arg=-Wl,--no-relax \
-    -C link-arg=-Wl,--pack-dyn-relocs=none \
-    -C link-arg=-Wl,--sort-common \
-    -C link-arg=-Wl,--sort-section=name"
-ENV CGO_LDFLAGS="-trimpath -buildvcs=false -buildid= "
-ENV CMAKE_C_FLAGS=$CFLAGS
-ENV CMAKE_CXX_FLAGS=$CFLAGS
-ENV CMAKE_SHARED_LINKER_FLAGS=$LDFLAGS
-
-ENV CFLAGS="-ffile-prefix-map=$(pwd)=. -fno-ident -g0 -gno-record-gcc-switches -frandom-seed=1 -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -no-canonical-prefixes"
-ENV LDFLAGS="-Wl,--build-id=none -Wl,--no-relax -Wl,--pack-dyn-relocs=none -Wl,--sort-common -Wl,--sort-section=name -Wl,--hash-style=gnu"
 
 # Install and setup Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -81,55 +58,3 @@ RUN echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
     && echo "linker = \"x86_64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
-
-# Install and setup OpenSSL
-WORKDIR /opt
-RUN curl -LO https://www.openssl.org/source/openssl-3.3.2.tar.gz -o openssl-3.3.2.tar.gz \
-    && tar xvf openssl-3.3.2.tar.gz \
-    && rm -rf openssl-3.3.2.tar.gz
-ENV OPENSSL_STATIC=yes
-WORKDIR /opt/openssl-3.3.2 
-RUN mkdir x86 \
-    && mkdir aarch64 \
-    && mkdir armv7 \
-    && mkdir x86_64
-
-RUN ./Configure --prefix=/opt/openssl-3.3.2/aarch64 android-arm64 \
-    -mno-outline-atomics \
-    -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 \
-    && make -j$(nproc) \
-    && make -j$(nproc) install \
-    && make clean \
-    && make distclean
-
-RUN ./Configure --prefix=/opt/openssl-3.3.2/armv7 android-arm \
-    -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 \
-    && make -j$(nproc) \
-    && make -j$(nproc) install \
-    && make clean \
-    && make distclean
-
-RUN ./Configure --prefix=/opt/openssl-3.3.2/x86 android-x86 \
-    -DBROKEN_CLANG_ATOMICS \
-    -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 \
-    && make -j$(nproc) \
-    && make -j$(nproc) install \
-    && make clean \
-    && make distclean
-
-RUN ./Configure --prefix=/opt/openssl-3.3.2/x86_64 android-x86_64 \
-    -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 \
-    && make -j$(nproc) \
-    && make -j$(nproc) install \
-    && make clean \
-    && make distclean
-
-# Apt clean up
-RUN apt autoremove -y \
-    && apt clean \
-    && rm -rf /var/lib/apt/lists/*
-

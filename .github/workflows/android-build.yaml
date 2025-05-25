@@ -62,7 +62,7 @@ jobs:
     if: ${{ needs.android-check-build-cache.outputs.native-cache-found != 'true' || needs.android-check-build-cache.outputs.kotlin-cache-found != 'true' }}
     runs-on: ubuntu-22.04
     container:
-      image: zingodevops/android_builder:014
+      image: zingodevops/android_builder:015
     env:
       RUSTUP_HOME: /root/.rustup
     steps:
@@ -126,7 +126,6 @@ jobs:
         run: |
           echo "TARGET=x86_64-linux-android" >> $GITHUB_ENV
           echo "CC=x86_64-linux-android" >> $GITHUB_ENV
-          echo "OPENSSL_PATH=x86_64" >> $GITHUB_ENV
           echo "CARGO_FEATURE_STD=false" >> $GITHUB_ENV
 
       - name: Set envs for x86
@@ -134,7 +133,6 @@ jobs:
         run: |
           echo "TARGET=i686-linux-android" >> $GITHUB_ENV
           echo "CC=i686-linux-android" >> $GITHUB_ENV
-          echo "OPENSSL_PATH=x86" >> $GITHUB_ENV
           echo "CARGO_FEATURE_STD=false" >> $GITHUB_ENV
 
       - name: Set envs for arm64-v8a
@@ -142,7 +140,6 @@ jobs:
         run: |
           echo "TARGET=aarch64-linux-android" >> $GITHUB_ENV
           echo "CC=aarch64-linux-android" >> $GITHUB_ENV
-          echo "OPENSSL_PATH=aarch64" >> $GITHUB_ENV
           echo "CARGO_FEATURE_STD=true" >> $GITHUB_ENV
 
       - name: Set envs for armeabi-v7a
@@ -150,11 +147,10 @@ jobs:
         run: |
           echo "TARGET=armv7-linux-androideabi" >> $GITHUB_ENV
           echo "CC=armv7a-linux-androideabi" >> $GITHUB_ENV
-          echo "OPENSSL_PATH=armv7" >> $GITHUB_ENV
           echo "CARGO_FEATURE_STD=false" >> $GITHUB_ENV
 
       - name: Cargo NDK
-        run: cargo install --version ^3 cargo-ndk
+        run: cargo install --version 3.5.4 cargo-ndk
 
       - name: Cargo build
         working-directory: ./rust/lib
@@ -167,13 +163,12 @@ jobs:
           LD: ld
           RANLIB: llvm-ranlib
           CC: ${{ env.CC }}24-clang
-          OPENSSL_DIR: /opt/openssl-3.3.2/${{ env.OPENSSL_PATH }}
           CARGO_FEATURE_STD: ${{ env.CARGO_FEATURE_STD }}
           LIBCLANG_PATH: /usr/lib/llvm-18/lib
 
       - name: LLVM Strip
         working-directory: ./rust/target
-        run: llvm-strip ./${{ env.TARGET }}/release/libzingo.so
+        run: llvm-strip --strip-all ./${{ env.TARGET }}/release/libzingo.so
 
       - name: LLVM Obj Copy
         working-directory: ./rust/target

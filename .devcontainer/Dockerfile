@@ -52,7 +52,7 @@ RUN cargo nextest --version
 FROM ubuntu:22.04
 
 # Install essential dependencies like build tools
-RUN apt-get update -y && apt-get install -y build-essential curl git unzip openjdk-17-jdk net-tools iproute2 libssl-dev pkg-config
+RUN apt-get update -y && apt-get install -y build-essential curl git unzip openjdk-17-jdk net-tools iproute2 pkg-config
 
 # Copy Node.js from the node-stage
 COPY --from=node-stage /usr/local /usr/local
