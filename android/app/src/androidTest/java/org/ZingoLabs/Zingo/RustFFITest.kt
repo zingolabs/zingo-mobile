@@ -18,7 +18,7 @@ object Ufvk {
 data class InitFromSeed (
     val seed : String,
     val birthday : Long,
-    val account_index: Long
+    val no_of_accounts: Long
 )
 
 data class InitFromUfvk (
