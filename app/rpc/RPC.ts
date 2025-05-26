@@ -758,9 +758,9 @@ export default class RPC {
       }
       const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
 
-      const orchardBal: number = balanceJSON.orchard_balance || 0;
-      const privateBal: number = balanceJSON.sapling_balance || 0;
-      const transparentBal: number = balanceJSON.confirmed_transparent_balance + balanceJSON.unconfirmed_transparent_balance || 0;
+      const orchardBal: number = balanceJSON.total_orchard_balance || 0;
+      const privateBal: number = balanceJSON.total_sapling_balance || 0;
+      const transparentBal: number = balanceJSON.total_transparent_balance || 0;
 
       const total = orchardBal + privateBal + transparentBal;
 
@@ -769,8 +769,8 @@ export default class RPC {
         orchardBal: orchardBal / 10 ** 8,
         privateBal: privateBal / 10 ** 8,
         transparentBal: transparentBal / 10 ** 8,
-        spendableOrchard: (balanceJSON.spendable_orchard_balance || 0) / 10 ** 8,
-        spendablePrivate: (balanceJSON.spendable_sapling_balance || 0) / 10 ** 8,
+        spendableOrchard: (balanceJSON.confirmed_orchard_balance || 0) / 10 ** 8,
+        spendablePrivate: (balanceJSON.confirmed_sapling_balance || 0) / 10 ** 8,
         confirmedTransparent: (balanceJSON.confirmed_transparent_balance || 0) / 10 ** 8,
         total: total / 10 ** 8,
       };

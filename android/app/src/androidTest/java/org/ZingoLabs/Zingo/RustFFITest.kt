@@ -98,14 +98,13 @@ data class Sync (
 )
 
 data class Balance (
-    val sapling_balance : Long,
-    val verified_sapling_balance : Long,
-    val spendable_sapling_balance : Long,
-    val unverified_sapling_balance : Long,
-    val orchard_balance : Long,
-    val verified_orchard_balance : Long,
-    val spendable_orchard_balance : Long,
-    val unverified_orchard_balance : Long,
+    val total_sapling_balance : Long,
+    val confirmed_sapling_balance : Long,
+    val unconfirmed_sapling_balance : Long,
+    val total_orchard_balance : Long,
+    val confirmed_orchard_balance : Long,
+    val unconfirmed_orchard_balance : Long,
+    val total_transparent_balance
     val confirmed_transparent_balance : Long,
     val unconfirmed_transparent_balance : Long
 )
@@ -367,7 +366,7 @@ class ExecuteSendFromOrchard {
         println("\nBalance pre-send:")
         println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(1000000)
+        assertThat(balancePreSend.confirmed_orchard_balance).isEqualTo(1000000)
         assertThat(balancePreSend.confirmed_transparent_balance).isEqualTo(0)
 
         val addressesJson: String = uniffi.zingo.getAddresses("full")
@@ -573,10 +572,10 @@ class ExecuteSaplingBalanceFromSeed {
 
         assertThat(balance.orchard_balance).isEqualTo(710000)
         assertThat(balance.verified_orchard_balance).isEqualTo(710000)
-        assertThat(balance.spendable_orchard_balance).isEqualTo(710000)
+        assertThat(balance.confirmed_orchard_balance).isEqualTo(710000)
         assertThat(balance.sapling_balance).isEqualTo(125000)
         assertThat(balance.verified_sapling_balance).isEqualTo(125000)
-        assertThat(balance.spendable_sapling_balance).isEqualTo(125000)
+        assertThat(balance.confirmed_sapling_balance).isEqualTo(125000)
         assertThat(balance.confirmed_transparent_balance).isEqualTo(0)
 
         // save the wallet file
