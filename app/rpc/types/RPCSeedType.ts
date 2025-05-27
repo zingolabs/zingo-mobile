@@ -1,5 +1,5 @@
 export type RPCSeedType = {
-  seed?: string;
+  seed_phrase?: string;
   birthday?: number;
   no_of_accounts?: number;
   error?: string;

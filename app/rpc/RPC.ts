@@ -262,8 +262,8 @@ export default class RPC {
         const RPCseed: RPCSeedType = await JSON.parse(seedStr);
 
         const wallet: WalletType = {} as WalletType;
-        if (RPCseed.seed) {
-          wallet.seed = RPCseed.seed;
+        if (RPCseed.seed_phrase) {
+          wallet.seed = RPCseed.seed_phrase;
         }
         if (RPCseed.birthday) {
           wallet.birthday = RPCseed.birthday;

@@ -1035,7 +1035,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           );
           return;
         }
-        const wallet: WalletType = { seed: seedJSON.seed || '', birthday: seedJSON.birthday || 0 };
+        const wallet: WalletType = { seed: seedJSON.seed_phrase || '', birthday: seedJSON.birthday || 0 };
         // default values for wallet options
         this.setWalletOption(WalletOptionEnum.downloadMemos, DownloadMemosEnum.walletMemos);
         // storing the seed & birthday in KeyChain/KeyStore
