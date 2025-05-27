@@ -22,7 +22,8 @@ data class InitFromSeed (
 )
 
 data class InitFromUfvk (
-    val error : String
+    val ufvk : String,
+    val birthday : Long
 )
 
 data class ExportUfvk (
@@ -192,7 +193,7 @@ class ExecuteAddressesFromUfvk {
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(server, ufvk, birthday, datadir, chainhint, tor)
+        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(server, ufvk, birthday, datadir, chainhint, tor, false)
         println("\nInit From UFVK:")
         println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
