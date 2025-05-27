@@ -77,6 +77,7 @@ import { sendEmail } from '../sendEmail';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
 import StartMenu from './components/StartMenu';
 import { ToastProvider } from 'react-native-toastier';
+import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -503,9 +504,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
           // here result can have an `error` field for watch-only which is actually OK.
-          const resultJson: RPCSeedType = await JSON.parse(result);
+          const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(result);
           //console.log('Load Wallet Exists result JSON', resultJson);
-          if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
+          if (!resultJson.error) {
             // Load the wallet and navigate to the vts screen
             let readOnly: boolean = false;
             let orchardPool: boolean = false;
@@ -1142,8 +1143,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
           // here result can have an `error` field for watch-only which is actually OK.
-          const resultJson: RPCSeedType = await JSON.parse(result);
-          if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
+          const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(result);
+          if (!resultJson.error) {
             // storing the seed/ufvk & birthday in KeyChain/KeyStore
             if (this.state.recoveryWalletInfoOnDevice) {
               if (type === RestoreFromTypeEnum.seedRestoreFrom) {

@@ -23,7 +23,6 @@ import { RPCWalletHeight } from './types/RPCWalletHeightType';
 import { RPCSeedType } from './types/RPCSeedType';
 import { RPCSyncStatusType } from './types/RPCSyncStatusType';
 //import { RPCGetOptionType } from './types/RPCGetOptionType';
-import { RPCUfvkType } from './types/RPCUfvkType';
 import { RPCSendType } from './types/RPCSendType';
 import { RPCValueTransfersType } from './types/RPCValueTransfersType';
 import { RPCValueTransfersKindEnum } from './enums/RPCValueTransfersKindEnum';
@@ -229,7 +228,7 @@ export default class RPC {
           console.log('Internal Error ufvk');
           return {} as WalletType;
         }
-        const RPCufvk: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
+        const RPCufvk: WalletType = await JSON.parse(ufvkStr);
 
         const wallet: WalletType = {} as WalletType;
         if (RPCufvk.birthday) {

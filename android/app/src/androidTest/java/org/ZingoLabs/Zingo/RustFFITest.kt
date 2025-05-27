@@ -197,13 +197,14 @@ class ExecuteAddressesFromUfvk {
         println("\nInit From UFVK:")
         println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
-        assertThat(initFromUfvk.error).startsWith("This wallet is watch-only")
+        assertThat(initFromUfvk.ufvk).isEqualTo(ufvk)
+        assertThat(initFromUfvk.birthday).isEqualTo(1)
 
         val exportUfvkJson: String = uniffi.zingo.getUfvk()
         println("\nExport Ufvk:")
         println(exportUfvkJson)
         val exportUfvk: ExportUfvk = mapper.readValue(exportUfvkJson)
-        assertThat(exportUfvk.ufvk).isEqualTo(Ufvk.ABANDON)
+        assertThat(exportUfvk.ufvk).isEqualTo(ufvk)
         assertThat(exportUfvk.birthday).isEqualTo(1)
 
         val addressesJson: String = uniffi.zingo.getAddresses("full")
