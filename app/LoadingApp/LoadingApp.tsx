@@ -497,14 +497,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       // for testing
       //await delay(5000);
 
-      console.log('Load Wallet Exists result', result);
+      //console.log('Load Wallet Exists result', result);
       let error = false;
       let errorText = '';
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
           // here result can have an `error` field for watch-only which is actually OK.
           const resultJson: RPCSeedType = await JSON.parse(result);
-          console.log('Load Wallet Exists result JSON', resultJson);
+          //console.log('Load Wallet Exists result JSON', resultJson);
           if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
             // Load the wallet and navigate to the vts screen
             let readOnly: boolean = false;
@@ -1022,13 +1022,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             );
             return;
           }
-        } catch (e) {
+        } catch (e: any) {
           this.setState({ actionButtonsDisabled: false });
           createAlert(
             this.setBackgroundError,
             this.addLastSnackbar,
             this.state.translate('loadingapp.creatingwallet-label') as string,
-            JSON.stringify(e),
+            e.toString(),
             false,
             this.state.translate,
             sendEmail,
@@ -1224,9 +1224,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             error = true;
             errorText = resultJson.error;
           }
-        } catch (e) {
+        } catch (e: any) {
           error = true;
-          errorText = JSON.stringify(e);
+          errorText = e.toString();
         }
       } else {
         error = true;
