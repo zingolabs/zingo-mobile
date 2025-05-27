@@ -104,7 +104,7 @@ data class Balance (
     val total_orchard_balance : Long,
     val confirmed_orchard_balance : Long,
     val unconfirmed_orchard_balance : Long,
-    val total_transparent_balance
+    val total_transparent_balance : Long,
     val confirmed_transparent_balance : Long,
     val unconfirmed_transparent_balance : Long
 )
