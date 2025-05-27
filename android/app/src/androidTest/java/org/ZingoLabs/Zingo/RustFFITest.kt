@@ -412,7 +412,7 @@ class ExecuteSendFromOrchard {
         println("\nBalance post-send:")
         println(balanceJson)
         val balancePostSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePostSend.orchard_balance).isEqualTo(885000)
+        assertThat(balancePostSend.total_orchard_balance).isEqualTo(885000)
         // the transparent funds are unconfirmed...
         assertThat(balancePostSend.confirmed_transparent_balance).isEqualTo(0)
         assertThat(balancePostSend.unconfirmed_transparent_balance).isEqualTo(100000)
@@ -570,11 +570,9 @@ class ExecuteSaplingBalanceFromSeed {
         println(balanceJson)
         val balance: Balance = mapper.readValue(balanceJson)
 
-        assertThat(balance.orchard_balance).isEqualTo(710000)
-        assertThat(balance.verified_orchard_balance).isEqualTo(710000)
+        assertThat(balance.total_orchard_balance).isEqualTo(710000)
         assertThat(balance.confirmed_orchard_balance).isEqualTo(710000)
-        assertThat(balance.sapling_balance).isEqualTo(125000)
-        assertThat(balance.verified_sapling_balance).isEqualTo(125000)
+        assertThat(balance.total_sapling_balance).isEqualTo(125000)
         assertThat(balance.confirmed_sapling_balance).isEqualTo(125000)
         assertThat(balance.confirmed_transparent_balance).isEqualTo(0)
 
