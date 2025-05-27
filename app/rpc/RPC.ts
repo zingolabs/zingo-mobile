@@ -23,7 +23,6 @@ import { RPCWalletHeight } from './types/RPCWalletHeightType';
 import { RPCSeedType } from './types/RPCSeedType';
 import { RPCSyncStatusType } from './types/RPCSyncStatusType';
 //import { RPCGetOptionType } from './types/RPCGetOptionType';
-import { RPCUfvkType } from './types/RPCUfvkType';
 import { RPCSendType } from './types/RPCSendType';
 import { RPCValueTransfersType } from './types/RPCValueTransfersType';
 import { RPCValueTransfersKindEnum } from './enums/RPCValueTransfersKindEnum';
@@ -229,7 +228,7 @@ export default class RPC {
           console.log('Internal Error ufvk');
           return {} as WalletType;
         }
-        const RPCufvk: WalletType = (await JSON.parse(ufvkStr)) as RPCUfvkType;
+        const RPCufvk: WalletType = await JSON.parse(ufvkStr);
 
         const wallet: WalletType = {} as WalletType;
         if (RPCufvk.birthday) {
@@ -262,8 +261,8 @@ export default class RPC {
         const RPCseed: RPCSeedType = await JSON.parse(seedStr);
 
         const wallet: WalletType = {} as WalletType;
-        if (RPCseed.seed) {
-          wallet.seed = RPCseed.seed;
+        if (RPCseed.seed_phrase) {
+          wallet.seed = RPCseed.seed_phrase;
         }
         if (RPCseed.birthday) {
           wallet.birthday = RPCseed.birthday;
@@ -758,9 +757,9 @@ export default class RPC {
       }
       const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
 
-      const orchardBal: number = balanceJSON.orchard_balance || 0;
-      const privateBal: number = balanceJSON.sapling_balance || 0;
-      const transparentBal: number = balanceJSON.confirmed_transparent_balance + balanceJSON.unconfirmed_transparent_balance || 0;
+      const orchardBal: number = balanceJSON.total_orchard_balance || 0;
+      const privateBal: number = balanceJSON.total_sapling_balance || 0;
+      const transparentBal: number = balanceJSON.total_transparent_balance || 0;
 
       const total = orchardBal + privateBal + transparentBal;
 
@@ -769,8 +768,8 @@ export default class RPC {
         orchardBal: orchardBal / 10 ** 8,
         privateBal: privateBal / 10 ** 8,
         transparentBal: transparentBal / 10 ** 8,
-        spendableOrchard: (balanceJSON.spendable_orchard_balance || 0) / 10 ** 8,
-        spendablePrivate: (balanceJSON.spendable_sapling_balance || 0) / 10 ** 8,
+        spendableOrchard: (balanceJSON.confirmed_orchard_balance || 0) / 10 ** 8,
+        spendablePrivate: (balanceJSON.confirmed_sapling_balance || 0) / 10 ** 8,
         confirmedTransparent: (balanceJSON.confirmed_transparent_balance || 0) / 10 ** 8,
         total: total / 10 ** 8,
       };

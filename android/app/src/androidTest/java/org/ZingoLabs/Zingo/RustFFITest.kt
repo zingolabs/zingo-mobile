@@ -16,13 +16,14 @@ object Ufvk {
 }
 
 data class InitFromSeed (
-    val seed : String,
+    val seed_phrase : String,
     val birthday : Long,
-    val account_index: Long
+    val no_of_accounts: Long
 )
 
 data class InitFromUfvk (
-    val error : String
+    val ufvk : String,
+    val birthday : Long
 )
 
 data class ExportUfvk (
@@ -98,14 +99,13 @@ data class Sync (
 )
 
 data class Balance (
-    val sapling_balance : Long,
-    val verified_sapling_balance : Long,
-    val spendable_sapling_balance : Long,
-    val unverified_sapling_balance : Long,
-    val orchard_balance : Long,
-    val verified_orchard_balance : Long,
-    val spendable_orchard_balance : Long,
-    val unverified_orchard_balance : Long,
+    val total_sapling_balance : Long,
+    val confirmed_sapling_balance : Long,
+    val unconfirmed_sapling_balance : Long,
+    val total_orchard_balance : Long,
+    val confirmed_orchard_balance : Long,
+    val unconfirmed_orchard_balance : Long,
+    val total_transparent_balance : Long,
     val confirmed_transparent_balance : Long,
     val unconfirmed_transparent_balance : Long
 )
@@ -163,7 +163,7 @@ class ExecuteAddressesFromSeed {
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         val addressesJson: String = uniffi.zingo.getAddresses("full")
@@ -197,13 +197,14 @@ class ExecuteAddressesFromUfvk {
         println("\nInit From UFVK:")
         println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
-        assertThat(initFromUfvk.error).startsWith("This wallet is watch-only")
+        assertThat(initFromUfvk.ufvk).isEqualTo(ufvk)
+        assertThat(initFromUfvk.birthday).isEqualTo(1)
 
         val exportUfvkJson: String = uniffi.zingo.getUfvk()
         println("\nExport Ufvk:")
         println(exportUfvkJson)
         val exportUfvk: ExportUfvk = mapper.readValue(exportUfvkJson)
-        assertThat(exportUfvk.ufvk).isEqualTo(Ufvk.ABANDON)
+        assertThat(exportUfvk.ufvk).isEqualTo(ufvk)
         assertThat(exportUfvk.birthday).isEqualTo(1)
 
         val addressesJson: String = uniffi.zingo.getAddresses("full")
@@ -237,7 +238,7 @@ class ExecuteVersionFromSeed {
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         val version: String = uniffi.zingo.getVersion()
@@ -268,7 +269,7 @@ class ExecuteSyncFromSeed {
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         val infoJson: String = uniffi.zingo.infoServer()
@@ -335,7 +336,7 @@ class ExecuteSendFromOrchard {
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         var syncJson: String = uniffi.zingo.runSync()
@@ -367,7 +368,7 @@ class ExecuteSendFromOrchard {
         println("\nBalance pre-send:")
         println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(1000000)
+        assertThat(balancePreSend.confirmed_orchard_balance).isEqualTo(1000000)
         assertThat(balancePreSend.confirmed_transparent_balance).isEqualTo(0)
 
         val addressesJson: String = uniffi.zingo.getAddresses("full")
@@ -413,7 +414,7 @@ class ExecuteSendFromOrchard {
         println("\nBalance post-send:")
         println(balanceJson)
         val balancePostSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePostSend.orchard_balance).isEqualTo(885000)
+        assertThat(balancePostSend.total_orchard_balance).isEqualTo(885000)
         // the transparent funds are unconfirmed...
         assertThat(balancePostSend.confirmed_transparent_balance).isEqualTo(0)
         assertThat(balancePostSend.unconfirmed_transparent_balance).isEqualTo(100000)
@@ -439,7 +440,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         val price: String = uniffi.zingo.zecPrice(tor)
@@ -520,7 +521,7 @@ class ExecuteSaplingBalanceFromSeed {
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         val syncJson:String = uniffi.zingo.runSync()
@@ -571,12 +572,10 @@ class ExecuteSaplingBalanceFromSeed {
         println(balanceJson)
         val balance: Balance = mapper.readValue(balanceJson)
 
-        assertThat(balance.orchard_balance).isEqualTo(710000)
-        assertThat(balance.verified_orchard_balance).isEqualTo(710000)
-        assertThat(balance.spendable_orchard_balance).isEqualTo(710000)
-        assertThat(balance.sapling_balance).isEqualTo(125000)
-        assertThat(balance.verified_sapling_balance).isEqualTo(125000)
-        assertThat(balance.spendable_sapling_balance).isEqualTo(125000)
+        assertThat(balance.total_orchard_balance).isEqualTo(710000)
+        assertThat(balance.confirmed_orchard_balance).isEqualTo(710000)
+        assertThat(balance.total_sapling_balance).isEqualTo(125000)
+        assertThat(balance.confirmed_sapling_balance).isEqualTo(125000)
         assertThat(balance.confirmed_transparent_balance).isEqualTo(0)
 
         // save the wallet file
@@ -616,7 +615,7 @@ class ExecuteParseAddresses {
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        val seedResult = initFromSeed.seed
+        val seedResult = initFromSeed.seed_phrase
         val birthdayResult = initFromSeed.birthday
 
         assertThat(seedResult).isEqualTo(seed)
@@ -657,7 +656,7 @@ class ExecuteParseAddresses {
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        val seedResult = initFromSeed.seed
+        val seedResult = initFromSeed.seed_phrase
         val birthdayResult = initFromSeed.birthday
 
         assertThat(seedResult).isEqualTo(seed)

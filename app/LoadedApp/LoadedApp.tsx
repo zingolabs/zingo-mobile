@@ -91,6 +91,7 @@ import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import MessageList from '../../components/Messages/components/MessageList';
 import { ToastProvider } from 'react-native-toastier';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
+import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -1343,11 +1344,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
           // here result can have an `error` field for watch-only which is actually OK.
-          const resultJson: RPCSeedType = await JSON.parse(result);
-          if (
-            !resultJson.error ||
-            (resultJson.error && resultJson.error.startsWith('This wallet is watch-only') && this.state.readOnly)
-          ) {
+          const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(result);
+          if (!resultJson.error) {
             // Load the wallet and navigate to the ValueTransfers screen
             //console.log(`wallet loaded ok ${value.uri}`);
             if (toast && selectServer !== SelectServerEnum.offline) {
