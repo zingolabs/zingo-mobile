@@ -65,27 +65,6 @@ data class Height (
 	val height : Long
 )
 
-data class ScanRange (
-    val priority : String,
-    val start_block : Long,
-    val end_block : Long
-)
-
-data class SyncStatus (
-  val scan_ranges : List<ScanRange>,
-  val sync_start_height : Long,
-  val session_blocks_scanned : Long,
-  val total_blocks_scanned : Long,
-  val percentage_session_blocks_scanned : Long?,
-  val percentage_total_blocks_scanned : Long,
-  val session_sapling_outputs_scanned : Long,
-  val total_sapling_outputs_scanned : Long,
-  val session_orchard_outputs_scanned : Long,
-  val total_orchard_outputs_scanned : Long,
-  val percentage_session_outputs_scanned : Long?,
-  val percentage_total_outputs_scanned : Long
-)
-
 data class SyncComplete (
     val sync_start_height : Long,
     val sync_end_height : Long,
@@ -97,12 +76,6 @@ data class SyncComplete (
 
 data class SyncPoll (
     val sync_complete : SyncComplete
-)
-
-data class Sync (
-	val result : String,
-    val latest_block : Long,
-    val total_blocks_synced : Long
 )
 
 data class Balance (
@@ -186,7 +159,7 @@ class ExecuteAddressesFromSeed {
         println("\nT Addresses:")
         println(taddressesJson)
         val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
-        assertThat(taddresses[0].receivers.transparent).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
+        assertThat(taddresses[0].encoded_address).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
         assertThat(taddresses[0].scope).isEqualTo("external")
     }
 }
@@ -234,7 +207,7 @@ class ExecuteAddressesFromUfvk {
         println("\nT Addresses:")
         println(taddressesJson)
         val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
-        assertThat(taddresses[0].receivers.transparent).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
+        assertThat(taddresses[0].encoded_address).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
         assertThat(taddresses[0].scope).isEqualTo("external")
     }    
 }
@@ -397,7 +370,7 @@ class ExecuteSendFromOrchard {
         println(taddressesJson)
         val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
 
-        val send = Send(taddresses[0].encoded_address, 100000, null)
+        val send = taddresses[0].encoded_address?.let { Send(it, 100000, null) }
 
         val proposeJson: String = uniffi.zingo.executeCommand("send", mapper.writeValueAsString(listOf(send)))
         println("\nPropose:")
