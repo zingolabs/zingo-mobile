@@ -31,15 +31,22 @@ data class ExportUfvk (
     val birthday : Long
 )
 
-data class Addresses (
-	val address : String,
-	val receivers : Receivers
+data class UnifiedAddress (
+	val account : Long?,
+    val address_index : Long?,
+	val has_orchard : Boolean?,
+    val has_sapling : Boolean?,
+    val has_transparent : Boolean?,
+    val encoded_address : String?,
+    val error : String?,
 )
 
-data class Receivers (
-	val transparent : String,
-	val sapling : String,
-	val orchard_exists : Boolean
+data class TransparentAddress (
+	val account : Long?,
+    val address_index : Long?,
+    val scope : String?,
+	val encoded_address : String?,
+    val error : String?,
 )
 
 data class Info (
@@ -166,14 +173,21 @@ class ExecuteAddressesFromSeed {
         assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val addressesJson: String = uniffi.zingo.getAddresses("full")
+        val addressesJson: String = uniffi.zingo.getUnifiedAddresses()
         println("\nAddresses:")
         println(addressesJson)
-        val addresses: List<Addresses> = mapper.readValue(addressesJson)
-        assertThat(addresses[0].address).isEqualTo("u16sw4v6wy7f4jzdny55yzl020tp3yqg3c85dc6n7mmq0urfm6adqg79hxmyk85ufn4lun4pfh5q48cc3kvxhxm3w978eqqecdd260gkzjrkun6z7m9mcrt2zszaj0mvk6ufux2zteqwh57cq906hz3rkg63duaeqsvjelv9h5srct0zq8rvlv23wz5hed7zuatqd7p6p4ztugc4t4w2g")
-        assertThat(addresses[0].receivers.transparent).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
-        assertThat(addresses[0].receivers.sapling).isEqualTo("zs16uhd4mux24se6wkm74vld0ec63d4dxt3d7m80l5xytreplkkllrrf9c7fj859mhp8tkcq9hxfvj")
-        assertThat(addresses[0].receivers.orchard_exists).isEqualTo(true)
+        val addresses: List<UnifiedAddresses> = mapper.readValue(addressesJson)
+        assertThat(addresses[0].encoded_address).isEqualTo("u16sw4v6wy7f4jzdny55yzl020tp3yqg3c85dc6n7mmq0urfm6adqg79hxmyk85ufn4lun4pfh5q48cc3kvxhxm3w978eqqecdd260gkzjrkun6z7m9mcrt2zszaj0mvk6ufux2zteqwh57cq906hz3rkg63duaeqsvjelv9h5srct0zq8rvlv23wz5hed7zuatqd7p6p4ztugc4t4w2g")
+        assertThat(addresses[0].has_orchard).isEqualTo(true)
+        assertThat(addresses[0].has_sapling).isEqualTo(true)
+        assertThat(addresses[0].has_transparent).isEqualTo(false)
+
+        val taddressesJson: String = uniffi.zingo.getTransparentAddresses()
+        println("\nT Addresses:")
+        println(taddressesJson)
+        val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
+        assertThat(taddresses[0].receivers.transparent).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
+        assertThat(taddresses[0].scope).isEqualTo("external")
     }
 }
 
@@ -207,14 +221,21 @@ class ExecuteAddressesFromUfvk {
         assertThat(exportUfvk.ufvk).isEqualTo(ufvk)
         assertThat(exportUfvk.birthday).isEqualTo(1)
 
-        val addressesJson: String = uniffi.zingo.getAddresses("full")
+        val addressesJson: String = uniffi.zingo.getUnifiedAddresses()
         println("\nAddresses:")
         println(addressesJson)
-        val addresses: List<Addresses> = mapper.readValue(addressesJson)
-        assertThat(addresses[0].address).isEqualTo("u16sw4v6wy7f4jzdny55yzl020tp3yqg3c85dc6n7mmq0urfm6adqg79hxmyk85ufn4lun4pfh5q48cc3kvxhxm3w978eqqecdd260gkzjrkun6z7m9mcrt2zszaj0mvk6ufux2zteqwh57cq906hz3rkg63duaeqsvjelv9h5srct0zq8rvlv23wz5hed7zuatqd7p6p4ztugc4t4w2g")
-        assertThat(addresses[0].receivers.transparent).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
-        assertThat(addresses[0].receivers.sapling).isEqualTo("zs16uhd4mux24se6wkm74vld0ec63d4dxt3d7m80l5xytreplkkllrrf9c7fj859mhp8tkcq9hxfvj")
-        assertThat(addresses[0].receivers.orchard_exists).isEqualTo(true)
+        val addresses: List<UnifiedAddresses> = mapper.readValue(addressesJson)
+        assertThat(addresses[0].encoded_address).isEqualTo("u16sw4v6wy7f4jzdny55yzl020tp3yqg3c85dc6n7mmq0urfm6adqg79hxmyk85ufn4lun4pfh5q48cc3kvxhxm3w978eqqecdd260gkzjrkun6z7m9mcrt2zszaj0mvk6ufux2zteqwh57cq906hz3rkg63duaeqsvjelv9h5srct0zq8rvlv23wz5hed7zuatqd7p6p4ztugc4t4w2g")
+        assertThat(addresses[0].has_orchard).isEqualTo(true)
+        assertThat(addresses[0].has_sapling).isEqualTo(true)
+        assertThat(addresses[0].has_transparent).isEqualTo(false)
+
+        val taddressesJson: String = uniffi.zingo.getTransparentAddresses()
+        println("\nT Addresses:")
+        println(taddressesJson)
+        val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
+        assertThat(taddresses[0].receivers.transparent).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
+        assertThat(taddresses[0].scope).isEqualTo("external")
     }    
 }
 
@@ -371,12 +392,12 @@ class ExecuteSendFromOrchard {
         assertThat(balancePreSend.confirmed_orchard_balance).isEqualTo(1000000)
         assertThat(balancePreSend.confirmed_transparent_balance).isEqualTo(0)
 
-        val addressesJson: String = uniffi.zingo.getAddresses("full")
-        println("\nAddresses:")
-        println(addressesJson)
-        val addresses: List<Addresses> = mapper.readValue(addressesJson)
+        val taddressesJson: String = uniffi.zingo.getTransparentAddresses()
+        println("\nT Addresses:")
+        println(taddressesJson)
+        val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
 
-        val send = Send(addresses[0].receivers.transparent, 100000, null)
+        val send = Send(taddresses[0].encoded_address, 100000, null)
 
         val proposeJson: String = uniffi.zingo.executeCommand("send", mapper.writeValueAsString(listOf(send)))
         println("\nPropose:")
