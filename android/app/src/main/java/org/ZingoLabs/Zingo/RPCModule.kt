@@ -974,27 +974,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun getAddressesInfo(receivers: String, promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getAddresses(receivers)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: addresses: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
-    }
-
-    @ReactMethod
     fun getTotalMemobytesToAddressInfo(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -1195,6 +1174,90 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: tor client: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getUnifiedAddressesInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getUnifiedAddresses()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: unified addresses: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getTransparentAddressesInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getTransparentAddresses()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: transparent addresses: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun createNewUnifiedAddressProcess(receivers: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.createNewUnifiedAddress(receivers)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: create new unified address: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun createNewTransparentAddressProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.createNewTransparentAddress()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: create new transparent address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
