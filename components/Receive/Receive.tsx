@@ -83,9 +83,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   ) => ReactNode = ({ route }) => {
     switch (route.key) {
       case 'uaddr': {
-        let uAddress = new UnifiedAddressClass(0, translate('receive.noaddress') as string, AddressKindEnum.u, false, false, false) as UnifiedAddressClass & TransparentAddressClass;
+        let uAddress = new UnifiedAddressClass(0, translate('receive.noaddress') as string, AddressKindEnum.u, false, false, false);
         if (uAddrIndex !== null) {
-          uAddress = uAddr[uAddrIndex] as UnifiedAddressClass & TransparentAddressClass;
+          uAddress = uAddr[uAddrIndex];
         }
 
         return (
@@ -114,9 +114,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         );
       }
       case 'taddr': {
-        let tAddress = new TransparentAddressClass(0, translate('receive.noaddress') as string, AddressKindEnum.t, RPCAddressScopeEnum.external) as UnifiedAddressClass & TransparentAddressClass;
+        let tAddress = new TransparentAddressClass(0, translate('receive.noaddress') as string, AddressKindEnum.t, RPCAddressScopeEnum.external);
         if (tAddrIndex !== null) {
-          tAddress = tAddr[tAddrIndex] as UnifiedAddressClass & TransparentAddressClass;
+          tAddress = tAddr[tAddrIndex];
         }
 
         return (

@@ -16,17 +16,17 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { ModeEnum, SecurityType, SnackbarDurationEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
+import { AddressKindEnum, ModeEnum, SecurityType, SnackbarDurationEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
 import RegText from './RegText';
 import FadeText from './FadeText';
 
 type SingleAddressProps = {
-  address: UnifiedAddressClass & TransparentAddressClass;
+  address?: UnifiedAddressClass | TransparentAddressClass;
+  ufvk?: string;
   index: number;
   total: number;
   prev: () => void;
   next: () => void;
-  ufvk?: boolean;
   setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 
@@ -61,7 +61,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
   }, [total]);
 
   const doCopy = () => {
-    Clipboard.setString(address.address);
+    Clipboard.setString(ufvk ? ufvk : address ? address.address : '');
     addLastSnackbar({
       message: translate('history.addresscopied') as string,
       duration: SnackbarDurationEnum.short,
@@ -123,7 +123,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
         contentContainerStyle={{
           alignItems: 'center',
         }}>
-        {!!address.address && address.address !== (translate('receive.noaddress') as string) ? (
+        {(ufvk || (address && address.address !== (translate('receive.noaddress') as string))) ? (
           <>
             <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.text }}>
               <TouchableOpacity
@@ -141,7 +141,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                     {expandQRAddress ? (
                       <ViewShot ref={qrCodeRef} options={{ format: 'png', quality: 1 }}>
                         <QRCode
-                          value={address.address}
+                          value={ufvk}
                           size={200}
                           ecl="L"
                           backgroundColor={colors.text}
@@ -177,7 +177,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                 ) : (
                   <ViewShot ref={qrCodeRef} options={{ format: 'png', quality: 1 }}>
                     <QRCode
-                      value={address.address}
+                      value={address ? address.address : ''}
                       size={200}
                       ecl="L"
                       backgroundColor={colors.text}
@@ -216,7 +216,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                 </View>
               )}
               <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 10, marginBottom: 5 }}>
-                {mode === ModeEnum.advanced && (
+                {mode === ModeEnum.advanced && address && address.addressKind === AddressKindEnum.u && (
                   <View
                     style={{
                       flexDirection: 'row',
@@ -246,11 +246,11 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                           opacity: 0.9,
                           marginRight: 5,
                         }}>
-                        {(address.has_orchard  === true && address.has_sapling === false
+                        {(address && address.has_orchard  === true && address.has_sapling === false
                           ? translate('receive.shielded-orchard')
-                          : address.has_orchard === true && address.has_sapling === true
+                          : address && address.has_orchard === true && address.has_sapling === true
                           ? translate('receive.shielded-orchard-sapling')
-                          : address.has_orchard === false && address.has_sapling === true
+                          : address && address.has_orchard === false && address.has_sapling === true
                           ? translate('receive.shielded-sapling')
                           : '') as string}
                       </FadeText>
@@ -322,7 +322,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                   justifyContent: 'center',
                   marginBottom: 30,
                 }}>
-                <AddressItem address={address.address} />
+                <AddressItem address={address ? address.address : ''} />
               </View>
             </TouchableOpacity>
           </>
@@ -335,7 +335,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
               marginTop: 50,
               marginBottom: 30,
             }}>
-            <RegText>{address.address}</RegText>
+            <RegText>{address ? address.address : ''}</RegText>
           </View>
         )}
       </ScrollView>
