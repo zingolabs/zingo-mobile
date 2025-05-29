@@ -448,7 +448,8 @@
     "birthday-acc": "Поле для даты создания",
     "tapreveal": "Нажмите для показа",
     "showtransactions": "Показать транзакции",
-    "youreceived": "Получено"
+    "youreceived": "Получено",
+    "tapcopy-ufvk-message": "Просмотр ключа скопирован в буфер обмена"
   },
   "send": {
     "Broadcast": "Успешная отправка, Tx:",

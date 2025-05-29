@@ -58,12 +58,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       // 2. T
       const uAdd =
         addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.u) || [];
+        // we are filtering only the `external` addresses... for now.
       const tAdd =
-        addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.t) || [];
+        addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.t && a.scope === RPCAddressScopeEnum.external) || [];
       setUAddr(uAdd as UnifiedAddressClass[]);
       setTAddr(tAdd as TransparentAddressClass[]);
-      setUAddrIndex(uAdd.length - 1);
-      setTAddrIndex(tAdd.length - 1);
+      setUAddrIndex(uAdd.length > 0 ? uAdd.length - 1 : 0);
+      setTAddrIndex(tAdd.length > 0 ? tAdd.length - 1 : 0);
     }
   }, [addresses]);
 
@@ -84,7 +85,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     switch (route.key) {
       case 'uaddr': {
         let uAddress = new UnifiedAddressClass(0, translate('receive.noaddress') as string, AddressKindEnum.u, false, false, false);
-        if (uAddrIndex !== null) {
+        if (uAddrIndex !== null && uAddr.length > 0) {
           uAddress = uAddr[uAddrIndex];
         }
 
@@ -115,7 +116,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       }
       case 'taddr': {
         let tAddress = new TransparentAddressClass(0, translate('receive.noaddress') as string, AddressKindEnum.t, RPCAddressScopeEnum.external);
-        if (tAddrIndex !== null) {
+        if (tAddrIndex !== null && tAddr.length > 0) {
           tAddress = tAddr[tAddrIndex];
         }
 
@@ -168,11 +169,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         </RegText>
         {route.key === 'uaddr' && mode === ModeEnum.basic && (
           <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. zingo)</RegText>
-        )}
-        {route.key === 'zaddr' && mode === ModeEnum.basic && (
-          <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>
-            (e.g. ledger, old wallets)
-          </RegText>
         )}
         {route.key === 'taddr' && mode === ModeEnum.basic && (
           <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. coinbase, gemini)</RegText>
@@ -227,7 +223,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     />
   );
 
-  //console.log('render Receive - 4');
+  //console.log('render Receive - 4', uAddr, uAddrIndex, tAddr, tAddrIndex, defaultUnifiedAddress);
 
   return returnPage;
 };

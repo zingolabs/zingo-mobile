@@ -61,9 +61,9 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
   }, [total]);
 
   const doCopy = () => {
-    Clipboard.setString(ufvk ? ufvk : address ? address.address : '');
+    Clipboard.setString(ufvk ? ufvk : (address ? address.address : ''));
     addLastSnackbar({
-      message: translate('history.addresscopied') as string,
+      message: ufvk ? (translate('seed.tapcopy-ufvk-message') as string) : (translate('history.addresscopied') as string),
       duration: SnackbarDurationEnum.short,
     });
   };
@@ -259,16 +259,16 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                   </View>
                 )}
                 <TouchableOpacity onPress={doCopy}>
-                <View
-                  style={{
-                    backgroundColor: colors.sideMenuBackground,
-                    borderRadius: 30,
-                    borderColor: colors.zingo,
-                    borderWidth: 1,
-                    paddingHorizontal: 5,
-                    paddingVertical: 5,
-                    marginHorizontal: 10,
-                  }}>
+                  <View
+                    style={{
+                      backgroundColor: colors.sideMenuBackground,
+                      borderRadius: 30,
+                      borderColor: colors.zingo,
+                      borderWidth: 1,
+                      paddingHorizontal: 5,
+                      paddingVertical: 5,
+                      marginHorizontal: 10,
+                    }}>
                     <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faCopy} color={colors.money} />
                   </View>
                 </TouchableOpacity>
@@ -311,20 +311,15 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                 </View>
               )}
             </View>
-            <TouchableOpacity
-              onPress={() => {
-                doCopy();
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                marginBottom: 30,
               }}>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  marginBottom: 30,
-                }}>
-                <AddressItem address={address ? address.address : ''} />
-              </View>
-            </TouchableOpacity>
+              <AddressItem ufvk={!!ufvk} address={ufvk ? ufvk : (address ? address.address : '')} />
+            </View>
           </>
         ) : (
           <View
@@ -335,7 +330,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
               marginTop: 50,
               marginBottom: 30,
             }}>
-            <RegText>{address ? address.address : ''}</RegText>
+            <RegText>{ufvk ? ufvk : (address ? address.address : '')}</RegText>
           </View>
         )}
       </ScrollView>

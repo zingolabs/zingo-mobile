@@ -293,46 +293,21 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
         </View>
       </View>
       <View
-        accessibilityState={
-          {
-            "busy": undefined,
-            "checked": undefined,
-            "disabled": undefined,
-            "expanded": undefined,
-            "selected": undefined,
-          }
-        }
-        accessibilityValue={
-          {
-            "max": undefined,
-            "min": undefined,
-            "now": undefined,
-            "text": undefined,
-          }
-        }
-        accessible={true}
-        collapsable={false}
-        focusable={true}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
         style={
           {
-            "opacity": 1,
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "marginBottom": 30,
           }
         }
       >
         <View
           style={
             {
+              "alignItems": "flex-start",
               "display": "flex",
               "flexDirection": "row",
-              "justifyContent": "center",
-              "marginBottom": 30,
             }
           }
         >
@@ -341,76 +316,66 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               {
                 "alignItems": "flex-start",
                 "display": "flex",
-                "flexDirection": "row",
+                "flexDirection": "column",
+                "marginRight": 10,
               }
             }
           >
             <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "alignItems": "flex-start",
-                  "display": "flex",
-                  "flexDirection": "column",
-                  "marginRight": 10,
+                  "opacity": 1,
                 }
               }
             >
               <View
-                accessibilityState={
-                  {
-                    "busy": undefined,
-                    "checked": undefined,
-                    "disabled": undefined,
-                    "expanded": undefined,
-                    "selected": undefined,
-                  }
-                }
-                accessibilityValue={
-                  {
-                    "max": undefined,
-                    "min": undefined,
-                    "now": undefined,
-                    "text": undefined,
-                  }
-                }
-                accessible={true}
-                collapsable={false}
-                focusable={true}
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
                 style={
                   {
-                    "opacity": 1,
+                    "display": "flex",
+                    "flexDirection": "column",
+                    "flexWrap": "wrap",
                   }
                 }
               >
-                <View
+                <Text
                   style={
                     {
-                      "display": "flex",
-                      "flexDirection": "column",
-                      "flexWrap": "wrap",
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
                     }
                   }
                 >
-                  <Text
-                    style={
-                      {
-                        "color": "#c3c3c3",
-                        "fontSize": 18,
-                        "fontWeight": "600",
-                        "opacity": 1,
-                      }
-                    }
-                  >
-                    UA-orch...4567890
-                  </Text>
-                </View>
+                  UA-orch...4567890
+                </Text>
               </View>
             </View>
           </View>
@@ -657,46 +622,21 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
         </View>
       </View>
       <View
-        accessibilityState={
-          {
-            "busy": undefined,
-            "checked": undefined,
-            "disabled": undefined,
-            "expanded": undefined,
-            "selected": undefined,
-          }
-        }
-        accessibilityValue={
-          {
-            "max": undefined,
-            "min": undefined,
-            "now": undefined,
-            "text": undefined,
-          }
-        }
-        accessible={true}
-        collapsable={false}
-        focusable={true}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
         style={
           {
-            "opacity": 1,
+            "display": "flex",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "marginBottom": 30,
           }
         }
       >
         <View
           style={
             {
+              "alignItems": "flex-start",
               "display": "flex",
               "flexDirection": "row",
-              "justifyContent": "center",
-              "marginBottom": 30,
             }
           }
         >
@@ -705,76 +645,66 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
               {
                 "alignItems": "flex-start",
                 "display": "flex",
-                "flexDirection": "row",
+                "flexDirection": "column",
+                "marginRight": 10,
               }
             }
           >
             <View
+              accessibilityState={
+                {
+                  "busy": undefined,
+                  "checked": undefined,
+                  "disabled": undefined,
+                  "expanded": undefined,
+                  "selected": undefined,
+                }
+              }
+              accessibilityValue={
+                {
+                  "max": undefined,
+                  "min": undefined,
+                  "now": undefined,
+                  "text": undefined,
+                }
+              }
+              accessible={true}
+              collapsable={false}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
               style={
                 {
-                  "alignItems": "flex-start",
-                  "display": "flex",
-                  "flexDirection": "column",
-                  "marginRight": 10,
+                  "opacity": 1,
                 }
               }
             >
               <View
-                accessibilityState={
-                  {
-                    "busy": undefined,
-                    "checked": undefined,
-                    "disabled": undefined,
-                    "expanded": undefined,
-                    "selected": undefined,
-                  }
-                }
-                accessibilityValue={
-                  {
-                    "max": undefined,
-                    "min": undefined,
-                    "now": undefined,
-                    "text": undefined,
-                  }
-                }
-                accessible={true}
-                collapsable={false}
-                focusable={true}
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
                 style={
                   {
-                    "opacity": 1,
+                    "display": "flex",
+                    "flexDirection": "column",
+                    "flexWrap": "wrap",
                   }
                 }
               >
-                <View
+                <Text
                   style={
                     {
-                      "display": "flex",
-                      "flexDirection": "column",
-                      "flexWrap": "wrap",
+                      "color": "#c3c3c3",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "opacity": 1,
                     }
                   }
                 >
-                  <Text
-                    style={
-                      {
-                        "color": "#c3c3c3",
-                        "fontSize": 18,
-                        "fontWeight": "600",
-                        "opacity": 1,
-                      }
-                    }
-                  >
-                    Unknown
-                  </Text>
-                </View>
+                  uview12...4567890
+                </Text>
               </View>
             </View>
           </View>

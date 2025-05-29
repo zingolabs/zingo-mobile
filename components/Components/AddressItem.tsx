@@ -30,6 +30,7 @@ type AddressItemProps = {
   withIcon?: boolean;
   withSendIcon?: boolean;
   addressProtected?: boolean;
+  ufvk?: boolean;
 };
 
 const AddressItem: React.FunctionComponent<AddressItemProps> = ({
@@ -39,6 +40,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   withIcon,
   withSendIcon,
   addressProtected,
+  ufvk,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -124,7 +126,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               if (address && !oneLine && !addressProtected) {
                 Clipboard.setString(address);
                 addLastSnackbar({
-                  message: translate('history.addresscopied') as string,
+                  message: ufvk ? (translate('seed.tapcopy-ufvk-message') as string) : (translate('history.addresscopied') as string),
                   duration: SnackbarDurationEnum.short,
                 });
                 setExpandAddress(true);

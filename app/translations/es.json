@@ -448,7 +448,8 @@
     "birthday-acc": "Campo Cumpleaños",
     "tapreveal": "Pulsar para revelar",
     "showtransactions": "Ver Transacciones",
-    "youreceived": "Recibiste"
+    "youreceived": "Recibiste",
+    "tapcopy-ufvk-message": "Clave de visualización copiada al portapapeles"
   },
   "send": {
     "Broadcast": "Transmitida y esperando confirmación Tx:",

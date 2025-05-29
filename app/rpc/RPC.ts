@@ -330,6 +330,14 @@ export default class RPC {
         resolve();
       }),
     );
+    taskPromises.push(
+      new Promise<void>(async resolve => {
+        //const s = Date.now();
+        await this.fetchAddresses();
+        //console.log('addresses - ', Date.now() - s);
+        resolve();
+      }),
+    );
     // do need this because of the sync process
     taskPromises.push(
       new Promise<void>(async resolve => {
@@ -355,8 +363,6 @@ export default class RPC {
     // takes a while to start
     await this.refreshSync();
 
-    // fetching only once
-    await this.fetchAddresses();
     //await this.fetchWalletSettings();
 
     this.runTaskPromises();

@@ -448,7 +448,8 @@
     "birthday-acc": "Birthday Field",
     "tapreveal": "Tap to reveal",
     "showtransactions": "Show Transactions",
-    "youreceived": "You received"
+    "youreceived": "You received",
+    "tapcopy-ufvk-message": "Viewing Key copied to Clipboard"
   },
   "send": {
     "Broadcast": "Broadcasted and awaiting confirmation Tx:",

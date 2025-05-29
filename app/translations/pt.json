@@ -448,7 +448,8 @@
     "birthday-acc": "Campo de Aniversário",
     "tapreveal": "Toque para revelar",
     "showtransactions": "Mostrar Transações",
-    "youreceived": "Você recebeu"
+    "youreceived": "Você recebeu",
+    "tapcopy-ufvk-message": "Chave de visualização copiada para a área de transferência"
   },
   "send": {
     "Broadcast": "Transmitido e aguardando confirmação Tx:",

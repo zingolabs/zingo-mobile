@@ -990,7 +990,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
     if (addresses.length > 0) {
       // the last Unified Address created.
-      const defaultUA: string = addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.u)[addresses.length - 1].address;
+      const defaultUAArray = addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.u);
+      const defaultUA: string = defaultUAArray[defaultUAArray.length - 1].address;
       if (this.state.defaultUnifiedAddress !== defaultUA) {
         this.setState({ defaultUnifiedAddress: defaultUA });
       }
