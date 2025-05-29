@@ -14,9 +14,10 @@ import {
   ValueTransferType,
   ValueTransferKindEnum,
   AddressBookFileClass,
-  AddressClass,
   SnackbarDurationEnum,
   GlobalConst,
+  UnifiedAddressClass,
+  TransparentAddressClass,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
@@ -60,25 +61,20 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
 
   const contactFound = (add: string) => {
     if (!add) {
-      return { found: false, uOrchardAddress: '' };
+      return {
+        found: false,
+      };
     }
     const contact: AddressBookFileClass[] = addressBook.filter(
-      (ab: AddressBookFileClass) => ab.address === add || ab.uOrchardAddress === add,
+      (ab: AddressBookFileClass) => ab.address === add,
     );
-    let uOrchAdd: string = '';
-    if (contact.length === 1) {
-      uOrchAdd = contact[0].uOrchardAddress || '';
-    } else if (contact.length === 2) {
-      uOrchAdd = contact[0].uOrchardAddress || contact[1].uOrchardAddress || '';
-    }
     return {
       found: contact.length >= 1,
-      uOrchardAddress: uOrchAdd,
     };
   };
 
   const thisWalletAddress: (add: string) => boolean = (add: string) => {
-    const address: AddressClass[] = addresses ? addresses.filter((a: AddressClass) => a.address === add) : [];
+    const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses ? addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.address === add) : [];
     return address.length >= 1;
   };
 
@@ -158,8 +154,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     });
                   }}>
                   {!thisWalletAddress(memoUA) &&
-                    memoUA !== messageAddress &&
-                    memoUA !== contactFound(memoUA).uOrchardAddress && (
+                    memoUA !== messageAddress && (
                       <>
                         <RegText>{GlobalConst.replyTo}</RegText>
                         <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />

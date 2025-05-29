@@ -25,7 +25,6 @@ type TextInputAddressProps = {
   setAddress: (a: string) => void;
   setError: (e: string) => void;
   disabled: boolean;
-  setUOrchardAddress: (a: string) => void;
   setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
@@ -33,7 +32,6 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   setAddress,
   setError,
   disabled,
-  setUOrchardAddress,
   setSecurityOption,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -53,17 +51,12 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
         //console.log(r);
         setValidAddress(r.isValid ? 1 : -1);
         setError(r.isValid ? '' : (translate('send.invalidaddress') as string));
-        // calculate the orchard only UA if the addess is a full UA.
-        // if have value then use it.
-        if (r.onlyOrchardUA) {
-          setUOrchardAddress(r.onlyOrchardUA);
-        }
       });
     } else {
       setValidAddress(0);
       setError('');
     }
-  }, [address, server.chainName, setError, setUOrchardAddress, translate]);
+  }, [address, server.chainName, setError, translate]);
 
   const setQrcodeModalShow = () => {
     if (Platform.OS === GlobalConst.platformOSandroid) {

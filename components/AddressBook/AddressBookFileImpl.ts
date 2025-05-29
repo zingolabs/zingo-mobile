@@ -10,7 +10,6 @@ export default class AddressBookFileImpl {
   static async updateColorItem(
     label: string,
     address: string,
-    uOrchardAddress: string,
     color: string,
   ): Promise<AddressBookFileClass[]> {
     const fileName = await this.getFileName();
@@ -18,17 +17,17 @@ export default class AddressBookFileImpl {
 
     if (
       addressBook.filter(
-        item => item.label === label && item.address === address && item.uOrchardAddress === uOrchardAddress,
+        item => item.label === label && item.address === address,
       ).length === 0
     ) {
       // no exists, do nothing
       return addressBook;
     } else {
       let newAddressBook: AddressBookFileClass[];
-      const newItem: AddressBookFileClass = { label, address, uOrchardAddress, color };
+      const newItem: AddressBookFileClass = { label, address, color };
       newAddressBook = [
         ...addressBook.filter(
-          item => item.label !== label && item.address !== address && item.uOrchardAddress !== uOrchardAddress,
+          item => item.label !== label && item.address !== address,
         ),
         newItem,
       ];
@@ -48,7 +47,6 @@ export default class AddressBookFileImpl {
   static async writeAddressBookItem(
     label: string,
     address: string,
-    uOrchardAddress: string,
     color: string,
   ): Promise<AddressBookFileClass[]> {
     const fileName = await this.getFileName();
@@ -56,7 +54,7 @@ export default class AddressBookFileImpl {
 
     if (
       addressBook.filter(
-        item => item.label === label && item.address === address && item.uOrchardAddress === uOrchardAddress,
+        item => item.label === label && item.address === address,
       ).length > 0
     ) {
       // already exists the combination of label & address & orchard address -> do nothing
@@ -64,7 +62,7 @@ export default class AddressBookFileImpl {
     }
 
     let newAddressBook: AddressBookFileClass[];
-    const newItem: AddressBookFileClass = { label, address, uOrchardAddress, color };
+    const newItem: AddressBookFileClass = { label, address, color };
 
     if (addressBook.filter(item => item.label === label && item.address === address).length > 0) {
       // already exists the label & the address -> update the orchard address

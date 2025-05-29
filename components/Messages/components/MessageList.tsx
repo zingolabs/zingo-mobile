@@ -90,7 +90,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     language,
     addLastSnackbar,
     addressBook,
-    uOrchardAddress,
+    defaultUnifiedAddress,
     selectServer,
     netInfo,
     info,
@@ -120,7 +120,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   const [memoFieldHeight, setMemoFieldHeight] = useState<number>(48 + 30);
   const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
   const [spendable, setSpendable] = useState<number>(0);
-  const [uOrchardAddressContact, setUOrchardAddressContact] = useState<string>('');
   const [memo, setMemo] = useState<string>('');
   const [stillConfirming, setStillConfirming] = useState<boolean>(false);
 
@@ -164,16 +163,14 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         return false;
       }
       const { memoUA } = Utils.splitMemo(memos);
-      // checking address & uOrchardAddress (if any value) as addresses
+      // checking address
       // from the same contact in the Address Book.
       return (
         addr === address ||
-        memoUA === address ||
-        (uOrchardAddressContact && addr === uOrchardAddressContact) ||
-        (uOrchardAddressContact && memoUA === uOrchardAddressContact)
+        memoUA === address
       );
     },
-    [address, uOrchardAddressContact],
+    [address],
   );
 
   const anonymousFilter = useMemo(
@@ -182,7 +179,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         return false;
       }
       const { memoUA } = Utils.splitMemo(memos);
-      // checking address & uOrchardAddress (if any value) as addresses
+      // checking address
       // from the same contact in the Address Book.
       return !addr && !memoUA;
     },
@@ -206,19 +203,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
 
   useEffect(() => {
     if (messages !== null) {
-      // edge case: the user can have the full UA from a contact (and the only orchard UA calculated)
-      // but the user can have the same only orchard UA as another contact as well.
-      // until the user solved this situation, the App can select the messages
-      // separately in one UA (only orchard), and all the messages in the another UA (full)
-      let contact = addressBook.filter((ab: AddressBookFileClass) => ab.address === address);
-      if (contact.length === 1) {
-        setUOrchardAddressContact(contact[0].uOrchardAddress ? contact[0].uOrchardAddress : '');
-      } else {
-        contact = addressBook.filter((ab: AddressBookFileClass) => ab.uOrchardAddress === address);
-        if (contact.length === 1) {
-          setUOrchardAddressContact(contact[0].address);
-        }
-      }
       const vtf = fetchMessagesFiltered;
       setLoadMoreButton(numVt < vtf.length);
       setMessagesFiltered(vtf);
@@ -289,7 +273,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   useEffect(() => {
     if (memo) {
       setMemo(memo);
-      const len = Utils.countMemoBytes(memo, true, uOrchardAddress);
+      const len = Utils.countMemoBytes(memo, true, defaultUnifiedAddress);
       if (len > GlobalConst.memoMaxLength) {
         setValidMemo(-1);
       } else {
@@ -298,7 +282,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     } else {
       setValidMemo(0);
     }
-  }, [memo, uOrchardAddress]);
+  }, [memo, defaultUnifiedAddress]);
 
   const loadMoreClicked = useCallback(() => {
     setNumVt(numVt + 50);
@@ -880,7 +864,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   fontWeight: 'bold',
                   fontSize: 12.5,
                   color: 'red',
-                }}>{`${Utils.countMemoBytes(memo, true, uOrchardAddress)} `}</FadeText>
+                }}>{`${Utils.countMemoBytes(memo, true, defaultUnifiedAddress)} `}</FadeText>
               <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>{translate('loadedapp.of') as string}</FadeText>
               <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
                 {' ' + GlobalConst.memoMaxLength.toString() + ' '}

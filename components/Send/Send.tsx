@@ -118,7 +118,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     language,
     donation,
     addresses,
-    uOrchardAddress,
+    defaultUnifiedAddress,
     shieldingAmount,
     selectServer,
     setZecPrice,
@@ -250,7 +250,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemoPar;
         sendPageStateCalculateFee.toaddr.amount = amountPar;
 
-        sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, uOrchardAddress, server, donation);
+        sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, defaultUnifiedAddress, server, donation);
         console.log('SEND', sendJson);
       }
 
@@ -317,7 +317,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setFee(proposeFee);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [addresses, donation, server, translate, uOrchardAddress, validAddress, validAmount, validMemo],
+    [addresses, donation, server, translate, defaultUnifiedAddress, validAddress, validAmount, validMemo],
   );
 
   const calculateSpendableBalance = useCallback(
@@ -537,7 +537,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     if (memoText || includeUAMemoBoolean) {
-      const len = Utils.countMemoBytes(memoText, includeUAMemoBoolean, uOrchardAddress);
+      const len = Utils.countMemoBytes(memoText, includeUAMemoBoolean, defaultUnifiedAddress);
       if (len > GlobalConst.memoMaxLength) {
         setValidMemo(-1);
       } else {
@@ -586,7 +586,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     spendable,
     fee,
     maxAmount,
-    uOrchardAddress,
+    defaultUnifiedAddress,
   ]);
 
   useEffect(() => {
@@ -1659,7 +1659,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         fontWeight: 'bold',
                         fontSize: 12.5,
                         color: 'red',
-                      }}>{`${Utils.countMemoBytes(memoText, includeUAMemoBoolean, uOrchardAddress)} `}</FadeText>
+                      }}>{`${Utils.countMemoBytes(memoText, includeUAMemoBoolean, defaultUnifiedAddress)} `}</FadeText>
                     <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>{translate('loadedapp.of') as string}</FadeText>
                     <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
                       {' ' + GlobalConst.memoMaxLength.toString() + ' '}

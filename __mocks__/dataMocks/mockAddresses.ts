@@ -1,22 +1,35 @@
-import { AddressClass, AddressKindEnum, ReceiverEnum } from '../../app/AppState';
+import { UnifiedAddressClass, AddressKindEnum, TransparentAddressClass } from '../../app/AppState';
+import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 
-export const mockAddresses: AddressClass[] = [
+export const mockAddresses: (UnifiedAddressClass | TransparentAddressClass)[] = [
   {
-    uOrchardAddress: 'UA-12345678901234567890',
-    address: 'UA-12345678901234567890',
+    index: 0,
+    address: 'UA-orchard-sapling12345678901234567890',
     addressKind: AddressKindEnum.u,
-    receivers: ReceiverEnum.o + ReceiverEnum.z + ReceiverEnum.t,
+    has_orchard: true,
+    has_sapling: true,
+    has_transparent: false,
   },
   {
-    uOrchardAddress: 'UA-12345678901234567890',
-    address: 'sapling-12345678901234567890',
-    addressKind: AddressKindEnum.z,
-    receivers: ReceiverEnum.z,
+    index: 1,
+    address: 'UA-sapling-12345678901234567890',
+    addressKind: AddressKindEnum.u,
+    has_orchard: false,
+    has_sapling: true,
+    has_transparent: false,
   },
   {
-    uOrchardAddress: 'UA-12345678901234567890',
+    index: 2,
+    address: 'UA-orchard-12345678901234567890',
+    addressKind: AddressKindEnum.u,
+    has_orchard: true,
+    has_sapling: false,
+    has_transparent: false,
+  },
+  {
+    index: 0,
     address: 'transparent-12345678901234567890',
     addressKind: AddressKindEnum.t,
-    receivers: ReceiverEnum.t,
+    scope: RPCAddressScopeEnum.external,
   },
 ];

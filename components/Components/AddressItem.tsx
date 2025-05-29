@@ -71,12 +71,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
       .filter((ab: AddressBookFileClass) => ab.address === address)
       .map((ab: AddressBookFileClass) => ab.label)
       .join(' ');
-    if (!cont) {
-      cont = addressBook
-        .filter((ab: AddressBookFileClass) => ab.uOrchardAddress === address)
-        .map((ab: AddressBookFileClass) => ab.label)
-        .join(' ');
-    }
     const numLinesCon = cont ? (cont.length < 20 ? 1 : cont.length / 20) : 0;
     setNumLinesAddress(numLinesAdd);
     setNumLinesContact(numLinesCon);

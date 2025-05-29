@@ -1,4 +1,5 @@
-import AddressClass from './classes/AddressClass';
+import UnifiedAddressClass from './classes/UnifiedAddressClass';
+import TransparentAddressClass from './classes/TransparentAddressClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import SettingsFileClass from './classes/SettingsFileClass';
@@ -22,7 +23,6 @@ import ValueTransferType from './types/ValueTransferType';
 import ContactType from './types/ContactType';
 
 import { CommandEnum } from './enums/CommandEnum';
-import { AddressesReceiversEnum } from './enums/AddressesReceiversEnum';
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
@@ -66,7 +66,8 @@ export {
   AppStateLoading,
   AppContextLoading,
   AppContextLoaded,
-  AddressClass,
+  UnifiedAddressClass,
+  TransparentAddressClass,
   AddressBookFileClass,
   SendPageStateClass,
   SettingsFileClass,
@@ -88,7 +89,6 @@ export {
   ValueTransferType,
   ContactType,
   CommandEnum,
-  AddressesReceiversEnum,
   AddressBookActionEnum,
   MenuItemEnum,
   LanguageEnum,

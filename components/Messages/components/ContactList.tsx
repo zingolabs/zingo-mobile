@@ -23,13 +23,14 @@ import { faAnglesUp, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-
 
 import {
   AddressBookFileClass,
-  AddressClass,
   ContactType,
   FilterEnum,
   RefreshScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
   ServerType,
+  TransparentAddressClass,
+  UnifiedAddressClass,
   ValueTransferType,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
@@ -96,7 +97,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   var lastMonth = '';
 
   const thisWalletAddress: (add: string) => boolean = (add: string) => {
-    const address: AddressClass[] = addresses ? addresses.filter((a: AddressClass) => a.address === add) : [];
+    const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses ? addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.address === add) : [];
     return address.length >= 1;
   };
 
@@ -126,12 +127,11 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             // of the same external wallet/contact.
             const chatsToAdd = [] as ContactType[];
             const isContact = addressBook.filter(
-              (ab: AddressBookFileClass) => ab.address === contactAddress || ab.uOrchardAddress === contactAddress,
+              (ab: AddressBookFileClass) => ab.address === contactAddress,
             );
             if (isContact.length === 0) {
               chatsToAdd.push({
                 address: contactAddress,
-                uOrchardAddress: '',
                 label: '',
                 time: vt.time,
                 memos: vt.memos && vt.memos.length > 0 ? vt.memos : [],
@@ -144,7 +144,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               isContact.forEach((ab: AddressBookFileClass) => {
                 chatsToAdd.push({
                   address: ab.address,
-                  uOrchardAddress: ab.uOrchardAddress ? ab.uOrchardAddress : '',
                   label: ab.label,
                   time: vt.time,
                   memos: vt.memos && vt.memos.length > 0 ? vt.memos : [],
@@ -158,7 +157,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             }
             chatsToAdd.forEach((c: ContactType) => {
               const exists = cont.filter(
-                (ch: ContactType) => ch.address === c.address && ch.uOrchardAddress === c.uOrchardAddress,
+                (ch: ContactType) => ch.address === c.address,
               );
               //console.log(contactAddress, exists);
               let pushAddress = false;
@@ -179,7 +178,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 if (searchText) {
                   if (
                     c.address.toLowerCase().includes(searchText.toLowerCase()) ||
-                    c.uOrchardAddress.toLowerCase().includes(searchText.toLowerCase()) ||
                     c.label.toLowerCase().includes(searchText.toLowerCase())
                   ) {
                     found = true;
@@ -206,7 +204,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         .forEach((ab: AddressBookFileClass) => {
           // must match the two addresses: full UA & only orchard UA.
           const exists = cont.filter(
-            (c: ContactType) => c.address === ab.address && c.uOrchardAddress === ab.uOrchardAddress,
+            (c: ContactType) => c.address === ab.address,
           );
           // ignore contacts with this wallet addresses
           if (exists.length === 0 && !thisWalletAddress(ab.address)) {
@@ -224,7 +222,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             if (found) {
               cont.push({
                 address: ab.address,
-                uOrchardAddress: ab.uOrchardAddress || '',
                 label: ab.label,
                 time: 0,
                 memos: [],

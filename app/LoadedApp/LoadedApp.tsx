@@ -32,7 +32,6 @@ import {
   InfoType,
   ToAddrClass,
   WalletSettingsClass,
-  AddressClass,
   ZecPriceType,
   BackgroundType,
   TranslateType,
@@ -61,6 +60,9 @@ import {
   ValueTransferKindEnum,
   CurrencyNameEnum,
   RefreshScreenEnum,
+  UnifiedAddressClass,
+  TransparentAddressClass,
+  AddressKindEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -92,6 +94,7 @@ import MessageList from '../../components/Messages/components/MessageList';
 import { ToastProvider } from 'react-native-toastier';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
+import AddressBookFileClassObsolete from '../AppState/classes/AddressBookFileClassObsolete';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -285,55 +288,28 @@ export default function LoadedApp(props: LoadedAppProps) {
         translate('zenny-tips-ab') as string,
         zenniesAddress,
         '',
-        '',
       );
       setZenniesDonationAddress(zenniesAddress);
 
-      // reply-to change, from full UA to only orchard UA.
-      // we need to calculate the only orchard UA for all the
-      // contacts with a full UA stored in the Address Book.
-      // We need to identify the old transaction memos (with full UA)
-      // and we need to idenfify the new transaction memos (with only orchard UA)
-
-      // if some contact don't have the new field: `uOrchardAddress` then
-      // the App have to create and calculate it if needed.
-      // same thing with the color of the contact
-      const toUpdate = ab.filter(
-        (a: AddressBookFileClass) => !a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('color'),
+      // now make no sense to have two UA's in the same contact
+      // if `uOrchardAddress` exists then it will be removed.
+      const toUpdate: AddressBookFileClassObsolete[] = ab.filter(
+        // if have orchard address or NOT have color
+        (a: AddressBookFileClassObsolete) => a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('color'),
       );
       console.log('Address Book -> TO UPDATE', toUpdate);
       if (toUpdate.length > 0) {
         const randomColors = Utils.generateColorList(toUpdate.length);
         for (let i = 0; i < toUpdate.length; i++) {
           const a = toUpdate[i];
-          if (!a.hasOwnProperty('uOrchardAddress') && !a.hasOwnProperty('color')) {
-            // both
-            const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
-              a.address,
-              server.chainName,
-            );
-            ab = await AddressBookFileImpl.writeAddressBookItem(
-              a.label,
-              a.address,
-              validAddress.onlyOrchardUA,
-              randomColors[i],
-            );
-          } else if (!a.hasOwnProperty('uOrchardAddress')) {
-            const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
-              a.address,
-              server.chainName,
-            );
-            ab = await AddressBookFileImpl.writeAddressBookItem(
-              a.label,
-              a.address,
-              validAddress.onlyOrchardUA,
-              a.color ? a.color : '',
-            );
-          } else if (!a.hasOwnProperty('color')) {
+          if (a.hasOwnProperty('uOrchardAddress')) {
+            // let's remove it, make no sense now.
+            delete a.uOrchardAddress;
+          }
+          if (!a.hasOwnProperty('color')) {
             ab = await AddressBookFileImpl.updateColorItem(
               a.label,
               a.address,
-              a.uOrchardAddress ? a.uOrchardAddress : '',
               randomColors[i],
             );
           }
@@ -469,7 +445,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       walletSettings: {} as WalletSettingsClass,
       syncingStatus: {} as RPCSyncStatusType,
       wallet: {} as WalletType,
-      uOrchardAddress: '',
+      defaultUnifiedAddress: '',
       zecPrice: {
         zecPrice: 0,
         date: 0,
@@ -1005,7 +981,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setAllAddresses = (addresses: AddressClass[]) => {
+  setAllAddresses = (addresses: (UnifiedAddressClass | TransparentAddressClass)[]) => {
     if (!isEqual(this.state.addresses, addresses)) {
       //console.log('fetch addresses');
       //const start = Date.now();
@@ -1013,11 +989,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       //console.log('=========================================== > ADDRESSES STORED SETSTATE - ', Date.now() - start);
     }
     if (addresses.length > 0) {
-      if (this.state.uOrchardAddress !== addresses[0].uOrchardAddress) {
-        this.setState({ uOrchardAddress: addresses[0].uOrchardAddress });
+      // the last Unified Address created.
+      const defaultUA: string = addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.u)[addresses.length - 1].address;
+      if (this.state.defaultUnifiedAddress !== defaultUA) {
+        this.setState({ defaultUnifiedAddress: defaultUA });
       }
     } else {
-      this.setState({ uOrchardAddress: '' });
+      this.setState({ defaultUnifiedAddress: '' });
     }
   };
 
@@ -1112,8 +1090,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   sendTransaction = async (sendPageState: SendPageStateClass): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
-      const { uOrchardAddress, server, donation } = this.state;
-      const sendJson = await Utils.getSendManyJSON(sendPageState, uOrchardAddress, server, donation);
+      const { server, donation, defaultUnifiedAddress } = this.state;
+      const sendJson = await Utils.getSendManyJSON(sendPageState, defaultUnifiedAddress, server, donation);
       //const start = Date.now();
       const txid = await this.rpc.sendTransaction(sendJson);
       //console.log('&&&&&&&&&&&&&& send tx', Date.now() - start);
@@ -1788,7 +1766,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       syncingStatus: this.state.syncingStatus,
       info: this.state.info,
       zecPrice: this.state.zecPrice,
-      uOrchardAddress: this.state.uOrchardAddress,
+      defaultUnifiedAddress: this.state.defaultUnifiedAddress,
       sendPageState: this.state.sendPageState,
       setSendPageState: this.state.setSendPageState,
       background: this.state.background,

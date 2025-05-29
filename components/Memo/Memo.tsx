@@ -37,7 +37,7 @@ type MemoProps = {
 };
 const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, setMessage }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, uOrchardAddress, snackbars, removeFirstSnackbar } = context;
+  const { translate, language, defaultUnifiedAddress, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -158,10 +158,10 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
                   marginTop: 0,
                   fontWeight: 'bold',
                   color:
-                    Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress) > GlobalConst.memoMaxLength
+                    Utils.countMemoBytes(memo, includeUAMessage, defaultUnifiedAddress) > GlobalConst.memoMaxLength
                       ? 'red'
                       : colors.text,
-                }}>{`${Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress)} `}</FadeText>
+                }}>{`${Utils.countMemoBytes(memo, includeUAMessage, defaultUnifiedAddress)} `}</FadeText>
               <FadeText style={{ marginTop: 0 }}>{translate('loadedapp.of') as string}</FadeText>
               <FadeText style={{ marginTop: 0 }}>{' ' + GlobalConst.memoMaxLength.toString() + ' '}</FadeText>
             </View>
@@ -178,7 +178,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
               type={ButtonTypeEnum.Primary}
               title={translate('save') as string}
               onPress={doSaveAndClose}
-              disabled={Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress) > GlobalConst.memoMaxLength}
+              disabled={Utils.countMemoBytes(memo, includeUAMessage, defaultUnifiedAddress) > GlobalConst.memoMaxLength}
             />
           </View>
         </View>

@@ -1,6 +1,5 @@
 import {
   TotalBalanceClass,
-  AddressClass,
   InfoType,
   SendJsonToTypeType,
   WalletType,
@@ -11,12 +10,13 @@ import {
   //WalletOptionEnum,
   CurrencyNameEnum,
   AddressKindEnum,
-  ReceiverEnum,
   GlobalConst,
   ValueTransferType,
+  UnifiedAddressClass,
+  TransparentAddressClass,
 } from '../AppState';
 import RPCModule from '../RPCModule';
-import { RPCAddressType } from './types/RPCAddressType';
+import { RPCUnifiedAddressType } from './types/RPCUnifiedAddressType';
 import { RPCBalancesType } from './types/RPCBalancesType';
 import { RPCInfoType } from './types/RPCInfoType';
 import { RPCWalletHeight } from './types/RPCWalletHeightType';
@@ -29,17 +29,17 @@ import { RPCValueTransfersKindEnum } from './enums/RPCValueTransfersKindEnum';
 import { RPCValueTransferType } from './types/RPCValueTransferType';
 import { ValueTransferKindEnum } from '../AppState/enums/ValueTransferKindEnum';
 import { RPCValueTransfersStatusEnum } from './enums/RPCValueTransfersStatusEnum';
-import { AddressesReceiversEnum } from '../AppState';
 import { RPCSendProposeType } from './types/RPCSendProposeType';
 import { RPCSyncPollType } from './types/RPCSyncPollType';
 import { RPCZecPrice } from './types/RPCZecPrice';
+import { RPCTransparentAddressType } from './types/RPCTransparentAddressType';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
   fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void;
   fnSetValueTransfersList: (vtList: ValueTransferType[], total: number) => void;
   fnSetMessagesList: (mList: ValueTransferType[], total: number) => void;
-  fnSetAllAddresses: (allAddresses: AddressClass[]) => void;
+  fnSetAllAddresses: (allAddresses: (UnifiedAddressClass | TransparentAddressClass)[]) => void;
   fnSetSyncingStatus: (syncingStatus: RPCSyncStatusType) => void;
   //fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string) => TranslateType;
@@ -76,7 +76,7 @@ export default class RPC {
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
     fnSetValueTransfersList: (vtlist: ValueTransferType[], total: number) => void,
     fnSetMessagesList: (mlist: ValueTransferType[], total: number) => void,
-    fnSetAllAddresses: (addresses: AddressClass[]) => void,
+    fnSetAllAddresses: (addresses: (UnifiedAddressClass | TransparentAddressClass)[]) => void,
     //fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
     fnSetSyncingStatus: (syncingStatus: RPCSyncStatusType) => void,
@@ -794,12 +794,14 @@ export default class RPC {
         return;
       }
       this.fetchAddressesLock = true;
+
+      // UNIFIED
       const start = Date.now();
-      const addressesStr: string = await RPCModule.getAddressesInfo(AddressesReceiversEnum.full);
+      const unifiedAddressesStr: string = await RPCModule.getUnifiedAddressesInfo();
       console.log('=========================================== > addresses full - ', Date.now() - start);
-      if (addressesStr) {
-        if (addressesStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error addresses ${addressesStr}`);
+      if (unifiedAddressesStr) {
+        if (unifiedAddressesStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error addresses ${unifiedAddressesStr}`);
           this.fetchAddressesLock = false;
           return;
         }
@@ -808,14 +810,15 @@ export default class RPC {
         this.fetchAddressesLock = false;
         return;
       }
-      const addressesJSON: RPCAddressType[] = await JSON.parse(addressesStr) || [];
+      const unifiedAddressesJSON: RPCUnifiedAddressType[] = await JSON.parse(unifiedAddressesStr) || [];
 
+      // TRANSPARENT
       const start2 = Date.now();
-      const orchardAddressStr: string = await RPCModule.getAddressesInfo(AddressesReceiversEnum.orchard);
+      const transparentAddressStr: string = await RPCModule.getTransparentAddressesInfo();
       console.log('=========================================== > addresses orchard - ', Date.now() - start2);
-      if (orchardAddressStr) {
-        if (orchardAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error addresses ${orchardAddressStr}`);
+      if (transparentAddressStr) {
+        if (transparentAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error addresses ${transparentAddressStr}`);
           this.fetchAddressesLock = false;
           return;
         }
@@ -824,47 +827,19 @@ export default class RPC {
         this.fetchAddressesLock = false;
         return;
       }
-      const orchardAddressesJSON: RPCAddressType[] = await JSON.parse(orchardAddressStr) || [];
-      const uOrchardAddress: string =
-        orchardAddressesJSON && orchardAddressesJSON.length > 0 ? orchardAddressesJSON[0].address : '';
+      const transparentAddressesJSON: RPCTransparentAddressType[] = await JSON.parse(transparentAddressStr) || [];
 
-      const start3 = Date.now();
-      const orchardSaplingAddressStr: string = await RPCModule.getAddressesInfo(AddressesReceiversEnum.shielded);
-      console.log('=========================================== > addresses shielded - ', Date.now() - start3);
-      if (orchardSaplingAddressStr) {
-        if (orchardSaplingAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error addresses ${orchardSaplingAddressStr}`);
-          this.fetchAddressesLock = false;
-          return;
-        }
-      } else {
-        console.log('Internal Error addresses');
-        this.fetchAddressesLock = false;
-        return;
-      }
-      const orchardSaplingAddressesJSON: RPCAddressType[] = await JSON.parse(orchardSaplingAddressStr) || [];
+      let allAddresses: (UnifiedAddressClass | TransparentAddressClass)[] = [];
 
-      let allAddresses: AddressClass[] = [];
+      unifiedAddressesJSON && unifiedAddressesJSON.forEach((u: RPCUnifiedAddressType) => {
+        const ua: UnifiedAddressClass = new UnifiedAddressClass(u.address_index, u.encoded_address, AddressKindEnum.u, u.has_orchard, u.has_sapling, u.has_transparent);
+        allAddresses.push(ua);
+      });
 
-      (addressesJSON || orchardAddressesJSON) &&
-        [...addressesJSON, ...orchardAddressesJSON, ...orchardSaplingAddressesJSON].forEach((u: RPCAddressType) => {
-          const receivers: string =
-            (u.receivers.orchard_exists ? ReceiverEnum.o : '') +
-            (u.receivers.sapling ? ReceiverEnum.z : '') +
-            (u.receivers.transparent ? ReceiverEnum.t : '');
-          if (u.address && allAddresses.filter((a: AddressClass) => a.address === u.address).length === 0) {
-            const abu = new AddressClass(uOrchardAddress, u.address, AddressKindEnum.u, receivers);
-            allAddresses.push(abu);
-          }
-          if (u.address && u.receivers.sapling && allAddresses.filter((a: AddressClass) => a.address === u.receivers.sapling).length === 0) {
-            const abz = new AddressClass(uOrchardAddress, u.receivers.sapling, AddressKindEnum.z, ReceiverEnum.z);
-            allAddresses.push(abz);
-          }
-          if (u.address && u.receivers.transparent && allAddresses.filter((a: AddressClass) => a.address === u.receivers.transparent).length === 0) {
-            const abt = new AddressClass(uOrchardAddress, u.receivers.transparent, AddressKindEnum.t, ReceiverEnum.t);
-            allAddresses.push(abt);
-          }
-        });
+      transparentAddressesJSON && transparentAddressesJSON.forEach((u: RPCTransparentAddressType) => {
+        const t: TransparentAddressClass = new TransparentAddressClass(u.address_index, u.encoded_address, AddressKindEnum.t, u.scope);
+        allAddresses.push(t);
+      });
 
       //console.log(allAddresses);
 

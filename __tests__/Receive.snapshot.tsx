@@ -18,7 +18,6 @@ describe('Component Receive - test', () => {
   //snapshot test
   test('Receive - snapshot', () => {
     const state = defaultAppContextLoaded;
-    state.uOrchardAddress = mockAddresses[0].uOrchardAddress;
     state.addresses = mockAddresses;
     state.translate = mockTranslate;
     state.info = mockInfo;

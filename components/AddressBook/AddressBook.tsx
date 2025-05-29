@@ -121,7 +121,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
     a: AddressBookActionEnum,
     label: string,
     address: string,
-    uOrchardAddress: string,
     color: string,
   ) => {
     if (!label || !address) {
@@ -134,7 +133,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
       ab = await AddressBookFileImpl.writeAddressBookItem(
         label,
         address,
-        uOrchardAddress,
         color ? color : Utils.generateColorList(1)[0],
       );
     }

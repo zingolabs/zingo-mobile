@@ -1,5 +1,5 @@
 import TotalBalanceClass from './classes/TotalBalanceClass';
-import AddressClass from './classes/AddressClass';
+import UnifiedAddressClass from './classes/UnifiedAddressClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
@@ -24,6 +24,7 @@ import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
 import { HideReturn } from 'react-native-magic-modal';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
+import TransparentAddressClass from './classes/TransparentAddressClass';
 
 export default interface AppContextLoaded {
   navigationHome: DrawerContentComponentProps['navigation'] | null;
@@ -32,9 +33,8 @@ export default interface AppContextLoaded {
   // The total confirmed and pending balance in this wallet
   totalBalance: TotalBalanceClass | null;
 
-  // List of all addresses in the wallet, including change addresses and addresses
-  // that don't have any balance or are unused
-  addresses: AddressClass[] | null;
+  // List of all diversified addresses of the wallet
+  addresses: (UnifiedAddressClass | TransparentAddressClass)[] | null;
 
   // List of all T and Z and O value transfers
   valueTransfers: ValueTransferType[] | null;
@@ -61,7 +61,7 @@ export default interface AppContextLoaded {
   wallet: WalletType;
 
   // active UA in the wallet
-  uOrchardAddress: string;
+  defaultUnifiedAddress: string;
 
   // zec price in USD from internet
   zecPrice: ZecPriceType;

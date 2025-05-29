@@ -33,7 +33,6 @@ type AbSummaryLineProps = {
     action: AddressBookActionEnum,
     label: string,
     address: string,
-    uOrchardAddress: string,
     color: string,
   ) => void;
   addressProtected?: boolean;
@@ -71,7 +70,6 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
               AddressBookActionEnum.Delete,
               item.label,
               item.address,
-              item.uOrchardAddress ? item.uOrchardAddress : '',
               item.color ? item.color : '',
             ),
         },

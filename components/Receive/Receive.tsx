@@ -14,8 +14,8 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import { AddressClass, AddressKindEnum, ModeEnum, ReceiverEnum, SecurityType } from '../../app/AppState';
-import { ShieldedEnum } from '../../app/AppState/enums/ShieldedEnum';
+import { AddressKindEnum, ModeEnum, SecurityType, UnifiedAddressClass, TransparentAddressClass } from '../../app/AppState';
+import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 
 type ReceiveProps = {
   toggleMenuDrawer: () => void;
@@ -34,18 +34,17 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   setSecurityOption,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addresses, uOrchardAddress, mode, language } = context;
+  const { translate, addresses, defaultUnifiedAddress, mode, language } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [index, setIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
 
-  const [uOrcharSaplingdAddr, setUOrcharSaplingdAddr] = useState<AddressClass>({} as AddressClass);
-  const [uOrchardAddr, setUOrchardAddr] = useState<AddressClass>({} as AddressClass);
-  const [zAddr, setZAddr] = useState<AddressClass>({} as AddressClass);
-  const [tAddr, setTAddr] = useState<AddressClass>({} as AddressClass);
-  const [shielded, setShielded] = useState<ShieldedEnum>(ShieldedEnum.uOrchard);
+  const [uAddr, setUAddr] = useState<UnifiedAddressClass[]>([]);
+  const [tAddr, setTAddr] = useState<TransparentAddressClass[]>([]);
+  const [uAddrIndex, setUAddrIndex] = useState<number | null>(null);
+  const [tAddrIndex, setTAddrIndex] = useState<number | null>(null);
 
   const dimensions = {
     width: Dimensions.get('window').width,
@@ -54,35 +53,24 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   useEffect(() => {
     if (addresses && addresses.length > 0) {
-      // we offering now three options for Shielded:
-      // 1. orchard UA
-      // 2. orchard+sapling UA
-      // 3. z-sapling
-      const uOrchardSaplingAdd =
-        addresses.filter(
-          a =>
-            a.addressKind === AddressKindEnum.u &&
-            a.receivers.length === 2 &&
-            a.receivers.includes(ReceiverEnum.o) &&
-            a.receivers.includes(ReceiverEnum.z),
-        ) || [];
-      const uOrchardAdd =
-        addresses.filter(
-          a => a.addressKind === AddressKindEnum.u && a.receivers.length === 1 && a.receivers === ReceiverEnum.o,
-        ) || [];
-      const zAdd = addresses.filter(a => a.addressKind === AddressKindEnum.z) || [];
-      const tAdd = addresses.filter(a => a.addressKind === AddressKindEnum.t) || [];
-      setUOrcharSaplingdAddr(uOrchardSaplingAdd[0]);
-      setUOrchardAddr(uOrchardAdd[0]);
-      setZAddr(zAdd[0]);
-      setTAddr(tAdd[0]);
+      // we offering now two types:
+      // 1. UA
+      // 2. T
+      const uAdd =
+        addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.u) || [];
+      const tAdd =
+        addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.t) || [];
+      setUAddr(uAdd as UnifiedAddressClass[]);
+      setTAddr(tAdd as TransparentAddressClass[]);
+      setUAddrIndex(uAdd.length - 1);
+      setTAddrIndex(tAdd.length - 1);
     }
   }, [addresses]);
 
   useEffect(() => {
-    const basicModeRoutes = [{ key: 'uorchardaddr', title: translate('receive.u-title') as string }];
+    const basicModeRoutes = [{ key: 'uaddr', title: translate('receive.u-title') as string }];
     const advancedModeRoutes = [
-      { key: 'uorchardaddr', title: translate('receive.u-title') as string },
+      { key: 'uaddr', title: translate('receive.u-title') as string },
       { key: 'taddr', title: translate('receive.t-title') as string },
     ];
     setRoutes(mode === ModeEnum.basic ? basicModeRoutes : advancedModeRoutes);
@@ -94,47 +82,66 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     },
   ) => ReactNode = ({ route }) => {
     switch (route.key) {
-      case 'uorchardaddr': {
-        let uOrchardSapling = translate('receive.noaddress') as string;
-        if (uOrcharSaplingdAddr) {
-          uOrchardSapling = uOrcharSaplingdAddr.address;
-        }
-        let uOrchard = translate('receive.noaddress') as string;
-        if (uOrchardAddr) {
-          uOrchard = uOrchardAddr.address;
-        }
-        let sapling = translate('receive.noaddress') as string;
-        if (zAddr) {
-          sapling = zAddr.address;
+      case 'uaddr': {
+        let uAddress = new UnifiedAddressClass(0, translate('receive.noaddress') as string, AddressKindEnum.u, false, false, false) as UnifiedAddressClass & TransparentAddressClass;
+        if (uAddrIndex !== null) {
+          uAddress = uAddr[uAddrIndex] as UnifiedAddressClass & TransparentAddressClass;
         }
 
         return (
           <>
-            {!!addresses && !!uOrchardAddress && (
+            {!!addresses && !!defaultUnifiedAddress && (
               <>
-                {shielded === ShieldedEnum.uOrchardSapling && (
-                  <SingleAddress setShielded={setShielded} shielded={shielded} address={uOrchardSapling} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
-                )}
-                {shielded === ShieldedEnum.uOrchard && (
-                  <SingleAddress setShielded={setShielded} shielded={shielded} address={uOrchard} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
-                )}
-                {shielded === ShieldedEnum.sapling && (
-                  <SingleAddress setShielded={setShielded} shielded={shielded} address={sapling} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
-                )}
+                <SingleAddress
+                  address={uAddress}
+                  index={uAddrIndex ? uAddrIndex : 0}
+                  total={uAddr.length}
+                  prev={() => {
+                    if (uAddrIndex !== null && uAddrIndex > 0) {
+                      setUAddrIndex(uAddrIndex - 1);
+                    }
+                  }}
+                  next={() => {
+                    if (uAddrIndex !== null && uAddrIndex < uAddr.length - 1) {
+                      setUAddrIndex(uAddrIndex + 1);
+                    }
+                  }}
+                  setSecurityOption={setSecurityOption}
+                />
               </>
             )}
           </>
         );
       }
       case 'taddr': {
-        let taddr = translate('receive.noaddress') as string;
-        if (tAddr) {
-          taddr = tAddr.address;
+        let tAddress = new TransparentAddressClass(0, translate('receive.noaddress') as string, AddressKindEnum.t, RPCAddressScopeEnum.external) as UnifiedAddressClass & TransparentAddressClass;
+        if (tAddrIndex !== null) {
+          tAddress = tAddr[tAddrIndex] as UnifiedAddressClass & TransparentAddressClass;
         }
 
         return (
-          !!addresses &&
-          !!uOrchardAddress && <SingleAddress address={taddr} index={0} total={1} prev={() => {}} next={() => {}} setSecurityOption={setSecurityOption} />
+          <>
+            {!!addresses && !!defaultUnifiedAddress && (
+              <>
+                <SingleAddress
+                  address={tAddress}
+                  index={tAddrIndex ? tAddrIndex : 0}
+                  total={tAddr.length}
+                  prev={() => {
+                    if (tAddrIndex !== null && tAddrIndex > 0) {
+                      setTAddrIndex(tAddrIndex - 1);
+                    }
+                  }}
+                  next={() => {
+                    if (tAddrIndex !== null && tAddrIndex < tAddr.length - 1) {
+                      setTAddrIndex(tAddrIndex + 1);
+                    }
+                  }}
+                  setSecurityOption={setSecurityOption}
+                />
+              </>
+            )}
+          </>
         );
       }
     }

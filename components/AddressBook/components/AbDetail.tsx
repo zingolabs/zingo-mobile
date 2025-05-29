@@ -8,7 +8,6 @@ import {
   AddressBookFileClass,
   ButtonTypeEnum,
   GlobalConst,
-  ModeEnum,
   SecurityType,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
@@ -32,7 +31,6 @@ type AbDetailProps = {
     action: AddressBookActionEnum,
     label: string,
     address: string,
-    uOrchardAddress: string,
     color: string,
   ) => void;
   addressBookCurrentAddress?: string;
@@ -48,13 +46,12 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   setSecurityOption,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, addLastSnackbar, addressBook, language, mode } = context;
+  const { translate, server, addLastSnackbar, addressBook, language } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [label, setLabel] = useState<string>(item.label);
   const [address, setAddress] = useState<string>(item.address);
-  const [uOrchardAddress, setUOrchardAddress] = useState<string>(item.uOrchardAddress ? item.uOrchardAddress : '');
   const [action, setAction] = useState<AddressBookActionEnum>(actionProp);
   const [error, setError] = useState<string>('');
   const [errorAddress, setErrorAddress] = useState<string>('');
@@ -91,7 +88,6 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         if (
           item.label === label &&
           item.address === address &&
-          item.uOrchardAddress === uOrchardAddress &&
           action === AddressBookActionEnum.Modify
         ) {
           setError(translate('addressbook.nochanges') as string);
@@ -107,16 +103,13 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
     error,
     item.address,
     item.label,
-    item.uOrchardAddress,
     label,
     translate,
-    uOrchardAddress,
   ]);
 
   const updateAddress = async (addr: string) => {
     if (!addr) {
       setAddress('');
-      setUOrchardAddress('');
       return;
     }
     let newAddress: string = addr;
@@ -193,14 +186,8 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         setAddress={updateAddress}
         setError={setErrorAddress}
         disabled={action === AddressBookActionEnum.Delete}
-        setUOrchardAddress={setUOrchardAddress}
         setSecurityOption={setSecurityOption}
       />
-      {mode === ModeEnum.advanced && uOrchardAddress && (
-        <FadeText style={{ marginLeft: 10, marginTop: 0, color: colors.primary }}>
-          {translate('addressbook.uorchardaddress') + uOrchardAddress}
-        </FadeText>
-      )}
       {(!!error || !!errorAddress) && (
         <View
           style={{
@@ -226,7 +213,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
           type={ButtonTypeEnum.Primary}
           title={translate(`addressbook.${action.toLowerCase()}`) as string}
           onPress={() => {
-            doAction(action, label.trim(), address, uOrchardAddress, item.color ? item.color : '');
+            doAction(action, label.trim(), address, item.color ? item.color : '');
             Keyboard.dismiss();
           }}
           disabled={

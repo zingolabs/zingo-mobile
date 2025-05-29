@@ -15,10 +15,11 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import RegText from '../Components/RegText';
-import { ButtonTypeEnum, ChainNameEnum, ModeEnum, SecurityType, UfvkActionEnum } from '../../app/AppState';
+import { AddressKindEnum, ButtonTypeEnum, ChainNameEnum, ModeEnum, SecurityType, TransparentAddressClass, UfvkActionEnum, UnifiedAddressClass } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 
 type TextsType = {
   new: string[];
@@ -139,7 +140,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
 
           <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
             {!!wallet.ufvk && (
-              <SingleAddress address={wallet.ufvk} ufvk={true} index={0} total={1} prev={() => null} next={() => null} setSecurityOption={setSecurityOption} />
+              <SingleAddress address={new TransparentAddressClass(0, wallet.ufvk, AddressKindEnum.t, RPCAddressScopeEnum.external) as UnifiedAddressClass & TransparentAddressClass} ufvk={true} index={0} total={1} prev={() => null} next={() => null} setSecurityOption={setSecurityOption} />
             )}
             {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}
           </View>

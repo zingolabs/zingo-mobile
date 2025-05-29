@@ -13,7 +13,6 @@ import { useTheme } from '@react-navigation/native';
 
 import {
   AddressBookFileClass,
-  AddressClass,
   ChainNameEnum,
   SnackbarDurationEnum,
   ValueTransferType,
@@ -23,6 +22,8 @@ import {
   SelectServerEnum,
   RouteEnums,
   TransactionActionEnum,
+  UnifiedAddressClass,
+  TransparentAddressClass,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
@@ -150,13 +151,13 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       return false;
     }
     const contact: AddressBookFileClass[] = addressBook.filter(
-      (ab: AddressBookFileClass) => ab.address === add || ab.uOrchardAddress === add,
+      (ab: AddressBookFileClass) => ab.address === add,
     );
     return contact.length >= 1;
   };
 
   const thisWalletAddress: (add: string) => boolean = (add: string) => {
-    const address: AddressClass[] = addresses ? addresses.filter((a: AddressClass) => a.address === add) : [];
+    const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses ? addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.address === add) : [];
     return address.length >= 1;
   };
 
