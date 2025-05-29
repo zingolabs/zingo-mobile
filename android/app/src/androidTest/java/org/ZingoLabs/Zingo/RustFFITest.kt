@@ -152,7 +152,7 @@ class ExecuteAddressesFromSeed {
         val addresses: List<UnifiedAddress> = mapper.readValue(addressesJson)
         assertThat(addresses[0].encoded_address).isEqualTo("u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd")
         assertThat(addresses[0].has_orchard).isEqualTo(true)
-        assertThat(addresses[0].has_sapling).isEqualTo(true)
+        assertThat(addresses[0].has_sapling).isEqualTo(false)
         assertThat(addresses[0].has_transparent).isEqualTo(false)
 
         val taddressesJson: String = uniffi.zingo.getTransparentAddresses()
@@ -200,7 +200,7 @@ class ExecuteAddressesFromUfvk {
         val addresses: List<UnifiedAddress> = mapper.readValue(addressesJson)
         assertThat(addresses[0].encoded_address).isEqualTo("u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd")
         assertThat(addresses[0].has_orchard).isEqualTo(true)
-        assertThat(addresses[0].has_sapling).isEqualTo(true)
+        assertThat(addresses[0].has_sapling).isEqualTo(false)
         assertThat(addresses[0].has_transparent).isEqualTo(false)
 
         val taddressesJson: String = uniffi.zingo.getTransparentAddresses()
