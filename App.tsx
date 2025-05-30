@@ -52,6 +52,7 @@ const advancedTheme: ThemeType = {
     primary: advancePalette[2],
     primaryDisabled: advancePalette[3],
     secondaryDisabled: advancePalette[5],
+    tertiary: '#033679',
     text: advancePalette[1],
     zingo: advancePalette[8],
     placeholder: advancePalette[8],

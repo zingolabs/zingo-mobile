@@ -40,6 +40,7 @@ jest.mock('react-native', () => {
     getTransparentAddressesInfo: jest.fn(() => '{}'),
     createNewUnifiedAddressProcess: jest.fn(() => '{}'),
     createNewTransparentAddressProcess: jest.fn(() => '{}'),
+    checkMyAddressInfo: jest.fn(() => '{}'),
   };
   RN.View = jest.fn();
 

@@ -185,5 +185,9 @@ RCT_EXTERN_METHOD(createNewUnifiedAddressProcess:
 RCT_EXTERN_METHOD(createNewTransparentAddressProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(checkMyAddressInfo:
+    (NSString)address
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

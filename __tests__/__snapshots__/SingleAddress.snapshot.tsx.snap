@@ -19,6 +19,69 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
       <View
         style={
           {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "marginBottom": 5,
+            "marginTop": 10,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+              "margin": 10,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "center",
+                "paddingHorizontal": 10,
+                "paddingVertical": 5,
+              }
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#040C17",
+                  "fontWeight": "bold",
+                  "marginRight": 5,
+                  "opacity": 0.9,
+                }
+              }
+            />
+            <
+              color="#040C17"
+              icon={
+                {
+                  "icon": [
+                    512,
+                    512,
+                    [],
+                    "f078",
+                    "M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z",
+                  ],
+                  "iconName": "chevron-down",
+                  "prefix": "fas",
+                }
+              }
+              size={15}
+            />
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          {
             "backgroundColor": "#c3c3c3",
             "marginHorizontal": 20,
             "marginTop": 20,
@@ -402,6 +465,17 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
     }
   >
     <View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "marginBottom": 5,
+            "marginTop": 10,
+          }
+        }
+      />
       <View
         style={
           {

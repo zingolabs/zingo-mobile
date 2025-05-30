@@ -333,6 +333,17 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
               <View
                 style={
                   {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                    "marginBottom": 5,
+                    "marginTop": 10,
+                  }
+                }
+              />
+              <View
+                style={
+                  {
                     "backgroundColor": "#c3c3c3",
                     "marginHorizontal": 20,
                     "marginTop": 20,

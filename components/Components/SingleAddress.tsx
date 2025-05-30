@@ -125,6 +125,45 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
         }}>
         {(ufvk || (address && address.address !== (translate('receive.noaddress') as string))) ? (
           <>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 10, marginBottom: 5 }}>
+              {mode === ModeEnum.advanced && address && address.addressKind === AddressKindEnum.u && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: 10,
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                    }}>
+                    <FadeText
+                      numberOfLines={1}
+                      style={{
+                        color: colors.sideMenuBackground,
+                        fontWeight: 'bold',
+                        opacity: 0.9,
+                        marginRight: 5,
+                      }}>
+                      {(address && address.has_orchard  === true && address.has_sapling === false
+                        ? translate('receive.shielded-orchard')
+                        : address && address.has_orchard === true && address.has_sapling === true
+                        ? translate('receive.shielded-orchard-sapling')
+                        : address && address.has_orchard === false && address.has_sapling === true
+                        ? translate('receive.shielded-sapling')
+                        : '') as string}
+                    </FadeText>
+                    <FontAwesomeIcon size={15} icon={faChevronDown} color={colors.sideMenuBackground} />
+                  </View>
+                </View>
+              )}
+            </View>
+
             <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.text }}>
               <TouchableOpacity
                 onPress={() => {

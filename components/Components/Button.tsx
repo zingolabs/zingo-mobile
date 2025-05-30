@@ -46,6 +46,11 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           borderWidth: 2,
           width: twoButtons ? '40%' : '80%',
         }
+      : type === ButtonTypeEnum.Tertiary
+      ? {
+          backgroundColor: colors.tertiary,
+          width: twoButtons ? '40%' : '80%',
+        }
       : {
           // error
           backgroundColor: colors.primary,
