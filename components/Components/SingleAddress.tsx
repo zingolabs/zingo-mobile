@@ -36,6 +36,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   ufvk,
   setSecurityOption,
   newAddressShow,
+  total,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, language, security, mode } = context;
@@ -265,20 +266,22 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faCircleCheck} color={colors.money} />
                       </View>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={doCopy}>
-                      <View
-                        style={{
-                          backgroundColor: colors.sideMenuBackground,
-                          borderRadius: 30,
-                          borderColor: colors.zingo,
-                          borderWidth: 1,
-                          paddingHorizontal: 5,
-                          paddingVertical: 5,
-                          marginHorizontal: 10,
-                        }}>
-                        <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faList} color={colors.money} />
-                      </View>
-                    </TouchableOpacity>
+                    {total > 1 && (
+                      <TouchableOpacity onPress={doCopy}>
+                        <View
+                          style={{
+                            backgroundColor: colors.sideMenuBackground,
+                            borderRadius: 30,
+                            borderColor: colors.zingo,
+                            borderWidth: 1,
+                            paddingHorizontal: 5,
+                            paddingVertical: 5,
+                            marginHorizontal: 10,
+                          }}>
+                          <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faList} color={colors.money} />
+                        </View>
+                      </TouchableOpacity>
+                    )}
                   </>
                 )}
               </View>

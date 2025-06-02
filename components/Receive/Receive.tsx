@@ -53,7 +53,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [indexBottomSheet, setIndexBottomSheet] = useState<number>(-1);
 
-  const snapPoints = useMemo(() => ['40%', '60%'], []);
+  const snapPoints = useMemo(() =>
+    [
+      index === 0 ? '55%' : '40%',
+      '65%',
+      index === 0 ? '95%' : '80%',
+    ], [index]);
 
   const dimensions = {
     width: Dimensions.get('window').width,

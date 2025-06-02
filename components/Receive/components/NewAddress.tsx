@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, TextInput, NativeSyntheticEvent, TouchableOpacity, ScrollView, Keyboard } from 'react-native';
+import { View, TextInput, NativeSyntheticEvent, TouchableOpacity, ScrollView, Keyboard, Platform } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import {
@@ -111,7 +111,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
   };
 
   return (
-    <ScrollView keyboardShouldPersistTaps={'handled'} style={{ backgroundColor: colors.sideMenuBackground }}>
+    <View style={{ backgroundColor: colors.sideMenuBackground }}>
       <TouchableOpacity
         onPress={() => {
           setLabel('');
@@ -222,7 +222,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                       minHeight: 48,
                       maxHeight: 48,
                       marginLeft: 20,
-                      marginTop: 17,
+                      marginTop: Platform.OS === GlobalConst.platformOSandroid ? 17 : 25,
                       backgroundColor: 'transparent',
                     }}>
                     {type === AddressUnifiedTypeEnum.orchard
@@ -273,7 +273,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
           />
         </View>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
