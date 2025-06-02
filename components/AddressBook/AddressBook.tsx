@@ -15,7 +15,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, GlobalConst, SecurityType } from '../../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, GlobalConst } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -35,10 +35,13 @@ import { RPCCheckAddress } from '../../app/rpc/types/RPCCheckAddress';
 
 type AddressBookProps = {
   setAddressBook: (ab: AddressBookFileClass[]) => void;
-  setSecurityOption: (s: SecurityType) => Promise<void>;
+  //setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 
-const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook, setSecurityOption }) => {
+const AddressBook: React.FunctionComponent<AddressBookProps> = ({
+  setAddressBook,
+  //setSecurityOption,
+}) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -325,7 +328,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
             action={action}
             doAction={doAction}
             addressBookCurrentAddress={addressBookCurrentAddress}
-            setSecurityOption={setSecurityOption}
           />
         )}
         {currentItem !== null && currentItem > -1 && action !== null && (
@@ -336,7 +338,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({ setAddressBook
             cancel={cancel}
             action={action}
             doAction={doAction}
-            setSecurityOption={setSecurityOption}
           />
         )}
         {!addressBookCurrentAddress && addressBookSliced.length === 0 && currentItem !== -1 && !loading && (

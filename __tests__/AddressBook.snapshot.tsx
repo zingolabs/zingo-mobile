@@ -21,7 +21,7 @@ describe('Component Address Book - test', () => {
     const onSet = jest.fn();
     const ab: any = render(
       <ContextAppLoadedProvider value={state}>
-        <AddressBook setAddressBook={onSet} setSecurityOption={onSet} />
+        <AddressBook setAddressBook={onSet} />
       </ContextAppLoadedProvider>,
     );
     expect(ab.toJSON()).toMatchSnapshot();

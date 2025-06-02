@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View, TextInput, NativeSyntheticEvent, TouchableOpacity, ScrollView, Keyboard, Platform } from 'react-native';
+import { View, TextInput, NativeSyntheticEvent, TouchableOpacity, Keyboard, Platform } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import {

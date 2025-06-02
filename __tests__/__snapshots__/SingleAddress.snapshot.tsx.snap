@@ -58,11 +58,21 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
                   "color": "#c3c3c3",
                   "fontSize": 18,
                   "fontWeight": "bold",
-                  "marginRight": 5,
+                  "marginRight": 10,
                   "opacity": 0.9,
                 }
               }
             />
+            <Text
+              style={
+                {
+                  "color": "#c3c3c3",
+                  "opacity": 0.65,
+                }
+              }
+            >
+               (1 / 1) 
+            </Text>
           </View>
         </View>
       </View>

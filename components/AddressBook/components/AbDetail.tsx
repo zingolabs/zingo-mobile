@@ -8,7 +8,7 @@ import {
   AddressBookFileClass,
   ButtonTypeEnum,
   GlobalConst,
-  SecurityType,
+  //SecurityType,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
@@ -34,7 +34,7 @@ type AbDetailProps = {
     color: string,
   ) => void;
   addressBookCurrentAddress?: string;
-  setSecurityOption: (s: SecurityType) => Promise<void>;
+  //setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   index,
@@ -43,7 +43,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   action: actionProp,
   doAction,
   addressBookCurrentAddress,
-  setSecurityOption,
+  //setSecurityOption,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, addLastSnackbar, addressBook, language } = context;
@@ -186,7 +186,6 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         setAddress={updateAddress}
         setError={setErrorAddress}
         disabled={action === AddressBookActionEnum.Delete}
-        setSecurityOption={setSecurityOption}
       />
       {(!!error || !!errorAddress) && (
         <View

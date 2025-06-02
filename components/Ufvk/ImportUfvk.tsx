@@ -31,7 +31,7 @@ import { ButtonTypeEnum, GlobalConst, SelectServerEnum } from '../../app/AppStat
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
 // @ts-ignore
-import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
+//import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
 
 type ImportUfvkProps = {
   onClickCancel: () => void;
@@ -116,13 +116,13 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   };
 
   const showQrcodeModalVisible = () => {
-    if (Platform.OS === GlobalConst.platformOSandroid) {
-      BarcodeZxingScan.showQrReader(async (a: string) => {
-        setSeedufvkText(a);
-      });
-    } else {
+    //if (Platform.OS === GlobalConst.platformOSandroid) {
+    //  BarcodeZxingScan.showQrReader(async (a: string) => {
+    //    setSeedufvkText(a);
+    //  });
+    //} else {
       setQrcodeModalVisible(true);
-    }
+    //}
   };
 
   return (

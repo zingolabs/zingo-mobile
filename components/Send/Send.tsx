@@ -62,7 +62,7 @@ import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
 import { magicModal } from 'react-native-magic-modal';
 // @ts-ignore
-import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
+//import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 
 type SendProps = {
@@ -96,7 +96,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setScrollToTop,
   setScrollToBottom,
   setServerOption,
-  setSecurityOption,
+  //setSecurityOption,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -126,7 +126,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     setComputingModalShow,
     closeAllModals,
     setPoolsModalShow,
-    security,
+    //security,
     currency,
   } = context;
   const { colors } = useTheme() as ThemeType;
@@ -822,50 +822,50 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const setQrcodeModalShow = () => {
-    if (Platform.OS === GlobalConst.platformOSandroid) {
-      let changed: boolean = false;
-      if (security.foregroundApp) {
-        // deactivate temporarily this
-        changed = true;
-        const newSecurity = {
-          startApp: security.startApp,
-          foregroundApp: false,
-          sendConfirm: security.sendConfirm,
-          seedUfvkScreen: security.seedUfvkScreen,
-          rescanScreen: security.rescanScreen,
-          settingsScreen: security.settingsScreen,
-          changeWalletScreen: security.changeWalletScreen,
-          restoreWalletBackupScreen: security.restoreWalletBackupScreen,
-        } as SecurityType;
-        setSecurityOption(newSecurity);
-      }
-      BarcodeZxingScan.showQrReader(async (a: string) => {
-        updateToField(a, null, null, null, null);
-      });
-      if (changed) {
-        // activate again in 5 seconds
-        setTimeout(() => {
-          const newSecurity = {
-            startApp: security.startApp,
-            foregroundApp: true,
-            sendConfirm: security.sendConfirm,
-            seedUfvkScreen: security.seedUfvkScreen,
-            rescanScreen: security.rescanScreen,
-            settingsScreen: security.settingsScreen,
-            changeWalletScreen: security.changeWalletScreen,
-            restoreWalletBackupScreen: security.restoreWalletBackupScreen,
-          } as SecurityType;
-          setSecurityOption(newSecurity);
-        }, 5 * 1000);
-      }
-      return;
-    } else {
+    //if (Platform.OS === GlobalConst.platformOSandroid) {
+    //  let changed: boolean = false;
+    //  if (security.foregroundApp) {
+    //    // deactivate temporarily this
+    //    changed = true;
+    //    const newSecurity = {
+    //      startApp: security.startApp,
+    //      foregroundApp: false,
+    //      sendConfirm: security.sendConfirm,
+    //      seedUfvkScreen: security.seedUfvkScreen,
+    //      rescanScreen: security.rescanScreen,
+    //      settingsScreen: security.settingsScreen,
+    //      changeWalletScreen: security.changeWalletScreen,
+    //      restoreWalletBackupScreen: security.restoreWalletBackupScreen,
+    //    } as SecurityType;
+    //    setSecurityOption(newSecurity);
+    //  }
+    //  BarcodeZxingScan.showQrReader(async (a: string) => {
+    //    updateToField(a, null, null, null, null);
+    //  });
+    //  if (changed) {
+    //    // activate again in 5 seconds
+    //    setTimeout(() => {
+    //      const newSecurity = {
+    //        startApp: security.startApp,
+    //        foregroundApp: true,
+    //        sendConfirm: security.sendConfirm,
+    //        seedUfvkScreen: security.seedUfvkScreen,
+    //        rescanScreen: security.rescanScreen,
+    //        settingsScreen: security.settingsScreen,
+    //        changeWalletScreen: security.changeWalletScreen,
+    //        restoreWalletBackupScreen: security.restoreWalletBackupScreen,
+    //      } as SecurityType;
+    //      setSecurityOption(newSecurity);
+    //    }, 5 * 1000);
+    //  }
+    //  return;
+    //} else {
       return magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
             updateToField(a, null, null, null, null);
           }}
         />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
       ).promise;
-    }
+    //}
   };
 
   const setMemoModalShow = () => {

@@ -19,6 +19,7 @@ import 'moment/locale/ru';
 import { AddressKindEnum, ButtonTypeEnum, ModeEnum, SecurityType, SnackbarDurationEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
 import RegText from './RegText';
 import Button from './Button';
+import FadeText from './FadeText';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
@@ -37,6 +38,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   setSecurityOption,
   newAddressShow,
   total,
+  index,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, language, security, mode } = context;
@@ -146,7 +148,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       style={{
                         fontWeight: 'bold',
                         opacity: 0.9,
-                        marginRight: 5,
+                        marginRight: 10,
                       }}>
                       {(address && address.has_orchard  === true && address.has_sapling === false
                         ? translate('receive.shielded-orchard')
@@ -156,6 +158,9 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         ? translate('receive.shielded-sapling')
                         : '') as string}
                     </RegText>
+                    <FadeText>
+                      {` (${index + 1} / ${total}) `}
+                    </FadeText>
                   </View>
                 </View>
               )}

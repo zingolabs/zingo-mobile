@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, TouchableOpacity, TextInput, Platform } from 'react-native';
+import { View, TouchableOpacity, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -16,26 +16,26 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import Utils from '../../app/utils';
 import { magicModal } from 'react-native-magic-modal';
-import { GlobalConst, SecurityType } from '../../app/AppState';
+//import { SecurityType } from '../../app/AppState';
 // @ts-ignore
-import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
+//import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
 
 type TextInputAddressProps = {
   address: string;
   setAddress: (a: string) => void;
   setError: (e: string) => void;
   disabled: boolean;
-  setSecurityOption: (s: SecurityType) => Promise<void>;
+  //setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
   setAddress,
   setError,
   disabled,
-  setSecurityOption,
+  //setSecurityOption,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, language, security } = context;
+  const { translate, server, language } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
@@ -59,50 +59,50 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   }, [address, server.chainName, setError, translate]);
 
   const setQrcodeModalShow = () => {
-    if (Platform.OS === GlobalConst.platformOSandroid) {
-      let changed: boolean = false;
-      if (security.foregroundApp) {
-        // deactivate temporarily this
-        changed = true;
-        const newSecurity = {
-          startApp: security.startApp,
-          foregroundApp: false,
-          sendConfirm: security.sendConfirm,
-          seedUfvkScreen: security.seedUfvkScreen,
-          rescanScreen: security.rescanScreen,
-          settingsScreen: security.settingsScreen,
-          changeWalletScreen: security.changeWalletScreen,
-          restoreWalletBackupScreen: security.restoreWalletBackupScreen,
-        } as SecurityType;
-        setSecurityOption(newSecurity);
-      }
-      BarcodeZxingScan.showQrReader(async (a: string) => {
-        setAddress(a);
-      });
-      if (changed) {
-        // activate again in 5 seconds
-        setTimeout(() => {
-          const newSecurity = {
-            startApp: security.startApp,
-            foregroundApp: true,
-            sendConfirm: security.sendConfirm,
-            seedUfvkScreen: security.seedUfvkScreen,
-            rescanScreen: security.rescanScreen,
-            settingsScreen: security.settingsScreen,
-            changeWalletScreen: security.changeWalletScreen,
-            restoreWalletBackupScreen: security.restoreWalletBackupScreen,
-          } as SecurityType;
-          setSecurityOption(newSecurity);
-        }, 5 * 1000);
-      }
-      return;
-    } else {
+    //if (Platform.OS === GlobalConst.platformOSandroid) {
+    //  let changed: boolean = false;
+    //  if (security.foregroundApp) {
+    //    // deactivate temporarily this
+    //    changed = true;
+    //    const newSecurity = {
+    //      startApp: security.startApp,
+    //      foregroundApp: false,
+    //      sendConfirm: security.sendConfirm,
+    //      seedUfvkScreen: security.seedUfvkScreen,
+    //      rescanScreen: security.rescanScreen,
+    //      settingsScreen: security.settingsScreen,
+    //      changeWalletScreen: security.changeWalletScreen,
+    //      restoreWalletBackupScreen: security.restoreWalletBackupScreen,
+    //    } as SecurityType;
+    //    setSecurityOption(newSecurity);
+    //  }
+    //  BarcodeZxingScan.showQrReader(async (a: string) => {
+    //    setAddress(a);
+    //  });
+    //  if (changed) {
+    //    // activate again in 5 seconds
+    //    setTimeout(() => {
+    //      const newSecurity = {
+    //        startApp: security.startApp,
+    //        foregroundApp: true,
+    //        sendConfirm: security.sendConfirm,
+    //        seedUfvkScreen: security.seedUfvkScreen,
+    //        rescanScreen: security.rescanScreen,
+    //        settingsScreen: security.settingsScreen,
+    //        changeWalletScreen: security.changeWalletScreen,
+    //        restoreWalletBackupScreen: security.restoreWalletBackupScreen,
+    //      } as SecurityType;
+    //      setSecurityOption(newSecurity);
+    //    }, 5 * 1000);
+    //  }
+    //  return;
+    //} else {
       return magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
             setAddress(a);
           }}
         />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
       ).promise;
-    }
+    //}
   };
 
   //console.log('render input text address');

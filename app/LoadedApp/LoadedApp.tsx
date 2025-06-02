@@ -1276,7 +1276,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setState({
         addressBookCurrentAddress: '',
       });
-      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} setSecurityOption={this.setSecurityOption} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
+      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
         .promise;
     } else if (item === MenuItemEnum.VoteForNym) {
       let update = false;
@@ -1745,7 +1745,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       addressBookCurrentAddress: address,
     });
-    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} setSecurityOption={this.setSecurityOption} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
+    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
       .promise;
   };
 
