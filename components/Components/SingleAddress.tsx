@@ -4,7 +4,7 @@ import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@react-navigation/native';
-import { faChevronDown, faChevronLeft, faChevronRight, faCopy, faShare } from '@fortawesome/free-solid-svg-icons';
+import { faCircleCheck, faCopy, faList } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Share from 'react-native-share';
 import ViewShot from 'react-native-view-shot';
@@ -16,9 +16,9 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { AddressKindEnum, ModeEnum, SecurityType, SnackbarDurationEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
+import { AddressKindEnum, ButtonTypeEnum, ModeEnum, SecurityType, SnackbarDurationEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
 import RegText from './RegText';
-import FadeText from './FadeText';
+import Button from './Button';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
@@ -28,16 +28,21 @@ type SingleAddressProps = {
   prev: () => void;
   next: () => void;
   setSecurityOption: (s: SecurityType) => Promise<void>;
+  newAddressShow?: () => void;
 };
 
-const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, index, total, prev, next, ufvk, setSecurityOption }) => {
+const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
+  address,
+  ufvk,
+  setSecurityOption,
+  newAddressShow,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, language, security, mode } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
-  const [multi, setMulti] = useState<boolean>(false);
 
   const qrCodeRef = useRef<ViewShot>(null);
 
@@ -54,11 +59,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
       setExpandQRAddress(true);
     }
   }, [expandQRAddress, privacy]);
-
-  useEffect(() => {
-    const mult = total > 1;
-    setMulti(mult);
-  }, [total]);
 
   const doCopy = () => {
     Clipboard.setString(ufvk ? ufvk : (address ? address.address : ''));
@@ -118,8 +118,9 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
   };
 
   return (
-    <View style={{ flexDirection: 'column' }}>
+    <View style={{ flexDirection: 'column', width: '100%' }}>
       <ScrollView
+        style={{ width: '100%' }}
         contentContainerStyle={{
           alignItems: 'center',
         }}>
@@ -132,20 +133,16 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    margin: 10,
+                    marginTop: 10,
                   }}>
                   <View
                     style={{
                       flexDirection: 'row',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
                     }}>
-                    <FadeText
-                      numberOfLines={1}
+                    <RegText
                       style={{
-                        color: colors.sideMenuBackground,
                         fontWeight: 'bold',
                         opacity: 0.9,
                         marginRight: 5,
@@ -157,8 +154,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                         : address && address.has_orchard === false && address.has_sapling === true
                         ? translate('receive.shielded-sapling')
                         : '') as string}
-                    </FadeText>
-                    <FontAwesomeIcon size={15} icon={faChevronDown} color={colors.sideMenuBackground} />
+                    </RegText>
                   </View>
                 </View>
               )}
@@ -238,65 +234,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                 width: '100%',
                 justifyContent: 'space-evenly',
               }}>
-              {multi && (
-                <View
-                  style={{
-                    width: 58,
-                    borderColor: colors.primary,
-                    borderWidth: 2,
-                    borderRadius: 10,
-                  }}>
-                  <TouchableOpacity
-                    accessible={true}
-                    accessibilityLabel={translate('send.scan-acc') as string}
-                    onPress={prev}>
-                    <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faChevronLeft} color={colors.primary} />
-                  </TouchableOpacity>
-                </View>
-              )}
-              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 10, marginBottom: 5 }}>
-                {mode === ModeEnum.advanced && address && address.addressKind === AddressKindEnum.u && (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      margin: 10,
-                      marginRight: 20,
-                    }}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        width: 155,
-                        backgroundColor: colors.primary,
-                        borderRadius: 15,
-                        borderColor: colors.primary,
-                        borderWidth: 1,
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                      }}>
-                      <FadeText
-                        numberOfLines={1}
-                        style={{
-                          color: colors.sideMenuBackground,
-                          fontWeight: 'bold',
-                          opacity: 0.9,
-                          marginRight: 5,
-                        }}>
-                        {(address && address.has_orchard  === true && address.has_sapling === false
-                          ? translate('receive.shielded-orchard')
-                          : address && address.has_orchard === true && address.has_sapling === true
-                          ? translate('receive.shielded-orchard-sapling')
-                          : address && address.has_orchard === false && address.has_sapling === true
-                          ? translate('receive.shielded-sapling')
-                          : '') as string}
-                      </FadeText>
-                      <FontAwesomeIcon size={15} icon={faChevronDown} color={colors.sideMenuBackground} />
-                    </View>
-                  </View>
-                )}
+              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 20, marginBottom: 5 }}>
                 <TouchableOpacity onPress={doCopy}>
                   <View
                     style={{
@@ -311,53 +249,68 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ address, i
                     <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faCopy} color={colors.money} />
                   </View>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={doShare}>
-                  <View
-                    style={{
-                      backgroundColor: colors.sideMenuBackground,
-                      borderRadius: 30,
-                      borderColor: colors.zingo,
-                      borderWidth: 1,
-                      paddingHorizontal: 5,
-                      paddingVertical: 5,
-                      marginHorizontal: 10,
-                    }}>
-                    <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faShare} color={colors.money} />
-                  </View>
-                </TouchableOpacity>
-                {multi && (
-                  <Text style={{ color: colors.primary, marginTop: -25 }}>
-                    {index + 1}
-                    {translate('receive.of') as string}
-                    {total}
-                  </Text>
+                {address && mode === ModeEnum.advanced && (
+                  <>
+                    <TouchableOpacity onPress={doCopy}>
+                      <View
+                        style={{
+                          backgroundColor: colors.sideMenuBackground,
+                          borderRadius: 30,
+                          borderColor: colors.zingo,
+                          borderWidth: 1,
+                          paddingHorizontal: 5,
+                          paddingVertical: 5,
+                          marginHorizontal: 10,
+                        }}>
+                        <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faCircleCheck} color={colors.money} />
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={doCopy}>
+                      <View
+                        style={{
+                          backgroundColor: colors.sideMenuBackground,
+                          borderRadius: 30,
+                          borderColor: colors.zingo,
+                          borderWidth: 1,
+                          paddingHorizontal: 5,
+                          paddingVertical: 5,
+                          marginHorizontal: 10,
+                        }}>
+                        <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faList} color={colors.money} />
+                      </View>
+                    </TouchableOpacity>
+                  </>
                 )}
               </View>
-              {multi && (
-                <View
-                  style={{
-                    width: 58,
-                    borderColor: colors.primary,
-                    borderWidth: 2,
-                    borderRadius: 10,
-                  }}>
-                  <TouchableOpacity
-                    accessible={true}
-                    accessibilityLabel={translate('send.scan-acc') as string}
-                    onPress={next}>
-                    <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faChevronRight} color={colors.primary} />
-                  </TouchableOpacity>
-                </View>
-              )}
             </View>
             <View
               style={{
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: 'center',
-                marginBottom: 30,
+                marginTop: 10,
+                marginBottom: 20,
               }}>
               <AddressItem ufvk={!!ufvk} address={ufvk ? ufvk : (address ? address.address : '')} />
+            </View>
+            <View style={{ flexDirection: 'column', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+              <Button
+                type={ButtonTypeEnum.Primary}
+                title={'Share'}
+                onPress={() => {
+                  doShare();
+                }}
+                style={{ marginBottom: 10 }}
+              />
+              {address && mode === ModeEnum.advanced && (
+                <Button
+                  type={ButtonTypeEnum.Tertiary}
+                  title={address.addressKind === AddressKindEnum.u ? 'New Unified Address' : 'New Transparent Address'}
+                  onPress={() => {
+                    newAddressShow && newAddressShow();
+                  }}
+                />
+              )}
             </View>
           </>
         ) : (

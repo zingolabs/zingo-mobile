@@ -355,13 +355,16 @@ export default class RPC {
   // - LoadedApp mounting component.
   // - App go to Foreground.
   // - Internet from Not Connected to Connected.
-  // - Cambio de Servidor.
+  // - Server change.
   async configure(): Promise<void> {
     // I need to fetch this quickly.
     this.fetchZingolibVersion();
 
     // takes a while to start
-    await this.refreshSync();
+    this.refreshSync();
+    this.fetchTandZandOValueTransfers();
+    this.fetchInfoAndServerHeight();
+    this.fetchTotalBalance();
 
     //await this.fetchWalletSettings();
 

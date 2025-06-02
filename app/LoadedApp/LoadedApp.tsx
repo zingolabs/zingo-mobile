@@ -95,6 +95,7 @@ import { ToastProvider } from 'react-native-toastier';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import AddressBookFileClassObsolete from '../AppState/classes/AddressBookFileClassObsolete';
+import { RPCCheckAddress } from '../rpc/types/RPCCheckAddress';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -282,48 +283,80 @@ export default function LoadedApp(props: LoadedAppProps) {
         setBackground(backgroundJson);
       }
 
-      // adding `Zenny Tips` address always.
+      let sort: boolean = false;
       const zenniesAddress = await Utils.getZenniesDonationAddress(server.chainName);
-      let ab = await AddressBookFileImpl.writeAddressBookItem(
-        translate('zenny-tips-ab') as string,
-        zenniesAddress,
-        '',
-      );
       setZenniesDonationAddress(zenniesAddress);
+
+      // adding `Zenny Tips` address always.
+      let ab = await AddressBookFileImpl.readAddressBook();
+      if (ab.filter((a: AddressBookFileClass) => a.address === zenniesAddress).length === 0) {
+        ab = await AddressBookFileImpl.writeAddressBookItem(
+          translate('zenny-tips-ab') as string,
+          zenniesAddress,
+          '',
+          false,
+        );
+        sort = true;
+      }
 
       // now make no sense to have two UA's in the same contact
       // if `uOrchardAddress` exists then it will be removed.
       const toUpdate: AddressBookFileClassObsolete[] = ab.filter(
-        // if have orchard address or NOT have color
-        (a: AddressBookFileClassObsolete) => a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('color'),
+        // if have orchard address or NOT have color or NOT have own flag...
+        (a: AddressBookFileClassObsolete) => a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('color') || !a.hasOwnProperty('own'),
       );
       console.log('Address Book -> TO UPDATE', toUpdate);
       if (toUpdate.length > 0) {
         const randomColors = Utils.generateColorList(toUpdate.length);
         for (let i = 0; i < toUpdate.length; i++) {
           const a = toUpdate[i];
-          if (a.hasOwnProperty('uOrchardAddress')) {
-            // let's remove it, make no sense now.
-            delete a.uOrchardAddress;
+          let own: boolean;
+          if (!a.hasOwnProperty('own')) {
+            // verify this address as own or not
+            const checkStr = await RPCModule.checkMyAddressInfo(a.address);
+            console.log(checkStr);
+            if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
+              const checkJSON: RPCCheckAddress = await JSON.parse(checkStr);
+              own = checkJSON.is_wallet_address;
+            } else {
+              // error
+              own = false;
+            }
+          } else {
+            // no value
+            own = a.own !== undefined ? a.own : false;
           }
+          let color: string;
           if (!a.hasOwnProperty('color')) {
-            ab = await AddressBookFileImpl.updateColorItem(
+            color = randomColors[i];
+          } else {
+            // no value
+            color = a.color !== undefined ? a.color : randomColors[i];
+          }
+          if (a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('own') || !a.hasOwnProperty('color')) {
+            ab = await AddressBookFileImpl.updateColorAndOwnItem(
               a.label,
               a.address,
-              randomColors[i],
+              color,
+              own,
             );
           }
         }
+        sort = true;
+        console.log('Address Book -> UPDATED', ab);
       }
-      // this is a good place to sort properly these data
-      setAddressBook(
-        ab.sort((a, b) => {
+      let abSorted = ab;
+      if (sort) {
+        // this is a good place to sort properly these data
+        // if anything changed.
+        abSorted = ab.sort((a, b) => {
           const aLabel = a.label;
           const bLabel = b.label;
           return aLabel.localeCompare(bLabel);
-        }),
-      );
-
+        });
+      }
+      setAddressBook(abSorted);
+      await AddressBookFileImpl.writeAddressBook(abSorted);
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1941,6 +1974,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                               toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
                               alone={false /* receive */}
                               setSecurityOption={this.setSecurityOption}
+                              setAddressBook={this.setAddressBook}
                             />
                           )}
                         </Tab.Screen>
@@ -1976,6 +2010,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                                   toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
                                   alone={true /* receive */}
                                   setSecurityOption={this.setSecurityOption}
+                                  setAddressBook={this.setAddressBook}
                                 />
                               )}
                             </Tab.Screen>

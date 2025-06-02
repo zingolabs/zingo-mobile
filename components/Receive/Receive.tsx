@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, ReactNode, useEffect } from 'react';
-import { Dimensions, View } from 'react-native';
+import React, { useContext, useState, ReactNode, useEffect, useRef, useMemo, useCallback } from 'react';
+import { Dimensions, Keyboard, View } from 'react-native';
 import { TabView, TabBar, SceneRendererProps, Route, NavigationState, TabBarItem } from 'react-native-tab-view';
 import { useTheme } from '@react-navigation/native';
 
@@ -14,13 +14,16 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import { AddressKindEnum, ModeEnum, SecurityType, UnifiedAddressClass, TransparentAddressClass } from '../../app/AppState';
+import { AddressKindEnum, ModeEnum, SecurityType, UnifiedAddressClass, TransparentAddressClass, AddressBookFileClass } from '../../app/AppState';
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import NewAddress from './components/NewAddress';
 
 type ReceiveProps = {
   toggleMenuDrawer: () => void;
   alone: boolean;
   setSecurityOption: (s: SecurityType) => Promise<void>;
+  setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
@@ -32,6 +35,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   // for receive
   alone,
   setSecurityOption,
+  setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addresses, defaultUnifiedAddress, mode, language } = context;
@@ -46,10 +50,47 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [uAddrIndex, setUAddrIndex] = useState<number | null>(null);
   const [tAddrIndex, setTAddrIndex] = useState<number | null>(null);
 
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [indexBottomSheet, setIndexBottomSheet] = useState<number>(-1);
+
+  const snapPoints = useMemo(() => ['40%', '60%'], []);
+
   const dimensions = {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
   };
+
+  const newAddressShow = useCallback(() => {
+    bottomSheetRef.current?.snapToIndex(0);
+  }, []);
+
+  const newAddressHide = useCallback(() => {
+    bottomSheetRef.current?.close();
+    Keyboard.dismiss();
+  }, []);
+
+  const handleSheetChanges = useCallback((ind: number) => {
+    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& handleSheetChanges', ind);
+    setIndexBottomSheet(ind);
+  }, []);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      if (indexBottomSheet > -1) {
+        bottomSheetRef.current?.snapToIndex(1);
+      }
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      if (indexBottomSheet > -1) {
+        bottomSheetRef.current?.snapToIndex(0);
+      }
+    });
+
+    return () => {
+      !!keyboardDidShowListener && keyboardDidShowListener.remove();
+      !!keyboardDidHideListener && keyboardDidHideListener.remove();
+    };
+  }, [indexBottomSheet]);
 
   useEffect(() => {
     if (addresses && addresses.length > 0) {
@@ -82,6 +123,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       route: Route;
     },
   ) => ReactNode = ({ route }) => {
+    let component: any;
     switch (route.key) {
       case 'uaddr': {
         let uAddress = new UnifiedAddressClass(0, translate('receive.noaddress') as string, AddressKindEnum.u, false, false, false);
@@ -89,7 +131,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           uAddress = uAddr[uAddrIndex];
         }
 
-        return (
+        component = (
           <>
             {!!addresses && !!defaultUnifiedAddress && (
               <>
@@ -108,11 +150,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                     }
                   }}
                   setSecurityOption={setSecurityOption}
+                  newAddressShow={newAddressShow}
                 />
               </>
             )}
           </>
         );
+        break;
       }
       case 'taddr': {
         let tAddress = new TransparentAddressClass(0, translate('receive.noaddress') as string, AddressKindEnum.t, RPCAddressScopeEnum.external);
@@ -120,7 +164,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           tAddress = tAddr[tAddrIndex];
         }
 
-        return (
+        component = (
           <>
             {!!addresses && !!defaultUnifiedAddress && (
               <>
@@ -139,13 +183,20 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                     }
                   }}
                   setSecurityOption={setSecurityOption}
+                  newAddressShow={newAddressShow}
                 />
               </>
             )}
           </>
         );
+        break;
       }
     }
+    return (
+      <>
+        {component}
+      </>
+    );
   };
 
   const renderLabelCustom: ({ route, focused, color }: {route: any, focused: any, color: any }) => ReactNode = ({ route, focused, color }) => {
@@ -165,7 +216,15 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             fontSize: mode === ModeEnum.basic ? 14 : focused ? 15 : 14,
             color: color,
           }}>
-          {route.title ? route.title : ''}
+          {(route.title ? route.title : '') +
+            (mode === ModeEnum.advanced &&
+            ((route.key === 'uaddr' && uAddr.length > 1) || (route.key === 'taddr' && tAddr.length > 1))
+              ? ` (${route.key === 'uaddr'
+                ? uAddr.length
+                : route.key === 'taddr'
+                ? tAddr.length
+                : ''})`
+              : '')}
         </RegText>
         {route.key === 'uaddr' && mode === ModeEnum.basic && (
           <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. zingo)</RegText>
@@ -203,7 +262,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           noBalance={true}
           noPrivacy={true}
         />
-
         <TabBar
           {...props}
           indicatorStyle={{ backgroundColor: colors.primary }}
@@ -215,12 +273,33 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   };
 
   const returnPage = (
-    <TabView
-      navigationState={{ index, routes }}
-      renderScene={renderScene}
-      renderTabBar={renderTabBarPage}
-      onIndexChange={setIndex}
-    />
+    <>
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        renderTabBar={renderTabBarPage}
+        onIndexChange={setIndex}
+      />
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enableDynamicSizing={false}
+        onChange={handleSheetChanges}
+        enablePanDownToClose
+        keyboardBehavior={'interactive'}
+        handleStyle={{ display: 'none' }}
+        onClose={() => Keyboard.dismiss()}
+      >
+        <BottomSheetView style={{ backgroundColor: colors.sideMenuBackground, width: '100%', height: '100%' }}>
+          <NewAddress
+            addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
+            closeSheet={newAddressHide}
+            setAddressBook={setAddressBook}
+          />
+        </BottomSheetView>
+      </BottomSheet>
+    </>
   );
 
   //console.log('render Receive - 4', uAddr, uAddrIndex, tAddr, tAddrIndex, defaultUnifiedAddress);
