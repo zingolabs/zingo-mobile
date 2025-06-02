@@ -1481,7 +1481,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   }
 
   func fnCheckMyAddressInfo(_ dict: [AnyHashable: Any]) {
-      if let receivers = dict["address"] as? String,
+      if let address = dict["address"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           let resp = checkMyAddress(address: address)
           let respStr = String(resp)
