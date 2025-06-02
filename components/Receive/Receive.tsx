@@ -62,15 +62,18 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   const newAddressShow = useCallback(() => {
     bottomSheetRef.current?.snapToIndex(0);
+    setIndexBottomSheet(0);
   }, []);
 
   const newAddressHide = useCallback(() => {
-    bottomSheetRef.current?.close();
     Keyboard.dismiss();
+    bottomSheetRef.current?.snapToIndex(-1);
+    bottomSheetRef.current?.close();
+    setIndexBottomSheet(-1);
   }, []);
 
   const handleSheetChanges = useCallback((ind: number) => {
-    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& handleSheetChanges', ind);
+    //console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& handleSheetChanges', ind);
     setIndexBottomSheet(ind);
   }, []);
 
@@ -78,11 +81,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
       if (indexBottomSheet > -1) {
         bottomSheetRef.current?.snapToIndex(1);
+        setIndexBottomSheet(1);
       }
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
       if (indexBottomSheet > -1) {
         bottomSheetRef.current?.snapToIndex(0);
+        setIndexBottomSheet(0);
       }
     });
 
@@ -289,7 +294,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         enablePanDownToClose
         keyboardBehavior={'interactive'}
         handleStyle={{ display: 'none' }}
-        onClose={() => Keyboard.dismiss()}
       >
         <BottomSheetView style={{ backgroundColor: colors.sideMenuBackground, width: '100%', height: '100%' }}>
           <NewAddress
