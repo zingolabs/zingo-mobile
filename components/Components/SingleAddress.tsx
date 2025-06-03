@@ -158,12 +158,27 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         ? translate('receive.shielded-sapling')
                         : '') as string}
                     </RegText>
-                    <FadeText>
-                      {` (${index + 1} / ${total}) `}
-                    </FadeText>
                   </View>
                 </View>
               )}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 10,
+                }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <FadeText>
+                    {` (${index + 1} / ${total}) `}
+                  </FadeText>
+                </View>
+              </View>
             </View>
 
             <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.text }}>
