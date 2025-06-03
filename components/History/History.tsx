@@ -230,7 +230,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     />;
   };
 
-  console.log('render History - 4', valueTransfers?.length);
+  //console.log('render History - 4', valueTransfers?.length);
 
   return (
     <View
