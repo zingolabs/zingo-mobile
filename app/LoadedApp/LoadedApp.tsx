@@ -673,11 +673,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     const initialUrl = await Linking.getInitialURL();
     if (initialUrl !== null) {
+      console.log('INITIAL URI', initialUrl);
       this.readUrl(initialUrl);
+
+      this.closeAllModals();
+      this.state.navigationHome?.navigate(RouteEnums.Home, {
+        screen: this.state.translate('loadedapp.send-menu'),
+        initial: false,
+      });
     }
 
     this.linking = Linking.addEventListener(EventListenerEnum.url, async ({ url }) => {
-      //console.log(url);
+      console.log('EVENT LISTENER URI', url);
       if (url !== null) {
         this.readUrl(url);
       }
