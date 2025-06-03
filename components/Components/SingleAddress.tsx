@@ -323,7 +323,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
               }}>
               <AddressItem ufvk={!!ufvk} address={ufvk ? ufvk : (address ? address.address : '')} />
             </View>
-            <View style={{ flexDirection: 'column', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'column', width: '100%', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
               <Button
                 type={ButtonTypeEnum.Primary}
                 title={'Share'}
