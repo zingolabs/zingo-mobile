@@ -357,14 +357,13 @@ export default class RPC {
   // - Internet from Not Connected to Connected.
   // - Server change.
   async configure(): Promise<void> {
-    // I need to fetch this quickly.
-    this.fetchZingolibVersion();
-
     // takes a while to start
-    this.refreshSync();
-    this.fetchTandZandOValueTransfers();
-    this.fetchInfoAndServerHeight();
-    this.fetchTotalBalance();
+    await this.fetchTandZandOValueTransfers();
+    await this.fetchInfoAndServerHeight();
+    await this.fetchTotalBalance();
+
+    // I need to fetch this quickly.
+    await this.fetchZingolibVersion();
 
     //await this.fetchWalletSettings();
 

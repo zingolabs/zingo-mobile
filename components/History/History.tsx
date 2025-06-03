@@ -150,8 +150,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
       const vtf = fetchValueTransfersFiltered;
       setValueTransfersFiltered(vtf);
       setLoadMoreButton(numVt < vtf.length);
-      setValueTransfersSliced(vtf.slice(0, numVt));
-      setDataProvider((data) => data.cloneWithRows(vtf.slice(0, numVt)));
+      const vtfs = vtf.slice(0, numVt);
+      setValueTransfersSliced(vtfs);
+      setDataProvider((data) => data.cloneWithRows(vtfs));
       setTimeout(() => {
         setLoading(false);
       }, 500);
@@ -160,8 +161,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   useEffect(() => {
     setLoadMoreButton(numVt < valueTransfersFiltered.length);
-    setValueTransfersSliced(valueTransfersFiltered.slice(0, numVt));
-    setDataProvider((data) => data.cloneWithRows(valueTransfersFiltered.slice(0, numVt)));
+    const vtfs = valueTransfersFiltered.slice(0, numVt);
+    setValueTransfersSliced(vtfs);
+    setDataProvider((data) => data.cloneWithRows(vtfs));
   }, [numVt, valueTransfersFiltered]);
 
   useEffect(() => {
@@ -228,7 +230,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     />;
   };
 
-  //console.log('render History - 4');
+  console.log('render History - 4', valueTransfers?.length);
 
   return (
     <View

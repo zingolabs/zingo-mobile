@@ -564,11 +564,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     //console.log('DID MOUNT APPLOADED...', netInfoState);
 
-    this.clearToAddr();
-
     // Configure the RPC to start doing refreshes
     await this.rpc.clearTimers();
     await this.rpc.configure();
+
+    this.clearToAddr();
 
     this.appstate = AppState.addEventListener(EventListenerEnum.change, async nextAppState => {
       //console.log('LOADED', 'prior', this.state.appStateStatus, 'next', nextAppState);
