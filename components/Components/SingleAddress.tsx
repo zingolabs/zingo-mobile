@@ -71,6 +71,13 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
     });
   };
 
+  const doNothing = () => {
+    addLastSnackbar({
+      message: 'Unimplemented option',
+      duration: SnackbarDurationEnum.short,
+    });
+  };
+  
   const doShare = async () => {
     if (qrCodeRef.current && qrCodeRef.current.capture) {
       let changed: boolean = false;
@@ -272,7 +279,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 </TouchableOpacity>
                 {address && mode === ModeEnum.advanced && (
                   <>
-                    <TouchableOpacity onPress={doCopy}>
+                    <TouchableOpacity onPress={doNothing}>
                       <View
                         style={{
                           backgroundColor: colors.sideMenuBackground,
@@ -287,7 +294,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       </View>
                     </TouchableOpacity>
                     {total > 1 && (
-                      <TouchableOpacity onPress={doCopy}>
+                      <TouchableOpacity onPress={doNothing}>
                         <View
                           style={{
                             backgroundColor: colors.sideMenuBackground,
