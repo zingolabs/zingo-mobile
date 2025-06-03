@@ -72,6 +72,8 @@ export default class RPC {
 
   readOnly: boolean;
 
+  lastPollSyncError: string;
+
   constructor(
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
     fnSetValueTransfersList: (vtlist: ValueTransferType[], total: number) => void,
@@ -120,6 +122,8 @@ export default class RPC {
     this.timers = [];
 
     this.readOnly = readOnly;
+
+    this.lastPollSyncError = '';
   }
 
   static async rpcGetZecPrice(withTOR: boolean): Promise<{price: number, error: string}> {
@@ -507,6 +511,7 @@ export default class RPC {
     let ss = {} as RPCSyncStatusType;
     try {
       ss = await JSON.parse(returnStatus);
+      ss.lastError = this.lastPollSyncError;
     } catch (e) {
       console.log('SYNC STATUS ERROR - PARSE JSON', returnStatus);
       this.fetchSyncStatusLock = false;
@@ -548,6 +553,7 @@ export default class RPC {
     console.log('=========================================== > sync poll command - ', Date.now() - s);
     if (!returnPoll || returnPoll.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC POLL ERROR', returnPoll);
+      this.lastPollSyncError = returnPoll;
       this.fetchSyncPollLock = false;
       return;
     }

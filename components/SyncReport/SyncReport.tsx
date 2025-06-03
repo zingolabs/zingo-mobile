@@ -579,6 +579,26 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
               <ActivityIndicator size="large" color={colors.primary} />
             </View>
           )}
+          {!!syncingStatus.lastError && (
+            <>
+              <View
+                style={{ height: 1, width: '100%', backgroundColor: 'white' }}
+              />
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'flex-end',
+                  marginHorizontal: 20,
+                }}>
+                <DetailLine label={'Last Sync Error'}>
+                  <View style={{ display: 'flex', flexDirection: 'column' }}>
+                    <RegText> {syncingStatus.lastError} </RegText>
+                  </View>
+                </DetailLine>
+              </View>
+            </>
+          )}
         </ScrollView>
       </View>
     </ToastProvider>
