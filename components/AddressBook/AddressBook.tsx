@@ -31,7 +31,7 @@ import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { useToast } from 'react-native-toastier';
 import RPCModule from '../../app/RPCModule';
-import { RPCCheckAddress } from '../../app/rpc/types/RPCCheckAddress';
+import { RPCCheckAddressType } from '../../app/rpc/types/RPCCheckAddressType';
 
 type AddressBookProps = {
   setAddressBook: (ab: AddressBookFileClass[]) => void;
@@ -150,7 +150,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       const checkStr = await RPCModule.checkMyAddressInfo(address);
       console.log(checkStr);
       if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
-        const checkJSON: RPCCheckAddress = await JSON.parse(checkStr);
+        const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
         own = checkJSON.is_wallet_address;
       } else {
         // error

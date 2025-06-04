@@ -19,7 +19,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useToast } from 'react-native-toastier';
-import { AddressUnifiedTypeEnum } from '../../../app/AppState/enums/AddressUnifiedTypeEnum';
+import { AddressUnifiedTypeEnum } from '../../../app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
 import ContextMenu, { ContextMenuOnPressNativeEvent } from 'react-native-context-menu-view';

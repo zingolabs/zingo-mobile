@@ -1,7 +1,7 @@
 import { RPCAddressScopeEnum } from '../enums/RPCAddressScopeEnum';
 import { RPCCheckAddressTypeEnum } from '../enums/RPCCheckAddressTypeEnum';
 
-export type RPCCheckAddress = {
+export type RPCCheckAddressType = {
   is_wallet_address: boolean;
   account_id: number;
   address_type: RPCCheckAddressTypeEnum;

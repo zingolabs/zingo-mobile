@@ -63,6 +63,7 @@ import {
   UnifiedAddressClass,
   TransparentAddressClass,
   AddressKindEnum,
+  AddressBookFileClassObsolete,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -94,8 +95,7 @@ import MessageList from '../../components/Messages/components/MessageList';
 import { ToastProvider } from 'react-native-toastier';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
-import AddressBookFileClassObsolete from '../AppState/classes/AddressBookFileClassObsolete';
-import { RPCCheckAddress } from '../rpc/types/RPCCheckAddress';
+import { RPCCheckAddressType } from '../rpc/types/RPCCheckAddressType';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -316,7 +316,7 @@ export default function LoadedApp(props: LoadedAppProps) {
             const checkStr = await RPCModule.checkMyAddressInfo(a.address);
             console.log(checkStr);
             if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
-              const checkJSON: RPCCheckAddress = await JSON.parse(checkStr);
+              const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
               own = checkJSON.is_wallet_address;
             } else {
               // error

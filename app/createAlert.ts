@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
-import SnackbarType from './AppState/types/SnackbarType';
-import { GlobalConst, TranslateType } from './AppState';
+import { GlobalConst, TranslateType, SnackbarType } from './AppState';
 
 export const createAlert = async (
   setBackgroundError: (title: string, error: string) => void,

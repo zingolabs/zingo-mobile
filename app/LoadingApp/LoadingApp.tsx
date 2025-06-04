@@ -46,6 +46,7 @@ import {
   InfoType,
   ZecPriceType,
   BackgroundErrorType,
+  RestoreFromTypeEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -62,7 +63,6 @@ import Launching from './components/Launching';
 import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
-import { RestoreFromTypeEnum } from '../AppState';
 import {
   createUpdateRecoveryWalletInfo,
   getRecoveryWalletInfo,

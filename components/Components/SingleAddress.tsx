@@ -77,7 +77,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
       duration: SnackbarDurationEnum.short,
     });
   };
-  
+
   const doShare = async () => {
     if (qrCodeRef.current && qrCodeRef.current.capture) {
       let changed: boolean = false;

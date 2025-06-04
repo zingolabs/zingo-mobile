@@ -14,6 +14,7 @@ import {
   ValueTransferType,
   UnifiedAddressClass,
   TransparentAddressClass,
+  ValueTransferKindEnum,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCUnifiedAddressType } from './types/RPCUnifiedAddressType';
@@ -27,11 +28,10 @@ import { RPCSendType } from './types/RPCSendType';
 import { RPCValueTransfersType } from './types/RPCValueTransfersType';
 import { RPCValueTransfersKindEnum } from './enums/RPCValueTransfersKindEnum';
 import { RPCValueTransferType } from './types/RPCValueTransferType';
-import { ValueTransferKindEnum } from '../AppState/enums/ValueTransferKindEnum';
 import { RPCValueTransfersStatusEnum } from './enums/RPCValueTransfersStatusEnum';
 import { RPCSendProposeType } from './types/RPCSendProposeType';
 import { RPCSyncPollType } from './types/RPCSyncPollType';
-import { RPCZecPrice } from './types/RPCZecPrice';
+import { RPCZecPriceType } from './types/RPCZecPriceType';
 import { RPCTransparentAddressType } from './types/RPCTransparentAddressType';
 
 export default class RPC {
@@ -143,7 +143,7 @@ export default class RPC {
           console.log(`Error fetching price ${resultStr}`);
           return {price: -1, error: resultStr};
         } else {
-          const resultJSON: RPCZecPrice = await JSON.parse(resultStr);
+          const resultJSON: RPCZecPriceType = await JSON.parse(resultStr);
           if (resultJSON.error) {
             console.log(resultJSON.error);
             return {price: -1, error: resultJSON.error};

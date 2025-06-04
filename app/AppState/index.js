@@ -6,6 +6,7 @@ import SettingsFileClass from './classes/SettingsFileClass';
 import ToAddrClass from './classes/ToAddrClass';
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
+import AddressBookFileClassObsolete from './classes/AddressBookFileClassObsolete';
 
 import InfoType from './types/InfoType';
 import SendJsonToTypeType from './types/SendJsonToTypeType';
@@ -21,6 +22,8 @@ import SecurityType from './types/SecurityType';
 import ServerUrisType from './types/ServerUrisType';
 import ValueTransferType from './types/ValueTransferType';
 import ContactType from './types/ContactType';
+import TransactionType from './types/TransactionType';
+import TxDetailType from './types/TxDetailType';
 
 import { CommandEnum } from './enums/CommandEnum';
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
@@ -53,6 +56,7 @@ import { ValueTransferKindEnum } from './enums/ValueTransferKindEnum';
 import { FilterEnum } from './enums/FilterEnum';
 import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
 import { TransactionActionEnum } from './enums/TransactionActionEnum';
+import { AddressUnifiedTypeEnum } from './enums/AddressUnifiedTypeEnum';
 
 import { GlobalConst } from './const/GlobalConst';
 
@@ -74,6 +78,7 @@ export {
   ToAddrClass,
   TotalBalanceClass,
   WalletSettingsClass,
+  AddressBookFileClassObsolete,
   WalletType,
   SendJsonToTypeType,
   InfoType,
@@ -88,6 +93,8 @@ export {
   ServerUrisType,
   ValueTransferType,
   ContactType,
+  TransactionType,
+  TxDetailType,
   CommandEnum,
   AddressBookActionEnum,
   MenuItemEnum,
@@ -119,5 +126,6 @@ export {
   FilterEnum,
   RefreshScreenEnum,
   TransactionActionEnum,
+  AddressUnifiedTypeEnum,
   GlobalConst,
 };
