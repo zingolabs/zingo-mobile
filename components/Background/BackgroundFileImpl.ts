@@ -1,6 +1,6 @@
 import * as RNFS from 'react-native-fs';
 
-import { BackgroundType } from '../../app/AppState';
+import { BackgroundType, GlobalConst } from '../../app/AppState';
 
 export default class BackgroundFileImpl {
   static async getFileName() {
@@ -12,7 +12,7 @@ export default class BackgroundFileImpl {
     const fileName = await this.getFileName();
     const newBackground: BackgroundType = { batches: 0, message: '', date: 0, dateEnd: 0 };
 
-    RNFS.writeFile(fileName, JSON.stringify(newBackground), 'utf8')
+    RNFS.writeFile(fileName, JSON.stringify(newBackground), GlobalConst.utf8 as BufferEncoding)
       .then(() => {
         //console.log('FILE WRITTEN!')
       })
@@ -28,7 +28,7 @@ export default class BackgroundFileImpl {
     const fileName = await this.getFileName();
 
     try {
-      const rStr = (await RNFS.readFile(fileName, 'utf8')).toString();
+      const rStr = (await RNFS.readFile(fileName, GlobalConst.utf8 as BufferEncoding)).toString();
       //console.log('background string', rStr);
       const r = JSON.parse(rStr) as BackgroundType;
       //console.log('background json', r);

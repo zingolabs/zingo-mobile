@@ -492,7 +492,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     if (exists && exists !== GlobalConst.false) {
       this.setState({ walletExists: true });
-      let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chainName, this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false');
+      let result: string = await RPCModule.loadExistingWallet(
+        this.state.server.uri,
+        this.state.server.chainName,
+        this.state.currency === CurrencyEnum.USDTORCurrency
+          ? GlobalConst.true
+          : GlobalConst.false
+      );
       //let result = 'Error: pepe es guapo';
 
       // for testing
@@ -1003,7 +1009,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     }
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
-      let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chainName, this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false');
+      let seed: string = await RPCModule.createNewWallet(
+        this.state.server.uri,
+        this.state.server.chainName,
+        this.state.currency === CurrencyEnum.USDTORCurrency
+          ? GlobalConst.true
+          : GlobalConst.false
+      );
 
       if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
         let seedJSON = {} as RPCSeedType;
@@ -1124,7 +1136,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           walletBirthday || '0',
           this.state.server.uri,
           this.state.server.chainName,
-          this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false',
+          this.state.currency === CurrencyEnum.USDTORCurrency
+            ? GlobalConst.true
+            : GlobalConst.false,
         );
       } else {
         result = await RPCModule.restoreWalletFromUfvk(
@@ -1132,7 +1146,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           walletBirthday || '0',
           this.state.server.uri,
           this.state.server.chainName,
-          this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false',
+          this.state.currency === CurrencyEnum.USDTORCurrency
+            ? GlobalConst.true
+            : GlobalConst.false,
         );
       }
 

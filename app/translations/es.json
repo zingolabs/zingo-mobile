@@ -20,6 +20,7 @@
   "cancel": "Cancelar",
   "save": "Guardar",
   "copy": "Copiar",
+  "share": "Compartir",
   "confirm": "Confirmar",
   "support": "Enviar Email",
   "menudrawer-acc": "Abrir Menú Lateral",
@@ -72,7 +73,8 @@
     "delete-alert": "¿Realmente quieres borrar este Contacto de tu libreta de direcciones?",
     "likely": "Probablemente: ",
     "thiswalletaddress": "La Dirección de este Monedero",
-    "addto": "Añadir a "
+    "addto": "Añadir a ",
+    "filter-wallet": "Monedero"
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",
@@ -525,7 +527,9 @@
     "shielded-sapling": "Solo Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
     "shielded-full": "Completa",
-    "showtip": "Tocar para seleccionar otra dirección."
+    "showtip": "Tocar para seleccionar otra dirección.",
+    "newunifiedaddress": "Nueva dirección unificada",
+    "newtransparentaddress": "Nueva dirección transparente"
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",

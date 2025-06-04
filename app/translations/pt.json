@@ -20,6 +20,7 @@
   "cancel": "Cancelar",
   "save": "Salvar",
   "copy": "Cópia de",
+  "share": "Compartilhar",
   "confirm": "Confirmar",
   "support": "Enviar E-mail",
   "menudrawer-acc": "Abrir Menu Lateral",
@@ -72,7 +73,8 @@
     "delete-alert": "Você realmente deseja excluir este Contato/Apelido?",
     "likely": "Provavelmente: ",
     "thiswalletaddress": "Endereço desta Carteira",
-    "addto": "Adicionar à "
+    "addto": "Adicionar à ",
+    "filter-wallet": "Carteira"
   },
   "change-privacy-legend": ".\nToque para revelar os valores ocultos.",
   "txtcopied": "Texto copiado para a Área de Transferência",
@@ -525,7 +527,9 @@
     "shielded-sapling": "Apenas Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
     "shielded-full": "Completa",
-    "showtip": "Toque para selecionar outro endereço."
+    "showtip": "Toque para selecionar outro endereço.",
+    "newunifiedaddress": "Novo Endereço Unificado",
+    "newtransparentaddress": "Novo Endereço Transparente"
   },
   "history": {
     "shield-all": "Blindar Todos os Fundos",

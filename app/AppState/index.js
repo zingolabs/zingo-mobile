@@ -57,6 +57,7 @@ import { FilterEnum } from './enums/FilterEnum';
 import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
 import { TransactionActionEnum } from './enums/TransactionActionEnum';
 import { AddressUnifiedTypeEnum } from './enums/AddressUnifiedTypeEnum';
+import { ZcashUriFieldEnum } from './enums/ZcashUriFieldEnum';
 
 import { GlobalConst } from './const/GlobalConst';
 
@@ -127,5 +128,6 @@ export {
   RefreshScreenEnum,
   TransactionActionEnum,
   AddressUnifiedTypeEnum,
+  ZcashUriFieldEnum,
   GlobalConst,
 };

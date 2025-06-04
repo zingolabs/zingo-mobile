@@ -274,7 +274,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 }
               }
             >
-              Contacts
+              text translated
             </Text>
           </View>
         </View>
@@ -334,7 +334,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 }
               }
             >
-              Wallet
+              text translated
             </Text>
           </View>
         </View>
@@ -394,7 +394,7 @@ exports[`Component Address Book - test Address Book - snapshot 1`] = `
                 }
               }
             >
-              All
+              text translated
             </Text>
           </View>
         </View>

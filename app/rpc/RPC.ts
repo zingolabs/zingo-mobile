@@ -134,7 +134,7 @@ export default class RPC {
       // -2  - error in RPCModule, likely.
       // > 0 - real value
       //const start = Date.now();
-      const resultStr: string = await RPCModule.zecPriceInfo(withTOR ? 'true' : 'false');
+      const resultStr: string = await RPCModule.zecPriceInfo(withTOR ? GlobalConst.true : GlobalConst.false);
       //console.log('=========================================== > get ZEC price - ', Date.now() - start);
       console.log(resultStr);
 
@@ -730,11 +730,11 @@ export default class RPC {
       if (zingolibStr) {
         if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error zingolib version ${zingolibStr}`);
-          zingolibStr = '<error>';
+          zingolibStr = GlobalConst.zingolibError;
         }
       } else {
         console.log('Internal Error zingolib version');
-        zingolibStr = '<none>';
+        zingolibStr = GlobalConst.zingolibNone;
       }
 
       //const start2 = Date.now();

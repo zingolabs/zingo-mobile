@@ -326,7 +326,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             <View style={{ flexDirection: 'column', width: '100%', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
               <Button
                 type={ButtonTypeEnum.Primary}
-                title={'Share'}
+                title={translate('share') as string}
                 onPress={() => {
                   doShare();
                 }}
@@ -335,7 +335,9 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
               {address && mode === ModeEnum.advanced && (
                 <Button
                   type={ButtonTypeEnum.Tertiary}
-                  title={address.addressKind === AddressKindEnum.u ? 'New Unified Address' : 'New Transparent Address'}
+                  title={(address.addressKind === AddressKindEnum.u
+                    ? translate('receive.newunifiedaddress')
+                    : translate('receive.newtransparentaddress')) as string}
                   onPress={() => {
                     newAddressShow && newAddressShow();
                   }}

@@ -15,7 +15,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, GlobalConst } from '../../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, FilterEnum, GlobalConst } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -68,7 +68,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const [action, setAction] = useState<AddressBookActionEnum | null>(null);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
-  const [filter, setFilter] = useState<'Contacts' | 'Wallet' | 'All'>('Contacts');
+  const [filter, setFilter] = useState<FilterEnum>(FilterEnum.contacts);
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -76,11 +76,11 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 
   const fetchAddressBookFiltered = useMemo(async () => {
       const filterApply = (ab: AddressBookFileClass) => {
-        if (filter === 'All') {
+        if (filter === FilterEnum.all) {
           return true;
-        } else if (filter === 'Contacts') {
+        } else if (filter === FilterEnum.contacts) {
           return !ab.own;
-        } else if (filter === 'Wallet') {
+        } else if (filter === FilterEnum.wallet) {
           return ab.own;
         }
       };
@@ -235,14 +235,14 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           }}>
           <TouchableOpacity
             onPress={() => {
-              setFilter('Contacts');
+              setFilter(FilterEnum.contacts);
               setLoading(true);
             }}>
             <View
               style={{
-                backgroundColor: filter === 'Contacts' ? colors.primary : colors.sideMenuBackground,
+                backgroundColor: filter === FilterEnum.contacts ? colors.primary : colors.sideMenuBackground,
                 borderRadius: 15,
-                borderColor: filter === 'Contacts' ? colors.primary : colors.zingo,
+                borderColor: filter === FilterEnum.contacts ? colors.primary : colors.zingo,
                 borderWidth: 1,
                 paddingHorizontal: 10,
                 paddingVertical: 5,
@@ -250,23 +250,23 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               }}>
               <FadeText
                 style={{
-                  color: filter === 'Contacts' ? colors.sideMenuBackground : colors.zingo,
+                  color: filter === FilterEnum.contacts ? colors.sideMenuBackground : colors.zingo,
                   fontWeight: 'bold',
                 }}>
-                {'Contacts'}
+                {translate('messages.filter-contacts') as string}
               </FadeText>
             </View>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              setFilter('Wallet');
+              setFilter(FilterEnum.wallet);
               setLoading(true);
             }}>
             <View
               style={{
-                backgroundColor: filter === 'Wallet' ? colors.primary : colors.sideMenuBackground,
+                backgroundColor: filter === FilterEnum.wallet ? colors.primary : colors.sideMenuBackground,
                 borderRadius: 15,
-                borderColor: filter === 'Wallet' ? colors.primary : colors.zingo,
+                borderColor: filter === FilterEnum.wallet ? colors.primary : colors.zingo,
                 borderWidth: 1,
                 paddingHorizontal: 10,
                 paddingVertical: 5,
@@ -274,23 +274,23 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               }}>
               <FadeText
                 style={{
-                  color: filter === 'Wallet' ? colors.sideMenuBackground : colors.zingo,
+                  color: filter === FilterEnum.wallet ? colors.sideMenuBackground : colors.zingo,
                   fontWeight: 'bold',
                 }}>
-                {'Wallet'}
+                {translate('addressbook.filter-wallet') as string}
               </FadeText>
             </View>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              setFilter('All');
+              setFilter(FilterEnum.all);
               setLoading(true);
             }}>
             <View
               style={{
-                backgroundColor: filter === 'All' ? colors.primary : colors.sideMenuBackground,
+                backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
                 borderRadius: 15,
-                borderColor: filter === 'All' ? colors.primary : colors.zingo,
+                borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
                 borderWidth: 1,
                 paddingHorizontal: 10,
                 paddingVertical: 5,
@@ -298,10 +298,10 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               }}>
               <FadeText
                 style={{
-                  color: filter === 'All' ? colors.sideMenuBackground : colors.zingo,
+                  color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
                   fontWeight: 'bold',
                 }}>
-                {'All'}
+                {translate('messages.filter-all') as string}
               </FadeText>
             </View>
           </TouchableOpacity>

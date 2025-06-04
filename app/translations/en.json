@@ -20,6 +20,7 @@
   "cancel": "Cancel",
   "save": "Save",
   "copy": "Copy",
+  "share": "Share",
   "confirm": "Confirm",
   "support": "Send Email",
   "menudrawer-acc": "Open Menu Drawer",
@@ -72,7 +73,8 @@
     "delete-alert": "Do you really want to delete this Contact/Nickname/Label/Tag?",
     "likely": "Likely: ",
     "thiswalletaddress": "This Wallet's Address",
-    "addto": "Add to "
+    "addto": "Add to ",
+    "filter-wallet": "Wallet"
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",
@@ -525,7 +527,9 @@
     "shielded-sapling": "Only Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
     "shielded-full": "Full",
-    "showtip": "Tap to select another address."
+    "showtip": "Tap to select another address.",
+    "newunifiedaddress": "New Unified Address",
+    "newtransparentaddress": "New Transparent Address"
   },
   "history": {
     "shield-all": "Shield All funds",

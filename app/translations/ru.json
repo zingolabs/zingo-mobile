@@ -20,6 +20,7 @@
   "cancel": "Отмена",
   "save": "Сохранить",
   "copy": "Копировать",
+  "share": "Поделиться",
   "confirm": "Подтвердить",
   "support": "Отправить Email",
   "menudrawer-acc": "Открыть панель меню",
@@ -72,7 +73,8 @@
     "delete-alert": "Вы действительно хотите удалить этот Контакт/Никнейм/Метку?",
     "likely": "Возможно: ",
     "thiswalletaddress": "Адрес этого кошелька",
-    "addto": "Добавить к "
+    "addto": "Добавить к ",
+    "filter-wallet": "Кошелек"
   },
   "change-privacy-legend": ".\nНажмите, чтобы раскрыть скрытые значения.",
   "txtcopied": "Текст скопирован в буфер обмена",
@@ -525,7 +527,9 @@
     "shielded-sapling": "Только Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
     "shielded-full": "Полный",
-    "showtip": "Нажмите, чтобы выбрать другой адрес."
+    "showtip": "Нажмите, чтобы выбрать другой адрес.",
+    "newunifiedaddress": "Новый унифицированный адрес",
+    "newtransparentaddress": "Новый прозрачный адрес"
   },
   "history": {
     "shield-all": "Экранирование всех средств",

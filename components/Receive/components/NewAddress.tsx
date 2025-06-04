@@ -124,7 +124,11 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
       >
         <FontAwesomeIcon size={30} icon={faXmark} color={colors.text} style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }} />
       </TouchableOpacity>
-      <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>{addressKind === AddressKindEnum.u ? 'New Unified Address' : 'New Transparent Address'}</RegText>
+      <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>
+        {(addressKind === AddressKindEnum.u
+          ? translate('receive.newunifiedaddress')
+          : translate('receive.newtransparentaddress')) as string}
+      </RegText>
       <View
         style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
         <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>{'Tag (Optional)'}</RegText>
