@@ -620,6 +620,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                     "alignItems": "center",
                     "flexDirection": "column",
                     "justifyContent": "center",
+                    "marginBottom": 20,
                     "width": "100%",
                   }
                 }

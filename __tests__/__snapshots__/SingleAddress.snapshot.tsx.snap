@@ -413,6 +413,7 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             "alignItems": "center",
             "flexDirection": "column",
             "justifyContent": "center",
+            "marginBottom": 20,
             "width": "100%",
           }
         }
@@ -880,6 +881,7 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
             "alignItems": "center",
             "flexDirection": "column",
             "justifyContent": "center",
+            "marginBottom": 20,
             "width": "100%",
           }
         }
