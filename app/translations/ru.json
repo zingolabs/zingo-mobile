@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.0 (235)",
+  "version": "zingo-2.0.0 (236)",
   "loading": "загрузка...",
   "connectingserver": "Подключение к серверу...",
   "wait": "Пожалуйста, подождите...",
@@ -72,8 +72,7 @@
     "delete-alert": "Вы действительно хотите удалить этот Контакт/Никнейм/Метку?",
     "likely": "Возможно: ",
     "thiswalletaddress": "Адрес этого кошелька",
-    "addto": "Добавить к ",
-    "uorchardaddress": "Orchard UA:\n"
+    "addto": "Добавить к "
   },
   "change-privacy-legend": ".\nНажмите, чтобы раскрыть скрытые значения.",
   "txtcopied": "Текст скопирован в буфер обмена",
@@ -449,7 +448,8 @@
     "birthday-acc": "Поле для даты создания",
     "tapreveal": "Нажмите для показа",
     "showtransactions": "Показать транзакции",
-    "youreceived": "Получено"
+    "youreceived": "Получено",
+    "tapcopy-ufvk-message": "Просмотр ключа скопирован в буфер обмена"
   },
   "send": {
     "Broadcast": "Успешная отправка, Tx:",

@@ -1,4 +1,4 @@
-export type RPCZecPrice = {
+export type RPCZecPriceType = {
   current_price?: number;
   error?: string;
 };

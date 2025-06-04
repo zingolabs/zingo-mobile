@@ -13,4 +13,6 @@ export type RPCSyncStatusType = {
   total_orchard_outputs_scanned: number,
   percentage_session_outputs_scanned: number | null,
   percentage_total_outputs_scanned: number,
+  // from poll sync
+  lastError?: string,
 };

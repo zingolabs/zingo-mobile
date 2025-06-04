@@ -1076,35 +1076,6 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
-  func fnGetAddressesInfo(_ dict: [AnyHashable: Any]) {
-      if let receivers = dict["receivers"] as? String,
-          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = getAddresses(receivers: receivers)
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-      } else {
-          let err = "Error: [Native] addresses. Command arguments problem."
-          NSLog(err)
-          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
-      }
-  }
-
-  @objc(getAddressesInfo:resolve:reject:)
-  func getAddressesInfo(_ receivers: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["receivers": receivers, "resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnGetAddressesInfo(dict)
-        }
-      }
-  }
-
   func fnGetTotalMemobytesToAddressInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           let resp = getTotalMemobytesToAddress()
@@ -1392,6 +1363,148 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
             NSLog(err)
             resolve(err)
           }
+        }
+      }
+  }
+
+  func fnGetUnifiedAddressesInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getUnifiedAddresses()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] unified addresses. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getUnifiedAddressesInfo:reject:)
+  func getUnifiedAddressesInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetUnifiedAddressesInfo(dict)
+        }
+      }
+  }
+
+  func fnGetTransparentAddressesInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getTransparentAddresses()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] transparent addresses. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getTransparentAddressesInfo:reject:)
+  func getTransparentAddressesInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetTransparentAddressesInfo(dict)
+        }
+      }
+  }
+
+  func fnCreateNewUnifiedAddressProcess(_ dict: [AnyHashable: Any]) {
+      if let receivers = dict["receivers"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = createNewUnifiedAddress(receivers: receivers)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] create new unified address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(createNewUnifiedAddressProcess:resolve:reject:)
+  func createNewUnifiedAddressProcess(_ receivers: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["receivers": receivers, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnCreateNewUnifiedAddressProcess(dict)
+        }
+      }
+  }
+
+  func fnCreateNewTransparentAddressProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = createNewTransparentAddress()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] create new transparent address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(createNewTransparentAddressProcess:reject:)
+  func createNewTransparentAddressProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnCreateNewTransparentAddressProcess(dict)
+        }
+      }
+  }
+
+  func fnCheckMyAddressInfo(_ dict: [AnyHashable: Any]) {
+      if let address = dict["address"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = checkMyAddress(address: address)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] create new unified address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(checkMyAddressInfo:resolve:reject:)
+  func checkMyAddressInfo(_ address: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["address": address, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnCheckMyAddressInfo(dict)
         }
       }
   }

@@ -137,10 +137,6 @@ RCT_EXTERN_METHOD(getMessagesInfo:
 RCT_EXTERN_METHOD(getBalanceInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(getAddressesInfo:
-    (NSString)receivers 
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getTotalMemobytesToAddressInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
@@ -175,6 +171,23 @@ RCT_EXTERN_METHOD(setOptionWalletProcess:
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(createTorClientProcess:
     (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getUnifiedAddressesInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getTransparentAddressesInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(createNewUnifiedAddressProcess:
+    (NSString)receivers 
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(createNewTransparentAddressProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(checkMyAddressInfo:
+    (NSString)address
+                  resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 
 @end

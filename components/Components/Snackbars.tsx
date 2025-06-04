@@ -1,7 +1,6 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { View } from 'react-native';
-import { SnackbarType } from '../../app/AppState';
-import { SnackbarDurationEnum, TranslateType } from '../../app/AppState';
+import { SnackbarDurationEnum, TranslateType, SnackbarType } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import { useTheme } from '@react-navigation/native';
 import { useToast } from 'react-native-toastier';

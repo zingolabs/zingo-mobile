@@ -638,9 +638,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                               padding: 3,
                             }}>
                             <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={19} />
-                            <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
-                              {translate('connecting') as string}
-                            </FadeText>
+                            {false && (
+                              <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                                {translate('connecting') as string}
+                              </FadeText>
+                            )}
                           </View>
                         </TouchableOpacity>
                       </View>

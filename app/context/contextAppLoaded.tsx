@@ -38,7 +38,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   info: {} as InfoType,
   walletSettings: new WalletSettingsClass(),
   wallet: {} as WalletType,
-  uOrchardAddress: '',
+  defaultUnifiedAddress: '',
   server: {} as ServerType,
   currency: CurrencyEnum.noCurrency,
   language: LanguageEnum.en,

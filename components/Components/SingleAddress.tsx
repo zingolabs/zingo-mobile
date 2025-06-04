@@ -1,10 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect, useRef, SetStateAction, Dispatch } from 'react';
-import { View, ScrollView, TouchableOpacity, Text, NativeSyntheticEvent } from 'react-native';
+import React, { useContext, useState, useEffect, useRef } from 'react';
+import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@react-navigation/native';
-import { faChevronDown, faChevronLeft, faChevronRight, faCopy, faShare } from '@fortawesome/free-solid-svg-icons';
+import { faCircleCheck, faCopy, faList } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Share from 'react-native-share';
 import ViewShot from 'react-native-view-shot';
@@ -16,32 +16,36 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { ModeEnum, SecurityType, SnackbarDurationEnum } from '../../app/AppState';
+import { AddressKindEnum, ButtonTypeEnum, ModeEnum, SecurityType, SnackbarDurationEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
 import RegText from './RegText';
-import { ShieldedEnum } from '../../app/AppState/enums/ShieldedEnum';
+import Button from './Button';
 import FadeText from './FadeText';
-import ContextMenu, { ContextMenuOnPressNativeEvent } from 'react-native-context-menu-view';
 
 type SingleAddressProps = {
-  setShielded?: Dispatch<SetStateAction<ShieldedEnum>>;
-  shielded?: ShieldedEnum;
-  address: string;
+  address?: UnifiedAddressClass | TransparentAddressClass;
+  ufvk?: string;
   index: number;
   total: number;
   prev: () => void;
   next: () => void;
-  ufvk?: boolean;
   setSecurityOption: (s: SecurityType) => Promise<void>;
+  newAddressShow?: () => void;
 };
 
-const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ setShielded, shielded, address, index, total, prev, next, ufvk, setSecurityOption }) => {
+const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
+  address,
+  ufvk,
+  setSecurityOption,
+  newAddressShow,
+  total,
+  index,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, language, security, mode } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
-  const [multi, setMulti] = useState<boolean>(false);
 
   const qrCodeRef = useRef<ViewShot>(null);
 
@@ -59,15 +63,17 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ setShielde
     }
   }, [expandQRAddress, privacy]);
 
-  useEffect(() => {
-    const mult = total > 1;
-    setMulti(mult);
-  }, [total]);
-
   const doCopy = () => {
-    Clipboard.setString(address);
+    Clipboard.setString(ufvk ? ufvk : (address ? address.address : ''));
     addLastSnackbar({
-      message: translate('history.addresscopied') as string,
+      message: ufvk ? (translate('seed.tapcopy-ufvk-message') as string) : (translate('history.addresscopied') as string),
+      duration: SnackbarDurationEnum.short,
+    });
+  };
+
+  const doNothing = () => {
+    addLastSnackbar({
+      message: 'Unimplemented option',
       duration: SnackbarDurationEnum.short,
     });
   };
@@ -122,13 +128,66 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ setShielde
   };
 
   return (
-    <View style={{ flexDirection: 'column' }}>
+    <View style={{ flexDirection: 'column', width: '100%' }}>
       <ScrollView
+        style={{ width: '100%' }}
         contentContainerStyle={{
           alignItems: 'center',
         }}>
-        {!!address && address !== (translate('receive.noaddress') as string) ? (
+        {(ufvk || (address && address.address !== (translate('receive.noaddress') as string))) ? (
           <>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 10, marginBottom: 5 }}>
+              {mode === ModeEnum.advanced && address && address.addressKind === AddressKindEnum.u && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 10,
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <RegText
+                      style={{
+                        fontWeight: 'bold',
+                        opacity: 0.9,
+                        marginRight: 10,
+                      }}>
+                      {(address && address.has_orchard  === true && address.has_sapling === false
+                        ? translate('receive.shielded-orchard')
+                        : address && address.has_orchard === true && address.has_sapling === true
+                        ? translate('receive.shielded-orchard-sapling')
+                        : address && address.has_orchard === false && address.has_sapling === true
+                        ? translate('receive.shielded-sapling')
+                        : '') as string}
+                    </RegText>
+                  </View>
+                </View>
+              )}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 10,
+                }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <FadeText>
+                    {` (${index + 1} / ${total}) `}
+                  </FadeText>
+                </View>
+              </View>
+            </View>
+
             <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.text }}>
               <TouchableOpacity
                 onPress={() => {
@@ -145,7 +204,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ setShielde
                     {expandQRAddress ? (
                       <ViewShot ref={qrCodeRef} options={{ format: 'png', quality: 1 }}>
                         <QRCode
-                          value={address}
+                          value={ufvk}
                           size={200}
                           ecl="L"
                           backgroundColor={colors.text}
@@ -181,7 +240,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ setShielde
                 ) : (
                   <ViewShot ref={qrCodeRef} options={{ format: 'png', quality: 1 }}>
                     <QRCode
-                      value={address}
+                      value={address ? address.address : ''}
                       size={200}
                       ecl="L"
                       backgroundColor={colors.text}
@@ -203,99 +262,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ setShielde
                 width: '100%',
                 justifyContent: 'space-evenly',
               }}>
-              {multi && (
-                <View
-                  style={{
-                    width: 58,
-                    borderColor: colors.primary,
-                    borderWidth: 2,
-                    borderRadius: 10,
-                  }}>
-                  <TouchableOpacity
-                    accessible={true}
-                    accessibilityLabel={translate('send.scan-acc') as string}
-                    onPress={prev}>
-                    <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faChevronLeft} color={colors.primary} />
-                  </TouchableOpacity>
-                </View>
-              )}
-              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 10, marginBottom: 5 }}>
-                {mode === ModeEnum.advanced && setShielded && (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      margin: 10,
-                      marginRight: 20,
-                    }}>
-                    <ContextMenu
-                      title={translate('loadedapp.options') as string}
-                      dropdownMenuMode={true}
-                      actions={
-                        [
-                          { title: translate('receive.shielded-orchard') as string },
-                          { title: translate('receive.shielded-orchard-sapling') as string },
-                          { title: translate('receive.shielded-sapling') as string },
-                        ]
-                      }
-                      onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
-                        if (e.nativeEvent.index === 0) {
-                          setShielded(ShieldedEnum.uOrchard);
-                        } else if (e.nativeEvent.index === 1) {
-                          setShielded(ShieldedEnum.uOrchardSapling);
-                        } else if (e.nativeEvent.index === 2) {
-                          setShielded(ShieldedEnum.sapling);
-                        }
-                      }}
-                    >
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          width: 155,
-                          backgroundColor: colors.primary,
-                          borderRadius: 15,
-                          borderColor: colors.primary,
-                          borderWidth: 1,
-                          paddingHorizontal: 10,
-                          paddingVertical: 5,
-                        }}>
-                        <FadeText
-                          numberOfLines={1}
-                          style={{
-                            color: colors.sideMenuBackground,
-                            fontWeight: 'bold',
-                            opacity: 0.9,
-                            marginRight: 5,
-                          }}>
-                          {(shielded === ShieldedEnum.uOrchard
-                            ? translate('receive.shielded-orchard')
-                            : shielded === ShieldedEnum.uOrchardSapling
-                            ? translate('receive.shielded-orchard-sapling')
-                            : translate('receive.shielded-sapling')) as string}
-                        </FadeText>
-                        <FontAwesomeIcon size={15} icon={faChevronDown} color={colors.sideMenuBackground} />
-                      </View>
-                    </ContextMenu>
-                  </View>
-                )}
+              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 20, marginBottom: 5 }}>
                 <TouchableOpacity onPress={doCopy}>
-                <View
-                  style={{
-                    backgroundColor: colors.sideMenuBackground,
-                    borderRadius: 30,
-                    borderColor: colors.zingo,
-                    borderWidth: 1,
-                    paddingHorizontal: 5,
-                    paddingVertical: 5,
-                    marginHorizontal: 10,
-                  }}>
-                    <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faCopy} color={colors.money} />
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={doShare}>
                   <View
                     style={{
                       backgroundColor: colors.sideMenuBackground,
@@ -306,48 +274,74 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ setShielde
                       paddingVertical: 5,
                       marginHorizontal: 10,
                     }}>
-                    <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faShare} color={colors.money} />
+                    <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faCopy} color={colors.money} />
                   </View>
                 </TouchableOpacity>
-                {multi && (
-                  <Text style={{ color: colors.primary, marginTop: -25 }}>
-                    {index + 1}
-                    {translate('receive.of') as string}
-                    {total}
-                  </Text>
+                {address && mode === ModeEnum.advanced && (
+                  <>
+                    <TouchableOpacity onPress={doNothing}>
+                      <View
+                        style={{
+                          backgroundColor: colors.sideMenuBackground,
+                          borderRadius: 30,
+                          borderColor: colors.zingo,
+                          borderWidth: 1,
+                          paddingHorizontal: 5,
+                          paddingVertical: 5,
+                          marginHorizontal: 10,
+                        }}>
+                        <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faCircleCheck} color={colors.money} />
+                      </View>
+                    </TouchableOpacity>
+                    {total > 1 && (
+                      <TouchableOpacity onPress={doNothing}>
+                        <View
+                          style={{
+                            backgroundColor: colors.sideMenuBackground,
+                            borderRadius: 30,
+                            borderColor: colors.zingo,
+                            borderWidth: 1,
+                            paddingHorizontal: 5,
+                            paddingVertical: 5,
+                            marginHorizontal: 10,
+                          }}>
+                          <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faList} color={colors.money} />
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                  </>
                 )}
               </View>
-              {multi && (
-                <View
-                  style={{
-                    width: 58,
-                    borderColor: colors.primary,
-                    borderWidth: 2,
-                    borderRadius: 10,
-                  }}>
-                  <TouchableOpacity
-                    accessible={true}
-                    accessibilityLabel={translate('send.scan-acc') as string}
-                    onPress={next}>
-                    <FontAwesomeIcon style={{ margin: 5 }} size={48} icon={faChevronRight} color={colors.primary} />
-                  </TouchableOpacity>
-                </View>
+            </View>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                marginTop: 10,
+                marginBottom: 20,
+              }}>
+              <AddressItem ufvk={!!ufvk} address={ufvk ? ufvk : (address ? address.address : '')} />
+            </View>
+            <View style={{ flexDirection: 'column', width: '100%', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
+              <Button
+                type={ButtonTypeEnum.Primary}
+                title={'Share'}
+                onPress={() => {
+                  doShare();
+                }}
+                style={{ marginBottom: 10 }}
+              />
+              {address && mode === ModeEnum.advanced && (
+                <Button
+                  type={ButtonTypeEnum.Tertiary}
+                  title={address.addressKind === AddressKindEnum.u ? 'New Unified Address' : 'New Transparent Address'}
+                  onPress={() => {
+                    newAddressShow && newAddressShow();
+                  }}
+                />
               )}
             </View>
-            <TouchableOpacity
-              onPress={() => {
-                doCopy();
-              }}>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  marginBottom: 30,
-                }}>
-                <AddressItem address={address} />
-              </View>
-            </TouchableOpacity>
           </>
         ) : (
           <View
@@ -358,7 +352,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({ setShielde
               marginTop: 50,
               marginBottom: 30,
             }}>
-            <RegText>{address}</RegText>
+            <RegText>{ufvk ? ufvk : (address ? address.address : '')}</RegText>
           </View>
         )}
       </ScrollView>

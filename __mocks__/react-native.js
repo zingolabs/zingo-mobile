@@ -26,7 +26,6 @@ jest.mock('react-native', () => {
     getVersionInfo: jest.fn(() => '{}'),
     getMessagesInfo: jest.fn(() => '{}'),
     getBalanceInfo: jest.fn(() => '{}'),
-    getAddressesInfo: jest.fn(() => '{}'),
     getTotalMemobytesToAddressInfo: jest.fn(() => '{}'),
     getTotalValueToAddressInfo: jest.fn(() => '{}'),
     getTotalSpendsToAddressInfo: jest.fn(() => '{}'),
@@ -37,6 +36,11 @@ jest.mock('react-native', () => {
     getOptionWalletInfo: jest.fn(() => '{}'),
     setOptionWalletProcess: jest.fn(() => '{}'),
     createTorClientProcess: jest.fn(() => '{}'),
+    getUnifiedAddressesInfo: jest.fn(() => '{}'),
+    getTransparentAddressesInfo: jest.fn(() => '{}'),
+    createNewUnifiedAddressProcess: jest.fn(() => '{}'),
+    createNewTransparentAddressProcess: jest.fn(() => '{}'),
+    checkMyAddressInfo: jest.fn(() => '{}'),
   };
   RN.View = jest.fn();
 

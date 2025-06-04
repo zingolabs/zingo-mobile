@@ -29,7 +29,6 @@ describe('Component Address Book Details - test', () => {
           cancel={onCancel}
           action={AddressBookActionEnum.Add}
           doAction={onAction}
-          setSecurityOption={onAction}
         />
       </ContextAppLoadedProvider>,
     );
@@ -44,7 +43,6 @@ describe('Component Address Book Details - test', () => {
           cancel={onCancel}
           action={AddressBookActionEnum.Modify}
           doAction={onAction}
-          setSecurityOption={onAction}
         />
       </ContextAppLoadedProvider>,
     );
@@ -59,7 +57,6 @@ describe('Component Address Book Details - test', () => {
           cancel={onCancel}
           action={AddressBookActionEnum.Delete}
           doAction={onAction}
-          setSecurityOption={onAction}
         />
       </ContextAppLoadedProvider>,
     );

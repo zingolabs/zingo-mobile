@@ -30,7 +30,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   twoButtons,
 }) => {
   const { colors } = useTheme()  as ThemeType;
-  // type: Primary or Secondary
+
   const styleButton: TextStyle =
     type === ButtonTypeEnum.Primary
       ? {
@@ -46,11 +46,17 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           borderWidth: 2,
           width: twoButtons ? '40%' : '80%',
         }
+      : type === ButtonTypeEnum.Tertiary
+      ? {
+          backgroundColor: colors.tertiary,
+          width: twoButtons ? '40%' : '80%',
+        }
       : {
           // error
           backgroundColor: colors.primary,
+          width: twoButtons ? '40%' : '80%',
         };
-  const styleCommon: TextStyle = {
+  const styleButtonCommon: TextStyle = {
     padding: 0,
     paddingLeft: 20,
     paddingRight: 20,
@@ -62,6 +68,34 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     justifyContent: 'center',
   };
 
+  const styleText: TextStyle =
+    type === ButtonTypeEnum.Primary
+      ? {
+          color: colors.background,
+        }
+      : type === ButtonTypeEnum.Secondary
+      ? {
+          color: disabled ? colors.primaryDisabled : colors.primary,
+        }
+      : type === ButtonTypeEnum.Tertiary
+      ? {
+          color: colors.text,
+        }
+      : {
+          // error
+          color: colors.background,
+        };
+  const styleTextCommon: TextStyle = {
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    fontSize: 16,
+    textAlign: 'center',
+  };
+
+  //if (type === ButtonTypeEnum.Tertiary) {
+  //  console.log(styleText, styleTextCommon);
+  //}
+
   return (
     <TouchableOpacity
       testID={testID}
@@ -69,11 +103,12 @@ const Button: React.FunctionComponent<ButtonProps> = ({
       accessibilityLabel={accessibilityLabel}
       style={{
         ...styleButton,
-        ...styleCommon,
+        ...styleButtonCommon,
         ...style,
       }}
       disabled={disabled}
-      onPress={() => onPress()}>
+      onPress={() => onPress()}
+    >
       <View
         style={{
           display: 'flex',
@@ -87,13 +122,9 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         }}>
         <Text
           style={{
-            color:
-              type === ButtonTypeEnum.Primary ? colors.background : disabled ? colors.primaryDisabled : colors.primary,
-            fontWeight: 'bold',
-            textTransform: 'uppercase',
-            fontSize: 16,
-            textAlign: 'center',
-          }}>
+            ...styleText,
+            ...styleTextCommon,
+        }}>
           {title}
         </Text>
       </View>

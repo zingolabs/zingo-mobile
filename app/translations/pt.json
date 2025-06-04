@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.0 (235)",
+  "version": "zingo-2.0.0 (236)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -72,8 +72,7 @@
     "delete-alert": "Você realmente deseja excluir este Contato/Apelido?",
     "likely": "Provavelmente: ",
     "thiswalletaddress": "Endereço desta Carteira",
-    "addto": "Adicionar à ",
-    "uorchardaddress": "EU Orchard:\n"
+    "addto": "Adicionar à "
   },
   "change-privacy-legend": ".\nToque para revelar os valores ocultos.",
   "txtcopied": "Texto copiado para a Área de Transferência",
@@ -449,7 +448,8 @@
     "birthday-acc": "Campo de Aniversário",
     "tapreveal": "Toque para revelar",
     "showtransactions": "Mostrar Transações",
-    "youreceived": "Você recebeu"
+    "youreceived": "Você recebeu",
+    "tapcopy-ufvk-message": "Chave de visualização copiada para a área de transferência"
   },
   "send": {
     "Broadcast": "Transmitido e aguardando confirmação Tx:",

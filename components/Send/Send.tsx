@@ -62,7 +62,7 @@ import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
 import { magicModal } from 'react-native-magic-modal';
 // @ts-ignore
-import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
+//import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 
 type SendProps = {
@@ -96,7 +96,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setScrollToTop,
   setScrollToBottom,
   setServerOption,
-  setSecurityOption,
+  //setSecurityOption,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -118,7 +118,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     language,
     donation,
     addresses,
-    uOrchardAddress,
+    defaultUnifiedAddress,
     shieldingAmount,
     selectServer,
     setZecPrice,
@@ -126,7 +126,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     setComputingModalShow,
     closeAllModals,
     setPoolsModalShow,
-    security,
+    //security,
     currency,
   } = context;
   const { colors } = useTheme() as ThemeType;
@@ -250,7 +250,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemoPar;
         sendPageStateCalculateFee.toaddr.amount = amountPar;
 
-        sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, uOrchardAddress, server, donation);
+        sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, defaultUnifiedAddress, server, donation);
         console.log('SEND', sendJson);
       }
 
@@ -317,7 +317,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setFee(proposeFee);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [addresses, donation, server, translate, uOrchardAddress, validAddress, validAmount, validMemo],
+    [addresses, donation, server, translate, defaultUnifiedAddress, validAddress, validAmount, validMemo],
   );
 
   const calculateSpendableBalance = useCallback(
@@ -537,7 +537,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
 
     if (memoText || includeUAMemoBoolean) {
-      const len = Utils.countMemoBytes(memoText, includeUAMemoBoolean, uOrchardAddress);
+      const len = Utils.countMemoBytes(memoText, includeUAMemoBoolean, defaultUnifiedAddress);
       if (len > GlobalConst.memoMaxLength) {
         setValidMemo(-1);
       } else {
@@ -586,7 +586,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     spendable,
     fee,
     maxAmount,
-    uOrchardAddress,
+    defaultUnifiedAddress,
   ]);
 
   useEffect(() => {
@@ -822,50 +822,50 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const setQrcodeModalShow = () => {
-    if (Platform.OS === GlobalConst.platformOSandroid) {
-      let changed: boolean = false;
-      if (security.foregroundApp) {
-        // deactivate temporarily this
-        changed = true;
-        const newSecurity = {
-          startApp: security.startApp,
-          foregroundApp: false,
-          sendConfirm: security.sendConfirm,
-          seedUfvkScreen: security.seedUfvkScreen,
-          rescanScreen: security.rescanScreen,
-          settingsScreen: security.settingsScreen,
-          changeWalletScreen: security.changeWalletScreen,
-          restoreWalletBackupScreen: security.restoreWalletBackupScreen,
-        } as SecurityType;
-        setSecurityOption(newSecurity);
-      }
-      BarcodeZxingScan.showQrReader(async (a: string) => {
-        updateToField(a, null, null, null, null);
-      });
-      if (changed) {
-        // activate again in 5 seconds
-        setTimeout(() => {
-          const newSecurity = {
-            startApp: security.startApp,
-            foregroundApp: true,
-            sendConfirm: security.sendConfirm,
-            seedUfvkScreen: security.seedUfvkScreen,
-            rescanScreen: security.rescanScreen,
-            settingsScreen: security.settingsScreen,
-            changeWalletScreen: security.changeWalletScreen,
-            restoreWalletBackupScreen: security.restoreWalletBackupScreen,
-          } as SecurityType;
-          setSecurityOption(newSecurity);
-        }, 5 * 1000);
-      }
-      return;
-    } else {
+    //if (Platform.OS === GlobalConst.platformOSandroid) {
+    //  let changed: boolean = false;
+    //  if (security.foregroundApp) {
+    //    // deactivate temporarily this
+    //    changed = true;
+    //    const newSecurity = {
+    //      startApp: security.startApp,
+    //      foregroundApp: false,
+    //      sendConfirm: security.sendConfirm,
+    //      seedUfvkScreen: security.seedUfvkScreen,
+    //      rescanScreen: security.rescanScreen,
+    //      settingsScreen: security.settingsScreen,
+    //      changeWalletScreen: security.changeWalletScreen,
+    //      restoreWalletBackupScreen: security.restoreWalletBackupScreen,
+    //    } as SecurityType;
+    //    setSecurityOption(newSecurity);
+    //  }
+    //  BarcodeZxingScan.showQrReader(async (a: string) => {
+    //    updateToField(a, null, null, null, null);
+    //  });
+    //  if (changed) {
+    //    // activate again in 5 seconds
+    //    setTimeout(() => {
+    //      const newSecurity = {
+    //        startApp: security.startApp,
+    //        foregroundApp: true,
+    //        sendConfirm: security.sendConfirm,
+    //        seedUfvkScreen: security.seedUfvkScreen,
+    //        rescanScreen: security.rescanScreen,
+    //        settingsScreen: security.settingsScreen,
+    //        changeWalletScreen: security.changeWalletScreen,
+    //        restoreWalletBackupScreen: security.restoreWalletBackupScreen,
+    //      } as SecurityType;
+    //      setSecurityOption(newSecurity);
+    //    }, 5 * 1000);
+    //  }
+    //  return;
+    //} else {
       return magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
             updateToField(a, null, null, null, null);
           }}
         />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
       ).promise;
-    }
+    //}
   };
 
   const setMemoModalShow = () => {
@@ -1659,7 +1659,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         fontWeight: 'bold',
                         fontSize: 12.5,
                         color: 'red',
-                      }}>{`${Utils.countMemoBytes(memoText, includeUAMemoBoolean, uOrchardAddress)} `}</FadeText>
+                      }}>{`${Utils.countMemoBytes(memoText, includeUAMemoBoolean, defaultUnifiedAddress)} `}</FadeText>
                     <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>{translate('loadedapp.of') as string}</FadeText>
                     <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
                       {' ' + GlobalConst.memoMaxLength.toString() + ' '}

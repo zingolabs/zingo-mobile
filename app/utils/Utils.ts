@@ -234,14 +234,14 @@ export default class Utils {
 
   static async getSendManyJSON(
     sendPageState: SendPageStateClass,
-    uOrchardAddress: string,
+    uAddress: string,
     server: ServerType,
     donation: boolean,
   ): Promise<SendJsonToTypeType[]> {
     let donationAddress: boolean = false;
     const json: Promise<SendJsonToTypeType[][]> = Promise.all(
       [sendPageState.toaddr].map(async (to: ToAddrClass) => {
-        const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uOrchardAddress);
+        const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uAddress);
         const amount = parseInt((Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(0), 10);
 
         donationAddress =
@@ -415,12 +415,12 @@ export default class Utils {
     return { memo: memoTotal, memoUA: '' };
   };
 
-  static buildMemo = (memo: string | undefined, includeUAMemo: boolean, uOrchardAddress: string): string => {
-    return `${memo || ''}${includeUAMemo ? GlobalConst.replyTo + uOrchardAddress : ''}`;
+  static buildMemo = (memo: string | undefined, includeUAMemo: boolean, uAddress: string): string => {
+    return `${memo || ''}${includeUAMemo ? GlobalConst.replyTo + uAddress : ''}`;
   };
 
-  static countMemoBytes = (memo: string | undefined, includeUAMemo: boolean, uOrchardAddress: string): number => {
-    const memoTotal = Utils.buildMemo(memo, includeUAMemo, uOrchardAddress);
+  static countMemoBytes = (memo: string | undefined, includeUAMemo: boolean, uAddress: string): number => {
+    const memoTotal = Utils.buildMemo(memo, includeUAMemo, uAddress);
     const len = Buffer.byteLength(memoTotal, 'utf8');
     return len;
   };

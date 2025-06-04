@@ -32,7 +32,6 @@ import {
   InfoType,
   ToAddrClass,
   WalletSettingsClass,
-  AddressClass,
   ZecPriceType,
   BackgroundType,
   TranslateType,
@@ -61,6 +60,10 @@ import {
   ValueTransferKindEnum,
   CurrencyNameEnum,
   RefreshScreenEnum,
+  UnifiedAddressClass,
+  TransparentAddressClass,
+  AddressKindEnum,
+  AddressBookFileClassObsolete,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -92,6 +95,7 @@ import MessageList from '../../components/Messages/components/MessageList';
 import { ToastProvider } from 'react-native-toastier';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
+import { RPCCheckAddressType } from '../rpc/types/RPCCheckAddressType';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -279,75 +283,80 @@ export default function LoadedApp(props: LoadedAppProps) {
         setBackground(backgroundJson);
       }
 
-      // adding `Zenny Tips` address always.
+      let sort: boolean = false;
       const zenniesAddress = await Utils.getZenniesDonationAddress(server.chainName);
-      let ab = await AddressBookFileImpl.writeAddressBookItem(
-        translate('zenny-tips-ab') as string,
-        zenniesAddress,
-        '',
-        '',
-      );
       setZenniesDonationAddress(zenniesAddress);
 
-      // reply-to change, from full UA to only orchard UA.
-      // we need to calculate the only orchard UA for all the
-      // contacts with a full UA stored in the Address Book.
-      // We need to identify the old transaction memos (with full UA)
-      // and we need to idenfify the new transaction memos (with only orchard UA)
+      // adding `Zenny Tips` address always.
+      let ab = await AddressBookFileImpl.readAddressBook();
+      if (ab.filter((a: AddressBookFileClass) => a.address === zenniesAddress).length === 0) {
+        ab = await AddressBookFileImpl.writeAddressBookItem(
+          translate('zenny-tips-ab') as string,
+          zenniesAddress,
+          '',
+          false,
+        );
+        sort = true;
+      }
 
-      // if some contact don't have the new field: `uOrchardAddress` then
-      // the App have to create and calculate it if needed.
-      // same thing with the color of the contact
-      const toUpdate = ab.filter(
-        (a: AddressBookFileClass) => !a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('color'),
+      // now make no sense to have two UA's in the same contact
+      // if `uOrchardAddress` exists then it will be removed.
+      const toUpdate: AddressBookFileClassObsolete[] = ab.filter(
+        // if have orchard address or NOT have color or NOT have own flag...
+        (a: AddressBookFileClassObsolete) => a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('color') || !a.hasOwnProperty('own'),
       );
       console.log('Address Book -> TO UPDATE', toUpdate);
       if (toUpdate.length > 0) {
         const randomColors = Utils.generateColorList(toUpdate.length);
         for (let i = 0; i < toUpdate.length; i++) {
           const a = toUpdate[i];
-          if (!a.hasOwnProperty('uOrchardAddress') && !a.hasOwnProperty('color')) {
-            // both
-            const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
-              a.address,
-              server.chainName,
-            );
-            ab = await AddressBookFileImpl.writeAddressBookItem(
+          let own: boolean;
+          if (!a.hasOwnProperty('own')) {
+            // verify this address as own or not
+            const checkStr = await RPCModule.checkMyAddressInfo(a.address);
+            console.log(checkStr);
+            if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
+              const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
+              own = checkJSON.is_wallet_address;
+            } else {
+              // error
+              own = false;
+            }
+          } else {
+            // no value
+            own = a.own !== undefined ? a.own : false;
+          }
+          let color: string;
+          if (!a.hasOwnProperty('color')) {
+            color = randomColors[i];
+          } else {
+            // no value
+            color = a.color !== undefined ? a.color : randomColors[i];
+          }
+          if (a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('own') || !a.hasOwnProperty('color')) {
+            ab = await AddressBookFileImpl.updateColorAndOwnItem(
               a.label,
               a.address,
-              validAddress.onlyOrchardUA,
-              randomColors[i],
-            );
-          } else if (!a.hasOwnProperty('uOrchardAddress')) {
-            const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
-              a.address,
-              server.chainName,
-            );
-            ab = await AddressBookFileImpl.writeAddressBookItem(
-              a.label,
-              a.address,
-              validAddress.onlyOrchardUA,
-              a.color ? a.color : '',
-            );
-          } else if (!a.hasOwnProperty('color')) {
-            ab = await AddressBookFileImpl.updateColorItem(
-              a.label,
-              a.address,
-              a.uOrchardAddress ? a.uOrchardAddress : '',
-              randomColors[i],
+              color,
+              own,
             );
           }
         }
+        sort = true;
+        console.log('Address Book -> UPDATED', ab);
       }
-      // this is a good place to sort properly these data
-      setAddressBook(
-        ab.sort((a, b) => {
+      let abSorted = ab;
+      if (sort) {
+        // this is a good place to sort properly these data
+        // if anything changed.
+        abSorted = ab.sort((a, b) => {
           const aLabel = a.label;
           const bLabel = b.label;
           return aLabel.localeCompare(bLabel);
-        }),
-      );
-
+        });
+      }
+      setAddressBook(abSorted);
+      await AddressBookFileImpl.writeAddressBook(abSorted);
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -469,7 +478,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       walletSettings: {} as WalletSettingsClass,
       syncingStatus: {} as RPCSyncStatusType,
       wallet: {} as WalletType,
-      uOrchardAddress: '',
+      defaultUnifiedAddress: '',
       zecPrice: {
         zecPrice: 0,
         date: 0,
@@ -555,11 +564,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     //console.log('DID MOUNT APPLOADED...', netInfoState);
 
-    this.clearToAddr();
-
     // Configure the RPC to start doing refreshes
     await this.rpc.clearTimers();
     await this.rpc.configure();
+
+    this.clearToAddr();
 
     this.appstate = AppState.addEventListener(EventListenerEnum.change, async nextAppState => {
       //console.log('LOADED', 'prior', this.state.appStateStatus, 'next', nextAppState);
@@ -664,11 +673,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     const initialUrl = await Linking.getInitialURL();
     if (initialUrl !== null) {
+      console.log('INITIAL URI', initialUrl);
       this.readUrl(initialUrl);
+
+      this.closeAllModals();
+      this.state.navigationHome?.navigate(RouteEnums.Home, {
+        screen: this.state.translate('loadedapp.send-menu'),
+        initial: false,
+      });
     }
 
     this.linking = Linking.addEventListener(EventListenerEnum.url, async ({ url }) => {
-      //console.log(url);
+      console.log('EVENT LISTENER URI', url);
       if (url !== null) {
         this.readUrl(url);
       }
@@ -1005,7 +1021,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setAllAddresses = (addresses: AddressClass[]) => {
+  setAllAddresses = (addresses: (UnifiedAddressClass | TransparentAddressClass)[]) => {
     if (!isEqual(this.state.addresses, addresses)) {
       //console.log('fetch addresses');
       //const start = Date.now();
@@ -1013,11 +1029,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       //console.log('=========================================== > ADDRESSES STORED SETSTATE - ', Date.now() - start);
     }
     if (addresses.length > 0) {
-      if (this.state.uOrchardAddress !== addresses[0].uOrchardAddress) {
-        this.setState({ uOrchardAddress: addresses[0].uOrchardAddress });
+      // the last Unified Address created.
+      const defaultUAArray = addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.u);
+      const defaultUA: string = defaultUAArray[defaultUAArray.length - 1].address;
+      if (this.state.defaultUnifiedAddress !== defaultUA) {
+        this.setState({ defaultUnifiedAddress: defaultUA });
       }
     } else {
-      this.setState({ uOrchardAddress: '' });
+      this.setState({ defaultUnifiedAddress: '' });
     }
   };
 
@@ -1112,8 +1131,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   sendTransaction = async (sendPageState: SendPageStateClass): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
-      const { uOrchardAddress, server, donation } = this.state;
-      const sendJson = await Utils.getSendManyJSON(sendPageState, uOrchardAddress, server, donation);
+      const { server, donation, defaultUnifiedAddress } = this.state;
+      const sendJson = await Utils.getSendManyJSON(sendPageState, defaultUnifiedAddress, server, donation);
       //const start = Date.now();
       const txid = await this.rpc.sendTransaction(sendJson);
       //console.log('&&&&&&&&&&&&&& send tx', Date.now() - start);
@@ -1264,7 +1283,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setState({
         addressBookCurrentAddress: '',
       });
-      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} setSecurityOption={this.setSecurityOption} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
+      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
         .promise;
     } else if (item === MenuItemEnum.VoteForNym) {
       let update = false;
@@ -1733,7 +1752,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       addressBookCurrentAddress: address,
     });
-    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} setSecurityOption={this.setSecurityOption} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
+    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
       .promise;
   };
 
@@ -1788,7 +1807,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       syncingStatus: this.state.syncingStatus,
       info: this.state.info,
       zecPrice: this.state.zecPrice,
-      uOrchardAddress: this.state.uOrchardAddress,
+      defaultUnifiedAddress: this.state.defaultUnifiedAddress,
       sendPageState: this.state.sendPageState,
       setSendPageState: this.state.setSendPageState,
       background: this.state.background,
@@ -1962,6 +1981,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                               toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
                               alone={false /* receive */}
                               setSecurityOption={this.setSecurityOption}
+                              setAddressBook={this.setAddressBook}
                             />
                           )}
                         </Tab.Screen>
@@ -1997,6 +2017,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                                   toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
                                   alone={true /* receive */}
                                   setSecurityOption={this.setSecurityOption}
+                                  setAddressBook={this.setAddressBook}
                                 />
                               )}
                             </Tab.Screen>
