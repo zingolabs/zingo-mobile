@@ -1230,10 +1230,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             if (this.state.currency === CurrencyEnum.USDTORCurrency) {
               RPCModule.createTorClientProcess();
             }
-            // creating tor cliente if needed
-            if (this.state.currency === CurrencyEnum.USDTORCurrency) {
-              RPCModule.createTorClientProcess();
-            }
             this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool);
           } else {
             error = true;
