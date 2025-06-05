@@ -10,7 +10,7 @@ interface AddressProps {
 }
 
 export function Address({ address, startLength = 10, endLength = 10, onPress, style }: AddressProps) {
-  if (!address) return null;
+  if (!address) {return null;}
 
   const shortAddress = `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
 

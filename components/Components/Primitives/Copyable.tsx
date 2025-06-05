@@ -11,7 +11,7 @@ interface CopyableProps {
 export function Copyable({ value, onCopy, children }: CopyableProps) {
   const doCopy = () => {
     Clipboard.setString(value);
-    if (onCopy) onCopy();
+    if (onCopy) {onCopy();}
   };
 
   return <Pressable onPress={doCopy}>{children}</Pressable>;

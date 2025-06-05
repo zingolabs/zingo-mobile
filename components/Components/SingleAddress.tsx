@@ -9,6 +9,7 @@ import {
   ChevronDown,
   ChevronUp,
   CopyIcon,
+  EyeIcon,
   ListIcon,
   ShieldIcon,
   SkullIcon,
@@ -40,6 +41,8 @@ import { CopyableAddress } from './Address/CopyableAddress';
 import { magicModal, MagicModalHideReason, useMagicModal } from 'react-native-magic-modal';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { opacity } from 'react-native-reanimated/lib/typescript/Colors';
+import { ExpandableAddress } from './Address/ExpandableAddress';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
@@ -158,20 +161,35 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
-  const height = useSharedValue(0);
+  const contentHeight = useRef(0);
+
+  const animatedHeight = useSharedValue(0);
+  const animatedOpacity = useSharedValue(0);
 
   const qrCodeRef = useRef<ViewShot>(null);
 
   const toggle = () => {
-    setShowMoreOptions(prev => !prev);
-    height.value = withTiming(showMoreOptions ? 0 : 60, {
-      duration: 300,
-      easing: Easing.out(Easing.cubic),
+    setShowMoreOptions(prev => {
+      const next = !prev;
+
+      animatedHeight.value = withTiming(next ? contentHeight.current : 0, {
+        duration: 300,
+        easing: Easing.out(Easing.cubic),
+      });
+
+      animatedOpacity.value = withTiming(next ? 1 : 0, {
+        duration: 300,
+        easing: Easing.out(Easing.cubic),
+      });
+
+      return next;
     });
   };
 
   const animatedStyle = useAnimatedStyle(() => ({
-    height: height.value,
+    height: animatedHeight.value,
+    opacity: animatedOpacity.value,
+    transform: [{ translateY: showMoreOptions ? 0 : -10 }],
     overflow: 'hidden',
   }));
 
@@ -304,6 +322,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
+                    <ShieldIcon color={colors.primary} size={24} style={{ marginRight: 10 }} />
                     <RegText
                       style={{
                         fontWeight: 'bold',
@@ -319,6 +338,32 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           ? translate('receive.shielded-sapling')
                           : '') as string
                       }
+                    </RegText>
+                  </View>
+                </View>
+              )}
+              {mode === ModeEnum.advanced && address && address.addressKind === AddressKindEnum.t && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 10,
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <EyeIcon color={'#DD7500'} size={24} style={{ marginRight: 10 }} />
+                    <RegText
+                      style={{
+                        fontWeight: 'bold',
+                        opacity: 0.9,
+                        marginRight: 10,
+                      }}>
+                      {address && (translate('receive.t-title') as string)}
                     </RegText>
                   </View>
                 </View>
@@ -449,8 +494,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 }}>
                 {contactFromAddress()}
               </Text>
-              <CopyableAddress
-                onCopy={onCopy}
+              <ExpandableAddress
                 address={address ? address.address : ''}
                 style={{ color: colors.money, fontSize: 18 }}
               />
@@ -515,25 +559,29 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     {showMoreOptions ? (
                       <ChevronUp size={20} color={'#dc2626'} style={{ marginRight: 16 }} />
                     ) : (
-                      <ChevronDown size={20} color={'#b45309'} style={{ marginRight: 16 }} />
+                      <ChevronDown size={20} color={colors.zingo} style={{ marginRight: 16 }} />
                     )}
-                    <SkullIcon size={20} color={showMoreOptions ? '#dc2626' : '#b45309'} style={{ marginRight: 16 }} />
+                    <SkullIcon
+                      size={20}
+                      color={showMoreOptions ? '#dc2626' : colors.zingo}
+                      style={{ marginRight: 16 }}
+                    />
                     <Text
                       style={{
                         fontSize: 16,
-                        color: showMoreOptions ? '#dc2626' : '#b45309',
+                        color: showMoreOptions ? '#dc2626' : colors.zingo,
                       }}>
                       DANGER ZONE{' '}
                     </Text>
                     <BiohazardIcon
                       size={20}
-                      color={showMoreOptions ? '#dc2626' : '#b45309'}
+                      color={showMoreOptions ? '#dc2626' : colors.zingo}
                       style={{ marginLeft: 16 }}
                     />
                     {showMoreOptions ? (
                       <ChevronUp size={20} color={'#dc2626'} style={{ marginLeft: 16 }} />
                     ) : (
-                      <ChevronDown size={20} color={'#b45309'} style={{ marginLeft: 16 }} />
+                      <ChevronDown size={20} color={colors.zingo} style={{ marginLeft: 16 }} />
                     )}
                   </Pressable>
                   {/* {showMoreOptions && ( */}
@@ -547,12 +595,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     ]}>
                     <View
                       style={{
-                        marginTop: 10,
                         width: '100%',
                         justifyContent: 'center',
                         alignItems: 'center',
                       }}>
                       <TouchableOpacity
+                        onLayout={e => {
+                          contentHeight.current = e.nativeEvent.layout.height;
+                        }}
                         style={{
                           display: 'flex',
                           flexDirection: 'row',
@@ -574,7 +624,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         onPress={() => {
                           handleConfirmationFlow(() => {
                             setShowMoreOptions(false);
-                            height.value = 0;
+                            animatedHeight.value = 0;
                             changeIndex && changeIndex(1);
                           });
                         }}>
