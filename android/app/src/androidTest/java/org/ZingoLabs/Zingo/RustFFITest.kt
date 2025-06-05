@@ -582,7 +582,7 @@ class ExecuteSaplingBalanceFromSeed {
         assertThat(changeServerJson.lowercase().startsWith("error")).isFalse()
 
         // open the wallet with no server - Offline mode
-        val loadWalletJson: String = rpcModule.loadExistingWalletNative("", "main", "false")
+        val loadWalletJson: String = rpcModule.loadExistingWalletNative("", "main")
         println("\nLoad Wallet:")
         println(loadWalletJson)
     }
