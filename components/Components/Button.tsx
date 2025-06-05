@@ -29,7 +29,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   testID,
   twoButtons,
 }) => {
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
 
   const styleButton: TextStyle =
     type === ButtonTypeEnum.Primary
@@ -51,11 +51,18 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           backgroundColor: colors.tertiary,
           width: twoButtons ? '40%' : '80%',
         }
+      : type === ButtonTypeEnum.Ghost
+      ? {
+          backgroundColor: 'transparent',
+          color: 'red',
+          width: twoButtons ? '40%' : '80%',
+        }
       : {
           // error
           backgroundColor: colors.primary,
           width: twoButtons ? '40%' : '80%',
         };
+
   const styleButtonCommon: TextStyle = {
     padding: 0,
     paddingLeft: 20,
@@ -81,13 +88,18 @@ const Button: React.FunctionComponent<ButtonProps> = ({
       ? {
           color: colors.text,
         }
+      : type === ButtonTypeEnum.Ghost
+      ? {
+          color: colors.money,
+          opacity: 0.5,
+        }
       : {
           // error
           color: colors.background,
         };
   const styleTextCommon: TextStyle = {
     fontWeight: 'bold',
-    textTransform: 'uppercase',
+    // textTransform: 'uppercase',
     fontSize: 16,
     textAlign: 'center',
   };
@@ -107,8 +119,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         ...style,
       }}
       disabled={disabled}
-      onPress={() => onPress()}
-    >
+      onPress={() => onPress()}>
       <View
         style={{
           display: 'flex',
@@ -124,7 +135,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           style={{
             ...styleText,
             ...styleTextCommon,
-        }}>
+          }}>
           {title}
         </Text>
       </View>

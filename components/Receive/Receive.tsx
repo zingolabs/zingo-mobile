@@ -14,7 +14,14 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 
-import { AddressKindEnum, ModeEnum, SecurityType, UnifiedAddressClass, TransparentAddressClass, AddressBookFileClass } from '../../app/AppState';
+import {
+  AddressKindEnum,
+  ModeEnum,
+  SecurityType,
+  UnifiedAddressClass,
+  TransparentAddressClass,
+  AddressBookFileClass,
+} from '../../app/AppState';
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
@@ -39,7 +46,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, addresses, defaultUnifiedAddress, mode, language } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
 
   const [index, setIndex] = useState<number>(0);
@@ -53,12 +60,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [indexBottomSheet, setIndexBottomSheet] = useState<number>(-1);
 
-  const snapPoints = useMemo(() =>
-    [
-      index === 0 ? '55%' : '40%',
-      '65%',
-      index === 0 ? '95%' : '80%',
-    ], [index]);
+  const snapPoints = useMemo(() => [index === 0 ? '55%' : '40%', '65%', index === 0 ? '95%' : '80%'], [index]);
 
   const dimensions = {
     width: Dimensions.get('window').width,
@@ -108,10 +110,14 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       // 1. UA
       // 2. T
       const uAdd =
-        addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.u) || [];
-        // we are filtering only the `external` addresses... for now.
+        addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.u) ||
+        [];
+      // we are filtering only the `external` addresses... for now.
       const tAdd =
-        addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.t && a.scope === RPCAddressScopeEnum.external) || [];
+        addresses.filter(
+          (a: UnifiedAddressClass | TransparentAddressClass) =>
+            a.addressKind === AddressKindEnum.t && a.scope === RPCAddressScopeEnum.external,
+        ) || [];
       setUAddr(uAdd as UnifiedAddressClass[]);
       setTAddr(tAdd as TransparentAddressClass[]);
       setUAddrIndex(uAdd.length > 0 ? uAdd.length - 1 : 0);
@@ -136,7 +142,14 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     let component: any;
     switch (route.key) {
       case 'uaddr': {
-        let uAddress = new UnifiedAddressClass(0, translate('receive.noaddress') as string, AddressKindEnum.u, false, false, false);
+        let uAddress = new UnifiedAddressClass(
+          0,
+          translate('receive.noaddress') as string,
+          AddressKindEnum.u,
+          false,
+          false,
+          false,
+        );
         if (uAddrIndex !== null && uAddr.length > 0) {
           uAddress = uAddr[uAddrIndex];
         }
@@ -161,6 +174,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   }}
                   setSecurityOption={setSecurityOption}
                   newAddressShow={newAddressShow}
+                  changeIndex={(index: number) => {
+                    setIndex(index);
+                  }}
                 />
               </>
             )}
@@ -169,7 +185,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         break;
       }
       case 'taddr': {
-        let tAddress = new TransparentAddressClass(0, translate('receive.noaddress') as string, AddressKindEnum.t, RPCAddressScopeEnum.external);
+        let tAddress = new TransparentAddressClass(
+          0,
+          translate('receive.noaddress') as string,
+          AddressKindEnum.t,
+          RPCAddressScopeEnum.external,
+        );
         if (tAddrIndex !== null && tAddr.length > 0) {
           tAddress = tAddr[tAddrIndex];
         }
@@ -194,6 +215,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   }}
                   setSecurityOption={setSecurityOption}
                   newAddressShow={newAddressShow}
+                  changeIndex={(index: number) => {
+                    setIndex(index);
+                  }}
                 />
               </>
             )}
@@ -202,14 +226,14 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         break;
       }
     }
-    return (
-      <>
-        {component}
-      </>
-    );
+    return <>{component}</>;
   };
 
-  const renderLabelCustom: ({ route, focused, color }: {route: any, focused: any, color: any }) => ReactNode = ({ route, focused, color }) => {
+  const renderLabelCustom: ({ route, focused, color }: { route: any; focused: any; color: any }) => ReactNode = ({
+    route,
+    focused,
+    color,
+  }) => {
     const w = (dimensions.width - 50) / (mode === ModeEnum.basic ? 1 : 2);
     //const w = route.key === 'uaddr' ? '40%' : '30%';
     return (
@@ -229,11 +253,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           {(route.title ? route.title : '') +
             (mode === ModeEnum.advanced &&
             ((route.key === 'uaddr' && uAddr.length > 1) || (route.key === 'taddr' && tAddr.length > 1))
-              ? ` (${route.key === 'uaddr'
-                ? uAddr.length
-                : route.key === 'taddr'
-                ? tAddr.length
-                : ''})`
+              ? ` (${route.key === 'uaddr' ? uAddr.length : route.key === 'taddr' ? tAddr.length : ''})`
               : '')}
         </RegText>
         {route.key === 'uaddr' && mode === ModeEnum.basic && (
@@ -272,12 +292,12 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           noBalance={true}
           noPrivacy={true}
         />
-        <TabBar
+        {/* <TabBar
           {...props}
           indicatorStyle={{ backgroundColor: colors.primary }}
           style={{ backgroundColor: colors.background }}
           renderTabBarItem={p => <TabBarItem {...p} key={p.route.key} label={renderLabelCustom} />}
-        />
+        /> */}
       </View>
     );
   };
@@ -289,6 +309,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         renderScene={renderScene}
         renderTabBar={renderTabBarPage}
         onIndexChange={setIndex}
+        swipeEnabled={false}
       />
       <BottomSheet
         ref={bottomSheetRef}
@@ -298,8 +319,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         onChange={handleSheetChanges}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
-        handleStyle={{ display: 'none' }}
-      >
+        handleStyle={{ display: 'none' }}>
         <BottomSheetView style={{ backgroundColor: colors.sideMenuBackground, width: '100%', height: '100%' }}>
           <NewAddress
             addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}

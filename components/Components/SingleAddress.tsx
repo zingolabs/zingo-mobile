@@ -1,25 +1,45 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
-import Clipboard from '@react-native-clipboard/clipboard';
+import { View, ScrollView, TouchableOpacity, Text, Pressable } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@react-navigation/native';
-import { faCircleCheck, faCopy, faList } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import {
+  BadgeCheck,
+  BiohazardIcon,
+  ChevronDown,
+  ChevronUp,
+  CopyIcon,
+  ListIcon,
+  ShieldIcon,
+  SkullIcon,
+  TriangleAlert,
+  XIcon,
+} from 'lucide-react-native';
 import Share from 'react-native-share';
 import ViewShot from 'react-native-view-shot';
 
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import AddressItem from './AddressItem';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { AddressKindEnum, ButtonTypeEnum, ModeEnum, SecurityType, SnackbarDurationEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
+import {
+  AddressKindEnum,
+  ButtonTypeEnum,
+  ModeEnum,
+  SecurityType,
+  SnackbarDurationEnum,
+  TransparentAddressClass,
+  UnifiedAddressClass,
+} from '../../app/AppState';
 import RegText from './RegText';
 import Button from './Button';
 import FadeText from './FadeText';
+import { CopyableAddress } from './Address/CopyableAddress';
+import { magicModal, MagicModalHideReason, useMagicModal } from 'react-native-magic-modal';
+import Clipboard from '@react-native-clipboard/clipboard';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
@@ -30,6 +50,96 @@ type SingleAddressProps = {
   next: () => void;
   setSecurityOption: (s: SecurityType) => Promise<void>;
   newAddressShow?: () => void;
+  changeIndex?: (index: number) => void;
+};
+
+type ConfirmationModalReturn = {
+  success: boolean;
+};
+
+const ConfirmationModal = () => {
+  const { hide } = useMagicModal<ConfirmationModalReturn>();
+  const { colors } = useTheme() as ThemeType;
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+      }}>
+      <View
+        style={{
+          width: '90%',
+          padding: 16,
+          borderRadius: 8,
+          backgroundColor: '#1e293b',
+          position: 'relative',
+        }}>
+        <TouchableOpacity
+          onPress={() => hide({ success: false })}
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            zIndex: 1,
+          }}
+          hitSlop={10}>
+          <XIcon color={colors.zingo} size={24} />
+        </TouchableOpacity>
+        <View
+          style={{
+            height: 2,
+            width: '100%',
+            marginBottom: 6,
+          }}
+        />
+
+        <View>
+          <Text style={{ color: 'white', fontSize: 25, fontWeight: 'bold', marginBottom: 12 }}>Privacy Warning</Text>
+          <Text style={{ color: '#cbd5e1', fontSize: 16, marginBottom: 12 }}>
+            Transparent addresses expose your transaction details on the public blockchain. This disintegrates your
+            privacy and is not recommended for most transactions.
+          </Text>
+          <Text style={{ color: '#94a3b8', fontSize: 16, marginBottom: 16 }}>
+            Shielded addresses are recommended as they provide the highest level of privacy.
+          </Text>
+          <TouchableOpacity
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: '#343536',
+              padding: 12,
+              borderRadius: 8,
+              borderColor: '#674827',
+              borderWidth: 2,
+            }}
+            onPress={() => hide({ success: true })}>
+            <TriangleAlert size={15} style={{ marginRight: 8 }} color={'#f59e0b'} />
+
+            <Text style={{ color: '#E1AA1B', fontSize: 12 }}>I understand the risks, show tranparent addresses.</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const handleConfirmationFlow = async (onSuccess: () => void) => {
+  const result = await magicModal.show<ConfirmationModalReturn>(() => <ConfirmationModal />).promise;
+
+  if (result.reason !== MagicModalHideReason.INTENTIONAL_HIDE) {
+    return;
+  }
+
+  if (!result.data.success) {
+    return;
+  }
+
+  onSuccess();
 };
 
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
@@ -39,15 +149,31 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   newAddressShow,
   total,
   index,
+  changeIndex,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, privacy, addLastSnackbar, language, security, mode } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { translate, privacy, addLastSnackbar, language, security, mode, addressBook } = context;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
+  const height = useSharedValue(0);
 
   const qrCodeRef = useRef<ViewShot>(null);
+
+  const toggle = () => {
+    setShowMoreOptions(prev => !prev);
+    height.value = withTiming(showMoreOptions ? 0 : 60, {
+      duration: 300,
+      easing: Easing.out(Easing.cubic),
+    });
+  };
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    height: height.value,
+    overflow: 'hidden',
+  }));
 
   useEffect(() => {
     if (privacy) {
@@ -63,68 +189,46 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
     }
   }, [expandQRAddress, privacy]);
 
+  useEffect(() => {
+    return () => {
+      setShowMoreOptions(false);
+      animatedStyle.height = 0;
+    };
+  }, []);
+
+  const toggleMoreOptions = () => {
+    setShowMoreOptions(prev => !prev);
+  };
+
+  function contactFromAddress() {
+    const contact = addressBook.find(c => c.address === address?.address);
+    return contact ? contact.label : '';
+  }
+
   const doCopy = () => {
-    Clipboard.setString(ufvk ? ufvk : (address ? address.address : ''));
+    Clipboard.setString(ufvk ? ufvk : address ? address.address : '');
     addLastSnackbar({
-      message: ufvk ? (translate('seed.tapcopy-ufvk-message') as string) : (translate('history.addresscopied') as string),
+      message: ufvk
+        ? (translate('seed.tapcopy-ufvk-message') as string)
+        : (translate('history.addresscopied') as string),
       duration: SnackbarDurationEnum.short,
     });
   };
+
+  function onCopy() {
+    addLastSnackbar({
+      message: ufvk
+        ? (translate('seed.tapcopy-ufvk-message') as string)
+        : (translate('history.addresscopied') as string),
+      duration: SnackbarDurationEnum.short,
+    });
+  }
 
   const doNothing = () => {
     addLastSnackbar({
       message: 'Unimplemented option',
       duration: SnackbarDurationEnum.short,
     });
-  };
-
-  const doShare = async () => {
-    if (qrCodeRef.current && qrCodeRef.current.capture) {
-      let changed: boolean = false;
-      if (security.foregroundApp) {
-        // deactivate temporarily this
-        changed = true;
-        const newSecurity = {
-          startApp: security.startApp,
-          foregroundApp: false,
-          sendConfirm: security.sendConfirm,
-          seedUfvkScreen: security.seedUfvkScreen,
-          rescanScreen: security.rescanScreen,
-          settingsScreen: security.settingsScreen,
-          changeWalletScreen: security.changeWalletScreen,
-          restoreWalletBackupScreen: security.restoreWalletBackupScreen,
-        } as SecurityType;
-        setSecurityOption(newSecurity);
-      }
-      try {
-        const uri = await qrCodeRef.current.capture(); // Capture the QR code as an image URI
-        const shareOptions = {
-          title: 'QR',
-          url: uri,
-          type: 'image/png',
-        };
-        await Share.open(shareOptions);
-      } catch (error) {
-        // https://github.com/react-native-share/react-native-share/issues/1664
-        console.log('Error sharing QR code:', error);
-      }
-      if (changed) {
-        // activate again in 5 seconds
-        setTimeout(() => {
-          const newSecurity = {
-            startApp: security.startApp,
-            foregroundApp: true,
-            sendConfirm: security.sendConfirm,
-            seedUfvkScreen: security.seedUfvkScreen,
-            rescanScreen: security.rescanScreen,
-            settingsScreen: security.settingsScreen,
-            changeWalletScreen: security.changeWalletScreen,
-            restoreWalletBackupScreen: security.restoreWalletBackupScreen,
-          } as SecurityType;
-          setSecurityOption(newSecurity);
-        }, 5 * 1000);
-      }
-    }
   };
 
   return (
@@ -134,9 +238,58 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         contentContainerStyle={{
           alignItems: 'center',
         }}>
-        {(ufvk || (address && address.address !== (translate('receive.noaddress') as string))) ? (
+        {ufvk || (address && address.address !== (translate('receive.noaddress') as string)) ? (
           <>
-            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 10, marginBottom: 5 }}>
+            {mode === ModeEnum.advanced && address && address.addressKind === AddressKindEnum.t && (
+              <View
+                style={{
+                  width: '95%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  justifyContent: 'center',
+                  backgroundColor: '#262527',
+                  borderRadius: 10,
+                  borderColor: '#65491C',
+                  borderWidth: 1,
+                  padding: 10,
+                  marginTop: 10,
+                }}>
+                <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                  <TriangleAlert color={'#F99D00'} size={24} style={{ marginRight: 10 }} />
+                  <Text style={{ color: '#E1AA1B', fontWeight: 'bold', fontSize: 16 }}>Privacy Warning</Text>
+                </View>
+                <Text style={{ color: '#FEE587' }}>
+                  You're viewing transparent addresses. These expose your transaction details publicly.
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    changeIndex && changeIndex(0);
+                  }}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '100%',
+                    backgroundColor: colors.primary,
+                    padding: 10,
+                    borderRadius: 5,
+                    marginTop: 10,
+                  }}>
+                  <ShieldIcon color={'#fff'} size={24} style={{ marginRight: 10 }} />
+                  <Text style={{ color: '#fff' }}>Switch to Shielded Addresses (Recommended)</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: 10,
+                marginBottom: 5,
+              }}>
               {mode === ModeEnum.advanced && address && address.addressKind === AddressKindEnum.u && (
                 <View
                   style={{
@@ -157,13 +310,15 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         opacity: 0.9,
                         marginRight: 10,
                       }}>
-                      {(address && address.has_orchard  === true && address.has_sapling === false
-                        ? translate('receive.shielded-orchard')
-                        : address && address.has_orchard === true && address.has_sapling === true
-                        ? translate('receive.shielded-orchard-sapling')
-                        : address && address.has_orchard === false && address.has_sapling === true
-                        ? translate('receive.shielded-sapling')
-                        : '') as string}
+                      {
+                        (address && address.has_orchard === true && address.has_sapling === false
+                          ? translate('receive.shielded-orchard')
+                          : address && address.has_orchard === true && address.has_sapling === true
+                          ? translate('receive.shielded-orchard-sapling')
+                          : address && address.has_orchard === false && address.has_sapling === true
+                          ? translate('receive.shielded-sapling')
+                          : '') as string
+                      }
                     </RegText>
                   </View>
                 </View>
@@ -181,78 +336,65 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}>
-                  <FadeText>
-                    {` (${index + 1} / ${total}) `}
-                  </FadeText>
+                  {total > 1 && <FadeText>{` (${index + 1} / ${total}) `}</FadeText>}
                 </View>
               </View>
             </View>
 
             <View style={{ marginTop: 20, marginHorizontal: 20, padding: 10, backgroundColor: colors.text }}>
-              <TouchableOpacity
-                onPress={() => {
-                  doCopy();
-                  setExpandQRAddress(true);
-                  if (privacy) {
-                    setTimeout(() => {
-                      setExpandQRAddress(false);
-                    }, 5 * 1000);
-                  }
-                }}>
-                {ufvk ? (
-                  <>
-                    {expandQRAddress ? (
-                      <ViewShot ref={qrCodeRef} options={{ format: 'png', quality: 1 }}>
-                        <QRCode
-                          value={ufvk}
-                          size={200}
-                          ecl="L"
-                          backgroundColor={colors.text}
-                          logo={require('../../assets/img/logobig-zingo.png')}
-                          logoSize={30}
-                          logoBackgroundColor={colors.text}
-                          logoBorderRadius={5} /* android not soported */
-                          logoMargin={3}
-                        />
-                      </ViewShot>
-                    ) : (
-                      <View
+              {ufvk ? (
+                <>
+                  {expandQRAddress ? (
+                    <ViewShot ref={qrCodeRef} options={{ format: 'png', quality: 1 }}>
+                      <QRCode
+                        value={ufvk}
+                        size={200}
+                        ecl="L"
+                        backgroundColor={colors.text}
+                        logo={require('../../assets/img/logobig-zingo.png')}
+                        logoSize={30}
+                        logoBackgroundColor={colors.text}
+                        logoBorderRadius={5} /* android not soported */
+                        logoMargin={3}
+                      />
+                    </ViewShot>
+                  ) : (
+                    <View
+                      style={{
+                        width: 200,
+                        height: 200,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderWidth: 1,
+                        borderColor: colors.text,
+                      }}>
+                      <Text
                         style={{
-                          width: 200,
-                          height: 200,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          borderWidth: 1,
-                          borderColor: colors.text,
+                          color: colors.zingo,
+                          textDecorationLine: 'underline',
+                          marginTop: 15,
+                          minHeight: 48,
                         }}>
-                        <Text
-                          style={{
-                            color: colors.zingo,
-                            textDecorationLine: 'underline',
-                            marginTop: 15,
-                            minHeight: 48,
-                          }}>
-                          {translate('seed.tapreveal') as string}
-                        </Text>
-                      </View>
-                    )}
-                  </>
-                ) : (
-                  <ViewShot ref={qrCodeRef} options={{ format: 'png', quality: 1 }}>
-                    <QRCode
-                      value={address ? address.address : ''}
-                      size={200}
-                      ecl="L"
-                      backgroundColor={colors.text}
-                      logo={require('../../assets/img/logobig-zingo.png')}
-                      logoSize={30}
-                      logoBackgroundColor={colors.text}
-                      logoBorderRadius={5} /* android not soported */
-                      logoMargin={3}
-                    />
-                  </ViewShot>
-                )}
-              </TouchableOpacity>
+                        {translate('seed.tapreveal') as string}
+                      </Text>
+                    </View>
+                  )}
+                </>
+              ) : (
+                <ViewShot ref={qrCodeRef} options={{ format: 'png', quality: 1 }}>
+                  <QRCode
+                    value={address ? address.address : ''}
+                    size={200}
+                    ecl="L"
+                    backgroundColor={colors.text}
+                    logo={require('../../assets/img/logobig-zingo.png')}
+                    logoSize={30}
+                    logoBackgroundColor={colors.text}
+                    logoBorderRadius={5} /* android not soported */
+                    logoMargin={3}
+                  />
+                </ViewShot>
+              )}
             </View>
             <View
               style={{
@@ -262,50 +404,27 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 width: '100%',
                 justifyContent: 'space-evenly',
               }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 20, marginBottom: 5 }}>
-                <TouchableOpacity onPress={doCopy}>
-                  <View
-                    style={{
-                      backgroundColor: colors.sideMenuBackground,
-                      borderRadius: 30,
-                      borderColor: colors.zingo,
-                      borderWidth: 1,
-                      paddingHorizontal: 5,
-                      paddingVertical: 5,
-                      marginHorizontal: 10,
-                    }}>
-                    <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faCopy} color={colors.money} />
-                  </View>
-                </TouchableOpacity>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: 20,
+                  marginBottom: 5,
+                }}>
                 {address && mode === ModeEnum.advanced && (
                   <>
-                    <TouchableOpacity onPress={doNothing}>
-                      <View
-                        style={{
-                          backgroundColor: colors.sideMenuBackground,
-                          borderRadius: 30,
-                          borderColor: colors.zingo,
-                          borderWidth: 1,
-                          paddingHorizontal: 5,
-                          paddingVertical: 5,
-                          marginHorizontal: 10,
-                        }}>
-                        <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faCircleCheck} color={colors.money} />
-                      </View>
-                    </TouchableOpacity>
                     {total > 1 && (
                       <TouchableOpacity onPress={doNothing}>
                         <View
                           style={{
-                            backgroundColor: colors.sideMenuBackground,
                             borderRadius: 30,
                             borderColor: colors.zingo,
-                            borderWidth: 1,
                             paddingHorizontal: 5,
                             paddingVertical: 5,
                             marginHorizontal: 10,
                           }}>
-                          <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={20} icon={faList} color={colors.money} />
+                          <ListIcon color={colors.money} size={24} opacity={0.9} style={{ margin: 3 }} />
                         </View>
                       </TouchableOpacity>
                     )}
@@ -316,30 +435,160 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             <View
               style={{
                 display: 'flex',
-                flexDirection: 'row',
+                flexDirection: 'column',
                 justifyContent: 'center',
+                gap: 5,
+                alignItems: 'center',
                 marginTop: 10,
                 marginBottom: 20,
               }}>
-              <AddressItem ufvk={!!ufvk} address={ufvk ? ufvk : (address ? address.address : '')} />
-            </View>
-            <View style={{ flexDirection: 'column', width: '100%', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
-              <Button
-                type={ButtonTypeEnum.Primary}
-                title={'Share'}
-                onPress={() => {
-                  doShare();
-                }}
-                style={{ marginBottom: 10 }}
+              <Text
+                style={{
+                  color: colors.zingo,
+                  fontSize: 16,
+                }}>
+                {contactFromAddress()}
+              </Text>
+              <CopyableAddress
+                onCopy={onCopy}
+                address={address ? address.address : ''}
+                style={{ color: colors.money, fontSize: 18 }}
               />
-              {address && mode === ModeEnum.advanced && (
-                <Button
-                  type={ButtonTypeEnum.Tertiary}
-                  title={address.addressKind === AddressKindEnum.u ? 'New Unified Address' : 'New Transparent Address'}
+            </View>
+            <View
+              style={{
+                flexDirection: 'column',
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: 10,
+              }}>
+              {address && mode === ModeEnum.advanced && address.addressKind === AddressKindEnum.u ? (
+                <TouchableOpacity
                   onPress={() => {
                     newAddressShow && newAddressShow();
                   }}
-                />
+                  style={{
+                    width: '70%',
+                    alignContent: 'center',
+                    justifyContent: 'center',
+                    borderColor: colors.zingo,
+                    borderWidth: 1,
+                    paddingVertical: 10,
+                    borderRadius: 10,
+                  }}>
+                  <Text style={{ fontSize: 16, color: colors.money, width: '100%', textAlign: 'center' }}>
+                    Get new address
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    newAddressShow && newAddressShow();
+                  }}
+                  style={{
+                    width: '70%',
+                    alignContent: 'center',
+                    justifyContent: 'center',
+                    paddingVertical: 10,
+                    backgroundColor: '#DD7500',
+                    borderRadius: 10,
+                  }}>
+                  <Text style={{ fontSize: 16, color: '#fff', width: '100%', textAlign: 'center', fontWeight: 'bold' }}>
+                    New transparent address
+                  </Text>
+                </TouchableOpacity>
+              )}
+              {address && address.addressKind === AddressKindEnum.u && (
+                <>
+                  <Pressable
+                    onPress={toggle}
+                    style={{
+                      width: '70%',
+                      marginVertical: 40,
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      paddingHorizontal: 10,
+                    }}>
+                    {showMoreOptions ? (
+                      <ChevronUp size={20} color={'#dc2626'} style={{ marginRight: 16 }} />
+                    ) : (
+                      <ChevronDown size={20} color={'#b45309'} style={{ marginRight: 16 }} />
+                    )}
+                    <SkullIcon size={20} color={showMoreOptions ? '#dc2626' : '#b45309'} style={{ marginRight: 16 }} />
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        color: showMoreOptions ? '#dc2626' : '#b45309',
+                      }}>
+                      DANGER ZONE{' '}
+                    </Text>
+                    <BiohazardIcon
+                      size={20}
+                      color={showMoreOptions ? '#dc2626' : '#b45309'}
+                      style={{ marginLeft: 16 }}
+                    />
+                    {showMoreOptions ? (
+                      <ChevronUp size={20} color={'#dc2626'} style={{ marginLeft: 16 }} />
+                    ) : (
+                      <ChevronDown size={20} color={'#b45309'} style={{ marginLeft: 16 }} />
+                    )}
+                  </Pressable>
+                  {/* {showMoreOptions && ( */}
+                  <Animated.View
+                    style={[
+                      {
+                        marginTop: 12,
+                        justifyContent: 'center',
+                      },
+                      animatedStyle,
+                    ]}>
+                    <View
+                      style={{
+                        marginTop: 10,
+                        width: '100%',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      <TouchableOpacity
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 10,
+                          backgroundColor: '#1e293b',
+                          borderColor: '#334155',
+                          borderWidth: 1,
+                          padding: 0,
+                          paddingLeft: 20,
+                          paddingRight: 20,
+                          borderRadius: 10,
+                          maxWidth: '90%',
+                          minWidth: '30%',
+                          minHeight: 48,
+                          width: '80%',
+                        }}
+                        onPress={() => {
+                          handleConfirmationFlow(() => {
+                            setShowMoreOptions(false);
+                            height.value = 0;
+                            changeIndex && changeIndex(1);
+                          });
+                        }}>
+                        <TriangleAlert size={24} color={'#f59e0b'} />
+                        <Text
+                          style={{
+                            color: '#cbd5e1',
+                          }}>
+                          Exposed transparent address
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </Animated.View>
+                </>
               )}
             </View>
           </>
@@ -352,7 +601,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
               marginTop: 50,
               marginBottom: 30,
             }}>
-            <RegText>{ufvk ? ufvk : (address ? address.address : '')}</RegText>
+            <RegText>{ufvk ? ufvk : address ? address.address : ''}</RegText>
           </View>
         )}
       </ScrollView>
