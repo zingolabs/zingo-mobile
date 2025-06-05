@@ -414,6 +414,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
+        val tor = "false"
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
@@ -425,7 +426,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val price: String = uniffi.zingo.zecPrice()
+        val price: String = uniffi.zingo.zecPrice(tor)
         println("\nPrice:")
         println(price)
 
