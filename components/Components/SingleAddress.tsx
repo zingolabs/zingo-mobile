@@ -20,6 +20,8 @@ import { AddressKindEnum, ButtonTypeEnum, ModeEnum, SecurityType, SnackbarDurati
 import RegText from './RegText';
 import Button from './Button';
 import FadeText from './FadeText';
+import { magicModal } from 'react-native-magic-modal';
+import { AddressList } from '../AddressList';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
@@ -69,6 +71,11 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
       message: ufvk ? (translate('seed.tapcopy-ufvk-message') as string) : (translate('history.addresscopied') as string),
       duration: SnackbarDurationEnum.short,
     });
+  };
+
+  const doAddressList = () => {
+    return magicModal.show(() => <AddressList addressKind={address ? address.addressKind : AddressKindEnum.u} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
+      .promise;
   };
 
   const doNothing = () => {
@@ -294,7 +301,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       </View>
                     </TouchableOpacity>
                     {total > 1 && (
-                      <TouchableOpacity onPress={doNothing}>
+                      <TouchableOpacity onPress={doAddressList}>
                         <View
                           style={{
                             backgroundColor: colors.sideMenuBackground,

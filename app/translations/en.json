@@ -52,6 +52,11 @@
     "link-all": "Global",
     "link-anonymous": "Anonymous"
   },
+  "addresslist": {
+    "title": "Address List",
+    "unified": "Unified",
+    "transparent": "Transparent"
+  },
   "addressbook": {
     "title": "Address Book",
     "end": "End",
