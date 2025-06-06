@@ -4,11 +4,9 @@ import { View, ScrollView, TouchableOpacity, Text, Pressable } from 'react-nativ
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@react-navigation/native';
 import {
-  BadgeCheck,
   BiohazardIcon,
   ChevronDown,
   ChevronUp,
-  CopyIcon,
   EyeIcon,
   ListIcon,
   ShieldIcon,
@@ -16,7 +14,6 @@ import {
   TriangleAlert,
   XIcon,
 } from 'lucide-react-native';
-import Share from 'react-native-share';
 import ViewShot from 'react-native-view-shot';
 
 import { ThemeType } from '../../app/types';
@@ -27,7 +24,6 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import {
   AddressKindEnum,
-  ButtonTypeEnum,
   ModeEnum,
   SecurityType,
   SnackbarDurationEnum,
@@ -35,13 +31,10 @@ import {
   UnifiedAddressClass,
 } from '../../app/AppState';
 import RegText from './RegText';
-import Button from './Button';
 import FadeText from './FadeText';
-import { CopyableAddress } from './Address/CopyableAddress';
 import { magicModal, MagicModalHideReason, useMagicModal } from 'react-native-magic-modal';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { opacity } from 'react-native-reanimated/lib/typescript/Colors';
 import { ExpandableAddress } from './Address/ExpandableAddress';
 
 type SingleAddressProps = {
@@ -516,12 +509,19 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     width: '70%',
                     alignContent: 'center',
                     justifyContent: 'center',
-                    borderColor: colors.zingo,
+                    borderColor: '#293D55',
+                    backgroundColor: '#13273E',
                     borderWidth: 1,
                     paddingVertical: 10,
                     borderRadius: 10,
                   }}>
-                  <Text style={{ fontSize: 16, color: colors.money, width: '100%', textAlign: 'center' }}>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: colors.money,
+                      width: '100%',
+                      textAlign: 'center',
+                    }}>
                     Get new address
                   </Text>
                 </TouchableOpacity>
