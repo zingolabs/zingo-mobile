@@ -128,13 +128,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun createNewWallet(server: String, chainhint: String, tor: String, promise: Promise) {
+    fun createNewWallet(server: String, chainhint: String, promise: Promise) {
         // Log.i("MAIN", "Creating new wallet")
 
         uniffi.zingo.initLogging()
 
         // Create a seed
-        val resp = uniffi.zingo.initNew(server, getDocumentDirectory(), chainhint, tor)
+        val resp = uniffi.zingo.initNew(server, chainhint)
         // Log.i("MAIN-Seed", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -145,12 +145,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun restoreWalletFromSeed(seed: String, birthday: String, server: String, chainhint: String, tor: String, promise: Promise) {
+    fun restoreWalletFromSeed(seed: String, birthday: String, server: String, chainhint: String, promise: Promise) {
         // Log.i("MAIN", "Restoring wallet with seed $seed")
 
         uniffi.zingo.initLogging()
 
-        val resp = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), getDocumentDirectory(), chainhint, tor)
+        val resp = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), chainhint)
         // Log.i("MAIN", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -161,12 +161,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, chainhint: String, tor: String, promise: Promise) {
+    fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, chainhint: String, promise: Promise) {
         // Log.i("MAIN", "Restoring wallet with ufvk $ufvk")
 
         uniffi.zingo.initLogging()
 
-        val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), getDocumentDirectory(), chainhint, tor)
+        val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), chainhint)
         // Log.i("MAIN", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -177,11 +177,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun loadExistingWallet(server: String, chainhint: String, tor: String, promise: Promise) {
-        promise.resolve(loadExistingWalletNative(server, chainhint, tor))
+    fun loadExistingWallet(server: String, chainhint: String, promise: Promise) {
+        promise.resolve(loadExistingWalletNative(server, chainhint))
     }
 
-    fun loadExistingWalletNative(server: String, chainhint: String, tor: String): String {
+    fun loadExistingWalletNative(server: String, chainhint: String): String {
         // Read the file
         val fileBytes = readFile(WalletFileName.value)
 
@@ -345,9 +345,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         return uniffi.zingo.initFromB64(
             server,
             fileb64.toString(),
-            applicationContext.filesDir.absolutePath,
-            chainhint,
-            tor
+            chainhint
         )
     }
 
@@ -582,27 +580,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: getting value transfers list: ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
-    }
-
-    @ReactMethod
-    fun getTransactionSummariesList(promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getTransactionSummaries()
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: getting transaction summaries list: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1173,7 +1150,28 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: tor client: ${e.localizedMessage}"
+                val errorMessage = "Error: create tor client: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun removeTorClientProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.removeTorClient()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: remove tor client: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
