@@ -492,13 +492,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     if (exists && exists !== GlobalConst.false) {
       this.setState({ walletExists: true });
-      let result: string = await RPCModule.loadExistingWallet(
-        this.state.server.uri,
-        this.state.server.chainName,
-        this.state.currency === CurrencyEnum.USDTORCurrency
-          ? GlobalConst.true
-          : GlobalConst.false
-      );
+      let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chainName);
       //let result = 'Error: pepe es guapo';
 
       // for testing
@@ -567,6 +561,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 actionButtonsDisabled: false,
               });
               this.addLastSnackbar({ message: walletKindStr });
+            }
+            // creating tor cliente if needed
+            if (this.state.currency === CurrencyEnum.USDTORCurrency) {
+              RPCModule.createTorClientProcess();
             }
             this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool);
             //console.log('navigate to LoadedApp');
@@ -1009,13 +1007,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     }
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
-      let seed: string = await RPCModule.createNewWallet(
-        this.state.server.uri,
-        this.state.server.chainName,
-        this.state.currency === CurrencyEnum.USDTORCurrency
-          ? GlobalConst.true
-          : GlobalConst.false
-      );
+      let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chainName);
 
       if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
         let seedJSON = {} as RPCSeedType;
@@ -1067,6 +1059,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           actionButtonsDisabled: false,
           walletExists: true,
         }));
+        // creating tor cliente if needed
+        if (this.state.currency === CurrencyEnum.USDTORCurrency) {
+          RPCModule.createTorClientProcess();
+        }
       } else {
         this.walletErrorHandle(seed, this.state.translate('loadingapp.creatingwallet-label') as string, 1, false);
       }
@@ -1136,9 +1132,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           walletBirthday || '0',
           this.state.server.uri,
           this.state.server.chainName,
-          this.state.currency === CurrencyEnum.USDTORCurrency
-            ? GlobalConst.true
-            : GlobalConst.false,
         );
       } else {
         result = await RPCModule.restoreWalletFromUfvk(
@@ -1146,9 +1139,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           walletBirthday || '0',
           this.state.server.uri,
           this.state.server.chainName,
-          this.state.currency === CurrencyEnum.USDTORCurrency
-            ? GlobalConst.true
-            : GlobalConst.false,
         );
       }
 
@@ -1235,6 +1225,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 actionButtonsDisabled: false,
               });
               this.addLastSnackbar({ message: walletKindStr });
+            }
+            // creating tor cliente if needed
+            if (this.state.currency === CurrencyEnum.USDTORCurrency) {
+              RPCModule.createTorClientProcess();
             }
             this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool);
           } else {

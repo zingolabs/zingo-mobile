@@ -205,8 +205,8 @@ class RPCModule: NSObject {
     try self.saveWalletBackupFile(walletString)
   }
 
-  func fnCreateNewWallet(server: String, chainhint: String, tor: String) throws -> String {
-    let seed = initNew(serveruri: server, datadir: try getDocumentsDirectory(), chainhint: chainhint, tor: tor)
+  func fnCreateNewWallet(server: String, chainhint: String) throws -> String {
+    let seed = initNew(serveruri: server, chainhint: chainhint)
     let seedStr = String(seed)
     if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -214,10 +214,10 @@ class RPCModule: NSObject {
     return seedStr
   }
 
-  @objc(createNewWallet:chainhint:tor:resolve:reject:)
-  func createNewWallet(_ server: String, chainhint: String, tor: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(createNewWallet:chainhint:resolve:reject:)
+  func createNewWallet(_ server: String, chainhint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      let seedStr = try self.fnCreateNewWallet(server: server, chainhint: chainhint, tor: tor)
+      let seedStr = try self.fnCreateNewWallet(server: server, chainhint: chainhint)
       DispatchQueue.main.async {
         resolve(seedStr)
       }
@@ -230,8 +230,8 @@ class RPCModule: NSObject {
     }
   }
   
-  func fnRestoreWalletFromSeed(server: String, chainhint: String, restoreSeed: String, birthday: String, tor: String) throws -> String {
-    let seed = initFromSeed(serveruri: server, seed: restoreSeed, birthday: UInt64(birthday) ?? 0, datadir: try getDocumentsDirectory(), chainhint: chainhint, tor: tor)
+  func fnRestoreWalletFromSeed(server: String, chainhint: String, restoreSeed: String, birthday: String) throws -> String {
+    let seed = initFromSeed(serveruri: server, seed: restoreSeed, birthday: UInt64(birthday) ?? 0, chainhint: chainhint)
     let seedStr = String(seed)
     if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -239,10 +239,10 @@ class RPCModule: NSObject {
     return seedStr
   }
 
-  @objc(restoreWalletFromSeed:birthday:server:chainhint:tor:resolve:reject:)
-  func restoreWalletFromSeed(_ restoreSeed: String, birthday: String, server: String, chainhint: String, tor: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(restoreWalletFromSeed:birthday:server:chainhint:resolve:reject:)
+  func restoreWalletFromSeed(_ restoreSeed: String, birthday: String, server: String, chainhint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      let seedStr = try self.fnRestoreWalletFromSeed(server: server, chainhint: chainhint, restoreSeed: restoreSeed, birthday: birthday, tor: tor)
+      let seedStr = try self.fnRestoreWalletFromSeed(server: server, chainhint: chainhint, restoreSeed: restoreSeed, birthday: birthday)
       DispatchQueue.main.async {
         resolve(seedStr)
       }
@@ -255,8 +255,8 @@ class RPCModule: NSObject {
     }
   }
   
-  func fnRestoreWalletFromUfvk(server: String, chainhint: String, restoreUfvk: String, birthday: String, tor: String) throws -> String {
-    let ufvk = initFromUfvk(serveruri: server, ufvk: restoreUfvk, birthday: UInt64(birthday) ?? 0, datadir: try getDocumentsDirectory(), chainhint: chainhint, tor: tor)
+  func fnRestoreWalletFromUfvk(server: String, chainhint: String, restoreUfvk: String, birthday: String) throws -> String {
+    let ufvk = initFromUfvk(serveruri: server, ufvk: restoreUfvk, birthday: UInt64(birthday) ?? 0, chainhint: chainhint)
     let ufvkStr = String(ufvk)
     if !ufvkStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -264,10 +264,10 @@ class RPCModule: NSObject {
     return ufvkStr
   }
 
-  @objc(restoreWalletFromUfvk:birthday:server:chainhint:tor:resolve:reject:)
-  func restoreWalletFromUfvk(_ restoreUfvk: String, birthday: String, server: String, chainhint: String, tor: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(restoreWalletFromUfvk:birthday:server:chainhint:resolve:reject:)
+  func restoreWalletFromUfvk(_ restoreUfvk: String, birthday: String, server: String, chainhint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      let ufvkStr = try self.fnRestoreWalletFromUfvk(server: server, chainhint: chainhint, restoreUfvk: restoreUfvk, birthday: birthday, tor: tor)
+      let ufvkStr = try self.fnRestoreWalletFromUfvk(server: server, chainhint: chainhint, restoreUfvk: restoreUfvk, birthday: birthday)
       DispatchQueue.main.async {
         resolve(ufvkStr)
       }
@@ -280,16 +280,16 @@ class RPCModule: NSObject {
     }
   }
 
-  func fnLoadExistingWallet(server: String, chainhint: String, tor: String) throws -> String {
-    let seed = initFromB64(serveruri: server, datab64: try self.readWalletUtf8String(), datadir: try getDocumentsDirectory(), chainhint: chainhint, tor: tor)
+  func fnLoadExistingWallet(server: String, chainhint: String) throws -> String {
+    let seed = initFromB64(serveruri: server, datab64: try self.readWalletUtf8String(), chainhint: chainhint)
     let seedStr = String(seed)
     return seedStr
   }
 
-  @objc(loadExistingWallet:chainhint:tor:resolve:reject:)
-  func loadExistingWallet(_ server: String, chainhint: String, tor: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(loadExistingWallet:chainhint:resolve:reject:)
+  func loadExistingWallet(_ server: String, chainhint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      let seedStr = try self.fnLoadExistingWallet(server: server, chainhint: chainhint, tor: tor)
+      let seedStr = try self.fnLoadExistingWallet(server: server, chainhint: chainhint)
       DispatchQueue.main.async {
         resolve(seedStr)
       }
@@ -555,34 +555,6 @@ class RPCModule: NSObject {
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fnGetValueTransfersList(dict)
-          }
-      }
-  }
-
-  func fnGetTransactionSummariesList(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = getTransactionSummaries()
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-      } else {
-          let err = "Error: [Native] Getting transaction summaries list. Command arguments problem."
-          NSLog(err)
-          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
-      }
-  }
-
-  @objc(getTransactionSummariesList:reject:)
-  func getTransactionSummariesList(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-          if let self = self {
-              self.fnGetTransactionSummariesList(dict)
           }
       }
   }
@@ -1341,7 +1313,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
             resolve(respStr)
           }
       } else {
-          let err = "Error: [Native] tor client. Command arguments problem."
+          let err = "Error: [Native] create tor client. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
             DispatchQueue.main.async {
@@ -1359,7 +1331,41 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
           do {
             try self.fnCreateTorClientProcess(dict)
           } catch {
-            let err = "Error: [Native] tor client. Document dir."
+            let err = "Error: [Native] create tor client. Document dir."
+            NSLog(err)
+            resolve(err)
+          }
+        }
+      }
+  }
+
+  func fnRemoveTorClientProcess(_ dict: [AnyHashable: Any]) throws {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = removeTorClient()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] remove tor client. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(removeTorClientProcess:reject:)
+  func removeTorClientProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          do {
+            try self.fnRemoveTorClientProcess(dict)
+          } catch {
+            let err = "Error: [Native] remove tor client. Document dir."
             NSLog(err)
             resolve(err)
           }

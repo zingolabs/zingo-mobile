@@ -24,7 +24,6 @@ RCT_EXTERN_METHOD(deleteExistingWalletBackup:
 RCT_EXTERN_METHOD(createNewWallet:
     (NSString)server 
                   chainhint:(NSString)chainhint
-                  tor:(NSString)tor
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(restoreWalletFromSeed:
@@ -32,7 +31,6 @@ RCT_EXTERN_METHOD(restoreWalletFromSeed:
                   birthday:(NSString)birthday
                   server:(NSString)server
                   chainhint:(NSString)chainhint
-                  tor:(NSString)tor
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(restoreWalletFromUfvk:
@@ -40,13 +38,11 @@ RCT_EXTERN_METHOD(restoreWalletFromUfvk:
                   birthday:(NSString)birthday
                   server:(NSString)server
                   chainhint:(NSString)chainhint
-                  tor:(NSString)tor
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(loadExistingWallet:
     (NSString)server 
                   chainhint:(NSString)chainhint
-                  tor:(NSString)tor
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(restoreExistingWalletBackup:
@@ -77,9 +73,6 @@ RCT_EXTERN_METHOD(getZenniesDonationAddress:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getValueTransfersList:
-    (RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(getTransactionSummariesList:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(setCryptoDefaultProvider:
@@ -170,6 +163,9 @@ RCT_EXTERN_METHOD(setOptionWalletProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(createTorClientProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(removeTorClientProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getUnifiedAddressesInfo:
