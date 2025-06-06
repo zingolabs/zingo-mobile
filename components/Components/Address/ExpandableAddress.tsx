@@ -63,14 +63,14 @@ export function ExpandableAddress({ address, style, renderModal }: ExpandableAdd
                 onClose();
               }}
               style={{
-                borderColor: '#ccc',
-                backgroundColor: colors.background,
+                borderColor: '#3B4B5F',
+                backgroundColor: '#2A394D',
                 paddingHorizontal: 8,
                 paddingVertical: 4,
                 borderRadius: 5,
                 borderWidth: 1,
               }}>
-              <Text style={{ color: '#ccc', fontSize: 16 }}>Copy Address</Text>
+              <Text style={{ color: '#ccc', fontSize: 16 }}>Copy address</Text>
             </TouchableOpacity>
           </View>
         </View>
