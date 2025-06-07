@@ -263,20 +263,20 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   flexDirection: 'column',
                   alignItems: 'flex-start',
                   justifyContent: 'center',
-                  backgroundColor: '#262527',
+                  backgroundColor: colors.warning.background,
                   borderRadius: 10,
-                  borderColor: '#65491C',
+                  borderColor: colors.warning.border,
                   borderWidth: 1,
                   padding: 10,
                   marginTop: 10,
                 }}>
                 <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                  <TriangleAlert color={'#F99D00'} size={24} style={{ marginRight: 10 }} />
-                  <Text style={{ color: '#E1AA1B', fontWeight: 'bold', fontSize: 16 }}>
+                  <TriangleAlert color={colors.warning.primary} size={24} style={{ marginRight: 10 }} />
+                  <Text style={{ color: colors.warning.title, fontWeight: 'bold', fontSize: 16 }}>
                     {translate('receive.transparent.warning.title') as string}
                   </Text>
                 </View>
-                <Text style={{ color: '#FEE587' }}>
+                <Text style={{ color: colors.warning.text }}>
                   {translate('receive.transparent.warning.description') as string}
                 </Text>
                 <TouchableOpacity
@@ -530,7 +530,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         alignContent: 'center',
                         justifyContent: 'center',
                         borderColor: '#293D55',
-                        backgroundColor: '#13273E',
+                        backgroundColor: '#112C51',
                         borderWidth: 1,
                         paddingVertical: 10,
                         borderRadius: 10,
@@ -555,13 +555,16 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         alignContent: 'center',
                         justifyContent: 'center',
                         paddingVertical: 10,
-                        backgroundColor: '#DD7500',
+                        borderColor: colors.danger.border,
+                        backgroundColor: colors.danger.background,
+                        opacity: 1,
+                        borderWidth: 1,
                         borderRadius: 10,
                       }}>
                       <Text
                         style={{
                           fontSize: 16,
-                          color: '#fff',
+                          color: colors.danger.text,
                           width: '100%',
                           textAlign: 'center',
                           fontWeight: 'bold',
