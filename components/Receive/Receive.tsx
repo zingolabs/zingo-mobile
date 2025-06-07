@@ -292,12 +292,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           noBalance={true}
           noPrivacy={true}
         />
-        {/* <TabBar
-          {...props}
-          indicatorStyle={{ backgroundColor: colors.primary }}
-          style={{ backgroundColor: colors.background }}
-          renderTabBarItem={p => <TabBarItem {...p} key={p.route.key} label={renderLabelCustom} />}
-        /> */}
       </View>
     );
   };

@@ -394,33 +394,17 @@
   },
   "seed": {
     "buttontexts": {
-      "new": [
-        "Eu salvei \n as Frases de Recuperação"
-      ],
+      "new": ["Eu salvei \n as Frases de Recuperação"],
       "change": [
         "",
         "Abrir Nova Carteira",
         "Você realmente quer\n alterar para a sua \n carteira atual",
         "Tem certeza?"
       ],
-      "server": [
-        "",
-        "Alterar Servidor",
-        "Você realmente quer \n alterar para o seu \n servidor atual",
-        "Tem certeza?"
-      ],
-      "view": [
-        "Eu salvei as \n Frases de Recuperação"
-      ],
-      "restore": [
-        "Restaurar Carteira"
-      ],
-      "backup": [
-        "",
-        "Restaurar",
-        "Você realmente deseja \n restaurar sua \n carteira de backup",
-        "Tem certeza?"
-      ]
+      "server": ["", "Alterar Servidor", "Você realmente quer \n alterar para o seu \n servidor atual", "Tem certeza?"],
+      "view": ["Eu salvei as \n Frases de Recuperação"],
+      "restore": ["Restaurar Carteira"],
+      "backup": ["", "Restaurar", "Você realmente deseja \n restaurar sua \n carteira de backup", "Tem certeza?"]
     },
     "title": "Frases de Recuperação",
     "new": "Novo",
@@ -512,6 +496,8 @@
     "title-advanced": "Meus Endereços",
     "title-basic": "Meu Endereço",
     "title-basic-alone": "Meu Endereço de Recebimento",
+    "danger-zone": "",
+    "go-to-transparent": "",
     "more": "mais...",
     "newu-option": "Novo Endereço Unificado Diversificado",
     "privkey-option": "Exportar Chave de Gastos",
@@ -525,7 +511,23 @@
     "shielded-sapling": "Apenas Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
     "shielded-full": "Completa",
-    "showtip": "Toque para selecionar outro endereço."
+    "showtip": "Toque para selecionar outro endereço.",
+    "copy-address-button": "",
+    "modal-transparent": {
+      "title": "",
+      "message": "",
+      "recommendation": "",
+      "button": ""
+    },
+    "transparent": {
+      "address-title": "",
+      "newt-option": "",
+      "warning": {
+        "title": "",
+        "description": "",
+        "button": ""
+      }
+    }
   },
   "history": {
     "shield-all": "Blindar Todos os Fundos",
@@ -666,33 +668,12 @@
   },
   "ufvk": {
     "buttontexts": {
-      "new": [
-        "Eu salvei a Chave \n de Visualização"
-      ],
-      "change": [
-        "",
-        "Abrir Nova Carteira",
-        "Você realmente deseja \n alterar sua carteira \n atual",
-        "Tem certeza?"
-      ],
-      "server": [
-        "",
-        "Alterar o Servidor",
-        "Você realmente quer \n mudar seu servidor \n atual",
-        "Tem certeza?"
-      ],
-      "view": [
-        "Eu salvei \na Chave de Visualização"
-      ],
-      "restore": [
-        "Restaurar Carteira"
-      ],
-      "backup": [
-        "",
-        "Restaurar",
-        "Você realmente deseja \n restaurar sua \n carteira de backup",
-        "Tem certeza?"
-      ]
+      "new": ["Eu salvei a Chave \n de Visualização"],
+      "change": ["", "Abrir Nova Carteira", "Você realmente deseja \n alterar sua carteira \n atual", "Tem certeza?"],
+      "server": ["", "Alterar o Servidor", "Você realmente quer \n mudar seu servidor \n atual", "Tem certeza?"],
+      "view": ["Eu salvei \na Chave de Visualização"],
+      "restore": ["Restaurar Carteira"],
+      "backup": ["", "Restaurar", "Você realmente deseja \n restaurar sua \n carteira de backup", "Tem certeza?"]
     },
     "privkey": "Disponível/Privado ",
     "viewkey": "Chave de Visualização ",

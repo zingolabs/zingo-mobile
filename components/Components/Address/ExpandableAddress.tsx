@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Pressable, TextStyle, View, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { XIcon } from 'lucide-react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -6,6 +6,7 @@ import { Address } from './Address';
 import { magicModal, MagicModalHideReason } from 'react-native-magic-modal';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types/ThemeType';
+import { ContextAppLoaded } from '../../../app/context';
 
 interface ExpandableAddressProps {
   address: string;
@@ -15,6 +16,7 @@ interface ExpandableAddressProps {
 
 export function ExpandableAddress({ address, style, renderModal }: ExpandableAddressProps) {
   const { colors } = useTheme() as unknown as ThemeType;
+  const { translate } = useContext(ContextAppLoaded);
 
   const onExpand = () => {
     const onClose = () => magicModal.hide({ reason: MagicModalHideReason.INTENTIONAL_HIDE });
@@ -55,7 +57,9 @@ export function ExpandableAddress({ address, style, renderModal }: ExpandableAdd
           />
 
           <View style={{ alignItems: 'flex-start' }}>
-            <Text style={{ color: 'white', fontSize: 22, fontWeight: 'bold', marginBottom: 12 }}>Your Address</Text>
+            <Text style={{ color: 'white', fontSize: 22, fontWeight: 'bold', marginBottom: 12 }}>
+              {translate('receive.title-basic') as string}
+            </Text>
             <Text style={{ color: '#cbd5e1', fontSize: 16, marginBottom: 12 }}>{address}</Text>
             <TouchableOpacity
               onPress={() => {
@@ -69,7 +73,7 @@ export function ExpandableAddress({ address, style, renderModal }: ExpandableAdd
                 borderRadius: 5,
                 borderWidth: 1,
               }}>
-              <Text style={{ color: '#ccc', fontSize: 16 }}>Copy address</Text>
+              <Text style={{ color: '#ccc', fontSize: 16 }}>{translate('receive.copy-address-button') as string}</Text>
             </TouchableOpacity>
           </View>
         </View>

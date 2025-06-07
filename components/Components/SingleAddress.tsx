@@ -57,6 +57,7 @@ type ConfirmationModalReturn = {
 const ConfirmationModal = () => {
   const { hide } = useMagicModal<ConfirmationModalReturn>();
   const { colors } = useTheme() as ThemeType;
+  const { translate } = useContext(ContextAppLoaded);
 
   return (
     <View
@@ -94,13 +95,14 @@ const ConfirmationModal = () => {
         />
 
         <View>
-          <Text style={{ color: 'white', fontSize: 25, fontWeight: 'bold', marginBottom: 12 }}>Privacy Warning</Text>
+          <Text style={{ color: 'white', fontSize: 25, fontWeight: 'bold', marginBottom: 12 }}>
+            {translate('receive.modal-transparent.title') as string}
+          </Text>
           <Text style={{ color: '#cbd5e1', fontSize: 16, marginBottom: 12 }}>
-            Transparent addresses expose your transaction details on the public blockchain. This disintegrates your
-            privacy and is not recommended for most transactions.
+            {translate('receive.modal-transparent.message') as string}
           </Text>
           <Text style={{ color: '#94a3b8', fontSize: 16, marginBottom: 16 }}>
-            Shielded addresses are recommended as they provide the highest level of privacy.
+            {translate('receive.modal-transparent.recommendation') as string}
           </Text>
           <TouchableOpacity
             style={{
@@ -117,7 +119,9 @@ const ConfirmationModal = () => {
             onPress={() => hide({ success: true })}>
             <TriangleAlert size={15} style={{ marginRight: 8 }} color={'#f59e0b'} />
 
-            <Text style={{ color: '#E1AA1B', fontSize: 12 }}>I understand the risks, show tranparent addresses.</Text>
+            <Text style={{ color: '#E1AA1B', fontSize: 12 }}>
+              {translate('receive.modal-transparent.button') as string}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -268,10 +272,12 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 }}>
                 <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
                   <TriangleAlert color={'#F99D00'} size={24} style={{ marginRight: 10 }} />
-                  <Text style={{ color: '#E1AA1B', fontWeight: 'bold', fontSize: 16 }}>Privacy Warning</Text>
+                  <Text style={{ color: '#E1AA1B', fontWeight: 'bold', fontSize: 16 }}>
+                    {translate('receive.transparent.warning.title') as string}
+                  </Text>
                 </View>
                 <Text style={{ color: '#FEE587' }}>
-                  You're viewing transparent addresses. These expose your transaction details publicly.
+                  {translate('receive.transparent.warning.description') as string}
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
@@ -289,7 +295,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     marginTop: 10,
                   }}>
                   <ShieldIcon color={'#fff'} size={24} style={{ marginRight: 10 }} />
-                  <Text style={{ color: '#fff' }}>Switch to Shielded Addresses (Recommended)</Text>
+                  <Text style={{ color: '#fff' }}>{translate('receive.transparent.warning.button') as string}</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -536,7 +542,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           width: '100%',
                           textAlign: 'center',
                         }}>
-                        Get new address
+                        {translate('receive.newu-option') as string}
                       </Text>
                     </TouchableOpacity>
                   ) : (
@@ -560,7 +566,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           textAlign: 'center',
                           fontWeight: 'bold',
                         }}>
-                        New transparent address
+                        {translate('receive.transparent.newt-option') as string}
                       </Text>
                     </TouchableOpacity>
                   )}
@@ -593,7 +599,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                             fontSize: 16,
                             color: showMoreOptions ? '#dc2626' : colors.zingo,
                           }}>
-                          DANGER ZONE{' '}
+                          {translate('receive.danger-zone') as string}{' '}
                         </Text>
                         <BiohazardIcon
                           size={20}
@@ -651,7 +657,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                               });
                             }}>
                             <TriangleAlert size={24} color={'#f59e0b'} />
-                            <Text style={{ color: '#cbd5e1' }}>Exposed transparent address</Text>
+                            <Text style={{ color: '#cbd5e1' }}>{translate('receive.go-to-transparent') as string}</Text>
                           </TouchableOpacity>
                         </View>
                       </Animated.View>
