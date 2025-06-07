@@ -133,13 +133,11 @@ class ExecuteAddressesFromSeed {
         val chainhint = "main"
         val seed = Seeds.ABANDON
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val tor = "false"
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, tor)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -174,13 +172,11 @@ class ExecuteAddressesFromUfvk {
         val chainhint = "main"
         val ufvk = Ufvk.ABANDON
         val birthday: ULong = 1u
-        val datadir = context.filesDir.path
-        val tor = "false"
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(server, ufvk, birthday, datadir, chainhint, tor)
+        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(server, ufvk, birthday, chainhint)
         println("\nInit From UFVK:")
         println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
@@ -222,13 +218,11 @@ class ExecuteVersionFromSeed {
         val chainhint = "main"
         val seed = Seeds.ABANDON
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val tor = "false"
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, tor)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -253,13 +247,11 @@ class ExecuteSyncFromSeed {
         val chainhint = "regtest"
         val seed = Seeds.ABANDON
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val tor = "false"
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, tor)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -320,13 +312,11 @@ class ExecuteSendFromOrchard {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val tor = "false"
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, tor)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -424,13 +414,12 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
         val tor = "false"
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, tor)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -505,13 +494,11 @@ class ExecuteSaplingBalanceFromSeed {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val tor = "false"
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, tor)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -582,7 +569,7 @@ class ExecuteSaplingBalanceFromSeed {
         assertThat(changeServerJson.lowercase().startsWith("error")).isFalse()
 
         // open the wallet with no server - Offline mode
-        val loadWalletJson: String = rpcModule.loadExistingWalletNative("", "main", "false")
+        val loadWalletJson: String = rpcModule.loadExistingWalletNative("", "main")
         println("\nLoad Wallet:")
         println(loadWalletJson)
     }
@@ -598,13 +585,11 @@ class ExecuteParseAddresses {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val tor = "false"
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, tor)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
@@ -639,13 +624,11 @@ class ExecuteParseAddresses {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val tor = "false"
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, tor)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
