@@ -162,6 +162,9 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
 
   const qrCodeRef = useRef<ViewShot>(null);
 
+  const isBasic = ModeEnum.basic === mode;
+  const isUnified = address?.addressKind === AddressKindEnum.u;
+
   const toggle = () => {
     setShowMoreOptions(prev => {
       const next = !prev;
@@ -208,10 +211,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
     };
   }, []);
 
-  const toggleMoreOptions = () => {
-    setShowMoreOptions(prev => !prev);
-  };
-
   function contactFromAddress() {
     const contact = addressBook.find(c => c.address === address?.address);
     return contact ? contact.label : '';
@@ -252,7 +251,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         }}>
         {ufvk || (address && address.address !== (translate('receive.noaddress') as string)) ? (
           <>
-            {mode === ModeEnum.advanced && address && address.addressKind === AddressKindEnum.t && (
+            {!isBasic && address && !isUnified && (
               <View
                 style={{
                   width: '95%',
@@ -302,7 +301,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 marginTop: 10,
                 marginBottom: 5,
               }}>
-              {mode === ModeEnum.advanced && address && address.addressKind === AddressKindEnum.u && (
+              {!isBasic && address && isUnified && (
                 <View
                   style={{
                     flexDirection: 'row',
@@ -451,21 +450,19 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   marginTop: 20,
                   marginBottom: 5,
                 }}>
-                {total > 1 && (
-                  <TouchableOpacity onPress={doCopy}>
-                    <View
-                      style={{
-                        borderRadius: 30,
-                        borderColor: colors.zingo,
-                        paddingHorizontal: 5,
-                        paddingVertical: 5,
-                        marginHorizontal: 10,
-                      }}>
-                      <CopyIcon color={colors.money} size={24} opacity={0.9} style={{ margin: 3 }} />
-                    </View>
-                  </TouchableOpacity>
-                )}
-                {address && mode === ModeEnum.advanced && (
+                <TouchableOpacity onPress={doCopy}>
+                  <View
+                    style={{
+                      borderRadius: 30,
+                      borderColor: colors.zingo,
+                      paddingHorizontal: 5,
+                      paddingVertical: 5,
+                      marginHorizontal: 10,
+                    }}>
+                    <CopyIcon color={colors.money} size={24} opacity={0.9} style={{ margin: 3 }} />
+                  </View>
+                </TouchableOpacity>
+                {address && !isBasic && (
                   <>
                     {total > 1 && (
                       <TouchableOpacity onPress={doNothing}>
@@ -515,144 +512,151 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 alignItems: 'center',
                 marginTop: 10,
               }}>
-              {address && mode === ModeEnum.advanced && address.addressKind === AddressKindEnum.u ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    newAddressShow && newAddressShow();
-                  }}
-                  style={{
-                    width: '70%',
-                    alignContent: 'center',
-                    justifyContent: 'center',
-                    borderColor: '#293D55',
-                    backgroundColor: '#13273E',
-                    borderWidth: 1,
-                    paddingVertical: 10,
-                    borderRadius: 10,
-                  }}>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color: colors.money,
-                      width: '100%',
-                      textAlign: 'center',
-                    }}>
-                    Get new address
-                  </Text>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  onPress={() => {
-                    newAddressShow && newAddressShow();
-                  }}
-                  style={{
-                    width: '70%',
-                    alignContent: 'center',
-                    justifyContent: 'center',
-                    paddingVertical: 10,
-                    backgroundColor: '#DD7500',
-                    borderRadius: 10,
-                  }}>
-                  <Text style={{ fontSize: 16, color: '#fff', width: '100%', textAlign: 'center', fontWeight: 'bold' }}>
-                    New transparent address
-                  </Text>
-                </TouchableOpacity>
-              )}
-              {address && address.addressKind === AddressKindEnum.u && (
+              {!isBasic && (
                 <>
-                  <Pressable
-                    onPress={toggle}
-                    style={{
-                      width: '70%',
-                      marginVertical: 40,
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      paddingHorizontal: 10,
-                    }}>
-                    {showMoreOptions ? (
-                      <ChevronUp size={20} color={'#dc2626'} style={{ marginRight: 16 }} />
-                    ) : (
-                      <ChevronDown size={20} color={colors.zingo} style={{ marginRight: 16 }} />
-                    )}
-                    <SkullIcon
-                      size={20}
-                      color={showMoreOptions ? '#dc2626' : colors.zingo}
-                      style={{ marginRight: 16 }}
-                    />
-                    <Text
+                  {isUnified ? (
+                    <TouchableOpacity
+                      onPress={() => {
+                        newAddressShow && newAddressShow();
+                      }}
                       style={{
-                        fontSize: 16,
-                        color: showMoreOptions ? '#dc2626' : colors.zingo,
-                      }}>
-                      DANGER ZONE{' '}
-                    </Text>
-                    <BiohazardIcon
-                      size={20}
-                      color={showMoreOptions ? '#dc2626' : colors.zingo}
-                      style={{ marginLeft: 16 }}
-                    />
-                    {showMoreOptions ? (
-                      <ChevronUp size={20} color={'#dc2626'} style={{ marginLeft: 16 }} />
-                    ) : (
-                      <ChevronDown size={20} color={colors.zingo} style={{ marginLeft: 16 }} />
-                    )}
-                  </Pressable>
-                  {/* {showMoreOptions && ( */}
-                  <Animated.View
-                    style={[
-                      {
-                        marginTop: 12,
+                        width: '70%',
+                        alignContent: 'center',
                         justifyContent: 'center',
-                      },
-                      animatedStyle,
-                    ]}>
-                    <View
-                      style={{
-                        width: '100%',
-                        justifyContent: 'center',
-                        alignItems: 'center',
+                        borderColor: '#293D55',
+                        backgroundColor: '#13273E',
+                        borderWidth: 1,
+                        paddingVertical: 10,
+                        borderRadius: 10,
                       }}>
-                      <TouchableOpacity
-                        onLayout={e => {
-                          contentHeight.current = e.nativeEvent.layout.height;
-                        }}
+                      <Text
                         style={{
+                          fontSize: 16,
+                          color: colors.money,
+                          width: '100%',
+                          textAlign: 'center',
+                        }}>
+                        Get new address
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => {
+                        newAddressShow && newAddressShow();
+                      }}
+                      style={{
+                        width: '70%',
+                        alignContent: 'center',
+                        justifyContent: 'center',
+                        paddingVertical: 10,
+                        backgroundColor: '#DD7500',
+                        borderRadius: 10,
+                      }}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          color: '#fff',
+                          width: '100%',
+                          textAlign: 'center',
+                          fontWeight: 'bold',
+                        }}>
+                        New transparent address
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+
+                  {isUnified && (
+                    <>
+                      <Pressable
+                        onPress={toggle}
+                        style={{
+                          width: '70%',
+                          marginVertical: 40,
                           display: 'flex',
                           flexDirection: 'row',
-                          alignItems: 'center',
                           justifyContent: 'center',
-                          gap: 10,
-                          backgroundColor: '#1e293b',
-                          borderColor: '#334155',
-                          borderWidth: 1,
-                          padding: 0,
-                          paddingLeft: 20,
-                          paddingRight: 20,
-                          borderRadius: 10,
-                          maxWidth: '90%',
-                          minWidth: '30%',
-                          minHeight: 48,
-                          width: '80%',
-                        }}
-                        onPress={() => {
-                          handleConfirmationFlow(() => {
-                            setShowMoreOptions(false);
-                            animatedHeight.value = 0;
-                            changeIndex && changeIndex(1);
-                          });
+                          alignItems: 'center',
+                          paddingHorizontal: 10,
                         }}>
-                        <TriangleAlert size={24} color={'#f59e0b'} />
+                        {showMoreOptions ? (
+                          <ChevronUp size={20} color={'#dc2626'} style={{ marginRight: 16 }} />
+                        ) : (
+                          <ChevronDown size={20} color={colors.zingo} style={{ marginRight: 16 }} />
+                        )}
+                        <SkullIcon
+                          size={20}
+                          color={showMoreOptions ? '#dc2626' : colors.zingo}
+                          style={{ marginRight: 16 }}
+                        />
                         <Text
                           style={{
-                            color: '#cbd5e1',
+                            fontSize: 16,
+                            color: showMoreOptions ? '#dc2626' : colors.zingo,
                           }}>
-                          Exposed transparent address
+                          DANGER ZONE{' '}
                         </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </Animated.View>
+                        <BiohazardIcon
+                          size={20}
+                          color={showMoreOptions ? '#dc2626' : colors.zingo}
+                          style={{ marginLeft: 16 }}
+                        />
+                        {showMoreOptions ? (
+                          <ChevronUp size={20} color={'#dc2626'} style={{ marginLeft: 16 }} />
+                        ) : (
+                          <ChevronDown size={20} color={colors.zingo} style={{ marginLeft: 16 }} />
+                        )}
+                      </Pressable>
+
+                      <Animated.View
+                        style={[
+                          {
+                            marginTop: 12,
+                            justifyContent: 'center',
+                          },
+                          animatedStyle,
+                        ]}>
+                        <View
+                          style={{
+                            width: '100%',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <TouchableOpacity
+                            onLayout={e => {
+                              contentHeight.current = e.nativeEvent.layout.height;
+                            }}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: 10,
+                              backgroundColor: '#1e293b',
+                              borderColor: '#334155',
+                              borderWidth: 1,
+                              padding: 0,
+                              paddingLeft: 20,
+                              paddingRight: 20,
+                              borderRadius: 10,
+                              maxWidth: '90%',
+                              minWidth: '30%',
+                              minHeight: 48,
+                              width: '80%',
+                            }}
+                            onPress={() => {
+                              handleConfirmationFlow(() => {
+                                setShowMoreOptions(false);
+                                animatedHeight.value = 0;
+                                changeIndex && changeIndex(1);
+                              });
+                            }}>
+                            <TriangleAlert size={24} color={'#f59e0b'} />
+                            <Text style={{ color: '#cbd5e1' }}>Exposed transparent address</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </Animated.View>
+                    </>
+                  )}
                 </>
               )}
             </View>
