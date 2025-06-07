@@ -7,6 +7,7 @@ import {
   BiohazardIcon,
   ChevronDown,
   ChevronUp,
+  CopyIcon,
   EyeIcon,
   ListIcon,
   ShieldIcon,
@@ -450,6 +451,20 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   marginTop: 20,
                   marginBottom: 5,
                 }}>
+                {total > 1 && (
+                  <TouchableOpacity onPress={doCopy}>
+                    <View
+                      style={{
+                        borderRadius: 30,
+                        borderColor: colors.zingo,
+                        paddingHorizontal: 5,
+                        paddingVertical: 5,
+                        marginHorizontal: 10,
+                      }}>
+                      <CopyIcon color={colors.money} size={24} opacity={0.9} style={{ margin: 3 }} />
+                    </View>
+                  </TouchableOpacity>
+                )}
                 {address && mode === ModeEnum.advanced && (
                   <>
                     {total > 1 && (

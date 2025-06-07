@@ -60,7 +60,6 @@ export function ExpandableAddress({ address, style, renderModal }: ExpandableAdd
             <TouchableOpacity
               onPress={() => {
                 Clipboard.setString(address);
-                onClose();
               }}
               style={{
                 borderColor: '#3B4B5F',
