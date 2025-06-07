@@ -141,9 +141,8 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
             <SingleAddress
               ufvk={wallet.ufvk}
               index={0}
+              setIndex={() => {}}
               total={1}
-              prev={() => null}
-              next={() => null}
               setSecurityOption={setSecurityOption}
             />
           )}

@@ -13,10 +13,9 @@ import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 describe('Component SingleAddress - test', () => {
   //snapshot test
   test('SingleAddress - snapshot', () => {
-    const onPrev = jest.fn();
-    const onNext = jest.fn();
+    const set = jest.fn();
     const single = render(
-      <SingleAddress address={mockAddresses[0]} index={0} total={1} prev={onPrev} next={onNext} setSecurityOption={jest.fn()} />,
+      <SingleAddress address={mockAddresses[0]} index={0} setIndex={set} total={1} setSecurityOption={jest.fn()} />,
     );
     expect(single.toJSON()).toMatchSnapshot();
   });
@@ -26,10 +25,9 @@ describe('Component SingleAddress UFVK - test', () => {
   //snapshot test
   test('SingleAddress UFVK - snapshot', () => {
     const ufvk = 'uview12345678901234567890';
-    const onPrev = jest.fn();
-    const onNext = jest.fn();
+    const set = jest.fn();
     const single = render(
-      <SingleAddress ufvk={ufvk} index={0} total={1} prev={onPrev} next={onNext} setSecurityOption={jest.fn()} />,
+      <SingleAddress ufvk={ufvk} index={0} setIndex={set} total={1} setSecurityOption={jest.fn()} />,
     );
     expect(single.toJSON()).toMatchSnapshot();
   });

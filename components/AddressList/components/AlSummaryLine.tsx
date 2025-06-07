@@ -3,18 +3,15 @@ import React, { useContext } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faQrcode, faPencil, faPaperPlane, faWallet } from '@fortawesome/free-solid-svg-icons';
+import { faQrcode, faCopy, faWallet, faTags } from '@fortawesome/free-solid-svg-icons';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import FadeText from '../../Components/FadeText';
 import {
-  SendPageStateClass,
-  ToAddrClass,
-  ModeEnum,
-  RouteEnums,
-  SelectServerEnum,
   UnifiedAddressClass,
   TransparentAddressClass,
   AddressBookFileClass,
+  SnackbarDurationEnum,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
@@ -26,29 +23,45 @@ import 'moment/locale/ru';
 
 type AlSummaryLineProps = {
   index: number;
+  setIndex: (i: number) => void;
   item: UnifiedAddressClass | TransparentAddressClass;
+  closeScreen: () => void;
 };
 const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
   index,
+  setIndex,
   item,
+  closeScreen,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, navigationHome, readOnly, mode, totalBalance, language, selectServer, setSendPageState, closeAllModals, addressBook } = context;
+  const { translate, language, addressBook, addLastSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
   const displayAddress: string = item.address ? Utils.trimToSmall(item.address, 7) : (translate('info.unknown') as string);
-  const label: string = addressBook.filter((ab: AddressBookFileClass) => ab.address === item.address)[0].label;
-  const displayContact: string = label
-    ? label.length > 20
+  const found: AddressBookFileClass[] = addressBook.filter((ab: AddressBookFileClass) => ab.address === item.address);
+  const label: string = found.length > 0 ? found[0].label : '-';
+  const displayContact: string = label.length > 20
       ? Utils.trimToSmall(label, 8)
-      : label
-    : (translate('info.unknown') as string);
+      : label;
+
+  const doCopy = () => {
+    Clipboard.setString(item.address);
+    addLastSnackbar({
+      message: translate('history.addresscopied') as string,
+      duration: SnackbarDurationEnum.short,
+    });
+  };
+
+  const doQr = () => {
+    setIndex(index);
+    closeScreen();
+  };
 
   //console.log('render Ab SummaryLine - 5', index);
 
   return (
-    <View testID={`addressbooklist.${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
+    <View style={{ display: 'flex', flexDirection: 'column' }}>
       <View
         style={{
           display: 'flex',
@@ -67,8 +80,8 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
               <FontAwesomeIcon
                 style={{ marginHorizontal: 10 }}
                 size={24}
-                icon={faWallet}
-                color={colors.zingo}
+                icon={faTags}
+                color={colors.text}
               />
               <FadeText
                 style={{
@@ -82,7 +95,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
               </FadeText>
             </View>
             <View style={{ flexDirection: 'row' }}>
-              <FontAwesomeIcon style={{ marginHorizontal: 10 }} size={24} icon={faQrcode} color={colors.zingo} />
+              <FontAwesomeIcon style={{ marginHorizontal: 10 }} size={24} icon={faWallet} color={colors.text} />
               <FadeText style={{ fontSize: 18, marginHorizontal: 10, opacity: 1, fontWeight: 'bold' }}>
                 {displayAddress}
               </FadeText>
@@ -93,35 +106,20 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
           <TouchableOpacity
             style={{ zIndex: 999, padding: 10 }}
             onPress={() => {
+              doCopy();
             }}>
-            <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faPencil} color={colors.money} />
+            <FontAwesomeIcon style={{ opacity: 0.8 }} size={25} icon={faCopy} color={colors.money} />
           </TouchableOpacity>
         </View>
-        {!readOnly &&
-          selectServer !== SelectServerEnum.offline &&
-          !(
-            mode === ModeEnum.basic &&
-            totalBalance &&
-            totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0
-          ) && (
-            <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
-              <TouchableOpacity
-                style={{ zIndex: 999, padding: 10 }}
-                onPress={() => {
-                  // enviar
-                  const sendPageState = new SendPageStateClass(new ToAddrClass(0));
-                  sendPageState.toaddr.to = item.address;
-                  setSendPageState(sendPageState);
-                  closeAllModals();
-                  navigationHome?.navigate(RouteEnums.Home, {
-                    screen: translate('loadedapp.send-menu'),
-                    initial: false,
-                  });
-                }}>
-                <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />
-              </TouchableOpacity>
-            </View>
-          )}
+        <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
+          <TouchableOpacity
+            style={{ zIndex: 999, padding: 10 }}
+            onPress={() => {
+              doQr();
+            }}>
+            <FontAwesomeIcon size={30} icon={faQrcode} color={colors.text} />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

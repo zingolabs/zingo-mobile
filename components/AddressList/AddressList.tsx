@@ -27,13 +27,16 @@ import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { useToast } from 'react-native-toastier';
+import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 
 type AddressListProps = {
   addressKind: AddressKindEnum;
+  setIndex: (i: number) => void;
 };
 
 const AddressList: React.FunctionComponent<AddressListProps> = ({
   addressKind,
+  setIndex,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -54,7 +57,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
   const [addressesSliced, setAddressesSliced] = useState<(UnifiedAddressClass | TransparentAddressClass)[]>([]);
 
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
-  const [loading, _setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -64,7 +67,11 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
     if (!addresses) {
       return [];
     }
-    return addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === addressKind);
+    if (addressKind === AddressKindEnum.u) {
+      return addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === addressKind);
+    } else {
+      return addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === addressKind && a.scope === RPCAddressScopeEnum.external);
+    }
   }, [addressKind, addresses]);
 
   useEffect(() => {
@@ -72,6 +79,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
       const abf = await fetchAddressBookFiltered;
       setLoadMoreButton(numAl < abf.length);
       setAddressesSliced(abf.slice(0, numAl));
+      setLoading(false);
     })();
   }, [fetchAddressBookFiltered, numAl]);
 
@@ -110,7 +118,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
       />
 
       <Header
-        title={`${translate('addresslist.title')} ${addressKind === AddressKindEnum.u
+        title={`${translate('addresslist.title')} - ${addressKind === AddressKindEnum.u
           ? translate('addresslist.unified')
           : translate('addresslist.transparent')}`}
         noBalance={true}
@@ -155,9 +163,14 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
               return (
                 <View key={`container-${index}-${alItem.address}`}>
                   <AlSummaryLine
-                    index={index}
                     key={`line-${index}-${alItem.address}`}
+                    index={index}
+                    setIndex={setIndex}
                     item={alItem}
+                    closeScreen={() => {
+                      clear();
+                      hide();
+                    }}
                   />
                 </View>
               );

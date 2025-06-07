@@ -27,9 +27,8 @@ type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
   ufvk?: string;
   index: number;
+  setIndex: (i: number) => void;
   total: number;
-  prev: () => void;
-  next: () => void;
   setSecurityOption: (s: SecurityType) => Promise<void>;
   newAddressShow?: () => void;
 };
@@ -41,6 +40,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   newAddressShow,
   total,
   index,
+  setIndex,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, language, security, mode } = context;
@@ -74,7 +74,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   };
 
   const doAddressList = () => {
-    return magicModal.show(() => <AddressList addressKind={address ? address.addressKind : AddressKindEnum.u} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
+    return magicModal.show(() => <AddressList addressKind={address ? address.addressKind : AddressKindEnum.u} setIndex={setIndex} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
       .promise;
   };
 

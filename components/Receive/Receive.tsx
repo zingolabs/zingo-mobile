@@ -148,17 +148,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 <SingleAddress
                   address={uAddress}
                   index={uAddrIndex ? uAddrIndex : 0}
+                  setIndex={setUAddrIndex}
                   total={uAddr.length}
-                  prev={() => {
-                    if (uAddrIndex !== null && uAddrIndex > 0) {
-                      setUAddrIndex(uAddrIndex - 1);
-                    }
-                  }}
-                  next={() => {
-                    if (uAddrIndex !== null && uAddrIndex < uAddr.length - 1) {
-                      setUAddrIndex(uAddrIndex + 1);
-                    }
-                  }}
                   setSecurityOption={setSecurityOption}
                   newAddressShow={newAddressShow}
                 />
@@ -181,17 +172,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 <SingleAddress
                   address={tAddress}
                   index={tAddrIndex ? tAddrIndex : 0}
+                  setIndex={setTAddrIndex}
                   total={tAddr.length}
-                  prev={() => {
-                    if (tAddrIndex !== null && tAddrIndex > 0) {
-                      setTAddrIndex(tAddrIndex - 1);
-                    }
-                  }}
-                  next={() => {
-                    if (tAddrIndex !== null && tAddrIndex < tAddr.length - 1) {
-                      setTAddrIndex(tAddrIndex + 1);
-                    }
-                  }}
                   setSecurityOption={setSecurityOption}
                   newAddressShow={newAddressShow}
                 />
