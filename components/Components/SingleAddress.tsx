@@ -255,7 +255,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         }}>
         {ufvk || (address && address.address !== (translate('receive.noaddress') as string)) ? (
           <>
-            {!isBasic && address && !isUnified && (
+            {address && !isBasic && !isUnified && (
               <View
                 style={{
                   width: '95%',
@@ -341,7 +341,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   </View>
                 </View>
               )}
-              {mode === ModeEnum.advanced && address && address.addressKind === AddressKindEnum.t && (
+              {address && !isBasic && !isUnified && (
                 <View
                   style={{
                     flexDirection: 'row',
@@ -355,7 +355,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    <EyeIcon color={'#DD7500'} size={24} style={{ marginRight: 10 }} />
+                    <EyeIcon color={colors.warning.primaryDark} size={24} style={{ marginRight: 10 }} />
                     <RegText
                       style={{
                         fontWeight: 'bold',
@@ -529,8 +529,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         width: '70%',
                         alignContent: 'center',
                         justifyContent: 'center',
-                        borderColor: '#293D55',
-                        backgroundColor: '#112C51',
+                        borderColor: colors.secondaryBorder,
+                        backgroundColor: colors.secondary,
                         borderWidth: 1,
                         paddingVertical: 10,
                         borderRadius: 10,
@@ -588,29 +588,29 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           paddingHorizontal: 10,
                         }}>
                         {showMoreOptions ? (
-                          <ChevronUp size={20} color={'#dc2626'} style={{ marginRight: 16 }} />
+                          <ChevronUp size={20} color={colors.danger.primary} style={{ marginRight: 16 }} />
                         ) : (
                           <ChevronDown size={20} color={colors.zingo} style={{ marginRight: 16 }} />
                         )}
                         <SkullIcon
                           size={20}
-                          color={showMoreOptions ? '#dc2626' : colors.zingo}
+                          color={showMoreOptions ? colors.danger.primary : colors.zingo}
                           style={{ marginRight: 16 }}
                         />
                         <Text
                           style={{
                             fontSize: 16,
-                            color: showMoreOptions ? '#dc2626' : colors.zingo,
+                            color: showMoreOptions ? colors.danger.primary : colors.zingo,
                           }}>
                           {translate('receive.danger-zone') as string}{' '}
                         </Text>
                         <BiohazardIcon
                           size={20}
-                          color={showMoreOptions ? '#dc2626' : colors.zingo}
+                          color={showMoreOptions ? colors.danger.primary : colors.zingo}
                           style={{ marginLeft: 16 }}
                         />
                         {showMoreOptions ? (
-                          <ChevronUp size={20} color={'#dc2626'} style={{ marginLeft: 16 }} />
+                          <ChevronUp size={20} color={colors.danger.primary} style={{ marginLeft: 16 }} />
                         ) : (
                           <ChevronDown size={20} color={colors.zingo} style={{ marginLeft: 16 }} />
                         )}
@@ -640,8 +640,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                               alignItems: 'center',
                               justifyContent: 'center',
                               gap: 10,
-                              backgroundColor: '#1e293b',
-                              borderColor: '#334155',
+                              backgroundColor: colors.secondary,
+                              borderColor: colors.secondaryBorder,
                               borderWidth: 1,
                               padding: 0,
                               paddingLeft: 20,
@@ -659,8 +659,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                                 changeIndex && changeIndex(1);
                               });
                             }}>
-                            <TriangleAlert size={24} color={'#f59e0b'} />
-                            <Text style={{ color: '#cbd5e1' }}>{translate('receive.go-to-transparent') as string}</Text>
+                            <TriangleAlert size={24} color={colors.warning.primary} />
+                            <Text style={{ color: colors.text }}>
+                              {translate('receive.go-to-transparent') as string}
+                            </Text>
                           </TouchableOpacity>
                         </View>
                       </Animated.View>
