@@ -99,7 +99,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         };
   const styleTextCommon: TextStyle = {
     fontWeight: 'bold',
-    // textTransform: 'uppercase',
+    textTransform: 'uppercase',
     fontSize: 16,
     textAlign: 'center',
   };
