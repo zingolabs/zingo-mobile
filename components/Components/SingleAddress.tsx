@@ -506,6 +506,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 {contactFromAddress()}
               </Text>
               <ExpandableAddress
+                onCopy={onCopy}
                 address={address ? address.address : ''}
                 style={{ color: colors.money, fontSize: 18 }}
               />

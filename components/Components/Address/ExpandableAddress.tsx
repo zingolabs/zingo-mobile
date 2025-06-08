@@ -12,9 +12,10 @@ interface ExpandableAddressProps {
   address: string;
   style?: TextStyle;
   renderModal?: (onClose: () => void) => React.ReactNode;
+  onCopy?: () => void;
 }
 
-export function ExpandableAddress({ address, style, renderModal }: ExpandableAddressProps) {
+export function ExpandableAddress({ address, style, renderModal, onCopy }: ExpandableAddressProps) {
   const { colors } = useTheme() as unknown as ThemeType;
   const { translate } = useContext(ContextAppLoaded);
 
@@ -64,6 +65,7 @@ export function ExpandableAddress({ address, style, renderModal }: ExpandableAdd
             <TouchableOpacity
               onPress={() => {
                 Clipboard.setString(address);
+                onCopy && onCopy();
               }}
               style={{
                 borderColor: '#3B4B5F',
