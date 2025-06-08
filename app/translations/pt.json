@@ -496,8 +496,8 @@
     "title-advanced": "Meus Endereços",
     "title-basic": "Meu Endereço",
     "title-basic-alone": "Meu Endereço de Recebimento",
-    "danger-zone": "",
-    "go-to-transparent": "",
+    "danger-zone": "ZONA DE PERIGO",
+    "go-to-transparent": "Ver endereço transparente",
     "more": "mais...",
     "newu-option": "Novo Endereço Unificado Diversificado",
     "privkey-option": "Exportar Chave de Gastos",
@@ -512,20 +512,20 @@
     "shielded-orchard-sapling": "Orchard+Sapling",
     "shielded-full": "Completa",
     "showtip": "Toque para selecionar outro endereço.",
-    "copy-address-button": "",
+    "copy-address-button": "Copiar endereço",
     "modal-transparent": {
-      "title": "",
-      "message": "",
-      "recommendation": "",
-      "button": ""
+      "title": "Aviso de Privacidade",
+      "message": "Endereços transparentes expõem os detalhes das suas transações na blockchain pública. Isso compromete sua privacidade e não é recomendado para a maioria das transações.",
+      "recommendation": "Endereços blindados são recomendados pois oferecem o mais alto nível de privacidade.",
+      "button": "Entendo os riscos, mostrar endereços transparentes"
     },
     "transparent": {
-      "address-title": "",
-      "newt-option": "",
+      "address-title": "Transparente exposto",
+      "newt-option": "Novo endereço transparente",
       "warning": {
-        "title": "",
-        "description": "",
-        "button": ""
+        "title": "Aviso de Privacidade",
+        "description": "Você está visualizando endereços transparentes. Eles expõem publicamente os detalhes das suas transações.",
+        "button": "Mudar para Endereços Blindados (Recomendado)"
       }
     }
   },
