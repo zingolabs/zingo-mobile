@@ -67,7 +67,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, clo
           console.log(`Error new address ${newAddressStr}`);
 
           addLastSnackbar({
-            message: newAddressStr,
+            message: translate('receive.transparent.new-error') as string,
             duration: SnackbarDurationEnum.short,
           });
 

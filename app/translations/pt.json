@@ -526,7 +526,8 @@
         "title": "Aviso de Privacidade",
         "description": "Você está visualizando endereços transparentes. Eles expõem publicamente os detalhes das suas transações.",
         "button": "Mudar para Endereços Blindados (Recomendado)"
-      }
+      },
+      "new-error": "Falha na geração de endereço transparente. O último endereço transparente não recebeu fundos."
     }
   },
   "history": {

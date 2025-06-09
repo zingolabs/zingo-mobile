@@ -520,7 +520,8 @@
         "title": "Privacy Warning",
         "description": "You're viewing transparent addresses. These expose your transaction details publicly.",
         "button": "Switch to Shielded Addresses (Recommended)"
-      }
+      },
+      "new-error": "Transparent address generation failed. Latest transparent address has not received funds."
     }
   },
   "history": {

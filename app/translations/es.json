@@ -521,7 +521,8 @@
         "title": "Advertencia de Privacidad",
         "description": "Está viendo direcciones transparentes. Estas exponen los detalles de sus transacciones públicamente.",
         "button": "Cambiar a Direcciones Blindadas (Recomendado)"
-      }
+      },
+      "new-error": "Error al generar la dirección transparente. La última dirección transparente no ha recibido fondos."
     }
   },
   "history": {
