@@ -8,7 +8,6 @@ import SingleAddress from '../Components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
-import RegText from '../Components/RegText';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -227,43 +226,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       }
     }
     return <>{component}</>;
-  };
-
-  const renderLabelCustom: ({ route, focused, color }: { route: any; focused: any; color: any }) => ReactNode = ({
-    route,
-    focused,
-    color,
-  }) => {
-    const w = (dimensions.width - 50) / (mode === ModeEnum.basic ? 1 : 2);
-    //const w = route.key === 'uaddr' ? '40%' : '30%';
-    return (
-      <View
-        style={{
-          width: w,
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: 50,
-        }}>
-        <RegText
-          style={{
-            fontWeight: mode === ModeEnum.basic ? 'normal' : focused ? 'bold' : 'normal',
-            fontSize: mode === ModeEnum.basic ? 14 : focused ? 15 : 14,
-            color: color,
-          }}>
-          {(route.title ? route.title : '') +
-            (mode === ModeEnum.advanced &&
-            ((route.key === 'uaddr' && uAddr.length > 1) || (route.key === 'taddr' && tAddr.length > 1))
-              ? ` (${route.key === 'uaddr' ? uAddr.length : route.key === 'taddr' ? tAddr.length : ''})`
-              : '')}
-        </RegText>
-        {route.key === 'uaddr' && mode === ModeEnum.basic && (
-          <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. zingo)</RegText>
-        )}
-        {route.key === 'taddr' && mode === ModeEnum.basic && (
-          <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. coinbase, gemini)</RegText>
-        )}
-      </View>
-    );
   };
 
   const renderTabBarPage: (

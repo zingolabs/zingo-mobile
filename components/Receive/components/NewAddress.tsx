@@ -9,6 +9,7 @@ import {
   ButtonTypeEnum,
   GlobalConst,
   ReceiverEnum,
+  SnackbarDurationEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
@@ -36,7 +37,7 @@ type NewAddressProps = {
 };
 const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, closeSheet, setAddressBook }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language } = context;
+  const { translate, language, addLastSnackbar } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
   const { clear } = useToast();
@@ -62,9 +63,15 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, clo
       }
 
       if (newAddressStr) {
-        if (newAddressStr.toLowerCase().includes(GlobalConst.error)) {
+        if (newAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error new address ${newAddressStr}`);
-          return newAddressStr;
+
+          addLastSnackbar({
+            message: 'Error: ' + newAddressStr,
+            duration: SnackbarDurationEnum.short,
+          });
+
+          // return newAddressStr;
         }
       } else {
         console.log('Internal Error new address ');
