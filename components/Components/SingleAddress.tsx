@@ -74,7 +74,7 @@ const ConfirmationModal = () => {
           width: '90%',
           padding: 16,
           borderRadius: 8,
-          backgroundColor: '#1e293b',
+          backgroundColor: colors.modal,
           position: 'relative',
         }}>
         <TouchableOpacity
@@ -97,13 +97,13 @@ const ConfirmationModal = () => {
         />
 
         <View>
-          <Text style={{ color: 'white', fontSize: 25, fontWeight: 'bold', marginBottom: 12 }}>
+          <Text style={{ color: colors.money, fontSize: 25, fontWeight: 'bold', marginBottom: 12 }}>
             {translate('receive.modal-transparent.title') as string}
           </Text>
-          <Text style={{ color: '#cbd5e1', fontSize: 16, marginBottom: 12 }}>
+          <Text style={{ color: colors.money, fontSize: 16, marginBottom: 12 }}>
             {translate('receive.modal-transparent.message') as string}
           </Text>
-          <Text style={{ color: '#94a3b8', fontSize: 16, marginBottom: 16 }}>
+          <Text style={{ color: colors.zingo, fontSize: 16, marginBottom: 16 }}>
             {translate('receive.modal-transparent.recommendation') as string}
           </Text>
           <TouchableOpacity
@@ -112,16 +112,16 @@ const ConfirmationModal = () => {
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: '#343536',
+              backgroundColor: colors.warning.background,
               padding: 12,
               borderRadius: 8,
-              borderColor: '#674827',
+              borderColor: colors.warning.border,
               borderWidth: 2,
             }}
             onPress={() => hide({ success: true })}>
-            <TriangleAlert size={15} style={{ marginRight: 8 }} color={'#f59e0b'} />
+            <TriangleAlert size={15} style={{ marginRight: 8 }} color={colors.warning.title} />
 
-            <Text style={{ color: '#E1AA1B', fontSize: 12 }}>
+            <Text style={{ color: colors.warning.title, fontSize: 12 }}>
               {translate('receive.modal-transparent.button') as string}
             </Text>
           </TouchableOpacity>

@@ -76,6 +76,7 @@ const advancedTheme: ThemeType = {
       border: '#572317',
       text: '#FFB972',
     },
+    modal: '#1e293b',
   },
 };
 
@@ -109,6 +110,7 @@ const basicTheme: ThemeType = {
       border: '#572317',
       text: '#FFB972',
     },
+    modal: '#1e293b',
   },
 };
 
