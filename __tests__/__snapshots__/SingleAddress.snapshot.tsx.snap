@@ -85,7 +85,6 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               vbHeight={24}
               vbWidth={24}
               width={24}
-              xmlns="http://www.w3.org/2000/svg"
             >
               <RNSVGGroup
                 fill={null}
@@ -110,25 +109,12 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               >
                 <RNSVGPath
                   d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
-                  fill={null}
-                  propList={
-                    [
-                      "fill",
-                      "stroke",
-                      "strokeWidth",
-                      "strokeLinecap",
-                      "strokeLinejoin",
-                    ]
-                  }
-                  stroke={
+                  fill={
                     {
-                      "payload": 4279811352,
+                      "payload": 4278190080,
                       "type": 0,
                     }
                   }
-                  strokeLinecap={1}
-                  strokeLinejoin={1}
-                  strokeWidth={2}
                 />
               </RNSVGGroup>
             </RNSVGSvgView>
@@ -281,7 +267,6 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
                 vbHeight={24}
                 vbWidth={24}
                 width={24}
-                xmlns="http://www.w3.org/2000/svg"
               >
                 <RNSVGGroup
                   fill={null}
@@ -305,55 +290,27 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
                   strokeWidth={2}
                 >
                   <RNSVGRect
-                    fill={null}
-                    height="14"
-                    opacity={0.9}
-                    propList={
-                      [
-                        "fill",
-                        "stroke",
-                        "strokeWidth",
-                        "strokeLinecap",
-                        "strokeLinejoin",
-                      ]
-                    }
-                    rx="2"
-                    ry="2"
-                    stroke={
+                    fill={
                       {
-                        "payload": 4294967295,
+                        "payload": 4278190080,
                         "type": 0,
                       }
                     }
-                    strokeLinecap={1}
-                    strokeLinejoin={1}
-                    strokeWidth={2}
-                    width="14"
-                    x="8"
-                    y="8"
+                    height={14}
+                    rx={2}
+                    ry={2}
+                    width={14}
+                    x={8}
+                    y={8}
                   />
                   <RNSVGPath
                     d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
-                    fill={null}
-                    opacity={0.9}
-                    propList={
-                      [
-                        "fill",
-                        "stroke",
-                        "strokeWidth",
-                        "strokeLinecap",
-                        "strokeLinejoin",
-                      ]
-                    }
-                    stroke={
+                    fill={
                       {
-                        "payload": 4294967295,
+                        "payload": 4278190080,
                         "type": 0,
                       }
                     }
-                    strokeLinecap={1}
-                    strokeLinejoin={1}
-                    strokeWidth={2}
                   />
                 </RNSVGGroup>
               </RNSVGSvgView>
@@ -619,7 +576,6 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             vbHeight={24}
             vbWidth={24}
             width={20}
-            xmlns="http://www.w3.org/2000/svg"
           >
             <RNSVGGroup
               fill={null}
@@ -644,35 +600,22 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             >
               <RNSVGPath
                 d="m6 9 6 6 6-6"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                stroke={
+                fill={
                   {
-                    "payload": 4287137928,
+                    "payload": 4278190080,
                     "type": 0,
                   }
                 }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
               />
             </RNSVGGroup>
           </RNSVGSvgView>
           <RNSVGSvgView
             align="xMidYMid"
-            bbHeight={20}
-            bbWidth={20}
+            bbHeight={24}
+            bbWidth={24}
             fill="none"
             focusable={false}
-            height={20}
+            height={24}
             meetOrSlice={0}
             minX={0}
             minY={0}
@@ -691,15 +634,14 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
                 },
                 {
                   "flex": 0,
-                  "height": 20,
-                  "width": 20,
+                  "height": 24,
+                  "width": 24,
                 },
               ]
             }
             vbHeight={24}
             vbWidth={24}
-            width={20}
-            xmlns="http://www.w3.org/2000/svg"
+            width={24}
           >
             <RNSVGGroup
               fill={null}
@@ -724,95 +666,43 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             >
               <RNSVGPath
                 d="m12.5 17-.5-1-.5 1h1z"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                stroke={
+                fill={
                   {
-                    "payload": 4287137928,
+                    "payload": 4278190080,
                     "type": 0,
                   }
                 }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
               />
               <RNSVGPath
                 d="M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                stroke={
+                fill={
                   {
-                    "payload": 4287137928,
+                    "payload": 4278190080,
                     "type": 0,
                   }
                 }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
               />
               <RNSVGCircle
-                cx="15"
-                cy="12"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                r="1"
-                stroke={
+                cx={15}
+                cy={12}
+                fill={
                   {
-                    "payload": 4287137928,
+                    "payload": 4278190080,
                     "type": 0,
                   }
                 }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
+                r={1}
               />
               <RNSVGCircle
-                cx="9"
-                cy="12"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                r="1"
-                stroke={
+                cx={9}
+                cy={12}
+                fill={
                   {
-                    "payload": 4287137928,
+                    "payload": 4278190080,
                     "type": 0,
                   }
                 }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
+                r={1}
               />
             </RNSVGGroup>
           </RNSVGSvgView>
@@ -828,11 +718,11 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
           </Text>
           <RNSVGSvgView
             align="xMidYMid"
-            bbHeight={20}
-            bbWidth={20}
+            bbHeight={24}
+            bbWidth={24}
             fill="none"
             focusable={false}
-            height={20}
+            height={24}
             meetOrSlice={0}
             minX={0}
             minY={0}
@@ -848,18 +738,18 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
                 },
                 {
                   "marginLeft": 16,
+                  "padding": 10,
                 },
                 {
                   "flex": 0,
-                  "height": 20,
-                  "width": 20,
+                  "height": 24,
+                  "width": 24,
                 },
               ]
             }
             vbHeight={24}
             vbWidth={24}
-            width={20}
-            xmlns="http://www.w3.org/2000/svg"
+            width={24}
           >
             <RNSVGGroup
               fill={null}
@@ -883,226 +773,24 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               strokeWidth={2}
             >
               <RNSVGCircle
-                cx="12"
-                cy="11.9"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                r="2"
-                stroke={
+                cx={12}
+                cy={11.9}
+                fill={
                   {
-                    "payload": 4287137928,
+                    "payload": 4278190080,
                     "type": 0,
                   }
                 }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
+                r={2}
               />
               <RNSVGPath
-                d="M6.7 3.4c-.9 2.5 0 5.2 2.2 6.7C6.5 9 3.7 9.6 2 11.6"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                stroke={
+                d="M6.7 3.4c-.9 2.5 0 5.2 2.2 6.7C6.5 9 3.7 9.6 2 11.6M8.9 10.1l1.4.8M17.3 3.4c.9 2.5 0 5.2-2.2 6.7 2.4-1.2 5.2-.6 6.9 1.5M15.1 10.1l-1.4.8M16.7 20.8c-2.6-.4-4.6-2.6-4.7-5.3-.2 2.6-2.1 4.8-4.7 5.2M12 13.9v1.6M13.5 5.4c-1-.2-2-.2-3 0M17 16.4c.7-.7 1.2-1.6 1.5-2.5M5.5 13.9c.3.9.8 1.8 1.5 2.5"
+                fill={
                   {
-                    "payload": 4287137928,
+                    "payload": 4278190080,
                     "type": 0,
                   }
                 }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
-              />
-              <RNSVGPath
-                d="m8.9 10.1 1.4.8"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                stroke={
-                  {
-                    "payload": 4287137928,
-                    "type": 0,
-                  }
-                }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
-              />
-              <RNSVGPath
-                d="M17.3 3.4c.9 2.5 0 5.2-2.2 6.7 2.4-1.2 5.2-.6 6.9 1.5"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                stroke={
-                  {
-                    "payload": 4287137928,
-                    "type": 0,
-                  }
-                }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
-              />
-              <RNSVGPath
-                d="m15.1 10.1-1.4.8"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                stroke={
-                  {
-                    "payload": 4287137928,
-                    "type": 0,
-                  }
-                }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
-              />
-              <RNSVGPath
-                d="M16.7 20.8c-2.6-.4-4.6-2.6-4.7-5.3-.2 2.6-2.1 4.8-4.7 5.2"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                stroke={
-                  {
-                    "payload": 4287137928,
-                    "type": 0,
-                  }
-                }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
-              />
-              <RNSVGPath
-                d="M12 13.9v1.6"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                stroke={
-                  {
-                    "payload": 4287137928,
-                    "type": 0,
-                  }
-                }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
-              />
-              <RNSVGPath
-                d="M13.5 5.4c-1-.2-2-.2-3 0"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                stroke={
-                  {
-                    "payload": 4287137928,
-                    "type": 0,
-                  }
-                }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
-              />
-              <RNSVGPath
-                d="M17 16.4c.7-.7 1.2-1.6 1.5-2.5"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                stroke={
-                  {
-                    "payload": 4287137928,
-                    "type": 0,
-                  }
-                }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
-              />
-              <RNSVGPath
-                d="M5.5 13.9c.3.9.8 1.8 1.5 2.5"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                stroke={
-                  {
-                    "payload": 4287137928,
-                    "type": 0,
-                  }
-                }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
               />
             </RNSVGGroup>
           </RNSVGSvgView>
@@ -1139,7 +827,6 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             vbHeight={24}
             vbWidth={24}
             width={20}
-            xmlns="http://www.w3.org/2000/svg"
           >
             <RNSVGGroup
               fill={null}
@@ -1164,25 +851,12 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
             >
               <RNSVGPath
                 d="m6 9 6 6 6-6"
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "stroke",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                  ]
-                }
-                stroke={
+                fill={
                   {
-                    "payload": 4287137928,
+                    "payload": 4278190080,
                     "type": 0,
                   }
                 }
-                strokeLinecap={1}
-                strokeLinejoin={1}
-                strokeWidth={2}
               />
             </RNSVGGroup>
           </RNSVGSvgView>
@@ -1362,7 +1036,6 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
                 vbHeight={24}
                 vbWidth={24}
                 width={24}
-                xmlns="http://www.w3.org/2000/svg"
               >
                 <RNSVGGroup
                   fill={null}
@@ -1386,55 +1059,27 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
                   strokeWidth={2}
                 >
                   <RNSVGRect
-                    fill={null}
-                    height="14"
-                    opacity={0.9}
-                    propList={
-                      [
-                        "fill",
-                        "stroke",
-                        "strokeWidth",
-                        "strokeLinecap",
-                        "strokeLinejoin",
-                      ]
-                    }
-                    rx="2"
-                    ry="2"
-                    stroke={
+                    fill={
                       {
-                        "payload": 4294967295,
+                        "payload": 4278190080,
                         "type": 0,
                       }
                     }
-                    strokeLinecap={1}
-                    strokeLinejoin={1}
-                    strokeWidth={2}
-                    width="14"
-                    x="8"
-                    y="8"
+                    height={14}
+                    rx={2}
+                    ry={2}
+                    width={14}
+                    x={8}
+                    y={8}
                   />
                   <RNSVGPath
                     d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
-                    fill={null}
-                    opacity={0.9}
-                    propList={
-                      [
-                        "fill",
-                        "stroke",
-                        "strokeWidth",
-                        "strokeLinecap",
-                        "strokeLinejoin",
-                      ]
-                    }
-                    stroke={
+                    fill={
                       {
-                        "payload": 4294967295,
+                        "payload": 4278190080,
                         "type": 0,
                       }
                     }
-                    strokeLinecap={1}
-                    strokeLinejoin={1}
-                    strokeWidth={2}
                   />
                 </RNSVGGroup>
               </RNSVGSvgView>

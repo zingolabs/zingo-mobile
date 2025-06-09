@@ -483,7 +483,6 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                         vbHeight={24}
                         vbWidth={24}
                         width={24}
-                        xmlns="http://www.w3.org/2000/svg"
                       >
                         <RNSVGGroup
                           fill={null}
@@ -507,55 +506,27 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                           strokeWidth={2}
                         >
                           <RNSVGRect
-                            fill={null}
-                            height="14"
-                            opacity={0.9}
-                            propList={
-                              [
-                                "fill",
-                                "stroke",
-                                "strokeWidth",
-                                "strokeLinecap",
-                                "strokeLinejoin",
-                              ]
-                            }
-                            rx="2"
-                            ry="2"
-                            stroke={
+                            fill={
                               {
-                                "payload": 4294967295,
+                                "payload": 4278190080,
                                 "type": 0,
                               }
                             }
-                            strokeLinecap={1}
-                            strokeLinejoin={1}
-                            strokeWidth={2}
-                            width="14"
-                            x="8"
-                            y="8"
+                            height={14}
+                            rx={2}
+                            ry={2}
+                            width={14}
+                            x={8}
+                            y={8}
                           />
                           <RNSVGPath
                             d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
-                            fill={null}
-                            opacity={0.9}
-                            propList={
-                              [
-                                "fill",
-                                "stroke",
-                                "strokeWidth",
-                                "strokeLinecap",
-                                "strokeLinejoin",
-                              ]
-                            }
-                            stroke={
+                            fill={
                               {
-                                "payload": 4294967295,
+                                "payload": 4278190080,
                                 "type": 0,
                               }
                             }
-                            strokeLinecap={1}
-                            strokeLinejoin={1}
-                            strokeWidth={2}
                           />
                         </RNSVGGroup>
                       </RNSVGSvgView>
