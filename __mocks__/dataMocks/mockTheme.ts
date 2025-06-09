@@ -18,5 +18,20 @@ export const mockTheme: ThemeType = {
     syncing: '#ebff5a',
     notification: '',
     sideMenuBackground: '#040C17',
+    warning: {
+      background: '#262527',
+      border: '#65491C',
+      primary: '#F99D00',
+      primaryDark: '#DD7500',
+      title: '#E1AA1B',
+      text: '#FEE587',
+    },
+    danger: {
+      primary: '#dc2626',
+      background: '#240E0C',
+      border: '#572317',
+      text: '#FFB972',
+    },
+    modal: '#1e293b',
   },
 };
