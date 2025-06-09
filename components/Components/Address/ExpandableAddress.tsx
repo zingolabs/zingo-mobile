@@ -85,9 +85,5 @@ export function ExpandableAddress({ address, style, renderModal, onCopy }: Expan
     magicModal.show(() => (renderModal ? renderModal(onClose) : <DefaultModal />));
   };
 
-  return (
-    <Pressable onPress={onExpand}>
-      <Address address={address} style={style} />
-    </Pressable>
-  );
+  return <Address address={address} style={style} onPress={onExpand} />;
 }

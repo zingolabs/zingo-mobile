@@ -25,6 +25,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import {
   AddressKindEnum,
+  ButtonTypeEnum,
   ModeEnum,
   SecurityType,
   SnackbarDurationEnum,
@@ -37,6 +38,7 @@ import { magicModal, MagicModalHideReason, useMagicModal } from 'react-native-ma
 import Clipboard from '@react-native-clipboard/clipboard';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { ExpandableAddress } from './Address/ExpandableAddress';
+import Button from './Button';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
@@ -294,8 +296,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     borderRadius: 5,
                     marginTop: 10,
                   }}>
-                  <ShieldIcon color={'#fff'} size={24} style={{ marginRight: 10 }} />
-                  <Text style={{ color: '#fff' }}>{translate('receive.transparent.warning.button') as string}</Text>
+                  <ShieldIcon color={colors.background} size={24} style={{ marginRight: 10 }} />
+                  <Text style={{ color: colors.background, fontWeight: 'bold' }}>
+                    {translate('receive.transparent.warning.button') as string}
+                  </Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -508,7 +512,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
               <ExpandableAddress
                 onCopy={onCopy}
                 address={address ? address.address : ''}
-                style={{ color: colors.money, fontSize: 18 }}
+                style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
               />
             </View>
             <View
@@ -522,57 +526,21 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
               {!isBasic && (
                 <>
                   {isUnified ? (
-                    <TouchableOpacity
+                    <Button
                       onPress={() => {
                         newAddressShow && newAddressShow();
                       }}
-                      style={{
-                        width: '70%',
-                        alignContent: 'center',
-                        justifyContent: 'center',
-                        borderColor: colors.secondaryBorder,
-                        backgroundColor: colors.secondary,
-                        borderWidth: 1,
-                        paddingVertical: 10,
-                        borderRadius: 10,
-                      }}>
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          color: colors.money,
-                          width: '100%',
-                          textAlign: 'center',
-                        }}>
-                        {translate('receive.newu-option') as string}
-                      </Text>
-                    </TouchableOpacity>
+                      title={translate('receive.newu-option') as string}
+                      type={ButtonTypeEnum.Primary}
+                    />
                   ) : (
-                    <TouchableOpacity
+                    <Button
                       onPress={() => {
                         newAddressShow && newAddressShow();
                       }}
-                      style={{
-                        width: '70%',
-                        alignContent: 'center',
-                        justifyContent: 'center',
-                        paddingVertical: 10,
-                        borderColor: colors.danger.border,
-                        backgroundColor: colors.danger.background,
-                        opacity: 1,
-                        borderWidth: 1,
-                        borderRadius: 10,
-                      }}>
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          color: colors.danger.text,
-                          width: '100%',
-                          textAlign: 'center',
-                          fontWeight: 'bold',
-                        }}>
-                        {translate('receive.transparent.newt-option') as string}
-                      </Text>
-                    </TouchableOpacity>
+                      title={translate('receive.transparent.newt-option') as string}
+                      type={ButtonTypeEnum.Tertiary}
+                    />
                   )}
 
                   {isUnified && (
@@ -589,29 +557,29 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           paddingHorizontal: 10,
                         }}>
                         {showMoreOptions ? (
-                          <ChevronUp size={20} color={colors.danger.primary} style={{ marginRight: 16 }} />
+                          <ChevronUp size={20} color={colors.warning.primary} style={{ marginRight: 16 }} />
                         ) : (
                           <ChevronDown size={20} color={colors.zingo} style={{ marginRight: 16 }} />
                         )}
                         <SkullIcon
                           size={20}
-                          color={showMoreOptions ? colors.danger.primary : colors.zingo}
+                          color={showMoreOptions ? colors.warning.primary : colors.zingo}
                           style={{ marginRight: 16 }}
                         />
                         <Text
                           style={{
                             fontSize: 16,
-                            color: showMoreOptions ? colors.danger.primary : colors.zingo,
+                            color: showMoreOptions ? colors.warning.primary : colors.zingo,
                           }}>
                           {translate('receive.danger-zone') as string}{' '}
                         </Text>
                         <BiohazardIcon
                           size={20}
-                          color={showMoreOptions ? colors.danger.primary : colors.zingo}
+                          color={showMoreOptions ? colors.warning.primary : colors.zingo}
                           style={{ marginLeft: 16 }}
                         />
                         {showMoreOptions ? (
-                          <ChevronUp size={20} color={colors.danger.primary} style={{ marginLeft: 16 }} />
+                          <ChevronUp size={20} color={colors.warning.primary} style={{ marginLeft: 16 }} />
                         ) : (
                           <ChevronDown size={20} color={colors.zingo} style={{ marginLeft: 16 }} />
                         )}
