@@ -3,18 +3,6 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import { View, ScrollView, TouchableOpacity, Text, Pressable } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@react-navigation/native';
-import {
-  BiohazardIcon,
-  ChevronDown,
-  ChevronUp,
-  CopyIcon,
-  EyeIcon,
-  ListIcon,
-  ShieldIcon,
-  SkullIcon,
-  TriangleAlert,
-  XIcon,
-} from 'lucide-react-native';
 import ViewShot from 'react-native-view-shot';
 
 import { ThemeType } from '../../app/types';
@@ -39,6 +27,15 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { ExpandableAddress } from './Address/ExpandableAddress';
 import Button from './Button';
+import { CopyIcon } from './Icons/CopyIcon';
+import { ChevronDown, ChevronUp } from './Icons/Chevron';
+import { BiohazardIcon } from './Icons/BiohazardIcon';
+import { EyeIcon } from './Icons/EyeIcon';
+import { XIcon } from './Icons/XIcon';
+import { TriangleAlert } from './Icons/TriangleAlert';
+import { ShieldIcon } from './Icons/ShieldIcon';
+import { ListIcon } from './Icons/ListIcon';
+import { SkullIcon } from './Icons/SkullIcon';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
@@ -562,7 +559,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           <ChevronDown size={20} color={colors.zingo} style={{ marginRight: 16 }} />
                         )}
                         <SkullIcon
-                          size={20}
+                          size={24}
                           color={showMoreOptions ? colors.warning.primary : colors.zingo}
                           style={{ marginRight: 16 }}
                         />
@@ -574,9 +571,9 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           {translate('receive.danger-zone') as string}{' '}
                         </Text>
                         <BiohazardIcon
-                          size={20}
+                          size={24}
                           color={showMoreOptions ? colors.warning.primary : colors.zingo}
-                          style={{ marginLeft: 16 }}
+                          style={{ marginLeft: 16, padding: 10 }}
                         />
                         {showMoreOptions ? (
                           <ChevronUp size={20} color={colors.warning.primary} style={{ marginLeft: 16 }} />

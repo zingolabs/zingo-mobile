@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
-import { Pressable, TextStyle, View, Text, TouchableOpacity, Dimensions } from 'react-native';
-import { XIcon } from 'lucide-react-native';
+import { TextStyle, View, Text, TouchableOpacity } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { Address } from './Address';
 import { magicModal, MagicModalHideReason } from 'react-native-magic-modal';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types/ThemeType';
 import { ContextAppLoaded } from '../../../app/context';
+import { XIcon } from '../Icons/XIcon';
 
 interface ExpandableAddressProps {
   address: string;
