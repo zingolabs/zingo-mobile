@@ -537,78 +537,12 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               "display": "flex",
               "flexDirection": "row",
               "justifyContent": "center",
-              "marginVertical": 40,
+              "marginVertical": 26,
               "paddingHorizontal": 10,
               "width": "70%",
             }
           }
         >
-          <RNSVGSvgView
-            align="xMidYMid"
-            bbHeight={20}
-            bbWidth={20}
-            fill="none"
-            focusable={false}
-            height={20}
-            meetOrSlice={0}
-            minX={0}
-            minY={0}
-            stroke="#888888"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "borderWidth": 0,
-                },
-                {
-                  "marginRight": 16,
-                },
-                {
-                  "flex": 0,
-                  "height": 20,
-                  "width": 20,
-                },
-              ]
-            }
-            vbHeight={24}
-            vbWidth={24}
-            width={20}
-          >
-            <RNSVGGroup
-              fill={null}
-              propList={
-                [
-                  "fill",
-                  "stroke",
-                  "strokeWidth",
-                  "strokeLinecap",
-                  "strokeLinejoin",
-                ]
-              }
-              stroke={
-                {
-                  "payload": 4287137928,
-                  "type": 0,
-                }
-              }
-              strokeLinecap={1}
-              strokeLinejoin={1}
-              strokeWidth={2}
-            >
-              <RNSVGPath
-                d="m6 9 6 6 6-6"
-                fill={
-                  {
-                    "payload": 4278190080,
-                    "type": 0,
-                  }
-                }
-              />
-            </RNSVGGroup>
-          </RNSVGSvgView>
           <RNSVGSvgView
             align="xMidYMid"
             bbHeight={24}
@@ -665,44 +599,13 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               strokeWidth={2}
             >
               <RNSVGPath
-                d="m12.5 17-.5-1-.5 1h1z"
+                d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4M12 17h.01"
                 fill={
                   {
                     "payload": 4278190080,
                     "type": 0,
                   }
                 }
-              />
-              <RNSVGPath
-                d="M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z"
-                fill={
-                  {
-                    "payload": 4278190080,
-                    "type": 0,
-                  }
-                }
-              />
-              <RNSVGCircle
-                cx={15}
-                cy={12}
-                fill={
-                  {
-                    "payload": 4278190080,
-                    "type": 0,
-                  }
-                }
-                r={1}
-              />
-              <RNSVGCircle
-                cx={9}
-                cy={12}
-                fill={
-                  {
-                    "payload": 4278190080,
-                    "type": 0,
-                  }
-                }
-                r={1}
               />
             </RNSVGGroup>
           </RNSVGSvgView>
@@ -716,84 +619,6 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
           >
              
           </Text>
-          <RNSVGSvgView
-            align="xMidYMid"
-            bbHeight={24}
-            bbWidth={24}
-            fill="none"
-            focusable={false}
-            height={24}
-            meetOrSlice={0}
-            minX={0}
-            minY={0}
-            stroke="#888888"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "borderWidth": 0,
-                },
-                {
-                  "marginLeft": 16,
-                  "padding": 10,
-                },
-                {
-                  "flex": 0,
-                  "height": 24,
-                  "width": 24,
-                },
-              ]
-            }
-            vbHeight={24}
-            vbWidth={24}
-            width={24}
-          >
-            <RNSVGGroup
-              fill={null}
-              propList={
-                [
-                  "fill",
-                  "stroke",
-                  "strokeWidth",
-                  "strokeLinecap",
-                  "strokeLinejoin",
-                ]
-              }
-              stroke={
-                {
-                  "payload": 4287137928,
-                  "type": 0,
-                }
-              }
-              strokeLinecap={1}
-              strokeLinejoin={1}
-              strokeWidth={2}
-            >
-              <RNSVGCircle
-                cx={12}
-                cy={11.9}
-                fill={
-                  {
-                    "payload": 4278190080,
-                    "type": 0,
-                  }
-                }
-                r={2}
-              />
-              <RNSVGPath
-                d="M6.7 3.4c-.9 2.5 0 5.2 2.2 6.7C6.5 9 3.7 9.6 2 11.6M8.9 10.1l1.4.8M17.3 3.4c.9 2.5 0 5.2-2.2 6.7 2.4-1.2 5.2-.6 6.9 1.5M15.1 10.1l-1.4.8M16.7 20.8c-2.6-.4-4.6-2.6-4.7-5.3-.2 2.6-2.1 4.8-4.7 5.2M12 13.9v1.6M13.5 5.4c-1-.2-2-.2-3 0M17 16.4c.7-.7 1.2-1.6 1.5-2.5M5.5 13.9c.3.9.8 1.8 1.5 2.5"
-                fill={
-                  {
-                    "payload": 4278190080,
-                    "type": 0,
-                  }
-                }
-              />
-            </RNSVGGroup>
-          </RNSVGSvgView>
           <RNSVGSvgView
             align="xMidYMid"
             bbHeight={20}
