@@ -189,7 +189,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const animatedStyle = useAnimatedStyle(() => ({
     height: animatedHeight.value,
     opacity: animatedOpacity.value,
-    transform: [{ translateY: showMoreOptions ? 0 : -10 }],
+    transform: [{ translateY: showMoreOptions ? 0 : -5 }],
     overflow: 'hidden',
   }));
 
@@ -546,19 +546,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         onPress={toggle}
                         style={{
                           width: '70%',
-                          marginVertical: 40,
+                          marginVertical: 26,
                           display: 'flex',
                           flexDirection: 'row',
                           justifyContent: 'center',
                           alignItems: 'center',
                           paddingHorizontal: 10,
                         }}>
-                        {showMoreOptions ? (
-                          <ChevronUp size={20} color={colors.warning.primary} style={{ marginRight: 16 }} />
-                        ) : (
-                          <ChevronDown size={20} color={colors.zingo} style={{ marginRight: 16 }} />
-                        )}
-                        <SkullIcon
+                        <TriangleAlert
                           size={24}
                           color={showMoreOptions ? colors.warning.primary : colors.zingo}
                           style={{ marginRight: 16 }}
@@ -570,11 +565,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           }}>
                           {translate('receive.danger-zone') as string}{' '}
                         </Text>
-                        <BiohazardIcon
-                          size={24}
-                          color={showMoreOptions ? colors.warning.primary : colors.zingo}
-                          style={{ marginLeft: 16, padding: 10 }}
-                        />
                         {showMoreOptions ? (
                           <ChevronUp size={20} color={colors.warning.primary} style={{ marginLeft: 16 }} />
                         ) : (
@@ -582,14 +572,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         )}
                       </Pressable>
 
-                      <Animated.View
-                        style={[
-                          {
-                            marginTop: 12,
-                            justifyContent: 'center',
-                          },
-                          animatedStyle,
-                        ]}>
+                      <Animated.View style={[animatedStyle]}>
                         <View
                           style={{
                             width: '100%',
@@ -625,7 +608,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                                 changeIndex && changeIndex(1);
                               });
                             }}>
-                            <TriangleAlert size={24} color={colors.warning.primary} />
                             <Text style={{ color: colors.text }}>
                               {translate('receive.go-to-transparent') as string}
                             </Text>
