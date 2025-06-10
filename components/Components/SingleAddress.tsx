@@ -29,13 +29,11 @@ import { ExpandableAddress } from './Address/ExpandableAddress';
 import Button from './Button';
 import { CopyIcon } from './Icons/CopyIcon';
 import { ChevronDown, ChevronUp } from './Icons/Chevron';
-import { BiohazardIcon } from './Icons/BiohazardIcon';
 import { EyeIcon } from './Icons/EyeIcon';
 import { XIcon } from './Icons/XIcon';
 import { TriangleAlert } from './Icons/TriangleAlert';
 import { ShieldIcon } from './Icons/ShieldIcon';
 import { ListIcon } from './Icons/ListIcon';
-import { SkullIcon } from './Icons/SkullIcon';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
@@ -145,14 +143,13 @@ const handleConfirmationFlow = async (onSuccess: () => void) => {
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   address,
   ufvk,
-  setSecurityOption,
   newAddressShow,
   total,
   index,
   changeIndex,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, privacy, addLastSnackbar, language, security, mode, addressBook } = context;
+  const { translate, privacy, addLastSnackbar, language, mode, addressBook } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
 
@@ -212,7 +209,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
       setShowMoreOptions(false);
       animatedStyle.height = 0;
     };
-  }, []);
+  }, [animatedStyle]);
 
   function contactFromAddress() {
     const contact = addressBook.find(c => c.address === address?.address);

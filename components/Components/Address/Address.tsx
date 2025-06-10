@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, Pressable, StyleSheet, GestureResponderEvent, TextStyle, StyleProp } from 'react-native';
+import { TextStyle } from 'react-native';
 import Button from '../Button';
 import { ButtonTypeEnum } from '../../../app/AppState';
 

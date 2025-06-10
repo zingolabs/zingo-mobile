@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, ReactNode, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Dimensions, Keyboard, View } from 'react-native';
-import { TabView, TabBar, SceneRendererProps, Route, NavigationState, TabBarItem } from 'react-native-tab-view';
+import { Keyboard, View } from 'react-native';
+import { TabView, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
 import { useTheme } from '@react-navigation/native';
 
 import SingleAddress from '../Components/SingleAddress';
@@ -22,7 +22,7 @@ import {
   AddressBookFileClass,
 } from '../../app/AppState';
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
 
 type ReceiveProps = {
@@ -60,11 +60,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [indexBottomSheet, setIndexBottomSheet] = useState<number>(-1);
 
   const snapPoints = useMemo(() => [index === 0 ? '55%' : '40%', '65%', index === 0 ? '95%' : '80%'], [index]);
-
-  const dimensions = {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-  };
 
   const newAddressShow = useCallback(() => {
     bottomSheetRef.current?.snapToIndex(0);
@@ -232,7 +227,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     props: SceneRendererProps & {
       navigationState: NavigationState<Route>;
     },
-  ) => ReactNode = props => {
+  ) => ReactNode = () => {
     return (
       <View
         accessible={true}
@@ -258,6 +253,10 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     );
   };
 
+  const renderBackdrop = (props: BottomSheetBackdropProps) => (
+    <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} pressBehavior="close" />
+  );
+
   const returnPage = (
     <>
       <TabView
@@ -275,7 +274,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         onChange={handleSheetChanges}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
-        handleStyle={{ display: 'none' }}>
+        handleStyle={{ display: 'none' }}
+        backdropComponent={renderBackdrop}>
         <BottomSheetView style={{ backgroundColor: colors.sideMenuBackground, width: '100%', height: '100%' }}>
           <NewAddress
             addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
