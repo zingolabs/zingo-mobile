@@ -192,10 +192,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const defaultValuesSpendableMaxAmount = useCallback((): void => {
-    setSpendable(totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0);
+    setSpendable(totalBalance ? totalBalance.totalSpendable : 0);
     const max =
-      (totalBalance ? totalBalance.spendableOrchard : 0) +
-      (totalBalance ? totalBalance.spendablePrivate : 0) -
+      (totalBalance ? totalBalance.totalSpendable : 0) -
       (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
         ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
         : 0);
@@ -215,8 +214,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     donationAddress,
     server.chainName,
     totalBalance,
-    totalBalance?.spendableOrchard,
-    totalBalance?.spendablePrivate,
+    totalBalance?.totalSpendable,
   ]);
 
   const calculateFeeWithPropose = useCallback(
@@ -328,33 +326,35 @@ const Send: React.FunctionComponent<SendProps> = ({
         setSpendableBalanceLastError('');
         return;
       }
-      // spendable
-      let spendableBalance = totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0;
+      // spendable TOTAL calculated
+      let spendableBalance: number = totalBalance ? totalBalance.totalSpendable : 0;
       let zenniesForZingo = donationAddress ? false : donation;
+
+      // spendable calculated with an Address
       console.log('SPENDABLEBALANCE', addressPar, zenniesForZingo);
-      const runSpendableBalanceStr = await RPCModule.getSpendableBalanceInfo(addressPar, zenniesForZingo ? 'true' : 'false');
-      if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
+      const runSpendableBalanceAddressStr = await RPCModule.getSpendableBalanceWithAddressInfo(addressPar, zenniesForZingo ? 'true' : 'false');
+      if (runSpendableBalanceAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
-        console.log(runSpendableBalanceStr);
-        setSpendableBalanceLastError(runSpendableBalanceStr);
+        console.log(runSpendableBalanceAddressStr);
+        setSpendableBalanceLastError(runSpendableBalanceAddressStr);
         //Alert.alert('Calculating the FEE', runProposeStr);
       } else {
         try {
-          const runSpendableBalanceJson: RPCSpendablebalanceType = await JSON.parse(runSpendableBalanceStr);
-          if (runSpendableBalanceJson.error) {
+          const runSpendableBalanceAddressJson: RPCSpendablebalanceType = await JSON.parse(runSpendableBalanceAddressStr);
+          if (runSpendableBalanceAddressJson.error) {
             // snack with error
-            console.log(runSpendableBalanceJson.error);
-            setSpendableBalanceLastError(runSpendableBalanceJson.error);
+            console.log(runSpendableBalanceAddressJson.error);
+            setSpendableBalanceLastError(runSpendableBalanceAddressJson.error);
             //Alert.alert('Calculating the FEE', runProposeJson.error);
-          } else if (runSpendableBalanceJson.balance) {
-            console.log('BALANCE', runSpendableBalanceJson.balance);
-            spendableBalance = runSpendableBalanceJson.balance / 10 ** 8;
+          } else if (runSpendableBalanceAddressJson.balance) {
+            console.log('BALANCE ADDRESS', runSpendableBalanceAddressJson.balance);
+            spendableBalance = runSpendableBalanceAddressJson.balance / 10 ** 8;
             setSpendableBalanceLastError('');
           }
         } catch (e) {
           // snack with error
-          console.log(runSpendableBalanceStr);
-          setSpendableBalanceLastError(runSpendableBalanceStr);
+          console.log(runSpendableBalanceAddressStr, e);
+          setSpendableBalanceLastError(runSpendableBalanceAddressStr);
           //Alert.alert('Calculating the FEE', runProposeJson.error);
         }
       }
@@ -385,8 +385,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       donation,
       donationAddress,
       totalBalance,
-      totalBalance?.spendableOrchard,
-      totalBalance?.spendablePrivate,
+      totalBalance?.totalSpendable,
       validAddress,
     ],
   );
@@ -464,8 +463,8 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     const stillConf =
-      (totalBalance ? totalBalance.orchardBal : 0) !== (totalBalance ? totalBalance.spendableOrchard : 0) ||
-      (totalBalance ? totalBalance.privateBal : 0) !== (totalBalance ? totalBalance.spendablePrivate : 0) ||
+      (totalBalance ? totalBalance.totalOrchardBalance : 0) !== (totalBalance ? totalBalance.confirmedOrchardBalance : 0) ||
+      (totalBalance ? totalBalance.totalSaplingBalance : 0) !== (totalBalance ? totalBalance.confirmedSaplingBalance : 0) ||
       somePending;
     const showShield = (somePending ? 0 : shieldingAmount) > 0;
     //const showUpgrade =
@@ -476,10 +475,10 @@ const Send: React.FunctionComponent<SendProps> = ({
     shieldingAmount,
     somePending,
     totalBalance,
-    totalBalance?.orchardBal,
-    totalBalance?.privateBal,
-    totalBalance?.spendableOrchard,
-    totalBalance?.spendablePrivate,
+    totalBalance?.totalOrchardBalance,
+    totalBalance?.totalSaplingBalance,
+    totalBalance?.confirmedOrchardBalance,
+    totalBalance?.confirmedSaplingBalance,
   ]);
 
   useEffect(() => {

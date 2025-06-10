@@ -33,6 +33,7 @@ import { RPCSendProposeType } from './types/RPCSendProposeType';
 import { RPCSyncPollType } from './types/RPCSyncPollType';
 import { RPCZecPriceType } from './types/RPCZecPriceType';
 import { RPCTransparentAddressType } from './types/RPCTransparentAddressType';
+import { RPCSpendablebalanceType } from './types/RPCSpendablebalanceType';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -460,13 +461,14 @@ export default class RPC {
       this.fnSetValueTransfersList([], 0);
       this.fnSetMessagesList([], 0);
       this.fnSetTotalBalance({
-        orchardBal: 0,
-        privateBal: 0,
-        transparentBal: 0,
-        confirmedTransparent: 0,
-        spendableOrchard: 0,
-        spendablePrivate: 0,
+        totalOrchardBalance: 0,
+        totalSaplingBalance: 0,
+        totalTransparentBalance: 0,
+        confirmedTransparentBalance: 0,
+        confirmedOrchardBalance: 0,
+        confirmedSaplingBalance: 0,
         total: 0,
+        totalSpendable: 0,
       } as TotalBalanceClass);
       this.fnSetSyncingStatus({} as RPCSyncStatusType);
 
@@ -755,9 +757,27 @@ export default class RPC {
         return;
       }
       this.fetchTotalBalanceLock = true;
+      let spendableBalance: number = 0;
       const start = Date.now();
+      const spendableStr: string = await RPCModule.getSpendableBalanceTotalInfo();
+      console.log('=========================================== > spendable balance - ', Date.now() - start);
+      if (spendableStr) {
+        if (spendableStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error spendable balance ${spendableStr}`);
+        }
+      } else {
+        console.log('Internal Error balance');
+      }
+      const spendableJSON: RPCSpendablebalanceType = await JSON.parse(spendableStr);
+      if (spendableJSON.error) {
+        console.log(`Error spendable balance ${spendableStr}`);
+      } else if (spendableJSON.balance) {
+        spendableBalance = spendableJSON.balance;
+      }
+
+      const start2 = Date.now();
       const balanceStr: string = await RPCModule.getBalanceInfo();
-      console.log('=========================================== > balance - ', Date.now() - start);
+      console.log('=========================================== > balance - ', Date.now() - start2);
       if (balanceStr) {
         if (balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error balance ${balanceStr}`);
@@ -771,22 +791,24 @@ export default class RPC {
       }
       const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
 
-      const orchardBal: number = balanceJSON.total_orchard_balance || 0;
-      const privateBal: number = balanceJSON.total_sapling_balance || 0;
-      const transparentBal: number = balanceJSON.total_transparent_balance || 0;
+      const orchardBalance: number = balanceJSON.total_orchard_balance || 0;
+      const saplingBalance: number = balanceJSON.total_sapling_balance || 0;
+      const transparentBalance: number = balanceJSON.total_transparent_balance || 0;
 
-      const total = orchardBal + privateBal + transparentBal;
+      const total = orchardBalance + saplingBalance + transparentBalance;
 
       // Total Balance
       const balance: TotalBalanceClass = {
-        orchardBal: orchardBal / 10 ** 8,
-        privateBal: privateBal / 10 ** 8,
-        transparentBal: transparentBal / 10 ** 8,
-        spendableOrchard: (balanceJSON.confirmed_orchard_balance || 0) / 10 ** 8,
-        spendablePrivate: (balanceJSON.confirmed_sapling_balance || 0) / 10 ** 8,
-        confirmedTransparent: (balanceJSON.confirmed_transparent_balance || 0) / 10 ** 8,
+        totalOrchardBalance: orchardBalance / 10 ** 8,
+        totalSaplingBalance: saplingBalance / 10 ** 8,
+        totalTransparentBalance: transparentBalance / 10 ** 8,
+        confirmedOrchardBalance: (balanceJSON.confirmed_orchard_balance || 0) / 10 ** 8,
+        confirmedSaplingBalance: (balanceJSON.confirmed_sapling_balance || 0) / 10 ** 8,
+        confirmedTransparentBalance: (balanceJSON.confirmed_transparent_balance || 0) / 10 ** 8,
         total: total / 10 ** 8,
+        totalSpendable: spendableBalance / 10 ** 8,
       };
+      console.log(balance);
       //const start2 = Date.now();
       this.fnSetTotalBalance(balance);
       //console.log('=========================================== > set balance - ', Date.now() - start2);

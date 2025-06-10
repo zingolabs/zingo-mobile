@@ -176,7 +176,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
         !(
           mode === ModeEnum.basic &&
           totalBalance &&
-          totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0
+          totalBalance.totalSpendable <= 0
         ) && (
           <TouchableOpacity
             style={{ marginLeft: 10 }}

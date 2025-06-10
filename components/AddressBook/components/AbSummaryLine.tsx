@@ -147,7 +147,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           !(
             mode === ModeEnum.basic &&
             totalBalance &&
-            totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0
+            totalBalance.totalSpendable <= 0
           ) && (
             <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
               <TouchableOpacity

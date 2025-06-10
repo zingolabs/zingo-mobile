@@ -18,6 +18,7 @@ import { AddressKindEnum, ModeEnum, SecurityType, UnifiedAddressClass, Transpare
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
+import VerifyAddress from './components/VerifyAddress';
 
 type ReceiveProps = {
   toggleMenuDrawer: () => void;
@@ -44,6 +45,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   const [index, setIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
+  const [sheetType, setSheetType] = useState<'NA' | 'VA' | null>(null);
 
   const [uAddr, setUAddr] = useState<UnifiedAddressClass[]>([]);
   const [tAddr, setTAddr] = useState<TransparentAddressClass[]>([]);
@@ -53,24 +55,46 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [indexBottomSheet, setIndexBottomSheet] = useState<number>(-1);
 
-  const snapPoints = useMemo(() =>
+  const NASnapPoints = useMemo(() =>
     [
       index === 0 ? '55%' : '40%',
       '65%',
       index === 0 ? '95%' : '80%',
     ], [index]);
 
+  const VASnapPoints = useMemo(() =>
+    [
+      '40%',
+      '65%',
+    ], []);
+
   const dimensions = {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
   };
 
-  const newAddressShow = useCallback(() => {
+  const NAShow = useCallback(() => {
+    setSheetType('NA');
     bottomSheetRef.current?.snapToIndex(0);
     setIndexBottomSheet(0);
   }, []);
 
-  const newAddressHide = useCallback(() => {
+  const NAHide = useCallback(() => {
+    setSheetType(null);
+    Keyboard.dismiss();
+    bottomSheetRef.current?.snapToIndex(-1);
+    bottomSheetRef.current?.close();
+    setIndexBottomSheet(-1);
+  }, []);
+
+  const VAShow = useCallback(() => {
+    setSheetType('VA');
+    bottomSheetRef.current?.snapToIndex(0);
+    setIndexBottomSheet(0);
+  }, []);
+
+  const VAHide = useCallback(() => {
+    setSheetType(null);
     Keyboard.dismiss();
     bottomSheetRef.current?.snapToIndex(-1);
     bottomSheetRef.current?.close();
@@ -151,7 +175,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   setIndex={setUAddrIndex}
                   total={uAddr.length}
                   setSecurityOption={setSecurityOption}
-                  newAddressShow={newAddressShow}
+                  NAShow={NAShow}
+                  VAShow={VAShow}
                 />
               </>
             )}
@@ -175,7 +200,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   setIndex={setTAddrIndex}
                   total={tAddr.length}
                   setSecurityOption={setSecurityOption}
-                  newAddressShow={newAddressShow}
+                  NAShow={NAShow}
+                  VAShow={VAShow}
                 />
               </>
             )}
@@ -275,19 +301,26 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
-        snapPoints={snapPoints}
+        snapPoints={sheetType === 'NA' ? NASnapPoints : VASnapPoints}
         enableDynamicSizing={false}
         onChange={handleSheetChanges}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
         handleStyle={{ display: 'none' }}
       >
-        <BottomSheetView style={{ backgroundColor: colors.sideMenuBackground, width: '100%', height: '100%' }}>
-          <NewAddress
-            addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
-            closeSheet={newAddressHide}
-            setAddressBook={setAddressBook}
-          />
+        <BottomSheetView style={{ backgroundColor: colors.sideMenuBackground, height: '100%' }}>
+          {sheetType === 'NA' && (
+            <NewAddress
+              addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
+              closeSheet={NAHide}
+              setAddressBook={setAddressBook}
+            />
+          )}
+          {sheetType === 'VA' && (
+            <VerifyAddress
+              closeSheet={VAHide}
+            />
+          )}
         </BottomSheetView>
       </BottomSheet>
     </>

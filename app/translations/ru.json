@@ -18,6 +18,7 @@
   "biometrics-error": "В целях безопасности для выполнения этого действия необходимо повторно пройти авторизацию. Вы всегда можете поменять эту опцию в Настройках",
   "close": "Закрыть",
   "cancel": "Отмена",
+  "verify": "Проверить",
   "save": "Сохранить",
   "copy": "Копировать",
   "share": "Поделиться",
@@ -51,6 +52,11 @@
     "contacts-empty": "Нет контактов или адресов.",
     "link-all": "Глобальный",
     "link-anonymous": "Анонимно"
+  },
+  "addresslist": {
+    "title": "Список адресов",
+    "unified": "Единый",
+    "transparent": "Прозрачный"
   },
   "addressbook": {
     "title": "Адресная книга",
@@ -529,7 +535,8 @@
     "shielded-full": "Полный",
     "showtip": "Нажмите, чтобы выбрать другой адрес.",
     "newunifiedaddress": "Новый унифицированный адрес",
-    "newtransparentaddress": "Новый прозрачный адрес"
+    "newtransparentaddress": "Новый прозрачный адрес",
+    "verify": "Проверить адреса"
   },
   "history": {
     "shield-all": "Экранирование всех средств",
@@ -717,10 +724,10 @@
     "title": "Ваши активы в пулах",
     "orchard-title": "ORCHARD (Унифицированный адрес)",
     "orchard-balance": "Общий баланс",
-    "orchard-spendable-balance": "Доступный баланс",
+    "orchard-confirmed-balance": "Подтвержденный баланс",
     "sapling-title": "SAPLING (Приватный Z-адрес)",
     "sapling-balance": "Общий баланс",
-    "sapling-spendable-balance": "Доступный баланс",
+    "sapling-confirmed-balance": "Подтвержденный баланс",
     "transparent-title": "ПРОЗРАЧНЫЙ (T-адрес)",
     "transparent-balance": "Общий баланс",
     "transparent-confirmed-balance": "Подтвержденный баланс",

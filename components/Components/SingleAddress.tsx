@@ -30,14 +30,16 @@ type SingleAddressProps = {
   setIndex: (i: number) => void;
   total: number;
   setSecurityOption: (s: SecurityType) => Promise<void>;
-  newAddressShow?: () => void;
+  NAShow?: () => void;
+  VAShow?: () => void;
 };
 
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   address,
   ufvk,
   setSecurityOption,
-  newAddressShow,
+  NAShow,
+  VAShow,
   total,
   index,
   setIndex,
@@ -76,13 +78,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const doAddressList = () => {
     return magicModal.show(() => <AddressList addressKind={address ? address.addressKind : AddressKindEnum.u} setIndex={setIndex} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
       .promise;
-  };
-
-  const doNothing = () => {
-    addLastSnackbar({
-      message: 'Unimplemented option',
-      duration: SnackbarDurationEnum.short,
-    });
   };
 
   const doShare = async () => {
@@ -286,7 +281,9 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 </TouchableOpacity>
                 {address && mode === ModeEnum.advanced && (
                   <>
-                    <TouchableOpacity onPress={doNothing}>
+                    <TouchableOpacity onPress={() => {
+                      VAShow && VAShow();
+                    }}>
                       <View
                         style={{
                           backgroundColor: colors.sideMenuBackground,
@@ -346,7 +343,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     ? translate('receive.newunifiedaddress')
                     : translate('receive.newtransparentaddress')) as string}
                   onPress={() => {
-                    newAddressShow && newAddressShow();
+                    NAShow && NAShow();
                   }}
                 />
               )}

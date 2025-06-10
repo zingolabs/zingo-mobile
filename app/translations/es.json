@@ -18,6 +18,7 @@
   "biometrics-error": "Por seguridad necesitas autenticarte de nuevo para realizar esta acción. Siempre puedes cambiarlo en Parámetros",
   "close": "Cerrar",
   "cancel": "Cancelar",
+  "verify": "Verificar",
   "save": "Guardar",
   "copy": "Copiar",
   "share": "Compartir",
@@ -51,6 +52,11 @@
     "contacts-empty": "Sin contactos ni direcciones.",
     "link-all": "Global",
     "link-anonymous": "Anónimos"
+  },
+  "addresslist": {
+    "title": "Lista de direcciones",
+    "unified": "Unificada",
+    "transparent": "Transparente"
   },
   "addressbook": {
     "title": "Libreta de Direcciones",
@@ -529,7 +535,8 @@
     "shielded-full": "Completa",
     "showtip": "Tocar para seleccionar otra dirección.",
     "newunifiedaddress": "Nueva dirección unificada",
-    "newtransparentaddress": "Nueva dirección transparente"
+    "newtransparentaddress": "Nueva dirección transparente",
+    "verify": "Verificar direcciones"
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",
@@ -717,10 +724,10 @@
     "title": "Agrupaciones de Fondos",
     "orchard-title": "ORCHARD (UA)",
     "orchard-balance": "Cantidad Total",
-    "orchard-spendable-balance": "Cantidad para Gastar",
+    "orchard-confirmed-balance": "Cantidad confirmada",
     "sapling-title": "SAPLING (Privada)",
     "sapling-balance": "Cantidad Total",
-    "sapling-spendable-balance": "Cantidad para Gastar",
+    "sapling-confirmed-balance": "Cantidad confirmada",
     "transparent-title": "TRANSPARENTE",
     "transparent-balance": "Cantidad Total",
     "transparent-confirmed-balance": "Cantidad Confirmada",

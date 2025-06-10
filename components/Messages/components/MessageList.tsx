@@ -433,20 +433,19 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
 
   useEffect(() => {
     const stillConf =
-      (totalBalance ? totalBalance.orchardBal : 0) !== (totalBalance ? totalBalance.spendableOrchard : 0) ||
-      (totalBalance ? totalBalance.privateBal : 0) !== (totalBalance ? totalBalance.spendablePrivate : 0) ||
+      (totalBalance ? totalBalance.totalOrchardBalance : 0) !== (totalBalance ? totalBalance.confirmedOrchardBalance : 0) ||
+      (totalBalance ? totalBalance.totalSaplingBalance : 0) !== (totalBalance ? totalBalance.confirmedSaplingBalance : 0) ||
       somePending;
     //const showUpgrade =
     //  (somePending ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
     setStillConfirming(stillConf);
-    setSpendable(totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0);
+    setSpendable(totalBalance ? totalBalance.totalSpendable : 0);
   }, [
     somePending,
     totalBalance,
-    totalBalance?.orchardBal,
-    totalBalance?.privateBal,
-    totalBalance?.spendableOrchard,
-    totalBalance?.spendablePrivate,
+    totalBalance?.totalOrchardBalance,
+    totalBalance?.totalSaplingBalance,
+    totalBalance?.totalSpendable,
   ]);
 
   const setMemoModalShow = () => {

@@ -223,7 +223,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     if (!readOnly &&
         setShieldingAmount &&
         selectServer !== SelectServerEnum.offline &&
-        somePending ? 0 : (totalBalance?.confirmedTransparent ? totalBalance.confirmedTransparent : 0) > 0
+        somePending ? 0 : (totalBalance?.confirmedTransparentBalance ? totalBalance.confirmedTransparentBalance : 0) > 0
     ) {
       (async () => {
         let proposeFee = 0;
@@ -264,7 +264,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       setShieldingFee(0);
       setShieldingAmount && setShieldingAmount(0);
     }
-  }, [readOnly, setShieldingAmount, totalBalance?.confirmedTransparent, somePending, selectServer]);
+  }, [readOnly, setShieldingAmount, totalBalance?.confirmedTransparentBalance, somePending, selectServer]);
 
   useEffect(() => {
     setShowShieldButton(
@@ -738,9 +738,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               />
               {mode !== ModeEnum.basic &&
                 totalBalance &&
-                (totalBalance.orchardBal !== totalBalance.spendableOrchard ||
-                  totalBalance.privateBal > 0 ||
-                  totalBalance.transparentBal > 0) && (
+                (totalBalance.totalOrchardBalance !== totalBalance.confirmedOrchardBalance ||
+                  totalBalance.totalSaplingBalance > 0 ||
+                  totalBalance.totalTransparentBalance > 0) && (
                   <TouchableOpacity onPress={() => setPoolsModalShow()}>
                     <View
                       style={{

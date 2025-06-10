@@ -18,6 +18,7 @@
   "biometrics-error": "For security you need to authenticate again to perform this action. You Always can change this in Settings",
   "close": "Close",
   "cancel": "Cancel",
+  "verify": "Verify",
   "save": "Save",
   "copy": "Copy",
   "share": "Share",
@@ -534,7 +535,8 @@
     "shielded-full": "Full",
     "showtip": "Tap to select another address.",
     "newunifiedaddress": "New Unified Address",
-    "newtransparentaddress": "New Transparent Address"
+    "newtransparentaddress": "New Transparent Address",
+    "verify": "Verify Addresses"
   },
   "history": {
     "shield-all": "Shield All funds",
@@ -722,10 +724,10 @@
     "title": "Fund Pools",
     "orchard-title": "ORCHARD (UA)",
     "orchard-balance": "Total Balance",
-    "orchard-spendable-balance": "Spendable Balance",
+    "orchard-confirmed-balance": "Confirmed Balance",
     "sapling-title": "SAPLING (Private)",
     "sapling-balance": "Total Balance",
-    "sapling-spendable-balance": "Spendable Balance",
+    "sapling-confirmed-balance": "Confirmed Balance",
     "transparent-title": "TRANSPARENT",
     "transparent-balance": "Total Balance",
     "transparent-confirmed-balance": "Confirmed Balance",

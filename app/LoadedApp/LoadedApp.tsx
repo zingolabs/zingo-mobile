@@ -1868,8 +1868,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         if (
           mode === ModeEnum.basic &&
           !!totalBalance &&
-          totalBalance.orchardBal + totalBalance.privateBal > 0 &&
-          totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
+          totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance > 0 &&
+          totalBalance.totalSpendable === 0 &&
           somePending
         ) {
           iconName = faRefresh;
@@ -1915,7 +1915,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   <>
                     {mode === ModeEnum.advanced ||
                     (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
-                    (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
+                    (!readOnly && !!totalBalance && totalBalance.totalSpendable > 0) ? (
                       <Tab.Navigator
                         detachInactiveScreens={true}
                         initialRouteName={translate('loadedapp.history-menu') as string}
@@ -1962,10 +1962,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                         {!readOnly &&
                           selectServer !== SelectServerEnum.offline &&
                           (mode === ModeEnum.advanced ||
-                            (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ||
+                            (!!totalBalance && totalBalance.totalSpendable > 0) ||
                             (!!totalBalance &&
-                              totalBalance.orchardBal + totalBalance.privateBal > 0 &&
-                              totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
+                              totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance > 0 &&
+                              totalBalance.totalSpendable === 0 &&
                               somePending)) && (
                             <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                               {() => (
