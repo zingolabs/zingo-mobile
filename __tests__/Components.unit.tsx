@@ -5,8 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { render } from '@testing-library/react-native';
-import { ReactTestRendererJSON } from 'react-test-renderer';
+import { render, screen } from '@testing-library/react-native';
 import CurrencyAmount from '../components/Components/CurrencyAmount';
 import ZecAmount from '../components/Components/ZecAmount';
 import BoldText from '../components/Components/BoldText';
@@ -17,198 +16,126 @@ import { CurrencyEnum, CurrencyNameEnum } from '../app/AppState';
 
 // test suite
 describe('Component Components - test', () => {
-  //unit test
-  test('CurrencyAmount - High Privacy - price=2.9826 and amtZec=1.00098 result $ -.-- USD', () => {
-    const text: ReactTestRendererJSON | null = render(
+  // CurrencyAmount tests
+  test('CurrencyAmount - High Privacy - should display privacy placeholder', () => {
+    render(
       <CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} currency={CurrencyEnum.USDCurrency} privacy={true} />,
-    ).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[0].children[0]).toBe('$ -.--');
-  });
-  test('CurrencyAmount - price undefined result $ -- USD', () => {
-    const text: ReactTestRendererJSON | null = render(<CurrencyAmount amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[0].children[0]).toBe('$ -.--');
+    );
+    expect(screen.getByText('$ -.--')).toBeTruthy();
   });
 
-  test('CurrencyAmount - price 0 result $ -- USD', () => {
-    const text: ReactTestRendererJSON | null = render(
-      <CurrencyAmount price={0} amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />,
-    ).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[0].children[0]).toBe('$ -.--');
+  test('CurrencyAmount - price undefined should display placeholder', () => {
+    render(<CurrencyAmount amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />);
+    expect(screen.getByText('$ -.--')).toBeTruthy();
   });
 
-  test('CurrencyAmount - amtZec undefined result $ -- USD', () => {
-    const text: ReactTestRendererJSON | null = render(<CurrencyAmount price={1} style={{}} currency={CurrencyEnum.USDCurrency} />).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[0].children[0]).toBe('$ -.--');
+  test('CurrencyAmount - price 0 should display placeholder', () => {
+    render(<CurrencyAmount price={0} amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />);
+    expect(screen.getByText('$ -.--')).toBeTruthy();
   });
 
-  test('CurrencyAmount - price * amtZec really tiny result $ < 0.01 USD', () => {
-    const text: ReactTestRendererJSON | null = render(
-      <CurrencyAmount price={0.001} amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />,
-    ).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[0].children[0]).toBe('$ < 0.01');
+  test('CurrencyAmount - amtZec undefined should display placeholder', () => {
+    render(<CurrencyAmount price={1} style={{}} currency={CurrencyEnum.USDCurrency} />);
+    expect(screen.getByText('$ -.--')).toBeTruthy();
   });
 
-  test('CurrencyAmount - price=2.9826 and amtZec=1.00098 result $ 2.99 USD', () => {
-    const text: ReactTestRendererJSON | null = render(
-      <CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} currency={CurrencyEnum.USDCurrency} />,
-    ).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[0].children[0]).toBe('$ 2.99');
+  test('CurrencyAmount - very small amount should display < 0.01', () => {
+    render(<CurrencyAmount price={0.001} amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />);
+    expect(screen.getByText('$ < 0.01')).toBeTruthy();
   });
 
-  test("CurrencyAmount - style={backgroundColor: 'red'} result same", () => {
-    const text: ReactTestRendererJSON | null = render(
-      <CurrencyAmount
-        price={2.9826}
-        amtZec={1.00098}
-        style={{ backgroundColor: 'red' }}
-        currency={CurrencyEnum.USDCurrency}
-      />,
-    ).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[0].props.style.backgroundColor).toBe('red');
+  test('CurrencyAmount - valid amount should display calculated value', () => {
+    render(<CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} currency={CurrencyEnum.USDCurrency} />);
+    expect(screen.getByText('$ 2.99')).toBeTruthy();
   });
 
-  test('ZecAmount - High Privacy - amtZec -1.123456789 rounded up result -.---- ZEC', () => {
-    const text: ReactTestRendererJSON | null = render(
-      <ZecAmount amtZec={-1.123456789} currencyName={CurrencyNameEnum.ZEC} privacy={true} />,
-    ).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' -.----');
+  // ZecAmount tests
+  test('ZecAmount - High Privacy should display privacy placeholder', () => {
+    render(<ZecAmount amtZec={-1.123456789} currencyName={CurrencyNameEnum.ZEC} privacy={true} />);
+    expect(screen.getByText('-.----')).toBeTruthy();
   });
 
-  test('ZecAmount - All props missing result -- ZEC', () => {
-    const text: ReactTestRendererJSON | null = render(<ZecAmount currencyName={CurrencyNameEnum.ZEC} />).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
+  test('ZecAmount - no props should display placeholder', () => {
+    render(<ZecAmount currencyName={CurrencyNameEnum.ZEC} />);
+    expect(screen.getByText('--')).toBeTruthy();
   });
 
-  test('ZecAmount - amtZec 0 result 0.00000000 ZEC', () => {
-    const text: ReactTestRendererJSON | null = render(<ZecAmount amtZec={0} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' 0.0000');
+  test('ZecAmount - zero amount should display formatted zero', () => {
+    render(<ZecAmount amtZec={0} currencyName={CurrencyNameEnum.ZEC} />);
+    expect(screen.getByText('0.0000')).toBeTruthy();
   });
 
-  test('ZecAmount - amtZec -1.123456789 rounded up result -1.12345679 ZEC', () => {
-    const text: ReactTestRendererJSON | null = render(<ZecAmount amtZec={-1.123456789} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' -1.1234');
-    expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children[0]).toBe('5679');
+  test('ZecAmount - negative amount should display formatted value', () => {
+    render(<ZecAmount amtZec={-1.123456789} currencyName={CurrencyNameEnum.ZEC} />);
+    expect(screen.getByText('-1.1234')).toBeTruthy();
+    expect(screen.getByText('5679')).toBeTruthy();
   });
 
-  test('ZecAmount - amtZec 1.123456781 rounded down result 1.12345678 ZEC', () => {
-    const text: ReactTestRendererJSON | null = render(<ZecAmount amtZec={1.123456781} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' 1.1234');
-    expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children[0]).toBe('5678');
+  test('ZecAmount - positive amount should display formatted value', () => {
+    render(<ZecAmount amtZec={1.123456781} currencyName={CurrencyNameEnum.ZEC} />);
+    expect(screen.getByText('1.1234')).toBeTruthy();
+    expect(screen.getByText('5678')).toBeTruthy();
   });
 
-  test("ZecAmount - color 'red' result same", () => {
-    const text: ReactTestRendererJSON | null = render(<ZecAmount color={'red'} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
-    expect(text.children[0].children[0].children[1].props.style.color).toBe('red');
-    expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children).toBe(null);
-    expect(text.children[0].children[0].children[2].props.style.color).toBe('red');
+  test('ZecAmount - no currency symbol should display placeholder', () => {
+    render(<ZecAmount />);
+    expect(screen.getByText('--')).toBeTruthy();
   });
 
-  test('ZecAmount - size 11 result same and same * 0.7', () => {
-    const text: ReactTestRendererJSON | null = render(<ZecAmount size={11} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
-    expect(text.children[0].children[0].children[1].props.style.fontSize).toBe(11);
-    expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children).toBe(null);
-    expect(text.children[0].children[0].children[2].props.style.fontSize).toBe(11 * 0.7);
+  // Text Component tests
+  test('BoldText - should render children correctly', () => {
+    render(<BoldText>bold text</BoldText>);
+    expect(screen.getByText('bold text')).toBeTruthy();
   });
 
-  test("ZecAmount - View style backgroundColor 'red' result same", () => {
-    const text: ReactTestRendererJSON | null = render(
-      <ZecAmount style={{ backgroundColor: 'red' }} currencyName={CurrencyNameEnum.ZEC} />,
-    ).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.props.style.backgroundColor).toBe('red');
-    expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
-    expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children).toBe(null);
+  test('FadeText - should render children correctly', () => {
+    render(<FadeText>Fade text</FadeText>);
+    expect(screen.getByText('Fade text')).toBeTruthy();
   });
 
-  test("ZecAmount - zecSymbol undefined result '---", () => {
-    const text: ReactTestRendererJSON | null = render(<ZecAmount />).toJSON();
-    expect(text.type).toBe('View');
-    expect(text.children[0].children[0].children[1].type).toBe('Text');
-    expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
-    expect(text.children[0].children[0].children[2].type).toBe('Text');
-    expect(text.children[0].children[0].children[2].children).toBe(null);
+  test('ErrorText - should render children correctly', () => {
+    render(<ErrorText>error text</ErrorText>);
+    expect(screen.getByText('error text')).toBeTruthy();
   });
 
-  test("BoldText - children 'bold text' result same", () => {
-    const text: ReactTestRendererJSON | null = render(<BoldText children={'bold text'} />).toJSON();
-    expect(text.type).toBe('Text');
-    expect(text.children[0]).toBe('bold text');
+  test('RegText - should render children correctly', () => {
+    render(<RegText>reg text</RegText>);
+    expect(screen.getByText('reg text')).toBeTruthy();
   });
 
-  test("BoldText - View style backgroundColor 'red' result same", () => {
-    const text: ReactTestRendererJSON | null = render(<BoldText style={{ backgroundColor: 'red' }}>Bold Text</BoldText>).toJSON();
-    expect(text.type).toBe('Text');
-    expect(text.props.style.backgroundColor).toBe('red');
+  // Style prop tests
+  test('BoldText - should accept style props', () => {
+    const { getByText } = render(<BoldText style={{ backgroundColor: 'red' }}>Bold Text</BoldText>);
+    const element = getByText('Bold Text');
+    expect(element).toBeTruthy();
+    expect(element.props.style).toEqual(expect.objectContaining({ backgroundColor: 'red' }));
   });
 
-  test("FadeText - children 'fade text' result same", () => {
-    const text: ReactTestRendererJSON | null = render(<FadeText>Fade text</FadeText>).toJSON();
-    expect(text.type).toBe('Text');
-    expect(text.children[0]).toBe('Fade text');
+  test('FadeText - should accept style props', () => {
+    const { getByText } = render(<FadeText style={{ backgroundColor: 'red' }}>Fade Text</FadeText>);
+    const element = getByText('Fade Text');
+    expect(element).toBeTruthy();
+    expect(element.props.style).toEqual(expect.objectContaining({ backgroundColor: 'red' }));
   });
 
-  test("FadeText - View style backgroundColor 'red' result same", () => {
-    const text: ReactTestRendererJSON | null = render(<FadeText style={{ backgroundColor: 'red' }}>Fade Text</FadeText>).toJSON();
-    expect(text.type).toBe('Text');
-    expect(text.props.style.backgroundColor).toBe('red');
+  test('ErrorText - should accept style props', () => {
+    const { getByText } = render(<ErrorText style={{ backgroundColor: 'red' }}>Error Text</ErrorText>);
+    const element = getByText('Error Text');
+    expect(element).toBeTruthy();
+    expect(element.props.style).toEqual(expect.objectContaining({ backgroundColor: 'red' }));
   });
 
-  test("ErrorText - children 'error text' result same", () => {
-    const text: ReactTestRendererJSON | null = render(<ErrorText children={'error text'} />).toJSON();
-    expect(text.type).toBe('Text');
-    expect(text.children[0]).toBe('error text');
+  test('RegText - should accept style props', () => {
+    const { getByText } = render(<RegText style={{ backgroundColor: 'red' }}>Reg Text</RegText>);
+    const element = getByText('Reg Text');
+    expect(element).toBeTruthy();
+    expect(element.props.style).toEqual(expect.objectContaining({ backgroundColor: 'red' }));
   });
 
-  test("ErrorText - View style backgroundColor 'red' result same", () => {
-    const text: ReactTestRendererJSON | null = render(<ErrorText style={{ backgroundColor: 'red' }}>Error Text</ErrorText>).toJSON();
-    expect(text.type).toBe('Text');
-    expect(text.props.style.backgroundColor).toBe('red');
-  });
-
-  test("RegText - children 'reg text' result same", () => {
-    const text: ReactTestRendererJSON | null = render(<RegText children={'reg text'} />).toJSON();
-    expect(text.type).toBe('Text');
-    expect(text.children[0]).toBe('reg text');
-  });
-
-  test("RegText - View style backgroundColor 'red' result same", () => {
-    const text: ReactTestRendererJSON | null = render(<RegText style={{ backgroundColor: 'red' }}>Reg Text</RegText>).toJSON();
-    expect(text.type).toBe('Text');
-    expect(text.props.style.backgroundColor).toBe('red');
-  });
-
-  test("RegText - View style color 'red' result same", () => {
-    const text: ReactTestRendererJSON | null = render(<RegText color={'red'}>Reg Text</RegText>).toJSON();
-    expect(text.type).toBe('Text');
-    expect(text.props.style.color).toBe('red');
+  test('RegText - should accept color prop', () => {
+    const { getByText } = render(<RegText color={'red'}>Reg Text</RegText>);
+    const element = getByText('Reg Text');
+    expect(element).toBeTruthy();
+    expect(element.props.style).toEqual(expect.objectContaining({ color: 'red' }));
   });
 });

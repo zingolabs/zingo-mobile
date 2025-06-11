@@ -88,7 +88,6 @@
     "@types/lodash": "^4.17.16",
     "@types/randomcolor": "^0.5.9",
     "@types/react": "^19.0.10",
-    "@types/react-test-renderer": "^19.0.0",
     "@types/url-parse": "^1.4.11",
     "babel-jest": "^29.6.3",
     "babel-plugin-dynamic-import-node": "^2.3.3",
