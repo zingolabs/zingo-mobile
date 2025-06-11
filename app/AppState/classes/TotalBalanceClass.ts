@@ -17,11 +17,11 @@ export default class TotalBalanceClass {
   // Total orchard, confirmed funds
   confirmedOrchardBalance: number;
 
-  // Total pending + confirmed
-  total: number;
+  // Total spendable
+  totalSpendableBalance: number;
 
   // Total spendable
-  totalSpendable: number;
+  potenciallyTotalSpendableBalance: number;
 
   constructor() {
     this.totalTransparentBalance = 0;
@@ -30,7 +30,7 @@ export default class TotalBalanceClass {
     this.confirmedTransparentBalance = 0;
     this.confirmedSaplingBalance = 0;
     this.confirmedOrchardBalance = 0;
-    this.total = 0;
-    this.totalSpendable = 0;
+    this.totalSpendableBalance = 0;
+    this.potenciallyTotalSpendableBalance = 0;
   }
 }

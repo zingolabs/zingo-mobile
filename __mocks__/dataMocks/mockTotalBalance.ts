@@ -7,6 +7,6 @@ export const mockTotalBalance: TotalBalanceClass = {
   confirmedSaplingBalance: 0.2,
   totalOrchardBalance: 0.6,
   confirmedOrchardBalance: 0.3,
-  total: 1.12345678,
-  totalSpendable: 1.12345678,
+  totalSpendableBalance: 1.12345678,
+  potenciallyTotalSpendableBalance: 1.12345678,
 };

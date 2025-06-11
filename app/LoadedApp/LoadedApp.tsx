@@ -1865,7 +1865,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           mode === ModeEnum.basic &&
           !!totalBalance &&
           totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance > 0 &&
-          totalBalance.totalSpendable === 0 &&
+          totalBalance.totalSpendableBalance === 0 &&
           somePending
         ) {
           iconName = faRefresh;
@@ -1911,7 +1911,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   <>
                     {mode === ModeEnum.advanced ||
                     (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
-                    (!readOnly && !!totalBalance && totalBalance.totalSpendable > 0) ? (
+                    (!readOnly && !!totalBalance && totalBalance.totalSpendableBalance > 0) ? (
                       <Tab.Navigator
                         detachInactiveScreens={true}
                         initialRouteName={translate('loadedapp.history-menu') as string}
@@ -1958,10 +1958,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                         {!readOnly &&
                           selectServer !== SelectServerEnum.offline &&
                           (mode === ModeEnum.advanced ||
-                            (!!totalBalance && totalBalance.totalSpendable > 0) ||
+                            (!!totalBalance && totalBalance.totalSpendableBalance > 0) ||
                             (!!totalBalance &&
                               totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance > 0 &&
-                              totalBalance.totalSpendable === 0 &&
+                              totalBalance.totalSpendableBalance === 0 &&
                               somePending)) && (
                             <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                               {() => (

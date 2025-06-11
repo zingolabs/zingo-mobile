@@ -108,13 +108,14 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
     const totalSpendable: number = Utils.parseStringLocaleToNumberFloat(
       Utils.parseNumberFloatToStringLocale(
-        totalBalance ? totalBalance.totalSpendable : 0,
+        totalBalance ? totalBalance.potenciallyTotalSpendableBalance : 0,
         8,
       ),
     );
 
     console.log('total', totalAmount);
-    console.log('spendable', totalBalance?.totalSpendable);
+    console.log('header spendable', totalBalance?.totalSpendableBalance);
+    console.log('potencially spendable', totalBalance?.potenciallyTotalSpendableBalance);
 
     // amount + fee
     if (totalAmount <= (totalBalance ? totalBalance.confirmedOrchardBalance : 0)) {

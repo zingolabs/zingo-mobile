@@ -467,8 +467,8 @@ export default class RPC {
         confirmedTransparentBalance: 0,
         confirmedOrchardBalance: 0,
         confirmedSaplingBalance: 0,
-        total: 0,
-        totalSpendable: 0,
+        totalSpendableBalance: 0,
+        potenciallyTotalSpendableBalance: 0,
       } as TotalBalanceClass);
       this.fnSetSyncingStatus({} as RPCSyncStatusType);
 
@@ -757,7 +757,6 @@ export default class RPC {
         return;
       }
       this.fetchTotalBalanceLock = true;
-      let spendableBalance: number = 0;
       const start = Date.now();
       const spendableStr: string = await RPCModule.getSpendableBalanceTotalInfo();
       console.log('=========================================== > spendable balance - ', Date.now() - start);
@@ -769,11 +768,6 @@ export default class RPC {
         console.log('Internal Error balance');
       }
       const spendableJSON: RPCSpendablebalanceType = await JSON.parse(spendableStr);
-      if (spendableJSON.error) {
-        console.log(`Error spendable balance ${spendableStr}`);
-      } else if (spendableJSON.balance) {
-        spendableBalance = spendableJSON.balance;
-      }
 
       const start2 = Date.now();
       const balanceStr: string = await RPCModule.getBalanceInfo();
@@ -791,22 +785,18 @@ export default class RPC {
       }
       const balanceJSON: RPCBalancesType = await JSON.parse(balanceStr);
 
-      const orchardBalance: number = balanceJSON.total_orchard_balance || 0;
-      const saplingBalance: number = balanceJSON.total_sapling_balance || 0;
-      const transparentBalance: number = balanceJSON.total_transparent_balance || 0;
-
-      const total = orchardBalance + saplingBalance + transparentBalance;
-
       // Total Balance
       const balance: TotalBalanceClass = {
-        totalOrchardBalance: orchardBalance / 10 ** 8,
-        totalSaplingBalance: saplingBalance / 10 ** 8,
-        totalTransparentBalance: transparentBalance / 10 ** 8,
+        totalOrchardBalance: (balanceJSON.total_orchard_balance || 0) / 10 ** 8,
+        totalSaplingBalance: (balanceJSON.total_sapling_balance || 0) / 10 ** 8,
+        totalTransparentBalance: (balanceJSON.total_transparent_balance || 0) / 10 ** 8,
         confirmedOrchardBalance: (balanceJSON.confirmed_orchard_balance || 0) / 10 ** 8,
         confirmedSaplingBalance: (balanceJSON.confirmed_sapling_balance || 0) / 10 ** 8,
         confirmedTransparentBalance: (balanceJSON.confirmed_transparent_balance || 0) / 10 ** 8,
-        total: total / 10 ** 8,
-        totalSpendable: spendableBalance / 10 ** 8,
+        // header total balance
+        totalSpendableBalance: spendableJSON.spendable_balance / 10 ** 8,
+        // send spendable balance
+        potenciallyTotalSpendableBalance: spendableJSON.potentially_spendable_balance / 10 ** 8,
       };
       console.log(balance);
       //const start2 = Date.now();
