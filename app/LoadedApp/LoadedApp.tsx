@@ -828,7 +828,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           onClickCancel={() => {}}
           action={UfvkActionEnum.view}
           setPrivacyOption={this.setPrivacyOption}
-          setSecurityOption={this.setSecurityOption}
         />
       ),
       { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
@@ -1202,7 +1201,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               onClickCancel={() => {}}
               action={UfvkActionEnum.change}
               setPrivacyOption={this.setPrivacyOption}
-              setSecurityOption={this.setSecurityOption}
             />
           ),
           { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
@@ -1229,7 +1227,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               onClickCancel={() => {}}
               action={UfvkActionEnum.backup}
               setPrivacyOption={this.setPrivacyOption}
-              setSecurityOption={this.setSecurityOption}
             />
           ),
           { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
@@ -1412,7 +1409,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               }}
               action={UfvkActionEnum.server}
               setPrivacyOption={this.setPrivacyOption}
-              setSecurityOption={this.setSecurityOption}
             />
           ),
           { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },

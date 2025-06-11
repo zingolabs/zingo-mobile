@@ -1,0 +1,11 @@
+import React from 'react';
+import { Path } from 'react-native-svg';
+import { Icon } from './Icon';
+
+export function TriangleAlert(props: React.ComponentProps<typeof Icon>) {
+  return (
+    <Icon {...props}>
+      <Path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4M12 17h.01" />
+    </Icon>
+  );
+}

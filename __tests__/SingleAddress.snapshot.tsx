@@ -15,7 +15,7 @@ describe('Component SingleAddress - test', () => {
   test('SingleAddress - snapshot', () => {
     const set = jest.fn();
     const single = render(
-      <SingleAddress address={mockAddresses[0]} index={0} setIndex={set} total={1} setSecurityOption={jest.fn()} />,
+      <SingleAddress address={mockAddresses[0]} index={0} setIndex={set} total={1} />,
     );
     expect(single.toJSON()).toMatchSnapshot();
   });
@@ -27,7 +27,7 @@ describe('Component SingleAddress UFVK - test', () => {
     const ufvk = 'uview12345678901234567890';
     const set = jest.fn();
     const single = render(
-      <SingleAddress ufvk={ufvk} index={0} setIndex={set} total={1} setSecurityOption={jest.fn()} />,
+      <SingleAddress ufvk={ufvk} index={0} setIndex={set} total={1} />,
     );
     expect(single.toJSON()).toMatchSnapshot();
   });

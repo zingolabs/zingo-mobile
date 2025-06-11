@@ -58,7 +58,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     setSendPageState,
     closeAllModals,
   } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
 
   const [expandAddress, setExpandAddress] = useState<boolean>(false);
@@ -126,7 +126,9 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
               if (address && !oneLine && !addressProtected) {
                 Clipboard.setString(address);
                 addLastSnackbar({
-                  message: ufvk ? (translate('seed.tapcopy-ufvk-message') as string) : (translate('history.addresscopied') as string),
+                  message: ufvk
+                    ? (translate('seed.tapcopy-ufvk-message') as string)
+                    : (translate('history.addresscopied') as string),
                   duration: SnackbarDurationEnum.short,
                 });
                 setExpandAddress(true);

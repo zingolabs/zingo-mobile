@@ -101,7 +101,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
 
   return (
     <View style={{
-      backgroundColor: colors.sideMenuBackground,
+      backgroundColor: colors.background,
     }}>
       <TouchableOpacity
         onPress={() => {

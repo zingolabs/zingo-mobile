@@ -402,33 +402,12 @@
   },
   "seed": {
     "buttontexts": {
-      "new": [
-        "Ya he guardado \n la semilla"
-      ],
-      "change": [
-        "",
-        "Abrir Nuevo",
-        "Realmente quieres \n cambiar tu \n monedero activo",
-        "Estás seguro/a?"
-      ],
-      "server": [
-        "",
-        "Cambiar Servidor",
-        "Realmente quieres \n cambiar el \n servidor activo",
-        "Estás seguro/a?"
-      ],
-      "view": [
-        "Ya he guardado \n la semilla"
-      ],
-      "restore": [
-        "Restaurar Monedero"
-      ],
-      "backup": [
-        "",
-        "Restaurar",
-        "Realmente quieres \n restaurar tu \n copia de seguridad",
-        "Estás seguro/a?"
-      ]
+      "new": ["Ya he guardado \n la semilla"],
+      "change": ["", "Abrir Nuevo", "Realmente quieres \n cambiar tu \n monedero activo", "Estás seguro/a?"],
+      "server": ["", "Cambiar Servidor", "Realmente quieres \n cambiar el \n servidor activo", "Estás seguro/a?"],
+      "view": ["Ya he guardado \n la semilla"],
+      "restore": ["Restaurar Monedero"],
+      "backup": ["", "Restaurar", "Realmente quieres \n restaurar tu \n copia de seguridad", "Estás seguro/a?"]
     },
     "title": "Semilla",
     "new": "Nueva",
@@ -520,8 +499,10 @@
     "title-advanced": "Mis Direcciones",
     "title-basic": "Mi Dirección",
     "title-basic-alone": "Mi Dirección de Recepción",
+    "newu-option": "Nueva dirección",
+    "danger-zone": "ZONA DE RIESGO",
+    "go-to-transparent": "Ir a dirección transparente expuesta",
     "more": "ver más...",
-    "newu-option": "Nueva Dirección Unificada Diversificada",
     "privkey-option": "Exportar la Clave para Gastar",
     "viewkey-option": "Exportar la Clave de Visualización Total",
     "import-option": "Importar una Clave...",
@@ -534,9 +515,24 @@
     "shielded-orchard-sapling": "Orchard+Sapling",
     "shielded-full": "Completa",
     "showtip": "Tocar para seleccionar otra dirección.",
-    "newunifiedaddress": "Nueva dirección unificada",
-    "newtransparentaddress": "Nueva dirección transparente",
-    "verify": "Verificar direcciones"
+    "verify": "Verificar direcciones",
+    "copy-address-button": "Copiar direccion",
+    "modal-transparent": {
+      "title": "Advertencia de Privacidad",
+      "message": "Las direcciones transparentes exponen los detalles de sus transacciones en la blockchain. Esto destruye su privacidad y no se recomienda para la mayoría de las transacciones.",
+      "recommendation": "Se recomiendan las direcciones blindadas ya que brindan el mayor nivel de privacidad.",
+      "button": "Entiendo los riesgos, mostrar direcciones transparentes"
+    },
+    "transparent": {
+      "address-title": "Transparente expuesta",
+      "newt-option": "Nueva dirección transparente",
+      "warning": {
+        "title": "Advertencia de Privacidad",
+        "description": "Está viendo direcciones transparentes. Estas exponen los detalles de sus transacciones públicamente.",
+        "button": "Cambiar a Direcciones Blindadas (Recomendado)"
+      },
+      "new-error": "Error al generar la dirección transparente. La última dirección transparente no ha recibido fondos."
+    }
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",
@@ -677,33 +673,12 @@
   },
   "ufvk": {
     "buttontexts": {
-      "new": [
-        "Ya he guardado \n la clave de visualización"
-      ],
-      "change": [
-        "",
-        "Abrir Nuevo",
-        "Realmente quieres \n cambiar tu \n monedero activo",
-        "Estás seguro/a?"
-      ],
-      "server": [
-        "",
-        "Cambiar Servidor",
-        "Realmente quieres \n cambiar el \n servidor activo",
-        "Estás seguro/a?"
-      ],
-      "view": [
-        "Ya he guardado \n la clave de visualización"
-      ],
-      "restore": [
-        "Restaurar Monedero"
-      ],
-      "backup": [
-        "",
-        "Restaurar",
-        "Realmente quieres \n restaurar tu \n copia de seguridad",
-        "Estás seguro/a?"
-      ]
+      "new": ["Ya he guardado \n la clave de visualización"],
+      "change": ["", "Abrir Nuevo", "Realmente quieres \n cambiar tu \n monedero activo", "Estás seguro/a?"],
+      "server": ["", "Cambiar Servidor", "Realmente quieres \n cambiar el \n servidor activo", "Estás seguro/a?"],
+      "view": ["Ya he guardado \n la clave de visualización"],
+      "restore": ["Restaurar Monedero"],
+      "backup": ["", "Restaurar", "Realmente quieres \n restaurar tu \n copia de seguridad", "Estás seguro/a?"]
     },
     "privkey": "Gastar/Privada ",
     "viewkey": "Clave de Visualización ",

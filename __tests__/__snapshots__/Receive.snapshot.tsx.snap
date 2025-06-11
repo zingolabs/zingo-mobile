@@ -20,5 +20,6 @@ exports[`Component Receive - test Receive - snapshot 1`] = `
   onIndexChange={[Function]}
   renderScene={[Function]}
   renderTabBar={[Function]}
+  swipeEnabled={false}
 />
 `;

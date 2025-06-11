@@ -67,7 +67,7 @@ type HeaderProps = {
   // syncing icons
   noSyncingStatus?: boolean;
   // ufvk
-  noUfvkIcon?: boolean
+  noUfvkIcon?: boolean;
   // privacy
   noPrivacy?: boolean;
   setPrivacyOption?: (value: boolean) => Promise<void>;
@@ -166,13 +166,26 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const [viewSyncStatus, setViewSyncStatus] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!syncingStatus || isEqual(syncingStatus, {} as RPCSyncStatusType) || (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) || syncingStatus.percentage_total_outputs_scanned === 0) {
+    if (
+      !syncingStatus ||
+      isEqual(syncingStatus, {} as RPCSyncStatusType) ||
+      (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) ||
+      syncingStatus.percentage_total_outputs_scanned === 0
+    ) {
       // if the App is waiting for the first fetching, let's put 0.
       setPercentageOutputsScanned(0);
       setSyncInProgress(true);
     } else {
-      setPercentageOutputsScanned(syncingStatus.percentage_total_outputs_scanned < 1 ? 1 : Math.floor(syncingStatus.percentage_total_outputs_scanned));
-      setSyncInProgress(!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length > 0 && syncingStatus.percentage_total_outputs_scanned < 100);
+      setPercentageOutputsScanned(
+        syncingStatus.percentage_total_outputs_scanned < 1
+          ? 1
+          : Math.floor(syncingStatus.percentage_total_outputs_scanned),
+      );
+      setSyncInProgress(
+        !!syncingStatus.scan_ranges &&
+          syncingStatus.scan_ranges.length > 0 &&
+          syncingStatus.percentage_total_outputs_scanned < 100,
+      );
     }
   }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);
 
@@ -220,10 +233,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       }
     };
 
-    if (!readOnly &&
-        setShieldingAmount &&
-        selectServer !== SelectServerEnum.offline &&
-        somePending ? 0 : (totalBalance?.confirmedTransparentBalance ? totalBalance.confirmedTransparentBalance : 0) > 0
+    if (
+      !readOnly && setShieldingAmount && selectServer !== SelectServerEnum.offline && somePending
+        ? 0
+        : (totalBalance?.confirmedTransparentBalance ? totalBalance.confirmedTransparentBalance : 0) > 0
     ) {
       (async () => {
         let proposeFee = 0;
@@ -584,13 +597,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                 <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
                               )}
                               {percentageOutputsScanned > 0 && (
-                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned}%`}</FadeText>
+                                <FadeText
+                                  style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned}%`}</FadeText>
                               )}
                             </View>
                           ) : (
-                            <TouchableOpacity
-                              testID="header.playicon"
-                              onPress={() => setSyncReportModalShow()}>
+                            <TouchableOpacity testID="header.playicon" onPress={() => setSyncReportModalShow()}>
                               <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                 <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={19} />
                                 {viewSyncStatus && (
@@ -602,7 +614,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                   <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
                                 )}
                                 {percentageOutputsScanned > 0 && (
-                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned}%`}</FadeText>
+                                  <FadeText
+                                    style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned}%`}</FadeText>
                                 )}
                               </View>
                             </TouchableOpacity>
@@ -627,8 +640,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           minWidth: 25,
                           minHeight: 25,
                         }}>
-                        <TouchableOpacity
-                          onPress={() => setSyncReportModalShow()}>
+                        <TouchableOpacity onPress={() => setSyncReportModalShow()}>
                           <View
                             testID="header.wifiicon"
                             style={{
@@ -783,45 +795,44 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             </View>
           )}
 
-          {(currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && !noBalance && selectServer !== SelectServerEnum.offline && (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <CurrencyAmount
-                style={{ marginTop: 0, marginBottom: 0 }}
-                price={zecPrice.zecPrice}
-                amtZec={totalBalance ? totalBalance.total : 0}
-                currency={currency}
-                privacy={privacy}
-              />
-              <View style={{ marginLeft: 5 }}>
-                <PriceFetcher setZecPrice={setZecPrice} />
-              </View>
-            </View>
-          )}
-
-          {showShieldButton &&
+          {(currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) &&
             !noBalance &&
-            !calculateDisableButtonToShield() &&
-            valueTransfersTotal !== null && (
-              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <FadeText style={{ fontSize: 8 }}>
-                  {(translate(`history.shield-legend-${calculatePoolsToShield()}`) as string) +
-                    ` ${calculateAmountToShield()} ` +
-                    (translate('send.fee') as string) +
-                    ': ' +
-                    Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
-                    ' '}
-                </FadeText>
-                <View style={{ margin: 5, flexDirection: 'row' }}>
-                  <Button
-                    testID="header.shield"
-                    type={ButtonTypeEnum.Primary}
-                    title={translate(`history.shield-${calculatePoolsToShield()}`) as string}
-                    onPress={onPressShieldFunds}
-                    disabled={calculateDisableButtonToShield()}
-                  />
+            selectServer !== SelectServerEnum.offline && (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <CurrencyAmount
+                  style={{ marginTop: 0, marginBottom: 0 }}
+                  price={zecPrice.zecPrice}
+                  amtZec={totalBalance ? totalBalance.total : 0}
+                  currency={currency}
+                  privacy={privacy}
+                />
+                <View style={{ marginLeft: 5 }}>
+                  <PriceFetcher setZecPrice={setZecPrice} />
                 </View>
               </View>
             )}
+
+          {showShieldButton && !noBalance && !calculateDisableButtonToShield() && valueTransfersTotal !== null && (
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+              <FadeText style={{ fontSize: 8 }}>
+                {(translate(`history.shield-legend-${calculatePoolsToShield()}`) as string) +
+                  ` ${calculateAmountToShield()} ` +
+                  (translate('send.fee') as string) +
+                  ': ' +
+                  Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
+                  ' '}
+              </FadeText>
+              <View style={{ margin: 5, flexDirection: 'row' }}>
+                <Button
+                  testID="header.shield"
+                  type={ButtonTypeEnum.Primary}
+                  title={translate(`history.shield-${calculatePoolsToShield()}`) as string}
+                  onPress={onPressShieldFunds}
+                  disabled={calculateDisableButtonToShield()}
+                />
+              </View>
+            </View>
+          )}
         </View>
         <View
           style={{
@@ -880,7 +891,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 } else {
                   navigationHome?.navigate(RouteEnums.Settings);
                 }
-            }}>
+              }}>
               <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
             </TouchableOpacity>
           ) : (

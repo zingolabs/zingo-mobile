@@ -51,7 +51,9 @@ const advancedTheme: ThemeType = {
     border: advancePalette[8],
     primary: advancePalette[2],
     primaryDisabled: advancePalette[3],
+    secondary: '#112C51',
     secondaryDisabled: advancePalette[5],
+    secondaryBorder: '#293D55',
     tertiary: '#033679',
     text: advancePalette[1],
     zingo: advancePalette[8],
@@ -60,6 +62,21 @@ const advancedTheme: ThemeType = {
     syncing: '#ebff5a', // yellow
     notification: '',
     sideMenuBackground: advancePalette[10],
+    warning: {
+      background: '#262527',
+      border: '#65491C',
+      primary: '#F99D00',
+      primaryDark: '#DD7500',
+      title: '#E1AA1B',
+      text: '#FEE587',
+    },
+    danger: {
+      primary: '#dc2626',
+      background: '#240E0C',
+      border: '#572317',
+      text: '#FFB972',
+    },
+    modal: '#1e293b',
   },
 };
 
@@ -80,6 +97,20 @@ const basicTheme: ThemeType = {
     syncing: '#ebff5a', // yellow
     notification: '',
     sideMenuBackground: basicPalette[10],
+    warning: {
+      background: '#262527',
+      border: '#65491C',
+      primary: '#F99D00',
+      primaryDark: '#DD7500',
+      title: '#E1AA1B',
+      text: '#FEE587',
+    },
+    danger: {
+      background: '#240E0C',
+      border: '#572317',
+      text: '#FFB972',
+    },
+    modal: '#1e293b',
   },
 };
 
@@ -103,7 +134,9 @@ const App: React.FunctionComponent = () => {
               flex: 1,
               backgroundColor: theme.colors.background,
             }}>
-            <Stack.Navigator initialRouteName={RouteEnums.LoadingApp} screenOptions={{ headerShown: false, animation: 'none' }}>
+            <Stack.Navigator
+              initialRouteName={RouteEnums.LoadingApp}
+              screenOptions={{ headerShown: false, animation: 'none' }}>
               <Stack.Screen name={RouteEnums.LoadingApp} options={{ animation: 'none' }}>
                 {props => <LoadingApp {...props} toggleTheme={toggleTheme} />}
               </Stack.Screen>

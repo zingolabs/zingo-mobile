@@ -402,33 +402,12 @@
   },
   "seed": {
     "buttontexts": {
-      "new": [
-        "I have saved \n the seed"
-      ],
-      "change": [
-        "",
-        "Open New",
-        "You really want \n to change your \n actual wallet",
-        "Are you certain?"
-      ],
-      "server": [
-        "",
-        "Change Server",
-        "You really want \n to change your \n actual server",
-        "Are you certain?"
-      ],
-      "view": [
-        "I have saved \n the seed"
-      ],
-      "restore": [
-        "Restore Wallet"
-      ],
-      "backup": [
-        "",
-        "Restore",
-        "You really want \n to restore your \n backup wallet",
-        "Are you certain?"
-      ]
+      "new": ["I have saved \n the seed"],
+      "change": ["", "Open New", "You really want \n to change your \n actual wallet", "Are you certain?"],
+      "server": ["", "Change Server", "You really want \n to change your \n actual server", "Are you certain?"],
+      "view": ["I have saved \n the seed"],
+      "restore": ["Restore Wallet"],
+      "backup": ["", "Restore", "You really want \n to restore your \n backup wallet", "Are you certain?"]
     },
     "title": "Seed",
     "new": "New",
@@ -517,11 +496,12 @@
     "noaddress": "No Address",
     "unoprivkey": "No Unified address to import the Spending Key",
     "unoviewkey": "No Unified address to import the Full Viewing Key",
-    "title-advanced": "My Addresses",
+    "title-advanced": "My Address",
     "title-basic": "My Address",
     "title-basic-alone": "My Receiving Address",
-    "more": "more...",
-    "newu-option": "New Diversified Unified Address",
+    "newu-option": "Get new address",
+    "danger-zone": "DANGER ZONE",
+    "go-to-transparent": "Exposed transparent address",
     "privkey-option": "Export Spending Key",
     "viewkey-option": "Export Full Viewing Key",
     "import-option": "Import Key...",
@@ -529,14 +509,29 @@
     "of": " of ",
     "prev": "Prev",
     "next": "Next",
-    "shielded-orchard": "Only Orchard",
-    "shielded-sapling": "Only Sapling",
+    "shielded-orchard": "Orchard",
+    "shielded-sapling": "Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
     "shielded-full": "Full",
     "showtip": "Tap to select another address.",
-    "newunifiedaddress": "New Unified Address",
-    "newtransparentaddress": "New Transparent Address",
-    "verify": "Verify Addresses"
+    "verify": "Verify Addresses",
+    "copy-address-button": "Copy address",
+    "modal-transparent": {
+      "title": "Privacy Warning",
+      "message": "Transparent addresses expose your transaction details on the public blockchain. This disintegrates your privacy and is not recommended for most transactions.",
+      "recommendation": "Shielded addresses are recommended as they provide the highest level of privacy.",
+      "button": "I understand the risks, show tranparent addresses"
+    },
+    "transparent": {
+      "address-title": "Exposed transparent",
+      "newt-option": "New transparent address",
+      "warning": {
+        "title": "Privacy Warning",
+        "description": "You're viewing transparent addresses. These expose your transaction details publicly.",
+        "button": "Switch to Shielded Addresses (Recommended)"
+      },
+      "new-error": "Transparent address generation failed. Latest transparent address has not received funds."
+    }
   },
   "history": {
     "shield-all": "Shield All funds",
@@ -677,33 +672,12 @@
   },
   "ufvk": {
     "buttontexts": {
-      "new": [
-        "I have saved \n the Viewing Key"
-      ],
-      "change": [
-        "",
-        "Open New",
-        "You really want \n to change your \n actual wallet",
-        "Are you certain?"
-      ],
-      "server": [
-        "",
-        "Change Server",
-        "You really want \n to change your \n actual server",
-        "Are you certain?"
-      ],
-      "view": [
-        "I have saved \n the Viewing Key"
-      ],
-      "restore": [
-        "Restore Wallet"
-      ],
-      "backup": [
-        "",
-        "Restore",
-        "You really want \n to restore your \n backup wallet",
-        "Are you certain?"
-      ]
+      "new": ["I have saved \n the Viewing Key"],
+      "change": ["", "Open New", "You really want \n to change your \n actual wallet", "Are you certain?"],
+      "server": ["", "Change Server", "You really want \n to change your \n actual server", "Are you certain?"],
+      "view": ["I have saved \n the Viewing Key"],
+      "restore": ["Restore Wallet"],
+      "backup": ["", "Restore", "You really want \n to restore your \n backup wallet", "Are you certain?"]
     },
     "privkey": "Spending/Private ",
     "viewkey": "Viewing Key ",
