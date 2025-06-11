@@ -12,6 +12,7 @@ type ButtonProps = {
   disabled?: boolean;
   onPress: () => void;
   style?: TextStyle;
+  textStyle?: TextStyle;
   accessible?: boolean;
   accessibilityLabel?: string;
   testID?: string;
@@ -24,12 +25,13 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   disabled,
   onPress,
   style,
+  textStyle,
   accessible,
   accessibilityLabel,
   testID,
   twoButtons,
 }) => {
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
 
   const styleButton: TextStyle =
     type === ButtonTypeEnum.Primary
@@ -51,11 +53,17 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           backgroundColor: colors.tertiary,
           width: twoButtons ? '40%' : '80%',
         }
+      : type === ButtonTypeEnum.Ghost
+      ? {
+          backgroundColor: 'transparent',
+          color: colors.money,
+        }
       : {
           // error
           backgroundColor: colors.primary,
           width: twoButtons ? '40%' : '80%',
         };
+
   const styleButtonCommon: TextStyle = {
     padding: 0,
     paddingLeft: 20,
@@ -80,6 +88,11 @@ const Button: React.FunctionComponent<ButtonProps> = ({
       : type === ButtonTypeEnum.Tertiary
       ? {
           color: colors.text,
+        }
+      : type === ButtonTypeEnum.Ghost
+      ? {
+          color: colors.text,
+          textTransform: 'lowercase',
         }
       : {
           // error
@@ -107,8 +120,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         ...style,
       }}
       disabled={disabled}
-      onPress={() => onPress()}
-    >
+      onPress={() => onPress()}>
       <View
         style={{
           display: 'flex',
@@ -122,9 +134,10 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         }}>
         <Text
           style={{
-            ...styleText,
             ...styleTextCommon,
-        }}>
+            ...styleText,
+            ...textStyle,
+          }}>
           {title}
         </Text>
       </View>

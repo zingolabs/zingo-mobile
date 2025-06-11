@@ -9,6 +9,7 @@ import {
   ButtonTypeEnum,
   GlobalConst,
   ReceiverEnum,
+  SnackbarDurationEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
@@ -34,14 +35,10 @@ type NewAddressProps = {
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
-const NewAddress: React.FunctionComponent<NewAddressProps> = ({
-  addressKind,
-  closeSheet,
-  setAddressBook,
-}) => {
+const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, closeSheet, setAddressBook }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { translate, language, addLastSnackbar } = context;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
   const { clear } = useToast();
 
@@ -64,11 +61,17 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
       } else {
         newAddressStr = await RPCModule.createNewTransparentAddressProcess();
       }
-      console.log(newAddressStr);
+
       if (newAddressStr) {
         if (newAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error new address ${newAddressStr}`);
-          //return newAddressStr;
+
+          addLastSnackbar({
+            message: translate('receive.transparent.new-error') as string,
+            duration: SnackbarDurationEnum.short,
+          });
+
+          // return newAddressStr;
         }
       } else {
         console.log('Internal Error new address ');
@@ -86,12 +89,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
         }
         console.log(label, newAddress);
         const randomColors = Utils.generateColorList(1);
-        const ab = await AddressBookFileImpl.writeAddressBookItem(
-          label,
-          newAddress,
-          randomColors[0],
-          true,
-        );
+        const ab = await AddressBookFileImpl.writeAddressBookItem(label, newAddress, randomColors[0], true);
         console.log(ab);
         setAddressBook(ab);
       }
@@ -120,13 +118,18 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
           setTimeout(() => {
             closeSheet();
           }, 100);
-        }}
-      >
-        <FontAwesomeIcon size={30} icon={faXmark} color={colors.text} style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }} />
+        }}>
+        <FontAwesomeIcon
+          size={30}
+          icon={faXmark}
+          color={colors.text}
+          style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
+        />
       </TouchableOpacity>
-      <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>{addressKind === AddressKindEnum.u ? 'New Unified Address' : 'New Transparent Address'}</RegText>
-      <View
-        style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
+      <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>
+        {addressKind === AddressKindEnum.u ? 'New Unified Address' : 'New Transparent Address'}
+      </RegText>
+      <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
         <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>{'Tag (Optional)'}</RegText>
         <View
           style={{
@@ -183,13 +186,11 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                 style={{
                   flexGrow: 1,
                 }}
-                actions={
-                  [
-                    { title: translate('receive.shielded-orchard') as string },
-                    { title: translate('receive.shielded-orchard-sapling') as string },
-                    { title: translate('receive.shielded-sapling') as string },
-                  ]
-                }
+                actions={[
+                  { title: translate('receive.shielded-orchard') as string },
+                  { title: translate('receive.shielded-orchard-sapling') as string },
+                  { title: translate('receive.shielded-sapling') as string },
+                ]}
                 onPress={(e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
                   if (e.nativeEvent.index === 0) {
                     setType(AddressUnifiedTypeEnum.orchard);
@@ -198,8 +199,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                   } else if (e.nativeEvent.index === 2) {
                     setType(AddressUnifiedTypeEnum.sapling);
                   }
-                }}
-              >
+                }}>
                 <View
                   style={{
                     flexGrow: 1,
