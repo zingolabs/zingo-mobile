@@ -6,6 +6,7 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
+import { ReactTestRendererJSON } from 'react-test-renderer';
 import CurrencyAmount from '../components/Components/CurrencyAmount';
 import ZecAmount from '../components/Components/ZecAmount';
 import BoldText from '../components/Components/BoldText';
@@ -18,20 +19,20 @@ import { CurrencyEnum, CurrencyNameEnum } from '../app/AppState';
 describe('Component Components - test', () => {
   //unit test
   test('CurrencyAmount - High Privacy - price=2.9826 and amtZec=1.00098 result $ -.-- USD', () => {
-    const text: any = render(
+    const text: ReactTestRendererJSON | null = render(
       <CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} currency={CurrencyEnum.USDCurrency} privacy={true} />,
     ).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$ -.--');
   });
   test('CurrencyAmount - price undefined result $ -- USD', () => {
-    const text: any = render(<CurrencyAmount amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />).toJSON();
+    const text: ReactTestRendererJSON | null = render(<CurrencyAmount amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$ -.--');
   });
 
   test('CurrencyAmount - price 0 result $ -- USD', () => {
-    const text: any = render(
+    const text: ReactTestRendererJSON | null = render(
       <CurrencyAmount price={0} amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />,
     ).toJSON();
     expect(text.type).toBe('View');
@@ -39,13 +40,13 @@ describe('Component Components - test', () => {
   });
 
   test('CurrencyAmount - amtZec undefined result $ -- USD', () => {
-    const text: any = render(<CurrencyAmount price={1} style={{}} currency={CurrencyEnum.USDCurrency} />).toJSON();
+    const text: ReactTestRendererJSON | null = render(<CurrencyAmount price={1} style={{}} currency={CurrencyEnum.USDCurrency} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[0].children[0]).toBe('$ -.--');
   });
 
   test('CurrencyAmount - price * amtZec really tiny result $ < 0.01 USD', () => {
-    const text: any = render(
+    const text: ReactTestRendererJSON | null = render(
       <CurrencyAmount price={0.001} amtZec={1} style={{}} currency={CurrencyEnum.USDCurrency} />,
     ).toJSON();
     expect(text.type).toBe('View');
@@ -53,7 +54,7 @@ describe('Component Components - test', () => {
   });
 
   test('CurrencyAmount - price=2.9826 and amtZec=1.00098 result $ 2.99 USD', () => {
-    const text: any = render(
+    const text: ReactTestRendererJSON | null = render(
       <CurrencyAmount price={2.9826} amtZec={1.00098} style={{}} currency={CurrencyEnum.USDCurrency} />,
     ).toJSON();
     expect(text.type).toBe('View');
@@ -61,7 +62,7 @@ describe('Component Components - test', () => {
   });
 
   test("CurrencyAmount - style={backgroundColor: 'red'} result same", () => {
-    const text: any = render(
+    const text: ReactTestRendererJSON | null = render(
       <CurrencyAmount
         price={2.9826}
         amtZec={1.00098}
@@ -74,7 +75,7 @@ describe('Component Components - test', () => {
   });
 
   test('ZecAmount - High Privacy - amtZec -1.123456789 rounded up result -.---- ZEC', () => {
-    const text: any = render(
+    const text: ReactTestRendererJSON | null = render(
       <ZecAmount amtZec={-1.123456789} currencyName={CurrencyNameEnum.ZEC} privacy={true} />,
     ).toJSON();
     expect(text.type).toBe('View');
@@ -83,21 +84,21 @@ describe('Component Components - test', () => {
   });
 
   test('ZecAmount - All props missing result -- ZEC', () => {
-    const text: any = render(<ZecAmount currencyName={CurrencyNameEnum.ZEC} />).toJSON();
+    const text: ReactTestRendererJSON | null = render(<ZecAmount currencyName={CurrencyNameEnum.ZEC} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
   });
 
   test('ZecAmount - amtZec 0 result 0.00000000 ZEC', () => {
-    const text: any = render(<ZecAmount amtZec={0} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
+    const text: ReactTestRendererJSON | null = render(<ZecAmount amtZec={0} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' 0.0000');
   });
 
   test('ZecAmount - amtZec -1.123456789 rounded up result -1.12345679 ZEC', () => {
-    const text: any = render(<ZecAmount amtZec={-1.123456789} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
+    const text: ReactTestRendererJSON | null = render(<ZecAmount amtZec={-1.123456789} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' -1.1234');
@@ -106,7 +107,7 @@ describe('Component Components - test', () => {
   });
 
   test('ZecAmount - amtZec 1.123456781 rounded down result 1.12345678 ZEC', () => {
-    const text: any = render(<ZecAmount amtZec={1.123456781} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
+    const text: ReactTestRendererJSON | null = render(<ZecAmount amtZec={1.123456781} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' 1.1234');
@@ -115,7 +116,7 @@ describe('Component Components - test', () => {
   });
 
   test("ZecAmount - color 'red' result same", () => {
-    const text: any = render(<ZecAmount color={'red'} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
+    const text: ReactTestRendererJSON | null = render(<ZecAmount color={'red'} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
@@ -126,7 +127,7 @@ describe('Component Components - test', () => {
   });
 
   test('ZecAmount - size 11 result same and same * 0.7', () => {
-    const text: any = render(<ZecAmount size={11} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
+    const text: ReactTestRendererJSON | null = render(<ZecAmount size={11} currencyName={CurrencyNameEnum.ZEC} />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
@@ -137,7 +138,7 @@ describe('Component Components - test', () => {
   });
 
   test("ZecAmount - View style backgroundColor 'red' result same", () => {
-    const text: any = render(
+    const text: ReactTestRendererJSON | null = render(
       <ZecAmount style={{ backgroundColor: 'red' }} currencyName={CurrencyNameEnum.ZEC} />,
     ).toJSON();
     expect(text.type).toBe('View');
@@ -149,7 +150,7 @@ describe('Component Components - test', () => {
   });
 
   test("ZecAmount - zecSymbol undefined result '---", () => {
-    const text: any = render(<ZecAmount />).toJSON();
+    const text: ReactTestRendererJSON | null = render(<ZecAmount />).toJSON();
     expect(text.type).toBe('View');
     expect(text.children[0].children[0].children[1].type).toBe('Text');
     expect(text.children[0].children[0].children[1].children[0]).toBe(' --');
@@ -158,55 +159,55 @@ describe('Component Components - test', () => {
   });
 
   test("BoldText - children 'bold text' result same", () => {
-    const text: any = render(<BoldText children={'bold text'} />).toJSON();
+    const text: ReactTestRendererJSON | null = render(<BoldText children={'bold text'} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.children[0]).toBe('bold text');
   });
 
   test("BoldText - View style backgroundColor 'red' result same", () => {
-    const text: any = render(<BoldText style={{ backgroundColor: 'red' }}>Bold Text</BoldText>).toJSON();
+    const text: ReactTestRendererJSON | null = render(<BoldText style={{ backgroundColor: 'red' }}>Bold Text</BoldText>).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style.backgroundColor).toBe('red');
   });
 
   test("FadeText - children 'fade text' result same", () => {
-    const text: any = render(<FadeText>Fade text</FadeText>).toJSON();
+    const text: ReactTestRendererJSON | null = render(<FadeText>Fade text</FadeText>).toJSON();
     expect(text.type).toBe('Text');
     expect(text.children[0]).toBe('Fade text');
   });
 
   test("FadeText - View style backgroundColor 'red' result same", () => {
-    const text: any = render(<FadeText style={{ backgroundColor: 'red' }}>Fade Text</FadeText>).toJSON();
+    const text: ReactTestRendererJSON | null = render(<FadeText style={{ backgroundColor: 'red' }}>Fade Text</FadeText>).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style.backgroundColor).toBe('red');
   });
 
   test("ErrorText - children 'error text' result same", () => {
-    const text: any = render(<ErrorText children={'error text'} />).toJSON();
+    const text: ReactTestRendererJSON | null = render(<ErrorText children={'error text'} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.children[0]).toBe('error text');
   });
 
   test("ErrorText - View style backgroundColor 'red' result same", () => {
-    const text: any = render(<ErrorText style={{ backgroundColor: 'red' }}>Error Text</ErrorText>).toJSON();
+    const text: ReactTestRendererJSON | null = render(<ErrorText style={{ backgroundColor: 'red' }}>Error Text</ErrorText>).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style.backgroundColor).toBe('red');
   });
 
   test("RegText - children 'reg text' result same", () => {
-    const text: any = render(<RegText children={'reg text'} />).toJSON();
+    const text: ReactTestRendererJSON | null = render(<RegText children={'reg text'} />).toJSON();
     expect(text.type).toBe('Text');
     expect(text.children[0]).toBe('reg text');
   });
 
   test("RegText - View style backgroundColor 'red' result same", () => {
-    const text: any = render(<RegText style={{ backgroundColor: 'red' }}>Reg Text</RegText>).toJSON();
+    const text: ReactTestRendererJSON | null = render(<RegText style={{ backgroundColor: 'red' }}>Reg Text</RegText>).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style.backgroundColor).toBe('red');
   });
 
   test("RegText - View style color 'red' result same", () => {
-    const text: any = render(<RegText color={'red'}>Reg Text</RegText>).toJSON();
+    const text: ReactTestRendererJSON | null = render(<RegText color={'red'}>Reg Text</RegText>).toJSON();
     expect(text.type).toBe('Text');
     expect(text.props.style.color).toBe('red');
   });

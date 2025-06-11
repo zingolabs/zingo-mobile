@@ -20,7 +20,8 @@ import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { cloneDeep, isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
-import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo/src/index';
+import { RootStackParamList, LoadedAppNavigationState } from '../types';
+import NetInfo, { NetInfoSubscription, NetInfoState } from '@react-native-community/netinfo/src/index';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import RPC from '../rpc';
@@ -118,8 +119,8 @@ const Tab = createBottomTabNavigator();
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 type LoadedAppProps = {
-  navigation: StackScreenProps<any>['navigation'];
-  route: StackScreenProps<any>['route'];
+  navigation: StackScreenProps<RootStackParamList, RouteEnums.LoadedApp>['navigation'];
+  route: StackScreenProps<RootStackParamList, RouteEnums.LoadedApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
 };
 
@@ -419,8 +420,8 @@ const Loading: React.FC<LoadingProps> = ({ backgroundColor, spinColor }) => {
 };
 
 type LoadedAppClassProps = {
-  navigationApp: StackScreenProps<any>['navigation'];
-  route: StackScreenProps<any>['route'];
+  navigationApp: StackScreenProps<RootStackParamList, RouteEnums.LoadedApp>['navigation'];
+  route: StackScreenProps<RootStackParamList, RouteEnums.LoadedApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
   theme: ThemeType;
@@ -696,7 +697,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       });
     });
 
-    this.unsubscribeNetInfo = NetInfo.addEventListener(async (state: any) => {
+    this.unsubscribeNetInfo = NetInfo.addEventListener(async (state: NetInfoState) => {
       const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
       if (
         isConnected !== state.isConnected ||
@@ -1571,7 +1572,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     //this.rpc.fetchWalletSettings();
   };
 
-  navigateToLoadingApp = async (state: any) => {
+  navigateToLoadingApp = async (state: LoadedAppNavigationState) => {
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
       await this.setModeOption(ModeEnum.advanced);
@@ -1587,7 +1588,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
   };
 
-  onClickOKChangeWallet = async (state: any) => {
+  onClickOKChangeWallet = async (state: LoadedAppNavigationState) => {
     const { server } = this.state;
 
     // if the App is working with a test server
@@ -1851,7 +1852,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
     };
 
-    const fnTabBarIcon = (route: StackScreenProps<any>['route'], focused: boolean) => {
+    const fnTabBarIcon = (route: { name: string; key: string }, focused: boolean) => {
       var iconName;
 
       if (route.name === translate('loadedapp.history-menu')) {
@@ -1911,7 +1912,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                       <Tab.Navigator
                         detachInactiveScreens={true}
                         initialRouteName={translate('loadedapp.history-menu') as string}
-                        screenOptions={({ route }) => ({
+                        screenOptions={({ route }: { route: { name: string; key: string } }) => ({
                           tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
                           tabBarIconStyle: {
                             alignSelf: 'center',

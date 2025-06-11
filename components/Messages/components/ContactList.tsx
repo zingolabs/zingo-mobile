@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TextInput,
+  TextInputEndEditingEventData,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -351,7 +352,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                   }}
                   value={searchTextField}
                   onChangeText={(text: string) => setSearchTextField(text.trim())}
-                  onEndEditing={(e: any) => {
+                  onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
                     setSearchTextField(e.nativeEvent.text.trim());
                   }}
                   editable={true}
