@@ -439,13 +439,13 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     //const showUpgrade =
     //  (somePending ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
     setStillConfirming(stillConf);
-    setSpendable(totalBalance ? totalBalance.potenciallyTotalSpendableBalance : 0);
+    setSpendable(totalBalance ? totalBalance.totalSpendableBalance : 0);
   }, [
     somePending,
     totalBalance,
     totalBalance?.totalOrchardBalance,
     totalBalance?.totalSaplingBalance,
-    totalBalance?.potenciallyTotalSpendableBalance,
+    totalBalance?.totalSpendableBalance,
   ]);
 
   const setMemoModalShow = () => {

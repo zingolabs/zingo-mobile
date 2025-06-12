@@ -179,7 +179,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
           mode === ModeEnum.basic &&
           totalBalance &&
           // because the action is related with `send`.
-          totalBalance.potenciallyTotalSpendableBalance <= 0
+          totalBalance.totalSpendableBalance <= 0
         ) && (
           <TouchableOpacity
             style={{ marginLeft: 10 }}

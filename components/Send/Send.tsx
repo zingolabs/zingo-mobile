@@ -63,6 +63,7 @@ import { magicModal } from 'react-native-magic-modal';
 // @ts-ignore
 //import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
+import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
 
 type SendProps = {
   // side menu
@@ -191,9 +192,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const defaultValuesSpendableMaxAmount = useCallback((): void => {
-    setSpendable(totalBalance ? totalBalance.potenciallyTotalSpendableBalance : 0);
+    setSpendable(totalBalance ? totalBalance.totalSpendableBalance : 0);
     const max =
-      (totalBalance ? totalBalance.potenciallyTotalSpendableBalance : 0) -
+      (totalBalance ? totalBalance.totalSpendableBalance : 0) -
       (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
         ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
         : 0);
@@ -213,7 +214,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     donationAddress,
     server.chainName,
     totalBalance,
-    totalBalance?.potenciallyTotalSpendableBalance,
+    totalBalance?.totalSpendableBalance,
   ]);
 
   const calculateFeeWithPropose = useCallback(
@@ -326,7 +327,31 @@ const Send: React.FunctionComponent<SendProps> = ({
         return;
       }
       // spendable TOTAL calculated
-      const spendableBalance: number = totalBalance ? totalBalance.potenciallyTotalSpendableBalance : 0;
+      let spendableBalance = totalBalance ? totalBalance.totalSpendableBalance : 0;
+      let zenniesForZingo = donationAddress ? false : donation;
+      console.log('SPENDABLEBALANCE', addressPar, zenniesForZingo);
+      const runSpendableBalanceStr = await RPCModule.getSpendableBalanceInfo(addressPar, zenniesForZingo ? 'true' : 'false');
+      if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
+        // snack with error
+        console.log(runSpendableBalanceStr);
+        setSpendableBalanceLastError(runSpendableBalanceStr);
+        //Alert.alert('Calculating the FEE', runProposeStr);
+      } else {
+        try {
+          const runSpendableBalanceJson: RPCSpendablebalanceType = await JSON.parse(runSpendableBalanceStr);
+          if (runSpendableBalanceJson.spendable_balance) {
+            console.log('BALANCE', runSpendableBalanceJson.spendable_balance);
+            spendableBalance = runSpendableBalanceJson.spendable_balance / 10 ** 8;
+            setSpendableBalanceLastError('');
+          }
+        } catch (e) {
+          // snack with error
+          console.log(runSpendableBalanceStr);
+          setSpendableBalanceLastError(runSpendableBalanceStr);
+          //Alert.alert('Calculating the FEE', runProposeJson.error);
+        }
+      }
+
       setSpendable(spendableBalance);
       // max amount
       // don't need to substract the donation here.
@@ -354,7 +379,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       donation,
       donationAddress,
       totalBalance,
-      totalBalance?.potenciallyTotalSpendableBalance,
+      totalBalance?.totalSpendableBalance,
       validAddress,
     ],
   );

@@ -21,7 +21,7 @@ export default class TotalBalanceClass {
   totalSpendableBalance: number;
 
   // Total spendable
-  potenciallyTotalSpendableBalance: number;
+  potentiallyTotalSpendableBalance: number;
 
   constructor() {
     this.totalTransparentBalance = 0;
@@ -31,6 +31,6 @@ export default class TotalBalanceClass {
     this.confirmedSaplingBalance = 0;
     this.confirmedOrchardBalance = 0;
     this.totalSpendableBalance = 0;
-    this.potenciallyTotalSpendableBalance = 0;
+    this.potentiallyTotalSpendableBalance = 0;
   }
 }

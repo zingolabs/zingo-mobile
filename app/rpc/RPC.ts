@@ -468,7 +468,7 @@ export default class RPC {
         confirmedOrchardBalance: 0,
         confirmedSaplingBalance: 0,
         totalSpendableBalance: 0,
-        potenciallyTotalSpendableBalance: 0,
+        potentiallyTotalSpendableBalance: 0,
       } as TotalBalanceClass);
       this.fnSetSyncingStatus({} as RPCSyncStatusType);
 
@@ -798,7 +798,7 @@ export default class RPC {
         // header total balance
         totalSpendableBalance: (spendableJSON.spendable_balance || 0) / 10 ** 8,
         // send spendable balance
-        potenciallyTotalSpendableBalance: (spendableJSON.potentially_spendable_balance || 0) / 10 ** 8,
+        potentiallyTotalSpendableBalance: (spendableJSON.potentially_spendable_balance || 0) / 10 ** 8,
       };
       console.log(balance);
       //const start2 = Date.now();
