@@ -744,7 +744,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 currencyName={info.currencyName}
                 color={colors.text}
                 size={36}
-                amtZec={totalBalance ? totalBalance.totalSpendableBalance : 0}
+                amtZec={totalBalance ? totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance : 0}
                 privacy={privacy}
                 smallPrefix={true}
               />
@@ -775,7 +775,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             </View>
           )}
 
-          {receivedLegend && totalBalance && totalBalance.totalSpendableBalance > 0 && (
+          {receivedLegend && totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0 && (
             <View
               style={{
                 flexDirection: 'row',
@@ -788,7 +788,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 currencyName={info.currencyName}
                 color={colors.primary}
                 size={18}
-                amtZec={totalBalance.totalSpendableBalance}
+                amtZec={totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance}
                 privacy={privacy}
               />
               <RegText color={colors.primary}>!!!</RegText>
@@ -802,7 +802,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 <CurrencyAmount
                   style={{ marginTop: 0, marginBottom: 0 }}
                   price={zecPrice.zecPrice}
-                  amtZec={totalBalance ? totalBalance.totalSpendableBalance : 0}
+                  amtZec={totalBalance ? totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance : 0}
                   currency={currency}
                   privacy={privacy}
                 />
@@ -854,7 +854,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             {readOnly && !noUfvkIcon && (
               <>
                 {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal <= 0) &&
-                !(mode === ModeEnum.basic && totalBalance && totalBalance.totalSpendableBalance <= 0) ? (
+                !(mode === ModeEnum.basic && totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance <= 0) ? (
                   <TouchableOpacity onPress={() => ufvkShowModal()}>
                     <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
                   </TouchableOpacity>

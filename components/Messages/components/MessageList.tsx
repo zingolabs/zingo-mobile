@@ -439,6 +439,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     //const showUpgrade =
     //  (somePending ? 0 : totalBalance.transparentBal) === 0 && totalBalance.spendablePrivate > fee;
     setStillConfirming(stillConf);
+    // because the action is related with `send`.
     setSpendable(totalBalance ? totalBalance.totalSpendableBalance : 0);
   }, [
     somePending,

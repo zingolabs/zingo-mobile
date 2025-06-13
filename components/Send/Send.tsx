@@ -329,8 +329,8 @@ const Send: React.FunctionComponent<SendProps> = ({
       // spendable TOTAL calculated
       let spendableBalance = totalBalance ? totalBalance.totalSpendableBalance : 0;
       let zenniesForZingo = donationAddress ? false : donation;
-      console.log('SPENDABLEBALANCE', addressPar, zenniesForZingo);
-      const runSpendableBalanceStr = await RPCModule.getSpendableBalanceInfo(addressPar, zenniesForZingo ? 'true' : 'false');
+      const runSpendableBalanceStr = await RPCModule.getSpendableBalanceWithAddressInfo(addressPar, zenniesForZingo ? 'true' : 'false');
+      console.log('SPENDABLEBALANCE', addressPar, zenniesForZingo, runSpendableBalanceStr);
       if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
         console.log(runSpendableBalanceStr);
@@ -340,7 +340,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         try {
           const runSpendableBalanceJson: RPCSpendablebalanceType = await JSON.parse(runSpendableBalanceStr);
           if (runSpendableBalanceJson.spendable_balance) {
-            console.log('BALANCE', runSpendableBalanceJson.spendable_balance);
+            console.log('SPENDABLEBALANCE result', runSpendableBalanceJson.spendable_balance);
             spendableBalance = runSpendableBalanceJson.spendable_balance / 10 ** 8;
             setSpendableBalanceLastError('');
           }

@@ -115,7 +115,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
     console.log('total', totalAmount);
     console.log('header spendable', totalBalance?.totalSpendableBalance);
-    console.log('HIDDEN potentially spendable', totalBalance?.potentiallyTotalSpendableBalance);
 
     // amount + fee
     if (totalAmount <= (totalBalance ? totalBalance.confirmedOrchardBalance : 0)) {
