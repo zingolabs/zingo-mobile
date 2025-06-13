@@ -18,8 +18,10 @@
   "biometrics-error": "Por seguridad necesitas autenticarte de nuevo para realizar esta acción. Siempre puedes cambiarlo en Parámetros",
   "close": "Cerrar",
   "cancel": "Cancelar",
+  "verify": "Verificar",
   "save": "Guardar",
   "copy": "Copiar",
+  "share": "Compartir",
   "confirm": "Confirmar",
   "support": "Enviar Email",
   "menudrawer-acc": "Abrir Menú Lateral",
@@ -51,6 +53,11 @@
     "link-all": "Global",
     "link-anonymous": "Anónimos"
   },
+  "addresslist": {
+    "title": "Lista de direcciones",
+    "unified": "Unificada",
+    "transparent": "Transparente"
+  },
   "addressbook": {
     "title": "Libreta de Direcciones",
     "end": "Fin",
@@ -72,7 +79,8 @@
     "delete-alert": "¿Realmente quieres borrar este Contacto de tu libreta de direcciones?",
     "likely": "Probablemente: ",
     "thiswalletaddress": "La Dirección de este Monedero",
-    "addto": "Añadir a "
+    "addto": "Añadir a ",
+    "filter-wallet": "Monedero"
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",
@@ -507,6 +515,7 @@
     "shielded-orchard-sapling": "Orchard+Sapling",
     "shielded-full": "Completa",
     "showtip": "Tocar para seleccionar otra dirección.",
+    "verify": "Verificar direcciones",
     "copy-address-button": "Copiar direccion",
     "modal-transparent": {
       "title": "Advertencia de Privacidad",
@@ -690,10 +699,10 @@
     "title": "Agrupaciones de Fondos",
     "orchard-title": "ORCHARD (UA)",
     "orchard-balance": "Cantidad Total",
-    "orchard-spendable-balance": "Cantidad para Gastar",
+    "orchard-confirmed-balance": "Cantidad confirmada",
     "sapling-title": "SAPLING (Privada)",
     "sapling-balance": "Cantidad Total",
-    "sapling-spendable-balance": "Cantidad para Gastar",
+    "sapling-confirmed-balance": "Cantidad confirmada",
     "transparent-title": "TRANSPARENTE",
     "transparent-balance": "Cantidad Total",
     "transparent-confirmed-balance": "Cantidad Confirmada",

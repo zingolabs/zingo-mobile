@@ -194,6 +194,8 @@ class RPCModule: NSObject {
   func saveWalletInternal() throws {
     let walletEncodedString = saveToB64()
     if !walletEncodedString.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
+      let size = (walletEncodedString.count * 3) / 4
+      NSLog("file size \(size)")
       try self.saveWalletFile(walletEncodedString)
     } else {
       throw FileError.saveFileError("Couldn't save the wallet. \(walletEncodedString)")
@@ -1219,17 +1221,17 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
-  func fnGetSpendableBalanceInfo(_ dict: [AnyHashable: Any]) {
+  func fnGetSpendableBalanceWithAddressInfo(_ dict: [AnyHashable: Any]) {
       if let address = dict["address"] as? String,
           let zennies = dict["zennies"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = getSpendableBalance(address: address, zennies: zennies)
+          let resp = getSpendableBalanceWithAddress(address: address, zennies: zennies)
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
           }
       } else {
-          let err = "Error: [Native] spendable balance. Command arguments problem."
+          let err = "Error: [Native] spendable balance address. Command arguments problem."
           NSLog(err)
           if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
             DispatchQueue.main.async {
@@ -1239,12 +1241,40 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
-  @objc(getSpendableBalanceInfo:zennies:resolve:reject:)
-  func getSpendableBalanceInfo(_ address: String, zennies: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(getSpendableBalanceWithAddressInfo:zennies:resolve:reject:)
+  func getSpendableBalanceWithAddressInfo(_ address: String, zennies: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let dict: [String: Any] = ["address": address, "zennies": zennies, "resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
-          self.fnGetSpendableBalanceInfo(dict)
+          self.fnGetSpendableBalanceWithAddressInfo(dict)
+        }
+      }
+  }
+
+  func fnGetSpendableBalanceTotalInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getSpendableBalanceTotal()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] spendable balance total. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getSpendableBalanceTotalInfo:reject:)
+  func getSpendableBalanceTotalInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetSpendableBalanceTotalInfo(dict)
         }
       }
   }

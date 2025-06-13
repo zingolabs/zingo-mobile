@@ -1,18 +1,24 @@
 import React from 'react';
-import { TextStyle, Alert } from 'react-native';
-import { Address } from './Address';
-import { Copyable } from '../Primitives/Copyable';
+import { TextStyle } from 'react-native';
+import Address from './Address';
+import Copyable from '../Primitives/Copyable';
 
-interface CopyableAddressProps {
+type CopyableAddressProps = {
   address: string;
   style?: TextStyle;
   onCopy?: () => void;
 }
 
-export function CopyableAddress({ address, style, onCopy }: CopyableAddressProps) {
+const CopyableAddress: React.FunctionComponent<CopyableAddressProps> = ({
+  address,
+  style,
+  onCopy,
+}) => {
   return (
     <Copyable value={address} onCopy={onCopy}>
       <Address address={address} style={style} />
     </Copyable>
   );
-}
+};
+
+export default CopyableAddress;

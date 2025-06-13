@@ -51,7 +51,6 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
       );
       //console.log('show snackbar', currentSnackbar);
       toast.show({
-        //message: currentSnackbar.message + 'vhasi  eiofjwf weoi fewo fjpe fwpf f efwp ejpo efjpwoe jp oj peowfjwpoefwpoe wpoefjwpo powe fpwoef jp wow pojfpwoej kjANLK ALCALKDSCLAK CLAK CLAKDC ALKDSCM LAKDSC LAKDC MLAKDA',
         message: currentSnackbar.message,
         animation: 'zoomIn',
         duration,

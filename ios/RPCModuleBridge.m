@@ -151,10 +151,13 @@ RCT_EXTERN_METHOD(removeTransactionProcess:
     (NSString)txid 
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(getSpendableBalanceInfo:
+RCT_EXTERN_METHOD(getSpendableBalanceWithAddressInfo:
     (NSString)address 
                   zennies:(NSString)zennies
                   resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getSpendableBalanceTotalInfo:
+    (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getOptionWalletInfo:
     (RCTPromiseResolveBlock)resolve

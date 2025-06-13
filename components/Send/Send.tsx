@@ -68,7 +68,6 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
-import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
 import { RPCSendallProposeType } from '../../app/rpc/types/RPCSendallProposeType';
 import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
@@ -76,6 +75,7 @@ import { magicModal } from 'react-native-magic-modal';
 // @ts-ignore
 //import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
+import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
 
 type SendProps = {
   // side menu
@@ -204,10 +204,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const defaultValuesSpendableMaxAmount = useCallback((): void => {
-    setSpendable(totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0);
+    setSpendable(totalBalance ? totalBalance.totalSpendableBalance : 0);
     const max =
-      (totalBalance ? totalBalance.spendableOrchard : 0) +
-      (totalBalance ? totalBalance.spendablePrivate : 0) -
+      (totalBalance ? totalBalance.totalSpendableBalance : 0) -
       (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
         ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
         : 0);
@@ -227,8 +226,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     donationAddress,
     server.chainName,
     totalBalance,
-    totalBalance?.spendableOrchard,
-    totalBalance?.spendablePrivate,
+    totalBalance?.totalSpendableBalance,
   ]);
 
   const calculateFeeWithPropose = useCallback(
@@ -340,8 +338,8 @@ const Send: React.FunctionComponent<SendProps> = ({
         setSpendableBalanceLastError('');
         return;
       }
-      // spendable
-      let spendableBalance = totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0;
+      // spendable TOTAL calculated
+      let spendableBalance = totalBalance ? totalBalance.totalSpendableBalance : 0;
       let zenniesForZingo = donationAddress ? false : donation;
       console.log('SPENDABLEBALANCE', addressPar, zenniesForZingo);
       const runSpendableBalanceStr = await RPCModule.getSpendableBalanceInfo(
@@ -356,14 +354,9 @@ const Send: React.FunctionComponent<SendProps> = ({
       } else {
         try {
           const runSpendableBalanceJson: RPCSpendablebalanceType = await JSON.parse(runSpendableBalanceStr);
-          if (runSpendableBalanceJson.error) {
-            // snack with error
-            console.log(runSpendableBalanceJson.error);
-            setSpendableBalanceLastError(runSpendableBalanceJson.error);
-            //Alert.alert('Calculating the FEE', runProposeJson.error);
-          } else if (runSpendableBalanceJson.balance) {
-            console.log('BALANCE', runSpendableBalanceJson.balance);
-            spendableBalance = runSpendableBalanceJson.balance / 10 ** 8;
+          if (runSpendableBalanceJson.spendable_balance) {
+            console.log('SPENDABLEBALANCE result', runSpendableBalanceJson.spendable_balance);
+            spendableBalance = runSpendableBalanceJson.spendable_balance / 10 ** 8;
             setSpendableBalanceLastError('');
           }
         } catch (e) {
@@ -373,6 +366,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           //Alert.alert('Calculating the FEE', runProposeJson.error);
         }
       }
+
       setSpendable(spendableBalance);
       // max amount
       // don't need to substract the donation here.
@@ -400,8 +394,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       donation,
       donationAddress,
       totalBalance,
-      totalBalance?.spendableOrchard,
-      totalBalance?.spendablePrivate,
+      totalBalance?.totalSpendableBalance,
       validAddress,
     ],
   );
@@ -479,8 +472,8 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   useEffect(() => {
     const stillConf =
-      (totalBalance ? totalBalance.orchardBal : 0) !== (totalBalance ? totalBalance.spendableOrchard : 0) ||
-      (totalBalance ? totalBalance.privateBal : 0) !== (totalBalance ? totalBalance.spendablePrivate : 0) ||
+      (totalBalance ? totalBalance.totalOrchardBalance : 0) !== (totalBalance ? totalBalance.confirmedOrchardBalance : 0) ||
+      (totalBalance ? totalBalance.totalSaplingBalance : 0) !== (totalBalance ? totalBalance.confirmedSaplingBalance : 0) ||
       somePending;
     const showShield = (somePending ? 0 : shieldingAmount) > 0;
     //const showUpgrade =
@@ -491,10 +484,10 @@ const Send: React.FunctionComponent<SendProps> = ({
     shieldingAmount,
     somePending,
     totalBalance,
-    totalBalance?.orchardBal,
-    totalBalance?.privateBal,
-    totalBalance?.spendableOrchard,
-    totalBalance?.spendablePrivate,
+    totalBalance?.totalOrchardBalance,
+    totalBalance?.totalSaplingBalance,
+    totalBalance?.confirmedOrchardBalance,
+    totalBalance?.confirmedSaplingBalance,
   ]);
 
   useEffect(() => {

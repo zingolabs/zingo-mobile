@@ -538,12 +538,10 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                 style={
                   {
                     "alignItems": "center",
-                    "display": "flex",
                     "flexDirection": "column",
-                    "gap": 5,
                     "justifyContent": "center",
                     "marginBottom": 20,
-                    "marginTop": 10,
+                    "width": "100%",
                   }
                 }
               >

@@ -108,21 +108,20 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
     const totalSpendable: number = Utils.parseStringLocaleToNumberFloat(
       Utils.parseNumberFloatToStringLocale(
-        totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0,
+        totalBalance ? totalBalance.totalSpendableBalance : 0,
         8,
       ),
     );
 
     console.log('total', totalAmount);
-    console.log('orchard', totalBalance?.spendableOrchard);
-    console.log('sapling', totalBalance?.spendablePrivate);
+    console.log('header spendable', totalBalance?.totalSpendableBalance);
 
     // amount + fee
-    if (totalAmount <= (totalBalance ? totalBalance.spendableOrchard : 0)) {
+    if (totalAmount <= (totalBalance ? totalBalance.confirmedOrchardBalance : 0)) {
       from = PrivacyLevelFromEnum.orchardPrivacyLevel;
-    } else if ((totalBalance ? totalBalance.spendableOrchard : 0) > 0 && totalAmount <= totalSpendable) {
+    } else if ((totalBalance ? totalBalance.confirmedOrchardBalance : 0) > 0 && totalAmount <= totalSpendable) {
       from = PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel;
-    } else if (totalAmount <= (totalBalance ? totalBalance.spendablePrivate : 0)) {
+    } else if (totalAmount <= (totalBalance ? totalBalance.confirmedSaplingBalance : 0)) {
       from = PrivacyLevelFromEnum.saplingPrivacyLevel;
     }
 
@@ -214,8 +213,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     sendPageState.toaddr.to,
     server.chainName,
     totalBalance,
-    totalBalance?.spendableOrchard,
-    totalBalance?.spendablePrivate,
+    totalBalance?.confirmedOrchardBalance,
+    totalBalance?.confirmedSaplingBalance,
     translate,
   ]);
 

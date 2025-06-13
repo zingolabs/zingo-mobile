@@ -51,12 +51,12 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
-  const displayAddress = item.address ? Utils.trimToSmall(item.address, 7) : 'Unknown';
-  const displayContact = item.label
+  const displayAddress: string = item.address ? Utils.trimToSmall(item.address, 7) : (translate('info.unknown') as string);
+  const displayContact: string = item.label
     ? item.label.length > 20
       ? Utils.trimToSmall(item.label, 8)
       : item.label
-    : 'Unknown';
+    : (translate('info.unknown') as string);
 
   const onPressDelete = () => {
     Alert.alert(
@@ -147,7 +147,8 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           !(
             mode === ModeEnum.basic &&
             totalBalance &&
-            totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0
+            // because the action is related with `send`.
+            totalBalance.totalSpendableBalance <= 0
           ) && (
             <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
               <TouchableOpacity

@@ -87,27 +87,27 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
                     <DetailLine label={translate('pools.orchard-balance') as string}>
                       <ZecAmount
                         testID="orchard-total-balance"
-                        amtZec={totalBalance.orchardBal}
+                        amtZec={totalBalance.totalOrchardBalance}
                         size={18}
                         currencyName={info.currencyName}
                         style={{
                           opacity:
-                            totalBalance.spendableOrchard > 0 &&
-                            totalBalance.spendableOrchard === totalBalance.orchardBal
+                            totalBalance.confirmedOrchardBalance > 0 &&
+                            totalBalance.confirmedOrchardBalance === totalBalance.totalOrchardBalance
                               ? 1
                               : 0.5,
                         }}
                         privacy={privacy}
                       />
                     </DetailLine>
-                    <DetailLine label={translate('pools.orchard-spendable-balance') as string}>
+                    <DetailLine label={translate('pools.orchard-confirmed-balance') as string}>
                       <ZecAmount
-                        testID="orchard-spendable-balance"
-                        amtZec={totalBalance.spendableOrchard}
+                        testID="orchard-confirmed-balance"
+                        amtZec={totalBalance.confirmedOrchardBalance}
                         size={18}
                         currencyName={info.currencyName}
                         color={
-                          totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
+                          totalBalance.confirmedOrchardBalance > 0 && totalBalance.confirmedOrchardBalance === totalBalance.totalOrchardBalance
                             ? colors.primary
                             : 'red'
                         }
@@ -130,27 +130,27 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
                     <DetailLine label={translate('pools.sapling-balance') as string}>
                       <ZecAmount
                         testID="sapling-total-balance"
-                        amtZec={totalBalance.privateBal}
+                        amtZec={totalBalance.totalSaplingBalance}
                         size={18}
                         currencyName={info.currencyName}
                         style={{
                           opacity:
-                            totalBalance.spendablePrivate > 0 &&
-                            totalBalance.spendablePrivate === totalBalance.privateBal
+                            totalBalance.confirmedSaplingBalance > 0 &&
+                            totalBalance.confirmedSaplingBalance === totalBalance.totalSaplingBalance
                               ? 1
                               : 0.5,
                         }}
                         privacy={privacy}
                       />
                     </DetailLine>
-                    <DetailLine label={translate('pools.sapling-spendable-balance') as string}>
+                    <DetailLine label={translate('pools.sapling-confirmed-balance') as string}>
                       <ZecAmount
-                        testID="sapling-spendable-balance"
-                        amtZec={totalBalance.spendablePrivate}
+                        testID="sapling-confirmed-balance"
+                        amtZec={totalBalance.confirmedSaplingBalance}
                         size={18}
                         currencyName={info.currencyName}
                         color={
-                          totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
+                          totalBalance.confirmedSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === totalBalance.totalSaplingBalance
                             ? colors.syncing
                             : 'red'
                         }
@@ -173,7 +173,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
                     <DetailLine label={translate('pools.transparent-balance') as string}>
                       <ZecAmount
                         testID="transparent-balance"
-                        amtZec={totalBalance.transparentBal}
+                        amtZec={totalBalance.totalTransparentBalance}
                         size={18}
                         currencyName={info.currencyName}
                         color={'red'}
@@ -183,7 +183,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
                     <DetailLine label={translate('pools.transparent-confirmed-balance') as string}>
                       <ZecAmount
                         testID="transparent-confirmed-balance"
-                        amtZec={totalBalance.confirmedTransparent}
+                        amtZec={totalBalance.confirmedTransparentBalance}
                         size={18}
                         currencyName={info.currencyName}
                         color={'red'}
@@ -194,7 +194,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
                 </>
               )}
 
-              {transparentPool && totalBalance.confirmedTransparent > 0 && shieldingAmount === 0 && (
+              {transparentPool && totalBalance.confirmedTransparentBalance > 0 && shieldingAmount === 0 && (
                 <View
                   style={{
                     display: 'flex',

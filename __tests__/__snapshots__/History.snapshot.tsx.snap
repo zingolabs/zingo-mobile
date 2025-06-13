@@ -1187,21 +1187,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                 }
                 testID="undefined.big-part"
               >
-                 1.1234
-              </Text>
-              <Text
-                style={
-                  {
-                    "color": "#c3c3c3",
-                    "fontSize": 25.2,
-                    "margin": 0,
-                    "marginBottom": 2.4,
-                    "padding": 0,
-                  }
-                }
-                testID="undefined.small-part"
-              >
-                5678
+                 0.5000
               </Text>
             </View>
           </View>

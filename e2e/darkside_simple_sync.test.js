@@ -17,12 +17,12 @@ describe('Syncs a darkside chain', () => {
     await element(by.id('menu.fundpools')).tap();
     await expect(element(by.id('orchard-total-balance.big-part'))).toHaveText(' 1.0000');
     await expect(element(by.id('orchard-total-balance.small-part'))).not.toBeVisible();
-    await expect(element(by.id('orchard-spendable-balance.big-part'))).toHaveText(' 1.0000');
-    await expect(element(by.id('orchard-spendable-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('orchard-confirmed-balance.big-part'))).toHaveText(' 1.0000');
+    await expect(element(by.id('orchard-confirmed-balance.small-part'))).not.toBeVisible();
     await expect(element(by.id('sapling-total-balance.big-part'))).toHaveText(' 0.0000');
     await expect(element(by.id('sapling-total-balance.small-part'))).not.toBeVisible();
-    await expect(element(by.id('sapling-spendable-balance.big-part'))).toHaveText(' 0.0000');
-    await expect(element(by.id('sapling-spendable-balance.small-part'))).not.toBeVisible();
+    await expect(element(by.id('sapling-confirmed-balance.big-part'))).toHaveText(' 0.0000');
+    await expect(element(by.id('sapling-confirmed-balance.small-part'))).not.toBeVisible();
     await expect(element(by.id('transparent-balance.big-part'))).toHaveText(' 0.0000');
     await expect(element(by.id('transparent-total-balance.small-part'))).not.toBeVisible();
     await waitFor(element(by.id('fundpools.button.close'))).toBeVisible().withTimeout(sync_timeout);

@@ -1,3 +1,4 @@
+import { GlobalConst } from '../const/GlobalConst';
 import { DownloadMemosEnum } from '../enums/DownloadMemosEnum';
 
 export default class WalletSettingsClass {
@@ -6,6 +7,6 @@ export default class WalletSettingsClass {
 
   constructor() {
     this.downloadMemos = DownloadMemosEnum.walletMemos;
-    this.transactionFilterThreshold = '500';
+    this.transactionFilterThreshold = GlobalConst.transactionFilterThreshold;
   }
 }

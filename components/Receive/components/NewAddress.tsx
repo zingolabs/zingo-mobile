@@ -75,7 +75,6 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, clo
         }
       } else {
         console.log('Internal Error new address ');
-        //return 'Error: Internal RPC Error: new address ';
       }
 
       if (label) {
@@ -109,7 +108,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, clo
   };
 
   return (
-    <View style={{ backgroundColor: colors.sideMenuBackground }}>
+    <View style={{ backgroundColor: colors.background }}>
       <TouchableOpacity
         onPress={() => {
           setLabel('');
@@ -127,9 +126,12 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, clo
         />
       </TouchableOpacity>
       <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>
-        {addressKind === AddressKindEnum.u ? 'New Unified Address' : 'New Transparent Address'}
+        {(addressKind === AddressKindEnum.u
+          ? translate('receive.newu-option')
+          : translate('receive.transparent.newt-option')) as string}
       </RegText>
-      <View style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
+      <View
+        style={{ display: 'flex', flexDirection: 'column', margin: 10 }}>
         <RegText style={{ marginTop: 10, paddingHorizontal: 10 }}>{'Tag (Optional)'}</RegText>
         <View
           style={{

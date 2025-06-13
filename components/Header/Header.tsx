@@ -236,7 +236,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     if (
       !readOnly && setShieldingAmount && selectServer !== SelectServerEnum.offline && somePending
         ? 0
-        : (totalBalance?.confirmedTransparent ? totalBalance.confirmedTransparent : 0) > 0
+        : (totalBalance?.confirmedTransparentBalance ? totalBalance.confirmedTransparentBalance : 0) > 0
     ) {
       (async () => {
         let proposeFee = 0;
@@ -277,7 +277,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       setShieldingFee(0);
       setShieldingAmount && setShieldingAmount(0);
     }
-  }, [readOnly, setShieldingAmount, totalBalance?.confirmedTransparent, somePending, selectServer]);
+  }, [readOnly, setShieldingAmount, totalBalance?.confirmedTransparentBalance, somePending, selectServer]);
 
   useEffect(() => {
     setShowShieldButton(
@@ -744,15 +744,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 currencyName={info.currencyName}
                 color={colors.text}
                 size={36}
-                amtZec={totalBalance ? totalBalance.total : 0}
+                amtZec={totalBalance ? totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance : 0}
                 privacy={privacy}
                 smallPrefix={true}
               />
               {mode !== ModeEnum.basic &&
                 totalBalance &&
-                (totalBalance.orchardBal !== totalBalance.spendableOrchard ||
-                  totalBalance.privateBal > 0 ||
-                  totalBalance.transparentBal > 0) && (
+                (totalBalance.totalOrchardBalance !== totalBalance.confirmedOrchardBalance ||
+                  totalBalance.totalSaplingBalance > 0 ||
+                  totalBalance.totalTransparentBalance > 0) && (
                   <TouchableOpacity onPress={() => setPoolsModalShow()}>
                     <View
                       style={{
@@ -775,7 +775,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             </View>
           )}
 
-          {receivedLegend && totalBalance && totalBalance.total > 0 && (
+          {receivedLegend && totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0 && (
             <View
               style={{
                 flexDirection: 'row',
@@ -788,7 +788,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 currencyName={info.currencyName}
                 color={colors.primary}
                 size={18}
-                amtZec={totalBalance.total}
+                amtZec={totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance}
                 privacy={privacy}
               />
               <RegText color={colors.primary}>!!!</RegText>
@@ -802,7 +802,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 <CurrencyAmount
                   style={{ marginTop: 0, marginBottom: 0 }}
                   price={zecPrice.zecPrice}
-                  amtZec={totalBalance ? totalBalance.total : 0}
+                  amtZec={totalBalance ? totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance : 0}
                   currency={currency}
                   privacy={privacy}
                 />
@@ -854,7 +854,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             {readOnly && !noUfvkIcon && (
               <>
                 {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal <= 0) &&
-                !(mode === ModeEnum.basic && totalBalance && totalBalance.total <= 0) ? (
+                !(mode === ModeEnum.basic && totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance <= 0) ? (
                   <TouchableOpacity onPress={() => ufvkShowModal()}>
                     <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
                   </TouchableOpacity>

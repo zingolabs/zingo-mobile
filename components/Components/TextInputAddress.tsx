@@ -25,6 +25,7 @@ type TextInputAddressProps = {
   setAddress: (a: string) => void;
   setError: (e: string) => void;
   disabled: boolean;
+  showLabel: boolean;
   //setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
@@ -32,6 +33,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   setAddress,
   setError,
   disabled,
+  showLabel,
   //setSecurityOption,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -110,14 +112,15 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   return (
     <View style={{ display: 'flex', flexDirection: 'column' }}>
       <View style={{ display: 'flex', padding: 10, marginTop: 10 }}>
-        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-          <RegText>{translate('send.toaddress') as string}</RegText>
-          {validAddress === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
-          {validAddress === -1 && <ErrorText>{translate('send.invalidaddress') as string}</ErrorText>}
-        </View>
+        {showLabel && (
+          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+            <RegText>{translate('send.toaddress') as string}</RegText>
+            {validAddress === 1 && <FontAwesomeIcon icon={faCheck} color={colors.primary} />}
+            {validAddress === -1 && <ErrorText>{translate('send.invalidaddress') as string}</ErrorText>}
+          </View>
+        )}
         <View
           style={{
-            flex: 1,
             borderWidth: 1,
             borderRadius: 5,
             borderColor: colors.text,

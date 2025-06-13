@@ -117,7 +117,6 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
             "borderColor": "#c3c3c3",
             "borderRadius": 5,
             "borderWidth": 1,
-            "flex": 1,
             "marginTop": 5,
           }
         }
@@ -517,7 +516,6 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
             "borderColor": "#c3c3c3",
             "borderRadius": 5,
             "borderWidth": 1,
-            "flex": 1,
             "marginTop": 5,
           }
         }
@@ -985,7 +983,6 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
             "borderColor": "#c3c3c3",
             "borderRadius": 5,
             "borderWidth": 1,
-            "flex": 1,
             "marginTop": 5,
           }
         }
