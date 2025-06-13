@@ -1359,7 +1359,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       //   The App have to go to the initial screen
       // - the seed exists and the App can open the wallet in the new server.
       //   But I have to restart the sync if needed.
-      let result: string = await RPCModule.loadExistingWallet(value.uri, value.chainName, this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false');
+      let result: string = await RPCModule.loadExistingWallet(value.uri, value.chainName);
       //console.log('load existing wallet', result);
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
@@ -1382,6 +1382,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             // the server is changed, the App needs to restart the timeout tasks from the beginning
             await this.rpc.clearTimers();
             await this.rpc.configure();
+            // creating tor cliente if needed
+            if (this.state.currency === CurrencyEnum.USDTORCurrency) {
+              RPCModule.createTorClientProcess();
+            }
             return;
           } else {
             error = true;
@@ -1464,6 +1468,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       console.log('before CREATE ------------------- TOR CLIENT');
       const result = await RPCModule.createTorClientProcess();
       console.log('after CREATE ------------------- TOR CLIENT', result);
+    } else {
+      console.log('before REMOVE ------------------- TOR CLIENT');
+      const result = await RPCModule.removeTorClientProcess();
+      console.log('after REMOVE ------------------- TOR CLIENT', result);
     }
 
     // Refetch the settings to update

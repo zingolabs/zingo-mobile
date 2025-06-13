@@ -566,6 +566,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               });
               this.addLastSnackbar({ message: walletKindStr });
             }
+            // creating tor cliente if needed
+            if (this.state.currency === CurrencyEnum.USDTORCurrency) {
+              RPCModule.createTorClientProcess();
+            }
             this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool);
             //console.log('navigate to LoadedApp');
           } else {
@@ -1063,6 +1067,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           actionButtonsDisabled: false,
           walletExists: true,
         }));
+        // creating tor cliente if needed
+        if (this.state.currency === CurrencyEnum.USDTORCurrency) {
+          RPCModule.createTorClientProcess();
+        }
       } else {
         this.walletErrorHandle(seed, this.state.translate('loadingapp.creatingwallet-label') as string, 1, false);
       }
@@ -1132,7 +1140,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           walletBirthday || '0',
           this.state.server.uri,
           this.state.server.chainName,
-          this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false',
         );
       } else {
         result = await RPCModule.restoreWalletFromUfvk(
@@ -1140,7 +1147,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           walletBirthday || '0',
           this.state.server.uri,
           this.state.server.chainName,
-          this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false',
         );
       }
 
@@ -1227,6 +1233,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 actionButtonsDisabled: false,
               });
               this.addLastSnackbar({ message: walletKindStr });
+            }
+            // creating tor cliente if needed
+            if (this.state.currency === CurrencyEnum.USDTORCurrency) {
+              RPCModule.createTorClientProcess();
             }
             this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool);
           } else {

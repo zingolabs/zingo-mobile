@@ -1,14 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, ReactNode, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Dimensions, Keyboard, View } from 'react-native';
-import { TabView, TabBar, SceneRendererProps, Route, NavigationState, TabBarItem } from 'react-native-tab-view';
+import { Keyboard, View } from 'react-native';
+import { TabView, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
 import { useTheme } from '@react-navigation/native';
 
 import SingleAddress from '../Components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
-import RegText from '../Components/RegText';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -23,7 +22,7 @@ import {
   AddressBookFileClass,
 } from '../../app/AppState';
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
 
 type ReceiveProps = {
@@ -61,11 +60,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [indexBottomSheet, setIndexBottomSheet] = useState<number>(-1);
 
   const snapPoints = useMemo(() => [index === 0 ? '55%' : '40%', '65%', index === 0 ? '95%' : '80%'], [index]);
-
-  const dimensions = {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-  };
 
   const newAddressShow = useCallback(() => {
     bottomSheetRef.current?.snapToIndex(0);
@@ -174,6 +168,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   }}
                   setSecurityOption={setSecurityOption}
                   newAddressShow={newAddressShow}
+                  changeIndex={(i: number) => {
+                    setIndex(i);
+                  }}
                 />
               </>
             )}
@@ -212,6 +209,9 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   }}
                   setSecurityOption={setSecurityOption}
                   newAddressShow={newAddressShow}
+                  changeIndex={(i: number) => {
+                    setIndex(i);
+                  }}
                 />
               </>
             )}
@@ -223,52 +223,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     return <>{component}</>;
   };
 
-  const renderLabelCustom: ({
-    route,
-    focused,
-    color,
-  }: {
-    route: Route;
-    focused: boolean;
-    color: string;
-  }) => ReactNode = ({ route, focused, color }) => {
-    const w = (dimensions.width - 50) / (mode === ModeEnum.basic ? 1 : 2);
-    //const w = route.key === 'uaddr' ? '40%' : '30%';
-    return (
-      <View
-        style={{
-          width: w,
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: 50,
-        }}>
-        <RegText
-          style={{
-            fontWeight: mode === ModeEnum.basic ? 'normal' : focused ? 'bold' : 'normal',
-            fontSize: mode === ModeEnum.basic ? 14 : focused ? 15 : 14,
-            color: color,
-          }}>
-          {(route.title ? route.title : '') +
-            (mode === ModeEnum.advanced &&
-            ((route.key === 'uaddr' && uAddr.length > 1) || (route.key === 'taddr' && tAddr.length > 1))
-              ? ` (${route.key === 'uaddr' ? uAddr.length : route.key === 'taddr' ? tAddr.length : ''})`
-              : '')}
-        </RegText>
-        {route.key === 'uaddr' && mode === ModeEnum.basic && (
-          <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. zingo)</RegText>
-        )}
-        {route.key === 'taddr' && mode === ModeEnum.basic && (
-          <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. coinbase, gemini)</RegText>
-        )}
-      </View>
-    );
-  };
-
   const renderTabBarPage: (
     props: SceneRendererProps & {
       navigationState: NavigationState<Route>;
     },
-  ) => ReactNode = props => {
+  ) => ReactNode = () => {
     return (
       <View
         accessible={true}
@@ -290,15 +249,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           noBalance={true}
           noPrivacy={true}
         />
-        <TabBar
-          {...props}
-          indicatorStyle={{ backgroundColor: colors.primary }}
-          style={{ backgroundColor: colors.background }}
-          renderTabBarItem={p => <TabBarItem {...p} key={p.route.key} label={renderLabelCustom} />}
-        />
       </View>
     );
   };
+
+  const renderBackdrop = (props: BottomSheetBackdropProps) => (
+    <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} pressBehavior="close" />
+  );
 
   const returnPage = (
     <>
@@ -307,6 +264,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         renderScene={renderScene}
         renderTabBar={renderTabBarPage}
         onIndexChange={setIndex}
+        swipeEnabled={false}
       />
       <BottomSheet
         ref={bottomSheetRef}
@@ -316,7 +274,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
         onChange={handleSheetChanges}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
-        handleStyle={{ display: 'none' }}>
+        handleStyle={{ display: 'none' }}
+        backdropComponent={renderBackdrop}>
         <BottomSheetView style={{ backgroundColor: colors.sideMenuBackground, width: '100%', height: '100%' }}>
           <NewAddress
             addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
