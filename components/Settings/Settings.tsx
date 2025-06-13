@@ -213,7 +213,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     (async () => {
       if (await hasRecoveryWalletInfo()) {
         setHasRecoveryWalletInfoSaved(true);
-        setStorageRecoveryWalletInfo(Platform.OS === GlobalConst.platformOSios ? 'KeyChain' : 'KeyStore');
+        setStorageRecoveryWalletInfo(Platform.OS === GlobalConst.platformOSios ? GlobalConst.keyChain : GlobalConst.keyStore);
       }
     })();
   }, [translate]);

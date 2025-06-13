@@ -1077,17 +1077,38 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun getSpendableBalanceInfo(address: String, zennies: String, promise: Promise) {
+    fun getSpendableBalanceWithAddressInfo(address: String, zennies: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getSpendableBalance(address, zennies)
+                val resp = uniffi.zingo.getSpendableBalanceWithAddress(address, zennies)
 
                 withContext(Dispatchers.Main) {
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: spendable balance: ${e.localizedMessage}"
+                val errorMessage = "Error: spendable balance with address: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getSpendableBalanceTotalInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getSpendableBalanceTotal()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: spendable balance total: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {

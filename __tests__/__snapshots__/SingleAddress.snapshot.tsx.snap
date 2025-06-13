@@ -316,18 +316,89 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
               </RNSVGSvgView>
             </View>
           </View>
+          <View
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
+            accessibilityValue={
+              {
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
+              }
+            }
+            accessible={true}
+            collapsable={false}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "borderColor": "#888888",
+                  "borderRadius": 30,
+                  "marginHorizontal": 10,
+                  "paddingHorizontal": 5,
+                  "paddingVertical": 5,
+                }
+              }
+            >
+              <
+                color="#ffffff"
+                icon={
+                  {
+                    "icon": [
+                      512,
+                      512,
+                      [
+                        61533,
+                        "check-circle",
+                      ],
+                      "f058",
+                      "M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z",
+                    ],
+                    "iconName": "circle-check",
+                    "prefix": "far",
+                  }
+                }
+                size={24}
+                style={
+                  {
+                    "margin": 5,
+                    "opacity": 0.9,
+                  }
+                }
+              />
+            </View>
+          </View>
         </View>
       </View>
       <View
         style={
           {
             "alignItems": "center",
-            "display": "flex",
             "flexDirection": "column",
-            "gap": 5,
             "justifyContent": "center",
             "marginBottom": 20,
-            "marginTop": 10,
+            "width": "100%",
           }
         }
       >
@@ -916,12 +987,10 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
         style={
           {
             "alignItems": "center",
-            "display": "flex",
             "flexDirection": "column",
-            "gap": 5,
             "justifyContent": "center",
             "marginBottom": 20,
-            "marginTop": 10,
+            "width": "100%",
           }
         }
       >

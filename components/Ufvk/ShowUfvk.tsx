@@ -15,7 +15,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import RegText from '../Components/RegText';
-import { ButtonTypeEnum, ChainNameEnum, ModeEnum, SecurityType, UfvkActionEnum } from '../../app/AppState';
+import { ButtonTypeEnum, ChainNameEnum, ModeEnum, UfvkActionEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { useToast } from 'react-native-toastier';
@@ -34,9 +34,8 @@ type ShowUfvkProps = {
   onClickCancel: () => void;
   action: UfvkActionEnum;
   setPrivacyOption: (value: boolean) => Promise<void>;
-  setSecurityOption: (s: SecurityType) => Promise<void>;
 };
-const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, setPrivacyOption, setSecurityOption }) => {
+const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, wallet, server, mode, addLastSnackbar, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
@@ -141,10 +140,8 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
             <SingleAddress
               ufvk={wallet.ufvk}
               index={0}
+              setIndex={() => {}}
               total={1}
-              prev={() => null}
-              next={() => null}
-              setSecurityOption={setSecurityOption}
             />
           )}
           {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}

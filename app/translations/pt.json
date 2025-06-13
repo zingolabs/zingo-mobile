@@ -18,8 +18,10 @@
   "biometrics-error": "Para sua segurança, você precisa autenticar essa ação novamente para executá-la. Você pode alterar isso em Configurações sempre que desejar.",
   "close": "Fechar",
   "cancel": "Cancelar",
+  "verify": "Verificar",
   "save": "Salvar",
   "copy": "Cópia de",
+  "share": "Compartilhar",
   "confirm": "Confirmar",
   "support": "Enviar E-mail",
   "menudrawer-acc": "Abrir Menu Lateral",
@@ -51,6 +53,11 @@
     "link-all": "Global",
     "link-anonymous": "Anônimo"
   },
+  "addresslist": {
+    "title": "Lista de Endereços",
+    "unified": "Unificado",
+    "transparent": "Transparente"
+  },
   "addressbook": {
     "title": "Address Book",
     "end": "Fim",
@@ -72,7 +79,8 @@
     "delete-alert": "Você realmente deseja excluir este Contato/Apelido?",
     "likely": "Provavelmente: ",
     "thiswalletaddress": "Endereço desta Carteira",
-    "addto": "Adicionar à "
+    "addto": "Adicionar à ",
+    "filter-wallet": "Carteira"
   },
   "change-privacy-legend": ".\nToque para revelar os valores ocultos.",
   "txtcopied": "Texto copiado para a Área de Transferência",
@@ -512,6 +520,7 @@
     "shielded-orchard-sapling": "Orchard+Sapling",
     "shielded-full": "Completa",
     "showtip": "Toque para selecionar outro endereço.",
+    "verify": "Verificar Endereços",
     "copy-address-button": "Copiar endereço",
     "modal-transparent": {
       "title": "Aviso de Privacidade",
@@ -695,13 +704,13 @@
     "title": "Fundos nas Pools",
     "orchard-title": "ORCHARD (UA)",
     "orchard-balance": "Saldo Total",
-    "orchard-spendable-balance": "Saldo Disponível",
+    "orchard-confirmed-balance": "Saldo confirmado",
     "sapling-title": "SAPLING (Privado)",
     "sapling-balance": "Saldo Total",
-    "sapling-spendable-balance": "Saldo Disponível",
+    "sapling-confirmed-balance": "Saldo confirmado",
     "transparent-title": "TRANSPARENTE",
     "transparent-balance": "Saldo Total",
-    "transparent-confirmed-balance": "Saldo Confirmado",
+    "transparent-confirmed-balance": "Saldo confirmado",
     "dust": "A quantidade transparente é muito pequena para ser protegida."
   },
   "uris": {

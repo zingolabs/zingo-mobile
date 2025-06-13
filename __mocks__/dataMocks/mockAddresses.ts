@@ -28,7 +28,13 @@ export const mockAddresses: (UnifiedAddressClass | TransparentAddressClass)[] = 
   },
   {
     index: 0,
-    address: 'transparent-12345678901234567890',
+    address: 'transparent-1-12345678901234567890',
+    addressKind: AddressKindEnum.t,
+    scope: RPCAddressScopeEnum.external,
+  },
+  {
+    index: 1,
+    address: 'transparent-2-12345678901234567890',
     addressKind: AddressKindEnum.t,
     scope: RPCAddressScopeEnum.external,
   },

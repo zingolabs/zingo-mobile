@@ -1,6 +1,6 @@
 import * as RNFS from 'react-native-fs';
 
-import { AddressBookFileClass } from '../../app/AppState';
+import { AddressBookFileClass, GlobalConst } from '../../app/AppState';
 
 export default class AddressBookFileImpl {
   static async getFileName() {
@@ -81,7 +81,7 @@ export default class AddressBookFileImpl {
   static async readAddressBook(): Promise<AddressBookFileClass[]> {
     try {
       const fileName = await this.getFileName();
-      const addressBook: AddressBookFileClass[] = await JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
+      const addressBook: AddressBookFileClass[] = await JSON.parse((await RNFS.readFile(fileName, GlobalConst.utf8 as BufferEncoding)).toString());
       return addressBook;
     } catch (err) {
       // The File doesn't exist, so return nothing
@@ -93,7 +93,7 @@ export default class AddressBookFileImpl {
   static async writeAddressBook(newAddressBook: AddressBookFileClass[]): Promise<AddressBookFileClass[]> {
     try {
       const fileName = await this.getFileName();
-      RNFS.writeFile(fileName, JSON.stringify(newAddressBook), 'utf8')
+      RNFS.writeFile(fileName, JSON.stringify(newAddressBook), GlobalConst.utf8 as BufferEncoding)
         .then(() => {
           //console.log('FILE WRITTEN!')
         })

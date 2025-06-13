@@ -24,6 +24,7 @@ import {
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
+import VerifyAddress from './components/VerifyAddress';
 
 type ReceiveProps = {
   toggleMenuDrawer: () => void;
@@ -40,7 +41,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   // shielding
   // for receive
   alone,
-  setSecurityOption,
   setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -50,6 +50,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   const [index, setIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
+  const [sheetType, setSheetType] = useState<'NA' | 'VA' | null>(null);
 
   const [uAddr, setUAddr] = useState<UnifiedAddressClass[]>([]);
   const [tAddr, setTAddr] = useState<TransparentAddressClass[]>([]);
@@ -59,14 +60,41 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [indexBottomSheet, setIndexBottomSheet] = useState<number>(-1);
 
-  const snapPoints = useMemo(() => [index === 0 ? '55%' : '40%', '65%', index === 0 ? '95%' : '80%'], [index]);
+  const NASnapPoints = useMemo(() =>
+    [
+      index === 0 ? '55%' : '40%',
+      '65%',
+      index === 0 ? '95%' : '80%',
+    ], [index]);
 
-  const newAddressShow = useCallback(() => {
+  const VASnapPoints = useMemo(() =>
+    [
+      '40%',
+      '65%',
+    ], []);
+
+  const NAShow = useCallback(() => {
+    setSheetType('NA');
     bottomSheetRef.current?.snapToIndex(0);
     setIndexBottomSheet(0);
   }, []);
 
-  const newAddressHide = useCallback(() => {
+  const NAHide = useCallback(() => {
+    setSheetType(null);
+    Keyboard.dismiss();
+    bottomSheetRef.current?.snapToIndex(-1);
+    bottomSheetRef.current?.close();
+    setIndexBottomSheet(-1);
+  }, []);
+
+  const VAShow = useCallback(() => {
+    setSheetType('VA');
+    bottomSheetRef.current?.snapToIndex(0);
+    setIndexBottomSheet(0);
+  }, []);
+
+  const VAHide = useCallback(() => {
+    setSheetType(null);
     Keyboard.dismiss();
     bottomSheetRef.current?.snapToIndex(-1);
     bottomSheetRef.current?.close();
@@ -155,22 +183,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 <SingleAddress
                   address={uAddress}
                   index={uAddrIndex ? uAddrIndex : 0}
+                  setIndex={setUAddrIndex}
                   total={uAddr.length}
-                  prev={() => {
-                    if (uAddrIndex !== null && uAddrIndex > 0) {
-                      setUAddrIndex(uAddrIndex - 1);
-                    }
-                  }}
-                  next={() => {
-                    if (uAddrIndex !== null && uAddrIndex < uAddr.length - 1) {
-                      setUAddrIndex(uAddrIndex + 1);
-                    }
-                  }}
-                  setSecurityOption={setSecurityOption}
-                  newAddressShow={newAddressShow}
-                  changeIndex={(index: number) => {
-                    setIndex(index);
-                  }}
+                  NAShow={NAShow}
+                  VAShow={VAShow}
+                  changeIndex={setIndex}
                 />
               </>
             )}
@@ -196,22 +213,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 <SingleAddress
                   address={tAddress}
                   index={tAddrIndex ? tAddrIndex : 0}
+                  setIndex={setTAddrIndex}
                   total={tAddr.length}
-                  prev={() => {
-                    if (tAddrIndex !== null && tAddrIndex > 0) {
-                      setTAddrIndex(tAddrIndex - 1);
-                    }
-                  }}
-                  next={() => {
-                    if (tAddrIndex !== null && tAddrIndex < tAddr.length - 1) {
-                      setTAddrIndex(tAddrIndex + 1);
-                    }
-                  }}
-                  setSecurityOption={setSecurityOption}
-                  newAddressShow={newAddressShow}
-                  changeIndex={(index: number) => {
-                    setIndex(index);
-                  }}
+                  NAShow={NAShow}
+                  VAShow={VAShow}
+                  changeIndex={setIndex}
                 />
               </>
             )}
@@ -269,19 +275,26 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
-        snapPoints={snapPoints}
+        snapPoints={sheetType === 'NA' ? NASnapPoints : VASnapPoints}
         enableDynamicSizing={false}
         onChange={handleSheetChanges}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
         handleStyle={{ display: 'none' }}
         backdropComponent={renderBackdrop}>
-        <BottomSheetView style={{ backgroundColor: colors.sideMenuBackground, width: '100%', height: '100%' }}>
-          <NewAddress
-            addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
-            closeSheet={newAddressHide}
-            setAddressBook={setAddressBook}
-          />
+        <BottomSheetView style={{ backgroundColor: colors.background, height: '100%' }}>
+          {sheetType === 'NA' && (
+            <NewAddress
+              addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
+              closeSheet={NAHide}
+              setAddressBook={setAddressBook}
+            />
+          )}
+          {sheetType === 'VA' && (
+            <VerifyAddress
+              closeSheet={VAHide}
+            />
+          )}
         </BottomSheetView>
       </BottomSheet>
     </>

@@ -1,9 +1,10 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { TextStyle } from 'react-native';
 import Button from '../Button';
 import { ButtonTypeEnum } from '../../../app/AppState';
 
-interface AddressProps {
+type AddressProps = {
   address: string;
   startLength?: number;
   endLength?: number;
@@ -11,7 +12,13 @@ interface AddressProps {
   style?: TextStyle;
 }
 
-export function Address({ address, startLength = 10, endLength = 10, onPress, style }: AddressProps) {
+const Address: React.FunctionComponent<AddressProps> = ({
+  address,
+  startLength = 10,
+  endLength = 10,
+  onPress,
+  style,
+}) => {
   if (!address) {
     return null;
   }
@@ -30,4 +37,6 @@ export function Address({ address, startLength = 10, endLength = 10, onPress, st
       }}
     />
   );
-}
+};
+
+export default Address;

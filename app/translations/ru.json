@@ -18,8 +18,10 @@
   "biometrics-error": "В целях безопасности для выполнения этого действия необходимо повторно пройти авторизацию. Вы всегда можете поменять эту опцию в Настройках",
   "close": "Закрыть",
   "cancel": "Отмена",
+  "verify": "Проверить",
   "save": "Сохранить",
   "copy": "Копировать",
+  "share": "Поделиться",
   "confirm": "Подтвердить",
   "support": "Отправить Email",
   "menudrawer-acc": "Открыть панель меню",
@@ -51,6 +53,11 @@
     "link-all": "Глобальный",
     "link-anonymous": "Анонимно"
   },
+  "addresslist": {
+    "title": "Список адресов",
+    "unified": "Единый",
+    "transparent": "Прозрачный"
+  },
   "addressbook": {
     "title": "Адресная книга",
     "end": "Окончание",
@@ -72,7 +79,8 @@
     "delete-alert": "Вы действительно хотите удалить этот Контакт/Никнейм/Метку?",
     "likely": "Возможно: ",
     "thiswalletaddress": "Адрес этого кошелька",
-    "addto": "Добавить к "
+    "addto": "Добавить к ",
+    "filter-wallet": "Кошелек"
   },
   "change-privacy-legend": ".\nНажмите, чтобы раскрыть скрытые значения.",
   "txtcopied": "Текст скопирован в буфер обмена",
@@ -512,6 +520,7 @@
     "shielded-orchard-sapling": "Orchard+Sapling",
     "shielded-full": "Полный",
     "showtip": "Нажмите, чтобы выбрать другой адрес.",
+    "verify": "Проверить адреса",
     "copy-address-button": "Скопировать адрес",
     "modal-transparent": {
       "title": "Предупреждение о конфиденциальности",
@@ -700,10 +709,10 @@
     "title": "Ваши активы в пулах",
     "orchard-title": "ORCHARD (Унифицированный адрес)",
     "orchard-balance": "Общий баланс",
-    "orchard-spendable-balance": "Доступный баланс",
+    "orchard-confirmed-balance": "Подтвержденный баланс",
     "sapling-title": "SAPLING (Приватный Z-адрес)",
     "sapling-balance": "Общий баланс",
-    "sapling-spendable-balance": "Доступный баланс",
+    "sapling-confirmed-balance": "Подтвержденный баланс",
     "transparent-title": "ПРОЗРАЧНЫЙ (T-адрес)",
     "transparent-balance": "Общий баланс",
     "transparent-confirmed-balance": "Подтвержденный баланс",

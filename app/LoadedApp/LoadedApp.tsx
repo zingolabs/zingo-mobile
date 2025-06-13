@@ -828,7 +828,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           onClickCancel={() => {}}
           action={UfvkActionEnum.view}
           setPrivacyOption={this.setPrivacyOption}
-          setSecurityOption={this.setSecurityOption}
         />
       ),
       { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
@@ -1202,7 +1201,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               onClickCancel={() => {}}
               action={UfvkActionEnum.change}
               setPrivacyOption={this.setPrivacyOption}
-              setSecurityOption={this.setSecurityOption}
             />
           ),
           { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
@@ -1229,7 +1227,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               onClickCancel={() => {}}
               action={UfvkActionEnum.backup}
               setPrivacyOption={this.setPrivacyOption}
-              setSecurityOption={this.setSecurityOption}
             />
           ),
           { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
@@ -1412,7 +1409,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               }}
               action={UfvkActionEnum.server}
               setPrivacyOption={this.setPrivacyOption}
-              setSecurityOption={this.setSecurityOption}
             />
           ),
           { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
@@ -1868,8 +1864,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         if (
           mode === ModeEnum.basic &&
           !!totalBalance &&
-          totalBalance.orchardBal + totalBalance.privateBal > 0 &&
-          totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
+          totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance > 0 &&
+          totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance === 0 &&
           somePending
         ) {
           iconName = faRefresh;
@@ -1915,7 +1911,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   <>
                     {mode === ModeEnum.advanced ||
                     (valueTransfersTotal !== null && valueTransfersTotal > 0) ||
-                    (!readOnly && !!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ? (
+                    (!readOnly && !!totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0) ? (
                       <Tab.Navigator
                         detachInactiveScreens={true}
                         initialRouteName={translate('loadedapp.history-menu') as string}
@@ -1962,10 +1958,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                         {!readOnly &&
                           selectServer !== SelectServerEnum.offline &&
                           (mode === ModeEnum.advanced ||
-                            (!!totalBalance && totalBalance.spendableOrchard + totalBalance.spendablePrivate > 0) ||
+                            (!!totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0) ||
                             (!!totalBalance &&
-                              totalBalance.orchardBal + totalBalance.privateBal > 0 &&
-                              totalBalance.spendableOrchard + totalBalance.spendablePrivate === 0 &&
+                              totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance > 0 &&
+                              totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance === 0 &&
                               somePending)) && (
                             <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                               {() => (

@@ -15,17 +15,17 @@ import {
   AddressKindEnum,
   ButtonTypeEnum,
   ModeEnum,
-  SecurityType,
   SnackbarDurationEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
 } from '../../app/AppState';
 import RegText from './RegText';
 import FadeText from './FadeText';
+import { AddressList } from '../AddressList';
 import { magicModal, MagicModalHideReason, useMagicModal } from 'react-native-magic-modal';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { ExpandableAddress } from './Address/ExpandableAddress';
+import ExpandableAddress from './Address/ExpandableAddress';
 import Button from './Button';
 import { CopyIcon } from './Icons/CopyIcon';
 import { ChevronDown, ChevronUp } from './Icons/Chevron';
@@ -34,18 +34,8 @@ import { XIcon } from './Icons/XIcon';
 import { TriangleAlert } from './Icons/TriangleAlert';
 import { ShieldIcon } from './Icons/ShieldIcon';
 import { ListIcon } from './Icons/ListIcon';
-
-type SingleAddressProps = {
-  address?: UnifiedAddressClass | TransparentAddressClass;
-  ufvk?: string;
-  index: number;
-  total: number;
-  prev: () => void;
-  next: () => void;
-  setSecurityOption: (s: SecurityType) => Promise<void>;
-  newAddressShow?: () => void;
-  changeIndex?: (index: number) => void;
-};
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 
 type ConfirmationModalReturn = {
   success: boolean;
@@ -140,12 +130,25 @@ const handleConfirmationFlow = async (onSuccess: () => void) => {
   onSuccess();
 };
 
+type SingleAddressProps = {
+  address?: UnifiedAddressClass | TransparentAddressClass;
+  ufvk?: string;
+  index: number;
+  setIndex: (i: number) => void;
+  total: number;
+  NAShow?: () => void;
+  VAShow?: () => void;
+  changeIndex?: (index: number) => void;
+};
+
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   address,
   ufvk,
-  newAddressShow,
+  NAShow,
+  VAShow,
   total,
   index,
+  setIndex,
   changeIndex,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -226,6 +229,11 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
     });
   };
 
+  const doAddressList = () => {
+    return magicModal.show(() => <AddressList addressKind={address ? address.addressKind : AddressKindEnum.u} setIndex={setIndex} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
+      .promise;
+  };
+
   function onCopy() {
     addLastSnackbar({
       message: ufvk
@@ -234,13 +242,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
       duration: SnackbarDurationEnum.short,
     });
   }
-
-  const doNothing = () => {
-    addLastSnackbar({
-      message: 'Unimplemented option',
-      duration: SnackbarDurationEnum.short,
-    });
-  };
 
   return (
     <View style={{ flexDirection: 'column', width: '100%' }}>
@@ -468,8 +469,22 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 </TouchableOpacity>
                 {address && !isBasic && (
                   <>
+                    <TouchableOpacity onPress={() => {
+                      VAShow && VAShow();
+                    }}>
+                      <View
+                        style={{
+                          borderRadius: 30,
+                          borderColor: colors.zingo,
+                          paddingHorizontal: 5,
+                          paddingVertical: 5,
+                          marginHorizontal: 10,
+                        }}>
+                        <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={24} icon={faCircleCheck} color={colors.money} />
+                      </View>
+                    </TouchableOpacity>
                     {total > 1 && (
-                      <TouchableOpacity onPress={doNothing}>
+                      <TouchableOpacity onPress={doAddressList}>
                         <View
                           style={{
                             borderRadius: 30,
@@ -486,16 +501,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 )}
               </View>
             </View>
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                gap: 5,
-                alignItems: 'center',
-                marginTop: 10,
-                marginBottom: 20,
-              }}>
+            <View style={{ flexDirection: 'column', width: '100%', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
               <Text
                 style={{
                   color: colors.zingo,
@@ -522,7 +528,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   {isUnified ? (
                     <Button
                       onPress={() => {
-                        newAddressShow && newAddressShow();
+                        NAShow && NAShow();
                       }}
                       title={translate('receive.newu-option') as string}
                       type={ButtonTypeEnum.Primary}
@@ -530,7 +536,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   ) : (
                     <Button
                       onPress={() => {
-                        newAddressShow && newAddressShow();
+                        NAShow && NAShow();
                       }}
                       title={translate('receive.transparent.newt-option') as string}
                       type={ButtonTypeEnum.Tertiary}
