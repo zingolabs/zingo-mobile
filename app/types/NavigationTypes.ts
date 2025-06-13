@@ -5,11 +5,7 @@ import { RouteEnums } from '../AppState';
  * This defines the structure of parameters passed between main app screens
  */
 export type RootStackParamList = {
-  [RouteEnums.LoadingApp]: {
-    screen?: number;
-    biometricsFailed?: boolean;
-    startingApp?: boolean;
-  } | undefined;
+  [RouteEnums.LoadingApp]: LoadedAppNavigationState | undefined;
   [RouteEnums.LoadedApp]: {
     readOnly: boolean;
     orchardPool: boolean;

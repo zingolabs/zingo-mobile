@@ -218,7 +218,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     ).promise;
   };
 
-  const _rowRenderer = (type: string | number, data: ValueTransferType, index: number) => {
+  const rowRenderer = (type: string | number, data: ValueTransferType, index: number) => {
     let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
 
     return (
@@ -356,7 +356,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
               scrollThrottle={100}
               layoutProvider={layoutProvider}
               dataProvider={dataProvider}
-              rowRenderer={_rowRenderer}
+              rowRenderer={rowRenderer}
               onEndReachedThreshold={0.75}
               onEndReached={() => {
                 setShowFooter(true);
