@@ -1,6 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext, useCallback, useRef } from 'react';
-import { View, ScrollView, Keyboard, TextInput, TouchableOpacity, Platform, Text, Alert } from 'react-native';
+import {
+  View,
+  ScrollView,
+  Keyboard,
+  TextInput,
+  TouchableOpacity,
+  Platform,
+  Text,
+  Alert,
+  NativeSyntheticEvent,
+  TextInputEndEditingEventData,
+  TextInputContentSizeChangeEventData,
+} from 'react-native';
 import {
   faQrcode,
   faCheck,
@@ -329,8 +341,11 @@ const Send: React.FunctionComponent<SendProps> = ({
       // spendable TOTAL calculated
       let spendableBalance = totalBalance ? totalBalance.totalSpendableBalance : 0;
       let zenniesForZingo = donationAddress ? false : donation;
-      const runSpendableBalanceStr = await RPCModule.getSpendableBalanceWithAddressInfo(addressPar, zenniesForZingo ? 'true' : 'false');
-      console.log('SPENDABLEBALANCE', addressPar, zenniesForZingo, runSpendableBalanceStr);
+      console.log('SPENDABLEBALANCE', addressPar, zenniesForZingo);
+      const runSpendableBalanceStr = await RPCModule.getSpendableBalanceInfo(
+        addressPar,
+        zenniesForZingo ? 'true' : 'false',
+      );
       if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
         console.log(runSpendableBalanceStr);
@@ -853,41 +868,48 @@ const Send: React.FunctionComponent<SendProps> = ({
     //  }
     //  return;
     //} else {
-      return magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
+    return magicModal.show(
+      () => (
+        <ScannerAddress
+          setAddress={(a: string) => {
             updateToField(a, null, null, null, null);
           }}
-        />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
-      ).promise;
+        />
+      ),
+      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+    ).promise;
     //}
   };
 
   const setMemoModalShow = () => {
-    return magicModal.show(() => <Memo
-        message={memoText}
-        includeUAMessage={includeUAMemoBoolean}
-        setMessage={setMemoText}
-      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
+    return magicModal.show(
+      () => <Memo message={memoText} includeUAMessage={includeUAMemoBoolean} setMessage={setMemoText} />,
+      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
   const setConfirmModalShow = (parseAddressInfoJSON: RPCParseAddressType) => {
-    return magicModal.show(() => <Confirm
-        calculatedFee={fee}
-        parseAddressInfoJSON={parseAddressInfoJSON}
-        donationAmount={
-          donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
-            ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
-            : 0
-        }
-        confirmSend={confirmSend}
-        sendAllAmount={
-          mode !== ModeEnum.basic &&
-          Utils.parseStringLocaleToNumberFloat(amountText) ===
-            Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
-        }
-        calculateFeeWithPropose={calculateFeeWithPropose}
-        sendPageState={buildSendState()}
-      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
+    return magicModal.show(
+      () => (
+        <Confirm
+          calculatedFee={fee}
+          parseAddressInfoJSON={parseAddressInfoJSON}
+          donationAmount={
+            donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+              ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
+              : 0
+          }
+          confirmSend={confirmSend}
+          sendAllAmount={
+            mode !== ModeEnum.basic &&
+            Utils.parseStringLocaleToNumberFloat(amountText) ===
+              Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
+          }
+          calculateFeeWithPropose={calculateFeeWithPropose}
+          sendPageState={buildSendState()}
+        />
+      ),
+      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
@@ -915,7 +937,6 @@ const Send: React.FunctionComponent<SendProps> = ({
         height: '100%',
         marginBottom: 200,
       }}>
-
       <View
         onLayout={e => {
           const { height } = e.nativeEvent.layout;
@@ -945,12 +966,7 @@ const Send: React.FunctionComponent<SendProps> = ({
               <View style={{ display: 'flex', flexDirection: 'row' }}>
                 <RegText style={{ marginRight: 10 }}>{translate('send.toaddress') as string}</RegText>
                 {validAddress === 1 && (
-                  <AddressItem
-                    address={addressText}
-                    oneLine={true}
-                    onlyContact={true}
-                    withIcon={true}
-                  />
+                  <AddressItem address={addressText} oneLine={true} onlyContact={true} withIcon={true} />
                 )}
               </View>
               {validAddress === 1 && (
@@ -1219,7 +1235,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       }}
                       value={amountText}
                       onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null, null)}
-                      onEndEditing={(e: any) => {
+                      onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
                         updateToField(null, e.nativeEvent.text.substring(0, 20), null, null, null);
                         calculateFeeWithPropose(
                           e.nativeEvent.text.substring(0, 20),
@@ -1410,96 +1426,99 @@ const Send: React.FunctionComponent<SendProps> = ({
                 </View>
               </View>
 
-              {(!zecPrice.zecPrice || zecPrice.zecPrice <= 0) && (currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && (
-                <View
-                  style={{
-                    width: '35%',
-                    marginTop: 5,
-                  }}>
-                  <PriceFetcher setZecPrice={setZecPrice} textBefore={translate('send.nofetchprice') as string} />
-                </View>
-              )}
+              {(!zecPrice.zecPrice || zecPrice.zecPrice <= 0) &&
+                (currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && (
+                  <View
+                    style={{
+                      width: '35%',
+                      marginTop: 5,
+                    }}>
+                    <PriceFetcher setZecPrice={setZecPrice} textBefore={translate('send.nofetchprice') as string} />
+                  </View>
+                )}
 
-              {!!zecPrice.zecPrice && zecPrice.zecPrice > 0 && (currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && (
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-start',
-                    width: '35%',
-                  }}>
+              {!!zecPrice.zecPrice &&
+                zecPrice.zecPrice > 0 &&
+                (currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && (
                   <View
                     style={{
                       display: 'flex',
-                      flexDirection: 'row',
+                      flexDirection: 'column',
                       justifyContent: 'flex-start',
+                      width: '35%',
                     }}>
-                    <RegText style={{ marginTop: 17, marginRight: 5 }}>$</RegText>
                     <View
-                      accessible={true}
-                      accessibilityLabel={translate('send.usd-acc') as string}
                       style={{
-                        flexGrow: 1,
-                        borderWidth: 1,
-                        borderRadius: 5,
-                        borderColor: colors.text,
-                        marginTop: 5,
-                        width: '55%',
-                        minWidth: 48,
-                        minHeight: 48,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
                       }}>
-                      <TextInput
-                        placeholder={`#${decimalSeparator}##`}
-                        placeholderTextColor={colors.placeholder}
-                        keyboardType="numeric"
+                      <RegText style={{ marginTop: 17, marginRight: 5 }}>$</RegText>
+                      <View
+                        accessible={true}
+                        accessibilityLabel={translate('send.usd-acc') as string}
                         style={{
-                          color: colors.text,
-                          fontWeight: '600',
-                          fontSize: 16,
+                          flexGrow: 1,
+                          borderWidth: 1,
+                          borderRadius: 5,
+                          borderColor: colors.text,
+                          marginTop: 5,
+                          width: '55%',
                           minWidth: 48,
                           minHeight: 48,
-                          marginLeft: 5,
-                          backgroundColor: 'transparent',
-                        }}
-                        value={amountCurrencyText}
-                        onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null, null)}
-                        onEndEditing={(e: any) => {
-                          updateToField(null, null, e.nativeEvent.text.substring(0, 15), null, null);
-                          // re-calculate the fee with the zec amount in the other field
-                          calculateFeeWithPropose(
-                            amountText,
-                            addressText,
-                            memoText,
-                            includeUAMemoBoolean,
-                            CommandEnum.send,
-                          );
-                        }}
-                        editable={true}
-                        maxLength={15}
-                      />
+                        }}>
+                        <TextInput
+                          placeholder={`#${decimalSeparator}##`}
+                          placeholderTextColor={colors.placeholder}
+                          keyboardType="numeric"
+                          style={{
+                            color: colors.text,
+                            fontWeight: '600',
+                            fontSize: 16,
+                            minWidth: 48,
+                            minHeight: 48,
+                            marginLeft: 5,
+                            backgroundColor: 'transparent',
+                          }}
+                          value={amountCurrencyText}
+                          onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null, null)}
+                          onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
+                            updateToField(null, null, e.nativeEvent.text.substring(0, 15), null, null);
+                            // re-calculate the fee with the zec amount in the other field
+                            calculateFeeWithPropose(
+                              amountText,
+                              addressText,
+                              memoText,
+                              includeUAMemoBoolean,
+                              CommandEnum.send,
+                            );
+                          }}
+                          editable={true}
+                          maxLength={15}
+                        />
+                      </View>
                     </View>
-                  </View>
 
-                  <View style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-                      <RegText style={{ marginTop: 0, fontSize: 12.5 }}>
-                        {translate('send.spendable') as string}
-                      </RegText>
-                      <CurrencyAmount
-                        style={{ marginTop: 1, fontSize: 12.5 }}
-                        price={zecPrice.zecPrice}
-                        amtZec={maxAmount}
-                        currency={CurrencyEnum.USDCurrency}
-                        privacy={privacy}
-                      />
-                    </View>
-                    <View style={{ marginLeft: 5, flexDirection: 'row', justifyContent: 'flex-start' }}>
-                      <View style={{ width: '40%' }} />
-                      <PriceFetcher setZecPrice={setZecPrice} />
+                    <View style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                        <RegText style={{ marginTop: 0, fontSize: 12.5 }}>
+                          {translate('send.spendable') as string}
+                        </RegText>
+                        <CurrencyAmount
+                          style={{ marginTop: 1, fontSize: 12.5 }}
+                          price={zecPrice.zecPrice}
+                          amtZec={maxAmount}
+                          currency={CurrencyEnum.USDCurrency}
+                          privacy={privacy}
+                        />
+                      </View>
+                      <View style={{ marginLeft: 5, flexDirection: 'row', justifyContent: 'flex-start' }}>
+                        <View style={{ width: '40%' }} />
+                        <PriceFetcher setZecPrice={setZecPrice} />
+                      </View>
                     </View>
                   </View>
-                </View>
-              )}
+                )}
             </View>
 
             {memoEnabled === true && (
@@ -1512,7 +1531,9 @@ const Send: React.FunctionComponent<SendProps> = ({
                   }}>
                   <FadeText style={{ marginTop: 6, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <FadeText style={{ marginTop: 6, marginBottom: 5, marginRight: 5 }}>{translate('send.includeua') as string}</FadeText>
+                    <FadeText style={{ marginTop: 6, marginBottom: 5, marginRight: 5 }}>
+                      {translate('send.includeua') as string}
+                    </FadeText>
                     <BouncyCheckbox
                       testID="send.checkboxua"
                       disabled={false}
@@ -1565,7 +1586,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       onChangeText={(text: string) => {
                         updateToField(null, !amountText && !!text ? '0' : null, null, text, null);
                       }}
-                      onEndEditing={(e: any) => {
+                      onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
                         updateToField(
                           null,
                           !amountText && !!e.nativeEvent.text ? '0' : null,
@@ -1581,7 +1602,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           CommandEnum.send,
                         );
                       }}
-                      onContentSizeChange={(e: any) => {
+                      onContentSizeChange={(e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
                         if (
                           e.nativeEvent.contentSize.height >
                             (Platform.OS === GlobalConst.platformOSandroid ? 70 : 35) &&

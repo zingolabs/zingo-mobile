@@ -1,4 +1,3 @@
-
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
   Alert,
@@ -15,7 +14,8 @@ import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
-import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo/src/index';
+import { RootStackParamList } from '../types';
+import NetInfo, { NetInfoSubscription, NetInfoState } from '@react-native-community/netinfo/src/index';
 
 import RPCModule from '../RPCModule';
 import {
@@ -88,8 +88,8 @@ const ru = require('../translations/ru.json');
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 type LoadingAppProps = {
-  navigation: StackScreenProps<any>['navigation'];
-  route: StackScreenProps<any>['route'];
+  navigation: StackScreenProps<RootStackParamList, RouteEnums.LoadingApp>['navigation'];
+  route: StackScreenProps<RootStackParamList, RouteEnums.LoadingApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
 };
 
@@ -207,9 +207,11 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
         //console.log('apploading NO settings', languageTag);
       }
-      if (settings.currency === CurrencyEnum.noCurrency ||
-          settings.currency === CurrencyEnum.USDCurrency ||
-          settings.currency === CurrencyEnum.USDTORCurrency) {
+      if (
+        settings.currency === CurrencyEnum.noCurrency ||
+        settings.currency === CurrencyEnum.USDCurrency ||
+        settings.currency === CurrencyEnum.USDTORCurrency
+      ) {
         setCurrency(settings.currency);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, currency);
@@ -276,9 +278,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   //console.log('render loadingApp - 2', translate('version'));
 
   if (loading) {
-    return (
-      <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
-    );
+    return <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />;
   } else {
     return (
       <LoadingAppClass
@@ -306,8 +306,8 @@ export default function LoadingApp(props: LoadingAppProps) {
 }
 
 type LoadingAppClassProps = {
-  navigationApp: StackScreenProps<any>['navigation'];
-  route: StackScreenProps<any>['route'];
+  navigationApp: StackScreenProps<RootStackParamList, RouteEnums.LoadingApp>['navigation'];
+  route: StackScreenProps<RootStackParamList, RouteEnums.LoadingApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
   theme: ThemeType;
@@ -492,7 +492,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     if (exists && exists !== GlobalConst.false) {
       this.setState({ walletExists: true });
-      let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chainName);
+      let result: string = await RPCModule.loadExistingWallet(
+        this.state.server.uri,
+        this.state.server.chainName,
+        this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false',
+      );
       //let result = 'Error: pepe es guapo';
 
       // for testing
@@ -572,9 +576,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             error = true;
             errorText = resultJson.error;
           }
-        } catch (e: any) {
+        } catch (e: unknown) {
           error = true;
-          errorText = e.toString();
+          errorText = e instanceof Error ? e.message : String(e);
         }
       } else {
         error = true;
@@ -662,7 +666,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       }
     });
 
-    this.unsubscribeNetInfo = NetInfo.addEventListener((state: any) => {
+    this.unsubscribeNetInfo = NetInfo.addEventListener((state: NetInfoState) => {
       const { screen } = this.state;
       const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
       if (
@@ -1007,7 +1011,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     }
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
-      let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chainName);
+      let seed: string = await RPCModule.createNewWallet(
+        this.state.server.uri,
+        this.state.server.chainName,
+        this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false',
+      );
 
       if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
         let seedJSON = {} as RPCSeedType;
@@ -1027,13 +1035,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             );
             return;
           }
-        } catch (e: any) {
+        } catch (e: unknown) {
           this.setState({ actionButtonsDisabled: false });
           createAlert(
             this.setBackgroundError,
             this.addLastSnackbar,
             this.state.translate('loadingapp.creatingwallet-label') as string,
-            e.toString(),
+            e instanceof Error ? e.message : String(e),
             false,
             this.state.translate,
             sendEmail,
@@ -1235,9 +1243,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             error = true;
             errorText = resultJson.error;
           }
-        } catch (e: any) {
+        } catch (e: unknown) {
           error = true;
-          errorText = e.toString();
+          errorText = e instanceof Error ? e.message : String(e);
         }
       } else {
         error = true;
@@ -1403,11 +1411,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     return (
       <ToastProvider>
         <ContextAppLoadingProvider value={context}>
-          <Snackbars
-            snackbars={snackbars}
-            removeFirstSnackbar={this.removeFirstSnackbar}
-            translate={translate}
-          />
+          <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
 
           {screen === 0 && (
             <Launching

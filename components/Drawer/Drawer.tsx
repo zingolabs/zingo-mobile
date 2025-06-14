@@ -7,7 +7,7 @@ import { HideReturn } from 'react-native-magic-modal';
 type DrawerProps = {
   onMenuItemSelected: (i: MenuItemEnum) => Promise<HideReturn<unknown> | undefined>;
   initialRouteName: string;
-  children: any;
+  children: React.ReactNode;
 };
 
 const SideBar = createDrawerNavigator();

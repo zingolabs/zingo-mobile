@@ -9,6 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  TextInputEndEditingEventData,
+  NativeSyntheticEvent,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -38,7 +40,7 @@ type MemoProps = {
 const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, setMessage }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, defaultUnifiedAddress, snackbars, removeFirstSnackbar } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
@@ -69,13 +71,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
           marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
-        }}
-      >
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
+        }}>
+        <Snackbars snackbars={snackbars} removeFirstSnackbar={removeFirstSnackbar} translate={translate} />
 
         <View
           style={{
@@ -135,7 +132,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
                 }}
                 value={memo}
                 onChangeText={(text: string) => setMemo(text)}
-                onEndEditing={(e: any) => setMemo(e.nativeEvent.text)}
+                onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => setMemo(e.nativeEvent.text)}
                 maxLength={GlobalConst.memoMaxLength}
               />
               {memo && (

@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { render } from '@testing-library/react-native';
+import { render, RenderResult } from '@testing-library/react-native';
 import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
 import AbDetail from '../components/AddressBook/components/AbDetail';
 import { AddressBookActionEnum, AddressBookFileClass } from '../app/AppState';
@@ -21,7 +21,7 @@ describe('Component Address Book Details - test', () => {
   const onCancel = jest.fn();
   const onAction = jest.fn();
   test('Address Book Datails - Add - snapshot', () => {
-    const ab: any = render(
+    const ab: RenderResult = render(
       <ContextAppLoadedProvider value={state}>
         <AbDetail
           index={-1}
@@ -35,7 +35,7 @@ describe('Component Address Book Details - test', () => {
     expect(ab.toJSON()).toMatchSnapshot();
   });
   test('Address Book Datails - Modify - snapshot', () => {
-    const ab: any = render(
+    const ab: RenderResult = render(
       <ContextAppLoadedProvider value={state}>
         <AbDetail
           index={0}
@@ -49,7 +49,7 @@ describe('Component Address Book Details - test', () => {
     expect(ab.toJSON()).toMatchSnapshot();
   });
   test('Address Book Datails - Delete - snapshot', () => {
-    const ab: any = render(
+    const ab: RenderResult = render(
       <ContextAppLoadedProvider value={state}>
         <AbDetail
           index={1}
