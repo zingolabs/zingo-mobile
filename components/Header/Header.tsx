@@ -236,7 +236,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     if (
       !readOnly && setShieldingAmount && selectServer !== SelectServerEnum.offline && somePending
         ? 0
-        : (totalBalance?.confirmedTransparentBalance ? totalBalance.confirmedTransparentBalance : 0) > 0
+        : (totalBalance ? totalBalance.confirmedTransparentBalance : 0) > 0
     ) {
       (async () => {
         let proposeFee = 0;
@@ -277,7 +277,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       setShieldingFee(0);
       setShieldingAmount && setShieldingAmount(0);
     }
-  }, [readOnly, setShieldingAmount, totalBalance?.confirmedTransparentBalance, somePending, selectServer]);
+  }, [readOnly, setShieldingAmount, totalBalance, totalBalance?.confirmedTransparentBalance, somePending, selectServer]);
 
   useEffect(() => {
     setShowShieldButton(
@@ -775,7 +775,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             </View>
           )}
 
-          {receivedLegend && totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0 && (
+          {receivedLegend && totalBalance && totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance > 0 && (
             <View
               style={{
                 flexDirection: 'row',
@@ -788,7 +788,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 currencyName={info.currencyName}
                 color={colors.primary}
                 size={18}
-                amtZec={totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance}
+                amtZec={totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance}
                 privacy={privacy}
               />
               <RegText color={colors.primary}>!!!</RegText>
@@ -854,7 +854,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             {readOnly && !noUfvkIcon && (
               <>
                 {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal <= 0) &&
-                !(mode === ModeEnum.basic && totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance <= 0) ? (
+                !(mode === ModeEnum.basic && totalBalance && totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance <= 0) ? (
                   <TouchableOpacity onPress={() => ufvkShowModal()}>
                     <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
                   </TouchableOpacity>
