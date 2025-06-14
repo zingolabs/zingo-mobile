@@ -14,6 +14,8 @@ import {
   Dimensions,
   Keyboard,
   KeyboardAvoidingView,
+  TextInputEndEditingEventData,
+  TextInputContentSizeChangeEventData,
 } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -778,13 +780,13 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                     setMemo(text);
                   }
                 }}
-                onEndEditing={(e: any) => {
+                onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
                   if (e.nativeEvent.text !== memo) {
                     setMemo(e.nativeEvent.text);
                   }
                 }}
                 editable={!disableSend && spendable > 0}
-                onContentSizeChange={(e: any) => {
+                onContentSizeChange={(e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
                   console.log(e.nativeEvent.contentSize.height);
                   if (e.nativeEvent.contentSize.height < 48) {
                     setMemoFieldHeight(48 + 30);

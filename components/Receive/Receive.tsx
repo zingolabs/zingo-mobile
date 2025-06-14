@@ -161,7 +161,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       route: Route;
     },
   ) => ReactNode = ({ route }) => {
-    let component: any;
+    let component: React.ReactNode;
     switch (route.key) {
       case 'uaddr': {
         let uAddress = new UnifiedAddressClass(

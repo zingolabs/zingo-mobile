@@ -83,8 +83,8 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
         }
       }
     }
-  } catch (error: any) {
-    //console.log('catch', error);
+  } catch (error: unknown) {
+    //console.log('catch', error instanceof Error ? error.message : String(error));
     // I have to restore the old server again. Just in case.
     await RPCModule.changeServerProcess(oldUri);
     // error, YES timeout

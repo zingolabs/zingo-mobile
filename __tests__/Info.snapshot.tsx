@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { render } from '@testing-library/react-native';
+import { render, RenderResult } from '@testing-library/react-native';
 import Info from '../components/Info';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
@@ -22,7 +22,7 @@ describe('Component Info - test', () => {
     state.zecPrice = mockZecPrice;
     state.translate = mockTranslate;
     state.totalBalance = mockTotalBalance;
-    const info: any = render(
+    const info: RenderResult = render(
       <ContextAppLoadedProvider value={state}>
         <Info />
       </ContextAppLoadedProvider>,

@@ -1,6 +1,7 @@
 import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../../app/types';
 
-export const mockNavigation: StackScreenProps<any>['navigation'] = {
+export const mockNavigation: StackScreenProps<RootStackParamList>['navigation'] = {
   // Propiedades y métodos necesarios para la navegación
   navigate: jest.fn(),
   goBack: jest.fn(),

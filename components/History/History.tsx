@@ -1,13 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import {
-  View,
-  ScrollView,
-  RefreshControl,
-  TouchableOpacity,
-  ActivityIndicator,
-  Dimensions,
-} from 'react-native';
+import { View, ScrollView, RefreshControl, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -36,9 +29,10 @@ import Header from '../Header';
 import { MessagesAddress } from '../Messages';
 import Utils from '../../app/utils';
 import { magicModal } from 'react-native-magic-modal';
-import { DataProvider, RecyclerListView, LayoutProvider } from 'recyclerlistview';
+import { DataProvider, RecyclerListView, LayoutProvider, RecyclerListViewProps } from 'recyclerlistview';
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
 import { isEqual } from 'lodash';
+import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -89,7 +83,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     doRefresh,
     zenniesDonationAddress,
   } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
 
   const [numVt, setNumVt] = useState<number>(50);
@@ -100,39 +94,44 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
   const [showFooter, setShowFooter] = useState<boolean>(false);
-  const scrollViewRef = useRef<RecyclerListView<any, any>>(null);
+  const scrollViewRef = useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(null);
 
-  const layoutProvider = useMemo(() => new LayoutProvider(
-    (index: number) => {
-      if (index === 0) {
-        return ViewTypes.WITH_MONTH;
-      }
-      const lastData = valueTransfersSliced[index - 1];
-      let lasttxmonth = lastData && lastData.time ? moment(lastData.time * 1000).format('MMM YYYY') : '--- ----';
+  const layoutProvider = useMemo(
+    () =>
+      new LayoutProvider(
+        (index: number) => {
+          if (index === 0) {
+            return ViewTypes.WITH_MONTH;
+          }
+          const lastData = valueTransfersSliced[index - 1];
+          let lasttxmonth = lastData && lastData.time ? moment(lastData.time * 1000).format('MMM YYYY') : '--- ----';
 
-      const data = valueTransfersSliced[index];
-      let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
+          const data = valueTransfersSliced[index];
+          let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
 
-      if (txmonth !== lasttxmonth) {
-        return ViewTypes.WITH_MONTH;
-      } else {
-        return ViewTypes.WITHOUT_MONTH;
-      }
-    },
-    (type, dim) => {
-      if (type === ViewTypes.WITHOUT_MONTH) {
-        dim.width = Dimensions.get('window').width;
-        dim.height = 65;
-      } else if (type === ViewTypes.WITH_MONTH) {
-        dim.width = Dimensions.get('window').width;
-        dim.height = 95;
-      }
-    },
-  ), [valueTransfersSliced]);
+          if (txmonth !== lasttxmonth) {
+            return ViewTypes.WITH_MONTH;
+          } else {
+            return ViewTypes.WITHOUT_MONTH;
+          }
+        },
+        (type, dim) => {
+          if (type === ViewTypes.WITHOUT_MONTH) {
+            dim.width = Dimensions.get('window').width;
+            dim.height = 65;
+          } else if (type === ViewTypes.WITH_MONTH) {
+            dim.width = Dimensions.get('window').width;
+            dim.height = 95;
+          }
+        },
+      ),
+    [valueTransfersSliced],
+  );
 
-  const _dataProvider = useMemo(() => new DataProvider(
-    (r1: ValueTransferType, r2: ValueTransferType) => !isEqual(r1, r2)
-  ), []);
+  const _dataProvider = useMemo(
+    () => new DataProvider((r1: ValueTransferType, r2: ValueTransferType) => !isEqual(r1, r2)),
+    [],
+  );
 
   const [dataProvider, setDataProvider] = useState<DataProvider>(_dataProvider);
 
@@ -141,8 +140,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
       return [] as ValueTransferType[];
     }
     // strictly show VT's with some amount on funds.
-    return valueTransfers
-      .filter((vt: ValueTransferType) => (filter === FilterEnum.withFunds ? vt.amount > 0 : true));
+    return valueTransfers.filter((vt: ValueTransferType) => (filter === FilterEnum.withFunds ? vt.amount > 0 : true));
   }, [valueTransfers, filter]);
 
   useEffect(() => {
@@ -152,7 +150,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
       setLoadMoreButton(numVt < vtf.length);
       const vtfs = vtf.slice(0, numVt);
       setValueTransfersSliced(vtfs);
-      setDataProvider((data) => data.cloneWithRows(vtfs));
+      setDataProvider(data => data.cloneWithRows(vtfs));
       setTimeout(() => {
         setLoading(false);
       }, 500);
@@ -163,7 +161,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     setLoadMoreButton(numVt < valueTransfersFiltered.length);
     const vtfs = valueTransfersFiltered.slice(0, numVt);
     setValueTransfersSliced(vtfs);
-    setDataProvider((data) => data.cloneWithRows(vtfs));
+    setDataProvider(data => data.cloneWithRows(vtfs));
   }, [numVt, valueTransfersFiltered]);
 
   useEffect(() => {
@@ -190,44 +188,52 @@ const History: React.FunctionComponent<HistoryProps> = ({
   };
 
   const setValueTransferDetailModalShow = (index: number, vt: ValueTransferType) => {
-    return magicModal.show(() => <ValueTransferDetail
-        index={index}
-        vt={vt}
-        valueTransfersSliced={valueTransfersSliced}
-        totalLength={valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0}
-        setPrivacyOption={setPrivacyOption}
-      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
+    return magicModal.show(
+      () => (
+        <ValueTransferDetail
+          index={index}
+          vt={vt}
+          valueTransfersSliced={valueTransfersSliced}
+          totalLength={valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0}
+          setPrivacyOption={setPrivacyOption}
+        />
+      ),
+      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
   const setMessagesAddressModalShow = (vt: ValueTransferType) => {
-    return magicModal.show(() => <MessagesAddress
-        setPrivacyOption={setPrivacyOption}
-        setScrollToBottom={setScrollToBottom}
-        scrollToBottom={scrollToBottom}
-        address={Utils.messagesAddress(vt)}
-        sendTransaction={sendTransaction}
-        setServerOption={setServerOption}
-      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
+    return magicModal.show(
+      () => (
+        <MessagesAddress
+          setPrivacyOption={setPrivacyOption}
+          setScrollToBottom={setScrollToBottom}
+          scrollToBottom={scrollToBottom}
+          address={Utils.messagesAddress(vt)}
+          sendTransaction={sendTransaction}
+          setServerOption={setServerOption}
+        />
+      ),
+      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
-  const _rowRenderer = (type: any, data: ValueTransferType, index: number) => {
+  const rowRenderer = (type: string | number, data: ValueTransferType, index: number) => {
     let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
 
-    return <ValueTransferLine
-      index={index}
-      vt={data}
-      month={type === ViewTypes.WITH_MONTH ? txmonth : ''}
-      setValueTransferDetailModalShow={setValueTransferDetailModalShow}
-      nextLineWithSameTxid={
-        index >= valueTransfersSliced.length - 1
-          ? false
-          : valueTransfersSliced[index + 1].txid === data.txid
-      }
-      setMessagesAddressModalShow={setMessagesAddressModalShow}
-      addressProtected={data.address === zenniesDonationAddress}
-    />;
+    return (
+      <ValueTransferLine
+        index={index}
+        vt={data}
+        month={type === ViewTypes.WITH_MONTH ? txmonth : ''}
+        setValueTransferDetailModalShow={setValueTransferDetailModalShow}
+        nextLineWithSameTxid={
+          index >= valueTransfersSliced.length - 1 ? false : valueTransfersSliced[index + 1].txid === data.txid
+        }
+        setMessagesAddressModalShow={setMessagesAddressModalShow}
+        addressProtected={data.address === zenniesDonationAddress}
+      />
+    );
   };
 
   //console.log('render History - 4', valueTransfers?.length);
@@ -327,8 +333,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
       ) : (
         <>
-          {valueTransfersSliced &&
-            valueTransfersSliced.length > 0 && (
+          {valueTransfersSliced && valueTransfersSliced.length > 0 && (
             <RecyclerListView
               ref={scrollViewRef}
               renderAheadOffset={1000}
@@ -351,7 +356,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
               scrollThrottle={100}
               layoutProvider={layoutProvider}
               dataProvider={dataProvider}
-              rowRenderer={_rowRenderer}
+              rowRenderer={rowRenderer}
               onEndReachedThreshold={0.75}
               onEndReached={() => {
                 setShowFooter(true);
@@ -387,7 +392,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
                                 marginTop: 20,
                                 marginBottom: 60,
                               }}>
-                              <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
+                              <FadeText style={{ color: colors.primary }}>
+                                {translate('history.end') as string}
+                              </FadeText>
                             </View>
                           ) : (
                             <View
@@ -397,7 +404,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
                                 justifyContent: 'flex-start',
                                 marginTop: 10,
                               }}>
-                              <FadeText style={{ color: colors.primary }}>{translate('history.empty') as string}</FadeText>
+                              <FadeText style={{ color: colors.primary }}>
+                                {translate('history.empty') as string}
+                              </FadeText>
                             </View>
                           )}
                         </>
@@ -406,8 +415,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
                   ) : null}
                 </>
               )}
-            />)
-          }
+            />
+          )}
           {!isAtTop && (
             <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 10 }}>
               <FontAwesomeIcon

@@ -49,7 +49,7 @@ type InsightProps = {
 const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, privacy, addLastSnackbar, language, snackbars, removeFirstSnackbar } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
@@ -84,7 +84,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
         default:
           break;
       }
-      let resultJSON: any;
+      let resultJSON: Record<string, unknown>;
       try {
         resultJSON = await JSON.parse(resultStr);
       } catch (e) {
@@ -174,12 +174,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
                   flexWrap: 'wrap',
                 }}>
                 {item.address !== 'fee' && (
-                  <AddressItem
-                    address={item.address}
-                    oneLine={true}
-                    onlyContact={true}
-                    withIcon={true}
-                  />
+                  <AddressItem address={item.address} oneLine={true} onlyContact={true} withIcon={true} />
                 )}
                 {!expandAddress[index] && !!item.address && (
                   <RegText>
@@ -234,7 +229,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
         {item?.value}
       </SvgText>
     ),
-    []
+    [],
   );
 
   //console.log('render insight');
@@ -250,11 +245,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
+        <Snackbars snackbars={snackbars} removeFirstSnackbar={removeFirstSnackbar} translate={translate} />
 
         <Header
           title={translate('insight.title') as string}

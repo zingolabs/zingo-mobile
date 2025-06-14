@@ -19,6 +19,7 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
+import { LoadedAppNavigationState } from '../types';
 import ValueTransferType from './types/ValueTransferType';
 import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
 import { HideReturn } from 'react-native-magic-modal';
@@ -90,7 +91,7 @@ export default interface AppContextLoaded {
   removeFirstSnackbar: () => void;
 
   // if the App is stalled - restart is fired
-  restartApp: (s: any) => void;
+  restartApp: (s: LoadedAppNavigationState) => void;
 
   // some ValueTransfer is pending?
   somePending: boolean;
