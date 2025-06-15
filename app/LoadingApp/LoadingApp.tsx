@@ -83,6 +83,7 @@ const en = require('../translations/en.json');
 const es = require('../translations/es.json');
 const pt = require('../translations/pt.json');
 const ru = require('../translations/ru.json');
+const tr = require('../translations/tr.json');
 
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -130,6 +131,7 @@ export default function LoadingApp(props: LoadingAppProps) {
       es: es,
       pt: pt,
       ru: ru,
+      tr: tr,
     }),
     [],
   );
@@ -189,7 +191,8 @@ export default function LoadingApp(props: LoadingAppProps) {
         settings.language === LanguageEnum.en ||
         settings.language === LanguageEnum.es ||
         settings.language === LanguageEnum.pt ||
-        settings.language === LanguageEnum.ru
+        settings.language === LanguageEnum.ru ||
+        settings.language === LanguageEnum.tr
       ) {
         setLanguage(settings.language);
         i18n.locale = settings.language;
@@ -199,7 +202,8 @@ export default function LoadingApp(props: LoadingAppProps) {
           languageTag === LanguageEnum.en ||
           languageTag === LanguageEnum.es ||
           languageTag === LanguageEnum.pt ||
-          languageTag === LanguageEnum.ru
+          languageTag === LanguageEnum.ru ||
+          languageTag === LanguageEnum.tr
             ? (languageTag as LanguageEnum)
             : (fallback.languageTag as LanguageEnum);
         setLanguage(lang);

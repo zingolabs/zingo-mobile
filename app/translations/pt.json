@@ -221,19 +221,23 @@
     "languages": [
       {
         "value": "en",
-        "text": "Todas as informações estarão em inglês."
+        "text": "Todas as informações estarão em Inglês."
       },
       {
         "value": "es",
-        "text": "Todas as informações estarão em espanhol."
+        "text": "Todas as informações estarão em Espanhol."
       },
       {
         "value": "pt",
-        "text": "Todas as informações estarão em português."
+        "text": "Todas as informações estarão em Português."
       },
       {
         "value": "ru",
-        "text": "Todas as informações estarão em russo."
+        "text": "Todas as informações estarão em Russo."
+      },
+      {
+        "value": "tr",
+        "text": "Todas as informações estarão em Turco."
       }
     ],
     "sendalls": [
@@ -375,7 +379,8 @@
     "select-placeholder": "Escolha um Servidor...",
     "value-language-ru": "Russo",
     "walletkeyssaved": "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo.",
-    "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!"
+    "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!",
+    "value-language-tr": "Turco"
   },
   "info": {
     "version": "Versão",

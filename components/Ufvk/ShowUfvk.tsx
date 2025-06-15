@@ -14,6 +14,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 import RegText from '../Components/RegText';
 import { ButtonTypeEnum, ChainNameEnum, ModeEnum, UfvkActionEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
