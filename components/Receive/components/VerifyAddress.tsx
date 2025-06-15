@@ -3,11 +3,7 @@ import React, { useContext, useState } from 'react';
 import { View, TouchableOpacity, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import {
-  ButtonTypeEnum,
-  GlobalConst,
-  SnackbarDurationEnum,
-} from '../../../app/AppState';
+import { ButtonTypeEnum, GlobalConst, SnackbarDurationEnum } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
@@ -24,16 +20,16 @@ import TextInputAddress from '../../Components/TextInputAddress';
 import FadeText from '../../Components/FadeText';
 import RegText from '../../Components/RegText';
 import { RPCCheckAddressType } from '../../../app/rpc/types/RPCCheckAddressType';
+import { VerifyCheckIcon } from '../../Components/Icons/VerifyCheckIcon';
+import { VerifyXIcon } from '../../Components/Icons/VerifyXIcon';
 
 type VerifyAddressProps = {
   closeSheet: () => void;
 };
-const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
-  closeSheet,
-}) => {
+const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, addLastSnackbar, server } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
   const { clear } = useToast();
 
@@ -71,7 +67,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
     clear();
   };
 
-    const updateAddress = async (addr: string) => {
+  const updateAddress = async (addr: string) => {
     if (!addr) {
       setAddress('');
       return;
@@ -100,9 +96,10 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   };
 
   return (
-    <View style={{
-      backgroundColor: colors.background,
-    }}>
+    <View
+      style={{
+        backgroundColor: colors.background,
+      }}>
       <TouchableOpacity
         onPress={() => {
           setAddress('');
@@ -111,9 +108,13 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
           setTimeout(() => {
             closeSheet();
           }, 100);
-        }}
-      >
-        <FontAwesomeIcon size={30} icon={faXmark} color={colors.text} style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }} />
+        }}>
+        <FontAwesomeIcon
+          size={30}
+          icon={faXmark}
+          color={colors.text}
+          style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
+        />
       </TouchableOpacity>
       <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>
         {translate('receive.verify') as string}
@@ -125,7 +126,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
         disabled={false}
         showLabel={false}
       />
-      {(!!errorAddress) && (
+      {!!errorAddress && (
         <View
           style={{
             flexGrow: 1,
@@ -137,7 +138,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
           <FadeText style={{ color: colors.primary }}>{errorAddress}</FadeText>
         </View>
       )}
-      {(verifyOK !== null) && (
+      {verifyOK !== null && (
         <View
           style={{
             flexGrow: 1,
@@ -146,11 +147,20 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
             alignItems: 'center',
             marginVertical: 5,
           }}>
-          <FadeText style={{ color: colors.primary }}>{verifyOK ? 'good' : 'bad'}</FadeText>
+          {verifyOK ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '90%' }}>
+              <VerifyCheckIcon color={colors.primary} style={{ marginRight: 10 }} />
+              <FadeText style={{ color: colors.text }}>{translate('receive.verification-success') as string}</FadeText>
+            </View>
+          ) : (
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '90%' }}>
+              <VerifyXIcon color={colors.danger.primary} style={{ marginRight: 10 }} />
+              <FadeText style={{ color: colors.text }}>{translate('receive.verification-failure') as string}</FadeText>
+            </View>
+          )}
         </View>
       )}
-      <View
-        style={{ display: 'flex', flexDirection: 'column', margin: 0 }}>
+      <View style={{ display: 'flex', flexDirection: 'column', margin: 0 }}>
         <View
           style={{
             flexGrow: 1,
