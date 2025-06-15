@@ -13,13 +13,9 @@ type DefaultModalProps = {
   address: string;
   onClose: () => void;
   onCopy?: () => void;
-}
+};
 
-const DefaultModal: React.FunctionComponent<DefaultModalProps> = ({
-  address,
-  onClose,
-  onCopy,
-}) => {
+const DefaultModal: React.FunctionComponent<DefaultModalProps> = ({ address, onClose, onCopy }) => {
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme() as unknown as ThemeType;
 
@@ -67,6 +63,7 @@ const DefaultModal: React.FunctionComponent<DefaultModalProps> = ({
             onPress={() => {
               Clipboard.setString(address);
               onCopy && onCopy();
+              onClose();
             }}
             style={{
               borderColor: '#3B4B5F',
@@ -89,7 +86,7 @@ type ExpandableAddressProps = {
   style?: TextStyle;
   renderModal?: (onClose: () => void) => React.ReactNode;
   onCopy?: () => void;
-}
+};
 
 const ExpandableAddress: React.FunctionComponent<ExpandableAddressProps> = ({
   address,
@@ -97,16 +94,11 @@ const ExpandableAddress: React.FunctionComponent<ExpandableAddressProps> = ({
   renderModal,
   onCopy,
 }) => {
-
   const onClose = () => magicModal.hide({ reason: MagicModalHideReason.INTENTIONAL_HIDE });
 
   const onExpand = async () => {
     return magicModal.show(
-      () => (
-        renderModal
-          ? renderModal(onClose)
-          : <DefaultModal address={address} onClose={onClose} onCopy={onCopy} />
-      ),
+      () => (renderModal ? renderModal(onClose) : <DefaultModal address={address} onClose={onClose} onCopy={onCopy} />),
       {},
     ).promise;
   };
