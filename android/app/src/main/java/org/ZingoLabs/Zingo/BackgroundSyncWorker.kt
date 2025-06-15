@@ -40,7 +40,7 @@ data class SyncComplete (
     val blocks_scanned : Long,
     val sapling_outputs_scanned : Long,
     val orchard_outputs_scanned : Long,
-    val percentage_total_outputs_scanned : Long
+    val percentage_total_outputs_scanned : Double
 )
 
 data class SyncPoll (

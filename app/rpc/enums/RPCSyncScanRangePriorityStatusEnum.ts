@@ -1,5 +1,5 @@
 export enum RPCSyncScanRangePriorityStatusEnum {
-  Ignored = 'Ignored',
+  Scanning = 'Scanning',
   Scanned = 'Scanned',
   Historic = 'Historic',
   OpenAdjacent = 'OpenAdjacent',

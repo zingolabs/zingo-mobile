@@ -495,7 +495,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       let result: string = await RPCModule.loadExistingWallet(
         this.state.server.uri,
         this.state.server.chainName,
-        this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false',
       );
       //let result = 'Error: pepe es guapo';
 
@@ -1014,7 +1013,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       let seed: string = await RPCModule.createNewWallet(
         this.state.server.uri,
         this.state.server.chainName,
-        this.state.currency === CurrencyEnum.USDTORCurrency ? 'true' : 'false',
       );
 
       if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {

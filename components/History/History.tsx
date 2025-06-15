@@ -336,7 +336,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
           {valueTransfersSliced && valueTransfersSliced.length > 0 && (
             <RecyclerListView
               ref={scrollViewRef}
-              renderAheadOffset={1000}
+              renderAheadOffset={500}
               scrollViewProps={{
                 refreshControl: (
                   <RefreshControl

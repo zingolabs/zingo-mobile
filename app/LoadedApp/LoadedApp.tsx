@@ -1865,8 +1865,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         if (
           mode === ModeEnum.basic &&
           !!totalBalance &&
-          totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance > 0 &&
-          totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance === 0 &&
+          (
+            (totalBalance.totalOrchardBalance > 0 && totalBalance.confirmedOrchardBalance === 0) ||
+            (totalBalance.totalSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === 0)
+          ) &&
           somePending
         ) {
           iconName = faRefresh;
@@ -1961,8 +1963,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                           (mode === ModeEnum.advanced ||
                             (!!totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0) ||
                             (!!totalBalance &&
-                              totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance > 0 &&
-                              totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance === 0 &&
+                              (
+                                (totalBalance.totalOrchardBalance > 0 && totalBalance.confirmedOrchardBalance === 0) ||
+                                (totalBalance.totalSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === 0)
+                              ) &&
                               somePending)) && (
                             <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                               {() => (
