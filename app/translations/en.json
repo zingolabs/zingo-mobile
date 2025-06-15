@@ -531,7 +531,9 @@
         "button": "Switch to Shielded Addresses (Recommended)"
       },
       "new-error": "Transparent address generation failed. Latest transparent address has not received funds."
-    }
+    },
+    "verification-success": "This address belongs to you and is safe for receiving funds.",
+    "verification-failure": "This address does not belong to you."
   },
   "history": {
     "shield-all": "Shield All funds",
