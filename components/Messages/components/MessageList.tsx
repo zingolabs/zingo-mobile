@@ -139,11 +139,11 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   };
 
   const getLabelAndColor = (addr: string) => {
-    const contacto = addressBook.filter((ab: AddressBookFileClass) => ab.address === addr);
+    const contact = addressBook.filter((ab: AddressBookFileClass) => ab.address === addr);
     let initials = null;
     let color = '';
-    if (contacto.length === 1) {
-      const words = contacto[0].label
+    if (contact.length === 1) {
+      const words = contact[0].label
         .trim()
         .split(' ')
         .filter((w: string) => !!w);
@@ -154,7 +154,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       if (words[1]) {
         initials = initials + words[1].charAt(0).toUpperCase();
       }
-      color = contacto[0].color ? contacto[0].color : Utils.generateColorList(1)[0];
+      color = contact[0].color ? contact[0].color : Utils.generateColorList(1)[0];
     }
     return { initials, color };
   };

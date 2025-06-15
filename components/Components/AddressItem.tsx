@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { ContextAppLoaded } from '../../app/context';
 import RegText from './RegText';
@@ -66,6 +66,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   const [numLinesAddress, setNumLinesAddress] = useState<number>(0);
   const [numLinesContact, setNumLinesContact] = useState<number>(0);
   const [contact, setContact] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const numLinesAdd = address ? (address.length < 50 ? 2 : address.length / 30) : 0;
@@ -77,6 +78,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     setNumLinesAddress(numLinesAdd);
     setNumLinesContact(numLinesCon);
     setContact(cont);
+    setLoading(false);
     // the address prop make no sense that it is going to change,
     // but the address book can change in any moment.
   }, [address, addressBook]);
@@ -92,112 +94,118 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   //console.log('addressItem - render');
 
   return (
-    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
-      <View
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          marginRight: onlyContact ? 0 : 10,
-        }}>
-        {contact && (
-          <TouchableOpacity
-            onPress={() => {
-              setExpandContact(true);
-              if (privacy) {
-                setTimeout(() => {
-                  setExpandContact(false);
-                }, 5 * 1000);
-              }
-            }}>
-            <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
-              {!expandContact && numLinesContact > 1 && <RegText>{Utils.trimToSmall(contact, 7)}</RegText>}
-              {!expandContact && numLinesContact === 1 && <RegText>{contact}</RegText>}
-              {expandContact &&
-                Utils.splitStringIntoChunks(contact, Number(numLinesContact.toFixed(0))).map(
-                  (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
-                )}
-            </View>
-          </TouchableOpacity>
-        )}
-        {(!oneLine || (oneLine && !contact)) && !onlyContact && (
-          <TouchableOpacity
-            onPress={() => {
-              if (address && !oneLine && !addressProtected) {
-                Clipboard.setString(address);
-                addLastSnackbar({
-                  message: ufvk
-                    ? (translate('seed.tapcopy-ufvk-message') as string)
-                    : (translate('history.addresscopied') as string),
-                  duration: SnackbarDurationEnum.short,
-                });
-                setExpandAddress(true);
-                if (privacy) {
-                  setTimeout(() => {
-                    setExpandAddress(false);
-                  }, 5 * 1000);
-                }
-              }
-            }}>
-            <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
-              {!address && <RegText>{'Unknown'}</RegText>}
-              {!expandAddress && !!address && <RegText>{Utils.trimToSmall(address, 7)}</RegText>}
-              {expandAddress &&
-                !!address &&
-                Utils.splitStringIntoChunks(address, Number(numLinesAddress.toFixed(0))).map(
-                  (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
-                )}
-            </View>
-          </TouchableOpacity>
-        )}
-      </View>
-      {withIcon && !contact && oneLine && (
-        <TouchableOpacity onPress={() => launchAddressBook(address)}>
+    <>
+      {loading ? (
+        <ActivityIndicator size="small" color={colors.primary} />
+      ) : (
+        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingHorizontal: 4,
-              paddingBottom: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              marginRight: onlyContact ? 0 : 10,
             }}>
-            <FontAwesomeIcon style={{ marginTop: 3 }} size={25} icon={faUserPlus} color={colors.primary} />
+            {contact && (
+              <TouchableOpacity
+                onPress={() => {
+                  setExpandContact(true);
+                  if (privacy) {
+                    setTimeout(() => {
+                      setExpandContact(false);
+                    }, 5 * 1000);
+                  }
+                }}>
+                <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
+                  {!expandContact && numLinesContact > 1 && <RegText>{Utils.trimToSmall(contact, 7)}</RegText>}
+                  {!expandContact && numLinesContact === 1 && <RegText>{contact}</RegText>}
+                  {expandContact &&
+                    Utils.splitStringIntoChunks(contact, Number(numLinesContact.toFixed(0))).map(
+                      (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
+                    )}
+                </View>
+              </TouchableOpacity>
+            )}
+            {(!oneLine || (oneLine && !contact)) && !onlyContact && (
+              <TouchableOpacity
+                onPress={() => {
+                  if (address && !oneLine && !addressProtected) {
+                    Clipboard.setString(address);
+                    addLastSnackbar({
+                      message: ufvk
+                        ? (translate('seed.tapcopy-ufvk-message') as string)
+                        : (translate('history.addresscopied') as string),
+                      duration: SnackbarDurationEnum.short,
+                    });
+                    setExpandAddress(true);
+                    if (privacy) {
+                      setTimeout(() => {
+                        setExpandAddress(false);
+                      }, 5 * 1000);
+                    }
+                  }
+                }}>
+                <View style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap' }}>
+                  {!address && <RegText>{'Unknown'}</RegText>}
+                  {!expandAddress && !!address && <RegText>{Utils.trimToSmall(address, 7)}</RegText>}
+                  {expandAddress &&
+                    !!address &&
+                    Utils.splitStringIntoChunks(address, Number(numLinesAddress.toFixed(0))).map(
+                      (c: string, idx: number) => <RegText key={idx}>{c}</RegText>,
+                    )}
+                </View>
+              </TouchableOpacity>
+            )}
           </View>
-        </TouchableOpacity>
+          {withIcon && !contact && oneLine && (
+            <TouchableOpacity onPress={() => launchAddressBook(address)}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingHorizontal: 4,
+                  paddingBottom: 2,
+                }}>
+                <FontAwesomeIcon style={{ marginTop: 3 }} size={25} icon={faUserPlus} color={colors.primary} />
+              </View>
+            </TouchableOpacity>
+          )}
+          {withIcon && !contact && !oneLine && (
+            <TouchableOpacity onPress={() => launchAddressBook(address)}>
+              <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faUserPlus} color={colors.primary} />
+            </TouchableOpacity>
+          )}
+          {withSendIcon &&
+            !addressProtected &&
+            contact &&
+            !readOnly &&
+            selectServer !== SelectServerEnum.offline &&
+            !(
+              mode === ModeEnum.basic &&
+              totalBalance &&
+              // because the action is related with `send`.
+              totalBalance.totalSpendableBalance <= 0
+            ) && (
+              <TouchableOpacity
+                style={{ marginLeft: 10 }}
+                onPress={() => {
+                  // enviar
+                  const sendPageState = new SendPageStateClass(new ToAddrClass(0));
+                  sendPageState.toaddr.to = address;
+                  setSendPageState(sendPageState);
+                  closeAllModals();
+                  navigationHome?.navigate(RouteEnums.Home, {
+                    screen: translate('loadedapp.send-menu'),
+                    initial: false,
+                  });
+                }}>
+                <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faPaperPlane} color={colors.primary} />
+              </TouchableOpacity>
+            )}
+        </View>
       )}
-      {withIcon && !contact && !oneLine && (
-        <TouchableOpacity onPress={() => launchAddressBook(address)}>
-          <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faUserPlus} color={colors.primary} />
-        </TouchableOpacity>
-      )}
-      {withSendIcon &&
-        !addressProtected &&
-        contact &&
-        !readOnly &&
-        selectServer !== SelectServerEnum.offline &&
-        !(
-          mode === ModeEnum.basic &&
-          totalBalance &&
-          // because the action is related with `send`.
-          totalBalance.totalSpendableBalance <= 0
-        ) && (
-          <TouchableOpacity
-            style={{ marginLeft: 10 }}
-            onPress={() => {
-              // enviar
-              const sendPageState = new SendPageStateClass(new ToAddrClass(0));
-              sendPageState.toaddr.to = address;
-              setSendPageState(sendPageState);
-              closeAllModals();
-              navigationHome?.navigate(RouteEnums.Home, {
-                screen: translate('loadedapp.send-menu'),
-                initial: false,
-              });
-            }}>
-            <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faPaperPlane} color={colors.primary} />
-          </TouchableOpacity>
-        )}
-    </View>
+    </>
   );
 };
 
