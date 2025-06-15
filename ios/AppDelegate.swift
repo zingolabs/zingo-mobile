@@ -18,7 +18,7 @@ struct SyncComplete: Decodable {
     let blocks_scanned: Int64
     let sapling_outputs_scanned: Int64
     let orchard_outputs_scanned: Int64
-    let percentage_total_outputs_scanned: Int64
+    let percentage_total_outputs_scanned: Double
 }
 
 struct SyncPoll: Decodable {
