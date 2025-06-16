@@ -6,7 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
-import { ThemeType } from './app/types';
+import { ThemeType, RootStackParamList } from './app/types';
 import { ModeEnum, RouteEnums } from './app/AppState';
 
 import { LogBox, StatusBar } from 'react-native';
@@ -114,7 +114,7 @@ const basicTheme: ThemeType = {
   },
 };
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
 
 const App: React.FunctionComponent = () => {
   const [theme, setTheme] = useState<ThemeType>(advancedTheme);

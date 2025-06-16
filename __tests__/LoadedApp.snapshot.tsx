@@ -14,8 +14,8 @@ import { I18n } from 'i18n-js';
 import { LanguageEnum, ModeEnum, SelectServerEnum, CurrencyEnum } from '../app/AppState';
 import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
-import { mockNavigation } from '../__mocks__/dataMocks/mockNavigation';
-import { mockRoute } from '../__mocks__/dataMocks/mockRoute';
+import { mockLoadedAppNavigation } from '../__mocks__/dataMocks/mockLoadedAppNavigation';
+import { mockLoadedAppRoute } from '../__mocks__/dataMocks/mockLoadedAppRoute';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockBackground } from '../__mocks__/dataMocks/mockBackground';
 import { mockSecurity } from '../__mocks__/dataMocks/mockSecurity';
@@ -42,8 +42,8 @@ describe('Component LoadedApp - test', () => {
     const zenniesDonationAddress = 'xxxxxxxxxxxxxxxxx';
     const loadedapp = render(
       <LoadedAppClass
-        navigationApp={mockNavigation}
-        route={mockRoute}
+        navigationApp={mockLoadedAppNavigation}
+        route={mockLoadedAppRoute}
         toggleTheme={toggleTheme}
         translate={mockTranslate}
         theme={mockTheme}
