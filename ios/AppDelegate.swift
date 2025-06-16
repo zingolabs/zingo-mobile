@@ -21,8 +21,19 @@ struct SyncComplete: Decodable {
     let percentage_total_outputs_scanned: Double
 }
 
-struct SyncPoll: Decodable {
-    let sync_complete: SyncComplete
+struct SyncStatus: Decodable {
+    let scan_ranges: String
+    let sync_start_height: Int64
+    let session_blocks_scanned: Int64
+    let total_blocks_scanned: Int64
+    let percentage_session_blocks_scanned: Double
+    let percentage_total_blocks_scanned: Double
+    let session_sapling_outputs_scanned: Int64
+    let total_sapling_outputs_scanned: Int64
+    let session_orchard_outputs_scanned: Int64
+    let total_orchard_outputs_scanned: Int64
+    let percentage_session_outputs_scanned: Double
+    let percentage_total_outputs_scanned: Double
 }
 
 @UIApplicationMain
@@ -329,29 +340,27 @@ extension AppDelegate {
             let syncingStr = String(syncing)
             NSLog("BGTask syncingProcessBackgroundTask - sync LAUNCH \(syncingStr)")
 
-            var syncPoll: SyncPoll?
+            var syncStatus: SyncStatus?
             while true {
-                let syncPollJson = pollSync()
-                NSLog("BGTask syncingProcessBackgroundTask - sync POLL \(syncPollJson)")
+                let syncStatusJson = statusSync()
+                NSLog("BGTask syncingProcessBackgroundTask - sync POLL \(syncStatusJson)")
                 
-                if syncPollJson.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-                    NSLog("BGTask syncingProcessBackgroundTask - sync POLL ERROR")
+                if syncStatusJson.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
+                    NSLog("BGTask syncingProcessBackgroundTask - sync STATUS ERROR")
                     break
                 }
 
-                if !syncPollJson.lowercased().hasPrefix(Constants.SyncPrefix.rawValue) {
-                    do {
-                        let data = syncPollJson.data(using: .utf8)!
-                        syncPoll = try JSONDecoder().decode(SyncPoll.self, from: data)
+                do {
+                    let data = syncStatusJson.data(using: .utf8)!
+                    syncStatus = try JSONDecoder().decode(SyncStatus.self, from: data)
 
-                        if syncPoll?.sync_complete.sync_end_height ?? 0 > 0 {
-                            NSLog("BGTask syncingProcessBackgroundTask - sync COMPLETED")
-                            break
-                        }
-                    } catch {
-                        NSLog("BGTask syncingProcessBackgroundTask - sync POLL - parsing ERROR \(error)")
+                    if syncStatus?.percentage_total_outputs_scanned ?? 0 == 100 {
+                        NSLog("BGTask syncingProcessBackgroundTask - sync COMPLETED")
                         break
                     }
+                } catch {
+                    NSLog("BGTask syncingProcessBackgroundTask - sync STATUS - parsing ERROR \(error)")
+                    break
                 }
 
                 Thread.sleep(forTimeInterval: 1)

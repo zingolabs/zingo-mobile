@@ -34,17 +34,19 @@ import java.io.FileInputStream
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 
-data class SyncComplete (
+data class SyncStatus (
+    val scan_ranges : String,
     val sync_start_height : Long,
-    val sync_end_height : Long,
-    val blocks_scanned : Long,
-    val sapling_outputs_scanned : Long,
-    val orchard_outputs_scanned : Long,
-    val percentage_total_outputs_scanned : Double
-)
-
-data class SyncPoll (
-    val sync_complete : SyncComplete
+    val session_blocks_scanned : Long,
+    val total_blocks_scanned : Long,
+    val percentage_session_blocks_scanned : Double,
+    val percentage_total_blocks_scanned : Double,
+    val session_sapling_outputs_scanned : Long,
+    val total_sapling_outputs_scanned : Long,
+    val session_orchard_outputs_scanned : Long,
+    val total_orchard_outputs_scanned : Long,
+    val percentage_session_outputs_scanned : Double,
+    val percentage_total_outputs_scanned : Double,
 )
 
 class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
@@ -88,21 +90,19 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             val syncing = uniffi.zingo.runSync()
             Log.i("SCHEDULED_TASK_RUN", "sync LAUNCH: $syncing")
 
-            var syncPoll: SyncPoll
+            var syncStatus: SyncStatus
             while (true) {
-                val syncPollJson: String = uniffi.zingo.pollSync()
-                Log.i("SCHEDULED_TASK_RUN", "sync POLL: $syncPollJson")
-                if (syncPollJson.lowercase().startsWith(ErrorPrefix.value)) {
+                val syncStatusJson: String = uniffi.zingo.statusSync()
+                Log.i("SCHEDULED_TASK_RUN", "sync STATUS: $syncStatusJson")
+                if (syncStatusJson.lowercase().startsWith(ErrorPrefix.value)) {
                     Log.i("SCHEDULED_TASK_RUN", "sync ERROR")
                     break
                 }
-                if (!syncPollJson.lowercase().startsWith(SyncPrefix.value)) {
-                    syncPoll = mapper.readValue(syncPollJson)
+                syncStatus = mapper.readValue(syncStatusJson)
 
-                    if (syncPoll.sync_complete.sync_end_height > 0) {
-                        Log.i("SCHEDULED_TASK_RUN", "sync COMPLETE")
-                        break
-                    }
+                if (syncStatus.percentage_total_outputs_scanned == 100) {
+                    Log.i("SCHEDULED_TASK_RUN", "sync COMPLETE")
+                    break
                 }
 
                 Thread.sleep(1000)
