@@ -507,6 +507,7 @@
     "newu-option": "Get new address",
     "danger-zone": "DANGER ZONE",
     "go-to-transparent": "Exposed transparent address",
+    "more": "View more...",
     "privkey-option": "Export Spending Key",
     "viewkey-option": "Export Full Viewing Key",
     "import-option": "Import Key...",

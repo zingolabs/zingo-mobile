@@ -408,12 +408,7 @@
   "seed": {
     "buttontexts": {
       "new": ["Eu salvei \n as Frases de Recuperação"],
-      "change": [
-        "",
-        "Abrir Nova Carteira",
-        "Você realmente quer\n alterar para a sua \n carteira atual",
-        "Tem certeza?"
-      ],
+      "change": ["", "Abrir Nova Carteira", "Você realmente quer\n alterar para a sua \n carteira atual", "Tem certeza?"],
       "server": ["", "Alterar Servidor", "Você realmente quer \n alterar para o seu \n servidor atual", "Tem certeza?"],
       "view": ["Eu salvei as \n Frases de Recuperação"],
       "restore": ["Restaurar Carteira"],
@@ -509,10 +504,10 @@
     "title-advanced": "Meus Endereços",
     "title-basic": "Meu Endereço",
     "title-basic-alone": "Meu Endereço de Recebimento",
+    "newu-option": "Novo Endereço Unificado Diversificado",
     "danger-zone": "ZONA DE PERIGO",
     "go-to-transparent": "Ver endereço transparente",
     "more": "mais...",
-    "newu-option": "Novo Endereço Unificado Diversificado",
     "privkey-option": "Exportar Chave de Gastos",
     "viewkey-option": "Exportar Chave de Visualização Completa",
     "import-option": "Chave de Importação...",

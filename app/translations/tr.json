@@ -507,6 +507,7 @@
     "newu-option": "Get new address",
     "danger-zone": "DANGER ZONE",
     "go-to-transparent": "Exposed transparent address",
+    "more": "View more...",
     "privkey-option": "Export Spending Key",
     "viewkey-option": "Export Full Viewing Key",
     "import-option": "Import Key...",
@@ -536,7 +537,9 @@
         "button": "Switch to Shielded Addresses (Recommended)"
       },
       "new-error": "Transparent address generation failed. Latest transparent address has not received funds."
-    }
+    },
+    "verification-success": "This address belongs to you and is safe for receiving funds.",
+    "verification-failure": "This address does not belong to you."
   },
   "history": {
     "shield-all": "Shield All funds",
