@@ -100,7 +100,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 }
                 syncStatus = mapper.readValue(syncStatusJson)
 
-                if (syncStatus.percentage_total_outputs_scanned == 100) {
+                if (syncStatus.percentage_total_outputs_scanned == 100.0) {
                     Log.i("SCHEDULED_TASK_RUN", "sync COMPLETE")
                     break
                 }
