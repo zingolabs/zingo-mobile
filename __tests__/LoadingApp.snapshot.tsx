@@ -12,8 +12,8 @@ import { LoadingAppClass } from '../app/LoadingApp';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { I18n } from 'i18n-js';
 import { LanguageEnum, ModeEnum, SelectServerEnum, CurrencyEnum } from '../app/AppState';
-import { mockNavigation } from '../__mocks__/dataMocks/mockNavigation';
-import { mockRoute } from '../__mocks__/dataMocks/mockRoute';
+import { mockLoadingAppNavigation } from '../__mocks__/dataMocks/mockLoadingAppNavigation';
+import { mockLoadingAppRoute } from '../__mocks__/dataMocks/mockLoadingAppRoute';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
@@ -38,8 +38,8 @@ describe('Component LoadingApp - test', () => {
     const donationAlert = false;
     const loadingapp = render(
       <LoadingAppClass
-        navigationApp={mockNavigation}
-        route={mockRoute}
+        navigationApp={mockLoadingAppNavigation}
+        route={mockLoadingAppRoute}
         toggleTheme={toggleTheme}
         translate={mockTranslate}
         theme={mockTheme}
