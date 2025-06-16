@@ -542,7 +542,9 @@
         "button": "Mudar para Endereços Blindados (Recomendado)"
       },
       "new-error": "Falha na geração de endereço transparente. O último endereço transparente não recebeu fundos."
-    }
+    },
+    "verification-success": "Este endereço pertence a você e é seguro para receber fundos.",
+    "verification-failure": "Este endereço não pertence a você."
   },
   "history": {
     "shield-all": "Blindar Todos os Fundos",
