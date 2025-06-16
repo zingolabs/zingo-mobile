@@ -34,8 +34,14 @@ import java.io.FileInputStream
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 
+data class ScanRanges (
+    val priority : String,
+    val start_block : Long,
+    val end_block : Long
+)
+
 data class SyncStatus (
-    val scan_ranges : String,
+    val scan_ranges : ScanRanges,
     val sync_start_height : Long,
     val session_blocks_scanned : Long,
     val total_blocks_scanned : Long,
@@ -46,7 +52,7 @@ data class SyncStatus (
     val session_orchard_outputs_scanned : Long,
     val total_orchard_outputs_scanned : Long,
     val percentage_session_outputs_scanned : Double,
-    val percentage_total_outputs_scanned : Double,
+    val percentage_total_outputs_scanned : Double
 )
 
 class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {

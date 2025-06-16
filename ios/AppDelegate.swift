@@ -12,17 +12,14 @@ import Network
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 
-struct SyncComplete: Decodable {
-    let sync_start_height: Int64
-    let sync_end_height: Int64
-    let blocks_scanned: Int64
-    let sapling_outputs_scanned: Int64
-    let orchard_outputs_scanned: Int64
-    let percentage_total_outputs_scanned: Double
+struct ScanRanges: Decodable {
+    let priority: String
+    let start_block: Int64
+    let end_block: Int64
 }
 
 struct SyncStatus: Decodable {
-    let scan_ranges: String
+    let scan_ranges: ScanRanges
     let sync_start_height: Int64
     let session_blocks_scanned: Int64
     let total_blocks_scanned: Int64

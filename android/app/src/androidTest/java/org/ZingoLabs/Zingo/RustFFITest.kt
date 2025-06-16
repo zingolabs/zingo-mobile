@@ -38,7 +38,7 @@ data class UnifiedAddress (
     val has_sapling : Boolean?,
     val has_transparent : Boolean?,
     val encoded_address : String?,
-    val error : String?,
+    val error : String?
 )
 
 data class TransparentAddress (
@@ -46,7 +46,7 @@ data class TransparentAddress (
     val address_index : Long?,
     val scope : String?,
 	val encoded_address : String?,
-    val error : String?,
+    val error : String?
 )
 
 data class Info (
@@ -65,8 +65,14 @@ data class Height (
 	val height : Long
 )
 
+data class ScanRanges (
+    val priority : String,
+    val start_block : Long,
+    val end_block : Long
+)
+
 data class SyncStatus (
-    val scan_ranges : String,
+    val scan_ranges : ScanRanges,
     val sync_start_height : Long,
     val session_blocks_scanned : Long,
     val total_blocks_scanned : Long,
@@ -77,7 +83,7 @@ data class SyncStatus (
     val session_orchard_outputs_scanned : Long,
     val total_orchard_outputs_scanned : Long,
     val percentage_session_outputs_scanned : Double,
-    val percentage_total_outputs_scanned : Double,
+    val percentage_total_outputs_scanned : Double
 )
 
 data class Balance (
