@@ -336,7 +336,7 @@ class ExecuteSendFromOrchard {
                 println("Sync Error!:")
                 break
             }
-            syncStatus = mapper.readValue(syncStatusBeforeJson)
+            syncStatusBefore = mapper.readValue(syncStatusBeforeJson)
 
             if (syncStatusBefore.percentage_total_outputs_scanned == 100.0) {
                 println("Sync completed!")
