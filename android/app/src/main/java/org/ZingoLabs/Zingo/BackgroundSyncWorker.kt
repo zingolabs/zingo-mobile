@@ -41,7 +41,7 @@ data class ScanRanges (
 )
 
 data class SyncStatus (
-    val scan_ranges : ScanRanges,
+    val scan_ranges : List<ScanRanges>,
     val sync_start_height : Long,
     val session_blocks_scanned : Long,
     val total_blocks_scanned : Long,

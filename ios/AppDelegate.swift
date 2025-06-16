@@ -19,7 +19,7 @@ struct ScanRanges: Decodable {
 }
 
 struct SyncStatus: Decodable {
-    let scan_ranges: ScanRanges
+    let scan_ranges: [ScanRanges]
     let sync_start_height: Int64
     let session_blocks_scanned: Int64
     let total_blocks_scanned: Int64
