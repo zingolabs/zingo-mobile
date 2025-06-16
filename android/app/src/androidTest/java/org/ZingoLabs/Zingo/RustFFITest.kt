@@ -327,18 +327,18 @@ class ExecuteSendFromOrchard {
         println("\nSync:")
         println(syncJson)
 
-        var syncStatus: SyncStatus
+        var syncStatusBefore: SyncStatus
         while (true) {
-            val syncStatusJson: String = uniffi.zingo.statusSync()
+            val syncStatusBeforeJson: String = uniffi.zingo.statusSync()
             println("\nSync status:")
-            println(syncStatusJson)
-            if (syncStatusJson.lowercase().startsWith("error")) {
+            println(syncStatusBeforeJson)
+            if (syncStatusBeforeJson.lowercase().startsWith("error")) {
                 println("Sync Error!:")
                 break
             }
-            syncStatus = mapper.readValue(syncStatusJson)
+            syncStatus = mapper.readValue(syncStatusBeforeJson)
 
-            if (syncStatus.percentage_total_outputs_scanned == 100.0) {
+            if (syncStatusBefore.percentage_total_outputs_scanned == 100.0) {
                 println("Sync completed!")
                 break
             }
