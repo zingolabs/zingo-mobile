@@ -14,8 +14,8 @@ import ReactAppDependencyProvider
 
 struct ScanRanges: Decodable {
     let priority: String
-    let start_block: Int64
-    let end_block: Int64
+    let start_block: String
+    let end_block: String
 }
 
 struct SyncStatus: Decodable {
