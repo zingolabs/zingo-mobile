@@ -449,11 +449,14 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                             style={{
                               height: 15,
                               width: ((range.priority === RPCSyncScanRangePriorityStatusEnum.Scanning && pixels < 2) ||
-                                      (range.priority === RPCSyncScanRangePriorityStatusEnum.Scanned && pixels < 2)) ? 2 : `${percent}%`,
+                                      (range.priority === RPCSyncScanRangePriorityStatusEnum.Scanned && pixels < 2) ||
+                                      (range.priority === RPCSyncScanRangePriorityStatusEnum.ScannedWithoutMapping && pixels < 2)) ? 2 : `${percent}%`,
                               backgroundColor:
                                 range.priority === RPCSyncScanRangePriorityStatusEnum.Scanning
                                   ? 'orange' /* Scanning */
                                   : range.priority === RPCSyncScanRangePriorityStatusEnum.Scanned
+                                  ? 'green'  /* Scanned  */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.ScannedWithoutMapping
                                   ? 'green'  /* Scanned  */
                                   : range.priority === RPCSyncScanRangePriorityStatusEnum.Historic
                                   ? 'gray'   /* Low priority */
