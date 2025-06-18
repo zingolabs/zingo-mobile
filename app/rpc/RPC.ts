@@ -314,16 +314,16 @@ export default class RPC {
     taskPromises.push(
       new Promise<void>(async resolve => {
         //const s = Date.now();
-        await this.fetchTandZandOValueTransfers();
-        //console.log('value transfers - ', Date.now() - s);
+        await this.fetchAddresses();
+        //console.log('addresses - ', Date.now() - s);
         resolve();
       }),
     );
     taskPromises.push(
       new Promise<void>(async resolve => {
         //const s = Date.now();
-        await this.fetchTandZandOMessages();
-        //console.log('messages - ', Date.now() - s);
+        await this.fetchTandZandOValueTransfers();
+        //console.log('value transfers - ', Date.now() - s);
         resolve();
       }),
     );
@@ -338,8 +338,8 @@ export default class RPC {
     taskPromises.push(
       new Promise<void>(async resolve => {
         //const s = Date.now();
-        await this.fetchAddresses();
-        //console.log('addresses - ', Date.now() - s);
+        await this.fetchTandZandOMessages();
+        //console.log('messages - ', Date.now() - s);
         resolve();
       }),
     );
@@ -363,6 +363,7 @@ export default class RPC {
   // - Server change.
   async configure(): Promise<void> {
     // takes a while to start
+    await this.fetchAddresses();
     await this.fetchTandZandOValueTransfers();
     await this.fetchInfoAndServerHeight();
     await this.fetchTotalBalance();
@@ -823,7 +824,7 @@ export default class RPC {
       // UNIFIED
       const start = Date.now();
       const unifiedAddressesStr: string = await RPCModule.getUnifiedAddressesInfo();
-      console.log('=========================================== > addresses full - ', Date.now() - start);
+      console.log('=========================================== > addresses unified - ', Date.now() - start);
       if (unifiedAddressesStr) {
         if (unifiedAddressesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error addresses ${unifiedAddressesStr}`);
@@ -840,7 +841,7 @@ export default class RPC {
       // TRANSPARENT
       const start2 = Date.now();
       const transparentAddressStr: string = await RPCModule.getTransparentAddressesInfo();
-      console.log('=========================================== > addresses orchard - ', Date.now() - start2);
+      console.log('=========================================== > addresses transparent - ', Date.now() - start2);
       if (transparentAddressStr) {
         if (transparentAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error addresses ${transparentAddressStr}`);

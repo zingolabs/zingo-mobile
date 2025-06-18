@@ -36,7 +36,6 @@ import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import { HideReturn } from 'react-native-magic-modal';
-import { isEqual } from 'lodash';
 //import Utils from '../../../app/utils';
 
 type ValueTransferLineProps = {
@@ -427,9 +426,4 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   );
 };
 
-export default React.memo(
-  ValueTransferLine,
-  (prev: ValueTransferLineProps, next: ValueTransferLineProps) => {
-    return isEqual(prev.vt, next.vt);
-  }
-);
+export default React.memo(ValueTransferLine);

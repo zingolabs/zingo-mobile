@@ -67,23 +67,23 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun saveWalletFile(): Boolean {
         uniffi.zingo.initLogging()
 
-        // Get the encoded wallet file
-        val b64encoded: String = uniffi.zingo.saveToB64()
-        if (b64encoded.lowercase().startsWith(ErrorPrefix.value)) {
-            // with error don't save the file. Obviously.
-            Log.e("MAIN", "Couldn't save the wallet. $b64encoded")
-            return false
-        }
-        // Log.i("MAIN", b64encoded)
-
         try {
+            // Get the encoded wallet file
+            val b64encoded: String = uniffi.zingo.saveToB64()
+            if (b64encoded.lowercase().startsWith(ErrorPrefix.value)) {
+                // with error don't save the file. Obviously.
+                Log.e("MAIN", "Couldn't save the wallet. $b64encoded")
+                return false
+            }
+            // Log.i("MAIN", b64encoded)
+
             val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
             Log.i("MAIN", "file size: ${fileBytes.size} bytes")
 
             // Save file to disk
             writeFile(WalletFileName.value, fileBytes)
         } catch (e: IllegalArgumentException) {
-            Log.e("MAIN", "Couldn't save the wallet")
+            Log.e("MAIN", "Couldn't save the wallet. Read/Write issue.")
             return false
         }
         return true
