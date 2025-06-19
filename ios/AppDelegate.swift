@@ -340,7 +340,7 @@ extension AppDelegate {
             var syncStatus: SyncStatus?
             while true {
                 let syncStatusJson = statusSync()
-                NSLog("BGTask syncingProcessBackgroundTask - sync POLL \(syncStatusJson)")
+                NSLog("BGTask syncingProcessBackgroundTask - sync STATUS \(syncStatusJson)")
                 
                 if syncStatusJson.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
                     NSLog("BGTask syncingProcessBackgroundTask - sync STATUS ERROR")
