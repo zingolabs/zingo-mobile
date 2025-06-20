@@ -291,7 +291,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                 borderWidth: 1,
                 paddingHorizontal: 10,
                 paddingVertical: 5,
-                marginHorizontal: 10,
+                marginRight: 10,
               }}>
               <FadeText
                 style={{
@@ -316,7 +316,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
                 borderWidth: 1,
                 paddingHorizontal: 10,
                 paddingVertical: 5,
-                marginHorizontal: 0,
               }}>
               <FadeText
                 style={{
@@ -333,7 +332,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
       ) : (
         <>
-          {valueTransfersSliced && valueTransfersSliced.length > 0 && (
+          {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
             <RecyclerListView
               ref={scrollViewRef}
               renderAheadOffset={500}
@@ -383,7 +382,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                         </View>
                       ) : (
                         <>
-                          {!!valueTransfersSliced && !!valueTransfersSliced.length ? (
+                          {!!valueTransfersSliced && !!valueTransfersSliced.length && (
                             <View
                               style={{
                                 display: 'flex',
@@ -396,18 +395,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
                                 {translate('history.end') as string}
                               </FadeText>
                             </View>
-                          ) : (
-                            <View
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
-                                marginTop: 10,
-                              }}>
-                              <FadeText style={{ color: colors.primary }}>
-                                {translate('history.empty') as string}
-                              </FadeText>
-                            </View>
                           )}
                         </>
                       )}
@@ -416,6 +403,18 @@ const History: React.FunctionComponent<HistoryProps> = ({
                 </>
               )}
             />
+          ) : (
+            <View
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 30,
+              }}>
+              <FadeText style={{ color: colors.primary }}>
+                {translate('history.empty') as string}
+              </FadeText>
+            </View>
           )}
           {!isAtTop && (
             <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 10 }}>

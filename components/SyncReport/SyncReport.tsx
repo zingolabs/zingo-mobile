@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, Text, ActivityIndicator, Dimensions } from 'react-native';
+import { View, ScrollView, Text, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
@@ -442,10 +442,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                           marginBottom: 0,
                         }}>
                         {!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.map((range: RPCSyncScanRangeStatusType) => {
-                          // the sum of all the ranges cannot be higher than 100% obviously...
-
                           const percent: number = ((range.end_block - range.start_block) * 100) / (info.latestBlock - wallet.birthday);
-                          const pixels: number = (Dimensions.get('window').width - 40) * (percent / 100);
                           return <View
                             key={`${range.start_block.toString() + '-' + range.end_block.toString()}`}
                             style={{
