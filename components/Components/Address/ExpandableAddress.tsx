@@ -84,7 +84,7 @@ const DefaultModal: React.FunctionComponent<DefaultModalProps> = ({ address, onC
 type ExpandableAddressProps = {
   address: string;
   style?: TextStyle;
-  renderModal?: (onClose: () => void) => React.ReactNode;
+  renderModal?: (onClose: () => void) => React.ReactElement;
   onCopy?: () => void;
 };
 
