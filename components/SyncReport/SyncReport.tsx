@@ -442,15 +442,17 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                           marginBottom: 0,
                         }}>
                         {!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.map((range: RPCSyncScanRangeStatusType) => {
+                          // the sum of all the ranges cannot be higher than 100% obviously...
+
                           const percent: number = ((range.end_block - range.start_block) * 100) / (info.latestBlock - wallet.birthday);
                           const pixels: number = (Dimensions.get('window').width - 40) * (percent / 100);
                           return <View
                             key={`${range.start_block.toString() + '-' + range.end_block.toString()}`}
                             style={{
                               height: 15,
-                              width: ((range.priority === RPCSyncScanRangePriorityStatusEnum.Scanning && pixels < 2) ||
-                                      (range.priority === RPCSyncScanRangePriorityStatusEnum.Scanned && pixels < 2) ||
-                                      (range.priority === RPCSyncScanRangePriorityStatusEnum.ScannedWithoutMapping && pixels < 2)) ? 2 : `${percent}%`,
+                              width: ((range.priority === RPCSyncScanRangePriorityStatusEnum.Scanning && pixels < 1) ||
+                                      (range.priority === RPCSyncScanRangePriorityStatusEnum.Scanned && pixels < 1) ||
+                                      (range.priority === RPCSyncScanRangePriorityStatusEnum.ScannedWithoutMapping && pixels < 1)) ? 1 : `${percent}%`,
                               backgroundColor:
                                 range.priority === RPCSyncScanRangePriorityStatusEnum.Scanning
                                   ? 'orange' /* Scanning */
