@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { View, ScrollView, TouchableOpacity, Text, Pressable, LayoutAnimation } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Text, Pressable } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@react-navigation/native';
 import ViewShot from 'react-native-view-shot';
