@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { View, ScrollView, TouchableOpacity, Text, Pressable } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Text, Pressable, LayoutAnimation } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@react-navigation/native';
 import ViewShot from 'react-native-view-shot';
@@ -164,6 +164,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const animatedOpacity = useSharedValue(0);
 
   const qrCodeRef = useRef<ViewShot>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const isBasic = ModeEnum.basic === mode;
   const isUnified = address?.addressKind === AddressKindEnum.u;
@@ -181,6 +182,12 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         duration: 300,
         easing: Easing.out(Easing.cubic),
       });
+
+      if (!prev) {
+        setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: true });
+        }, 200);
+      }
 
       return next;
     });
@@ -230,8 +237,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   };
 
   const doAddressList = () => {
-    return magicModal.show(() => <AddressList addressKind={address ? address.addressKind : AddressKindEnum.u} setIndex={setIndex} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
-      .promise;
+    return magicModal.show(
+      () => <AddressList addressKind={address ? address.addressKind : AddressKindEnum.u} setIndex={setIndex} />,
+      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+    ).promise;
   };
 
   function onCopy() {
@@ -246,9 +255,11 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   return (
     <View style={{ flexDirection: 'column', width: '100%' }}>
       <ScrollView
+        ref={scrollViewRef}
         style={{ width: '100%' }}
         contentContainerStyle={{
           alignItems: 'center',
+          paddingBottom: 20,
         }}>
         {ufvk || (address && address.address !== (translate('receive.noaddress') as string)) ? (
           <>
@@ -469,9 +480,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 </TouchableOpacity>
                 {address && !isBasic && (
                   <>
-                    <TouchableOpacity onPress={() => {
-                      VAShow && VAShow();
-                    }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        VAShow && VAShow();
+                      }}>
                       <View
                         style={{
                           borderRadius: 30,
@@ -480,7 +492,12 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                           paddingVertical: 5,
                           marginHorizontal: 10,
                         }}>
-                        <FontAwesomeIcon style={{ margin: 5, opacity: 0.9 }} size={24} icon={faCircleCheck} color={colors.money} />
+                        <FontAwesomeIcon
+                          style={{ margin: 5, opacity: 0.9 }}
+                          size={24}
+                          icon={faCircleCheck}
+                          color={colors.money}
+                        />
                       </View>
                     </TouchableOpacity>
                     {total > 1 && (
@@ -501,7 +518,14 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 )}
               </View>
             </View>
-            <View style={{ flexDirection: 'column', width: '100%', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
+            <View
+              style={{
+                flexDirection: 'column',
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: 20,
+              }}>
               <Text
                 style={{
                   color: colors.zingo,
