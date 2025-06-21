@@ -68,6 +68,10 @@ export const mockTranslate = (p: string) => {
         value: LanguageEnum.ru,
         text: 'text ru',
       },
+      {
+        value: LanguageEnum.tr,
+        text: 'text tr',
+      },
     ];
   }
   if (p === 'settings.sendalls') {

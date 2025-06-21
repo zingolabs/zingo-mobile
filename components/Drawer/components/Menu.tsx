@@ -12,6 +12,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 import { GlobalConst, MenuItemEnum, ModeEnum, SelectServerEnum } from '../../../app/AppState';
 import { HideReturn } from 'react-native-magic-modal';
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';

@@ -6,6 +6,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 import Header from '../../Header';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 

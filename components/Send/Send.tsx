@@ -66,6 +66,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
 import { RPCSendallProposeType } from '../../app/rpc/types/RPCSendallProposeType';
