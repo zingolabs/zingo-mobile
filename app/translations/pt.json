@@ -45,8 +45,8 @@
     "message-placeholder": "Mensagem",
     "message-placeholder-error": "Não há fundos disponíveis para gastar",
     "search-placeholder": "Procurar",
-    "filtro-tudo": "Todos",
-    "filtro-contatos": "Contatos",
+    "filter-all": "Tudo",
+    "filter-contacts": "Contactos",
     "filter-no-contacts": "Sem contatos",
     "clear-filter": "Limpar:",
     "contacts-empty": "Sem contatos ou endereços.",
@@ -221,19 +221,23 @@
     "languages": [
       {
         "value": "en",
-        "text": "Todas as informações estarão em inglês."
+        "text": "Todas as informações estarão em Inglês."
       },
       {
         "value": "es",
-        "text": "Todas as informações estarão em espanhol."
+        "text": "Todas as informações estarão em Espanhol."
       },
       {
         "value": "pt",
-        "text": "Todas as informações estarão em português."
+        "text": "Todas as informações estarão em Português."
       },
       {
         "value": "ru",
-        "text": "Todas as informações estarão em russo."
+        "text": "Todas as informações estarão em Russo."
+      },
+      {
+        "value": "tr",
+        "text": "Todas as informações estarão em Turco."
       }
     ],
     "sendalls": [
@@ -375,7 +379,8 @@
     "select-placeholder": "Escolha um Servidor...",
     "value-language-ru": "Russo",
     "walletkeyssaved": "As últimas informações de recuperação da carteira armazenadas com segurança no dispositivo.",
-    "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!"
+    "walletkeyswarning": "Este é um recurso experimental que depende da segurança de código não auditado para armazenar sua frase-semente. Por favor, não o use com sementes que controlam fundos significativos!",
+    "value-language-tr": "Turco"
   },
   "info": {
     "version": "Versão",
@@ -402,17 +407,33 @@
   },
   "seed": {
     "buttontexts": {
-      "new": ["Eu salvei \n as Frases de Recuperação"],
+      "new": [
+        "Eu salvei \n as Frases de Recuperação"
+      ],
       "change": [
         "",
         "Abrir Nova Carteira",
         "Você realmente quer\n alterar para a sua \n carteira atual",
         "Tem certeza?"
       ],
-      "server": ["", "Alterar Servidor", "Você realmente quer \n alterar para o seu \n servidor atual", "Tem certeza?"],
-      "view": ["Eu salvei as \n Frases de Recuperação"],
-      "restore": ["Restaurar Carteira"],
-      "backup": ["", "Restaurar", "Você realmente deseja \n restaurar sua \n carteira de backup", "Tem certeza?"]
+      "server": [
+        "",
+        "Alterar Servidor",
+        "Você realmente quer \n alterar para o seu \n servidor atual",
+        "Tem certeza?"
+      ],
+      "view": [
+        "Eu salvei as \n Frases de Recuperação"
+      ],
+      "restore": [
+        "Restaurar Carteira"
+      ],
+      "backup": [
+        "",
+        "Restaurar",
+        "Você realmente deseja \n restaurar sua \n carteira de backup",
+        "Tem certeza?"
+      ]
     },
     "title": "Frases de Recuperação",
     "new": "Novo",
@@ -504,10 +525,10 @@
     "title-advanced": "Meus Endereços",
     "title-basic": "Meu Endereço",
     "title-basic-alone": "Meu Endereço de Recebimento",
+    "newu-option": "Novo Endereço Unificado Diversificado",
     "danger-zone": "ZONA DE PERIGO",
     "go-to-transparent": "Ver endereço transparente",
     "more": "mais...",
-    "newu-option": "Novo Endereço Unificado Diversificado",
     "privkey-option": "Exportar Chave de Gastos",
     "viewkey-option": "Exportar Chave de Visualização Completa",
     "import-option": "Chave de Importação...",
@@ -680,12 +701,33 @@
   },
   "ufvk": {
     "buttontexts": {
-      "new": ["Eu salvei a Chave \n de Visualização"],
-      "change": ["", "Abrir Nova Carteira", "Você realmente deseja \n alterar sua carteira \n atual", "Tem certeza?"],
-      "server": ["", "Alterar o Servidor", "Você realmente quer \n mudar seu servidor \n atual", "Tem certeza?"],
-      "view": ["Eu salvei \na Chave de Visualização"],
-      "restore": ["Restaurar Carteira"],
-      "backup": ["", "Restaurar", "Você realmente deseja \n restaurar sua \n carteira de backup", "Tem certeza?"]
+      "new": [
+        "Eu salvei a Chave \n de Visualização"
+      ],
+      "change": [
+        "",
+        "Abrir Nova Carteira",
+        "Você realmente deseja \n alterar sua carteira \n atual",
+        "Tem certeza?"
+      ],
+      "server": [
+        "",
+        "Alterar o Servidor",
+        "Você realmente quer \n mudar seu servidor \n atual",
+        "Tem certeza?"
+      ],
+      "view": [
+        "Eu salvei \na Chave de Visualização"
+      ],
+      "restore": [
+        "Restaurar Carteira"
+      ],
+      "backup": [
+        "",
+        "Restaurar",
+        "Você realmente deseja \n restaurar sua \n carteira de backup",
+        "Tem certeza?"
+      ]
     },
     "privkey": "Disponível/Privado ",
     "viewkey": "Chave de Visualização ",

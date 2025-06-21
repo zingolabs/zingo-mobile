@@ -234,6 +234,10 @@
       {
         "value": "ru",
         "text": "Toda la información estará en Ruso."
+      },
+      {
+        "value": "tr",
+        "text": "Toda la información estará en Turco."
       }
     ],
     "sendalls": [
@@ -375,7 +379,8 @@
     "select-placeholder": "Elige un Servidor...",
     "value-language-ru": "Ruso",
     "walletkeyssaved": "La ultima información de recuperacion del Monedero almacenada de forma segura en el dispositivo.",
-    "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!"
+    "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!",
+    "value-language-tr": "Turco"
   },
   "info": {
     "version": "Versión",
@@ -402,12 +407,33 @@
   },
   "seed": {
     "buttontexts": {
-      "new": ["Ya he guardado \n la semilla"],
-      "change": ["", "Abrir Nuevo", "Realmente quieres \n cambiar tu \n monedero activo", "Estás seguro/a?"],
-      "server": ["", "Cambiar Servidor", "Realmente quieres \n cambiar el \n servidor activo", "Estás seguro/a?"],
-      "view": ["Ya he guardado \n la semilla"],
-      "restore": ["Restaurar Monedero"],
-      "backup": ["", "Restaurar", "Realmente quieres \n restaurar tu \n copia de seguridad", "Estás seguro/a?"]
+      "new": [
+        "Ya he guardado \n la semilla"
+      ],
+      "change": [
+        "",
+        "Abrir Nuevo",
+        "Realmente quieres \n cambiar tu \n monedero activo",
+        "Estás seguro/a?"
+      ],
+      "server": [
+        "",
+        "Cambiar Servidor",
+        "Realmente quieres \n cambiar el \n servidor activo",
+        "Estás seguro/a?"
+      ],
+      "view": [
+        "Ya he guardado \n la semilla"
+      ],
+      "restore": [
+        "Restaurar Monedero"
+      ],
+      "backup": [
+        "",
+        "Restaurar",
+        "Realmente quieres \n restaurar tu \n copia de seguridad",
+        "Estás seguro/a?"
+      ]
     },
     "title": "Semilla",
     "new": "Nueva",
@@ -675,12 +701,33 @@
   },
   "ufvk": {
     "buttontexts": {
-      "new": ["Ya he guardado \n la clave de visualización"],
-      "change": ["", "Abrir Nuevo", "Realmente quieres \n cambiar tu \n monedero activo", "Estás seguro/a?"],
-      "server": ["", "Cambiar Servidor", "Realmente quieres \n cambiar el \n servidor activo", "Estás seguro/a?"],
-      "view": ["Ya he guardado \n la clave de visualización"],
-      "restore": ["Restaurar Monedero"],
-      "backup": ["", "Restaurar", "Realmente quieres \n restaurar tu \n copia de seguridad", "Estás seguro/a?"]
+      "new": [
+        "Ya he guardado \n la clave de visualización"
+      ],
+      "change": [
+        "",
+        "Abrir Nuevo",
+        "Realmente quieres \n cambiar tu \n monedero activo",
+        "Estás seguro/a?"
+      ],
+      "server": [
+        "",
+        "Cambiar Servidor",
+        "Realmente quieres \n cambiar el \n servidor activo",
+        "Estás seguro/a?"
+      ],
+      "view": [
+        "Ya he guardado \n la clave de visualización"
+      ],
+      "restore": [
+        "Restaurar Monedero"
+      ],
+      "backup": [
+        "",
+        "Restaurar",
+        "Realmente quieres \n restaurar tu \n copia de seguridad",
+        "Estás seguro/a?"
+      ]
     },
     "privkey": "Gastar/Privada ",
     "viewkey": "Clave de Visualización ",

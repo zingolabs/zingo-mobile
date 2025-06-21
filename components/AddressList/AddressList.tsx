@@ -14,6 +14,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import { AddressKindEnum, ButtonTypeEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
