@@ -353,7 +353,7 @@ extension AppDelegate {
                         NSLog("BGTask syncingProcessBackgroundTask - sync COMPLETED")
                         break
                     } else {
-                        let percent = syncStatus.percentage_total_outputs_scanned
+                        let percent = syncStatus?.percentage_total_outputs_scanned ?? 0
                         NSLog("BGTask syncingProcessBackgroundTask - sync STATUS %: \(percent)")
                     }
                 } catch {
