@@ -550,6 +550,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setZingolibVersion,
       this.setWallet,
       props.readOnly,
+      props.server,
     );
 
     this.appstate = {} as NativeEventSubscription;

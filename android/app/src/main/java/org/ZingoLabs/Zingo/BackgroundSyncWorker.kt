@@ -156,7 +156,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             val settingsString = settingsBytes.toString(Charsets.UTF_8)
             val jsonObject = JSONObject(settingsString)
             val server = jsonObject.getJSONObject("server").getString("uri")
-            val chainhint = jsonObject.getJSONObject("server").getString("chain_name")
+            val chainhint = jsonObject.getJSONObject("server").getString("chainName")
             Log.i(
                 "SCHEDULED_TASK_RUN",
                 "Opening the wallet file - No App active - server: $server chain: $chainhint"

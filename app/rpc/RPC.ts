@@ -15,6 +15,7 @@ import {
   UnifiedAddressClass,
   TransparentAddressClass,
   ValueTransferKindEnum,
+  ServerType,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCUnifiedAddressType } from './types/RPCUnifiedAddressType';
@@ -72,6 +73,7 @@ export default class RPC {
   timers: NodeJS.Timeout[];
 
   readOnly: boolean;
+  server: ServerType;
 
   lastPollSyncError: string;
 
@@ -88,6 +90,7 @@ export default class RPC {
     fnSetZingolib: (zingolib: string) => void,
     fnSetWallet: (wallet: WalletType) => void,
     readOnly: boolean,
+    server: ServerType,
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetValueTransfersList = fnSetValueTransfersList;
@@ -123,6 +126,7 @@ export default class RPC {
     this.timers = [];
 
     this.readOnly = readOnly;
+    this.server = server;
 
     this.lastPollSyncError = '';
   }
@@ -363,9 +367,8 @@ export default class RPC {
   // - Server change.
   async configure(): Promise<void> {
     // takes a while to start
-    await this.fetchAddresses();
     await this.fetchTandZandOValueTransfers();
-    await this.fetchInfoAndServerHeight();
+    await this.fetchAddresses();
     await this.fetchTotalBalance();
 
     // I need to fetch this quickly.
@@ -947,10 +950,26 @@ export default class RPC {
       if (this.fetchTandZandOValueTransfersLock) {
         return;
       }
-      this.fetchTandZandOValueTransfersLock = true;
+      // first to get the last server block.
       const start = Date.now();
+      const heightStr: string = await RPCModule.getLatestBlockServerInfo(this.server.uri);
+      console.log('=========================================== > server height - ', Date.now() - start);
+      if (heightStr) {
+        if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error server height ${heightStr}`);
+        } else {
+          this.lastServerBlockHeight = Number(heightStr);
+        }
+      } else {
+        console.log('Internal Error server height');
+      }
+
+      console.log('SERVER HEIGHT', this.lastServerBlockHeight);
+
+      this.fetchTandZandOValueTransfersLock = true;
+      const start2 = Date.now();
       const valueTransfersStr: string = await RPCModule.getValueTransfersList();
-      console.log('=========================================== > value transfers - ', Date.now() - start);
+      console.log('=========================================== > value transfers - ', Date.now() - start2);
       //console.log(valueTransfersStr);
       if (valueTransfersStr) {
         if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1018,6 +1037,8 @@ export default class RPC {
           currentValueTransferList.poolType = !vt.pool_received ? undefined : vt.pool_received;
 
           if (vt.txid.startsWith('xxxxxxxxx')) {
+            console.log('server', this.lastServerBlockHeight);
+            console.log('wallet', this.lastWalletBlockHeight);
             console.log('valuetransfer zingolib: ', vt);
             console.log('valuetransfer zingo', currentValueTransferList);
             console.log('--------------------------------------------------');

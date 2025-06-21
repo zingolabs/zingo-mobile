@@ -431,7 +431,7 @@ extension AppDelegate {
               let jsonObject = try? JSONSerialization.jsonObject(with: contentData, options: []) as? [String: Any],
               let server = jsonObject["server"] as? [String: Any],
               let serverURI = server["uri"] as? String,
-              let chainhint = server["chain_name"] as? String else {
+              let chainhint = server["chainName"] as? String else {
             NSLog("Error: Unable to parse JSON object from file at path \(fileName)")
             return
         }
