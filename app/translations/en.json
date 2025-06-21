@@ -407,12 +407,33 @@
   },
   "seed": {
     "buttontexts": {
-      "new": ["I have saved \n the seed"],
-      "change": ["", "Open New", "You really want \n to change your \n actual wallet", "Are you certain?"],
-      "server": ["", "Change Server", "You really want \n to change your \n actual server", "Are you certain?"],
-      "view": ["I have saved \n the seed"],
-      "restore": ["Restore Wallet"],
-      "backup": ["", "Restore", "You really want \n to restore your \n backup wallet", "Are you certain?"]
+      "new": [
+        "I have saved \n the seed"
+      ],
+      "change": [
+        "",
+        "Open New",
+        "You really want \n to change your \n actual wallet",
+        "Are you certain?"
+      ],
+      "server": [
+        "",
+        "Change Server",
+        "You really want \n to change your \n actual server",
+        "Are you certain?"
+      ],
+      "view": [
+        "I have saved \n the seed"
+      ],
+      "restore": [
+        "Restore Wallet"
+      ],
+      "backup": [
+        "",
+        "Restore",
+        "You really want \n to restore your \n backup wallet",
+        "Are you certain?"
+      ]
     },
     "title": "Seed",
     "new": "New",
@@ -680,12 +701,33 @@
   },
   "ufvk": {
     "buttontexts": {
-      "new": ["I have saved \n the Viewing Key"],
-      "change": ["", "Open New", "You really want \n to change your \n actual wallet", "Are you certain?"],
-      "server": ["", "Change Server", "You really want \n to change your \n actual server", "Are you certain?"],
-      "view": ["I have saved \n the Viewing Key"],
-      "restore": ["Restore Wallet"],
-      "backup": ["", "Restore", "You really want \n to restore your \n backup wallet", "Are you certain?"]
+      "new": [
+        "I have saved \n the Viewing Key"
+      ],
+      "change": [
+        "",
+        "Open New",
+        "You really want \n to change your \n actual wallet",
+        "Are you certain?"
+      ],
+      "server": [
+        "",
+        "Change Server",
+        "You really want \n to change your \n actual server",
+        "Are you certain?"
+      ],
+      "view": [
+        "I have saved \n the Viewing Key"
+      ],
+      "restore": [
+        "Restore Wallet"
+      ],
+      "backup": [
+        "",
+        "Restore",
+        "You really want \n to restore your \n backup wallet",
+        "Are you certain?"
+      ]
     },
     "privkey": "Spending/Private ",
     "viewkey": "Viewing Key ",

@@ -45,8 +45,8 @@
     "message-placeholder": "Mensagem",
     "message-placeholder-error": "Não há fundos disponíveis para gastar",
     "search-placeholder": "Procurar",
-    "filtro-tudo": "Todos",
-    "filtro-contatos": "Contatos",
+    "filter-all": "Tudo",
+    "filter-contacts": "Contactos",
     "filter-no-contacts": "Sem contatos",
     "clear-filter": "Limpar:",
     "contacts-empty": "Sem contatos ou endereços.",
@@ -407,12 +407,33 @@
   },
   "seed": {
     "buttontexts": {
-      "new": ["Eu salvei \n as Frases de Recuperação"],
-      "change": ["", "Abrir Nova Carteira", "Você realmente quer\n alterar para a sua \n carteira atual", "Tem certeza?"],
-      "server": ["", "Alterar Servidor", "Você realmente quer \n alterar para o seu \n servidor atual", "Tem certeza?"],
-      "view": ["Eu salvei as \n Frases de Recuperação"],
-      "restore": ["Restaurar Carteira"],
-      "backup": ["", "Restaurar", "Você realmente deseja \n restaurar sua \n carteira de backup", "Tem certeza?"]
+      "new": [
+        "Eu salvei \n as Frases de Recuperação"
+      ],
+      "change": [
+        "",
+        "Abrir Nova Carteira",
+        "Você realmente quer\n alterar para a sua \n carteira atual",
+        "Tem certeza?"
+      ],
+      "server": [
+        "",
+        "Alterar Servidor",
+        "Você realmente quer \n alterar para o seu \n servidor atual",
+        "Tem certeza?"
+      ],
+      "view": [
+        "Eu salvei as \n Frases de Recuperação"
+      ],
+      "restore": [
+        "Restaurar Carteira"
+      ],
+      "backup": [
+        "",
+        "Restaurar",
+        "Você realmente deseja \n restaurar sua \n carteira de backup",
+        "Tem certeza?"
+      ]
     },
     "title": "Frases de Recuperação",
     "new": "Novo",
@@ -680,12 +701,33 @@
   },
   "ufvk": {
     "buttontexts": {
-      "new": ["Eu salvei a Chave \n de Visualização"],
-      "change": ["", "Abrir Nova Carteira", "Você realmente deseja \n alterar sua carteira \n atual", "Tem certeza?"],
-      "server": ["", "Alterar o Servidor", "Você realmente quer \n mudar seu servidor \n atual", "Tem certeza?"],
-      "view": ["Eu salvei \na Chave de Visualização"],
-      "restore": ["Restaurar Carteira"],
-      "backup": ["", "Restaurar", "Você realmente deseja \n restaurar sua \n carteira de backup", "Tem certeza?"]
+      "new": [
+        "Eu salvei a Chave \n de Visualização"
+      ],
+      "change": [
+        "",
+        "Abrir Nova Carteira",
+        "Você realmente deseja \n alterar sua carteira \n atual",
+        "Tem certeza?"
+      ],
+      "server": [
+        "",
+        "Alterar o Servidor",
+        "Você realmente quer \n mudar seu servidor \n atual",
+        "Tem certeza?"
+      ],
+      "view": [
+        "Eu salvei \na Chave de Visualização"
+      ],
+      "restore": [
+        "Restaurar Carteira"
+      ],
+      "backup": [
+        "",
+        "Restaurar",
+        "Você realmente deseja \n restaurar sua \n carteira de backup",
+        "Tem certeza?"
+      ]
     },
     "privkey": "Disponível/Privado ",
     "viewkey": "Chave de Visualização ",

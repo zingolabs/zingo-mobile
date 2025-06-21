@@ -407,12 +407,33 @@
   },
   "seed": {
     "buttontexts": {
-      "new": ["Ya he guardado \n la semilla"],
-      "change": ["", "Abrir Nuevo", "Realmente quieres \n cambiar tu \n monedero activo", "Estás seguro/a?"],
-      "server": ["", "Cambiar Servidor", "Realmente quieres \n cambiar el \n servidor activo", "Estás seguro/a?"],
-      "view": ["Ya he guardado \n la semilla"],
-      "restore": ["Restaurar Monedero"],
-      "backup": ["", "Restaurar", "Realmente quieres \n restaurar tu \n copia de seguridad", "Estás seguro/a?"]
+      "new": [
+        "Ya he guardado \n la semilla"
+      ],
+      "change": [
+        "",
+        "Abrir Nuevo",
+        "Realmente quieres \n cambiar tu \n monedero activo",
+        "Estás seguro/a?"
+      ],
+      "server": [
+        "",
+        "Cambiar Servidor",
+        "Realmente quieres \n cambiar el \n servidor activo",
+        "Estás seguro/a?"
+      ],
+      "view": [
+        "Ya he guardado \n la semilla"
+      ],
+      "restore": [
+        "Restaurar Monedero"
+      ],
+      "backup": [
+        "",
+        "Restaurar",
+        "Realmente quieres \n restaurar tu \n copia de seguridad",
+        "Estás seguro/a?"
+      ]
     },
     "title": "Semilla",
     "new": "Nueva",
@@ -680,12 +701,33 @@
   },
   "ufvk": {
     "buttontexts": {
-      "new": ["Ya he guardado \n la clave de visualización"],
-      "change": ["", "Abrir Nuevo", "Realmente quieres \n cambiar tu \n monedero activo", "Estás seguro/a?"],
-      "server": ["", "Cambiar Servidor", "Realmente quieres \n cambiar el \n servidor activo", "Estás seguro/a?"],
-      "view": ["Ya he guardado \n la clave de visualización"],
-      "restore": ["Restaurar Monedero"],
-      "backup": ["", "Restaurar", "Realmente quieres \n restaurar tu \n copia de seguridad", "Estás seguro/a?"]
+      "new": [
+        "Ya he guardado \n la clave de visualización"
+      ],
+      "change": [
+        "",
+        "Abrir Nuevo",
+        "Realmente quieres \n cambiar tu \n monedero activo",
+        "Estás seguro/a?"
+      ],
+      "server": [
+        "",
+        "Cambiar Servidor",
+        "Realmente quieres \n cambiar el \n servidor activo",
+        "Estás seguro/a?"
+      ],
+      "view": [
+        "Ya he guardado \n la clave de visualización"
+      ],
+      "restore": [
+        "Restaurar Monedero"
+      ],
+      "backup": [
+        "",
+        "Restaurar",
+        "Realmente quieres \n restaurar tu \n copia de seguridad",
+        "Estás seguro/a?"
+      ]
     },
     "privkey": "Gastar/Privada ",
     "viewkey": "Clave de Visualización ",
