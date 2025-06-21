@@ -99,19 +99,26 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             var syncStatus: SyncStatus
             while (true) {
                 val syncStatusJson: String = uniffi.zingo.statusSync()
-                Log.i("SCHEDULED_TASK_RUN", "sync STATUS: $syncStatusJson")
                 if (syncStatusJson.lowercase().startsWith(ErrorPrefix.value)) {
-                    Log.i("SCHEDULED_TASK_RUN", "sync ERROR")
-                    break
-                }
-                syncStatus = mapper.readValue(syncStatusJson)
-
-                if (syncStatus.percentage_total_outputs_scanned == 100.0) {
-                    Log.i("SCHEDULED_TASK_RUN", "sync COMPLETE")
+                    Log.i("SCHEDULED_TASK_RUN", "sync STATUS ERROR: $syncStatusJson")
                     break
                 }
 
-                Thread.sleep(1000)
+                try {
+                    syncStatus = mapper.readValue(syncStatusJson)
+
+                    if (syncStatus.percentage_total_outputs_scanned == 100.0) {
+                        Log.i("SCHEDULED_TASK_RUN", "sync COMPLETED")
+                        break
+                    } else {
+                        val percent = syncStatus.percentage_total_outputs_scanned
+                        Log.i("SCHEDULED_TASK_RUN", "sync STATUS %: $percent")
+                    }
+                } catch (e: Exception) {
+                    Log.e("SCHEDULED_TASK_RUN", "sync STATUS - parsing ERROR ${e.localizedMessage}")
+                }
+
+                Thread.sleep(5000)
             }
 
         } else {
@@ -162,7 +169,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         val stop = uniffi.zingo.stopSync()
         if (stop.lowercase().startsWith(ErrorPrefix.value)) {
             // this means this task not have a valid lightclient
-            Log.i("SCHEDULED_TASK_RUN", "$stop")
+            Log.i("SCHEDULED_TASK_RUN", stop)
             return
         }
         Log.i("SCHEDULED_TASK_RUN", "Stopping sync: $stop")

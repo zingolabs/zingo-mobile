@@ -340,10 +340,8 @@ extension AppDelegate {
             var syncStatus: SyncStatus?
             while true {
                 let syncStatusJson = statusSync()
-                NSLog("BGTask syncingProcessBackgroundTask - sync STATUS \(syncStatusJson)")
-                
                 if syncStatusJson.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-                    NSLog("BGTask syncingProcessBackgroundTask - sync STATUS ERROR")
+                    NSLog("BGTask syncingProcessBackgroundTask - sync STATUS ERROR: \(syncStatusJson)")
                     break
                 }
 
@@ -354,13 +352,16 @@ extension AppDelegate {
                     if syncStatus?.percentage_total_outputs_scanned ?? 0 == 100.0 {
                         NSLog("BGTask syncingProcessBackgroundTask - sync COMPLETED")
                         break
+                    } else {
+                        let percent = syncStatus.percentage_total_outputs_scanned
+                        NSLog("BGTask syncingProcessBackgroundTask - sync STATUS %: \(percent)")
                     }
                 } catch {
                     NSLog("BGTask syncingProcessBackgroundTask - sync STATUS - parsing ERROR \(error)")
                     break
                 }
 
-                Thread.sleep(forTimeInterval: 1)
+                Thread.sleep(forTimeInterval: 5)
             }
 
         } else {
