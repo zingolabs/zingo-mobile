@@ -42,6 +42,7 @@ class AppDelegate: RCTAppDelegate {
   private var isConnectedToWifi = false
   private var bgTask: BGProcessingTask? = nil
   private var timeStampStrStart: String? = nil
+  private var syncWorkItem: DispatchWorkItem?
   
   override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
     self.moduleName = "Zingo"
@@ -173,8 +174,6 @@ extension AppDelegate {
         
         NSLog("BGTask SCHEDULER registered \(bcgSchedulerTaskResult)")
     }
-
-    var syncWorkItem: DispatchWorkItem?
     
     private func startBackgroundTask(_ task: BGProcessingTask) {
         task.expirationHandler = {
@@ -345,7 +344,7 @@ extension AppDelegate {
 
             var syncStatus: SyncStatus?
             while true {
-                if syncWorkItem?.isCanceled == true {
+                if syncWorkItem?.isCancelled == true {
                     NSLog("BGTask syncingProcessBackgroundTask - sync cancelled by expiration handler")
                     return
                 }
@@ -372,7 +371,7 @@ extension AppDelegate {
                 }
 
                 //Thread.sleep(forTimeInterval: 5)
-                DispatchSemaphore(value: 0).wait(timeout: .now() + 5)
+                _ = DispatchSemaphore(value: 0).wait(timeout: .now() + 5)
             }
 
         } else {
