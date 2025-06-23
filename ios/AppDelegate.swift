@@ -173,29 +173,15 @@ extension AppDelegate {
         
         NSLog("BGTask SCHEDULER registered \(bcgSchedulerTaskResult)")
     }
+
+    var syncWorkItem: DispatchWorkItem?
     
     private func startBackgroundTask(_ task: BGProcessingTask) {
-        NSLog("BGTask startBackgroundTask called")
-        
-        // schedule tasks for the next time
-        scheduleBackgroundTask()
-        scheduleSchedulerBackgroundTask()
-
-        guard isConnectedToWifi else {
-            NSLog("BGTask startBackgroundTask: not connected to the wifi")
-            task.setTaskCompleted(success: false)
-            return
-        }
-        
-        // Start sync process
-        NSLog("BGTask startBackgroundTask run sync task")
-        // to run only one task
-        self.syncingProcessBackgroundTask()
-
         task.expirationHandler = {
             NSLog("BGTask startBackgroundTask - expirationHandler called")
             // stop the sync process, can't wait to check if the process is over.
             // have no time here
+            self.syncWorkItem?.cancel()
             let stopStr = stopSync()
             NSLog("BGTask startBackgroundTask - expirationHandler pause syncing \(stopStr)")
             
@@ -227,6 +213,26 @@ extension AppDelegate {
             NSLog("BGTask startBackgroundTask - expirationHandler THE END")
         }
 
+        NSLog("BGTask startBackgroundTask called")
+        
+        // schedule tasks for the next time
+        scheduleBackgroundTask()
+        scheduleSchedulerBackgroundTask()
+
+        guard isConnectedToWifi else {
+            NSLog("BGTask startBackgroundTask: not connected to the wifi")
+            task.setTaskCompleted(success: false)
+            return
+        }
+        
+        // Start sync process
+        NSLog("BGTask startBackgroundTask run sync task")
+        // to run only one task
+        syncWorkItem = DispatchWorkItem {
+            self.syncingProcessBackgroundTask()
+        }
+
+        DispatchQueue.global(qos: .background).async(execute: syncWorkItem!)
     }
     
     func scheduleBackgroundTask() {
@@ -339,6 +345,10 @@ extension AppDelegate {
 
             var syncStatus: SyncStatus?
             while true {
+                if syncWorkItem?.isCanceled == true {
+                    NSLog("BGTask syncingProcessBackgroundTask - sync cancelled by expiration handler")
+                    return
+                }
                 let syncStatusJson = statusSync()
                 if syncStatusJson.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
                     NSLog("BGTask syncingProcessBackgroundTask - sync STATUS ERROR: \(syncStatusJson)")
@@ -361,7 +371,8 @@ extension AppDelegate {
                     break
                 }
 
-                Thread.sleep(forTimeInterval: 5)
+                //Thread.sleep(forTimeInterval: 5)
+                DispatchSemaphore(value: 0).wait(timeout: .now() + 5)
             }
 
         } else {
@@ -396,7 +407,6 @@ extension AppDelegate {
           NSLog("BGTask syncingProcessBackgroundTask - Save Wallet error: \(error.localizedDescription)")
         }
         
-
         // save the background file
         let timeStampEnd = Date().timeIntervalSince1970
         let timeStampStrEnd = String(format: "%.0f", timeStampEnd)
@@ -409,7 +419,7 @@ extension AppDelegate {
         }
 
         if let task = self.bgTask {
-          task.setTaskCompleted(success: false)
+          task.setTaskCompleted(success: true)
         }
         bgTask = nil
     }
