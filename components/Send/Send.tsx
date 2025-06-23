@@ -76,7 +76,7 @@ import { magicModal } from 'react-native-magic-modal';
 // @ts-ignore
 //import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
-//import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
+import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
 
 type SendProps = {
   // side menu
@@ -342,31 +342,34 @@ const Send: React.FunctionComponent<SendProps> = ({
       // spendable TOTAL calculated
       let spendableBalance = totalBalance ? totalBalance.totalSpendableBalance : 0;
       let zenniesForZingo = donationAddress ? false : donation;
-      console.log('SPENDABLEBALANCE', addressPar, zenniesForZingo, spendableBalance);
-      //const runSpendableBalanceStr = await RPCModule.getSpendableBalanceInfo(
-      //  addressPar,
-      //  zenniesForZingo ? 'true' : 'false',
-      //);
-      //if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
-      //  // snack with error
-      //  console.log(runSpendableBalanceStr);
-      //  setSpendableBalanceLastError(runSpendableBalanceStr);
-      //  //Alert.alert('Calculating the FEE', runProposeStr);
-      //} else {
-      //  try {
-      //    const runSpendableBalanceJson: RPCSpendablebalanceType = await JSON.parse(runSpendableBalanceStr);
-      //    if (runSpendableBalanceJson.spendable_balance) {
-      //      console.log('SPENDABLEBALANCE result', runSpendableBalanceJson.spendable_balance);
-      //      spendableBalance = runSpendableBalanceJson.spendable_balance / 10 ** 8;
-      //      setSpendableBalanceLastError('');
-      //    }
-      //  } catch (e) {
-      //    // snack with error
-      //    console.log(runSpendableBalanceStr);
-      //    setSpendableBalanceLastError(runSpendableBalanceStr);
-      //    //Alert.alert('Calculating the FEE', runProposeJson.error);
-      //  }
-      //}
+      //console.log('SPENDABLEBALANCE', addressPar, zenniesForZingo, spendableBalance);
+      const start = Date.now();
+      const runSpendableBalanceStr = await RPCModule.getSpendableBalanceWithAddressInfo(
+        addressPar,
+        zenniesForZingo ? 'true' : 'false',
+      );
+      console.log('=========================================== > spendable balance with address - ', Date.now() - start);
+      console.log(runSpendableBalanceStr);
+      if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
+        // snack with error
+        console.log(runSpendableBalanceStr);
+        setSpendableBalanceLastError(runSpendableBalanceStr);
+        //Alert.alert('Calculating the FEE', runProposeStr);
+      } else {
+        try {
+          const runSpendableBalanceJson: RPCSpendablebalanceType = await JSON.parse(runSpendableBalanceStr);
+          if (runSpendableBalanceJson.spendable_balance) {
+            console.log('SPENDABLEBALANCE result', runSpendableBalanceJson.spendable_balance);
+            spendableBalance = runSpendableBalanceJson.spendable_balance / 10 ** 8;
+            setSpendableBalanceLastError('');
+          }
+        } catch (e) {
+          // snack with error
+          console.log('SPENDABLEBALANCE error', runSpendableBalanceStr);
+          setSpendableBalanceLastError(runSpendableBalanceStr);
+          //Alert.alert('Calculating the FEE', runProposeJson.error);
+        }
+      }
 
       setSpendable(spendableBalance);
       // max amount
@@ -684,6 +687,8 @@ const Send: React.FunctionComponent<SendProps> = ({
     setMemoText('');
     setIncludeUAMemoBoolean(false);
     clearToAddr();
+    setSpendable(0);
+    setSpendableBalanceLastError('');
   };
 
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {

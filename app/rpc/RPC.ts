@@ -34,7 +34,7 @@ import { RPCSendProposeType } from './types/RPCSendProposeType';
 import { RPCSyncPollType } from './types/RPCSyncPollType';
 import { RPCZecPriceType } from './types/RPCZecPriceType';
 import { RPCTransparentAddressType } from './types/RPCTransparentAddressType';
-//import { RPCSpendablebalanceType } from './types/RPCSpendablebalanceType';
+import { RPCSpendablebalanceType } from './types/RPCSpendablebalanceType';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -760,19 +760,20 @@ export default class RPC {
         return;
       }
       this.fetchTotalBalanceLock = true;
-      //const start = Date.now();
-      //const spendableStr: string = await RPCModule.getSpendableBalanceTotalInfo();
-      //console.log('=========================================== > spendable balance - ', Date.now() - start);
-      //let spendableJSON: RPCSpendablebalanceType = {} as RPCSpendablebalanceType;
-      //if (spendableStr) {
-      //  if (spendableStr.toLowerCase().startsWith(GlobalConst.error)) {
-      //    console.log(`Error spendable balance ${spendableStr}`);
-      //  } else {
-      //    spendableJSON = await JSON.parse(spendableStr);
-      //  }
-      //} else {
-      //  console.log('Internal Error balance');
-      //}
+      const start = Date.now();
+      const spendableStr: string = await RPCModule.getSpendableBalanceTotalInfo();
+      console.log('=========================================== > spendable balance - ', Date.now() - start);
+      console.log(spendableStr);
+      let spendableJSON: RPCSpendablebalanceType = {} as RPCSpendablebalanceType;
+      if (spendableStr) {
+        if (spendableStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error spendable balance ${spendableStr}`);
+        } else {
+          spendableJSON = await JSON.parse(spendableStr);
+        }
+      } else {
+        console.log('Internal Error spendable balance');
+      }
 
       const start2 = Date.now();
       const balanceStr: string = await RPCModule.getBalanceInfo();
@@ -799,8 +800,8 @@ export default class RPC {
         confirmedSaplingBalance: (balanceJSON.confirmed_sapling_balance || 0) / 10 ** 8,
         confirmedTransparentBalance: (balanceJSON.confirmed_transparent_balance || 0) / 10 ** 8,
         // header total balance
-        //totalSpendableBalance: (spendableJSON.spendable_balance || 0) / 10 ** 8,
-        totalSpendableBalance: ((balanceJSON.confirmed_orchard_balance + balanceJSON.confirmed_sapling_balance) || 0) / 10 ** 8,
+        totalSpendableBalance: (spendableJSON.spendable_balance || 0) / 10 ** 8,
+        //totalSpendableBalance: ((balanceJSON.confirmed_orchard_balance + balanceJSON.confirmed_sapling_balance) || 0) / 10 ** 8,
       };
       console.log(balance);
       //const start2 = Date.now();
