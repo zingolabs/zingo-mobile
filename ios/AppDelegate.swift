@@ -91,7 +91,8 @@ class AppDelegate: RCTAppDelegate {
     if #available(iOS 13.0, *) {
         // cancel existing sync process (if any).
         NSLog("BGTask foreground")
-        self.stopSyncingProcess()
+        // with pepper-sync no need to stop the sync process here
+        //self.stopSyncingProcess()
 
         // cancel bg task
         if let task = self.bgTask {
@@ -106,7 +107,8 @@ class AppDelegate: RCTAppDelegate {
     if #available(iOS 13.0, *) {
         // Cancel existing sync process (if any).
         NSLog("BGTask background")
-        self.stopSyncingProcess()
+        // with pepper-sync no need to stop the sync process here
+        //self.stopSyncingProcess()
 
         // Cancel bg task
         if let task = self.bgTask {
@@ -182,7 +184,7 @@ extension AppDelegate {
             // have no time here
             self.syncWorkItem?.cancel()
             let stopStr = stopSync()
-            NSLog("BGTask startBackgroundTask - expirationHandler pause syncing \(stopStr)")
+            NSLog("BGTask startBackgroundTask - expirationHandler stop syncing: \(stopStr)")
             
             let rpcmodule = RPCModule()
 
@@ -326,16 +328,19 @@ extension AppDelegate {
       
         if exists == "true" {
             // chaeck the server
-            let balance = executeCommand(cmd: "balance", args: "")
+            let balance = getBalance()
             let balanceStr = String(balance)
             NSLog("BGTask syncingProcessBackgroundTask - testing if server is active \(balanceStr)")
             if balanceStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
                 // this task is running with the App closed.
+                // probably is an impossible case...
                 self.loadWalletFile()
-            } else {
-                // the App is open, stop the sync first, just in case.
-                self.stopSyncingProcess()
             }
+            // else {
+                // the App is open, stop the sync first, just in case.
+                // with pepper-sync no need to stop the sync process here
+                //self.stopSyncingProcess()
+            //}
 
             // run the sync process.
             let syncing = runSync()
