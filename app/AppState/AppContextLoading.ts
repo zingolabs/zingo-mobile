@@ -1,4 +1,3 @@
-import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
 import ZecPriceType from './types/ZecPriceType';
 import BackgroundType from './types/BackgroundType';
@@ -18,7 +17,6 @@ export default interface AppContextLoading {
   // context
   netInfo: NetInfoType;
   wallet: WalletType;
-  info: InfoType;
   zecPrice: ZecPriceType;
   background: BackgroundType;
   translate: (key: string) => TranslateType;
@@ -31,6 +29,7 @@ export default interface AppContextLoading {
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
   removeFirstSnackbar: () => void;
+  zingolibVersion: string;
 
   // context settings
   server: ServerType;

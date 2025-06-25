@@ -118,6 +118,9 @@ export default interface AppContextLoaded {
   // donation address
   zenniesDonationAddress: string;
 
+  // zingolib Version
+  zingolibVersion: string;
+
   // settings
   server: ServerType;
   currency: CurrencyEnum;

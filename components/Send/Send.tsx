@@ -141,6 +141,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     setPoolsModalShow,
     //security,
     currency,
+    zingolibVersion,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -806,7 +807,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           false,
           translate,
           sendEmail,
-          info.zingolib,
+          zingolibVersion,
         );
       }, 1000);
       closeAllModals();
@@ -1270,7 +1271,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               onPress: async () =>
                                 sendEmail(
                                   translate,
-                                  info.zingolib,
+                                  zingolibVersion,
                                   translate('send.spendable') as string,
                                   spendableBalanceLastError,
                                 ),
@@ -1363,7 +1364,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                                   onPress: async () =>
                                     sendEmail(
                                       translate,
-                                      info.zingolib,
+                                      zingolibVersion,
                                       translate('send.fee') as string,
                                       proposeSendLastError,
                                     ),

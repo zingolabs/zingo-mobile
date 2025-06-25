@@ -642,9 +642,9 @@
   },
   "report": {
     "title": "Senkronizasyon / Yeniden Tarama Raporu",
-    "running": "Cüzdan senkronize ediliyor…",
-    "finished": "Cüzdan tamamen senkronize edildi",
-    "paused": "Cüzdan, senkronizasyona başlamak için bekliyor…",
+    "running": "Senkronize ediliyor...",
+    "finished": "Tamamen Senkronize Edildi",
+    "paused": "Senkronizasyonun başlatılmasını bekliyor...",
     "server-title": "SUNUCU:",
     "blocks": "Bloklar.",
     "wallet": "Cüzdan:",

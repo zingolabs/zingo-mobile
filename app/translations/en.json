@@ -642,9 +642,9 @@
   },
   "report": {
     "title": "Sync / Rescan Report",
-    "running": "The wallet is Syncing...",
-    "finished": "The wallet is Fully Synced",
-    "paused": "The wallet is waiting to start syncing...",
+    "running": "Syncing...",
+    "finished": "Fully Synced",
+    "paused": "Waiting to start syncing...",
     "server-title": "SERVER: ",
     "blocks": " Blocks. ",
     "wallet": "Wallet: ",

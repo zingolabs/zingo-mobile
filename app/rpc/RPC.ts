@@ -741,7 +741,6 @@ export default class RPC {
           infoJSON.version
         }`,
         currencyName: infoJSON.chain_name === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.TAZ,
-        zingolib: '',
       };
 
       //const start3 = Date.now();

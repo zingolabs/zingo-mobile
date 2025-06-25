@@ -43,7 +43,6 @@ import {
   GlobalConst,
   EventListenerEnum,
   AppContextLoading,
-  InfoType,
   ZecPriceType,
   BackgroundErrorType,
   RestoreFromTypeEnum,
@@ -345,7 +344,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       // context
       netInfo: {} as NetInfoType,
       wallet: {} as WalletType,
-      info: {} as InfoType,
       zecPrice: {} as ZecPriceType,
       background: props.background,
       translate: props.translate,
@@ -358,6 +356,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       snackbars: [] as SnackbarType[],
       addLastSnackbar: this.addLastSnackbar,
       removeFirstSnackbar: this.removeFirstSnackbar,
+      zingolibVersion: '',
 
       // context settings
       server: props.server,
@@ -411,6 +410,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       },
       //actionButtonsDisabled: !netInfoState.isConnected ? true : false,
     });
+
+    this.fetchZingolibVersion();
 
     //console.log('DID MOUNT APPLOADING...', netInfoState);
 
@@ -830,7 +831,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         false,
         this.state.translate,
         sendEmail,
-        this.state.info.zingolib,
+        this.state.zingolibVersion,
       );
       this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
     } else {
@@ -845,7 +846,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           false,
           this.state.translate,
           sendEmail,
-          this.state.info.zingolib,
+          this.state.zingolibVersion,
         );
         this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
       } else {
@@ -876,7 +877,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 false,
                 this.state.translate,
                 sendEmail,
-                this.state.info.zingolib,
+                this.state.zingolibVersion,
               );
               this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
             }
@@ -889,7 +890,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               false,
               this.state.translate,
               sendEmail,
-              this.state.info.zingolib,
+              this.state.zingolibVersion,
             );
             this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
           }
@@ -908,7 +909,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               false,
               this.state.translate,
               sendEmail,
-              this.state.info.zingolib,
+              this.state.zingolibVersion,
             );
             this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
           }, 1000);
@@ -1033,7 +1034,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               false,
               this.state.translate,
               sendEmail,
-              this.state.info.zingolib,
+              this.state.zingolibVersion,
             );
             return;
           }
@@ -1047,7 +1048,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             false,
             this.state.translate,
             sendEmail,
-            this.state.info.zingolib,
+            this.state.zingolibVersion,
           );
           return;
         }
@@ -1093,7 +1094,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         false,
         this.state.translate,
         sendEmail,
-        this.state.info.zingolib,
+        this.state.zingolibVersion,
       );
       return;
     }
@@ -1111,7 +1112,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         false,
         this.state.translate,
         sendEmail,
-        this.state.info.zingolib,
+        this.state.zingolibVersion,
       );
       return;
     }
@@ -1355,6 +1356,33 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.componentDidMount();
   };
 
+  async fetchZingolibVersion(): Promise<void> {
+    try {
+      const start = Date.now();
+      let zingolibStr: string = await RPCModule.getVersionInfo();
+      console.log('=========================================== > zingolib version - ', Date.now() - start);
+      if (zingolibStr) {
+        if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error zingolib version ${zingolibStr}`);
+          zingolibStr = GlobalConst.zingolibError;
+        }
+      } else {
+        console.log('Internal Error zingolib version');
+        zingolibStr = GlobalConst.zingolibNone;
+      }
+
+      //const start2 = Date.now();
+      this.setState({
+        zingolibVersion: zingolibStr,
+      });
+      //console.log('=========================================== > set zingolib version - ', Date.now() - start2);
+    } catch (error) {
+      console.log(`Critical Error info ${error}`);
+      return;
+    }
+  }
+
+
   render() {
     const {
       screen,
@@ -1382,7 +1410,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       // context
       netInfo: this.state.netInfo,
       wallet: this.state.wallet,
-      info: this.state.info,
       zecPrice: this.state.zecPrice,
       background: this.state.background,
       translate: this.state.translate,
@@ -1395,6 +1422,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       snackbars: this.state.snackbars,
       addLastSnackbar: this.state.addLastSnackbar,
       removeFirstSnackbar: this.removeFirstSnackbar,
+      zingolibVersion: this.state.zingolibVersion,
 
       // settings
       server: this.state.server,

@@ -2,7 +2,6 @@ import React, { ReactNode } from 'react';
 
 import {
   AppContextLoading,
-  InfoType,
   WalletType,
   ZecPriceType,
   BackgroundType,
@@ -20,7 +19,6 @@ import {
 export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,
   wallet: {} as WalletType,
-  info: {} as InfoType,
   server: {} as ServerType,
   currency: CurrencyEnum.noCurrency,
   language: LanguageEnum.en,
@@ -52,6 +50,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   selectServer: SelectServerEnum.auto,
   rescanMenu: false,
   recoveryWalletInfoOnDevice: false,
+  zingolibVersion: '',
 };
 
 export const ContextAppLoading = React.createContext(defaultAppContextLoading);

@@ -642,9 +642,9 @@
   },
   "report": {
     "title": "Informe de Sincronización",
-    "running": "El monedero se está sincronizando...",
-    "finished": "El monedero está totalmente sincronizado",
-    "paused": "El monedero está esperando para empezar a sincronizar...",
+    "running": "Sincronizando...",
+    "finished": "Totalmente sincronizado",
+    "paused": "Esperando para empezar a sincronizar...",
     "server-title": "SERVIDOR: ",
     "blocks": " Bloques. ",
     "wallet": "Monedero: ",

@@ -23,7 +23,7 @@ type AboutProps = {
 };
 const About: React.FunctionComponent<AboutProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language, snackbars, removeFirstSnackbar } = context;
+  const { zingolibVersion, translate, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -75,7 +75,7 @@ const About: React.FunctionComponent<AboutProps> = () => {
           padding: 20,
         }}>
         <FadeText>{arrayTxt[0]}</FadeText>
-        <DetailLine label={translate('info.zingolib') as string} value={info.zingolib} />
+        <DetailLine label={translate('info.zingolib') as string} value={zingolibVersion} />
         <View style={{ marginTop: 20 }}>
           {arrayTxt.map((txt: string, ind: number) => (
             <View key={txt.substring(0, 10)}>

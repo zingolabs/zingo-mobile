@@ -96,12 +96,12 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     defaultUnifiedAddress,
     selectServer,
     netInfo,
-    info,
     setBackgroundError,
     server,
     totalBalance,
     doRefresh,
     somePending,
+    zingolibVersion,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
@@ -428,7 +428,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         false,
         translate,
         sendEmail,
-        info.zingolib,
+        zingolibVersion,
       );
       setDisableSend(false);
     });

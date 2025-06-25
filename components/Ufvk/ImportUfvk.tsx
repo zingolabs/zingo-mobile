@@ -40,7 +40,7 @@ type ImportUfvkProps = {
 };
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, onClickOK }) => {
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, info, server, mode, addLastSnackbar, language, selectServer, snackbars, removeFirstSnackbar } = context;
+  const { translate, netInfo, server, mode, addLastSnackbar, language, selectServer, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
@@ -51,10 +51,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   const [latestBlock, setLatestBlock] = useState<number>(0);
 
   useEffect(() => {
-    if (info.latestBlock) {
-      setLatestBlock(info.latestBlock);
-    } else {
-      if (selectServer !== SelectServerEnum.offline) {
+      if (!netInfo.isConnected || selectServer !== SelectServerEnum.offline) {
         (async () => {
           const resp: string = await RPCModule.getLatestBlockServerInfo(server.uri);
           //console.log(resp);
@@ -65,8 +62,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           }
         })();
       }
-    }
-  }, [info.latestBlock, server, selectServer]);
+  }, [server, selectServer, netInfo.isConnected]);
 
   useEffect(() => {
     if (seedufvkText) {

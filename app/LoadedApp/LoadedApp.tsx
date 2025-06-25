@@ -18,7 +18,7 @@ import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft, faCommen
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
-import { cloneDeep, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList, LoadedAppNavigationState } from '../types';
 import NetInfo, { NetInfoSubscription, NetInfoState } from '@react-native-community/netinfo/src/index';
@@ -514,6 +514,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       setUfvkViewModalShow: this.setUfvkViewModalShow,
       setSyncReportModalShow: this.setSyncReportModalShow,
       setPoolsModalShow: this.setPoolsModalShow,
+      zingolibVersion: '',
 
       // context settings
       server: props.server,
@@ -1094,11 +1095,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     return magicModal.show(() => <ComputingTxContent />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
   };
 
-  setInfo = (info: InfoType) => {
-    let newInfo = cloneDeep(info);
-    if (!newInfo.zingolib) {
-      newInfo.zingolib = this.state.info.zingolib;
-    }
+  setInfo = (newInfo: InfoType) => {
     if (!isEqual(this.state.info, newInfo)) {
       // if currencyName is empty,
       // I need to rescue the last value from the state,
@@ -1120,16 +1117,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       //const start = Date.now();
       this.setState({ info: newInfo });
       //console.log('=========================================== > INFO STORED SETSTATE - ', Date.now() - start);
+      //console.log('SET', newInfo);
     }
   };
 
-  setZingolibVersion = (zingolib: string) => {
-    if (!this.state.info.zingolib) {
-      let newInfo = cloneDeep(this.state.info);
-      newInfo.zingolib = zingolib;
+  setZingolibVersion = (newZingolibVersion: string) => {
+    if (!this.state.zingolibVersion) {
       //const start = Date.now();
-      this.setState({ info: newInfo });
+      this.setState({ zingolibVersion: newZingolibVersion });
       //console.log('=========================================== > ZINGOLIB STORED SETSTATE - ', Date.now() - start);
+      //console.log('SET', newZingolibVersion);
     }
   };
 
@@ -1327,7 +1324,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       });
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
-      await sendEmail(this.state.translate, this.state.info.zingolib);
+      await sendEmail(this.state.translate, this.state.zingolibVersion);
       this.setShowSwipeableIcons(true);
     }
   };
@@ -1622,7 +1619,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         false,
         this.state.translate,
         sendEmail,
-        this.state.info.zingolib,
+        this.state.zingolibVersion,
       );
       return;
     }
@@ -1645,7 +1642,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         false,
         this.state.translate,
         sendEmail,
-        this.state.info.zingolib,
+        this.state.zingolibVersion,
       );
       return;
     }
@@ -1710,7 +1707,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           false,
           this.state.translate,
           sendEmail,
-          this.state.info.zingolib,
+          this.state.zingolibVersion,
         );
         //return;
       }
@@ -1846,6 +1843,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       setUfvkViewModalShow: this.setUfvkViewModalShow,
       setSyncReportModalShow: this.setSyncReportModalShow,
       setPoolsModalShow: this.setPoolsModalShow,
+      zingolibVersion: this.state.zingolibVersion,
 
       // context settings
       server: this.state.server,

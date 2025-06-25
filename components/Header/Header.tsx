@@ -506,7 +506,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     </TouchableOpacity>
   );
 
-  //console.log('render header &&&&&&&&&&&&&&&&&&&&&', percentageOutputsScanned, syncInProgress);
+  //console.log('render header &&&&&&&&&&&&&&&&&&&&&', info.currencyName);
 
   return (
     <>

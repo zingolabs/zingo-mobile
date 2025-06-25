@@ -642,7 +642,7 @@
   },
   "report": {
     "title": "Relatório de Sincronização / Rescan",
-    "running": "Em Processo",
+    "running": "Em Processo...",
     "finished": "Finalizado",
     "paused": "Pausado",
     "server-title": "SERVIDOR: ",
