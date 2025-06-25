@@ -188,5 +188,8 @@ RCT_EXTERN_METHOD(checkMyAddressInfo:
     (NSString)address
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getWalletSaveRequiredInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end
