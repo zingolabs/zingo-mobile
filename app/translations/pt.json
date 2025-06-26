@@ -506,6 +506,7 @@
     "fetchpricetitle": "Buscar preço em USD",
     "fetchpricebody": "Confirme que você deseja obter o preço em USD na Internet.",
     "fetch-button": "Buscar",
+    "fetchwithtor-button": "Buscar com Tor",
     "confirm-privacy-level": "Nível de Privacidade",
     "private": "Privado",
     "amountrevealed": "Quantia Revelada",

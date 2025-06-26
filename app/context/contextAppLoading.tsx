@@ -20,7 +20,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,
   wallet: {} as WalletType,
   server: {} as ServerType,
-  currency: CurrencyEnum.noCurrency,
+  currency: CurrencyEnum.USDCurrency,
   language: LanguageEnum.en,
   zecPrice: {
     zecPrice: 0,

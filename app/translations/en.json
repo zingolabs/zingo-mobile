@@ -506,6 +506,7 @@
     "fetchpricetitle": "Fetch USD Price",
     "fetchpricebody": "Please confirm that you want to fetch the USD price from the Internet.",
     "fetch-button": "Fetch",
+    "fetchwithtor-button": "Fetch with Tor",
     "confirm-privacy-level": "Privacy Level",
     "private": "Private",
     "amountrevealed": "Amount Revealed",

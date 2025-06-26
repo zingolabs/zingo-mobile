@@ -133,7 +133,7 @@ const SERVER_DEFAULT_0: ServerType = {
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as ThemeType;
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency);
+  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.USDCurrency);
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [donation, setDonation] = useState<boolean>(false);
@@ -1382,7 +1382,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             await this.rpc.clearTimers();
             await this.rpc.configure();
             // creating tor cliente if needed
-            if (this.state.currency === CurrencyEnum.USDTORCurrency) {
+            // we have two buttons to fetch -> we need tor client Just in case.
+            if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
               RPCModule.createTorClientProcess();
             }
             return;
@@ -1460,8 +1461,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       currency: value as CurrencyEnum,
     });
 
-    if (value === CurrencyEnum.USDTORCurrency) {
-      // when the user select USD with Tor
+    if (value === CurrencyEnum.USDTORCurrency || value === CurrencyEnum.USDCurrency) {
+      // when the user select USD
       // the App have to create a Tor Client
       console.log('before CREATE ------------------- TOR CLIENT');
       const result = await RPCModule.createTorClientProcess();

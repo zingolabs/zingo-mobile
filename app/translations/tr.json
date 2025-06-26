@@ -506,6 +506,7 @@
     "fetchpricetitle": "USD Fiyatını Getir",
     "fetchpricebody": "Lütfen USD fiyatını internetten almak istediğinizi onaylayın.",
     "fetch-button": "Getir",
+    "fetchwithtor-button": "Tor ile getir",
     "confirm-privacy-level": "Gizlilik Seviyesi",
     "private": "Gizli",
     "amountrevealed": "Açıklanan Tutar",

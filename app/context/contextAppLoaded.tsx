@@ -40,7 +40,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   wallet: {} as WalletType,
   defaultUnifiedAddress: '',
   server: {} as ServerType,
-  currency: CurrencyEnum.noCurrency,
+  currency: CurrencyEnum.USDCurrency,
   language: LanguageEnum.en,
   zecPrice: {
     zecPrice: 0,

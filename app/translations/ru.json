@@ -506,6 +506,7 @@
     "fetchpricetitle": "Загрузить цену в USD",
     "fetchpricebody": "Пожалуйста, подтвердите, что вы хотите получить цену в USD из Интернета.",
     "fetch-button": "Получить",
+    "fetchwithtor-button": "Получить с помощью Tor",
     "confirm-privacy-level": "Режим конфиденциальности",
     "private": "Приватный",
     "amountrevealed": "Раскрытая сумма",

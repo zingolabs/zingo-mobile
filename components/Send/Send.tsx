@@ -1515,7 +1515,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           style={{ marginTop: 1, fontSize: 12.5 }}
                           price={zecPrice.zecPrice}
                           amtZec={maxAmount}
-                          currency={CurrencyEnum.USDCurrency}
+                          currency={currency}
                           privacy={privacy}
                         />
                       </View>

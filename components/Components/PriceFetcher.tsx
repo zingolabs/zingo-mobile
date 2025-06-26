@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { TouchableOpacity, View, ActivityIndicator, Alert } from 'react-native';
+import { TouchableOpacity, View, ActivityIndicator, Alert, AlertButton } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
@@ -53,12 +53,12 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
     }
   };
 
-  const onPressFetch = async () => {
+  const onPressFetch = async (withTor: boolean) => {
     setLoading(true);
     let price: number;
     let error: string;
     // first attempt
-    ({price, error} = await RPC.rpcGetZecPrice(currency === CurrencyEnum.USDTORCurrency));
+    ({price, error} = await RPC.rpcGetZecPrice(withTor));
     console.log('first price fetching', price, error);
     // values:
     // 0   - initial/default value
@@ -67,7 +67,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
     // > 0 - real value
     if (price <= 0) {
       // second attempt
-      ({price, error} = await RPC.rpcGetZecPrice(currency === CurrencyEnum.USDTORCurrency));
+      ({price, error} = await RPC.rpcGetZecPrice(withTor));
       console.log('second price fetching', price, error);
     }
 
@@ -95,13 +95,17 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
   };
 
   const onPressFetchAlert = () => {
+    const buttons: AlertButton[] = [
+      ...[currency === CurrencyEnum.USDCurrency
+        ? { text: translate('send.fetch-button') as string, onPress: () => onPressFetch(false) } : {}],
+      ...[currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency
+        ? { text: translate('send.fetchwithtor-button') as string, onPress: () => onPressFetch(true) } : {}],
+      { text: translate('cancel') as string, style: 'cancel' },
+    ];
     Alert.alert(
       translate('send.fetchpricetitle') as string,
       translate('send.fetchpricebody') as string,
-      [
-        { text: translate('send.fetch-button') as string, onPress: () => onPressFetch() },
-        { text: translate('cancel') as string, style: 'cancel' },
-      ],
+      buttons,
       { cancelable: false },
     );
   };
@@ -128,7 +132,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
       {!loading && (
         <TouchableOpacity
           disabled={loading}
-          onPress={() => (mode === ModeEnum.basic ? onPressFetch() : onPressFetchAlert())}>
+          onPress={() => (mode === ModeEnum.basic ? onPressFetch(false) : onPressFetchAlert())}>
           <View
             style={{
               flexDirection: 'row',
