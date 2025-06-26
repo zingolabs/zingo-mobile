@@ -294,6 +294,10 @@ export default class RPC {
 
     const performance = await this.getConfigWalletPerformance();
     console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL', performance);
+    if (performance !== RPCPerformanceLevelEnum.Medium) {
+      const setConfigWallet = await RPCModule.setConfigWalletToProdProcess();
+      console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET', setConfigWallet);
+    }
 
     const taskPromises: Promise<void>[] = [];
 
