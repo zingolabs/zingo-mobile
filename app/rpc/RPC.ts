@@ -79,6 +79,7 @@ export default class RPC {
   server: ServerType;
 
   lastPollSyncError: string;
+  walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
 
   constructor(
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
@@ -292,11 +293,19 @@ export default class RPC {
     console.log('+++++++++++++++++ interval update 5 secs ALL', this.timers);
     this.sanitizeTimers();
 
-    const performance = await this.getConfigWalletPerformance();
-    console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL', performance);
-    if (performance !== RPCPerformanceLevelEnum.Medium) {
-      const setConfigWallet = await RPCModule.setConfigWalletToProdProcess();
-      console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET', setConfigWallet);
+    if (this.walletConfigPerformanceLevel !== RPCPerformanceLevelEnum.Medium) {
+      const performance = await this.getConfigWalletPerformance();
+      this.walletConfigPerformanceLevel = performance;
+      console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL', performance);
+      if (performance !== RPCPerformanceLevelEnum.Medium) {
+        const setConfigWallet = await RPCModule.setConfigWalletToProdProcess();
+        console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET', setConfigWallet);
+        // I need to be sure in this point that the performance level is Medium
+        await RPCModule.doSave();
+        const performanceChanged = await this.getConfigWalletPerformance();
+        this.walletConfigPerformanceLevel = performanceChanged;
+        console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL CHANGED', performanceChanged);
+      }
     }
 
     const taskPromises: Promise<void>[] = [];
