@@ -26,14 +26,14 @@ import { isEqual } from 'lodash';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 import { RPCSyncScanRangeStatusType } from '../../app/rpc/types/RPCSyncScanRangeStatusType';
 import { RPCSyncScanRangePriorityStatusEnum } from '../../app/rpc/enums/RPCSyncScanRangePriorityStatusEnum';
-import { ModeEnum } from '../../app/AppState';
+//import { ModeEnum } from '../../app/AppState';
 
 type SyncReportProps = {
 };
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { syncingStatus, wallet, translate, background, language, netInfo, snackbars, removeFirstSnackbar, info, mode } = context;
+  const { syncingStatus, wallet, translate, background, language, netInfo, snackbars, removeFirstSnackbar, info } = context; //mode
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -578,7 +578,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
               <ActivityIndicator size="large" color={colors.primary} />
             </View>
           )}
-          {!!syncingStatus.lastError && mode === ModeEnum.advanced && (
+          {/*!!syncingStatus.lastError && mode === ModeEnum.advanced && (
             <>
               <View
                 style={{ height: 1, width: '100%', backgroundColor: 'white' }}
@@ -597,7 +597,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                 </DetailLine>
               </View>
             </>
-          )}
+          )*/}
         </ScrollView>
       </View>
     </ToastProvider>
