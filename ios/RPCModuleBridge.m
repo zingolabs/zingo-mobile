@@ -191,5 +191,11 @@ RCT_EXTERN_METHOD(checkMyAddressInfo:
 RCT_EXTERN_METHOD(getWalletSaveRequiredInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(setConfigWalletToProdProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getConfigWalletPerformanceInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end

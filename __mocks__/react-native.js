@@ -43,6 +43,8 @@ jest.mock('react-native', () => {
     createNewTransparentAddressProcess: jest.fn(() => '{}'),
     checkMyAddressInfo: jest.fn(() => '{}'),
     getWalletSaveRequiredInfo: jest.fn(() => '{}'),
+    setConfigWalletToProdProcess: jest.fn(() => '{}'),
+    getConfigWalletPerformanceInfo: jest.fn(() => '{}'),
   };
   RN.View = jest.fn();
 

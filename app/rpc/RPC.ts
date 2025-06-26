@@ -36,6 +36,8 @@ import { RPCZecPriceType } from './types/RPCZecPriceType';
 import { RPCTransparentAddressType } from './types/RPCTransparentAddressType';
 import { RPCSpendablebalanceType } from './types/RPCSpendablebalanceType';
 import { RPCWalletSaveRequiredType } from './types/RPCWalletSaveRequiredType';
+import { RPCConfigWalletPerformanceType } from './types/RPCConfigWalletPerformanceType';
+import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -289,6 +291,9 @@ export default class RPC {
   async runTaskPromises(): Promise<void> {
     console.log('+++++++++++++++++ interval update 5 secs ALL', this.timers);
     this.sanitizeTimers();
+
+    const performance = await this.getConfigWalletPerformance();
+    console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL', performance);
 
     const taskPromises: Promise<void>[] = [];
 
@@ -977,6 +982,29 @@ export default class RPC {
     } catch (error) {
       console.log(`Critical Error wallet save required ${error}`);
       return false;
+    }
+  }
+
+  async getConfigWalletPerformance(): Promise<RPCPerformanceLevelEnum | undefined> {
+    try {
+      const start = Date.now();
+      const configWalletPerformanceStr: string = await RPCModule.getConfigWalletPerformanceInfo();
+      console.log('=========================================== > wallet config performance - ', Date.now() - start);
+      if (configWalletPerformanceStr) {
+        if (configWalletPerformanceStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error wallet config performance ${configWalletPerformanceStr}`);
+          return;
+        }
+      } else {
+        console.log('Internal Error wallet config performance');
+        return;
+      }
+      const configWalletPerformanceJSON: RPCConfigWalletPerformanceType = await JSON.parse(configWalletPerformanceStr);
+
+      return configWalletPerformanceJSON.performance_level;
+    } catch (error) {
+      console.log(`Critical Error wallet config performance ${error}`);
+      return;
     }
   }
 
