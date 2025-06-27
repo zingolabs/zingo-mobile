@@ -247,7 +247,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                 borderWidth: 1,
                 paddingHorizontal: 10,
                 paddingVertical: 5,
-                marginRight: 0,
+                marginRight: 10,
               }}>
               <FadeText
                 style={{
@@ -295,7 +295,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                 borderWidth: 1,
                 paddingHorizontal: 10,
                 paddingVertical: 5,
-                marginRight: 10,
+                marginRight: 0,
               }}>
               <FadeText
                 style={{
