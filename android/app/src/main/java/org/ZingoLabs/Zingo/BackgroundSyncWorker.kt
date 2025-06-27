@@ -84,13 +84,15 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             if (balance.lowercase().startsWith(ErrorPrefix.value)) {
                 // this means this task is running with the App closed
                 loadWalletFile()
-            }
-            // else {
+            } else {
                 // this means the App is open,
                 // stop syncing first, just in case.
                 // with pepper-sync no need to stop sync process here
-                //stopSyncingProcess()
-            //}
+                stopSyncingProcess()
+            }
+
+            // setting performance level & min confirmations
+            uniffi.zingo.setConfigWalletToProd()
 
             // the task is running here blocking this execution until this process finished:
             // 1. finished the syncing.

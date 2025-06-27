@@ -342,6 +342,9 @@ extension AppDelegate {
                 //self.stopSyncingProcess()
             //}
 
+            // setting performance level & min confirmations
+            setConfigWalletToProd()
+
             // run the sync process.
             let syncing = runSync()
             let syncingStr = String(syncing)
