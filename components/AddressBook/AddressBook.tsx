@@ -69,7 +69,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const [action, setAction] = useState<AddressBookActionEnum | null>(null);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
-  const [filter, setFilter] = useState<FilterEnum>(FilterEnum.contacts);
+  const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -236,6 +236,30 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           }}>
           <TouchableOpacity
             onPress={() => {
+              setFilter(FilterEnum.all);
+              setLoading(true);
+            }}>
+            <View
+              style={{
+                backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
+                borderRadius: 15,
+                borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
+                borderWidth: 1,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                marginRight: 0,
+              }}>
+              <FadeText
+                style={{
+                  color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
+                  fontWeight: 'bold',
+                }}>
+                {translate('messages.filter-all') as string}
+              </FadeText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
               setFilter(FilterEnum.contacts);
               setLoading(true);
             }}>
@@ -279,30 +303,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                   fontWeight: 'bold',
                 }}>
                 {translate('addressbook.filter-wallet') as string}
-              </FadeText>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setFilter(FilterEnum.all);
-              setLoading(true);
-            }}>
-            <View
-              style={{
-                backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
-                borderRadius: 15,
-                borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
-                borderWidth: 1,
-                paddingHorizontal: 10,
-                paddingVertical: 5,
-                marginRight: 0,
-              }}>
-              <FadeText
-                style={{
-                  color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
-                  fontWeight: 'bold',
-                }}>
-                {translate('messages.filter-all') as string}
               </FadeText>
             </View>
           </TouchableOpacity>

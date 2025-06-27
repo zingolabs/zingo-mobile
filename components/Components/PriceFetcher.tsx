@@ -105,7 +105,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
     Alert.alert(
       translate('send.fetchpricetitle') as string,
       translate('send.fetchpricebody') as string,
-      buttons,
+      buttons.filter((b: AlertButton) => !!b.text),
       { cancelable: false },
     );
   };
