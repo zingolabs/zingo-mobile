@@ -221,11 +221,17 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
   const setServer = () => {
     if (selectServerContext === SelectServerEnum.auto) {
-      setAutoIcon(faDotCircle);
+      setAutoIcon(faDotCircle); // ->
+      setListIcon(farCircle);
+      setCustomIcon(farCircle);
+      setOfflineIcon(farCircle);
       setAutoServerUri(serverContext.uri);
       setAutoServerChainName(serverContext.chainName);
     } else if (selectServerContext === SelectServerEnum.list) {
-      setListIcon(faDotCircle);
+      setAutoIcon(farCircle);
+      setListIcon(faDotCircle); // ->
+      setCustomIcon(farCircle);
+      setOfflineIcon(farCircle);
       setListServerUri(serverContext.uri);
       setListServerChainName(serverContext.chainName);
       // I have to update them in auto as well
@@ -233,7 +239,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setAutoServerUri(serverContext.uri);
       setAutoServerChainName(serverContext.chainName);
     } else if (selectServerContext === SelectServerEnum.custom) {
-      setCustomIcon(faDotCircle);
+      setAutoIcon(farCircle);
+      setListIcon(farCircle);
+      setCustomIcon(faDotCircle); // ->
+      setOfflineIcon(farCircle);
       setCustomServerUri(serverContext.uri);
       setCustomServerChainName(serverContext.chainName);
       // I have to update them in auto as well
@@ -241,7 +250,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setAutoServerUri(serverUris(translate)[0].uri);
       setAutoServerChainName(serverUris(translate)[0].chainName);
     } else if (selectServerContext === SelectServerEnum.offline) {
-      setOfflineIcon(faDotCircle);
+      setAutoIcon(farCircle);
+      setListIcon(farCircle);
+      setCustomIcon(farCircle);
+      setOfflineIcon(faDotCircle); // ->
       // I have to update them in auto as well
       // with the first of the list
       setAutoServerUri(serverUris(translate)[0].uri);
@@ -553,8 +565,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setPrivacy(privacyContext);
       setSendAll(sendAllContext);
       setRescanMenu(rescanMenuContext);
-      setServer();
       setSelectServer(selectServerContext);
+      setServer();
       setStartApp(securityContext.startApp);
       setForegroundApp(securityContext.foregroundApp);
       setSendConfirm(securityContext.sendConfirm);
@@ -869,6 +881,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           setCustomIcon(farCircle);
                           setSelectServer(SelectServerEnum.list);
                           setListServerUri(itemValue);
+                          setAutoServerUri(itemValue);
                           // avoiding obsolete ones
                           const cnItem = serverUris(translate).find(
                             (s: ServerUrisType) => s.uri === itemValue && !s.obsolete,
