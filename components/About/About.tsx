@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
@@ -18,6 +18,7 @@ import 'moment/locale/tr';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { GlobalConst } from '../../app/AppState';
 
 type AboutProps = {
 };
@@ -36,10 +37,9 @@ const About: React.FunctionComponent<AboutProps> = () => {
     arrayTxt = arrayTxtObject as string[];
   }
 
-  console.log(top, bottom, right, left);
+  //console.log(top, bottom, right, left);
 
-  return (
-    <ToastProvider>
+  const AndroidReturn = (
     <View
       style={{
         marginTop: top,
@@ -86,8 +86,17 @@ const About: React.FunctionComponent<AboutProps> = () => {
         </View>
       </ScrollView>
     </View>
-    </ToastProvider>
   );
+
+  if (Platform.OS === GlobalConst.platformOSandroid) {
+    return AndroidReturn;
+  } else {
+    return (
+      <ToastProvider>
+        {AndroidReturn}
+      </ToastProvider>
+    );
+  }
 };
 
 export default About;
