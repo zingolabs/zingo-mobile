@@ -60,7 +60,6 @@ import {
   ValueTransferType,
   ValueTransferKindEnum,
   CurrencyNameEnum,
-  RefreshScreenEnum,
   UnifiedAddressClass,
   TransparentAddressClass,
   AddressKindEnum,
@@ -1149,9 +1148,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  doRefresh = (screen: RefreshScreenEnum) => {
+  doRefresh = (screen: ScreenEnum) => {
     //console.log('================== MANUAL REFRESH ================== ', screen);
-    if (screen === RefreshScreenEnum.History || screen === RefreshScreenEnum.ContactList) {
+    if (screen === ScreenEnum.History || screen === ScreenEnum.ContactList) {
       // Value Transfers
       this.rpc.fetchTandZandOValueTransfers();
     } else {

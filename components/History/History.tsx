@@ -14,7 +14,6 @@ import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 import {
   ButtonTypeEnum,
   FilterEnum,
-  RefreshScreenEnum,
   ScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
@@ -356,7 +355,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
                   refreshControl: (
                     <RefreshControl
                       refreshing={false}
-                      onRefresh={() => doRefresh(RefreshScreenEnum.History)}
+                      onRefresh={() => doRefresh(screenName)}
                       tintColor={colors.text}
                       title={translate('history.refreshing') as string}
                     />

@@ -27,7 +27,6 @@ import {
   AddressBookFileClass,
   ContactType,
   FilterEnum,
-  RefreshScreenEnum,
   ScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
@@ -543,7 +542,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               refreshControl={
                 <RefreshControl
                   refreshing={false}
-                  onRefresh={() => doRefresh(RefreshScreenEnum.ContactList)}
+                  onRefresh={() => doRefresh(screenName)}
                   tintColor={colors.text}
                   title={translate('history.refreshing') as string}
                 />
