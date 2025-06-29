@@ -13,7 +13,6 @@ type SnackbarProps = {
 
 const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFirstSnackbar, screenName }) => {
   const { colors } = useTheme()  as ThemeType;
-  //const [snacking, setSnacking] = useState<boolean>(false);
   const snacking = useRef<boolean>(false);
   const snackingMessage = useRef<string>(undefined);
   const [duration, setDuration] = useState<number>(4000);

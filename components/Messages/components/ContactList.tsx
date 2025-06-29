@@ -572,6 +572,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                       month={month}
                       setMessagesAddressModalShow={setMessagesAddressModalShow}
                       addressProtected={c.address === zenniesDonationAddress}
+                      screenName={screenName}
                     />
                   );
                 })}

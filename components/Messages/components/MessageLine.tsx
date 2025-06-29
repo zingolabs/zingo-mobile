@@ -40,6 +40,7 @@ type MessageLineProps = {
   vt: ValueTransferType;
   setValueTransferDetailModalShow: (i: number, v: ValueTransferType) => Promise<HideReturn<unknown>>;
   messageAddress?: string;
+  screenName: ScreenEnum;
 };
 const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   index,
@@ -47,6 +48,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   month,
   setValueTransferDetailModalShow,
   messageAddress,
+  screenName,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, privacy, info, addressBook, addresses, addLastSnackbar } = context;
@@ -121,7 +123,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
           }}>
           {!!vt.address && !messageAddress && (
             <View style={{ marginTop: -10, marginBottom: 10, marginLeft: 30 }}>
-              <AddressItem address={vt.address} screenName={ScreenEnum.MessagesList} oneLine={true} />
+              <AddressItem address={vt.address} screenName={screenName} oneLine={true} />
             </View>
           )}
           {(!!memo || !!memoUA) && (
@@ -134,7 +136,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     addLastSnackbar({
                       message: translate('history.memocopied') as string,
                       duration: SnackbarDurationEnum.short,
-                      screenName: ScreenEnum.MessagesList,
+                      screenName: screenName,
                     });
                   }}>
                   <RegText selectable={true}>{memo}</RegText>
@@ -149,13 +151,13 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       addLastSnackbar({
                         message: translate('history.address-http') as string,
                         duration: SnackbarDurationEnum.long,
-                        screenName: ScreenEnum.MessagesList,
+                        screenName: screenName,
                       });
                     }
                     addLastSnackbar({
                       message: translate('history.addresscopied') as string,
                       duration: SnackbarDurationEnum.short,
-                      screenName: ScreenEnum.MessagesList,
+                      screenName: screenName,
                     });
                   }}>
                   {!thisWalletAddress(memoUA) &&
@@ -171,7 +173,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                             )}
                             <AddressItem
                               address={memoUA}
-                              screenName={ScreenEnum.MessagesList}
+                              screenName={screenName}
                               onlyContact={true}
                             />
                           </View>

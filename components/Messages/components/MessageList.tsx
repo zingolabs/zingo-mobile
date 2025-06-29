@@ -726,6 +726,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   month={month}
                   setValueTransferDetailModalShow={setValueTransferDetailModalShow}
                   messageAddress={address}
+                  screenName={screenName}
                 />
               );
             })}

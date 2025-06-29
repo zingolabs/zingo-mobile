@@ -302,11 +302,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
               closeSheet={NAHide}
               setAddressBook={setAddressBook}
+              screenName={screenName}
             />
           )}
           {sheetType === 'VA' && (
             <VerifyAddress
               closeSheet={VAHide}
+              screenName={screenName}
             />
           )}
         </BottomSheetView>

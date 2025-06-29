@@ -239,6 +239,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         }
         setMessagesAddressModalShow={setMessagesAddressModalShow}
         addressProtected={data.address === zenniesDonationAddress}
+        screenName={screenName}
       />
     );
   };

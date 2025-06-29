@@ -19,10 +19,11 @@ import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-nav
 
 type MenuProps = {
   onItemSelected: (item: MenuItemEnum) => Promise<HideReturn<unknown> | undefined>;
+  screenName: ScreenEnum;
   navigation: DrawerContentComponentProps['navigation'];
 };
 
-const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, navigation }) => {
+const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, navigation }) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -66,7 +67,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, navigation }
       //console.log('BIOMETRIC --------> ', resultBio);
       if (resultBio === false) {
         // snack with Error & closing the menu.
-        addLastSnackbar({ message: translate('biometrics-error') as string, screenName: ScreenEnum.LoadedApp });
+        addLastSnackbar({ message: translate('biometrics-error') as string, screenName: screenName });
       } else {
         onItemSelected(value);
       }

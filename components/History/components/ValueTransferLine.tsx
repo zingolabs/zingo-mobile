@@ -48,6 +48,7 @@ type ValueTransferLineProps = {
   nextLineWithSameTxid: boolean;
   setMessagesAddressModalShow: (vt: ValueTransferType) => Promise<HideReturn<unknown>>;
   addressProtected?: boolean;
+  screenName: ScreenEnum;
 };
 const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   index,
@@ -57,6 +58,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   nextLineWithSameTxid,
   //setMessagesAddressModalShow,
   addressProtected,
+  screenName,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -308,7 +310,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               <View style={{ display: 'flex' }}>
                 {!!vt.address && vt.confirmations > 0 && (
                   <View>
-                    <AddressItem address={vt.address} screenName={ScreenEnum.History} oneLine={true} />
+                    <AddressItem address={vt.address} screenName={screenName} oneLine={true} />
                   </View>
                 )}
                 <View

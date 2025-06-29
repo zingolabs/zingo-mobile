@@ -1918,7 +1918,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
         <ContextAppLoadedProvider value={context}>
           <GestureHandlerRootView>
-            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnums.Home}>
+            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnums.Home} screenName={this.screenName}>
               <Drawer.Screen name={RouteEnums.Home}>
                 {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {
                   useEffect(() => {

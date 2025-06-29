@@ -28,12 +28,14 @@ type AlSummaryLineProps = {
   setIndex: (i: number) => void;
   item: UnifiedAddressClass | TransparentAddressClass;
   closeScreen: () => void;
+  screenName: ScreenEnum;
 };
 const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
   index,
   setIndex,
   item,
   closeScreen,
+  screenName,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, addressBook, addLastSnackbar } = context;
@@ -52,7 +54,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
     addLastSnackbar({
       message: translate('history.addresscopied') as string,
       duration: SnackbarDurationEnum.short,
-      screenName: ScreenEnum.AddressList,
+      screenName: screenName,
     });
   };
 

@@ -175,6 +175,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                         clear();
                         hide();
                       }}
+                      screenName={screenName}
                     />
                   </View>
                 );

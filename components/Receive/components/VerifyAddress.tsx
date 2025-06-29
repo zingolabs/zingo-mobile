@@ -26,8 +26,9 @@ import { VerifyXIcon } from '../../Components/Icons/VerifyXIcon';
 
 type VerifyAddressProps = {
   closeSheet: () => void;
+  screenName: ScreenEnum;
 };
-const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet }) => {
+const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet, screenName }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, addLastSnackbar, server } = context;
   const { colors } = useTheme() as ThemeType;
@@ -48,7 +49,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet
           addLastSnackbar({
             message: verifyAddressStr,
             duration: SnackbarDurationEnum.short,
-            screenName: ScreenEnum.Receive,
+            screenName: screenName,
           });
           setErrorAddress(verifyAddressStr);
         }
@@ -87,7 +88,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet
         });
       } else {
         // Show the error message as a toast
-        addLastSnackbar({ message: target, screenName: ScreenEnum.Receive });
+        addLastSnackbar({ message: target, screenName: screenName });
         //return;
       }
     } else {
