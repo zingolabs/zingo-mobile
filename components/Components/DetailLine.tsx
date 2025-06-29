@@ -20,9 +20,10 @@ type DetailLineProps = {
   value?: string;
   children?: ReactNode;
   testID?: string;
+  screenName?: string;
 };
 
-const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, children, testID }) => {
+const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, children, testID, screenName }) => {
   const { colors } = useTheme()  as ThemeType;
   const context = useContext(ContextAppLoaded);
   const { addLastSnackbar, translate, language } = context;
@@ -38,6 +39,7 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, ch
             addLastSnackbar({
               message: translate('txtcopied') as string,
               duration: SnackbarDurationEnum.short,
+              screenName: screenName,
             });
           }}>
           <RegText testID={testID} color={colors.text}>

@@ -463,6 +463,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
+  screenName: string = 'LoadedApp';
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -1901,13 +1902,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     return (
       <ToastProvider>
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={this.removeFirstSnackbar}
+          translate={translate}
+          screenName={this.screenName}
+        />
         <ContextAppLoadedProvider value={context}>
           <GestureHandlerRootView>
-            <Snackbars
-              snackbars={snackbars}
-              removeFirstSnackbar={this.removeFirstSnackbar}
-              translate={translate}
-            />
             <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnums.Home}>
               <Drawer.Screen name={RouteEnums.Home}>
                 {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {

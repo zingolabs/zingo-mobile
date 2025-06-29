@@ -27,7 +27,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
-import { useToast } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 
 type AddressListProps = {
@@ -103,126 +103,128 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
   //console.log('render Address Book - 4', currentItem, action, addressBook);
 
   return (
-    <View
-      style={{
-        marginTop: top,
-        marginBottom: bottom,
-        marginRight: right,
-        marginLeft: left,
-        flex: 1,
-        backgroundColor: colors.background,
-      }}>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        translate={translate}
-      />
-
-      <Header
-        title={`${translate('addresslist.title')} - ${addressKind === AddressKindEnum.u
-          ? translate('addresslist.unified')
-          : translate('addresslist.transparent')}`}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noPrivacy={true}
-        noUfvkIcon={true}
-        closeScreen={() => {
-          clear();
-          hide();
-        }}
-      />
-      <ScrollView
-        ref={scrollViewRef}
-        onScroll={handleScroll}
-        scrollEventThrottle={100}
-        testID="addressbook.scroll-view"
-        keyboardShouldPersistTaps="handled"
-        style={{ height: '80%', maxHeight: '80%' }}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
+    <ToastProvider>
+      <View
+        style={{
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
+          backgroundColor: colors.background,
         }}>
-        {addressesSliced.length === 0 && !loading && (
-          <View
-            style={{
-              height: 150,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-start',
-              marginTop: 30,
-            }}>
-            <FadeText style={{ color: colors.primary }}>{translate('addressbook.empty') as string}</FadeText>
-          </View>
-        )}
-        {loading ? (
-          <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
-        ) : (
-          <>
-            {addressesSliced.map((alItem, index) => {
-              return (
-                <View key={`container-${index}-${alItem.address}`}>
-                  <AlSummaryLine
-                    key={`line-${index}-${alItem.address}`}
-                    index={index}
-                    setIndex={setIndex}
-                    item={alItem}
-                    closeScreen={() => {
-                      clear();
-                      hide();
-                    }}
-                  />
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={removeFirstSnackbar}
+          translate={translate}
+        />
+
+        <Header
+          title={`${translate('addresslist.title')} - ${addressKind === AddressKindEnum.u
+            ? translate('addresslist.unified')
+            : translate('addresslist.transparent')}`}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          noUfvkIcon={true}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
+        />
+        <ScrollView
+          ref={scrollViewRef}
+          onScroll={handleScroll}
+          scrollEventThrottle={100}
+          testID="addressbook.scroll-view"
+          keyboardShouldPersistTaps="handled"
+          style={{ height: '80%', maxHeight: '80%' }}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
+          }}>
+          {addressesSliced.length === 0 && !loading && (
+            <View
+              style={{
+                height: 150,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                marginTop: 30,
+              }}>
+              <FadeText style={{ color: colors.primary }}>{translate('addressbook.empty') as string}</FadeText>
+            </View>
+          )}
+          {loading ? (
+            <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
+          ) : (
+            <>
+              {addressesSliced.map((alItem, index) => {
+                return (
+                  <View key={`container-${index}-${alItem.address}`}>
+                    <AlSummaryLine
+                      key={`line-${index}-${alItem.address}`}
+                      index={index}
+                      setIndex={setIndex}
+                      item={alItem}
+                      closeScreen={() => {
+                        clear();
+                        hide();
+                      }}
+                    />
+                  </View>
+                );
+              })}
+            </>
+          )}
+          {loadMoreButton ? (
+            <View
+              style={{
+                height: 150,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                marginTop: 5,
+                marginBottom: 30,
+              }}>
+              <Button
+                type={ButtonTypeEnum.Secondary}
+                title={translate('addressbook.loadmore') as string}
+                onPress={loadMoreClicked}
+              />
+            </View>
+          ) : (
+            <>
+              {!!addressesSliced && !!addressesSliced.length && !loading && (
+                <View
+                  style={{
+                    height: 150,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    marginTop: 5,
+                    marginBottom: 30,
+                  }}>
+                  <FadeText style={{ color: colors.primary }}>{translate('addressbook.end') as string}</FadeText>
                 </View>
-              );
-            })}
-          </>
-        )}
-        {loadMoreButton ? (
-          <View
-            style={{
-              height: 150,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-start',
-              marginTop: 5,
-              marginBottom: 30,
-            }}>
-            <Button
-              type={ButtonTypeEnum.Secondary}
-              title={translate('addressbook.loadmore') as string}
-              onPress={loadMoreClicked}
+              )}
+            </>
+          )}
+        </ScrollView>
+        {!isAtTop && (
+          <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 105, right: 10 }}>
+            <FontAwesomeIcon
+              style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+              size={50}
+              icon={faAnglesUp}
+              color={colors.zingo}
             />
-          </View>
-        ) : (
-          <>
-            {!!addressesSliced && !!addressesSliced.length && !loading && (
-              <View
-                style={{
-                  height: 150,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  marginTop: 5,
-                  marginBottom: 30,
-                }}>
-                <FadeText style={{ color: colors.primary }}>{translate('addressbook.end') as string}</FadeText>
-              </View>
-            )}
-          </>
+          </TouchableOpacity>
         )}
-      </ScrollView>
-      {!isAtTop && (
-        <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 105, right: 10 }}>
-          <FontAwesomeIcon
-            style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-            size={50}
-            icon={faAnglesUp}
-            color={colors.zingo}
-          />
-        </TouchableOpacity>
-      )}
-    </View>
+      </View>
+    </ToastProvider>
   );
 };
 

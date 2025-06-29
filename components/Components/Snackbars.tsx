@@ -9,9 +9,10 @@ type SnackbarProps = {
   snackbars: SnackbarType[];
   removeFirstSnackbar: () => void;
   translate: (key: string) => TranslateType;
+  screenName?: string;
 };
 
-const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFirstSnackbar, translate }) => {
+const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFirstSnackbar, translate, screenName }) => {
   const { colors } = useTheme()  as ThemeType;
   //const [snacking, setSnacking] = useState<boolean>(false);
   const snacking = useRef<boolean>(false);
@@ -23,6 +24,9 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     if (snackbars[0]?.message !== snackingMessage.current) {
       return;
     }
+    if (snackbars[0]?.screenName !== screenName) {
+        return;
+      }
     // we need some time between messages
     setTimeout(() => {
       //console.log('remove first snackbar', snackbars[0]?.message, snackingMessage.current);
@@ -31,7 +35,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
       removeFirstSnackbar();
       setDuration(4000);
     }, 0);
-  }, [removeFirstSnackbar, snackbars]);
+  }, [removeFirstSnackbar, screenName, snackbars]);
 
   // short  - 1 sec
   // long   - 4 sec
@@ -40,6 +44,9 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
   useEffect(() => {
     if (snackbars.length > 0 && !snacking.current) {
       const currentSnackbar = snackbars[0];
+      if (currentSnackbar.screenName !== screenName) {
+        return;
+      }
       snacking.current = true;
       snackingMessage.current = currentSnackbar.message;
       setDuration(
@@ -91,6 +98,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     translate,
     duration,
     toast,
+    screenName,
   ]);
 
   useEffect(() => {
