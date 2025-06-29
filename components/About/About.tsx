@@ -18,6 +18,7 @@ import 'moment/locale/tr';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { ScreenEnum } from '../../app/AppState';
 
 type AboutProps = {
 };
@@ -29,7 +30,7 @@ const About: React.FunctionComponent<AboutProps> = () => {
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
-  const screenName: string = 'About';
+  const screenName = ScreenEnum.About;
 
   const arrayTxtObject = translate('about.copyright');
   let arrayTxt: string[] = [];
@@ -44,7 +45,6 @@ const About: React.FunctionComponent<AboutProps> = () => {
       <Snackbars
         snackbars={snackbars}
         removeFirstSnackbar={removeFirstSnackbar}
-        translate={translate}
         screenName={screenName}
       />
 
@@ -59,6 +59,7 @@ const About: React.FunctionComponent<AboutProps> = () => {
         }}>
         <Header
           title={translate('zingo') + ' ' + translate('version')}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

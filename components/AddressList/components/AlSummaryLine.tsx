@@ -12,6 +12,7 @@ import {
   TransparentAddressClass,
   AddressBookFileClass,
   SnackbarDurationEnum,
+  ScreenEnum,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
@@ -51,6 +52,7 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
     addLastSnackbar({
       message: translate('history.addresscopied') as string,
       duration: SnackbarDurationEnum.short,
+      screenName: ScreenEnum.AddressList,
     });
   };
 

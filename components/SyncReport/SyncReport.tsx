@@ -26,6 +26,7 @@ import { isEqual } from 'lodash';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 import { RPCSyncScanRangeStatusType } from '../../app/rpc/types/RPCSyncScanRangeStatusType';
 import { RPCSyncScanRangePriorityStatusEnum } from '../../app/rpc/enums/RPCSyncScanRangePriorityStatusEnum';
+import { ScreenEnum } from '../../app/AppState';
 //import { ModeEnum } from '../../app/AppState';
 
 type SyncReportProps = {
@@ -39,6 +40,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.SyncReport;
 
   const [maxBlocks, setMaxBlocks] = useState<number>(0);
   const [points, setPoints] = useState<number[]>([]);
@@ -152,6 +154,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -161,14 +169,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('report.title') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -195,7 +198,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                 alignItems: 'flex-end',
                 marginHorizontal: 20,
               }}>
-              <DetailLine label={translate('report.networkstatus') as string}>
+              <DetailLine label={translate('report.networkstatus') as string} screenName={screenName}>
                 <View style={{ display: 'flex', flexDirection: 'column' }}>
                   {!netInfo.isConnected && <RegText color="red"> {translate('report.nointernet') as string} </RegText>}
                   {netInfo.type === NetInfoStateType.cellular && (
@@ -233,6 +236,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                       ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
                       : '')
                   }
+                  screenName={screenName}
                 />
                 {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
               </View>
@@ -247,6 +251,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                         ? ((translate('report.running') as string) + ` ${percentageOutputsScanned > 0 ? percentageOutputsScanned + '%' : ''}`)
                         : (translate('report.finished') as string)
                   }
+                  screenName={screenName}
                 />
 
                 <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
@@ -395,6 +400,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                   <>
                     <DetailLine
                       label={translate('report.map') as string}
+                      screenName={screenName}
                     >
                       <View
                         style={{
@@ -473,6 +479,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                     </DetailLine>
                     <DetailLine
                       label={translate('report.legend') as string}
+                      screenName={screenName}
                     >
                       <View
                         style={{

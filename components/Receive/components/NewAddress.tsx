@@ -9,6 +9,7 @@ import {
   ButtonTypeEnum,
   GlobalConst,
   ReceiverEnum,
+  ScreenEnum,
   SnackbarDurationEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
@@ -70,6 +71,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, clo
           addLastSnackbar({
             message: translate('receive.transparent.new-error') as string,
             duration: SnackbarDurationEnum.short,
+            screenName: ScreenEnum.Receive,
           });
 
           // return newAddressStr;

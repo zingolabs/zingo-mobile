@@ -29,6 +29,7 @@ import {
   CommandEnum,
   SelectServerEnum,
   RouteEnums,
+  ScreenEnum,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
@@ -59,6 +60,7 @@ type HeaderProps = {
   // general
   testID?: string;
   title: string;
+  screenName: ScreenEnum;
   // side menu
   noDrawMenu?: boolean;
   toggleMenuDrawer?: () => void;
@@ -103,6 +105,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   noPrivacy,
   setPrivacyOption,
   addLastSnackbar,
+  screenName,
   receivedLegend,
   setShieldingAmount,
   setScrollToTop,
@@ -189,18 +192,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       );
     }
   }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);
-
-  // the new sync engine doesn't stalled... for now.
-  //useEffect(() => {
-  //  if (syncingStatus.syncProcessStalled && addLastSnackbar && restartApp) {
-  //    // if the sync process is stalled -> let's restart the App.
-  //    addLastSnackbar({
-  //      message: translate('restarting') as string,
-  //      duration: SnackbarDurationEnum.short,
-  //    });
-  //    setTimeout(() => restartApp({ startingApp: false }), 3000);
-  //  }
-  //}, [addLastSnackbar, restartApp, syncingStatus.syncProcessStalled, translate]);
 
   useEffect(() => {
     // when the App is syncing this can fired a lot of times
@@ -305,7 +296,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       return;
     }
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
       return;
     }
 
@@ -324,6 +315,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         createAlert(
           setBackgroundError,
           addLastSnackbar,
+          screenName,
           translate(`history.shield-title-${pools}`) as string,
           `${translate(`history.shield-error-${pools}`)} ${shieldStr}`,
           true,
@@ -337,6 +329,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             createAlert(
               setBackgroundError,
               addLastSnackbar,
+              screenName,
               translate(`history.shield-title-${pools}`) as string,
               `${translate(`history.shield-error-${pools}`)} ${shieldJSON.error}`,
               true,
@@ -346,6 +339,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             createAlert(
               setBackgroundError,
               addLastSnackbar,
+              screenName,
               translate(`history.shield-title-${pools}`) as string,
               `${translate(`history.shield-message-${pools}`)} ${shieldJSON.txids.join(', ')}`,
               true,
@@ -356,6 +350,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           createAlert(
             setBackgroundError,
             addLastSnackbar,
+            screenName,
             translate(`history.shield-title-${pools}`) as string,
             `${translate(`history.shield-message-${pools}`)} ${shieldStr}`,
             true,
@@ -455,7 +450,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     if (resultBio === false) {
       // snack with Error & closing the menu.
       if (addLastSnackbar) {
-        addLastSnackbar({ message: translate('biometrics-error') as string });
+        addLastSnackbar({ message: translate('biometrics-error') as string, screenName: screenName });
       }
     } else {
       await setUfvkViewModalShow();
@@ -474,6 +469,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 : (((translate('settings.value-privacy-true') as string) +
                     translate('change-privacy-legend')) as string)
             }`,
+            screenName: screenName,
           });
         setPrivacyOption && setPrivacyOption(!privacy);
       }}>
@@ -808,7 +804,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   privacy={privacy}
                 />
                 <View style={{ marginLeft: 5 }}>
-                  <PriceFetcher setZecPrice={setZecPrice} />
+                  <PriceFetcher setZecPrice={setZecPrice} screenName={screenName} />
                 </View>
               </View>
             )}
@@ -887,7 +883,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 if (resultBio === false) {
                   // snack with Error & closing the menu.
                   if (addLastSnackbar) {
-                    addLastSnackbar({ message: translate('biometrics-error') as string });
+                    addLastSnackbar({ message: translate('biometrics-error') as string, screenName: screenName });
                   }
                 } else {
                   navigationHome?.navigate(RouteEnums.Settings);

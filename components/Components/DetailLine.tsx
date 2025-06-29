@@ -13,14 +13,14 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { SnackbarDurationEnum } from '../../app/AppState';
+import { ScreenEnum, SnackbarDurationEnum } from '../../app/AppState';
 
 type DetailLineProps = {
   label: string;
   value?: string;
   children?: ReactNode;
   testID?: string;
-  screenName?: string;
+  screenName: ScreenEnum;
 };
 
 const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, children, testID, screenName }) => {

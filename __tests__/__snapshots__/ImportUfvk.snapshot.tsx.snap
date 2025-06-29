@@ -11,6 +11,7 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
     ]
   }
 >
+  <View />
   <View
     onLayout={[Function]}
     style={
@@ -29,7 +30,6 @@ exports[`Component ImportUfvk - test ImportUfvk - snapshot 1`] = `
       ]
     }
   >
-    <View />
     <View
       style={
         {

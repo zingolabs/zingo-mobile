@@ -18,6 +18,7 @@ import {
   GlobalConst,
   UnifiedAddressClass,
   TransparentAddressClass,
+  ScreenEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
@@ -120,7 +121,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
           }}>
           {!!vt.address && !messageAddress && (
             <View style={{ marginTop: -10, marginBottom: 10, marginLeft: 30 }}>
-              <AddressItem address={vt.address} oneLine={true} />
+              <AddressItem address={vt.address} screenName={ScreenEnum.MessagesList} oneLine={true} />
             </View>
           )}
           {(!!memo || !!memoUA) && (
@@ -133,6 +134,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     addLastSnackbar({
                       message: translate('history.memocopied') as string,
                       duration: SnackbarDurationEnum.short,
+                      screenName: ScreenEnum.MessagesList,
                     });
                   }}>
                   <RegText selectable={true}>{memo}</RegText>
@@ -147,11 +149,13 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       addLastSnackbar({
                         message: translate('history.address-http') as string,
                         duration: SnackbarDurationEnum.long,
+                        screenName: ScreenEnum.MessagesList,
                       });
                     }
                     addLastSnackbar({
                       message: translate('history.addresscopied') as string,
                       duration: SnackbarDurationEnum.short,
+                      screenName: ScreenEnum.MessagesList,
                     });
                   }}>
                   {!thisWalletAddress(memoUA) &&
@@ -167,6 +171,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                             )}
                             <AddressItem
                               address={memoUA}
+                              screenName={ScreenEnum.MessagesList}
                               onlyContact={true}
                             />
                           </View>

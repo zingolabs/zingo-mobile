@@ -26,7 +26,7 @@ import 'moment/locale/ru';
 import 'moment/locale/tr';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
+import { ButtonTypeEnum, GlobalConst, ScreenEnum } from '../../app/AppState';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import { useMagicModal } from 'react-native-magic-modal';
@@ -46,6 +46,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.Memo;
 
   const [memo, setMemo] = useState<string>(message);
 
@@ -62,6 +63,12 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <KeyboardAvoidingView
         behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
@@ -73,7 +80,6 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars snackbars={snackbars} removeFirstSnackbar={removeFirstSnackbar} translate={translate} />
 
         <View
           style={{
@@ -82,6 +88,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
           }}>
           <Header
             title={translate('send.memo') as string}
+            screenName={screenName}
             noBalance={true}
             noSyncingStatus={true}
             noDrawMenu={true}

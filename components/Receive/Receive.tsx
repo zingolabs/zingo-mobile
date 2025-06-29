@@ -21,11 +21,14 @@ import {
   UnifiedAddressClass,
   TransparentAddressClass,
   AddressBookFileClass,
+  ScreenEnum,
 } from '../../app/AppState';
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
 import NewAddress from './components/NewAddress';
 import VerifyAddress from './components/VerifyAddress';
+import { ToastProvider } from 'react-native-toastier';
+import Snackbars from '../Components/Snackbars';
 
 type ReceiveProps = {
   toggleMenuDrawer: () => void;
@@ -45,9 +48,10 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addresses, defaultUnifiedAddress, mode, language } = context;
+  const { translate, addresses, defaultUnifiedAddress, mode, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
+  const screenName = ScreenEnum.Receive;
 
   const [index, setIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
@@ -183,6 +187,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               <>
                 <SingleAddress
                   address={uAddress}
+                  screenName={screenName}
                   index={uAddrIndex ? uAddrIndex : 0}
                   setIndex={setUAddrIndex}
                   total={uAddr.length}
@@ -213,6 +218,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               <>
                 <SingleAddress
                   address={tAddress}
+                  screenName={screenName}
                   index={tAddrIndex ? tAddrIndex : 0}
                   setIndex={setTAddrIndex}
                   total={tAddr.length}
@@ -252,6 +258,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               ? (translate('receive.title-basic') as string)
               : (translate('receive.title-advanced') as string)
           }
+          screenName={screenName}
           toggleMenuDrawer={toggleMenuDrawer}
           noBalance={true}
           noPrivacy={true}
@@ -265,7 +272,13 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   );
 
   const returnPage = (
-    <>
+    <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
@@ -298,7 +311,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           )}
         </BottomSheetView>
       </BottomSheet>
-    </>
+    </ToastProvider>
   );
 
   //console.log('render Receive - 4', uAddr, uAddrIndex, tAddr, tAddrIndex, defaultUnifiedAddress);

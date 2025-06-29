@@ -21,6 +21,7 @@ import {
   SelectServerEnum,
   ContactType,
   GlobalConst,
+  ScreenEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
@@ -318,7 +319,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                   {c.label ? (
                     <RegText>{c.label}</RegText>
                   ) : (
-                    <AddressItem address={c.address} oneLine={true} />
+                    <AddressItem address={c.address} screenName={ScreenEnum.ContactList} oneLine={true} />
                   )}
                   <FadeText>{c.time ? moment((c.time || 0) * 1000).format('MMM D, h:mm a') : ''}</FadeText>
                 </View>

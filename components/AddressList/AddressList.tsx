@@ -16,7 +16,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import { AddressKindEnum, ButtonTypeEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
+import { AddressKindEnum, ButtonTypeEnum, ScreenEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -52,6 +52,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.AddressList;
 
   const [numAl, setNumAl] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
@@ -104,6 +105,12 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -113,16 +120,11 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={`${translate('addresslist.title')} - ${addressKind === AddressKindEnum.u
             ? translate('addresslist.unified')
             : translate('addresslist.transparent')}`}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

@@ -8,7 +8,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { GlobalConst } from '../../../app/AppState';
+import { GlobalConst, ScreenEnum } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import Header from '../../Header';
 import { useTheme } from '@react-navigation/native';
@@ -32,6 +32,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.ScannerAddress;
 
   const validateAddress = async (scannedAddress: string) => {
     if (scannedAddress.toLowerCase().startsWith(GlobalConst.zcash)) {
@@ -63,6 +64,12 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -72,14 +79,9 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('scanner.scanaddress') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

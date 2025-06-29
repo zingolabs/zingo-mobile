@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react';
 import { View, TouchableOpacity, Keyboard } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { ButtonTypeEnum, GlobalConst, SnackbarDurationEnum } from '../../../app/AppState';
+import { ButtonTypeEnum, GlobalConst, ScreenEnum, SnackbarDurationEnum } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
@@ -48,6 +48,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet
           addLastSnackbar({
             message: verifyAddressStr,
             duration: SnackbarDurationEnum.short,
+            screenName: ScreenEnum.Receive,
           });
           setErrorAddress(verifyAddressStr);
         }
@@ -86,7 +87,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet
         });
       } else {
         // Show the error message as a toast
-        addLastSnackbar({ message: target });
+        addLastSnackbar({ message: target, screenName: ScreenEnum.Receive });
         //return;
       }
     } else {

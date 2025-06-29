@@ -25,6 +25,7 @@ import {
   ToAddrClass,
   RouteEnums,
   SelectServerEnum,
+  ScreenEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
@@ -307,7 +308,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
               <View style={{ display: 'flex' }}>
                 {!!vt.address && vt.confirmations > 0 && (
                   <View>
-                    <AddressItem address={vt.address} oneLine={true} />
+                    <AddressItem address={vt.address} screenName={ScreenEnum.History} oneLine={true} />
                   </View>
                 )}
                 <View

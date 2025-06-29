@@ -29,6 +29,7 @@ import {
   PrivacyLevelFromEnum,
   GlobalConst,
   SendPageStateClass,
+  ScreenEnum,
 } from '../../../app/AppState';
 import { RPCAddressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
@@ -82,6 +83,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.Confirm;
 
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
   const [sendingTotal, setSendingTotal] = useState<number>(0);
@@ -228,7 +230,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     //console.log('BIOMETRIC --------> ', resultBio);
     if (resultBio === false) {
       // snack with Error
-      addLastSnackbar({ message: translate('biometrics-error') as string });
+      addLastSnackbar({ message: translate('biometrics-error') as string, screenName: screenName });
     } else {
       confirmSend(sendPageState);
     }
@@ -259,6 +261,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -268,14 +276,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('send.confirm-title') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -350,7 +353,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             return (
               <View key={`${to.id}-${to.to}`} style={{ margin: 10 }}>
                 <FadeText>{translate('send.to') as string}</FadeText>
-                <AddressItem address={to.to} withIcon={true} />
+                <AddressItem address={to.to} screenName={screenName} withIcon={true} />
 
                 {donationAmount > 0 && (
                   <>

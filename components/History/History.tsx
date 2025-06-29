@@ -15,6 +15,7 @@ import {
   ButtonTypeEnum,
   FilterEnum,
   RefreshScreenEnum,
+  ScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
   ServerType,
@@ -34,6 +35,8 @@ import { DataProvider, RecyclerListView, LayoutProvider, RecyclerListViewProps }
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
 import { isEqual } from 'lodash';
 import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
+import { ToastProvider } from 'react-native-toastier';
+import Snackbars from '../Components/Snackbars';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -83,9 +86,12 @@ const History: React.FunctionComponent<HistoryProps> = ({
     server,
     doRefresh,
     zenniesDonationAddress,
+    snackbars,
+    removeFirstSnackbar,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
+  const screenName = ScreenEnum.History;
 
   const [numVt, setNumVt] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
@@ -240,196 +246,205 @@ const History: React.FunctionComponent<HistoryProps> = ({
   //console.log('render History - 4', valueTransfers?.length);
 
   return (
-    <View
-      accessible={true}
-      accessibilityLabel={translate('history.title-acc') as string}
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        width: '100%',
-        height: '100%',
-      }}>
-      <Header
-        testID="valuetransfer text"
-        title={translate('history.title') as string}
-        toggleMenuDrawer={toggleMenuDrawer}
-        setPrivacyOption={setPrivacyOption}
-        addLastSnackbar={addLastSnackbar /* context */}
-        setShieldingAmount={setShieldingAmount}
-        setScrollToTop={setScrollToTop}
-        setScrollToBottom={setScrollToBottom}
-        setBackgroundError={setBackgroundError /* context */}
+    <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
       />
+
       <View
+        accessible={true}
+        accessibilityLabel={translate('history.title-acc') as string}
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: 'flex',
+          justifyContent: 'flex-start',
           width: '100%',
-          marginHorizontal: 5,
-          marginBottom: 2,
+          height: '100%',
         }}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            width: '100%',
-            marginTop: 10,
+        <Header
+          testID="valuetransfer text"
+          title={translate('history.title') as string}
+          toggleMenuDrawer={toggleMenuDrawer}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar /* context */}
+          screenName={screenName}
+          setShieldingAmount={setShieldingAmount}
+          setScrollToTop={setScrollToTop}
+          setScrollToBottom={setScrollToBottom}
+          setBackgroundError={setBackgroundError /* context */}
+        />
+        <View
+          style={{
+            flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
+            width: '100%',
+            marginHorizontal: 5,
+            marginBottom: 2,
           }}>
-          <TouchableOpacity
-            onPress={() => {
-              setFilter(FilterEnum.all);
-              setLoading(true);
-              setShowFooter(false);
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              width: '100%',
+              marginTop: 10,
+              alignItems: 'center',
+              justifyContent: 'center',
             }}>
-            <View
-              style={{
-                backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
-                borderRadius: 15,
-                borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
-                borderWidth: 1,
-                paddingHorizontal: 10,
-                paddingVertical: 5,
-                marginRight: 10,
+            <TouchableOpacity
+              onPress={() => {
+                setFilter(FilterEnum.all);
+                setLoading(true);
+                setShowFooter(false);
               }}>
-              <FadeText
+              <View
                 style={{
-                  color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
-                  fontWeight: 'bold',
+                  backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
+                  borderRadius: 15,
+                  borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
+                  borderWidth: 1,
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                  marginRight: 10,
                 }}>
-                {translate('messages.filter-all') as string}
-              </FadeText>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setFilter(FilterEnum.withFunds);
-              setLoading(true);
-              setShowFooter(false);
-            }}>
-            <View
-              style={{
-                backgroundColor: filter === FilterEnum.withFunds ? colors.primary : colors.sideMenuBackground,
-                borderRadius: 15,
-                borderColor: filter === FilterEnum.withFunds ? colors.primary : colors.zingo,
-                borderWidth: 1,
-                paddingHorizontal: 10,
-                paddingVertical: 5,
-              }}>
-              <FadeText
-                style={{
-                  color: filter === FilterEnum.withFunds ? colors.sideMenuBackground : colors.zingo,
-                  fontWeight: 'bold',
-                }}>
-                {translate('history.filter-withfunds') as string}
-              </FadeText>
-            </View>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
-      {loading ? (
-        <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
-      ) : (
-        <>
-          {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
-            <RecyclerListView
-              ref={scrollViewRef}
-              renderAheadOffset={500}
-              scrollViewProps={{
-                refreshControl: (
-                  <RefreshControl
-                    refreshing={false}
-                    onRefresh={() => doRefresh(RefreshScreenEnum.History)}
-                    tintColor={colors.text}
-                    title={translate('history.refreshing') as string}
-                  />
-                ),
-                style: {
-                  flexGrow: 1,
-                  marginTop: 10,
-                  width: '100%',
-                },
-              }}
-              onScroll={handleScroll}
-              scrollThrottle={100}
-              layoutProvider={layoutProvider}
-              dataProvider={dataProvider}
-              rowRenderer={rowRenderer}
-              onEndReachedThreshold={0.75}
-              onEndReached={() => {
-                setShowFooter(true);
-              }}
-              disableRecycling={true}
-              renderFooter={() => (
-                <>
-                  {showFooter ? (
-                    <>
-                      {loadMoreButton ? (
-                        <View
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'flex-start',
-                            marginTop: 20,
-                            marginBottom: 60,
-                          }}>
-                          <Button
-                            type={ButtonTypeEnum.Secondary}
-                            title={translate('history.loadmore') as string}
-                            onPress={loadMoreClicked}
-                          />
-                        </View>
-                      ) : (
-                        <>
-                          {!!valueTransfersSliced && !!valueTransfersSliced.length && (
-                            <View
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
-                                marginTop: 20,
-                                marginBottom: 60,
-                              }}>
-                              <FadeText style={{ color: colors.primary }}>
-                                {translate('history.end') as string}
-                              </FadeText>
-                            </View>
-                          )}
-                        </>
-                      )}
-                    </>
-                  ) : null}
-                </>
-              )}
-            />
-          ) : (
-            <View
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: 30,
-              }}>
-              <FadeText style={{ color: colors.primary }}>
-                {translate('history.empty') as string}
-              </FadeText>
-            </View>
-          )}
-          {!isAtTop && (
-            <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 10 }}>
-              <FontAwesomeIcon
-                style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                size={50}
-                icon={faAnglesUp}
-                color={colors.zingo}
-              />
+                <FadeText
+                  style={{
+                    color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
+                    fontWeight: 'bold',
+                  }}>
+                  {translate('messages.filter-all') as string}
+                </FadeText>
+              </View>
             </TouchableOpacity>
-          )}
-        </>
-      )}
-    </View>
+            <TouchableOpacity
+              onPress={() => {
+                setFilter(FilterEnum.withFunds);
+                setLoading(true);
+                setShowFooter(false);
+              }}>
+              <View
+                style={{
+                  backgroundColor: filter === FilterEnum.withFunds ? colors.primary : colors.sideMenuBackground,
+                  borderRadius: 15,
+                  borderColor: filter === FilterEnum.withFunds ? colors.primary : colors.zingo,
+                  borderWidth: 1,
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                }}>
+                <FadeText
+                  style={{
+                    color: filter === FilterEnum.withFunds ? colors.sideMenuBackground : colors.zingo,
+                    fontWeight: 'bold',
+                  }}>
+                  {translate('history.filter-withfunds') as string}
+                </FadeText>
+              </View>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+        {loading ? (
+          <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
+        ) : (
+          <>
+            {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
+              <RecyclerListView
+                ref={scrollViewRef}
+                renderAheadOffset={500}
+                scrollViewProps={{
+                  refreshControl: (
+                    <RefreshControl
+                      refreshing={false}
+                      onRefresh={() => doRefresh(RefreshScreenEnum.History)}
+                      tintColor={colors.text}
+                      title={translate('history.refreshing') as string}
+                    />
+                  ),
+                  style: {
+                    flexGrow: 1,
+                    marginTop: 10,
+                    width: '100%',
+                  },
+                }}
+                onScroll={handleScroll}
+                scrollThrottle={100}
+                layoutProvider={layoutProvider}
+                dataProvider={dataProvider}
+                rowRenderer={rowRenderer}
+                onEndReachedThreshold={0.75}
+                onEndReached={() => {
+                  setShowFooter(true);
+                }}
+                disableRecycling={true}
+                renderFooter={() => (
+                  <>
+                    {showFooter ? (
+                      <>
+                        {loadMoreButton ? (
+                          <View
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'flex-start',
+                              marginTop: 20,
+                              marginBottom: 60,
+                            }}>
+                            <Button
+                              type={ButtonTypeEnum.Secondary}
+                              title={translate('history.loadmore') as string}
+                              onPress={loadMoreClicked}
+                            />
+                          </View>
+                        ) : (
+                          <>
+                            {!!valueTransfersSliced && !!valueTransfersSliced.length && (
+                              <View
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'flex-start',
+                                  marginTop: 20,
+                                  marginBottom: 60,
+                                }}>
+                                <FadeText style={{ color: colors.primary }}>
+                                  {translate('history.end') as string}
+                                </FadeText>
+                              </View>
+                            )}
+                          </>
+                        )}
+                      </>
+                    ) : null}
+                  </>
+                )}
+              />
+            ) : (
+              <View
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 30,
+                }}>
+                <FadeText style={{ color: colors.primary }}>
+                  {translate('history.empty') as string}
+                </FadeText>
+              </View>
+            )}
+            {!isAtTop && (
+              <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 10 }}>
+                <FontAwesomeIcon
+                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                  size={50}
+                  icon={faAnglesUp}
+                  color={colors.zingo}
+                />
+              </TouchableOpacity>
+            )}
+          </>
+        )}
+      </View>
+    </ToastProvider>
   );
 };
 

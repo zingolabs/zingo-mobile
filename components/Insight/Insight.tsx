@@ -19,7 +19,7 @@ import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
-import { SnackbarDurationEnum } from '../../app/AppState';
+import { ScreenEnum, SnackbarDurationEnum } from '../../app/AppState';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -55,6 +55,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.Insight;
 
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
@@ -164,6 +165,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
                   addLastSnackbar({
                     message: translate('history.addresscopied') as string,
                     duration: SnackbarDurationEnum.short,
+                    screenName: screenName,
                   });
                   selectExpandAddress(index);
                 }
@@ -175,7 +177,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
                   flexWrap: 'wrap',
                 }}>
                 {item.address !== 'fee' && (
-                  <AddressItem address={item.address} oneLine={true} onlyContact={true} withIcon={true} />
+                  <AddressItem address={item.address} screenName={screenName} oneLine={true} onlyContact={true} withIcon={true} />
                 )}
                 {!expandAddress[index] && !!item.address && (
                   <RegText>
@@ -237,6 +239,12 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -246,10 +254,9 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars snackbars={snackbars} removeFirstSnackbar={removeFirstSnackbar} translate={translate} />
-
         <Header
           title={translate('insight.title') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

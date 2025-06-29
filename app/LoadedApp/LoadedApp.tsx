@@ -65,6 +65,7 @@ import {
   TransparentAddressClass,
   AddressKindEnum,
   AddressBookFileClassObsolete,
+  ScreenEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -463,7 +464,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
-  screenName: string = 'LoadedApp';
+  screenName = ScreenEnum.LoadedApp;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -793,7 +794,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         }
       } else {
         // Show the error message as a toast
-        this.addLastSnackbar({ message: target });
+        this.addLastSnackbar({ message: target, screenName: this.screenName });
       }
     }
   };
@@ -984,7 +985,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 title = this.state.translate('loadedapp.send-menu') as string;
               }
               if (message && title) {
-                createAlert(this.setBackgroundError, this.addLastSnackbar, title, message, true, this.state.translate);
+                createAlert(this.setBackgroundError, this.addLastSnackbar, this.screenName, title, message, true, this.state.translate);
               }
             }
             // the ValueTransfer is gone -> Likely Reverted by the server
@@ -992,6 +993,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               createAlert(
                 this.setBackgroundError,
                 this.addLastSnackbar,
+                this.screenName,
                 this.state.translate('loadedapp.send-menu') as string,
                 this.state.translate('loadedapp.valuetransfer-reverted') as string,
                 true,
@@ -1371,6 +1373,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             if (toast && selectServer !== SelectServerEnum.offline) {
               this.addLastSnackbar({
                 message: `${this.state.translate('loadedapp.readingwallet')} ${value.uri}`,
+                screenName: this.screenName,
               });
             }
             await SettingsFileImpl.writeSettings(SettingsNameEnum.server, value);
@@ -1439,6 +1442,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       if (toast) {
         this.addLastSnackbar({
           message: `${this.state.translate('loadedapp.readingwallet-error')} ${value.uri}`,
+          screenName: this.screenName,
         });
       }
 
@@ -1616,6 +1620,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
+        this.screenName,
         this.state.translate('loadedapp.changingwallet-label') as string,
         resultStr,
         false,
@@ -1639,6 +1644,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
+        this.screenName,
         this.state.translate('loadedapp.restoringwallet-label') as string,
         resultStr,
         false,
@@ -1671,6 +1677,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         //console.log(`Error change server ${value} - ${resultStr}`);
         this.addLastSnackbar({
           message: `${this.state.translate('loadedapp.changeservernew-error')} ${resultStrServer}`,
+          screenName: this.screenName,
         });
         return;
       } else {
@@ -1704,6 +1711,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
+          this.screenName,
           this.state.translate('loadedapp.changingwallet-label') as string,
           resultStr2,
           false,
@@ -1905,9 +1913,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         <Snackbars
           snackbars={snackbars}
           removeFirstSnackbar={this.removeFirstSnackbar}
-          translate={translate}
           screenName={this.screenName}
         />
+
         <ContextAppLoadedProvider value={context}>
           <GestureHandlerRootView>
             <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnums.Home}>

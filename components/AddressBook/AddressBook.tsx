@@ -17,7 +17,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, FilterEnum, GlobalConst } from '../../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, FilterEnum, GlobalConst, ScreenEnum } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
@@ -59,6 +59,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.AddressBook;
 
   const [numAb, setNumAb] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
@@ -191,6 +192,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 
   const AndroidReturn = (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -200,14 +207,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('addressbook.title') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

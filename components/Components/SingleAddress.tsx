@@ -16,6 +16,7 @@ import {
   AddressKindEnum,
   ButtonTypeEnum,
   ModeEnum,
+  ScreenEnum,
   SnackbarDurationEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
@@ -134,6 +135,7 @@ const handleConfirmationFlow = async (onSuccess: () => void) => {
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
   ufvk?: string;
+  screenName: ScreenEnum;
   index: number;
   setIndex: (i: number) => void;
   total: number;
@@ -145,6 +147,7 @@ type SingleAddressProps = {
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   address,
   ufvk,
+  screenName,
   NAShow,
   VAShow,
   total,
@@ -234,6 +237,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         ? (translate('seed.tapcopy-ufvk-message') as string)
         : (translate('history.addresscopied') as string),
       duration: SnackbarDurationEnum.short,
+      screenName: screenName,
     });
   };
 
@@ -250,6 +254,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         ? (translate('seed.tapcopy-ufvk-message') as string)
         : (translate('history.addresscopied') as string),
       duration: SnackbarDurationEnum.short,
+      screenName: screenName,
     });
   }
 
