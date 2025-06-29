@@ -17,7 +17,7 @@ import 'moment/locale/ru';
 import 'moment/locale/tr';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
-import { useToast } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
 
 type AboutProps = {
 };
@@ -39,6 +39,7 @@ const About: React.FunctionComponent<AboutProps> = () => {
   console.log(top, bottom, right, left);
 
   return (
+    <ToastProvider>
     <View
       style={{
         marginTop: top,
@@ -85,6 +86,7 @@ const About: React.FunctionComponent<AboutProps> = () => {
         </View>
       </ScrollView>
     </View>
+    </ToastProvider>
   );
 };
 
