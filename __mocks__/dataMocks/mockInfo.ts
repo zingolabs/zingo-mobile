@@ -7,5 +7,4 @@ export const mockInfo: InfoType = {
   latestBlock: 2000000,
   version: 'server_version',
   currencyName: CurrencyNameEnum.ZEC,
-  zingolib: 'zingolib_version',
 };

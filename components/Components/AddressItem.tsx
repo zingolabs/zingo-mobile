@@ -13,6 +13,7 @@ import {
   SnackbarDurationEnum,
   RouteEnums,
   SelectServerEnum,
+  ScreenEnum,
 } from '../../app/AppState';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
@@ -26,6 +27,7 @@ import 'moment/locale/tr';
 
 type AddressItemProps = {
   address: string;
+  screenName: ScreenEnum;
   oneLine?: boolean;
   onlyContact?: boolean;
   withIcon?: boolean;
@@ -36,6 +38,7 @@ type AddressItemProps = {
 
 const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   address,
+  screenName,
   oneLine,
   onlyContact,
   withIcon,
@@ -137,6 +140,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                         ? (translate('seed.tapcopy-ufvk-message') as string)
                         : (translate('history.addresscopied') as string),
                       duration: SnackbarDurationEnum.short,
+                      screenName: screenName,
                     });
                     setExpandAddress(true);
                     if (privacy) {

@@ -16,6 +16,7 @@ import {
   AddressKindEnum,
   ButtonTypeEnum,
   ModeEnum,
+  ScreenEnum,
   SnackbarDurationEnum,
   TransparentAddressClass,
   UnifiedAddressClass,
@@ -134,10 +135,12 @@ const handleConfirmationFlow = async (onSuccess: () => void) => {
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
   ufvk?: string;
+  screenName: ScreenEnum;
   index: number;
   setIndex: (i: number) => void;
   total: number;
   NAShow?: () => void;
+  NATShow?: () => void;
   VAShow?: () => void;
   changeIndex?: (index: number) => void;
 };
@@ -145,7 +148,9 @@ type SingleAddressProps = {
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   address,
   ufvk,
+  screenName,
   NAShow,
+  NATShow,
   VAShow,
   total,
   index,
@@ -234,6 +239,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         ? (translate('seed.tapcopy-ufvk-message') as string)
         : (translate('history.addresscopied') as string),
       duration: SnackbarDurationEnum.short,
+      screenName: screenName,
     });
   };
 
@@ -250,6 +256,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         ? (translate('seed.tapcopy-ufvk-message') as string)
         : (translate('history.addresscopied') as string),
       duration: SnackbarDurationEnum.short,
+      screenName: screenName,
     });
   }
 
@@ -527,13 +534,28 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 alignItems: 'center',
                 marginBottom: 20,
               }}>
-              <Text
-                style={{
-                  color: colors.zingo,
-                  fontSize: 16,
-                }}>
-                {contactFromAddress()}
-              </Text>
+              {contactFromAddress() ? (
+                <Text
+                  style={{
+                    color: colors.zingo,
+                    fontSize: 16,
+                  }}>
+                  {contactFromAddress()}
+                </Text>
+              ) : (
+                <TouchableOpacity onPress={() => {
+                    NATShow && NATShow();
+                  }}>
+                  <Text
+                    style={{
+                      color: colors.zingo,
+                      textDecorationLine: 'underline',
+                      fontSize: 16,
+                    }}>
+                    {translate('receive.add-tag') as string}
+                  </Text>
+                </TouchableOpacity>
+              )}
               <ExpandableAddress
                 onCopy={onCopy}
                 address={address ? address.address : ''}

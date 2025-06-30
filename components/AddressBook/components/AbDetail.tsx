@@ -47,7 +47,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   //setSecurityOption,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, addLastSnackbar, addressBook, language } = context;
+  const { translate, server, addressBook, language } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
@@ -126,7 +126,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         });
       } else {
         // Show the error message as a toast
-        addLastSnackbar({ message: target });
+        setError(target);
         //return;
       }
     } else {

@@ -11,6 +11,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
     ]
   }
 >
+  <View />
   <View
     style={
       {
@@ -23,7 +24,6 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
       }
     }
   >
-    <View />
     <View>
       <View
         style={
@@ -616,6 +616,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
     ]
   }
 >
+  <View />
   <View
     style={
       {
@@ -628,7 +629,6 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
       }
     }
   >
-    <View />
     <View>
       <View
         style={
@@ -1221,6 +1221,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
     ]
   }
 >
+  <View />
   <View
     style={
       {
@@ -1233,7 +1234,6 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
       }
     }
   >
-    <View />
     <View>
       <View
         style={
@@ -1826,6 +1826,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
     ]
   }
 >
+  <View />
   <View
     style={
       {
@@ -1838,7 +1839,6 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
       }
     }
   >
-    <View />
     <View>
       <View
         style={
@@ -2431,6 +2431,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
     ]
   }
 >
+  <View />
   <View
     style={
       {
@@ -2443,7 +2444,6 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
       }
     }
   >
-    <View />
     <View>
       <View
         style={

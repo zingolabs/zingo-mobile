@@ -18,9 +18,9 @@ import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft, faCommen
 import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
-import { cloneDeep, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList, LoadedAppNavigationState } from '../types';
+import { RootStackParamList, LoadingAppNavigationState } from '../types';
 import NetInfo, { NetInfoSubscription, NetInfoState } from '@react-native-community/netinfo/src/index';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 
@@ -60,11 +60,11 @@ import {
   ValueTransferType,
   ValueTransferKindEnum,
   CurrencyNameEnum,
-  RefreshScreenEnum,
   UnifiedAddressClass,
   TransparentAddressClass,
   AddressKindEnum,
   AddressBookFileClassObsolete,
+  ScreenEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -133,7 +133,7 @@ const SERVER_DEFAULT_0: ServerType = {
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as ThemeType;
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency);
+  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.USDCurrency);
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [donation, setDonation] = useState<boolean>(false);
@@ -173,6 +173,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const orchardPool = props.route.params ? props.route.params.orchardPool : false;
   const saplingPool = props.route.params ? props.route.params.saplingPool : false;
   const transparentPool = props.route.params ? props.route.params.transparentPool : false;
+  const newWallet = props.route.params ? props.route.params.newWallet : false;
 
   useEffect(() => {
     (async () => {
@@ -306,7 +307,7 @@ export default function LoadedApp(props: LoadedAppProps) {
 
       // now make no sense to have two UA's in the same contact
       // if `uOrchardAddress` exists then it will be removed.
-      const toUpdate: AddressBookFileClassObsolete[] = ab.filter(
+      let toUpdate: AddressBookFileClassObsolete[] = ab.filter(
         // if have orchard address or NOT have color or NOT have own flag...
         (a: AddressBookFileClassObsolete) => a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('color') || !a.hasOwnProperty('own'),
       );
@@ -348,7 +349,34 @@ export default function LoadedApp(props: LoadedAppProps) {
           }
         }
         sort = true;
-        console.log('Address Book -> UPDATED', ab);
+        console.log('Address Book -> UPDATED', ab.length);
+      }
+      // if new wallet or restore from seed/ufvk
+      // the App needs to calculate if the Addresses
+      // in the Address Book belong to this new/restored wallet.
+      if (newWallet) {
+        toUpdate = ab.filter((a: AddressBookFileClass) => !!a.address);
+        for (let i = 0; i < toUpdate.length; i++) {
+          const a = toUpdate[i];
+          let own: boolean;
+          // verify this address as own or not
+          const checkStr = await RPCModule.checkMyAddressInfo(a.address);
+          //console.log(checkStr);
+          if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
+            const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
+            own = checkJSON.is_wallet_address;
+          } else {
+            // error
+            own = false;
+          }
+          ab = await AddressBookFileImpl.updateColorAndOwnItem(
+            a.label,
+            a.address,
+            a.color ? a.color : '',
+            own,
+          );
+        }
+        sort = true;
       }
       let abSorted = ab;
       if (sort) {
@@ -463,6 +491,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   appstate: NativeEventSubscription;
   linking: EmitterSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
+  screenName = ScreenEnum.LoadedApp;
 
   constructor(props: LoadedAppClassProps) {
     super(props);
@@ -514,6 +543,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       setUfvkViewModalShow: this.setUfvkViewModalShow,
       setSyncReportModalShow: this.setSyncReportModalShow,
       setPoolsModalShow: this.setPoolsModalShow,
+      zingolibVersion: '',
 
       // context settings
       server: props.server,
@@ -550,6 +580,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setZingolibVersion,
       this.setWallet,
       props.readOnly,
+      props.server,
     );
 
     this.appstate = {} as NativeEventSubscription;
@@ -790,7 +821,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         }
       } else {
         // Show the error message as a toast
-        this.addLastSnackbar({ message: target });
+        this.addLastSnackbar({ message: target, screenName: this.screenName });
       }
     }
   };
@@ -981,7 +1012,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 title = this.state.translate('loadedapp.send-menu') as string;
               }
               if (message && title) {
-                createAlert(this.setBackgroundError, this.addLastSnackbar, title, message, true, this.state.translate);
+                createAlert(this.setBackgroundError, this.addLastSnackbar, this.screenName, title, message, true, this.state.translate);
               }
             }
             // the ValueTransfer is gone -> Likely Reverted by the server
@@ -989,6 +1020,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               createAlert(
                 this.setBackgroundError,
                 this.addLastSnackbar,
+                this.screenName,
                 this.state.translate('loadedapp.send-menu') as string,
                 this.state.translate('loadedapp.valuetransfer-reverted') as string,
                 true,
@@ -1093,11 +1125,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     return magicModal.show(() => <ComputingTxContent />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
   };
 
-  setInfo = (info: InfoType) => {
-    let newInfo = cloneDeep(info);
-    if (!newInfo.zingolib) {
-      newInfo.zingolib = this.state.info.zingolib;
-    }
+  setInfo = (newInfo: InfoType) => {
     if (!isEqual(this.state.info, newInfo)) {
       // if currencyName is empty,
       // I need to rescue the last value from the state,
@@ -1119,16 +1147,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       //const start = Date.now();
       this.setState({ info: newInfo });
       //console.log('=========================================== > INFO STORED SETSTATE - ', Date.now() - start);
+      //console.log('SET', newInfo);
     }
   };
 
-  setZingolibVersion = (zingolib: string) => {
-    if (!this.state.info.zingolib) {
-      let newInfo = cloneDeep(this.state.info);
-      newInfo.zingolib = zingolib;
+  setZingolibVersion = (newZingolibVersion: string) => {
+    if (!this.state.zingolibVersion) {
       //const start = Date.now();
-      this.setState({ info: newInfo });
+      this.setState({ zingolibVersion: newZingolibVersion });
       //console.log('=========================================== > ZINGOLIB STORED SETSTATE - ', Date.now() - start);
+      //console.log('SET', newZingolibVersion);
     }
   };
 
@@ -1148,9 +1176,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  doRefresh = (screen: RefreshScreenEnum) => {
+  doRefresh = (screen: ScreenEnum) => {
     //console.log('================== MANUAL REFRESH ================== ', screen);
-    if (screen === RefreshScreenEnum.History || screen === RefreshScreenEnum.ContactList) {
+    if (screen === ScreenEnum.History || screen === ScreenEnum.ContactList) {
       // Value Transfers
       this.rpc.fetchTandZandOValueTransfers();
     } else {
@@ -1326,7 +1354,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       });
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
-      await sendEmail(this.state.translate, this.state.info.zingolib);
+      await sendEmail(this.state.translate, this.state.zingolibVersion);
       this.setShowSwipeableIcons(true);
     }
   };
@@ -1372,6 +1400,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             if (toast && selectServer !== SelectServerEnum.offline) {
               this.addLastSnackbar({
                 message: `${this.state.translate('loadedapp.readingwallet')} ${value.uri}`,
+                screenName: this.screenName,
               });
             }
             await SettingsFileImpl.writeSettings(SettingsNameEnum.server, value);
@@ -1384,7 +1413,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             await this.rpc.clearTimers();
             await this.rpc.configure();
             // creating tor cliente if needed
-            if (this.state.currency === CurrencyEnum.USDTORCurrency) {
+            // we have two buttons to fetch -> we need tor client Just in case.
+            if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
               RPCModule.createTorClientProcess();
             }
             return;
@@ -1439,6 +1469,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       if (toast) {
         this.addLastSnackbar({
           message: `${this.state.translate('loadedapp.readingwallet-error')} ${value.uri}`,
+          screenName: this.screenName,
         });
       }
 
@@ -1462,8 +1493,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       currency: value as CurrencyEnum,
     });
 
-    if (value === CurrencyEnum.USDTORCurrency) {
-      // when the user select USD with Tor
+    if (value === CurrencyEnum.USDTORCurrency || value === CurrencyEnum.USDCurrency) {
+      // when the user select USD
       // the App have to create a Tor Client
       console.log('before CREATE ------------------- TOR CLIENT');
       const result = await RPCModule.createTorClientProcess();
@@ -1580,7 +1611,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     //this.rpc.fetchWalletSettings();
   };
 
-  navigateToLoadingApp = async (state: LoadedAppNavigationState) => {
+  navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
       await this.setModeOption(ModeEnum.advanced);
@@ -1596,7 +1627,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
   };
 
-  onClickOKChangeWallet = async (state: LoadedAppNavigationState) => {
+  onClickOKChangeWallet = async (state: LoadingAppNavigationState) => {
     const { server } = this.state;
 
     // if the App is working with a test server
@@ -1616,12 +1647,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
+        this.screenName,
         this.state.translate('loadedapp.changingwallet-label') as string,
         resultStr,
         false,
         this.state.translate,
         sendEmail,
-        this.state.info.zingolib,
+        this.state.zingolibVersion,
       );
       return;
     }
@@ -1639,18 +1671,19 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
+        this.screenName,
         this.state.translate('loadedapp.restoringwallet-label') as string,
         resultStr,
         false,
         this.state.translate,
         sendEmail,
-        this.state.info.zingolib,
+        this.state.zingolibVersion,
       );
       return;
     }
 
     this.keepAwake(false);
-    this.navigateToLoadingApp({ startingApp: false });
+    this.navigateToLoadingApp({ startingApp: false, newWallet: true });
   };
 
   onClickOKServerWallet = async () => {
@@ -1671,6 +1704,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         //console.log(`Error change server ${value} - ${resultStr}`);
         this.addLastSnackbar({
           message: `${this.state.translate('loadedapp.changeservernew-error')} ${resultStrServer}`,
+          screenName: this.screenName,
         });
         return;
       } else {
@@ -1704,12 +1738,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
+          this.screenName,
           this.state.translate('loadedapp.changingwallet-label') as string,
           resultStr2,
           false,
           this.state.translate,
           sendEmail,
-          this.state.info.zingolib,
+          this.state.zingolibVersion,
         );
         //return;
       }
@@ -1845,6 +1880,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       setUfvkViewModalShow: this.setUfvkViewModalShow,
       setSyncReportModalShow: this.setSyncReportModalShow,
       setPoolsModalShow: this.setPoolsModalShow,
+      zingolibVersion: this.state.zingolibVersion,
 
       // context settings
       server: this.state.server,
@@ -1901,14 +1937,15 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     return (
       <ToastProvider>
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={this.removeFirstSnackbar}
+          screenName={this.screenName}
+        />
+
         <ContextAppLoadedProvider value={context}>
           <GestureHandlerRootView>
-            <Snackbars
-              snackbars={snackbars}
-              removeFirstSnackbar={this.removeFirstSnackbar}
-              translate={translate}
-            />
-            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnums.Home}>
+            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnums.Home} screenName={this.screenName}>
               <Drawer.Screen name={RouteEnums.Home}>
                 {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {
                   useEffect(() => {

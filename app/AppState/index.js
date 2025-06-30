@@ -54,10 +54,10 @@ import { SecurityTypeEnum } from './enums/SecurityTypeEnum';
 import { EventListenerEnum } from './enums/EventListenerEnum';
 import { ValueTransferKindEnum } from './enums/ValueTransferKindEnum';
 import { FilterEnum } from './enums/FilterEnum';
-import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
 import { TransactionActionEnum } from './enums/TransactionActionEnum';
 import { AddressUnifiedTypeEnum } from './enums/AddressUnifiedTypeEnum';
 import { ZcashUriFieldEnum } from './enums/ZcashUriFieldEnum';
+import { ScreenEnum } from './enums/ScreenEnum';
 
 import { GlobalConst } from './const/GlobalConst';
 
@@ -125,9 +125,9 @@ export {
   EventListenerEnum,
   ValueTransferKindEnum,
   FilterEnum,
-  RefreshScreenEnum,
   TransactionActionEnum,
   AddressUnifiedTypeEnum,
   ZcashUriFieldEnum,
+  ScreenEnum,
   GlobalConst,
 };

@@ -1,11 +1,12 @@
 import { createDrawerNavigator, DrawerContentComponentProps } from '@react-navigation/drawer';
 import React from 'react';
 import Menu from './components/Menu';
-import { MenuItemEnum } from '../../app/AppState';
+import { MenuItemEnum, ScreenEnum } from '../../app/AppState';
 import { HideReturn } from 'react-native-magic-modal';
 
 type DrawerProps = {
   onMenuItemSelected: (i: MenuItemEnum) => Promise<HideReturn<unknown> | undefined>;
+  screenName: ScreenEnum;
   initialRouteName: string;
   children: React.ReactNode;
 };
@@ -29,8 +30,8 @@ const SideBar = createDrawerNavigator();
  *   </Drawer>
  * }
  */
-function Drawer({ onMenuItemSelected, initialRouteName, children }: DrawerProps) {
-  const menu = (props: DrawerContentComponentProps) => <Menu onItemSelected={onMenuItemSelected} {...props} />;
+function Drawer({ onMenuItemSelected, screenName, initialRouteName, children }: DrawerProps) {
+  const menu = (props: DrawerContentComponentProps) => <Menu onItemSelected={onMenuItemSelected} screenName={screenName} {...props} />;
 
   return (
     <SideBar.Navigator

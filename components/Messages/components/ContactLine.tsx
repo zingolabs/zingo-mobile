@@ -21,6 +21,7 @@ import {
   SelectServerEnum,
   ContactType,
   GlobalConst,
+  ScreenEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
@@ -42,6 +43,7 @@ type ContactLineProps = {
   c: ContactType;
   setMessagesAddressModalShow: (c: ContactType) => Promise<HideReturn<unknown>>;
   addressProtected?: boolean;
+  screenName: ScreenEnum;
 };
 const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   index,
@@ -49,6 +51,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   month,
   setMessagesAddressModalShow,
   addressProtected,
+  screenName,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, navigationHome, showSwipeableIcons, readOnly, selectServer, setSendPageState, closeAllModals } = context;
@@ -318,7 +321,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                   {c.label ? (
                     <RegText>{c.label}</RegText>
                   ) : (
-                    <AddressItem address={c.address} oneLine={true} />
+                    <AddressItem address={c.address} screenName={screenName} oneLine={true} />
                   )}
                   <FadeText>{c.time ? moment((c.time || 0) * 1000).format('MMM D, h:mm a') : ''}</FadeText>
                 </View>

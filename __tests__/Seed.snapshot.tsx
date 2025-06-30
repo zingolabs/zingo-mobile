@@ -64,7 +64,6 @@ describe('Component Seed - test', () => {
   const contextLoading = defaultAppContextLoading;
   contextLoading.translate = mockTranslate;
   contextLoading.wallet = mockWallet;
-  contextLoading.info = mockInfo;
   //contextLoading.totalBalance = mockTotalBalance;
   test('Seed New - snapshot', () => {
     const seed = render(

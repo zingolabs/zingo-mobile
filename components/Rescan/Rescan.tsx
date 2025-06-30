@@ -15,7 +15,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { ButtonTypeEnum, SelectServerEnum, SnackbarDurationEnum } from '../../app/AppState';
+import { ButtonTypeEnum, ScreenEnum, SelectServerEnum, SnackbarDurationEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -32,10 +32,11 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.Rescan;
 
   const doRescanAndClose = async () => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
       return;
     }
     // was removed the `await` here because launching the rescan can
@@ -46,12 +47,19 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
       addLastSnackbar({
         message: translate('loadedapp.syncing') as string,
         duration: SnackbarDurationEnum.longer,
+        screenName: screenName,
       });
     }, 3 * 1000);
   };
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -61,14 +69,9 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('rescan.title') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

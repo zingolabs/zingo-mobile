@@ -15,6 +15,7 @@ import {
   UnifiedAddressClass,
   TransparentAddressClass,
   ValueTransferKindEnum,
+  ServerType,
 } from '../AppState';
 import RPCModule from '../RPCModule';
 import { RPCUnifiedAddressType } from './types/RPCUnifiedAddressType';
@@ -34,6 +35,9 @@ import { RPCSyncPollType } from './types/RPCSyncPollType';
 import { RPCZecPriceType } from './types/RPCZecPriceType';
 import { RPCTransparentAddressType } from './types/RPCTransparentAddressType';
 import { RPCSpendablebalanceType } from './types/RPCSpendablebalanceType';
+import { RPCWalletSaveRequiredType } from './types/RPCWalletSaveRequiredType';
+import { RPCConfigWalletPerformanceType } from './types/RPCConfigWalletPerformanceType';
+import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -55,7 +59,7 @@ export default class RPC {
   walletBirthday: number;
 
   fetchWalletHeightLock: boolean;
-  fetchWalletBirthdayLock: boolean;
+  fetchWalletBirthdaySeedUfvkLock: boolean;
   fetchInfoAndServerHeightLock: boolean;
   fetchTandZandOValueTransfersLock: boolean;
   fetchTandZandOMessagesLock: boolean;
@@ -72,8 +76,10 @@ export default class RPC {
   timers: NodeJS.Timeout[];
 
   readOnly: boolean;
+  server: ServerType;
 
   lastPollSyncError: string;
+  walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
 
   constructor(
     fnSetTotalBalance: (totalBalance: TotalBalanceClass) => void,
@@ -88,6 +94,7 @@ export default class RPC {
     fnSetZingolib: (zingolib: string) => void,
     fnSetWallet: (wallet: WalletType) => void,
     readOnly: boolean,
+    server: ServerType,
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetValueTransfersList = fnSetValueTransfersList;
@@ -106,7 +113,7 @@ export default class RPC {
     this.walletBirthday = 0;
 
     this.fetchWalletHeightLock = false;
-    this.fetchWalletBirthdayLock = false;
+    this.fetchWalletBirthdaySeedUfvkLock = false;
     this.fetchInfoAndServerHeightLock = false;
     this.fetchTandZandOValueTransfersLock = false;
     this.fetchTandZandOMessagesLock = false;
@@ -123,6 +130,7 @@ export default class RPC {
     this.timers = [];
 
     this.readOnly = readOnly;
+    this.server = server;
 
     this.lastPollSyncError = '';
   }
@@ -281,76 +289,125 @@ export default class RPC {
     }
   }
 
-  runTaskPromises(): void {
-    //console.log('++++++++++ interval update 5 secs ALL', this.timers);
+  async runTaskPromises(): Promise<void> {
+    console.log('+++++++++++++++++ interval update 5 secs ALL', this.timers);
     this.sanitizeTimers();
+
+    if (this.walletConfigPerformanceLevel !== RPCPerformanceLevelEnum.Medium) {
+      const performance = await this.getConfigWalletPerformance();
+      this.walletConfigPerformanceLevel = performance;
+      console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL', performance);
+      if (performance !== RPCPerformanceLevelEnum.Medium) {
+        const setConfigWallet = await RPCModule.setConfigWalletToProdProcess();
+        console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET', setConfigWallet);
+        // I need to be sure in this point that the performance level is Medium
+        await RPCModule.doSave();
+        const performanceChanged = await this.getConfigWalletPerformance();
+        this.walletConfigPerformanceLevel = performanceChanged;
+        console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL CHANGED', performanceChanged);
+      }
+    }
 
     const taskPromises: Promise<void>[] = [];
 
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        //const s = Date.now();
-        await this.fetchWalletHeight();
-        //console.log('wallet height - ', Date.now() - s);
-        resolve();
-      }),
-    );
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        //const s = Date.now();
-        await this.fetchWalletBirthdaySeedUfvk();
-        //console.log('wallet birthday - ', Date.now() - s);
-        resolve();
-      }),
-    );
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        //const s = Date.now();
-        await this.fetchInfoAndServerHeight();
-        //console.log('info & server height - ', Date.now() - s);
-        resolve();
-      }),
-    );
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        //const s = Date.now();
-        await this.fetchTandZandOValueTransfers();
-        //console.log('value transfers - ', Date.now() - s);
-        resolve();
-      }),
-    );
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        //const s = Date.now();
-        await this.fetchTandZandOMessages();
-        //console.log('messages - ', Date.now() - s);
-        resolve();
-      }),
-    );
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        //const s = Date.now();
-        await this.fetchTotalBalance();
-        //console.log('balance - ', Date.now() - s);
-        resolve();
-      }),
-    );
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        //const s = Date.now();
-        await this.fetchAddresses();
-        //console.log('addresses - ', Date.now() - s);
-        resolve();
-      }),
-    );
-    // do need this because of the sync process
-    taskPromises.push(
-      new Promise<void>(async resolve => {
-        await this.fetchSyncPoll();
-        //console.log('INTERVAL poll sync');
-        resolve();
-      }),
-    );
+    // if the wallet needs to save, means the App needs to fetch all the new data
+    if (!(await this.getWalletSaveRequired())) {
+      console.log('NOT SAVE REQUIRED: No fetching data');
+      // do need this because of the sync process
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          await this.fetchSyncPoll();
+          //console.log('INTERVAL poll sync');
+          resolve();
+        }),
+      );
+    } else {
+      if (
+        this.fetchWalletHeightLock ||
+        this.fetchWalletBirthdaySeedUfvkLock ||
+        this.fetchInfoAndServerHeightLock ||
+        this.fetchAddressesLock ||
+        this.fetchTotalBalanceLock ||
+        this.fetchTandZandOValueTransfersLock ||
+        this.fetchTandZandOMessagesLock
+      ) {
+        console.log('LONG TASKS: No fetching data');
+        return;
+      }
+      // do need this because of the sync process
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          await this.fetchSyncPoll();
+          //console.log('INTERVAL poll sync');
+          resolve();
+        }),
+      );
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          //const s = Date.now();
+          await this.fetchWalletHeight();
+          //console.log('wallet height - ', Date.now() - s);
+          resolve();
+        }),
+      );
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          //const s = Date.now();
+          await this.fetchWalletBirthdaySeedUfvk();
+          //console.log('wallet birthday - ', Date.now() - s);
+          resolve();
+        }),
+      );
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          //const s = Date.now();
+          await this.fetchInfoAndServerHeight();
+          //console.log('info & server height - ', Date.now() - s);
+          resolve();
+        }),
+      );
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          //const s = Date.now();
+          await this.fetchAddresses();
+          //console.log('addresses - ', Date.now() - s);
+          resolve();
+        }),
+      );
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          //const s = Date.now();
+          await this.fetchTotalBalance();
+          //console.log('balance - ', Date.now() - s);
+          resolve();
+        }),
+      );
+      // save the wallet as required.
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          const s = Date.now();
+          await RPCModule.doSave();
+          console.log('=========================================== > save wallet - ', Date.now() - s);
+          resolve();
+        }),
+      );
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          //const s = Date.now();
+          await this.fetchTandZandOValueTransfers();
+          //console.log('value transfers - ', Date.now() - s);
+          resolve();
+        }),
+      );
+      taskPromises.push(
+        new Promise<void>(async resolve => {
+          //const s = Date.now();
+          await this.fetchTandZandOMessages();
+          //console.log('messages - ', Date.now() - s);
+          resolve();
+        }),
+      );
+    }
 
     Promise.allSettled(taskPromises);
   }
@@ -364,15 +421,19 @@ export default class RPC {
   async configure(): Promise<void> {
     // takes a while to start
     await this.fetchTandZandOValueTransfers();
-    await this.fetchInfoAndServerHeight();
+    await this.fetchAddresses();
     await this.fetchTotalBalance();
+    await this.fetchInfoAndServerHeight();
 
     // I need to fetch this quickly.
     await this.fetchZingolibVersion();
 
-    //await this.fetchWalletSettings();
+    await this.fetchTandZandOMessages();
+    await this.fetchWalletHeight();
+    await this.fetchWalletBirthdaySeedUfvk();
 
-    this.runTaskPromises();
+
+    //await this.fetchWalletSettings();
 
     // every 5 seconds the App update part of the data
     if (!this.updateTimerID) {
@@ -520,7 +581,7 @@ export default class RPC {
     }
 
     //console.log('SYNC STATUS', ss);
-    //console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_total_outputs_scanned);
+    console.log('SYNC STATUS', ss.scan_ranges?.length, ss.percentage_total_outputs_scanned);
 
     //console.log('interval sync/rescan, secs', this.secondsBatch, 'timer', this.syncStatusTimerID);
 
@@ -535,9 +596,6 @@ export default class RPC {
       // here we can release the screen...
       this.keepAwake(false);
     }
-    const start2 = Date.now();
-    await RPCModule.doSave();
-    console.log('=========================================== > save wallet - ', Date.now() - start2);
 
     this.fetchSyncStatusLock = false;
   }
@@ -701,7 +759,6 @@ export default class RPC {
           infoJSON.version
         }`,
         currencyName: infoJSON.chain_name === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.TAZ,
-        zingolib: '',
       };
 
       //const start3 = Date.now();
@@ -759,6 +816,7 @@ export default class RPC {
       const start = Date.now();
       const spendableStr: string = await RPCModule.getSpendableBalanceTotalInfo();
       console.log('=========================================== > spendable balance - ', Date.now() - start);
+      console.log(spendableStr);
       let spendableJSON: RPCSpendablebalanceType = {} as RPCSpendablebalanceType;
       if (spendableStr) {
         if (spendableStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -767,7 +825,7 @@ export default class RPC {
           spendableJSON = await JSON.parse(spendableStr);
         }
       } else {
-        console.log('Internal Error balance');
+        console.log('Internal Error spendable balance');
       }
 
       const start2 = Date.now();
@@ -796,6 +854,7 @@ export default class RPC {
         confirmedTransparentBalance: (balanceJSON.confirmed_transparent_balance || 0) / 10 ** 8,
         // header total balance
         totalSpendableBalance: (spendableJSON.spendable_balance || 0) / 10 ** 8,
+        //totalSpendableBalance: ((balanceJSON.confirmed_orchard_balance + balanceJSON.confirmed_sapling_balance) || 0) / 10 ** 8,
       };
       console.log(balance);
       //const start2 = Date.now();
@@ -823,7 +882,7 @@ export default class RPC {
       // UNIFIED
       const start = Date.now();
       const unifiedAddressesStr: string = await RPCModule.getUnifiedAddressesInfo();
-      console.log('=========================================== > addresses full - ', Date.now() - start);
+      console.log('=========================================== > addresses unified - ', Date.now() - start);
       if (unifiedAddressesStr) {
         if (unifiedAddressesStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error addresses ${unifiedAddressesStr}`);
@@ -840,7 +899,7 @@ export default class RPC {
       // TRANSPARENT
       const start2 = Date.now();
       const transparentAddressStr: string = await RPCModule.getTransparentAddressesInfo();
-      console.log('=========================================== > addresses orchard - ', Date.now() - start2);
+      console.log('=========================================== > addresses transparent - ', Date.now() - start2);
       if (transparentAddressStr) {
         if (transparentAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error addresses ${transparentAddressStr}`);
@@ -916,25 +975,71 @@ export default class RPC {
     }
   }
 
-  async fetchWalletBirthdaySeedUfvk(): Promise<void> {
+    async getWalletSaveRequired(): Promise<boolean> {
     try {
-      if (this.fetchWalletBirthdayLock) {
+      const start = Date.now();
+      const walletSaveRequiredStr: string = await RPCModule.getWalletSaveRequiredInfo();
+      console.log('=========================================== > wallet save required - ', Date.now() - start);
+      if (walletSaveRequiredStr) {
+        if (walletSaveRequiredStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error wallet save required ${walletSaveRequiredStr}`);
+          return false;
+        }
+      } else {
+        console.log('Internal Error wallet save required');
+        return false;
+      }
+      const walletSaveRequiredJSON: RPCWalletSaveRequiredType = await JSON.parse(walletSaveRequiredStr);
+
+      return walletSaveRequiredJSON.save_required;
+    } catch (error) {
+      console.log(`Critical Error wallet save required ${error}`);
+      return false;
+    }
+  }
+
+  async getConfigWalletPerformance(): Promise<RPCPerformanceLevelEnum | undefined> {
+    try {
+      const start = Date.now();
+      const configWalletPerformanceStr: string = await RPCModule.getConfigWalletPerformanceInfo();
+      console.log('=========================================== > wallet config performance - ', Date.now() - start);
+      if (configWalletPerformanceStr) {
+        if (configWalletPerformanceStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error wallet config performance ${configWalletPerformanceStr}`);
+          return;
+        }
+      } else {
+        console.log('Internal Error wallet config performance');
         return;
       }
-      this.fetchWalletBirthdayLock = true;
+      const configWalletPerformanceJSON: RPCConfigWalletPerformanceType = await JSON.parse(configWalletPerformanceStr);
+
+      return configWalletPerformanceJSON.performance_level;
+    } catch (error) {
+      console.log(`Critical Error wallet config performance ${error}`);
+      return;
+    }
+  }
+
+  async fetchWalletBirthdaySeedUfvk(): Promise<void> {
+    try {
+      if (this.fetchWalletBirthdaySeedUfvkLock) {
+        return;
+      }
+      this.fetchWalletBirthdaySeedUfvkLock = true;
       const wallet = await RPC.rpcFetchWallet(this.readOnly);
 
       if (wallet) {
         this.walletBirthday = wallet.birthday;
         this.fnSetWallet(wallet);
       }
-      this.fetchWalletBirthdayLock = false;
+      this.fetchWalletBirthdaySeedUfvkLock = false;
     } catch (error) {
       console.log(`Critical Error wallet birthday ${error}`);
       // relaunch the interval tasks just in case they are aborted.
       await this.clearTimers();
       await this.configure();
-      this.fetchWalletBirthdayLock = false;
+      this.fetchWalletBirthdaySeedUfvkLock = false;
       return;
     }
   }
@@ -943,12 +1048,29 @@ export default class RPC {
   async fetchTandZandOValueTransfers() {
     try {
       if (this.fetchTandZandOValueTransfersLock) {
+        console.log('VT LOCKKKKKKKKKKKKKKKKKKKKKKK');
         return;
       }
-      this.fetchTandZandOValueTransfersLock = true;
+      // first to get the last server block.
       const start = Date.now();
+      const heightStr: string = await RPCModule.getLatestBlockServerInfo(this.server.uri);
+      console.log('=========================================== > server height - ', Date.now() - start);
+      if (heightStr) {
+        if (heightStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error server height ${heightStr}`);
+        } else {
+          this.lastServerBlockHeight = Number(heightStr);
+        }
+      } else {
+        console.log('Internal Error server height');
+      }
+
+      console.log('SERVER HEIGHT', this.lastServerBlockHeight);
+
+      this.fetchTandZandOValueTransfersLock = true;
+      const start2 = Date.now();
       const valueTransfersStr: string = await RPCModule.getValueTransfersList();
-      console.log('=========================================== > value transfers - ', Date.now() - start);
+      console.log('=========================================== > value transfers - ', Date.now() - start2);
       //console.log(valueTransfersStr);
       if (valueTransfersStr) {
         if (valueTransfersStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1016,6 +1138,8 @@ export default class RPC {
           currentValueTransferList.poolType = !vt.pool_received ? undefined : vt.pool_received;
 
           if (vt.txid.startsWith('xxxxxxxxx')) {
+            console.log('server', this.lastServerBlockHeight);
+            console.log('wallet', this.lastWalletBlockHeight);
             console.log('valuetransfer zingolib: ', vt);
             console.log('valuetransfer zingo', currentValueTransferList);
             console.log('--------------------------------------------------');
@@ -1053,6 +1177,7 @@ export default class RPC {
   async fetchTandZandOMessages() {
     try {
       if (this.fetchTandZandOMessagesLock) {
+        console.log('MESSAGES LOCKKKKKKKKKKKKKKKKKKKKKKK');
         return;
       }
       this.fetchTandZandOMessagesLock = true;

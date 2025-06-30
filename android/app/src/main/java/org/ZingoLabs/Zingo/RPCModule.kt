@@ -67,23 +67,23 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     fun saveWalletFile(): Boolean {
         uniffi.zingo.initLogging()
 
-        // Get the encoded wallet file
-        val b64encoded: String = uniffi.zingo.saveToB64()
-        if (b64encoded.lowercase().startsWith(ErrorPrefix.value)) {
-            // with error don't save the file. Obviously.
-            Log.e("MAIN", "Couldn't save the wallet. $b64encoded")
-            return false
-        }
-        // Log.i("MAIN", b64encoded)
-
         try {
+            // Get the encoded wallet file
+            val b64encoded: String = uniffi.zingo.saveToB64()
+            if (b64encoded.lowercase().startsWith(ErrorPrefix.value)) {
+                // with error don't save the file. Obviously.
+                Log.e("MAIN", "Couldn't save the wallet. $b64encoded")
+                return false
+            }
+            // Log.i("MAIN", b64encoded)
+
             val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
             Log.i("MAIN", "file size: ${fileBytes.size} bytes")
 
             // Save file to disk
             writeFile(WalletFileName.value, fileBytes)
         } catch (e: IllegalArgumentException) {
-            Log.e("MAIN", "Couldn't save the wallet")
+            Log.e("MAIN", "Couldn't save the wallet. Read/Write issue.")
             return false
         }
         return true
@@ -1298,6 +1298,69 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: create new unified address: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun getWalletSaveRequiredInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getWalletSaveRequired()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: get wallet save required: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun setConfigWalletToProdProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.setConfigWalletToProd()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: set wallet config prod: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+    
+    @ReactMethod
+    fun getConfigWalletPerformanceInfo(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.getConfigWalletPerformance()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: get wallet config performance level: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {

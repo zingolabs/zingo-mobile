@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.0 (237)",
+  "version": "zingo-2.0.0 (243)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -506,6 +506,7 @@
     "fetchpricetitle": "Buscar preço em USD",
     "fetchpricebody": "Confirme que você deseja obter o preço em USD na Internet.",
     "fetch-button": "Buscar",
+    "fetchwithtor-button": "Buscar com Tor",
     "confirm-privacy-level": "Nível de Privacidade",
     "private": "Privado",
     "amountrevealed": "Quantia Revelada",
@@ -560,7 +561,8 @@
       "new-error": "Falha na geração de endereço transparente. O último endereço transparente não recebeu fundos."
     },
     "verification-success": "Este endereço pertence a você e é seguro para receber fundos.",
-    "verification-failure": "Este endereço não pertence a você."
+    "verification-failure": "Este endereço não pertence a você.",
+    "add-tag": "Adicionar etiqueta"
   },
   "history": {
     "shield-all": "Blindar Todos os Fundos",
@@ -642,7 +644,7 @@
   },
   "report": {
     "title": "Relatório de Sincronização / Rescan",
-    "running": "Em Processo",
+    "running": "Em Processo...",
     "finished": "Finalizado",
     "paused": "Pausado",
     "server-title": "SERVIDOR: ",

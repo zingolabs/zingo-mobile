@@ -49,6 +49,7 @@ import {
   SelectServerEnum,
   RouteEnums,
   SecurityType,
+  ScreenEnum,
 } from '../../app/AppState';
 import { parseZcashURI, serverUris, ZcashURITargetClass } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
@@ -77,6 +78,8 @@ import { magicModal } from 'react-native-magic-modal';
 //import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
+import { ToastProvider } from 'react-native-toastier';
+import Snackbars from '../Components/Snackbars';
 
 type SendProps = {
   // side menu
@@ -141,9 +144,13 @@ const Send: React.FunctionComponent<SendProps> = ({
     setPoolsModalShow,
     //security,
     currency,
+    zingolibVersion,
+    snackbars,
+    removeFirstSnackbar,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
+  const screenName = ScreenEnum.Send;
 
   const [memoEnabled, setMemoEnabled] = useState<boolean>(false);
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
@@ -342,11 +349,14 @@ const Send: React.FunctionComponent<SendProps> = ({
       // spendable TOTAL calculated
       let spendableBalance = totalBalance ? totalBalance.totalSpendableBalance : 0;
       let zenniesForZingo = donationAddress ? false : donation;
-      console.log('SPENDABLEBALANCE', addressPar, zenniesForZingo);
-      const runSpendableBalanceStr = await RPCModule.getSpendableBalanceInfo(
+      //console.log('SPENDABLEBALANCE', addressPar, zenniesForZingo, spendableBalance);
+      const start = Date.now();
+      const runSpendableBalanceStr = await RPCModule.getSpendableBalanceWithAddressInfo(
         addressPar,
         zenniesForZingo ? 'true' : 'false',
       );
+      console.log('=========================================== > spendable balance with address - ', Date.now() - start);
+      console.log(runSpendableBalanceStr);
       if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
         console.log(runSpendableBalanceStr);
@@ -362,7 +372,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           }
         } catch (e) {
           // snack with error
-          console.log(runSpendableBalanceStr);
+          console.log('SPENDABLEBALANCE error', runSpendableBalanceStr);
           setSpendableBalanceLastError(runSpendableBalanceStr);
           //Alert.alert('Calculating the FEE', runProposeJson.error);
         }
@@ -422,7 +432,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           });
         } else {
           // Show the error message as a toast
-          addLastSnackbar({ message: target });
+          addLastSnackbar({ message: target, screenName: screenName });
         }
       } else {
         setAddressText(addressPar.replace(/[ \t\n\r]+/g, '')); // Remove spaces
@@ -684,11 +694,13 @@ const Send: React.FunctionComponent<SendProps> = ({
     setMemoText('');
     setIncludeUAMemoBoolean(false);
     clearToAddr();
+    setSpendable(0);
+    setSpendableBalanceLastError('');
   };
 
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
       return;
     }
 
@@ -717,6 +729,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         createAlert(
           setBackgroundError,
           addLastSnackbar,
+          screenName,
           translate('send.confirm-title') as string,
           `${translate('send.Broadcast')} ${txid}`,
           true,
@@ -772,6 +785,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             createAlert(
               setBackgroundError,
               addLastSnackbar,
+              screenName,
               translate('send.confirm-title') as string,
               `${translate('send.Broadcast')} ${txid}`,
               true,
@@ -796,12 +810,13 @@ const Send: React.FunctionComponent<SendProps> = ({
         createAlert(
           setBackgroundError,
           addLastSnackbar,
+          screenName,
           translate('send.sending-error') as string,
           `${customError ? customError : error}`,
           false,
           translate,
           sendEmail,
-          info.zingolib,
+          zingolibVersion,
         );
       }, 1000);
       closeAllModals();
@@ -928,170 +943,158 @@ const Send: React.FunctionComponent<SendProps> = ({
   //console.log(slideAnim.value);
 
   const returnPage = (
-    <View
-      accessible={true}
-      accessibilityLabel={translate('send.title-acc') as string}
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        width: '100%',
-        height: '100%',
-        marginBottom: 200,
-      }}>
+    <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
-        onLayout={e => {
-          const { height } = e.nativeEvent.layout;
-          keyboardListeners(height);
-          //console.log('LAYOUTTT', height);
+        accessible={true}
+        accessibilityLabel={translate('send.title-acc') as string}
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-start',
+          width: '100%',
+          height: '100%',
+          marginBottom: 200,
         }}>
-        <Header
-          title={translate('send.title') as string}
-          toggleMenuDrawer={toggleMenuDrawer}
-          setPrivacyOption={setPrivacyOption}
-          addLastSnackbar={addLastSnackbar /* context */}
-          setShieldingAmount={setShieldingAmount}
-          setScrollToTop={setScrollToTop}
-          setScrollToBottom={setScrollToBottom}
-          setBackgroundError={setBackgroundError /* context */}
-        />
-      </View>
-      <ScrollView
-        ref={scrollViewRef}
-        onContentSizeChange={(_, height) => setContentHeight(height)}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{}}
-        testID="send.scroll-view">
-        <View style={{ marginBottom: Platform.OS === GlobalConst.platformOSandroid ? 30 : 250 }}>
-          <View style={{ display: 'flex', padding: 10, paddingTop: 5, marginTop: 0 }}>
-            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <View style={{ display: 'flex', flexDirection: 'row' }}>
-                <RegText style={{ marginRight: 10 }}>{translate('send.toaddress') as string}</RegText>
+        <View
+          onLayout={e => {
+            const { height } = e.nativeEvent.layout;
+            keyboardListeners(height);
+            //console.log('LAYOUTTT', height);
+          }}>
+          <Header
+            title={translate('send.title') as string}
+            screenName={screenName}
+            toggleMenuDrawer={toggleMenuDrawer}
+            setPrivacyOption={setPrivacyOption}
+            addLastSnackbar={addLastSnackbar /* context */}
+            setShieldingAmount={setShieldingAmount}
+            setScrollToTop={setScrollToTop}
+            setScrollToBottom={setScrollToBottom}
+            setBackgroundError={setBackgroundError /* context */}
+          />
+        </View>
+        <ScrollView
+          ref={scrollViewRef}
+          onContentSizeChange={(_, height) => setContentHeight(height)}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{}}
+          testID="send.scroll-view">
+          <View style={{ marginBottom: Platform.OS === GlobalConst.platformOSandroid ? 30 : 250 }}>
+            <View style={{ display: 'flex', padding: 10, paddingTop: 5, marginTop: 0 }}>
+              <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ display: 'flex', flexDirection: 'row' }}>
+                  <RegText style={{ marginRight: 10 }}>{translate('send.toaddress') as string}</RegText>
+                  {validAddress === 1 && (
+                    <AddressItem address={addressText} screenName={screenName} oneLine={true} onlyContact={true} withIcon={true} />
+                  )}
+                </View>
                 {validAddress === 1 && (
-                  <AddressItem address={addressText} oneLine={true} onlyContact={true} withIcon={true} />
+                  <View testID="send.address.check">
+                    <FontAwesomeIcon icon={faCheck} color={colors.primary} />
+                  </View>
+                )}
+                {validAddress === -1 && (
+                  <ErrorText testID="send.address.error">{translate('send.invalidaddress') as string}</ErrorText>
                 )}
               </View>
-              {validAddress === 1 && (
-                <View testID="send.address.check">
-                  <FontAwesomeIcon icon={faCheck} color={colors.primary} />
-                </View>
-              )}
-              {validAddress === -1 && (
-                <ErrorText testID="send.address.error">{translate('send.invalidaddress') as string}</ErrorText>
-              )}
-            </View>
-            <View
-              style={{
-                flex: 1,
-                borderWidth: 1,
-                borderRadius: 5,
-                borderColor: colors.text,
-                marginTop: 5,
-              }}>
-              <View style={{ flexDirection: 'row' }}>
-                <View
-                  accessible={true}
-                  accessibilityLabel={translate('send.address-acc') as string}
-                  style={{
-                    flex: 1,
-                    justifyContent: 'center',
-                  }}>
-                  <TextInput
-                    testID="send.addressplaceholder"
-                    placeholder={translate('send.addressplaceholder') as string}
-                    placeholderTextColor={colors.placeholder}
+              <View
+                style={{
+                  flex: 1,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  borderColor: colors.text,
+                  marginTop: 5,
+                }}>
+                <View style={{ flexDirection: 'row' }}>
+                  <View
+                    accessible={true}
+                    accessibilityLabel={translate('send.address-acc') as string}
                     style={{
-                      color: colors.text,
-                      fontWeight: '600',
-                      fontSize: 14,
-                      marginLeft: 5,
-                      backgroundColor: 'transparent',
-                    }}
-                    value={addressText}
-                    onChangeText={(text: string) => {
-                      updateToField(text, null, null, null, null);
-                    }}
-                    editable={true}
-                  />
-                </View>
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  {addressText && (
-                    <TouchableOpacity
-                      onPress={() => {
-                        updateToField('', null, null, null, null);
-                      }}>
-                      <FontAwesomeIcon
-                        style={{ marginRight: 5 }}
-                        size={25}
-                        icon={faXmark}
-                        color={colors.primaryDisabled}
-                      />
-                    </TouchableOpacity>
-                  )}
-                  {itemsPicker.length > 0 && (
-                    <>
-                      {!updatingToField ? (
-                        <RNPickerSelect
-                          style={{
-                            modalViewBottom: {
-                              minHeight: 300,
-                            },
-                          }}
-                          pickerProps={{
-                            itemStyle: {
-                              color: colors.background,
-                            },
-                          }}
-                          fixAndroidTouchableBug={true}
-                          value={
-                            pickerTempSelectedAddress && Platform.OS === GlobalConst.platformOSios
-                              ? pickerTempSelectedAddress
-                              : addressText
-                          }
-                          items={itemsPicker}
-                          placeholder={{
-                            label: translate('addressbook.select-placeholder') as string,
-                            value: addressText,
-                            color: colors.primary,
-                          }}
-                          useNativeAndroidPickerStyle={false}
-                          onDonePress={async () => {
-                            // only for IOS
-                            if (
-                              validAddress === 1 &&
-                              addressText &&
-                              pickerTempSelectedAddress &&
-                              addressText !== pickerTempSelectedAddress
-                            ) {
-                              setUpdatingToField(true);
-                              await ShowAddressAlertAsync(translate)
-                                .then(() => {
-                                  updateToField(pickerTempSelectedAddress, null, null, null, null);
-                                })
-                                .catch(() => {
-                                  updateToField(addressText, null, null, null, null);
-                                });
-                              setTimeout(() => {
-                                setUpdatingToField(false);
-                              }, 500);
-                            } else if (addressText !== pickerTempSelectedAddress) {
-                              updateToField(pickerTempSelectedAddress, null, null, null, null);
+                      flex: 1,
+                      justifyContent: 'center',
+                    }}>
+                    <TextInput
+                      testID="send.addressplaceholder"
+                      placeholder={translate('send.addressplaceholder') as string}
+                      placeholderTextColor={colors.placeholder}
+                      style={{
+                        color: colors.text,
+                        fontWeight: '600',
+                        fontSize: 14,
+                        marginLeft: 5,
+                        backgroundColor: 'transparent',
+                      }}
+                      value={addressText}
+                      onChangeText={(text: string) => {
+                        updateToField(text, null, null, null, null);
+                      }}
+                      editable={true}
+                    />
+                  </View>
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    {addressText && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          updateToField('', null, null, null, null);
+                        }}>
+                        <FontAwesomeIcon
+                          style={{ marginRight: 5 }}
+                          size={25}
+                          icon={faXmark}
+                          color={colors.primaryDisabled}
+                        />
+                      </TouchableOpacity>
+                    )}
+                    {itemsPicker.length > 0 && (
+                      <>
+                        {!updatingToField ? (
+                          <RNPickerSelect
+                            style={{
+                              modalViewBottom: {
+                                minHeight: 300,
+                              },
+                            }}
+                            pickerProps={{
+                              itemStyle: {
+                                color: colors.background,
+                              },
+                            }}
+                            fixAndroidTouchableBug={true}
+                            value={
+                              pickerTempSelectedAddress && Platform.OS === GlobalConst.platformOSios
+                                ? pickerTempSelectedAddress
+                                : addressText
                             }
-                            setPickerTempSelectedAddress('');
-                          }}
-                          onValueChange={async (itemValue: string) => {
-                            // only for Android
-                            if (Platform.OS === GlobalConst.platformOSandroid) {
-                              if (validAddress === 1 && addressText && itemValue && addressText !== itemValue) {
+                            items={itemsPicker}
+                            placeholder={{
+                              label: translate('addressbook.select-placeholder') as string,
+                              value: addressText,
+                              color: colors.primary,
+                            }}
+                            useNativeAndroidPickerStyle={false}
+                            onDonePress={async () => {
+                              // only for IOS
+                              if (
+                                validAddress === 1 &&
+                                addressText &&
+                                pickerTempSelectedAddress &&
+                                addressText !== pickerTempSelectedAddress
+                              ) {
                                 setUpdatingToField(true);
                                 await ShowAddressAlertAsync(translate)
                                   .then(() => {
-                                    updateToField(itemValue, null, null, null, null);
+                                    updateToField(pickerTempSelectedAddress, null, null, null, null);
                                   })
                                   .catch(() => {
                                     updateToField(addressText, null, null, null, null);
@@ -1099,732 +1102,714 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 setTimeout(() => {
                                   setUpdatingToField(false);
                                 }, 500);
-                              } else if (addressText !== itemValue) {
-                                updateToField(itemValue, null, null, null, null);
+                              } else if (addressText !== pickerTempSelectedAddress) {
+                                updateToField(pickerTempSelectedAddress, null, null, null, null);
                               }
-                            } else {
-                              setPickerTempSelectedAddress(itemValue);
-                            }
-                          }}>
+                              setPickerTempSelectedAddress('');
+                            }}
+                            onValueChange={async (itemValue: string) => {
+                              // only for Android
+                              if (Platform.OS === GlobalConst.platformOSandroid) {
+                                if (validAddress === 1 && addressText && itemValue && addressText !== itemValue) {
+                                  setUpdatingToField(true);
+                                  await ShowAddressAlertAsync(translate)
+                                    .then(() => {
+                                      updateToField(itemValue, null, null, null, null);
+                                    })
+                                    .catch(() => {
+                                      updateToField(addressText, null, null, null, null);
+                                    });
+                                  setTimeout(() => {
+                                    setUpdatingToField(false);
+                                  }, 500);
+                                } else if (addressText !== itemValue) {
+                                  updateToField(itemValue, null, null, null, null);
+                                }
+                              } else {
+                                setPickerTempSelectedAddress(itemValue);
+                              }
+                            }}>
+                            <FontAwesomeIcon
+                              style={{ marginRight: 7 }}
+                              size={39}
+                              icon={faAddressCard}
+                              color={colors.primary}
+                            />
+                          </RNPickerSelect>
+                        ) : (
                           <FontAwesomeIcon
                             style={{ marginRight: 7 }}
                             size={39}
                             icon={faAddressCard}
-                            color={colors.primary}
+                            color={colors.primaryDisabled}
                           />
-                        </RNPickerSelect>
-                      ) : (
-                        <FontAwesomeIcon
-                          style={{ marginRight: 7 }}
-                          size={39}
-                          icon={faAddressCard}
-                          color={colors.primaryDisabled}
-                        />
-                      )}
-                    </>
-                  )}
-                  <TouchableOpacity
-                    testID="send.scan-button"
-                    accessible={true}
-                    accessibilityLabel={translate('send.scan-acc') as string}
-                    onPress={() => {
-                      setQrcodeModalShow();
-                    }}>
-                    <FontAwesomeIcon style={{ marginRight: 5 }} size={35} icon={faQrcode} color={colors.border} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-
-            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'flex-end',
-                    borderRadius: 10,
-                    margin: 0,
-                    padding: 0,
-                    paddingBottom: 3,
-                  }}>
-                  <FadeText>{`${translate('send.amount')}`}</FadeText>
-                </View>
-                {sendAll && mode !== ModeEnum.basic && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      //if (fee > 0) {
-                      updateToField(null, Utils.parseNumberFloatToStringLocale(maxAmount, 8), null, null, null);
-                      //}
-                      calculateFeeWithPropose(
-                        Utils.parseNumberFloatToStringLocale(maxAmount, 8),
-                        addressText,
-                        memoText,
-                        includeUAMemoBoolean,
-                        CommandEnum.sendall,
-                      );
-                      //setSendAllClick(true);
-                      //setTimeout(() => {
-                      //  setSendAllClick(false);
-                      //}, 1000);
-                    }}>
-                    <View
-                      style={{
-                        alignItems: 'center',
-                        justifyContent: 'flex-end',
-                        borderRadius: 10,
-                        margin: 0,
-                        padding: 0,
-                        marginLeft: 10,
+                        )}
+                      </>
+                    )}
+                    <TouchableOpacity
+                      testID="send.scan-button"
+                      accessible={true}
+                      accessibilityLabel={translate('send.scan-acc') as string}
+                      onPress={() => {
+                        setQrcodeModalShow();
                       }}>
-                      <RegText color={colors.primary}>{translate('send.sendall') as string}</RegText>
-                    </View>
-                  </TouchableOpacity>
-                )}
+                      <FontAwesomeIcon style={{ marginRight: 5 }} size={35} icon={faQrcode} color={colors.border} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
-              {validAmount === -1 && <ErrorText>{translate('send.invalidnumber') as string}</ErrorText>}
-              {validAmount === -2 && <ErrorText>{translate('send.invalidamount') as string}</ErrorText>}
-            </View>
 
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
+              <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                      borderRadius: 10,
+                      margin: 0,
+                      padding: 0,
+                      paddingBottom: 3,
+                    }}>
+                    <FadeText>{`${translate('send.amount')}`}</FadeText>
+                  </View>
+                  {sendAll && mode !== ModeEnum.basic && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        //if (fee > 0) {
+                        updateToField(null, Utils.parseNumberFloatToStringLocale(maxAmount, 8), null, null, null);
+                        //}
+                        calculateFeeWithPropose(
+                          Utils.parseNumberFloatToStringLocale(maxAmount, 8),
+                          addressText,
+                          memoText,
+                          includeUAMemoBoolean,
+                          CommandEnum.sendall,
+                        );
+                        //setSendAllClick(true);
+                        //setTimeout(() => {
+                        //  setSendAllClick(false);
+                        //}, 1000);
+                      }}>
+                      <View
+                        style={{
+                          alignItems: 'center',
+                          justifyContent: 'flex-end',
+                          borderRadius: 10,
+                          margin: 0,
+                          padding: 0,
+                          marginLeft: 10,
+                        }}>
+                        <RegText color={colors.primary}>{translate('send.sendall') as string}</RegText>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                </View>
+                {validAmount === -1 && <ErrorText>{translate('send.invalidnumber') as string}</ErrorText>}
+                {validAmount === -2 && <ErrorText>{translate('send.invalidamount') as string}</ErrorText>}
+              </View>
+
               <View
                 style={{
                   display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-start',
-                  width: '60%',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
                 }}>
                 <View
                   style={{
                     display: 'flex',
-                    flexDirection: 'row',
+                    flexDirection: 'column',
                     justifyContent: 'flex-start',
+                    width: '60%',
                   }}>
-                  <RegText style={{ marginTop: 18, marginRight: 5, fontSize: 20, transform: [{ scaleY: 1.5 }] }}>
-                    {'\u1647'}
-                  </RegText>
-                  <View
-                    accessible={true}
-                    accessibilityLabel={translate('send.zec-acc') as string}
-                    style={{
-                      flexGrow: 1,
-                      borderWidth: 1,
-                      borderRadius: 5,
-                      borderColor: colors.text,
-                      marginTop: 5,
-                      width: '75%',
-                      minWidth: 48,
-                      minHeight: 48,
-                    }}>
-                    <TextInput
-                      testID="send.amount"
-                      placeholder={`#${decimalSeparator}########`}
-                      placeholderTextColor={colors.placeholder}
-                      keyboardType="numeric"
-                      style={{
-                        color: colors.text,
-                        fontWeight: '600',
-                        fontSize: 16,
-                        minWidth: 48,
-                        minHeight: 48,
-                        marginLeft: 5,
-                        backgroundColor: 'transparent',
-                      }}
-                      value={amountText}
-                      onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null, null)}
-                      onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
-                        updateToField(null, e.nativeEvent.text.substring(0, 20), null, null, null);
-                        calculateFeeWithPropose(
-                          e.nativeEvent.text.substring(0, 20),
-                          addressText,
-                          memoText,
-                          includeUAMemoBoolean,
-                          CommandEnum.send,
-                        );
-                      }}
-                      editable={true}
-                      maxLength={20}
-                    />
-                  </View>
-                </View>
-
-                <View style={{ display: 'flex', flexDirection: 'column' }}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (spendableBalanceLastError && mode === ModeEnum.advanced) {
-                        Alert.alert(
-                          translate('send.spendable') as string,
-                          spendableBalanceLastError,
-                          [
-                            {
-                              text: translate('support') as string,
-                              onPress: async () =>
-                                sendEmail(
-                                  translate,
-                                  info.zingolib,
-                                  translate('send.spendable') as string,
-                                  spendableBalanceLastError,
-                                ),
-                            },
-                            { text: translate('cancel') as string, style: 'cancel' },
-                          ],
-                          { cancelable: false },
-                        );
-                      }
-                    }}>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                        marginTop: 0,
-                      }}>
-                      <RegText
-                        style={{
-                          fontSize: 14,
-                          color: spendableBalanceLastError && mode === ModeEnum.advanced ? 'red' : colors.money,
-                        }}>
-                        {translate('send.spendable') as string}
-                      </RegText>
-                      <ZecAmount
-                        currencyName={info.currencyName}
-                        color={
-                          stillConfirming ||
-                          negativeMaxAmount ||
-                          (spendableBalanceLastError && mode === ModeEnum.advanced)
-                            ? 'red'
-                            : colors.money
-                        }
-                        size={15}
-                        amtZec={maxAmount}
-                        privacy={privacy}
-                      />
-                    </View>
-                  </TouchableOpacity>
-                  {donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress && (
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        marginTop: 0,
-                        backgroundColor: colors.card,
-                        padding: 5,
-                        borderRadius: 10,
-                      }}>
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        size={20}
-                        color={colors.primary}
-                        style={{ marginRight: 5 }}
-                      />
-                      <FadeText>{'( '}</FadeText>
-                      <FadeText>
-                        {(translate('send.confirm-donation') as string) + ': ' + Utils.getZenniesDonationAmount() + ' '}
-                      </FadeText>
-                      <FadeText>{')'}</FadeText>
-                    </View>
-                  )}
-                  {validAddress !== 0 && validAmount !== 0 && (
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        marginTop: 0,
-                        backgroundColor: colors.card,
-                        padding: 5,
-                        borderRadius: 10,
-                      }}>
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        size={20}
-                        color={colors.primary}
-                        style={{ marginRight: 5 }}
-                      />
-                      <FadeText>{'( '}</FadeText>
-                      <TouchableOpacity
-                        onPress={() => {
-                          if (proposeSendLastError && mode === ModeEnum.advanced) {
-                            Alert.alert(
-                              translate('send.fee') as string,
-                              proposeSendLastError,
-                              [
-                                {
-                                  text: translate('support') as string,
-                                  onPress: async () =>
-                                    sendEmail(
-                                      translate,
-                                      info.zingolib,
-                                      translate('send.fee') as string,
-                                      proposeSendLastError,
-                                    ),
-                                },
-                                { text: translate('cancel') as string, style: 'cancel' },
-                              ],
-                              { cancelable: false },
-                            );
-                          }
-                        }}>
-                        <FadeText
-                          style={{
-                            color: proposeSendLastError && mode === ModeEnum.advanced ? 'red' : colors.money,
-                          }}>
-                          {(translate('send.fee') as string) +
-                            ': ' +
-                            Utils.parseNumberFloatToStringLocale(fee, 8) +
-                            ' '}
-                        </FadeText>
-                      </TouchableOpacity>
-                      <FadeText>{')'}</FadeText>
-                    </View>
-                  )}
-                  {stillConfirming && (
-                    <TouchableOpacity onPress={() => setPoolsModalShow()}>
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          marginTop: 0,
-                          backgroundColor: colors.card,
-                          padding: 5,
-                          borderRadius: 10,
-                        }}>
-                        <FontAwesomeIcon
-                          icon={faInfoCircle}
-                          size={20}
-                          color={colors.primary}
-                          style={{ marginRight: 5 }}
-                        />
-                        <FadeText style={{ fontSize: 12.5 }}>{translate('send.somefunds') as string}</FadeText>
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                  {showShieldInfo && mode === ModeEnum.advanced && (
-                    <TouchableOpacity onPress={() => setPoolsModalShow()}>
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          marginTop: 0,
-                          backgroundColor: colors.card,
-                          padding: 5,
-                          borderRadius: 10,
-                        }}>
-                        <FontAwesomeIcon
-                          icon={faInfoCircle}
-                          size={20}
-                          color={colors.primary}
-                          style={{ marginRight: 5 }}
-                        />
-                        <FadeText>{translate('send.needtoshield') as string}</FadeText>
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </View>
-
-              {(!zecPrice.zecPrice || zecPrice.zecPrice <= 0) &&
-                (currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && (
-                  <View
-                    style={{
-                      width: '35%',
-                      marginTop: 5,
-                    }}>
-                    <PriceFetcher setZecPrice={setZecPrice} textBefore={translate('send.nofetchprice') as string} />
-                  </View>
-                )}
-
-              {!!zecPrice.zecPrice &&
-                zecPrice.zecPrice > 0 &&
-                (currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && (
                   <View
                     style={{
                       display: 'flex',
-                      flexDirection: 'column',
+                      flexDirection: 'row',
                       justifyContent: 'flex-start',
-                      width: '35%',
                     }}>
+                    <RegText style={{ marginTop: 18, marginRight: 5, fontSize: 20, transform: [{ scaleY: 1.5 }] }}>
+                      {'\u1647'}
+                    </RegText>
                     <View
+                      accessible={true}
+                      accessibilityLabel={translate('send.zec-acc') as string}
                       style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'flex-start',
+                        flexGrow: 1,
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        borderColor: colors.text,
+                        marginTop: 5,
+                        width: '75%',
+                        minWidth: 48,
+                        minHeight: 48,
                       }}>
-                      <RegText style={{ marginTop: 17, marginRight: 5 }}>$</RegText>
-                      <View
-                        accessible={true}
-                        accessibilityLabel={translate('send.usd-acc') as string}
+                      <TextInput
+                        testID="send.amount"
+                        placeholder={`#${decimalSeparator}########`}
+                        placeholderTextColor={colors.placeholder}
+                        keyboardType="numeric"
                         style={{
-                          flexGrow: 1,
-                          borderWidth: 1,
-                          borderRadius: 5,
-                          borderColor: colors.text,
-                          marginTop: 5,
-                          width: '55%',
+                          color: colors.text,
+                          fontWeight: '600',
+                          fontSize: 16,
                           minWidth: 48,
                           minHeight: 48,
-                        }}>
-                        <TextInput
-                          placeholder={`#${decimalSeparator}##`}
-                          placeholderTextColor={colors.placeholder}
-                          keyboardType="numeric"
-                          style={{
-                            color: colors.text,
-                            fontWeight: '600',
-                            fontSize: 16,
-                            minWidth: 48,
-                            minHeight: 48,
-                            marginLeft: 5,
-                            backgroundColor: 'transparent',
-                          }}
-                          value={amountCurrencyText}
-                          onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null, null)}
-                          onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
-                            updateToField(null, null, e.nativeEvent.text.substring(0, 15), null, null);
-                            // re-calculate the fee with the zec amount in the other field
-                            calculateFeeWithPropose(
-                              amountText,
-                              addressText,
-                              memoText,
-                              includeUAMemoBoolean,
-                              CommandEnum.send,
-                            );
-                          }}
-                          editable={true}
-                          maxLength={15}
-                        />
-                      </View>
+                          marginLeft: 5,
+                          backgroundColor: 'transparent',
+                        }}
+                        value={amountText}
+                        onChangeText={(text: string) => updateToField(null, text.substring(0, 20), null, null, null)}
+                        onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
+                          updateToField(null, e.nativeEvent.text.substring(0, 20), null, null, null);
+                          calculateFeeWithPropose(
+                            e.nativeEvent.text.substring(0, 20),
+                            addressText,
+                            memoText,
+                            includeUAMemoBoolean,
+                            CommandEnum.send,
+                          );
+                        }}
+                        editable={true}
+                        maxLength={20}
+                      />
                     </View>
+                  </View>
 
-                    <View style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-                        <RegText style={{ marginTop: 0, fontSize: 12.5 }}>
+                  <View style={{ display: 'flex', flexDirection: 'column' }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (spendableBalanceLastError && mode === ModeEnum.advanced) {
+                          Alert.alert(
+                            translate('send.spendable') as string,
+                            spendableBalanceLastError,
+                            [
+                              {
+                                text: translate('support') as string,
+                                onPress: async () =>
+                                  sendEmail(
+                                    translate,
+                                    zingolibVersion,
+                                    translate('send.spendable') as string,
+                                    spendableBalanceLastError,
+                                  ),
+                              },
+                              { text: translate('cancel') as string, style: 'cancel' },
+                            ],
+                            { cancelable: false },
+                          );
+                        }
+                      }}>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                          marginTop: 0,
+                        }}>
+                        <RegText
+                          style={{
+                            fontSize: 14,
+                            color: spendableBalanceLastError && mode === ModeEnum.advanced ? 'red' : colors.money,
+                          }}>
                           {translate('send.spendable') as string}
                         </RegText>
-                        <CurrencyAmount
-                          style={{ marginTop: 1, fontSize: 12.5 }}
-                          price={zecPrice.zecPrice}
+                        <ZecAmount
+                          currencyName={info.currencyName}
+                          color={
+                            stillConfirming ||
+                            negativeMaxAmount ||
+                            (spendableBalanceLastError && mode === ModeEnum.advanced)
+                              ? 'red'
+                              : colors.money
+                          }
+                          size={15}
                           amtZec={maxAmount}
-                          currency={CurrencyEnum.USDCurrency}
                           privacy={privacy}
                         />
                       </View>
-                      <View style={{ marginLeft: 5, flexDirection: 'row', justifyContent: 'flex-start' }}>
-                        <View style={{ width: '40%' }} />
-                        <PriceFetcher setZecPrice={setZecPrice} />
+                    </TouchableOpacity>
+                    {donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress && (
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          marginTop: 0,
+                          backgroundColor: colors.card,
+                          padding: 5,
+                          borderRadius: 10,
+                        }}>
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          size={20}
+                          color={colors.primary}
+                          style={{ marginRight: 5 }}
+                        />
+                        <FadeText>{'( '}</FadeText>
+                        <FadeText>
+                          {(translate('send.confirm-donation') as string) + ': ' + Utils.getZenniesDonationAmount() + ' '}
+                        </FadeText>
+                        <FadeText>{')'}</FadeText>
+                      </View>
+                    )}
+                    {validAddress !== 0 && validAmount !== 0 && (
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          marginTop: 0,
+                          backgroundColor: colors.card,
+                          padding: 5,
+                          borderRadius: 10,
+                        }}>
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          size={20}
+                          color={colors.primary}
+                          style={{ marginRight: 5 }}
+                        />
+                        <FadeText>{'( '}</FadeText>
+                        <TouchableOpacity
+                          onPress={() => {
+                            if (proposeSendLastError && mode === ModeEnum.advanced) {
+                              Alert.alert(
+                                translate('send.fee') as string,
+                                proposeSendLastError,
+                                [
+                                  {
+                                    text: translate('support') as string,
+                                    onPress: async () =>
+                                      sendEmail(
+                                        translate,
+                                        zingolibVersion,
+                                        translate('send.fee') as string,
+                                        proposeSendLastError,
+                                      ),
+                                  },
+                                  { text: translate('cancel') as string, style: 'cancel' },
+                                ],
+                                { cancelable: false },
+                              );
+                            }
+                          }}>
+                          <FadeText
+                            style={{
+                              color: proposeSendLastError && mode === ModeEnum.advanced ? 'red' : colors.money,
+                            }}>
+                            {(translate('send.fee') as string) +
+                              ': ' +
+                              Utils.parseNumberFloatToStringLocale(fee, 8) +
+                              ' '}
+                          </FadeText>
+                        </TouchableOpacity>
+                        <FadeText>{')'}</FadeText>
+                      </View>
+                    )}
+                    {stillConfirming && (
+                      <TouchableOpacity onPress={() => setPoolsModalShow()}>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            marginTop: 0,
+                            backgroundColor: colors.card,
+                            padding: 5,
+                            borderRadius: 10,
+                          }}>
+                          <FontAwesomeIcon
+                            icon={faInfoCircle}
+                            size={20}
+                            color={colors.primary}
+                            style={{ marginRight: 5 }}
+                          />
+                          <FadeText style={{ fontSize: 12.5 }}>{translate('send.somefunds') as string}</FadeText>
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                    {showShieldInfo && mode === ModeEnum.advanced && (
+                      <TouchableOpacity onPress={() => setPoolsModalShow()}>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            marginTop: 0,
+                            backgroundColor: colors.card,
+                            padding: 5,
+                            borderRadius: 10,
+                          }}>
+                          <FontAwesomeIcon
+                            icon={faInfoCircle}
+                            size={20}
+                            color={colors.primary}
+                            style={{ marginRight: 5 }}
+                          />
+                          <FadeText>{translate('send.needtoshield') as string}</FadeText>
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </View>
+
+                {(!zecPrice.zecPrice || zecPrice.zecPrice <= 0) &&
+                  (currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && (
+                    <View
+                      style={{
+                        width: '35%',
+                        marginTop: 5,
+                      }}>
+                      <PriceFetcher setZecPrice={setZecPrice} screenName={screenName} textBefore={translate('send.nofetchprice') as string} />
+                    </View>
+                  )}
+
+                {!!zecPrice.zecPrice &&
+                  zecPrice.zecPrice > 0 &&
+                  (currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && (
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        width: '35%',
+                      }}>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'flex-start',
+                        }}>
+                        <RegText style={{ marginTop: 17, marginRight: 5 }}>$</RegText>
+                        <View
+                          accessible={true}
+                          accessibilityLabel={translate('send.usd-acc') as string}
+                          style={{
+                            flexGrow: 1,
+                            borderWidth: 1,
+                            borderRadius: 5,
+                            borderColor: colors.text,
+                            marginTop: 5,
+                            width: '55%',
+                            minWidth: 48,
+                            minHeight: 48,
+                          }}>
+                          <TextInput
+                            placeholder={`#${decimalSeparator}##`}
+                            placeholderTextColor={colors.placeholder}
+                            keyboardType="numeric"
+                            style={{
+                              color: colors.text,
+                              fontWeight: '600',
+                              fontSize: 16,
+                              minWidth: 48,
+                              minHeight: 48,
+                              marginLeft: 5,
+                              backgroundColor: 'transparent',
+                            }}
+                            value={amountCurrencyText}
+                            onChangeText={(text: string) => updateToField(null, null, text.substring(0, 15), null, null)}
+                            onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
+                              updateToField(null, null, e.nativeEvent.text.substring(0, 15), null, null);
+                              // re-calculate the fee with the zec amount in the other field
+                              calculateFeeWithPropose(
+                                amountText,
+                                addressText,
+                                memoText,
+                                includeUAMemoBoolean,
+                                CommandEnum.send,
+                              );
+                            }}
+                            editable={true}
+                            maxLength={15}
+                          />
+                        </View>
+                      </View>
+
+                      <View style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                          <RegText style={{ marginTop: 0, fontSize: 12.5 }}>
+                            {translate('send.spendable') as string}
+                          </RegText>
+                          <CurrencyAmount
+                            style={{ marginTop: 1, fontSize: 12.5 }}
+                            price={zecPrice.zecPrice}
+                            amtZec={maxAmount}
+                            currency={currency}
+                            privacy={privacy}
+                          />
+                        </View>
+                        <View style={{ marginLeft: 5, flexDirection: 'row', justifyContent: 'flex-start' }}>
+                          <View style={{ width: '40%' }} />
+                          <PriceFetcher setZecPrice={setZecPrice} screenName={screenName} />
+                        </View>
                       </View>
                     </View>
-                  </View>
-                )}
-            </View>
+                  )}
+              </View>
 
-            {memoEnabled === true && (
-              <>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}>
-                  <FadeText style={{ marginTop: 6, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <FadeText style={{ marginTop: 6, marginBottom: 5, marginRight: 5 }}>
-                      {translate('send.includeua') as string}
-                    </FadeText>
-                    <BouncyCheckbox
-                      testID="send.checkboxua"
-                      disabled={false}
-                      disableText
-                      isChecked={includeUAMemoBoolean}
-                      useBuiltInState={false}
-                      onPress={() => updateToField(null, null, null, null, !includeUAMemoBoolean)}
-                      unFillColor={colors.card}
-                      fillColor={colors.primary}
-                      innerIconStyle={{
-                        borderRadius: 5,
-                      }}
-                      iconStyle={{
-                        borderRadius: 5,
-                      }}
-                    />
-                  </View>
-                </View>
-                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
-                  <View
-                    accessible={true}
-                    accessibilityLabel={translate('send.memo-acc') as string}
-                    style={{
-                      flexGrow: 1,
-                      flexDirection: 'row',
-                      borderWidth: 1,
-                      borderRadius: 5,
-                      borderColor: colors.text,
-                      minWidth: 48,
-                      minHeight: 48,
-                      maxHeight: 130,
-                    }}>
-                    <TextInput
-                      testID="send.memo-field"
-                      placeholder={translate('messages.message-placeholder') as string}
-                      placeholderTextColor={colors.placeholder}
-                      multiline
-                      style={{
-                        flex: 1,
-                        color: colors.text,
-                        fontWeight: '600',
-                        fontSize: 14,
-                        minWidth: 48,
-                        minHeight: 48,
-                        marginLeft: 5,
-                        backgroundColor: 'transparent',
-                        textAlignVertical: 'top',
-                      }}
-                      value={memoText}
-                      onChangeText={(text: string) => {
-                        updateToField(null, !amountText && !!text ? '0' : null, null, text, null);
-                      }}
-                      onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
-                        updateToField(
-                          null,
-                          !amountText && !!e.nativeEvent.text ? '0' : null,
-                          null,
-                          e.nativeEvent.text,
-                          null,
-                        );
-                        calculateFeeWithPropose(
-                          amountText,
-                          addressText,
-                          e.nativeEvent.text,
-                          includeUAMemoBoolean,
-                          CommandEnum.send,
-                        );
-                      }}
-                      onContentSizeChange={(e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
-                        if (
-                          e.nativeEvent.contentSize.height >
-                            (Platform.OS === GlobalConst.platformOSandroid ? 70 : 35) &&
-                          !memoIcon
-                        ) {
-                          setMemoIcon(true);
-                          scrollToEnd();
-                        }
-                        if (
-                          e.nativeEvent.contentSize.height <=
-                            (Platform.OS === GlobalConst.platformOSandroid ? 70 : 35) &&
-                          memoIcon
-                        ) {
-                          setMemoIcon(false);
-                        }
-                      }}
-                      maxLength={GlobalConst.memoMaxLength}
-                      onFocus={() => {
-                        // I need to wait for the keyboard is totally open
-                        // otherwise the scroll to end never happened.
-                        if (keyboardVisible) {
-                          scrollToEnd();
-                        } else {
-                          setTimeout(() => {
-                            scrollToEnd();
-                          }, 1000);
-                        }
-                      }}
-                    />
-                    {memoText && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          updateToField(null, null, null, '', null);
-                        }}>
-                        <FontAwesomeIcon
-                          style={{ marginTop: 7, marginRight: memoIcon ? 0 : 7 }}
-                          size={25}
-                          icon={faXmark}
-                          color={colors.primaryDisabled}
-                        />
-                      </TouchableOpacity>
-                    )}
-                    {memoIcon && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          setMemoModalShow();
-                        }}>
-                        <FontAwesomeIcon
-                          style={{ margin: 7 }}
-                          size={30}
-                          icon={faMagnifyingGlassPlus}
-                          color={colors.border}
-                        />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                </View>
-                {validMemo === -1 && (
+              {memoEnabled === true && (
+                <>
                   <View
                     style={{
                       flexDirection: 'row',
-                      justifyContent: 'flex-end',
+                      justifyContent: 'space-between',
                       alignItems: 'center',
                     }}>
-                    <FadeText
-                      style={{
-                        marginTop: 0,
-                        fontWeight: 'bold',
-                        fontSize: 12.5,
-                        color: 'red',
-                      }}>{`${Utils.countMemoBytes(memoText, includeUAMemoBoolean, defaultUnifiedAddress)} `}</FadeText>
-                    <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>{translate('loadedapp.of') as string}</FadeText>
-                    <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
-                      {' ' + GlobalConst.memoMaxLength.toString() + ' '}
-                    </FadeText>
+                    <FadeText style={{ marginTop: 6, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <FadeText style={{ marginTop: 6, marginBottom: 5, marginRight: 5 }}>
+                        {translate('send.includeua') as string}
+                      </FadeText>
+                      <BouncyCheckbox
+                        testID="send.checkboxua"
+                        disabled={false}
+                        disableText
+                        isChecked={includeUAMemoBoolean}
+                        useBuiltInState={false}
+                        onPress={() => updateToField(null, null, null, null, !includeUAMemoBoolean)}
+                        unFillColor={colors.card}
+                        fillColor={colors.primary}
+                        innerIconStyle={{
+                          borderRadius: 5,
+                        }}
+                        iconStyle={{
+                          borderRadius: 5,
+                        }}
+                      />
+                    </View>
                   </View>
-                )}
-              </>
-            )}
-          </View>
-          <View
-            style={{
-              flexGrow: 1,
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginVertical: 0,
-            }}>
+                  <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
+                    <View
+                      accessible={true}
+                      accessibilityLabel={translate('send.memo-acc') as string}
+                      style={{
+                        flexGrow: 1,
+                        flexDirection: 'row',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        borderColor: colors.text,
+                        minWidth: 48,
+                        minHeight: 48,
+                        maxHeight: 130,
+                      }}>
+                      <TextInput
+                        testID="send.memo-field"
+                        placeholder={translate('messages.message-placeholder') as string}
+                        placeholderTextColor={colors.placeholder}
+                        multiline
+                        style={{
+                          flex: 1,
+                          color: colors.text,
+                          fontWeight: '600',
+                          fontSize: 14,
+                          minWidth: 48,
+                          minHeight: 48,
+                          marginLeft: 5,
+                          backgroundColor: 'transparent',
+                          textAlignVertical: 'top',
+                        }}
+                        value={memoText}
+                        onChangeText={(text: string) => {
+                          updateToField(null, !amountText && !!text ? '0' : null, null, text, null);
+                        }}
+                        onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
+                          updateToField(
+                            null,
+                            !amountText && !!e.nativeEvent.text ? '0' : null,
+                            null,
+                            e.nativeEvent.text,
+                            null,
+                          );
+                          calculateFeeWithPropose(
+                            amountText,
+                            addressText,
+                            e.nativeEvent.text,
+                            includeUAMemoBoolean,
+                            CommandEnum.send,
+                          );
+                        }}
+                        onContentSizeChange={(e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
+                          if (
+                            e.nativeEvent.contentSize.height >
+                              (Platform.OS === GlobalConst.platformOSandroid ? 70 : 35) &&
+                            !memoIcon
+                          ) {
+                            setMemoIcon(true);
+                            scrollToEnd();
+                          }
+                          if (
+                            e.nativeEvent.contentSize.height <=
+                              (Platform.OS === GlobalConst.platformOSandroid ? 70 : 35) &&
+                            memoIcon
+                          ) {
+                            setMemoIcon(false);
+                          }
+                        }}
+                        maxLength={GlobalConst.memoMaxLength}
+                        onFocus={() => {
+                          // I need to wait for the keyboard is totally open
+                          // otherwise the scroll to end never happened.
+                          if (keyboardVisible) {
+                            scrollToEnd();
+                          } else {
+                            setTimeout(() => {
+                              scrollToEnd();
+                            }, 1000);
+                          }
+                        }}
+                      />
+                      {memoText && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            updateToField(null, null, null, '', null);
+                          }}>
+                          <FontAwesomeIcon
+                            style={{ marginTop: 7, marginRight: memoIcon ? 0 : 7 }}
+                            size={25}
+                            icon={faXmark}
+                            color={colors.primaryDisabled}
+                          />
+                        </TouchableOpacity>
+                      )}
+                      {memoIcon && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            setMemoModalShow();
+                          }}>
+                          <FontAwesomeIcon
+                            style={{ margin: 7 }}
+                            size={30}
+                            icon={faMagnifyingGlassPlus}
+                            color={colors.border}
+                          />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+                  {validMemo === -1 && (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end',
+                        alignItems: 'center',
+                      }}>
+                      <FadeText
+                        style={{
+                          marginTop: 0,
+                          fontWeight: 'bold',
+                          fontSize: 12.5,
+                          color: 'red',
+                        }}>{`${Utils.countMemoBytes(memoText, includeUAMemoBoolean, defaultUnifiedAddress)} `}</FadeText>
+                      <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>{translate('loadedapp.of') as string}</FadeText>
+                      <FadeText style={{ marginTop: 0, fontSize: 12.5 }}>
+                        {' ' + GlobalConst.memoMaxLength.toString() + ' '}
+                      </FadeText>
+                    </View>
+                  )}
+                </>
+              )}
+            </View>
             <View
               style={{
                 flexGrow: 1,
-                flexDirection: 'row',
+                flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginBottom: 20,
+                marginVertical: 0,
               }}>
-              <Button
-                testID={sendButtonEnabled ? 'send.button' : 'send.button-disabled'}
-                accessible={true}
-                accessibilityLabel={'title ' + translate('send.button')}
-                type={ButtonTypeEnum.Primary}
-                title={
-                  validAmount === 1 &&
-                  amountText &&
-                  mode !== ModeEnum.basic &&
-                  Utils.parseStringLocaleToNumberFloat(amountText) ===
-                    Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
-                    ? (translate('send.button-all') as string)
-                    : (translate('send.button') as string)
-                }
-                disabled={!sendButtonEnabled}
-                onPress={async () => {
-                  setSendButtonEnabled(false);
-                  updateToField(null, null, null, memoText, null);
-                  // donation - a Zenny is the minimum
-                  if (
-                    server.chainName === ChainNameEnum.mainChainName &&
-                    donationAddress &&
-                    Utils.parseStringLocaleToNumberFloat(amountText) <
-                      Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
-                  ) {
-                    addLastSnackbar({ message: `${translate('send.donation-minimum-message') as string}` });
-                    updateToField(null, Utils.getZenniesDonationAmount(), null, null, false);
-                    return;
-                  }
-                  if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-                    addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
-                    return;
-                  }
-                  if (
+              <View
+                style={{
+                  flexGrow: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginBottom: 20,
+                }}>
+                <Button
+                  testID={sendButtonEnabled ? 'send.button' : 'send.button-disabled'}
+                  accessible={true}
+                  accessibilityLabel={'title ' + translate('send.button')}
+                  type={ButtonTypeEnum.Primary}
+                  title={
                     validAmount === 1 &&
                     amountText &&
                     mode !== ModeEnum.basic &&
                     Utils.parseStringLocaleToNumberFloat(amountText) ===
                       Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
-                  ) {
-                    addLastSnackbar({ message: `${translate('send.sendall-message') as string}` });
+                      ? (translate('send.button-all') as string)
+                      : (translate('send.button') as string)
                   }
-                  // if the address is transparent - clean the memo field Just in Case.
-                  if (!memoEnabled) {
-                    setMemoText('');
-                    updateToField(null, null, null, '', false);
-                  }
-                  // calculating for Privacy Level
-                  let parseAddressInfoJSON: RPCParseAddressType;
-                  const result: string = await RPCModule.parseAddressInfo(addressText);
-                  if (result) {
-                    if (result.toLowerCase().startsWith(GlobalConst.error)) {
-                      parseAddressInfoJSON = {} as RPCParseAddressType;
-                    } else {
-                      try {
-                        parseAddressInfoJSON = await JSON.parse(result);
-                      } catch (e) {
-                        //console.log(e);
-                        parseAddressInfoJSON = {} as RPCParseAddressType;
-                      }
+                  disabled={!sendButtonEnabled}
+                  onPress={async () => {
+                    setSendButtonEnabled(false);
+                    updateToField(null, null, null, memoText, null);
+                    // donation - a Zenny is the minimum
+                    if (
+                      server.chainName === ChainNameEnum.mainChainName &&
+                      donationAddress &&
+                      Utils.parseStringLocaleToNumberFloat(amountText) <
+                        Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
+                    ) {
+                      addLastSnackbar({ message: `${translate('send.donation-minimum-message') as string}`, screenName: screenName });
+                      updateToField(null, Utils.getZenniesDonationAmount(), null, null, false);
+                      return;
                     }
-                  } else {
-                    parseAddressInfoJSON = {} as RPCParseAddressType;
-                  }
-                  setConfirmModalShow(parseAddressInfoJSON);
-                  Keyboard.dismiss();
-                  setSendButtonEnabled(true);
-                }}
-                twoButtons={true}
-              />
-              <Button
-                type={ButtonTypeEnum.Secondary}
-                style={{ marginLeft: 10 }}
-                title={translate('send.clear') as string}
-                onPress={() => {
-                  defaultValueFee();
-                  defaultValuesSpendableMaxAmount();
-                  clearState();
-                  setPickerTempSelectedAddress('');
-                  Keyboard.dismiss();
-                }}
-                twoButtons={true}
-              />
-            </View>
-            {server.chainName === ChainNameEnum.mainChainName && Platform.OS === GlobalConst.platformOSandroid && (
-              <>
-                {donation ? (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      paddingHorizontal: 4,
-                      paddingBottom: 2,
-                      borderWidth: 1,
-                      borderColor: colors.primary,
-                      borderRadius: 5,
-                    }}>
-                    <Text style={{ fontSize: 13, color: colors.border }}>{translate('donation-legend') as string}</Text>
-                  </View>
-                ) : (
-                  <TouchableOpacity
-                    onPress={async () => {
-                      let update = false;
-                      if (addressText && addressText !== (await Utils.getDonationAddress(server.chainName))) {
-                        await ShowAddressAlertAsync(translate)
-                          .then(async () => {
-                            // fill the fields in the screen with the donation data
-                            update = true;
-                          })
-                          .catch(() => {});
+                    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+                      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
+                      return;
+                    }
+                    if (
+                      validAmount === 1 &&
+                      amountText &&
+                      mode !== ModeEnum.basic &&
+                      Utils.parseStringLocaleToNumberFloat(amountText) ===
+                        Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
+                    ) {
+                      addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, screenName: screenName });
+                    }
+                    // if the address is transparent - clean the memo field Just in Case.
+                    if (!memoEnabled) {
+                      setMemoText('');
+                      updateToField(null, null, null, '', false);
+                    }
+                    // calculating for Privacy Level
+                    let parseAddressInfoJSON: RPCParseAddressType;
+                    const result: string = await RPCModule.parseAddressInfo(addressText);
+                    if (result) {
+                      if (result.toLowerCase().startsWith(GlobalConst.error)) {
+                        parseAddressInfoJSON = {} as RPCParseAddressType;
                       } else {
-                        // fill the fields in the screen with the donation data
-                        update = true;
+                        try {
+                          parseAddressInfoJSON = await JSON.parse(result);
+                        } catch (e) {
+                          //console.log(e);
+                          parseAddressInfoJSON = {} as RPCParseAddressType;
+                        }
                       }
-                      if (update) {
-                        updateToField(
-                          await Utils.getDonationAddress(server.chainName),
-                          Utils.getDonationAmount(),
-                          null,
-                          Utils.getDonationMemo(translate),
-                          true,
-                        );
-                      }
-                    }}>
+                    } else {
+                      parseAddressInfoJSON = {} as RPCParseAddressType;
+                    }
+                    setConfirmModalShow(parseAddressInfoJSON);
+                    Keyboard.dismiss();
+                    setSendButtonEnabled(true);
+                  }}
+                  twoButtons={true}
+                />
+                <Button
+                  type={ButtonTypeEnum.Secondary}
+                  style={{ marginLeft: 10 }}
+                  title={translate('send.clear') as string}
+                  onPress={() => {
+                    defaultValueFee();
+                    defaultValuesSpendableMaxAmount();
+                    clearState();
+                    setPickerTempSelectedAddress('');
+                    Keyboard.dismiss();
+                  }}
+                  twoButtons={true}
+                />
+              </View>
+              {server.chainName === ChainNameEnum.mainChainName && Platform.OS === GlobalConst.platformOSandroid && (
+                <>
+                  {donation ? (
                     <View
                       style={{
                         flexDirection: 'row',
@@ -1836,24 +1821,63 @@ const Send: React.FunctionComponent<SendProps> = ({
                         borderColor: colors.primary,
                         borderRadius: 5,
                       }}>
-                      <Text style={{ fontSize: 13, color: colors.border }}>
-                        {translate('donation-button') as string}
-                      </Text>
-                      <FontAwesomeIcon
-                        style={{ marginTop: 3 }}
-                        size={20}
-                        icon={faMoneyCheckDollar}
-                        color={colors.primary}
-                      />
+                      <Text style={{ fontSize: 13, color: colors.border }}>{translate('donation-legend') as string}</Text>
                     </View>
-                  </TouchableOpacity>
-                )}
-              </>
-            )}
+                  ) : (
+                    <TouchableOpacity
+                      onPress={async () => {
+                        let update = false;
+                        if (addressText && addressText !== (await Utils.getDonationAddress(server.chainName))) {
+                          await ShowAddressAlertAsync(translate)
+                            .then(async () => {
+                              // fill the fields in the screen with the donation data
+                              update = true;
+                            })
+                            .catch(() => {});
+                        } else {
+                          // fill the fields in the screen with the donation data
+                          update = true;
+                        }
+                        if (update) {
+                          updateToField(
+                            await Utils.getDonationAddress(server.chainName),
+                            Utils.getDonationAmount(),
+                            null,
+                            Utils.getDonationMemo(translate),
+                            true,
+                          );
+                        }
+                      }}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          paddingHorizontal: 4,
+                          paddingBottom: 2,
+                          borderWidth: 1,
+                          borderColor: colors.primary,
+                          borderRadius: 5,
+                        }}>
+                        <Text style={{ fontSize: 13, color: colors.border }}>
+                          {translate('donation-button') as string}
+                        </Text>
+                        <FontAwesomeIcon
+                          style={{ marginTop: 3 }}
+                          size={20}
+                          icon={faMoneyCheckDollar}
+                          color={colors.primary}
+                        />
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                </>
+              )}
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </View>
+    </ToastProvider>
   );
 
   return returnPage;

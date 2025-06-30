@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, ScrollView, Text, ActivityIndicator, Dimensions } from 'react-native';
+import { View, ScrollView, Text, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
@@ -26,19 +26,21 @@ import { isEqual } from 'lodash';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 import { RPCSyncScanRangeStatusType } from '../../app/rpc/types/RPCSyncScanRangeStatusType';
 import { RPCSyncScanRangePriorityStatusEnum } from '../../app/rpc/enums/RPCSyncScanRangePriorityStatusEnum';
-import { ModeEnum } from '../../app/AppState';
+import { ScreenEnum } from '../../app/AppState';
+//import { ModeEnum } from '../../app/AppState';
 
 type SyncReportProps = {
 };
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { syncingStatus, wallet, translate, background, language, netInfo, snackbars, removeFirstSnackbar, info, mode } = context;
+  const { syncingStatus, wallet, translate, background, language, netInfo, snackbars, removeFirstSnackbar, info } = context; //mode
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.SyncReport;
 
   const [maxBlocks, setMaxBlocks] = useState<number>(0);
   const [points, setPoints] = useState<number[]>([]);
@@ -106,8 +108,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
       setPercentageOutputsScanned(0);
       setSyncInProgress(true);
     } else {
-      setPercentageOutputsScanned(syncingStatus.percentage_total_outputs_scanned < 1 ? 1 : Math.floor(syncingStatus.percentage_total_outputs_scanned));
-      setSyncInProgress(!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length > 0 && syncingStatus.percentage_total_outputs_scanned < 100);
+      setPercentageOutputsScanned(
+        Number(syncingStatus.percentage_total_outputs_scanned.toFixed(2).replace(/\.?0+$/, '')),
+      );
+      setSyncInProgress(
+        !!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length > 0 && syncingStatus.percentage_total_outputs_scanned < 100
+      );
     }
   }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);
 
@@ -152,6 +158,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -161,14 +173,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('report.title') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -195,7 +202,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                 alignItems: 'flex-end',
                 marginHorizontal: 20,
               }}>
-              <DetailLine label={translate('report.networkstatus') as string}>
+              <DetailLine label={translate('report.networkstatus') as string} screenName={screenName}>
                 <View style={{ display: 'flex', flexDirection: 'column' }}>
                   {!netInfo.isConnected && <RegText color="red"> {translate('report.nointernet') as string} </RegText>}
                   {netInfo.type === NetInfoStateType.cellular && (
@@ -233,6 +240,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                       ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
                       : '')
                   }
+                  screenName={screenName}
                 />
                 {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
               </View>
@@ -243,12 +251,11 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                 <DetailLine
                   label={translate('report.syncstatus') as string}
                   value={
-                      '(' +
-                        (syncInProgress
-                          ? ((translate('report.running') as string) + ` ${percentageOutputsScanned > 0 ? percentageOutputsScanned + '%' : ''}`)
-                          : (translate('report.finished') as string)) +
-                        ')'
+                      syncInProgress
+                        ? ((translate('report.running') as string) + ` ${percentageOutputsScanned > 0 ? percentageOutputsScanned + '%' : ''}`)
+                        : (translate('report.finished') as string)
                   }
+                  screenName={screenName}
                 />
 
                 <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
@@ -397,6 +404,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                   <>
                     <DetailLine
                       label={translate('report.map') as string}
+                      screenName={screenName}
                     >
                       <View
                         style={{
@@ -444,17 +452,17 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                         }}>
                         {!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.map((range: RPCSyncScanRangeStatusType) => {
                           const percent: number = ((range.end_block - range.start_block) * 100) / (info.latestBlock - wallet.birthday);
-                          const pixels: number = (Dimensions.get('window').width - 40) * (percent / 100);
                           return <View
                             key={`${range.start_block.toString() + '-' + range.end_block.toString()}`}
                             style={{
                               height: 15,
-                              width: ((range.priority === RPCSyncScanRangePriorityStatusEnum.Scanning && pixels < 2) ||
-                                      (range.priority === RPCSyncScanRangePriorityStatusEnum.Scanned && pixels < 2)) ? 2 : `${percent}%`,
+                              width: `${percent}%`,
                               backgroundColor:
                                 range.priority === RPCSyncScanRangePriorityStatusEnum.Scanning
                                   ? 'orange' /* Scanning */
                                   : range.priority === RPCSyncScanRangePriorityStatusEnum.Scanned
+                                  ? 'green'  /* Scanned  */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.ScannedWithoutMapping
                                   ? 'green'  /* Scanned  */
                                   : range.priority === RPCSyncScanRangePriorityStatusEnum.Historic
                                   ? 'gray'   /* Low priority */
@@ -475,16 +483,16 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                     </DetailLine>
                     <DetailLine
                       label={translate('report.legend') as string}
+                      screenName={screenName}
                     >
                       <View
                         style={{
                           display: 'flex',
-                          flexDirection: 'row',
-                          flexWrap: 'wrap',
                           width: '100%',
                           justifyContent: 'flex-start',
-                          alignItems: 'center',
+                          alignItems: 'flex-start',
                           marginTop: 5,
+                          marginLeft: 10,
                         }}>
                         <View
                           style={{
@@ -581,7 +589,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
               <ActivityIndicator size="large" color={colors.primary} />
             </View>
           )}
-          {!!syncingStatus.lastError && mode === ModeEnum.advanced && (
+          {/*!!syncingStatus.lastError && mode === ModeEnum.advanced && (
             <>
               <View
                 style={{ height: 1, width: '100%', backgroundColor: 'white' }}
@@ -600,7 +608,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                 </DetailLine>
               </View>
             </>
-          )}
+          )*/}
         </ScrollView>
       </View>
     </ToastProvider>

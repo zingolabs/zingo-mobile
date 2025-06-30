@@ -11,6 +11,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
     ]
   }
 >
+  <View />
   <View
     style={
       {
@@ -23,7 +24,6 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
       }
     }
   >
-    <View />
     <View>
       <View
         style={
@@ -290,7 +290,7 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
                   }
                 }
               >
-                (text translated)
+                text translated
               </Text>
             </View>
           </View>
@@ -714,11 +714,10 @@ exports[`Component SyncReport - test SyncReport - snapshot 1`] = `
             <View
               style={
                 {
-                  "alignItems": "center",
+                  "alignItems": "flex-start",
                   "display": "flex",
-                  "flexDirection": "row",
-                  "flexWrap": "wrap",
                   "justifyContent": "flex-start",
+                  "marginLeft": 10,
                   "marginTop": 5,
                   "width": "100%",
                 }

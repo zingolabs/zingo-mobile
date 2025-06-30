@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.0 (237)",
+  "version": "zingo-2.0.0 (243)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
@@ -506,6 +506,7 @@
     "fetchpricetitle": "Fetch USD Price",
     "fetchpricebody": "Please confirm that you want to fetch the USD price from the Internet.",
     "fetch-button": "Fetch",
+    "fetchwithtor-button": "Fetch with Tor",
     "confirm-privacy-level": "Privacy Level",
     "private": "Private",
     "amountrevealed": "Amount Revealed",
@@ -560,7 +561,8 @@
       "new-error": "Transparent address generation failed. Latest transparent address has not received funds."
     },
     "verification-success": "This address belongs to you and is safe for receiving funds.",
-    "verification-failure": "This address does not belong to you."
+    "verification-failure": "This address does not belong to you.",
+    "add-tag": "Add tag"
   },
   "history": {
     "shield-all": "Shield All funds",
@@ -642,9 +644,9 @@
   },
   "report": {
     "title": "Sync / Rescan Report",
-    "running": "The wallet is Syncing...",
-    "finished": "The wallet is Fully Synced",
-    "paused": "The wallet is waiting to start syncing...",
+    "running": "Syncing...",
+    "finished": "Fully Synced",
+    "paused": "Waiting to start syncing...",
     "server-title": "SERVER: ",
     "blocks": " Blocks. ",
     "wallet": "Wallet: ",

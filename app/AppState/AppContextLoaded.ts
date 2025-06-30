@@ -21,11 +21,11 @@ import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { LoadedAppNavigationState } from '../types';
 import ValueTransferType from './types/ValueTransferType';
-import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
 import { HideReturn } from 'react-native-magic-modal';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
+import { ScreenEnum } from './enums/ScreenEnum';
 
 export default interface AppContextLoaded {
   navigationHome: DrawerContentComponentProps['navigation'] | null;
@@ -110,13 +110,16 @@ export default interface AppContextLoaded {
   showSwipeableIcons: boolean;
 
   // refresh the different list in the App: history & messages
-  doRefresh: (s: RefreshScreenEnum) => void;
+  doRefresh: (s: ScreenEnum) => void;
 
   // fetch the ZEC price in USD
   setZecPrice: (p: number, d: number) => void;
 
   // donation address
   zenniesDonationAddress: string;
+
+  // zingolib Version
+  zingolibVersion: string;
 
   // settings
   server: ServerType;

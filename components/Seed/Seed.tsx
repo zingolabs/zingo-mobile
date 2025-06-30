@@ -24,6 +24,7 @@ import {
   SettingsNameEnum,
   SnackbarType,
   ButtonTypeEnum,
+  ScreenEnum,
 } from '../../app/AppState';
 import Header from '../Header';
 import Utils from '../../app/utils';
@@ -105,6 +106,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.Seed;
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
@@ -221,6 +223,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -230,14 +238,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('seed.title') + ' (' + translate(`seed.${action}`) + ')'}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -281,6 +284,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                     addLastSnackbar({
                       message: translate('seed.tapcopy-seed-message') as string,
                       duration: SnackbarDurationEnum.short,
+                      screenName: screenName,
                     });
                   }
                   setExpandSeed(true);
@@ -309,6 +313,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                       addLastSnackbar({
                         message: translate('seed.tapcopy-seed-message') as string,
                         duration: SnackbarDurationEnum.short,
+                        screenName: screenName,
                       });
                     }
                   }
@@ -339,6 +344,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                     addLastSnackbar({
                       message: translate('seed.tapcopy-birthday-message') as string,
                       duration: SnackbarDurationEnum.short,
+                      screenName: screenName,
                     });
                   }
                   setExpandBithday(true);

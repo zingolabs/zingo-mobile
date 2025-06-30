@@ -10,5 +10,6 @@ export const mockLoadedAppRoute: RouteProp<RootStackParamList, RouteEnums.Loaded
     orchardPool: true,
     saplingPool: true,
     transparentPool: true,
+    newWallet: false,
   },
 };

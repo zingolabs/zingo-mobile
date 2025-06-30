@@ -27,7 +27,7 @@ import {
   AddressBookFileClass,
   ContactType,
   FilterEnum,
-  RefreshScreenEnum,
+  ScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
   ServerType,
@@ -83,6 +83,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   const { colors } = useTheme()  as ThemeType;
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const screenName = ScreenEnum.ContactList;
 
   const [contacts, setContacts] = useState<ContactType[]>([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
@@ -295,6 +296,12 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -304,14 +311,9 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('messages.title-chats') as string}
+          screenName={screenName}
           toggleMenuDrawer={toggleMenuDrawer}
           noPrivacy={true}
           noBalance={true}
@@ -540,7 +542,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               refreshControl={
                 <RefreshControl
                   refreshing={false}
-                  onRefresh={() => doRefresh(RefreshScreenEnum.ContactList)}
+                  onRefresh={() => doRefresh(screenName)}
                   tintColor={colors.text}
                   title={translate('history.refreshing') as string}
                 />
@@ -569,6 +571,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                       month={month}
                       setMessagesAddressModalShow={setMessagesAddressModalShow}
                       addressProtected={c.address === zenniesDonationAddress}
+                      screenName={screenName}
                     />
                   );
                 })}

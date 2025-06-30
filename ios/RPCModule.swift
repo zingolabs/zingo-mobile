@@ -192,13 +192,17 @@ class RPCModule: NSObject {
   }
 
   func saveWalletInternal() throws {
-    let walletEncodedString = saveToB64()
-    if !walletEncodedString.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-      let size = (walletEncodedString.count * 3) / 4
-      NSLog("file size \(size)")
-      try self.saveWalletFile(walletEncodedString)
-    } else {
-      throw FileError.saveFileError("Couldn't save the wallet. \(walletEncodedString)")
+    do {
+      let walletEncodedString = saveToB64()
+      if !walletEncodedString.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
+        let size = (walletEncodedString.count * 3) / 4
+        NSLog("file size \(size)")
+        try self.saveWalletFile(walletEncodedString)
+      } else {
+        throw FileError.saveFileError("Couldn't save the wallet. \(walletEncodedString)")
+      }
+    } catch {
+      throw FileError.saveFileError("Couldn't save the wallet. Read/Write issue.")
     }
   }
 
@@ -1541,6 +1545,90 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnCheckMyAddressInfo(dict)
+        }
+      }
+  }
+
+  func fnGetWalletSaveRequiredInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getWalletSaveRequired()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] get wallet save required. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getWalletSaveRequiredInfo:reject:)
+  func getWalletSaveRequiredInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetWalletSaveRequiredInfo(dict)
+        }
+      }
+  }
+
+  func fnSetConfigWalletToProdProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = setConfigWalletToProd()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] set wallet config prod. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(setConfigWalletToProdProcess:reject:)
+  func setConfigWalletToProdProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnSetConfigWalletToProdProcess(dict)
+        }
+      }
+  }
+
+  func fnGetConfigWalletPerformanceInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getConfigWalletPerformance()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] get wallet config performance level. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getConfigWalletPerformanceInfo:reject:)
+  func getConfigWalletPerformanceInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetConfigWalletPerformanceInfo(dict)
         }
       }
   }

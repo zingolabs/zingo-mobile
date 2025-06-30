@@ -43,10 +43,10 @@ import {
   GlobalConst,
   EventListenerEnum,
   AppContextLoading,
-  InfoType,
   ZecPriceType,
   BackgroundErrorType,
   RestoreFromTypeEnum,
+  ScreenEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -102,7 +102,7 @@ const SERVER_DEFAULT_0: ServerType = {
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as ThemeType;
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency);
+  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.USDCurrency); // by default USD
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [donation, setDonation] = useState<boolean>(false);
@@ -161,6 +161,11 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else if (settings.version === '' || settings.version !== (translate('version') as string)) {
         // this is an update
         setFirstLaunchingMessage(true);
+        // The App needs to set the currency opt-in to USD by default
+        // only if the currency have `none`
+        if (settings.currency === CurrencyEnum.noCurrency) {
+          await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, CurrencyEnum.USDCurrency);
+        }
       }
 
       // new donation feature.
@@ -337,6 +342,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
   dim: EmitterSubscription;
   appstate: NativeEventSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
+  screenName = ScreenEnum.LoadingApp;
 
   constructor(props: LoadingAppClassProps) {
     super(props);
@@ -345,7 +351,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       // context
       netInfo: {} as NetInfoType,
       wallet: {} as WalletType,
-      info: {} as InfoType,
       zecPrice: {} as ZecPriceType,
       background: props.background,
       translate: props.translate,
@@ -358,6 +363,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       snackbars: [] as SnackbarType[],
       addLastSnackbar: this.addLastSnackbar,
       removeFirstSnackbar: this.removeFirstSnackbar,
+      zingolibVersion: '',
 
       // context settings
       server: props.server,
@@ -411,6 +417,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       },
       //actionButtonsDisabled: !netInfoState.isConnected ? true : false,
     });
+
+    this.fetchZingolibVersion();
 
     //console.log('DID MOUNT APPLOADING...', netInfoState);
 
@@ -473,6 +481,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.addLastSnackbar({
             message: this.state.translate('loadedapp.selectingserver') as string,
             duration: SnackbarDurationEnum.longer,
+            screenName: this.screenName,
           });
         }, 10);
         // not a different one, can be the same.
@@ -567,13 +576,19 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 transparentPool,
                 actionButtonsDisabled: false,
               });
-              this.addLastSnackbar({ message: walletKindStr });
+              this.addLastSnackbar({ message: walletKindStr, screenName: this.screenName });
             }
             // creating tor cliente if needed
-            if (this.state.currency === CurrencyEnum.USDTORCurrency) {
+            if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
               RPCModule.createTorClientProcess();
             }
-            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool);
+            // if the App is restoring another wallet backup...
+            // needs to recalculate the Address Book.
+            const newWallet = !!this.props.route.params &&
+              (this.props.route.params.newWallet === true || this.props.route.params.newWallet === false)
+                ? this.props.route.params.newWallet
+                : false;
+            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, newWallet);
             //console.log('navigate to LoadedApp');
           } else {
             error = true;
@@ -623,7 +638,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           } else {
             this.createNewWallet(false);
             this.setState({ actionButtonsDisabled: false });
-            this.navigateToLoadedApp(false, true, true, true);
+            this.navigateToLoadedApp(false, true, true, true, true);
             //console.log('navigate to LoadedApp');
           }
         }
@@ -782,11 +797,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         this.addLastSnackbar({
           message: this.state.translate('loadedapp.selectingserversame') as string,
           duration: SnackbarDurationEnum.long,
+          screenName: this.screenName,
         });
       } else {
         this.addLastSnackbar({
           message: (this.state.translate('loadedapp.selectingserverbest') as string) + ' ' + fasterServer.uri,
           duration: SnackbarDurationEnum.long,
+          screenName: this.screenName,
         });
       }
     }
@@ -817,6 +834,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       this.addLastSnackbar({
         message: this.state.translate('restarting') as string,
         duration: SnackbarDurationEnum.long,
+        screenName: this.screenName,
       });
     }
     // if no internet connection -> show the error.
@@ -825,12 +843,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
+        this.screenName,
         title,
         result,
         false,
         this.state.translate,
         sendEmail,
-        this.state.info.zingolib,
+        this.state.zingolibVersion,
       );
       this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
     } else {
@@ -840,12 +859,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
+          this.screenName,
           title,
           result,
           false,
           this.state.translate,
           sendEmail,
-          this.state.info.zingolib,
+          this.state.zingolibVersion,
         );
         this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
       } else {
@@ -856,6 +876,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.addLastSnackbar({
             message: this.state.translate('loadingapp.serverfirsttry') as string,
             duration: SnackbarDurationEnum.longer,
+            screenName: this.screenName,
           });
           // a different server.
           const someServerIsWorking = await this.selectTheBestServer(true);
@@ -871,12 +892,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               createAlert(
                 this.setBackgroundError,
                 this.addLastSnackbar,
+                this.screenName,
                 title,
                 result,
                 false,
                 this.state.translate,
                 sendEmail,
-                this.state.info.zingolib,
+                this.state.zingolibVersion,
               );
               this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
             }
@@ -884,12 +906,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             createAlert(
               this.setBackgroundError,
               this.addLastSnackbar,
+              this.screenName,
               title,
               this.state.translate('loadingapp.noservers') as string,
               false,
               this.state.translate,
               sendEmail,
-              this.state.info.zingolib,
+              this.state.zingolibVersion,
             );
             this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
           }
@@ -898,17 +921,19 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.addLastSnackbar({
             message: this.state.translate('loadingapp.serversecondtry') as string,
             duration: SnackbarDurationEnum.longer,
+            screenName: this.screenName,
           });
           setTimeout(() => {
             createAlert(
               this.setBackgroundError,
               this.addLastSnackbar,
+              this.screenName,
               title,
               result,
               false,
               this.state.translate,
               sendEmail,
-              this.state.info.zingolib,
+              this.state.zingolibVersion,
             );
             this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
           }, 1000);
@@ -959,12 +984,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       const uri: string = parseServerURI(this.state.customServerUri, this.state.translate);
       const chainName = this.state.customServerChainName;
       if (uri.toLowerCase().startsWith(GlobalConst.error)) {
-        this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string });
+        this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, screenName: this.screenName });
         this.setState({ actionButtonsDisabled: false });
         return;
       }
 
-      this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string });
+      this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string, screenName: this.screenName });
 
       const cs = {
         uri: uri,
@@ -989,19 +1014,20 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       } else {
         this.addLastSnackbar({
           message: (this.state.translate('loadedapp.changeservernew-error') as string) + uri,
+          screenName: this.screenName,
         });
       }
     }
     this.setState({ actionButtonsDisabled: false });
   };
 
-  navigateToLoadedApp = (readOnly: boolean, orchardPool: boolean, saplingPool: boolean, transparentPool: boolean) => {
+  navigateToLoadedApp = (readOnly: boolean, orchardPool: boolean, saplingPool: boolean, transparentPool: boolean, newWallet: boolean) => {
     this.props.navigationApp.reset({
       index: 0,
       routes: [
         {
           name: RouteEnums.LoadedApp,
-          params: { readOnly, orchardPool, saplingPool, transparentPool },
+          params: { readOnly, orchardPool, saplingPool, transparentPool, newWallet },
         },
       ],
     });
@@ -1009,7 +1035,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
   createNewWallet = (goSeedScreen: boolean = true) => {
     if (!this.state.netInfo.isConnected || this.state.selectServer === SelectServerEnum.offline) {
-      this.addLastSnackbar({ message: this.state.translate('loadedapp.connection-error') as string });
+      this.addLastSnackbar({ message: this.state.translate('loadedapp.connection-error') as string, screenName: this.screenName });
       return;
     }
     this.setState({ actionButtonsDisabled: true });
@@ -1028,12 +1054,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             createAlert(
               this.setBackgroundError,
               this.addLastSnackbar,
+              this.screenName,
               this.state.translate('loadingapp.creatingwallet-label') as string,
               seedJSON.error,
               false,
               this.state.translate,
               sendEmail,
-              this.state.info.zingolib,
+              this.state.zingolibVersion,
             );
             return;
           }
@@ -1042,12 +1069,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           createAlert(
             this.setBackgroundError,
             this.addLastSnackbar,
+            this.screenName,
             this.state.translate('loadingapp.creatingwallet-label') as string,
             e instanceof Error ? e.message : String(e),
             false,
             this.state.translate,
             sendEmail,
-            this.state.info.zingolib,
+            this.state.zingolibVersion,
           );
           return;
         }
@@ -1070,7 +1098,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           walletExists: true,
         }));
         // creating tor cliente if needed
-        if (this.state.currency === CurrencyEnum.USDTORCurrency) {
+        if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
           RPCModule.createTorClientProcess();
         }
       } else {
@@ -1088,12 +1116,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
+        this.screenName,
         this.state.translate('loadingapp.emptyseedufvk-label') as string,
         this.state.translate('loadingapp.emptyseedufvk-error') as string,
         false,
         this.state.translate,
         sendEmail,
-        this.state.info.zingolib,
+        this.state.zingolibVersion,
       );
       return;
     }
@@ -1106,12 +1135,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
+        this.screenName,
         this.state.translate('loadingapp.invalidseedufvk-label') as string,
         this.state.translate('loadingapp.invalidseedufvk-error') as string,
         false,
         this.state.translate,
         sendEmail,
-        this.state.info.zingolib,
+        this.state.zingolibVersion,
       );
       return;
     }
@@ -1234,13 +1264,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 transparentPool,
                 actionButtonsDisabled: false,
               });
-              this.addLastSnackbar({ message: walletKindStr });
+              this.addLastSnackbar({ message: walletKindStr, screenName: this.screenName });
             }
             // creating tor cliente if needed
-            if (this.state.currency === CurrencyEnum.USDTORCurrency) {
+            if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
               RPCModule.createTorClientProcess();
             }
-            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool);
+            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true);
           } else {
             error = true;
             errorText = resultJson.error;
@@ -1332,6 +1362,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                   this.addLastSnackbar({
                     message: this.props.translate('txtcopied') as string,
                     duration: SnackbarDurationEnum.short,
+                    screenName: this.screenName,
                   });
                 },
               },
@@ -1354,6 +1385,33 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     });
     this.componentDidMount();
   };
+
+  async fetchZingolibVersion(): Promise<void> {
+    try {
+      const start = Date.now();
+      let zingolibStr: string = await RPCModule.getVersionInfo();
+      console.log('=========================================== > zingolib version - ', Date.now() - start);
+      if (zingolibStr) {
+        if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error zingolib version ${zingolibStr}`);
+          zingolibStr = GlobalConst.zingolibError;
+        }
+      } else {
+        console.log('Internal Error zingolib version');
+        zingolibStr = GlobalConst.zingolibNone;
+      }
+
+      //const start2 = Date.now();
+      this.setState({
+        zingolibVersion: zingolibStr,
+      });
+      //console.log('=========================================== > set zingolib version - ', Date.now() - start2);
+    } catch (error) {
+      console.log(`Critical Error info ${error}`);
+      return;
+    }
+  }
+
 
   render() {
     const {
@@ -1382,7 +1440,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       // context
       netInfo: this.state.netInfo,
       wallet: this.state.wallet,
-      info: this.state.info,
       zecPrice: this.state.zecPrice,
       background: this.state.background,
       translate: this.state.translate,
@@ -1395,6 +1452,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       snackbars: this.state.snackbars,
       addLastSnackbar: this.state.addLastSnackbar,
       removeFirstSnackbar: this.removeFirstSnackbar,
+      zingolibVersion: this.state.zingolibVersion,
 
       // settings
       server: this.state.server,
@@ -1412,9 +1470,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     return (
       <ToastProvider>
-        <ContextAppLoadingProvider value={context}>
-          <Snackbars snackbars={snackbars} removeFirstSnackbar={this.removeFirstSnackbar} translate={translate} />
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={this.removeFirstSnackbar}
+          screenName={this.screenName}
+        />
 
+        <ContextAppLoadingProvider value={context}>
           {screen === 0 && (
             <Launching
               translate={translate}
@@ -1452,10 +1514,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               animationType="slide"
               transparent={true}
               visible={screen === 2}
-              onRequestClose={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool)}>
+              onRequestClose={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true)}>
               <Seed
-                onClickOK={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool)}
-                onClickCancel={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool)}
+                onClickOK={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true)}
+                onClickCancel={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true)}
                 action={SeedActionEnum.new}
                 setPrivacyOption={this.setPrivacyOption}
               />

@@ -9,6 +9,7 @@ import {
   ButtonTypeEnum,
   GlobalConst,
   ReceiverEnum,
+  ScreenEnum,
   SnackbarDurationEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
@@ -35,8 +36,9 @@ type NewAddressProps = {
   addressKind: AddressKindEnum;
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
+  screenName: ScreenEnum;
 };
-const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, closeSheet, setAddressBook }) => {
+const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, closeSheet, setAddressBook, screenName }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, addLastSnackbar } = context;
   const { colors } = useTheme() as ThemeType;
@@ -70,6 +72,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, clo
           addLastSnackbar({
             message: translate('receive.transparent.new-error') as string,
             duration: SnackbarDurationEnum.short,
+            screenName: screenName,
           });
 
           // return newAddressStr;

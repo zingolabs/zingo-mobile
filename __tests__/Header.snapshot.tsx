@@ -11,6 +11,7 @@ import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/contex
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { ScreenEnum } from '../app/AppState';
 
 // test suite
 describe('Component Header - test', () => {
@@ -23,6 +24,7 @@ describe('Component Header - test', () => {
       <ContextAppLoadedProvider value={state}>
         <Header
           title="title"
+          screenName={ScreenEnum.About}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -44,6 +46,7 @@ describe('Component Header - test', () => {
       <ContextAppLoadedProvider value={state}>
         <Header
           title="title"
+          screenName={ScreenEnum.History}
           testID="valuetransfer text"
           toggleMenuDrawer={onFunction}
           setBackgroundError={onFunction}

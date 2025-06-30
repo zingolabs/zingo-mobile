@@ -13,6 +13,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
+import { ScreenEnum } from '../../AppState';
 
 const ComputingTxContent: React.FunctionComponent = () => {
   const context = useContext(ContextAppLoaded);
@@ -20,6 +21,7 @@ const ComputingTxContent: React.FunctionComponent = () => {
   const { colors } = useTheme() as ThemeType;
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const screenName = ScreenEnum.ComputingTxContext;
 
   return (
     <View
@@ -33,6 +35,7 @@ const ComputingTxContent: React.FunctionComponent = () => {
       }}>
       <Header
         title={translate('send.sending-title') as string}
+        screenName={screenName}
         noBalance={true}
         noSyncingStatus={true}
         noDrawMenu={true}

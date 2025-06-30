@@ -149,6 +149,10 @@ class ExecuteAddressesFromSeed {
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
         assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
@@ -188,6 +192,10 @@ class ExecuteAddressesFromUfvk {
         println("\nInit From UFVK:")
         println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
+
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
         assertThat(initFromUfvk.ufvk).isEqualTo(ufvk)
         assertThat(initFromUfvk.birthday).isEqualTo(1)
 
@@ -234,6 +242,10 @@ class ExecuteVersionFromSeed {
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
         assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
@@ -263,6 +275,10 @@ class ExecuteSyncFromSeed {
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
         assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
@@ -326,6 +342,10 @@ class ExecuteSendFromOrchard {
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
         assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
@@ -426,6 +446,10 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
         assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
@@ -503,6 +527,10 @@ class ExecuteSaplingBalanceFromSeed {
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
         assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
@@ -593,6 +621,9 @@ class ExecuteParseAddresses {
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
         val seedResult = initFromSeed.seed_phrase
         val birthdayResult = initFromSeed.birthday
 
@@ -631,6 +662,9 @@ class ExecuteParseAddresses {
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
+
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
 
         val seedResult = initFromSeed.seed_phrase
         val birthdayResult = initFromSeed.birthday

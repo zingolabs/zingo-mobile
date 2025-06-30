@@ -21,7 +21,8 @@ import 'moment/locale/ru';
 import 'moment/locale/tr';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
-import { useToast } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
+import { ScreenEnum } from '../../app/AppState';
 
 type PoolsProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -35,200 +36,204 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.Pools;
 
-  console.log('render pools. Balance:', totalBalance, orchardPool, saplingPool, transparentPool);
+  //console.log('render pools. Balance:', totalBalance, orchardPool, saplingPool, transparentPool);
 
   return (
-    <View
-      style={{
-        marginTop: top,
-        marginBottom: bottom,
-        marginRight: right,
-        marginLeft: left,
-        flex: 1,
-        backgroundColor: colors.background,
-      }}>
+    <ToastProvider>
       <Snackbars
         snackbars={snackbars}
         removeFirstSnackbar={removeFirstSnackbar}
-        translate={translate}
+        screenName={screenName}
       />
 
-      <Header
-        title={translate('pools.title') as string}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noUfvkIcon={true}
-        setPrivacyOption={setPrivacyOption}
-        addLastSnackbar={addLastSnackbar}
-        closeScreen={() => {
-          clear();
-          hide();
-        }}
-      />
-      <ScrollView
-        style={{ maxHeight: '90%' }}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
+      <View
+        style={{
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
+          backgroundColor: colors.background,
         }}>
-        <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
-          {totalBalance && (
-            <>
-              {!orchardPool && !saplingPool && !transparentPool && (
-                <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
-              )}
-              {orchardPool && (
-                <>
-                  <BoldText>{translate('pools.orchard-title') as string}</BoldText>
+        <Header
+          title={translate('pools.title') as string}
+          screenName={screenName}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noUfvkIcon={true}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
+        />
+        <ScrollView
+          style={{ maxHeight: '90%' }}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
+          }}>
+          <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
+            {totalBalance && (
+              <>
+                {!orchardPool && !saplingPool && !transparentPool && (
+                  <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
+                )}
+                {orchardPool && (
+                  <>
+                    <BoldText>{translate('pools.orchard-title') as string}</BoldText>
 
-                  <View style={{ display: 'flex', marginLeft: 25 }}>
-                    <DetailLine label={translate('pools.orchard-balance') as string}>
-                      <ZecAmount
-                        testID="orchard-total-balance"
-                        amtZec={totalBalance.totalOrchardBalance}
-                        size={18}
-                        currencyName={info.currencyName}
-                        style={{
-                          opacity:
-                            totalBalance.confirmedOrchardBalance > 0 &&
-                            totalBalance.confirmedOrchardBalance === totalBalance.totalOrchardBalance
-                              ? 1
-                              : 0.5,
-                        }}
-                        privacy={privacy}
-                      />
-                    </DetailLine>
-                    <DetailLine label={translate('pools.orchard-confirmed-balance') as string}>
-                      <ZecAmount
-                        testID="orchard-confirmed-balance"
-                        amtZec={totalBalance.confirmedOrchardBalance}
-                        size={18}
-                        currencyName={info.currencyName}
-                        color={
-                          totalBalance.confirmedOrchardBalance > 0 && totalBalance.confirmedOrchardBalance === totalBalance.totalOrchardBalance
-                            ? colors.primary
-                            : 'red'
-                        }
-                        privacy={privacy}
-                      />
-                    </DetailLine>
-                  </View>
+                    <View style={{ display: 'flex', marginLeft: 25 }}>
+                      <DetailLine label={translate('pools.orchard-balance') as string} screenName={screenName}>
+                        <ZecAmount
+                          testID="orchard-total-balance"
+                          amtZec={totalBalance.totalOrchardBalance}
+                          size={18}
+                          currencyName={info.currencyName}
+                          style={{
+                            opacity:
+                              totalBalance.confirmedOrchardBalance > 0 &&
+                              totalBalance.confirmedOrchardBalance === totalBalance.totalOrchardBalance
+                                ? 1
+                                : 0.5,
+                          }}
+                          privacy={privacy}
+                        />
+                      </DetailLine>
+                      <DetailLine label={translate('pools.orchard-confirmed-balance') as string} screenName={screenName}>
+                        <ZecAmount
+                          testID="orchard-confirmed-balance"
+                          amtZec={totalBalance.confirmedOrchardBalance}
+                          size={18}
+                          currencyName={info.currencyName}
+                          color={
+                            totalBalance.confirmedOrchardBalance > 0 && totalBalance.confirmedOrchardBalance === totalBalance.totalOrchardBalance
+                              ? colors.primary
+                              : 'red'
+                          }
+                          privacy={privacy}
+                        />
+                      </DetailLine>
+                    </View>
 
+                    <View
+                      style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }}
+                    />
+                  </>
+                )}
+
+                {saplingPool && (
+                  <>
+                    <BoldText>{translate('pools.sapling-title') as string}</BoldText>
+
+                    <View style={{ display: 'flex', marginLeft: 25 }}>
+                      <DetailLine label={translate('pools.sapling-balance') as string} screenName={screenName}>
+                        <ZecAmount
+                          testID="sapling-total-balance"
+                          amtZec={totalBalance.totalSaplingBalance}
+                          size={18}
+                          currencyName={info.currencyName}
+                          style={{
+                            opacity:
+                              totalBalance.confirmedSaplingBalance > 0 &&
+                              totalBalance.confirmedSaplingBalance === totalBalance.totalSaplingBalance
+                                ? 1
+                                : 0.5,
+                          }}
+                          privacy={privacy}
+                        />
+                      </DetailLine>
+                      <DetailLine label={translate('pools.sapling-confirmed-balance') as string} screenName={screenName}>
+                        <ZecAmount
+                          testID="sapling-confirmed-balance"
+                          amtZec={totalBalance.confirmedSaplingBalance}
+                          size={18}
+                          currencyName={info.currencyName}
+                          color={
+                            totalBalance.confirmedSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === totalBalance.totalSaplingBalance
+                              ? colors.syncing
+                              : 'red'
+                          }
+                          privacy={privacy}
+                        />
+                      </DetailLine>
+                    </View>
+
+                    <View
+                      style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }}
+                    />
+                  </>
+                )}
+
+                {transparentPool && (
+                  <>
+                    <BoldText>{translate('pools.transparent-title') as string}</BoldText>
+
+                    <View style={{ display: 'flex', marginLeft: 25 }}>
+                      <DetailLine label={translate('pools.transparent-balance') as string} screenName={screenName}>
+                        <ZecAmount
+                          testID="transparent-balance"
+                          amtZec={totalBalance.totalTransparentBalance}
+                          size={18}
+                          currencyName={info.currencyName}
+                          color={'red'}
+                          privacy={privacy}
+                        />
+                      </DetailLine>
+                      <DetailLine label={translate('pools.transparent-confirmed-balance') as string} screenName={screenName}>
+                        <ZecAmount
+                          testID="transparent-confirmed-balance"
+                          amtZec={totalBalance.confirmedTransparentBalance}
+                          size={18}
+                          currencyName={info.currencyName}
+                          color={'red'}
+                          privacy={privacy}
+                        />
+                      </DetailLine>
+                    </View>
+                  </>
+                )}
+
+                {transparentPool && totalBalance.confirmedTransparentBalance > 0 && shieldingAmount === 0 && (
                   <View
-                    style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }}
-                  />
-                </>
-              )}
-
-              {saplingPool && (
-                <>
-                  <BoldText>{translate('pools.sapling-title') as string}</BoldText>
-
-                  <View style={{ display: 'flex', marginLeft: 25 }}>
-                    <DetailLine label={translate('pools.sapling-balance') as string}>
-                      <ZecAmount
-                        testID="sapling-total-balance"
-                        amtZec={totalBalance.totalSaplingBalance}
-                        size={18}
-                        currencyName={info.currencyName}
-                        style={{
-                          opacity:
-                            totalBalance.confirmedSaplingBalance > 0 &&
-                            totalBalance.confirmedSaplingBalance === totalBalance.totalSaplingBalance
-                              ? 1
-                              : 0.5,
-                        }}
-                        privacy={privacy}
-                      />
-                    </DetailLine>
-                    <DetailLine label={translate('pools.sapling-confirmed-balance') as string}>
-                      <ZecAmount
-                        testID="sapling-confirmed-balance"
-                        amtZec={totalBalance.confirmedSaplingBalance}
-                        size={18}
-                        currencyName={info.currencyName}
-                        color={
-                          totalBalance.confirmedSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === totalBalance.totalSaplingBalance
-                            ? colors.syncing
-                            : 'red'
-                        }
-                        privacy={privacy}
-                      />
-                    </DetailLine>
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      marginTop: 5,
+                      backgroundColor: colors.card,
+                      padding: 5,
+                      borderRadius: 10,
+                    }}>
+                    <FontAwesomeIcon icon={faInfoCircle} size={20} color={colors.primary} style={{ marginRight: 5 }} />
+                    <FadeText>{translate('pools.dust') as string}</FadeText>
                   </View>
+                )}
 
+                {somePending && (
                   <View
-                    style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }}
-                  />
-                </>
-              )}
-
-              {transparentPool && (
-                <>
-                  <BoldText>{translate('pools.transparent-title') as string}</BoldText>
-
-                  <View style={{ display: 'flex', marginLeft: 25 }}>
-                    <DetailLine label={translate('pools.transparent-balance') as string}>
-                      <ZecAmount
-                        testID="transparent-balance"
-                        amtZec={totalBalance.totalTransparentBalance}
-                        size={18}
-                        currencyName={info.currencyName}
-                        color={'red'}
-                        privacy={privacy}
-                      />
-                    </DetailLine>
-                    <DetailLine label={translate('pools.transparent-confirmed-balance') as string}>
-                      <ZecAmount
-                        testID="transparent-confirmed-balance"
-                        amtZec={totalBalance.confirmedTransparentBalance}
-                        size={18}
-                        currencyName={info.currencyName}
-                        color={'red'}
-                        privacy={privacy}
-                      />
-                    </DetailLine>
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      marginTop: 5,
+                      backgroundColor: colors.card,
+                      padding: 5,
+                      borderRadius: 10,
+                    }}>
+                    <FontAwesomeIcon icon={faInfoCircle} size={20} color={colors.primary} style={{ marginRight: 5 }} />
+                    <FadeText>{translate('send.somefunds') as string}</FadeText>
                   </View>
-                </>
-              )}
-
-              {transparentPool && totalBalance.confirmedTransparentBalance > 0 && shieldingAmount === 0 && (
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    marginTop: 5,
-                    backgroundColor: colors.card,
-                    padding: 5,
-                    borderRadius: 10,
-                  }}>
-                  <FontAwesomeIcon icon={faInfoCircle} size={20} color={colors.primary} style={{ marginRight: 5 }} />
-                  <FadeText>{translate('pools.dust') as string}</FadeText>
-                </View>
-              )}
-
-              {somePending && (
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    marginTop: 5,
-                    backgroundColor: colors.card,
-                    padding: 5,
-                    borderRadius: 10,
-                  }}>
-                  <FontAwesomeIcon icon={faInfoCircle} size={20} color={colors.primary} style={{ marginRight: 5 }} />
-                  <FadeText>{translate('send.somefunds') as string}</FadeText>
-                </View>
-              )}
-            </>
-          )}
-        </View>
-      </ScrollView>
-    </View>
+                )}
+              </>
+            )}
+          </View>
+        </ScrollView>
+      </View>
+    </ToastProvider>
   );
 };
 

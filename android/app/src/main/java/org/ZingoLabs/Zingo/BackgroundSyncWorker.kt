@@ -87,8 +87,12 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             } else {
                 // this means the App is open,
                 // stop syncing first, just in case.
+                // with pepper-sync no need to stop sync process here
                 stopSyncingProcess()
             }
+
+            // setting performance level & min confirmations
+            uniffi.zingo.setConfigWalletToProd()
 
             // the task is running here blocking this execution until this process finished:
             // 1. finished the syncing.
@@ -96,22 +100,39 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             val syncing = uniffi.zingo.runSync()
             Log.i("SCHEDULED_TASK_RUN", "sync LAUNCH: $syncing")
 
+            val startTime = System.currentTimeMillis()
+            val maxDurationMillis = 60 * 60 * 1000
+
             var syncStatus: SyncStatus
             while (true) {
+                val elapsed = System.currentTimeMillis() - startTime
+                if (elapsed > maxDurationMillis) {
+                    Log.w("SCHEDULED_TASK_RUN", "sync TIMEOUT after 1 hour")
+                    break
+                }
+
                 val syncStatusJson: String = uniffi.zingo.statusSync()
-                Log.i("SCHEDULED_TASK_RUN", "sync STATUS: $syncStatusJson")
                 if (syncStatusJson.lowercase().startsWith(ErrorPrefix.value)) {
-                    Log.i("SCHEDULED_TASK_RUN", "sync ERROR")
-                    break
-                }
-                syncStatus = mapper.readValue(syncStatusJson)
-
-                if (syncStatus.percentage_total_outputs_scanned == 100.0) {
-                    Log.i("SCHEDULED_TASK_RUN", "sync COMPLETE")
+                    Log.i("SCHEDULED_TASK_RUN", "sync STATUS ERROR: $syncStatusJson")
                     break
                 }
 
-                Thread.sleep(1000)
+                try {
+                    syncStatus = mapper.readValue(syncStatusJson)
+
+                    val percent = syncStatus.percentage_total_outputs_scanned
+
+                    if (percent == 100.0) {
+                        Log.i("SCHEDULED_TASK_RUN", "sync COMPLETED %: $percent")
+                        break
+                    } else {
+                        Log.i("SCHEDULED_TASK_RUN", "sync STATUS %: $percent")
+                    }
+                } catch (e: Exception) {
+                    Log.e("SCHEDULED_TASK_RUN", "sync STATUS - parsing ERROR ${e.localizedMessage}")
+                }
+
+                Thread.sleep(5000)
             }
 
         } else {
@@ -149,7 +170,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             val settingsString = settingsBytes.toString(Charsets.UTF_8)
             val jsonObject = JSONObject(settingsString)
             val server = jsonObject.getJSONObject("server").getString("uri")
-            val chainhint = jsonObject.getJSONObject("server").getString("chain_name")
+            val chainhint = jsonObject.getJSONObject("server").getString("chainName")
             Log.i(
                 "SCHEDULED_TASK_RUN",
                 "Opening the wallet file - No App active - server: $server chain: $chainhint"
@@ -162,7 +183,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         val stop = uniffi.zingo.stopSync()
         if (stop.lowercase().startsWith(ErrorPrefix.value)) {
             // this means this task not have a valid lightclient
-            Log.i("SCHEDULED_TASK_RUN", "$stop")
+            Log.i("SCHEDULED_TASK_RUN", stop)
             return
         }
         Log.i("SCHEDULED_TASK_RUN", "Stopping sync: $stop")

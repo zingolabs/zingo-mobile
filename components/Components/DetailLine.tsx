@@ -13,16 +13,17 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { SnackbarDurationEnum } from '../../app/AppState';
+import { ScreenEnum, SnackbarDurationEnum } from '../../app/AppState';
 
 type DetailLineProps = {
   label: string;
   value?: string;
   children?: ReactNode;
   testID?: string;
+  screenName: ScreenEnum;
 };
 
-const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, children, testID }) => {
+const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, children, testID, screenName }) => {
   const { colors } = useTheme()  as ThemeType;
   const context = useContext(ContextAppLoaded);
   const { addLastSnackbar, translate, language } = context;
@@ -38,6 +39,7 @@ const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, ch
             addLastSnackbar({
               message: translate('txtcopied') as string,
               duration: SnackbarDurationEnum.short,
+              screenName: screenName,
             });
           }}>
           <RegText testID={testID} color={colors.text}>

@@ -9,5 +9,6 @@ export const mockLoadingAppRoute: RouteProp<RootStackParamList, RouteEnums.Loadi
     screen: 0,
     startingApp: true,
     biometricsFailed: false,
+    newWallet: false,
   },
 };

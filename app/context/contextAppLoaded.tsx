@@ -40,7 +40,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   wallet: {} as WalletType,
   defaultUnifiedAddress: '',
   server: {} as ServerType,
-  currency: CurrencyEnum.noCurrency,
+  currency: CurrencyEnum.USDCurrency,
   language: LanguageEnum.en,
   zecPrice: {
     zecPrice: 0,
@@ -85,6 +85,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   setUfvkViewModalShow: () => new Promise(resolve => resolve),
   setSyncReportModalShow: () => new Promise(resolve => resolve),
   setPoolsModalShow: () => new Promise(resolve => resolve),
+  zingolibVersion: '',
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

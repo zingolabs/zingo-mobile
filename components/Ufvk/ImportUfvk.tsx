@@ -28,7 +28,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { ButtonTypeEnum, GlobalConst, SelectServerEnum } from '../../app/AppState';
+import { ButtonTypeEnum, GlobalConst, ScreenEnum, SelectServerEnum } from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
 // @ts-ignore
@@ -40,10 +40,11 @@ type ImportUfvkProps = {
 };
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, onClickOK }) => {
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, info, server, mode, addLastSnackbar, language, selectServer, snackbars, removeFirstSnackbar } = context;
+  const { translate, netInfo, server, mode, addLastSnackbar, language, selectServer, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const screenName = ScreenEnum.ImportUfvk;
 
   const [seedufvkText, setSeedufvkText] = useState<string>('');
   const [birthday, setBirthday] = useState<string>('');
@@ -51,10 +52,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   const [latestBlock, setLatestBlock] = useState<number>(0);
 
   useEffect(() => {
-    if (info.latestBlock) {
-      setLatestBlock(info.latestBlock);
-    } else {
-      if (selectServer !== SelectServerEnum.offline) {
+      if (!netInfo.isConnected || selectServer !== SelectServerEnum.offline) {
         (async () => {
           const resp: string = await RPCModule.getLatestBlockServerInfo(server.uri);
           //console.log(resp);
@@ -65,8 +63,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           }
         })();
       }
-    }
-  }, [info.latestBlock, server, selectServer]);
+  }, [server, selectServer, netInfo.isConnected]);
 
   useEffect(() => {
     if (seedufvkText) {
@@ -109,7 +106,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
 
   const okButton = async () => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
       return;
     }
     onClickOK(seedufvkText.trimEnd().trimStart(), Number(birthday));
@@ -128,6 +125,12 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <KeyboardAvoidingView
         behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
@@ -140,12 +143,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           backgroundColor: colors.background,
         }}
       >
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <View
           style={{
             flex: 1,
@@ -160,6 +157,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
           </Modal>
           <Header
             title={translate('import.title') as string}
+            screenName={screenName}
             noBalance={true}
             noSyncingStatus={true}
             noDrawMenu={true}

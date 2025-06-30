@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.0 (237)",
+  "version": "zingo-2.0.0 (243)",
   "loading": "Yükleniyor...",
   "connectingserver": "Sunucuya bağlanılıyor...",
   "wait": "Lütfen bekleyin...",
@@ -506,6 +506,7 @@
     "fetchpricetitle": "USD Fiyatını Getir",
     "fetchpricebody": "Lütfen USD fiyatını internetten almak istediğinizi onaylayın.",
     "fetch-button": "Getir",
+    "fetchwithtor-button": "Tor ile getir",
     "confirm-privacy-level": "Gizlilik Seviyesi",
     "private": "Gizli",
     "amountrevealed": "Açıklanan Tutar",
@@ -560,7 +561,8 @@
       "new-error": "Şeffaf adres oluşturulamadı. En son oluşturulan şeffaf adres henüz herhangi bir fon almadı."
     },
     "verification-success": "Bu adres size aittir ve fon almak için güvenlidir.",
-    "verification-failure": "Bu adres size ait değil."
+    "verification-failure": "Bu adres size ait değil.",
+    "add-tag": "Etiket ekle"
   },
   "history": {
     "shield-all": "Tüm Fonları Koru",
@@ -642,9 +644,9 @@
   },
   "report": {
     "title": "Senkronizasyon / Yeniden Tarama Raporu",
-    "running": "Cüzdan senkronize ediliyor…",
-    "finished": "Cüzdan tamamen senkronize edildi",
-    "paused": "Cüzdan, senkronizasyona başlamak için bekliyor…",
+    "running": "Senkronize ediliyor...",
+    "finished": "Tamamen Senkronize Edildi",
+    "paused": "Senkronizasyonun başlatılmasını bekliyor...",
     "server-title": "SUNUCU:",
     "blocks": "Bloklar.",
     "wallet": "Cüzdan:",

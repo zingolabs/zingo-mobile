@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.0 (237)",
+  "version": "zingo-2.0.0 (243)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -506,6 +506,7 @@
     "fetchpricetitle": "Consultar Precio USD",
     "fetchpricebody": "Por favor confirma que quieres recuperar/consultar el precio en USD de internet.",
     "fetch-button": "Consultar",
+    "fetchwithtor-button": "Consultar con Tor",
     "confirm-privacy-level": "Nivel de Privacidad",
     "private": "Privada",
     "amountrevealed": "Monto Revelado",
@@ -560,7 +561,8 @@
       "new-error": "Error al generar la dirección transparente. La última dirección transparente no ha recibido fondos."
     },
     "verification-success": "Esta dirección te pertenece y es segura para recibir fondos.",
-    "verification-failure": "Esta dirección no te pertenece."
+    "verification-failure": "Esta dirección no te pertenece.",
+    "add-tag": "Añadir etiqueta"
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",
@@ -642,9 +644,9 @@
   },
   "report": {
     "title": "Informe de Sincronización",
-    "running": "El monedero se está sincronizando...",
-    "finished": "El monedero está totalmente sincronizado",
-    "paused": "El monedero está esperando para empezar a sincronizar...",
+    "running": "Sincronizando...",
+    "finished": "Totalmente sincronizado",
+    "paused": "Esperando para empezar a sincronizar...",
     "server-title": "SERVIDOR: ",
     "blocks": " Bloques. ",
     "wallet": "Monedero: ",

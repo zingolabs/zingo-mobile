@@ -17,18 +17,20 @@ import 'moment/locale/ru';
 import 'moment/locale/tr';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
-import { useToast } from 'react-native-toastier';
+import { ToastProvider, useToast } from 'react-native-toastier';
+import { ScreenEnum } from '../../app/AppState';
 
 type AboutProps = {
 };
 const About: React.FunctionComponent<AboutProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language, snackbars, removeFirstSnackbar } = context;
+  const { zingolibVersion, translate, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.About;
 
   const arrayTxtObject = translate('about.copyright');
   let arrayTxt: string[] = [];
@@ -36,55 +38,56 @@ const About: React.FunctionComponent<AboutProps> = () => {
     arrayTxt = arrayTxtObject as string[];
   }
 
-  console.log(top, bottom, right, left);
-
   return (
-    <View
-      style={{
-        marginTop: top,
-        marginBottom: bottom,
-        marginRight: right,
-        marginLeft: left,
-        flex: 1,
-        backgroundColor: colors.background,
-      }}>
+    <ToastProvider>
       <Snackbars
         snackbars={snackbars}
         removeFirstSnackbar={removeFirstSnackbar}
-        translate={translate}
+        screenName={screenName}
       />
 
-      <Header
-        title={translate('zingo') + ' ' + translate('version')}
-        noBalance={true}
-        noSyncingStatus={true}
-        noDrawMenu={true}
-        noPrivacy={true}
-        noUfvkIcon={true}
-        closeScreen={() => {
-          clear();
-          hide();
-        }}
-      />
-      <ScrollView
-        style={{ maxHeight: '90%' }}
-        contentContainerStyle={{
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
-          padding: 20,
+      <View
+        style={{
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
+          flex: 1,
+          backgroundColor: colors.background,
         }}>
-        <FadeText>{arrayTxt[0]}</FadeText>
-        <DetailLine label={translate('info.zingolib') as string} value={info.zingolib} />
-        <View style={{ marginTop: 20 }}>
-          {arrayTxt.map((txt: string, ind: number) => (
-            <View key={txt.substring(0, 10)}>
-              {ind !== 0 && <FadeText style={{ marginBottom: 20 }}>{txt}</FadeText>}
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-    </View>
+        <Header
+          title={translate('zingo') + ' ' + translate('version')}
+          screenName={screenName}
+          noBalance={true}
+          noSyncingStatus={true}
+          noDrawMenu={true}
+          noPrivacy={true}
+          noUfvkIcon={true}
+          closeScreen={() => {
+            clear();
+            hide();
+          }}
+        />
+        <ScrollView
+          style={{ maxHeight: '90%' }}
+          contentContainerStyle={{
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
+            padding: 20,
+          }}>
+          <FadeText>{arrayTxt[0]}</FadeText>
+          <DetailLine label={translate('info.zingolib') as string} value={zingolibVersion} screenName={screenName} />
+          <View style={{ marginTop: 20 }}>
+            {arrayTxt.map((txt: string, ind: number) => (
+              <View key={txt.substring(0, 10)}>
+                {ind !== 0 && <FadeText style={{ marginBottom: 20 }}>{txt}</FadeText>}
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+    </ToastProvider>
   );
 };
 
