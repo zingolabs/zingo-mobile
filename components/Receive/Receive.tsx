@@ -210,6 +210,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   NATShow={NATShow}
                   VAShow={VAShow}
                   changeIndex={setIndex}
+                  hasTransparent={tAddr && tAddr.length > 0}
                 />
               </>
             )}

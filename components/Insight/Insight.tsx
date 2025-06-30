@@ -229,7 +229,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
   const renderExternalLabel = useCallback(
     (item: pieDataItem | undefined) => (
       <SvgText fontSize={12} fill={item?.color}>
-        {item?.value}
+        {Number(item?.value.toFixed(2))}
       </SvgText>
     ),
     [],

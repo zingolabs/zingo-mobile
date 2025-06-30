@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { TextStyle, View, Text, TouchableOpacity } from 'react-native';
-import Clipboard from '@react-native-clipboard/clipboard';
 import Address from './Address';
 import { magicModal, MagicModalHideReason } from 'react-native-magic-modal';
 import { useTheme } from '@react-navigation/native';
@@ -61,7 +60,6 @@ const DefaultModal: React.FunctionComponent<DefaultModalProps> = ({ address, onC
           <Text style={{ color: '#cbd5e1', fontSize: 16, marginBottom: 12 }}>{address}</Text>
           <TouchableOpacity
             onPress={() => {
-              Clipboard.setString(address);
               onCopy && onCopy();
               onClose();
             }}

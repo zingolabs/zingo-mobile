@@ -389,9 +389,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                     }
                   }
                 >
-                  <View>
-                    <mockQRCode />
-                  </View>
+                  <mockQRCode />
                 </View>
                 <View
                   style={
@@ -546,60 +544,78 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                   </View>
                 </View>
                 <View
+                  accessibilityState={
+                    {
+                      "busy": undefined,
+                      "checked": undefined,
+                      "disabled": undefined,
+                      "expanded": undefined,
+                      "selected": undefined,
+                    }
+                  }
+                  accessibilityValue={
+                    {
+                      "max": undefined,
+                      "min": undefined,
+                      "now": undefined,
+                      "text": undefined,
+                    }
+                  }
+                  accessible={true}
+                  collapsable={false}
+                  focusable={true}
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
                   style={
                     {
                       "alignItems": "center",
-                      "flexDirection": "column",
+                      "backgroundColor": "transparent",
+                      "borderRadius": 10,
+                      "color": "#ffffff",
                       "justifyContent": "center",
-                      "marginBottom": 20,
-                      "width": "100%",
+                      "maxWidth": "90%",
+                      "minHeight": 48,
+                      "minWidth": "30%",
+                      "opacity": 1,
+                      "padding": 0,
+                      "paddingLeft": 20,
+                      "paddingRight": 20,
                     }
                   }
                 >
                   <View
-                    accessibilityState={
-                      {
-                        "busy": undefined,
-                        "checked": undefined,
-                        "disabled": undefined,
-                        "expanded": undefined,
-                        "selected": undefined,
-                      }
-                    }
-                    accessibilityValue={
-                      {
-                        "max": undefined,
-                        "min": undefined,
-                        "now": undefined,
-                        "text": undefined,
-                      }
-                    }
-                    accessible={true}
-                    collapsable={false}
-                    focusable={true}
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
                     style={
                       {
-                        "opacity": 1,
+                        "alignItems": "center",
+                        "display": "flex",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "margin": 0,
+                        "minHeight": 48,
+                        "minWidth": 48,
+                        "padding": 0,
                       }
                     }
                   >
                     <Text
                       style={
                         {
-                          "color": "#888888",
+                          "color": "#ffffff",
+                          "fontFamily": "monospace",
                           "fontSize": 16,
-                          "textDecorationLine": "underline",
+                          "fontWeight": "bold",
+                          "opacity": 0.8,
+                          "textAlign": "center",
+                          "textTransform": "lowercase",
                         }
                       }
                     >
-                      text translated
+                      uview12345...1234567890
                     </Text>
                   </View>
                 </View>
@@ -613,82 +629,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                       "width": "100%",
                     }
                   }
-                >
-                  <View
-                    accessibilityState={
-                      {
-                        "busy": undefined,
-                        "checked": undefined,
-                        "disabled": undefined,
-                        "expanded": undefined,
-                        "selected": undefined,
-                      }
-                    }
-                    accessibilityValue={
-                      {
-                        "max": undefined,
-                        "min": undefined,
-                        "now": undefined,
-                        "text": undefined,
-                      }
-                    }
-                    accessible={true}
-                    collapsable={false}
-                    focusable={true}
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
-                    style={
-                      {
-                        "alignItems": "center",
-                        "backgroundColor": undefined,
-                        "borderRadius": 10,
-                        "justifyContent": "center",
-                        "maxWidth": "90%",
-                        "minHeight": 48,
-                        "minWidth": "30%",
-                        "opacity": 1,
-                        "padding": 0,
-                        "paddingLeft": 20,
-                        "paddingRight": 20,
-                        "width": "80%",
-                      }
-                    }
-                  >
-                    <View
-                      style={
-                        {
-                          "alignItems": "center",
-                          "display": "flex",
-                          "flexDirection": "row",
-                          "justifyContent": "center",
-                          "margin": 0,
-                          "minHeight": 48,
-                          "minWidth": 48,
-                          "padding": 0,
-                        }
-                      }
-                    >
-                      <Text
-                        style={
-                          {
-                            "color": "#c3c3c3",
-                            "fontSize": 16,
-                            "fontWeight": "bold",
-                            "textAlign": "center",
-                            "textTransform": "uppercase",
-                          }
-                        }
-                      >
-                        text translated
-                      </Text>
-                    </View>
-                  </View>
-                </View>
+                />
               </View>
             </RCTScrollView>
           </View>
