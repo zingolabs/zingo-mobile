@@ -181,9 +181,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       setSyncInProgress(true);
     } else {
       setPercentageOutputsScanned(
-        syncingStatus.percentage_total_outputs_scanned < 1
-          ? 1
-          : Math.floor(syncingStatus.percentage_total_outputs_scanned),
+        Number(syncingStatus.percentage_total_outputs_scanned.toFixed(2).replace(/\.?0+$/, '')),
       );
       setSyncInProgress(
         !!syncingStatus.scan_ranges &&
