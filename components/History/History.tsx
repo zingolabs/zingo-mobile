@@ -204,7 +204,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
           setPrivacyOption={setPrivacyOption}
         />
       ),
-      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
@@ -220,7 +221,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
           setServerOption={setServerOption}
         />
       ),
-      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 

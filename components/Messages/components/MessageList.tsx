@@ -463,7 +463,9 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         message={memo}
         includeUAMessage={true}
         setMessage={setMemo}
-      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
+      />,
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -474,7 +476,9 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         valueTransfersSliced={messagesSliced}
         totalLength={messagesFiltered ? messagesFiltered.length : 0}
         setPrivacyOption={setPrivacyOption}
-      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
+      />,
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 

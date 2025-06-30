@@ -278,7 +278,9 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         address={Utils.messagesAddress(c)}
         sendTransaction={sendTransaction}
         setServerOption={setServerOption}
-      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
+      />,
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -287,7 +289,9 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         setPrivacyOption={setPrivacyOption}
         setScrollToBottom={setScrollToBottom}
         scrollToBottom={scrollToBottom}
-      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
+      />,
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 

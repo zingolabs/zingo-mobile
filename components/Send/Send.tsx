@@ -892,6 +892,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           }}
         />
       ),
+      // possible problem if scrolling vertically, if so change to `undefined`.
       { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
     //}
@@ -900,6 +901,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   const setMemoModalShow = () => {
     return magicModal.show(
       () => <Memo message={memoText} includeUAMessage={includeUAMemoBoolean} setMessage={setMemoText} />,
+      // possible problem if scrolling vertically, if so change to `undefined`.
       { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
@@ -925,7 +927,8 @@ const Send: React.FunctionComponent<SendProps> = ({
           sendPageState={buildSendState()}
         />
       ),
-      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 

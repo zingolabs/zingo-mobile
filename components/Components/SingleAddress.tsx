@@ -246,7 +246,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const doAddressList = () => {
     return magicModal.show(
       () => <AddressList addressKind={address ? address.addressKind : AddressKindEnum.u} setIndex={setIndex} />,
-      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 

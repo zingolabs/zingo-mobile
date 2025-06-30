@@ -103,6 +103,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
       return magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
             setAddress(a);
           }}
+        // possible problem if scrolling vertically, if so change to `undefined`.
         />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
       ).promise;
     //}
