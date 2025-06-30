@@ -561,7 +561,8 @@
       "new-error": "Error al generar la dirección transparente. La última dirección transparente no ha recibido fondos."
     },
     "verification-success": "Esta dirección te pertenece y es segura para recibir fondos.",
-    "verification-failure": "Esta dirección no te pertenece."
+    "verification-failure": "Esta dirección no te pertenece.",
+    "add-tag": "Añadir etiqueta"
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",

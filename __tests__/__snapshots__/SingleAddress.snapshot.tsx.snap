@@ -403,14 +403,50 @@ exports[`Component SingleAddress - test SingleAddress - snapshot 1`] = `
           }
         }
       >
-        <Text
-          style={
+        <View
+          accessibilityState={
             {
-              "color": "#888888",
-              "fontSize": 16,
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
             }
           }
-        />
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "#888888",
+                "fontSize": 16,
+                "textDecorationLine": "underline",
+              }
+            }
+          />
+        </View>
         <View
           accessibilityState={
             {
@@ -996,14 +1032,50 @@ exports[`Component SingleAddress UFVK - test SingleAddress UFVK - snapshot 1`] =
           }
         }
       >
-        <Text
-          style={
+        <View
+          accessibilityState={
             {
-              "color": "#888888",
-              "fontSize": 16,
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
             }
           }
-        />
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "#888888",
+                "fontSize": 16,
+                "textDecorationLine": "underline",
+              }
+            }
+          />
+        </View>
       </View>
       <View
         style={

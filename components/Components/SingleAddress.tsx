@@ -140,6 +140,7 @@ type SingleAddressProps = {
   setIndex: (i: number) => void;
   total: number;
   NAShow?: () => void;
+  NATShow?: () => void;
   VAShow?: () => void;
   changeIndex?: (index: number) => void;
 };
@@ -149,6 +150,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   ufvk,
   screenName,
   NAShow,
+  NATShow,
   VAShow,
   total,
   index,
@@ -532,13 +534,28 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 alignItems: 'center',
                 marginBottom: 20,
               }}>
-              <Text
-                style={{
-                  color: colors.zingo,
-                  fontSize: 16,
-                }}>
-                {contactFromAddress()}
-              </Text>
+              {contactFromAddress() ? (
+                <Text
+                  style={{
+                    color: colors.zingo,
+                    fontSize: 16,
+                  }}>
+                  {contactFromAddress()}
+                </Text>
+              ) : (
+                <TouchableOpacity onPress={() => {
+                    NATShow && NATShow();
+                  }}>
+                  <Text
+                    style={{
+                      color: colors.zingo,
+                      textDecorationLine: 'underline',
+                      fontSize: 16,
+                    }}>
+                    {translate('receive.add-tag') as string}
+                  </Text>
+                </TouchableOpacity>
+              )}
               <ExpandableAddress
                 onCopy={onCopy}
                 address={address ? address.address : ''}

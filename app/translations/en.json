@@ -561,7 +561,8 @@
       "new-error": "Transparent address generation failed. Latest transparent address has not received funds."
     },
     "verification-success": "This address belongs to you and is safe for receiving funds.",
-    "verification-failure": "This address does not belong to you."
+    "verification-failure": "This address does not belong to you.",
+    "add-tag": "Add tag"
   },
   "history": {
     "shield-all": "Shield All funds",

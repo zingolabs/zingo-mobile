@@ -29,6 +29,7 @@ import NewAddress from './components/NewAddress';
 import VerifyAddress from './components/VerifyAddress';
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
+import NewAddressTag from './components/NewAddressTag';
 
 type ReceiveProps = {
   toggleMenuDrawer: () => void;
@@ -55,7 +56,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   const [index, setIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
-  const [sheetType, setSheetType] = useState<'NA' | 'VA' | null>(null);
+  const [sheetType, setSheetType] = useState<'NA' | 'VA' | 'NAT' | null>(null);
 
   const [uAddr, setUAddr] = useState<UnifiedAddressClass[]>([]);
   const [tAddr, setTAddr] = useState<TransparentAddressClass[]>([]);
@@ -85,6 +86,20 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   }, []);
 
   const NAHide = useCallback(() => {
+    setSheetType(null);
+    Keyboard.dismiss();
+    bottomSheetRef.current?.snapToIndex(-1);
+    bottomSheetRef.current?.close();
+    setIndexBottomSheet(-1);
+  }, []);
+
+  const NATShow = useCallback(() => {
+    setSheetType('NAT');
+    bottomSheetRef.current?.snapToIndex(0);
+    setIndexBottomSheet(0);
+  }, []);
+
+  const NATHide = useCallback(() => {
     setSheetType(null);
     Keyboard.dismiss();
     bottomSheetRef.current?.snapToIndex(-1);
@@ -192,6 +207,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   setIndex={setUAddrIndex}
                   total={uAddr.length}
                   NAShow={NAShow}
+                  NATShow={NATShow}
                   VAShow={VAShow}
                   changeIndex={setIndex}
                 />
@@ -223,6 +239,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   setIndex={setTAddrIndex}
                   total={tAddr.length}
                   NAShow={NAShow}
+                  NATShow={NATShow}
                   VAShow={VAShow}
                   changeIndex={setIndex}
                 />
@@ -303,6 +320,17 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
               closeSheet={NAHide}
               setAddressBook={setAddressBook}
               screenName={screenName}
+            />
+          )}
+          {sheetType === 'NAT' && (
+            <NewAddressTag
+              address={index === 0 && uAddrIndex !== null
+                ? uAddr[uAddrIndex].address
+                : index === 1 && tAddrIndex !== null
+                ? tAddr[tAddrIndex].address
+                : ''}
+              closeSheet={NATHide}
+              setAddressBook={setAddressBook}
             />
           )}
           {sheetType === 'VA' && (
