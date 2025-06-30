@@ -100,8 +100,17 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             val syncing = uniffi.zingo.runSync()
             Log.i("SCHEDULED_TASK_RUN", "sync LAUNCH: $syncing")
 
+            val startTime = System.currentTimeMillis()
+            val maxDurationMillis = 60 * 60 * 1000
+
             var syncStatus: SyncStatus
             while (true) {
+                val elapsed = System.currentTimeMillis() - startTime
+                if (elapsed > maxDurationMillis) {
+                    Log.w("SCHEDULED_TASK_RUN", "sync TIMEOUT after 1 hour")
+                    break
+                }
+
                 val syncStatusJson: String = uniffi.zingo.statusSync()
                 if (syncStatusJson.lowercase().startsWith(ErrorPrefix.value)) {
                     Log.i("SCHEDULED_TASK_RUN", "sync STATUS ERROR: $syncStatusJson")
@@ -111,11 +120,12 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 try {
                     syncStatus = mapper.readValue(syncStatusJson)
 
-                    if (syncStatus.percentage_total_outputs_scanned == 100.0) {
-                        Log.i("SCHEDULED_TASK_RUN", "sync COMPLETED")
+                    val percent = syncStatus.percentage_total_outputs_scanned
+
+                    if (percent == 100.0) {
+                        Log.i("SCHEDULED_TASK_RUN", "sync COMPLETED %: $percent")
                         break
                     } else {
-                        val percent = syncStatus.percentage_total_outputs_scanned
                         Log.i("SCHEDULED_TASK_RUN", "sync STATUS %: $percent")
                     }
                 } catch (e: Exception) {
