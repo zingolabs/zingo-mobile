@@ -366,11 +366,12 @@ extension AppDelegate {
                     let data = syncStatusJson.data(using: .utf8)!
                     syncStatus = try JSONDecoder().decode(SyncStatus.self, from: data)
 
-                    if syncStatus?.percentage_total_outputs_scanned ?? 0 == 100.0 {
-                        NSLog("BGTask syncingProcessBackgroundTask - sync COMPLETED")
+                    let percent = syncStatus?.percentage_total_outputs_scanned ?? 0
+
+                    if percent == 100.0 {
+                        NSLog("BGTask syncingProcessBackgroundTask - sync COMPLETED %: \(percent)")
                         break
                     } else {
-                        let percent = syncStatus?.percentage_total_outputs_scanned ?? 0
                         NSLog("BGTask syncingProcessBackgroundTask - sync STATUS %: \(percent)")
                     }
                 } catch {
