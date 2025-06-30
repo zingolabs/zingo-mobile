@@ -7,7 +7,6 @@ import {
   NativeSyntheticEvent,
   TouchableOpacity,
   ActivityIndicator,
-  Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -190,7 +189,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 
   //console.log('render Address Book - 4', currentItem, action, addressBook);
 
-  const AndroidReturn = (
+  return (
     <ToastProvider>
       <Snackbars
         snackbars={snackbars}
@@ -480,16 +479,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       </View>
     </ToastProvider>
   );
-
-  if (Platform.OS === GlobalConst.platformOSandroid) {
-    return AndroidReturn;
-  } else {
-    return (
-      <ToastProvider>
-        {AndroidReturn}
-      </ToastProvider>
-    );
-  }
 };
 
 export default React.memo(AddressBook);

@@ -38,7 +38,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
   const { clear } = useToast();
   const screenName = ScreenEnum.Pools;
 
-  console.log('render pools. Balance:', totalBalance, orchardPool, saplingPool, transparentPool);
+  //console.log('render pools. Balance:', totalBalance, orchardPool, saplingPool, transparentPool);
 
   return (
     <ToastProvider>

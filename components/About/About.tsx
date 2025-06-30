@@ -38,8 +38,6 @@ const About: React.FunctionComponent<AboutProps> = () => {
     arrayTxt = arrayTxtObject as string[];
   }
 
-  //console.log(top, bottom, right, left);
-
   return (
     <ToastProvider>
       <Snackbars
