@@ -582,7 +582,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
               RPCModule.createTorClientProcess();
             }
-            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool);
+            // if the App is restoring another wallet backup...
+            // needs to recalculate the Address Book.
+            const newWallet = !!this.props.route.params &&
+              (this.props.route.params.newWallet === true || this.props.route.params.newWallet === false)
+                ? this.props.route.params.newWallet
+                : false;
+            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, newWallet);
             //console.log('navigate to LoadedApp');
           } else {
             error = true;
@@ -632,7 +638,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           } else {
             this.createNewWallet(false);
             this.setState({ actionButtonsDisabled: false });
-            this.navigateToLoadedApp(false, true, true, true);
+            this.navigateToLoadedApp(false, true, true, true, true);
             //console.log('navigate to LoadedApp');
           }
         }
@@ -1015,13 +1021,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.setState({ actionButtonsDisabled: false });
   };
 
-  navigateToLoadedApp = (readOnly: boolean, orchardPool: boolean, saplingPool: boolean, transparentPool: boolean) => {
+  navigateToLoadedApp = (readOnly: boolean, orchardPool: boolean, saplingPool: boolean, transparentPool: boolean, newWallet: boolean) => {
     this.props.navigationApp.reset({
       index: 0,
       routes: [
         {
           name: RouteEnums.LoadedApp,
-          params: { readOnly, orchardPool, saplingPool, transparentPool },
+          params: { readOnly, orchardPool, saplingPool, transparentPool, newWallet },
         },
       ],
     });
@@ -1264,7 +1270,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
               RPCModule.createTorClientProcess();
             }
-            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool);
+            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true);
           } else {
             error = true;
             errorText = resultJson.error;
@@ -1508,10 +1514,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               animationType="slide"
               transparent={true}
               visible={screen === 2}
-              onRequestClose={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool)}>
+              onRequestClose={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true)}>
               <Seed
-                onClickOK={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool)}
-                onClickCancel={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool)}
+                onClickOK={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true)}
+                onClickCancel={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true)}
                 action={SeedActionEnum.new}
                 setPrivacyOption={this.setPrivacyOption}
               />

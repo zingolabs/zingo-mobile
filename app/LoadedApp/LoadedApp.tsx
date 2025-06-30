@@ -20,7 +20,7 @@ import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList, LoadedAppNavigationState } from '../types';
+import { RootStackParamList, LoadingAppNavigationState } from '../types';
 import NetInfo, { NetInfoSubscription, NetInfoState } from '@react-native-community/netinfo/src/index';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 
@@ -173,6 +173,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const orchardPool = props.route.params ? props.route.params.orchardPool : false;
   const saplingPool = props.route.params ? props.route.params.saplingPool : false;
   const transparentPool = props.route.params ? props.route.params.transparentPool : false;
+  const newWallet = props.route.params ? props.route.params.newWallet : false;
 
   useEffect(() => {
     (async () => {
@@ -306,7 +307,7 @@ export default function LoadedApp(props: LoadedAppProps) {
 
       // now make no sense to have two UA's in the same contact
       // if `uOrchardAddress` exists then it will be removed.
-      const toUpdate: AddressBookFileClassObsolete[] = ab.filter(
+      let toUpdate: AddressBookFileClassObsolete[] = ab.filter(
         // if have orchard address or NOT have color or NOT have own flag...
         (a: AddressBookFileClassObsolete) => a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('color') || !a.hasOwnProperty('own'),
       );
@@ -348,7 +349,34 @@ export default function LoadedApp(props: LoadedAppProps) {
           }
         }
         sort = true;
-        console.log('Address Book -> UPDATED', ab);
+        console.log('Address Book -> UPDATED', ab.length);
+      }
+      // if new wallet or restore from seed/ufvk
+      // the App needs to calculate if the Addresses
+      // in the Address Book belong to this new/restored wallet.
+      if (newWallet) {
+        toUpdate = ab.filter((a: AddressBookFileClass) => !!a.address);
+        for (let i = 0; i < toUpdate.length; i++) {
+          const a = toUpdate[i];
+          let own: boolean;
+          // verify this address as own or not
+          const checkStr = await RPCModule.checkMyAddressInfo(a.address);
+          //console.log(checkStr);
+          if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
+            const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
+            own = checkJSON.is_wallet_address;
+          } else {
+            // error
+            own = false;
+          }
+          ab = await AddressBookFileImpl.updateColorAndOwnItem(
+            a.label,
+            a.address,
+            a.color ? a.color : '',
+            own,
+          );
+        }
+        sort = true;
       }
       let abSorted = ab;
       if (sort) {
@@ -1583,7 +1611,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     //this.rpc.fetchWalletSettings();
   };
 
-  navigateToLoadingApp = async (state: LoadedAppNavigationState) => {
+  navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
     await this.rpc.clearTimers();
     if (!!state.screen && state.screen === 3) {
       await this.setModeOption(ModeEnum.advanced);
@@ -1599,7 +1627,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
   };
 
-  onClickOKChangeWallet = async (state: LoadedAppNavigationState) => {
+  onClickOKChangeWallet = async (state: LoadingAppNavigationState) => {
     const { server } = this.state;
 
     // if the App is working with a test server
@@ -1655,7 +1683,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
 
     this.keepAwake(false);
-    this.navigateToLoadingApp({ startingApp: false });
+    this.navigateToLoadingApp({ startingApp: false, newWallet: true });
   };
 
   onClickOKServerWallet = async () => {
