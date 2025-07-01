@@ -68,7 +68,7 @@
     "add": "Add",
     "modify": "Modify",
     "delete": "Delete",
-    "empty": "No Contacts/Nicknames/Labels/Tags yet.",
+    "empty": "You haven't saved any new addresses yet.",
     "nochanges": "No changes registered. ",
     "fillboth": "Please fill out both fields. ",
     "bothexists": "This label and this address already exists. ",

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { View, ScrollView, TouchableOpacity, Text, Pressable } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Text, Pressable, Platform } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@react-navigation/native';
 
@@ -14,6 +14,7 @@ import 'moment/locale/tr';
 import {
   AddressKindEnum,
   ButtonTypeEnum,
+  GlobalConst,
   ModeEnum,
   ScreenEnum,
   SnackbarDurationEnum,
@@ -247,7 +248,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
     return magicModal.show(
       () => <AddressList addressKind={address ? address.addressKind : AddressKindEnum.u} setIndex={setIndex} />,
       // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 

@@ -68,7 +68,7 @@
     "add": "Ekle",
     "modify": "Düzenle",
     "delete": "Sil",
-    "empty": "Kişi yok/Takma ad/Etiket/Tag bulunmamaktadır.",
+    "empty": "Henüz yeni adres kaydetmediniz.",
     "nochanges": "Herhangi bir değişiklik kaydedilmedi ",
     "fillboth": "Lütfen her iki alanı da doldurun. ",
     "bothexists": "Bu etiket ve bu adres zaten mevcut ",

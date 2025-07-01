@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   TextInput,
   TextInputEndEditingEventData,
+  Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -27,6 +28,7 @@ import {
   AddressBookFileClass,
   ContactType,
   FilterEnum,
+  GlobalConst,
   ScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
@@ -280,7 +282,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         setServerOption={setServerOption}
       />,
       // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -291,7 +293,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         scrollToBottom={scrollToBottom}
       />,
       // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 

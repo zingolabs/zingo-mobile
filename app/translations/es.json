@@ -68,7 +68,7 @@
     "add": "Añadir",
     "modify": "Modificar",
     "delete": "Borrar",
-    "empty": "Todavía no hay contactos en su libreta de direcciones.",
+    "empty": "Todavía no has guardado nuevas direcciones.",
     "nochanges": "No se han registrado cambios. ",
     "fillboth": "Por favor rellena ambos campos. ",
     "bothexists": "Esta etiqueta y esta dirección ya existen. ",

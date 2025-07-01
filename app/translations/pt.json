@@ -68,7 +68,7 @@
     "add": "Adicionar",
     "modify": "Modificar",
     "delete": "Excluir",
-    "empty": "Sem Contatos/Apelidos ainda.",
+    "empty": "Você ainda não salvou nenhum endereço novo.",
     "nochanges": "Nenhuma alteração registrada.",
     "fillboth": "Preencha todos os campos. ",
     "bothexists": "Esse contato e endereço já existem. ",

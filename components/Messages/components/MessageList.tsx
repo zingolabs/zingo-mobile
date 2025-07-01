@@ -465,7 +465,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         setMessage={setMemo}
       />,
       // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -478,7 +478,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         setPrivacyOption={setPrivacyOption}
       />,
       // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 

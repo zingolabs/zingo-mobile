@@ -852,7 +852,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         />
       ),
       // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
@@ -868,7 +868,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         />
       ),
       // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
@@ -1124,7 +1124,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   setComputingModalShow = () => {
     const { colors } = this.props.theme;
     // no swipping right in this modal.
-    return magicModal.show(() => <ComputingTxContent />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
+    return magicModal.show(() => <ComputingTxContent />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
   };
 
   setInfo = (newInfo: InfoType) => {
@@ -1210,20 +1210,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     // Depending on the menu item, open the appropriate modal
     if (item === MenuItemEnum.About) {
       // possible problem if scrolling vertically, if so change to `undefined`.
-      return magicModal.show(() => <About />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
+      return magicModal.show(() => <About />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.Rescan) {
       // possible problem if scrolling vertically, if so change to `undefined`.
-      return magicModal.show(() => <Rescan doRescan={this.doRescan} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }).promise;
+      return magicModal.show(() => <Rescan doRescan={this.doRescan} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.Info) {
       // possible problem if scrolling vertically, if so change to `undefined`.
-      return magicModal.show(() => <Info />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }).promise;
+      return magicModal.show(() => <Info />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.SyncReport) {
       return this.setSyncReportModalShow();
     } else if (item === MenuItemEnum.FundPools) {
       return this.setPoolsModalShow();
     } else if (item === MenuItemEnum.Insight) {
       // possible problem if scrolling vertically, if so change to `undefined`.
-      return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
+      return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } })
         .promise;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
@@ -1243,7 +1243,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             />
           ),
           // possible problem if scrolling vertically, if so change to `undefined`.
-          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
+          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       } else {
         return magicModal.show(
@@ -1256,7 +1256,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             />
           ),
           // possible problem if scrolling vertically, if so change to `undefined`.
-          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
+          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       }
     } else if (item === MenuItemEnum.RestoreWalletBackup) {
@@ -1271,7 +1271,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             />
           ),
           // possible problem if scrolling vertically, if so change to `undefined`.
-          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
+          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       } else {
         return magicModal.show(
@@ -1284,7 +1284,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             />
           ),
           // possible problem if scrolling vertically, if so change to `undefined`.
-          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
+          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       }
     } else if (item === MenuItemEnum.LoadWalletFromSeed) {
@@ -1324,7 +1324,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         addressBookCurrentAddress: '',
       });
       // possible problem if scrolling vertically, if so change to `undefined`.
-      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
+      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } })
         .promise;
     } else if (item === MenuItemEnum.VoteForNym) {
       let update = false;
@@ -1458,7 +1458,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             />
           ),
           // possible problem if scrolling vertically, if so change to `undefined`.
-          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
+          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
         );
       } else {
         magicModal.show(
@@ -1475,7 +1475,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             />
           ),
           // possible problem if scrolling vertically, if so change to `undefined`.
-          { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } },
+          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
         );
       }
       //console.log(`Error Reading Wallet ${value} - ${error}`);
@@ -1770,13 +1770,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   setSyncReportModalShow = async () => {
     const { colors } = this.props.theme;
     // possible problem if scrolling vertically, if so change to `undefined`.
-    return magicModal.show(() => <SyncReport />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
+    return magicModal.show(() => <SyncReport />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
   };
 
   setPoolsModalShow = async () => {
     const { colors } = this.props.theme;
     // possible problem if scrolling vertically, if so change to `undefined`.
-    return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
+    return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } })
       .promise;
   };
 
@@ -1812,7 +1812,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       addressBookCurrentAddress: address,
     });
     // possible problem if scrolling vertically, if so change to `undefined`.
-    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } })
+    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } })
       .promise;
   };
 
