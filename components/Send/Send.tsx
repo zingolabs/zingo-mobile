@@ -25,7 +25,6 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
-import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
 
 import FadeText from '../Components/FadeText';
@@ -1459,6 +1458,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       style={{
                         width: '35%',
                         marginTop: 5,
+                        alignItems: 'flex-start',
                       }}>
                       <PriceFetcher setZecPrice={setZecPrice} screenName={screenName} textBefore={translate('send.nofetchprice') as string} />
                     </View>
@@ -1540,7 +1540,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           />
                         </View>
                         <View style={{ marginLeft: 5, flexDirection: 'row', justifyContent: 'flex-start' }}>
-                          <View style={{ width: '40%' }} />
+                          <View style={{ width: '5%' }} />
                           <PriceFetcher setZecPrice={setZecPrice} screenName={screenName} />
                         </View>
                       </View>
@@ -1550,36 +1550,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
               {memoEnabled === true && (
                 <>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}>
-                    <FadeText style={{ marginTop: 6, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <FadeText style={{ marginTop: 6, marginBottom: 5, marginRight: 5 }}>
-                        {translate('send.includeua') as string}
-                      </FadeText>
-                      <BouncyCheckbox
-                        testID="send.checkboxua"
-                        disabled={false}
-                        disableText
-                        isChecked={includeUAMemoBoolean}
-                        useBuiltInState={false}
-                        onPress={() => updateToField(null, null, null, null, !includeUAMemoBoolean)}
-                        unFillColor={colors.card}
-                        fillColor={colors.primary}
-                        innerIconStyle={{
-                          borderRadius: 5,
-                        }}
-                        iconStyle={{
-                          borderRadius: 5,
-                        }}
-                      />
-                    </View>
-                  </View>
-                  <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
+                  <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', marginTop: 6 }}>
                     <View
                       accessible={true}
                       accessibilityLabel={translate('send.memo-acc') as string}
