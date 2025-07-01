@@ -310,8 +310,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     borderRadius: 5,
                     marginTop: 10,
                   }}>
-                  <ShieldIcon color={colors.background} size={24} style={{ marginRight: 10 }} />
-                  <Text style={{ color: colors.background, fontWeight: 'bold' }}>
+                  <ShieldIcon color={colors.background} size={24} style={{ marginRight: 5 }} />
+                  <Text style={{ color: colors.background, fontWeight: 'bold', fontSize: 14 }}>
                     {translate('receive.transparent.warning.button') as string}
                   </Text>
                 </TouchableOpacity>
