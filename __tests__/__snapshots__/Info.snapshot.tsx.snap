@@ -560,7 +560,7 @@ exports[`Component Info - test Info - snapshot 1`] = `
           <View
             style={
               {
-                "alignItems": "flex-end",
+                "alignItems": "baseline",
                 "flexDirection": "row",
               }
             }
@@ -694,13 +694,16 @@ exports[`Component Info - test Info - snapshot 1`] = `
                     {
                       "alignItems": "center",
                       "backgroundColor": "#011401",
-                      "borderRadius": 10,
+                      "columnGap": 10,
                       "flexDirection": "row",
+                      "flexWrap": "wrap",
                       "justifyContent": "center",
                       "margin": 0,
+                      "marginTop": 10,
                       "minHeight": 40,
                       "minWidth": 40,
                       "padding": 5,
+                      "rowGap": 5,
                     }
                   }
                 >

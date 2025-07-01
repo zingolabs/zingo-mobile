@@ -562,13 +562,16 @@ exports[`Component History - test History currency USD, privacy high & mode adva
                   {
                     "alignItems": "center",
                     "backgroundColor": "#011401",
-                    "borderRadius": 10,
+                    "columnGap": 10,
                     "flexDirection": "row",
+                    "flexWrap": "wrap",
                     "justifyContent": "center",
                     "margin": 0,
+                    "marginTop": 10,
                     "minHeight": 40,
                     "minWidth": 40,
                     "padding": 5,
+                    "rowGap": 5,
                   }
                 }
               >

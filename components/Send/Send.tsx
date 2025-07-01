@@ -1539,7 +1539,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                             privacy={privacy}
                           />
                         </View>
-                        <View style={{ marginLeft: 5, flexDirection: 'row', justifyContent: 'flex-start' }}>
+                        <View style={{ marginLeft: 5, flexDirection: 'row', justifyContent: 'flex-start', marginTop: -10 }}>
                           <View style={{ width: '5%' }} />
                           <PriceFetcher setZecPrice={setZecPrice} screenName={screenName} />
                         </View>
