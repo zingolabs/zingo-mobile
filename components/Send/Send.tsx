@@ -1550,7 +1550,15 @@ const Send: React.FunctionComponent<SendProps> = ({
 
               {memoEnabled === true && (
                 <>
-                  <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', marginTop: 6 }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                    <FadeText style={{ marginTop: 3, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
+                  </View>
+                  <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
                     <View
                       accessible={true}
                       accessibilityLabel={translate('send.memo-acc') as string}
