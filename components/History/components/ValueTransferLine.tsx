@@ -85,13 +85,13 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   //const maxWidthHit = useRef<boolean>(false);
   const swipeableRef = useRef<Swipeable | null>(null);
 
-  const amountColor = vt.confirmations === 0
+  const amountColor = vt.confirmations < GlobalConst.minConfirmations
       ? colors.primaryDisabled
       : vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
       ? colors.primary
       : colors.text;
 
-  const icon = vt.confirmations === 0
+  const icon = vt.confirmations < GlobalConst.minConfirmations
       ? faRefresh
       : vt.kind === ValueTransferKindEnum.Received || vt.kind === ValueTransferKindEnum.Shield
       ? faArrowDown
@@ -308,7 +308,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 />
               </View>
               <View style={{ display: 'flex' }}>
-                {!!vt.address && vt.confirmations > 0 && (
+                {!!vt.address && vt.confirmations >= GlobalConst.minConfirmations && (
                   <View>
                     <AddressItem address={vt.address} screenName={screenName} oneLine={true} />
                   </View>
@@ -316,40 +316,40 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 <View
                   style={{
                     display: 'flex',
-                    flexDirection: vt.kind === ValueTransferKindEnum.Sent && vt.confirmations > 0 ? 'row' : 'column',
+                    flexDirection: vt.kind === ValueTransferKindEnum.Sent && vt.confirmations >= GlobalConst.minConfirmations ? 'row' : 'column',
                     alignItems:
-                      vt.kind === ValueTransferKindEnum.Sent && vt.confirmations > 0 ? 'center' : 'flex-start',
+                      vt.kind === ValueTransferKindEnum.Sent && vt.confirmations >= GlobalConst.minConfirmations ? 'center' : 'flex-start',
                   }}>
                   <FadeText
                     style={{
                       opacity: 1,
                       fontWeight: 'bold',
                       color: amountColor,
-                      fontSize: vt.confirmations === 0 ? 14 : 18,
+                      fontSize: vt.confirmations < GlobalConst.minConfirmations ? 14 : 18,
                     }}>
-                    {vt.kind === ValueTransferKindEnum.Sent && vt.confirmations === 0
+                    {vt.kind === ValueTransferKindEnum.Sent && vt.confirmations < GlobalConst.minConfirmations
                       ? (translate('history.sending') as string)
-                      : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations > 0
+                      : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations >= GlobalConst.minConfirmations
                       ? (translate('history.sent') as string)
-                      : vt.kind === ValueTransferKindEnum.Received && vt.confirmations === 0
+                      : vt.kind === ValueTransferKindEnum.Received && vt.confirmations < GlobalConst.minConfirmations
                       ? (translate('history.receiving') as string)
-                      : vt.kind === ValueTransferKindEnum.Received && vt.confirmations > 0
+                      : vt.kind === ValueTransferKindEnum.Received && vt.confirmations >= GlobalConst.minConfirmations
                       ? (translate('history.received') as string)
-                      : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations === 0
+                      : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations < GlobalConst.minConfirmations
                       ? (translate('history.sendingtoself') as string)
-                      : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations > 0
+                      : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations >= GlobalConst.minConfirmations
                       ? (translate('history.memotoself') as string)
-                      : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations === 0
+                      : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations < GlobalConst.minConfirmations
                       ? (translate('history.sendingtoself') as string)
-                      : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations > 0
+                      : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations >= GlobalConst.minConfirmations
                       ? (translate('history.sendtoself') as string)
-                      : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations === 0
+                      : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations < GlobalConst.minConfirmations
                       ? (translate('history.shielding') as string)
-                      : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations > 0
+                      : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations >= GlobalConst.minConfirmations
                       ? (translate('history.shield') as string)
-                      : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations === 0
+                      : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations < GlobalConst.minConfirmations
                       ? (translate('history.sending') as string)
-                      : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations > 0
+                      : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations >= GlobalConst.minConfirmations
                       ? (translate('history.rejection') as string)
                       : ''}
                   </FadeText>
@@ -375,7 +375,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 privacy={privacy}
               />
             </View>
-            {vt.confirmations === 0 && (
+            {vt.confirmations < GlobalConst.minConfirmations && (
               <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 {(vt.status === RPCValueTransfersStatusEnum.transmitted ||
                   vt.status === RPCValueTransfersStatusEnum.calculated) && (

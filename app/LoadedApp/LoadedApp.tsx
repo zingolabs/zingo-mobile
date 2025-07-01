@@ -932,13 +932,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (!isEqual(this.state.valueTransfers, valueTransfers) || this.state.valueTransfersTotal !== valueTransfersTotal) {
       // set somePending as well here when I know there is something new in ValueTransfers
       const pending: number =
-        valueTransfersTotal > 0 ? valueTransfers.filter((vt: ValueTransferType) => vt.confirmations === 0).length : 0;
-      // if a ValueTransfer go from 0 confirmations to > 0 -> Show a message about a ValueTransfer is confirmed
+        valueTransfersTotal > 0 ? valueTransfers.filter((vt: ValueTransferType) => vt.confirmations < GlobalConst.minConfirmations).length : 0;
+      // if a ValueTransfer go from 3 confirmations to > 3 -> Show a message about a ValueTransfer is confirmed
       this.state.valueTransfers &&
         this.state.valueTransfersTotal !== null &&
         this.state.valueTransfersTotal > 0 &&
         this.state.valueTransfers
-          .filter((vtOld: ValueTransferType) => !vtOld.confirmations || vtOld.confirmations === 0)
+          .filter((vtOld: ValueTransferType) => vtOld.confirmations < GlobalConst.minConfirmations)
           .forEach((vtOld: ValueTransferType) => {
             const vtNew = valueTransfers.filter(
               (vt: ValueTransferType) =>
@@ -947,7 +947,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             //console.log('old', vtOld);
             //console.log('new', vtNew);
             // the ValueTransfer is confirmed
-            if (vtNew.length > 0 && vtNew[0].confirmations > 0) {
+            if (vtNew.length > 0 && vtNew[0].confirmations >= GlobalConst.minConfirmations) {
               let message: string = '';
               let title: string = '';
               if (vtNew[0].kind === ValueTransferKindEnum.Received && vtNew[0].amount > 0) {

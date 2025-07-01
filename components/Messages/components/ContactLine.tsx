@@ -68,7 +68,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   const swipeableRef = useRef<Swipeable | null>(null);
 
   const getAmountColor = (_c: ContactType) => {
-    return _c.confirmations === 0
+    return _c.confirmations < GlobalConst.minConfirmations
       ? colors.primaryDisabled
       : _c.kind === ValueTransferKindEnum.Received || _c.kind === ValueTransferKindEnum.Shield
       ? colors.primary
