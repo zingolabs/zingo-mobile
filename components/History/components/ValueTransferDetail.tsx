@@ -410,29 +410,33 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                   size={15}
                 />
               )}
-              <FadeText
-                style={{
-                  color:
-                    valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
-                    valueTransfer.status === RPCValueTransfersStatusEnum.calculated
-                      ? colors.primary
-                      : colors.primaryDisabled,
-                  fontSize: 12,
-                  opacity: 1,
-                  fontWeight: '700',
-                  textAlign:
-                    valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
-                    valueTransfer.status === RPCValueTransfersStatusEnum.calculated
-                      ? 'center'
-                      : 'left',
-                  textDecorationLine:
-                    valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
-                    valueTransfer.status === RPCValueTransfersStatusEnum.calculated
-                      ? 'underline'
-                      : 'none',
-                }}>
-                {(translate(`history.${valueTransfer.status}`) as string) + ' - ' + (translate('history.not-confirmed') as string)}
-              </FadeText>
+              {(valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
+                valueTransfer.status === RPCValueTransfersStatusEnum.mempool) && (
+                <FadeText
+                  style={{
+                    color:
+                      valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                      valueTransfer.status === RPCValueTransfersStatusEnum.calculated
+                        ? colors.primary
+                        : colors.primaryDisabled,
+                    fontSize: 12,
+                    opacity: 1,
+                    fontWeight: '700',
+                    textAlign:
+                      valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                      valueTransfer.status === RPCValueTransfersStatusEnum.calculated
+                        ? 'center'
+                        : 'left',
+                    textDecorationLine:
+                      valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                      valueTransfer.status === RPCValueTransfersStatusEnum.calculated
+                        ? 'underline'
+                        : 'none',
+                  }}>
+                  {(translate(`history.${valueTransfer.status}`) as string) + ' - ' + (translate('history.not-confirmed') as string)}
+                </FadeText>
+              )}
             </View>
           )}
 
