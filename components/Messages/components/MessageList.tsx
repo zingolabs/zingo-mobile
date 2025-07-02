@@ -428,7 +428,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       createAlert(
         setBackgroundError,
         addLastSnackbar,
-        screenName,
+        [screenName],
         translate('send.sending-error') as string,
         `${customError ? customError : error}`,
         false,
@@ -862,7 +862,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   <TouchableOpacity
                     onPress={() => {
                       if (!netInfo.isConnected) {
-                        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
+                        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
                         return;
                       }
                       confirmSend();

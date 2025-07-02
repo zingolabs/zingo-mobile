@@ -49,7 +49,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet
           addLastSnackbar({
             message: verifyAddressStr,
             duration: SnackbarDurationEnum.short,
-            screenName: screenName,
+            screenName: [screenName],
           });
           setErrorAddress(verifyAddressStr);
         }
@@ -88,7 +88,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet
         });
       } else {
         // Show the error message as a toast
-        addLastSnackbar({ message: target, screenName: screenName });
+        addLastSnackbar({ message: target, screenName: [screenName] });
         //return;
       }
     } else {

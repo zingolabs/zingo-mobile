@@ -67,7 +67,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
       //console.log('BIOMETRIC --------> ', resultBio);
       if (resultBio === false) {
         // snack with Error & closing the menu.
-        addLastSnackbar({ message: translate('biometrics-error') as string, screenName: screenName });
+        addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
       } else {
         onItemSelected(value);
       }

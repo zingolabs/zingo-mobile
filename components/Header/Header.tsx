@@ -294,7 +294,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       return;
     }
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
 
@@ -313,7 +313,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         createAlert(
           setBackgroundError,
           addLastSnackbar,
-          screenName,
+          [screenName],
           translate(`history.shield-title-${pools}`) as string,
           `${translate(`history.shield-error-${pools}`)} ${shieldStr}`,
           true,
@@ -327,7 +327,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             createAlert(
               setBackgroundError,
               addLastSnackbar,
-              screenName,
+              [screenName],
               translate(`history.shield-title-${pools}`) as string,
               `${translate(`history.shield-error-${pools}`)} ${shieldJSON.error}`,
               true,
@@ -337,7 +337,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             createAlert(
               setBackgroundError,
               addLastSnackbar,
-              screenName,
+              [screenName],
               translate(`history.shield-title-${pools}`) as string,
               `${translate(`history.shield-message-${pools}`)} ${shieldJSON.txids.join(', ')}`,
               true,
@@ -348,7 +348,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           createAlert(
             setBackgroundError,
             addLastSnackbar,
-            screenName,
+            [screenName],
             translate(`history.shield-title-${pools}`) as string,
             `${translate(`history.shield-message-${pools}`)} ${shieldStr}`,
             true,
@@ -448,7 +448,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     if (resultBio === false) {
       // snack with Error & closing the menu.
       if (addLastSnackbar) {
-        addLastSnackbar({ message: translate('biometrics-error') as string, screenName: screenName });
+        addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
       }
     } else {
       await setUfvkViewModalShow();
@@ -467,7 +467,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 : (((translate('settings.value-privacy-true') as string) +
                     translate('change-privacy-legend')) as string)
             }`,
-            screenName: screenName,
+            screenName: [screenName],
           });
         setPrivacyOption && setPrivacyOption(!privacy);
       }}>
@@ -881,7 +881,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 if (resultBio === false) {
                   // snack with Error & closing the menu.
                   if (addLastSnackbar) {
-                    addLastSnackbar({ message: translate('biometrics-error') as string, screenName: screenName });
+                    addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
                   }
                 } else {
                   navigationHome?.navigate(RouteEnums.Settings);

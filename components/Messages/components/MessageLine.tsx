@@ -136,7 +136,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     addLastSnackbar({
                       message: translate('history.memocopied') as string,
                       duration: SnackbarDurationEnum.short,
-                      screenName: screenName,
+                      screenName: [screenName],
                     });
                   }}>
                   <RegText selectable={true}>{memo}</RegText>
@@ -151,13 +151,13 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       addLastSnackbar({
                         message: translate('history.address-http') as string,
                         duration: SnackbarDurationEnum.long,
-                        screenName: screenName,
+                        screenName: [screenName],
                       });
                     }
                     addLastSnackbar({
                       message: translate('history.addresscopied') as string,
                       duration: SnackbarDurationEnum.short,
-                      screenName: screenName,
+                      screenName: [screenName],
                     });
                   }}>
                   {!thisWalletAddress(memoUA) &&

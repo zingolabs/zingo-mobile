@@ -165,7 +165,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
                   addLastSnackbar({
                     message: translate('history.addresscopied') as string,
                     duration: SnackbarDurationEnum.short,
-                    screenName: screenName,
+                    screenName: [screenName],
                   });
                   selectExpandAddress(index);
                 }

@@ -36,7 +36,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
 
   const doRescanAndClose = async () => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
     // was removed the `await` here because launching the rescan can
@@ -44,10 +44,11 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
     doRescan();
     hide();
     setTimeout(() => {
+      // because this message is between screens.
       addLastSnackbar({
         message: translate('loadedapp.syncing') as string,
         duration: SnackbarDurationEnum.longer,
-        screenName: screenName,
+        screenName: [screenName, ScreenEnum.LoadedApp],
       });
     }, 3 * 1000);
   };

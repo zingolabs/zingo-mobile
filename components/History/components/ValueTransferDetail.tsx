@@ -183,7 +183,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       return;
     }
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
 
@@ -202,7 +202,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
         createAlert(
           setBackgroundError,
           addLastSnackbar,
-          screenName,
+          [screenName],
           translate(`history.${action}-title`) as string,
           `${translate(`history.${action}-error`)} ${actionStr}`,
           true,
@@ -212,7 +212,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
         createAlert(
           setBackgroundError,
           addLastSnackbar,
-          screenName,
+          [screenName],
           translate(`history.${action}-title`) as string,
           `${translate(`history.${action}-message`)} ${actionStr}`,
           true,
@@ -461,7 +461,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                     addLastSnackbar({
                       message: translate('history.txcopied') as string,
                       duration: SnackbarDurationEnum.short,
-                      screenName: screenName,
+                      screenName: [screenName],
                     });
                     setExpandTxid(true);
                   }
@@ -532,7 +532,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                       addLastSnackbar({
                         message: translate('history.memocopied') as string,
                         duration: SnackbarDurationEnum.short,
-                        screenName: screenName,
+                        screenName: [screenName],
                       });
                     }}>
                     <RegText selectable={true}>{memo}</RegText>
@@ -546,13 +546,13 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                         addLastSnackbar({
                           message: translate('history.address-http') as string,
                           duration: SnackbarDurationEnum.long,
-                          screenName: screenName,
+                          screenName: [screenName],
                         });
                       }
                       addLastSnackbar({
                         message: translate('history.addresscopied') as string,
                         duration: SnackbarDurationEnum.short,
-                        screenName: screenName,
+                        screenName: [screenName],
                       });
                     }}>
                     <RegText>{GlobalConst.replyTo}</RegText>

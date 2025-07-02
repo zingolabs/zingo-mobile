@@ -140,7 +140,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                         ? (translate('seed.tapcopy-ufvk-message') as string)
                         : (translate('history.addresscopied') as string),
                       duration: SnackbarDurationEnum.short,
-                      screenName: screenName,
+                      screenName: [screenName],
                     });
                     setExpandAddress(true);
                     if (privacy) {

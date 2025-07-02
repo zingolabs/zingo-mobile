@@ -5,7 +5,7 @@ import { GlobalConst, TranslateType, SnackbarType, ScreenEnum } from './AppState
 export const createAlert = async (
   setBackgroundError: (title: string, error: string) => void,
   addLastSnackbar: (snackbar: SnackbarType) => void,
-  screenName: ScreenEnum,
+  screenName: ScreenEnum[],
   title: string,
   error: string,
   toast: boolean,

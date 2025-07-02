@@ -402,30 +402,30 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       rescanMenuContext === rescanMenu &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice
     ) {
-      addLastSnackbar({ message: translate('settings.nochanges') as string, screenName: screenName });
+      addLastSnackbar({ message: translate('settings.nochanges') as string, screenName: [screenName] });
       return;
     }
     //if (!memos) {
-    //  addLastSnackbar({ message: translate('settings.ismemo') as string, screenName: screenName });
+    //  addLastSnackbar({ message: translate('settings.ismemo') as string, screenName: [screenName] });
     //  return;
     //}
     //if (!filter) {
-    //  addLastSnackbar({ message: translate('settings.isthreshold') as string, screenName: screenName });
+    //  addLastSnackbar({ message: translate('settings.isthreshold') as string, screenName: [screenName] });
     //  return;
     //}
     if ((!serverUriParsed || !chainNameParsed) && selectServer !== SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('settings.isserver') as string, screenName: screenName });
+      addLastSnackbar({ message: translate('settings.isserver') as string, screenName: [screenName] });
       return;
     }
     if (!language) {
-      addLastSnackbar({ message: translate('settings.islanguage') as string, screenName: screenName });
+      addLastSnackbar({ message: translate('settings.islanguage') as string, screenName: [screenName] });
       return;
     }
 
     if (serverContext.uri !== serverUriParsed && selectServer !== SelectServerEnum.offline) {
       const resultUri = parseServerURI(serverUriParsed, translate);
       if (resultUri.toLowerCase().startsWith(GlobalConst.error)) {
-        addLastSnackbar({ message: translate('settings.isuri') as string, screenName: screenName });
+        addLastSnackbar({ message: translate('settings.isuri') as string, screenName: [screenName] });
         return;
       } else {
         // url-parse sometimes is too wise, and if you put:
@@ -451,7 +451,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       !serverUriParsed &&
       selectServer !== SelectServerEnum.offline
     ) {
-      addLastSnackbar({ message: translate('settings.isuri') as string, screenName: screenName });
+      addLastSnackbar({ message: translate('settings.isuri') as string, screenName: [screenName] });
       return;
     }
 
@@ -462,22 +462,22 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         !netInfo.isConnected &&
         !(selectServerContext !== SelectServerEnum.offline && selectServer === SelectServerEnum.offline)
       ) {
-        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
+        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
         return;
       }
       setDisabled(true);
       if (serverUriParsed) {
-        addLastSnackbar({ message: translate('loadedapp.tryingnewserver') as string, screenName: screenName });
+        addLastSnackbar({ message: translate('loadedapp.tryingnewserver') as string, screenName: [screenName] });
       }
       const { result, timeout, newChainName } = await checkServerURI(serverUriParsed, serverContext.uri);
       if (!result) {
         // if the server checking takes more then 30 seconds.
         if (timeout === true) {
-          addLastSnackbar({ message: translate('loadedapp.tryingnewserver-error') as string, screenName: screenName });
+          addLastSnackbar({ message: translate('loadedapp.tryingnewserver-error') as string, screenName: [screenName] });
         } else {
           addLastSnackbar({
             message: (translate('loadedapp.changeservernew-error') as string) + serverUriParsed,
-            screenName: screenName,
+            screenName: [screenName],
           });
         }
         // in this point the sync process is blocked, who knows why.
@@ -488,14 +488,14 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       } else {
         if (newChainName && newChainName !== chainName) {
           sameServerChainName = false;
-          addLastSnackbar({ message: translate('loadedapp.differentchain-error') as string, screenName: screenName });
+          addLastSnackbar({ message: translate('loadedapp.differentchain-error') as string, screenName: [screenName] });
         }
       }
     }
 
     if (walletSettings.downloadMemos !== memos) {
       if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
+        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
         setDisabled(false);
         return;
       }
@@ -503,7 +503,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
     if (walletSettings.transactionFilterThreshold !== filter) {
       if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
+        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
         setDisabled(false);
         return;
       }

@@ -431,7 +431,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           });
         } else {
           // Show the error message as a toast
-          addLastSnackbar({ message: target, screenName: screenName });
+          addLastSnackbar({ message: target, screenName: [screenName] });
         }
       } else {
         setAddressText(addressPar.replace(/[ \t\n\r]+/g, '')); // Remove spaces
@@ -699,7 +699,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
 
@@ -728,7 +728,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         createAlert(
           setBackgroundError,
           addLastSnackbar,
-          screenName,
+          [screenName, ScreenEnum.History],
           translate('send.confirm-title') as string,
           `${translate('send.Broadcast')} ${txid}`,
           true,
@@ -784,7 +784,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             createAlert(
               setBackgroundError,
               addLastSnackbar,
-              screenName,
+              [screenName, ScreenEnum.History],
               translate('send.confirm-title') as string,
               `${translate('send.Broadcast')} ${txid}`,
               true,
@@ -809,7 +809,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         createAlert(
           setBackgroundError,
           addLastSnackbar,
-          screenName,
+          [screenName],
           translate('send.sending-error') as string,
           `${customError ? customError : error}`,
           false,
@@ -1730,12 +1730,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                       Utils.parseStringLocaleToNumberFloat(amountText) <
                         Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
                     ) {
-                      addLastSnackbar({ message: `${translate('send.donation-minimum-message') as string}`, screenName: screenName });
+                      addLastSnackbar({ message: `${translate('send.donation-minimum-message') as string}`, screenName: [screenName] });
                       updateToField(null, Utils.getZenniesDonationAmount(), null, null, false);
                       return;
                     }
                     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-                      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
+                      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
                       return;
                     }
                     if (
@@ -1745,7 +1745,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       Utils.parseStringLocaleToNumberFloat(amountText) ===
                         Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
                     ) {
-                      addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, screenName: screenName });
+                      addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, screenName: [screenName] });
                     }
                     // if the address is transparent - clean the memo field Just in Case.
                     if (!memoEnabled) {

@@ -73,17 +73,17 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
     }
 
     if (price === -1) {
-      addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}`, screenName: screenName });
+      addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}`, screenName: [screenName] });
       setLoading(false);
       return;
     }
     if (price === -2) {
-      addLastSnackbar({ message: `${translate('info.errorrpcmodule')} - ${error}`, screenName: screenName });
+      addLastSnackbar({ message: `${translate('info.errorrpcmodule')} - ${error}`, screenName: [screenName] });
       setLoading(false);
       return;
     }
     if (price <= 0) {
-      addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}`, screenName: screenName });
+      addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}`, screenName: [screenName] });
       setZecPrice(price, 0);
     } else {
       setZecPrice(price, Date.now());

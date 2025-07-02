@@ -481,7 +481,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.addLastSnackbar({
             message: this.state.translate('loadedapp.selectingserver') as string,
             duration: SnackbarDurationEnum.longer,
-            screenName: this.screenName,
+            screenName: [this.screenName],
           });
         }, 10);
         // not a different one, can be the same.
@@ -576,7 +576,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 transparentPool,
                 actionButtonsDisabled: false,
               });
-              this.addLastSnackbar({ message: walletKindStr, screenName: this.screenName });
+              this.addLastSnackbar({ message: walletKindStr, screenName: [this.screenName] });
             }
             // creating tor cliente if needed
             if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
@@ -797,13 +797,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         this.addLastSnackbar({
           message: this.state.translate('loadedapp.selectingserversame') as string,
           duration: SnackbarDurationEnum.long,
-          screenName: this.screenName,
+          screenName: [this.screenName],
         });
       } else {
         this.addLastSnackbar({
           message: (this.state.translate('loadedapp.selectingserverbest') as string) + ' ' + fasterServer.uri,
           duration: SnackbarDurationEnum.long,
-          screenName: this.screenName,
+          screenName: [this.screenName],
         });
       }
     }
@@ -834,7 +834,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       this.addLastSnackbar({
         message: this.state.translate('restarting') as string,
         duration: SnackbarDurationEnum.long,
-        screenName: this.screenName,
+        screenName: [this.screenName],
       });
     }
     // if no internet connection -> show the error.
@@ -876,7 +876,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.addLastSnackbar({
             message: this.state.translate('loadingapp.serverfirsttry') as string,
             duration: SnackbarDurationEnum.longer,
-            screenName: this.screenName,
+            screenName: [this.screenName],
           });
           // a different server.
           const someServerIsWorking = await this.selectTheBestServer(true);
@@ -921,7 +921,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.addLastSnackbar({
             message: this.state.translate('loadingapp.serversecondtry') as string,
             duration: SnackbarDurationEnum.longer,
-            screenName: this.screenName,
+            screenName: [this.screenName],
           });
           setTimeout(() => {
             createAlert(
@@ -984,12 +984,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       const uri: string = parseServerURI(this.state.customServerUri, this.state.translate);
       const chainName = this.state.customServerChainName;
       if (uri.toLowerCase().startsWith(GlobalConst.error)) {
-        this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, screenName: this.screenName });
+        this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, screenName: [this.screenName] });
         this.setState({ actionButtonsDisabled: false });
         return;
       }
 
-      this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string, screenName: this.screenName });
+      this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string, screenName: [this.screenName] });
 
       const cs = {
         uri: uri,
@@ -1014,7 +1014,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       } else {
         this.addLastSnackbar({
           message: (this.state.translate('loadedapp.changeservernew-error') as string) + uri,
-          screenName: this.screenName,
+          screenName: [this.screenName],
         });
       }
     }
@@ -1035,7 +1035,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
   createNewWallet = (goSeedScreen: boolean = true) => {
     if (!this.state.netInfo.isConnected || this.state.selectServer === SelectServerEnum.offline) {
-      this.addLastSnackbar({ message: this.state.translate('loadedapp.connection-error') as string, screenName: this.screenName });
+      this.addLastSnackbar({ message: this.state.translate('loadedapp.connection-error') as string, screenName: [this.screenName] });
       return;
     }
     this.setState({ actionButtonsDisabled: true });
@@ -1264,7 +1264,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 transparentPool,
                 actionButtonsDisabled: false,
               });
-              this.addLastSnackbar({ message: walletKindStr, screenName: this.screenName });
+              this.addLastSnackbar({ message: walletKindStr, screenName: [this.screenName] });
             }
             // creating tor cliente if needed
             if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
@@ -1362,7 +1362,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                   this.addLastSnackbar({
                     message: this.props.translate('txtcopied') as string,
                     duration: SnackbarDurationEnum.short,
-                    screenName: this.screenName,
+                    screenName: [this.screenName],
                   });
                 },
               },

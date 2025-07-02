@@ -240,7 +240,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         ? (translate('seed.tapcopy-ufvk-message') as string)
         : (translate('history.addresscopied') as string),
       duration: SnackbarDurationEnum.short,
-      screenName: screenName,
+      screenName: [screenName],
     });
   };
 

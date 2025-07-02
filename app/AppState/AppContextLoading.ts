@@ -12,6 +12,7 @@ import { CurrencyEnum } from './enums/CurrencyEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
+import { ScreenEnum } from './enums/ScreenEnum';
 
 export default interface AppContextLoading {
   // context
@@ -28,7 +29,7 @@ export default interface AppContextLoading {
   transparentPool: boolean;
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
-  removeFirstSnackbar: () => void;
+  removeFirstSnackbar: (s: ScreenEnum) => void;
   zingolibVersion: string;
 
   // context settings

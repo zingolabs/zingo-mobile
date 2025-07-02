@@ -230,7 +230,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     //console.log('BIOMETRIC --------> ', resultBio);
     if (resultBio === false) {
       // snack with Error
-      addLastSnackbar({ message: translate('biometrics-error') as string, screenName: screenName });
+      addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
     } else {
       confirmSend(sendPageState);
     }
