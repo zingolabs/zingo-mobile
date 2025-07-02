@@ -843,7 +843,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
-        this.screenName,
+        [this.screenName],
         title,
         result,
         false,
@@ -859,7 +859,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
-          this.screenName,
+          [this.screenName],
           title,
           result,
           false,
@@ -892,7 +892,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               createAlert(
                 this.setBackgroundError,
                 this.addLastSnackbar,
-                this.screenName,
+                [this.screenName],
                 title,
                 result,
                 false,
@@ -906,7 +906,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             createAlert(
               this.setBackgroundError,
               this.addLastSnackbar,
-              this.screenName,
+              [this.screenName],
               title,
               this.state.translate('loadingapp.noservers') as string,
               false,
@@ -927,7 +927,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             createAlert(
               this.setBackgroundError,
               this.addLastSnackbar,
-              this.screenName,
+              [this.screenName],
               title,
               result,
               false,
@@ -1054,7 +1054,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             createAlert(
               this.setBackgroundError,
               this.addLastSnackbar,
-              this.screenName,
+              [this.screenName],
               this.state.translate('loadingapp.creatingwallet-label') as string,
               seedJSON.error,
               false,
@@ -1069,7 +1069,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           createAlert(
             this.setBackgroundError,
             this.addLastSnackbar,
-            this.screenName,
+            [this.screenName],
             this.state.translate('loadingapp.creatingwallet-label') as string,
             e instanceof Error ? e.message : String(e),
             false,
@@ -1116,7 +1116,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
-        this.screenName,
+        [this.screenName],
         this.state.translate('loadingapp.emptyseedufvk-label') as string,
         this.state.translate('loadingapp.emptyseedufvk-error') as string,
         false,
@@ -1135,7 +1135,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
-        this.screenName,
+        [this.screenName],
         this.state.translate('loadingapp.invalidseedufvk-label') as string,
         this.state.translate('loadingapp.invalidseedufvk-error') as string,
         false,

@@ -31,7 +31,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
       removeFirstSnackbar(screenName);
       setDuration(4000);
     }, 0);
-  }, [removeFirstSnackbar, snackbarsFiltered]);
+  }, [removeFirstSnackbar, screenName, snackbarsFiltered]);
 
   // short  - 1 sec
   // long   - 4 sec

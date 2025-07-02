@@ -73,7 +73,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     mode: ModeEnum.basic | ModeEnum.advanced,
     addLastSnackbar: (snackbar: SnackbarType) => void,
     snackbars: SnackbarType[],
-    removeFirstSnackbar: () => void,
+    removeFirstSnackbar: (s: ScreenEnum) => void,
     language: LanguageEnum;
   if (action === SeedActionEnum.new) {
     wallet = contextLoading.wallet;
