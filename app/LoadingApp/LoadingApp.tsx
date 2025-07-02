@@ -1390,7 +1390,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     try {
       const start = Date.now();
       let zingolibStr: string = await RPCModule.getVersionInfo();
-      console.log('=========================================== > zingolib version - ', Date.now() - start);
+      if (Date.now() - start) {
+        console.log('=========================================== > zingolib version - ', Date.now() - start);
+      }
       if (zingolibStr) {
         if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error zingolib version ${zingolibStr}`);

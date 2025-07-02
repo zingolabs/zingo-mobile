@@ -110,7 +110,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     };
   }, [toast]);
 
-  console.log('snackbars', screenName, snackbarsFiltered);
+  //console.log('snackbars', screenName, snackbarsFiltered);
 
   return <View />;
 };

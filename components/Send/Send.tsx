@@ -354,7 +354,9 @@ const Send: React.FunctionComponent<SendProps> = ({
         addressPar,
         zenniesForZingo ? 'true' : 'false',
       );
-      console.log('=========================================== > spendable balance with address - ', Date.now() - start);
+      if (Date.now() - start > 4000) {
+        console.log('=========================================== > spendable balance with address - ', Date.now() - start);
+      }
       console.log(runSpendableBalanceStr);
       if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error

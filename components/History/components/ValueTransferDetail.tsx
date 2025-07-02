@@ -243,6 +243,11 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
 
   //console.log('vt', vt, info.latestBlock - valueTransfer.blockheight);
 
+  //if (valueTransfer.status === RPCValueTransfersStatusEnum.calculated || valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) {
+  //  console.log('server', info.latestBlock, 'VT', valueTransfer.blockheight, 'expire', GlobalConst.expireBlocks);
+  //  console.log(info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks);
+  //}
+
   return (
     <ToastProvider>
       <Snackbars
@@ -364,7 +369,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             )}
           </View>
 
-          {valueTransfer.confirmations < GlobalConst.minConfirmations && (
+          {valueTransfer.confirmations === 0 && ( /* not min confirmations apply */
             <>
               {(valueTransfer.status === RPCValueTransfersStatusEnum.calculated || valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) && (
                 <View
