@@ -335,15 +335,14 @@ extension AppDelegate {
                 // this task is running with the App closed.
                 // probably is an impossible case...
                 self.loadWalletFile()
-            }
-            // else {
+            } else {
                 // the App is open, stop the sync first, just in case.
                 // with pepper-sync no need to stop the sync process here
-                //self.stopSyncingProcess()
-            //}
+                self.stopSyncingProcess()
+            }
 
             // setting performance level & min confirmations
-            setConfigWalletToProd()
+            let _ = setConfigWalletToProd()
 
             // run the sync process.
             let syncing = runSync()
