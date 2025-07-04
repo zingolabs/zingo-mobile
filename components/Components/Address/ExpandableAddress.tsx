@@ -12,9 +12,10 @@ type DefaultModalProps = {
   address: string;
   onClose: () => void;
   onCopy?: () => void;
+  title?: string;
 };
 
-const DefaultModal: React.FunctionComponent<DefaultModalProps> = ({ address, onClose, onCopy }) => {
+const DefaultModal: React.FunctionComponent<DefaultModalProps> = ({ address, onClose, onCopy, title }) => {
   const { translate } = useContext(ContextAppLoaded);
   const { colors } = useTheme() as unknown as ThemeType;
 
@@ -71,7 +72,7 @@ const DefaultModal: React.FunctionComponent<DefaultModalProps> = ({ address, onC
               borderRadius: 5,
               borderWidth: 1,
             }}>
-            <Text style={{ color: '#ccc', fontSize: 16 }}>{translate('receive.copy-address-button') as string}</Text>
+            <Text style={{ color: '#ccc', fontSize: 16 }}>{title}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -84,6 +85,7 @@ type ExpandableAddressProps = {
   style?: TextStyle;
   renderModal?: (onClose: () => void) => React.ReactElement;
   onCopy?: () => void;
+  title?: string;
 };
 
 const ExpandableAddress: React.FunctionComponent<ExpandableAddressProps> = ({
@@ -91,12 +93,13 @@ const ExpandableAddress: React.FunctionComponent<ExpandableAddressProps> = ({
   style,
   renderModal,
   onCopy,
+  title,
 }) => {
   const onClose = () => magicModal.hide({ reason: MagicModalHideReason.INTENTIONAL_HIDE });
 
   const onExpand = async () => {
     return magicModal.show(
-      () => (renderModal ? renderModal(onClose) : <DefaultModal address={address} onClose={onClose} onCopy={onCopy} />),
+      () => (renderModal ? renderModal(onClose) : <DefaultModal address={address} onClose={onClose} onCopy={onCopy} title={title} />),
       {},
     ).promise;
   };

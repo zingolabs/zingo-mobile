@@ -544,6 +544,7 @@
     "showtip": "Tap to select another address.",
     "verify": "Verify Addresses",
     "copy-address-button": "Copy address",
+    "copy-ufvk-button": "Copy viewing key",
     "modal-transparent": {
       "title": "Privacy Warning",
       "message": "Transparent addresses expose your transaction details on the public blockchain. This disintegrates your privacy and is not recommended for most transactions.",

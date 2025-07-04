@@ -544,6 +544,7 @@
     "showtip": "Tocar para seleccionar otra dirección.",
     "verify": "Verificar direcciones",
     "copy-address-button": "Copiar direccion",
+    "copy-ufvk-button": "Copiar clave visualización",
     "modal-transparent": {
       "title": "Advertencia de Privacidad",
       "message": "Las direcciones transparentes exponen los detalles de sus transacciones en la blockchain. Esto destruye su privacidad y no se recomienda para la mayoría de las transacciones.",

@@ -544,6 +544,7 @@
     "showtip": "Toque para selecionar outro endereço.",
     "verify": "Verificar Endereços",
     "copy-address-button": "Copiar endereço",
+    "copy-ufvk-button": "Copiar chave visualização",
     "modal-transparent": {
       "title": "Aviso de Privacidade",
       "message": "Endereços transparentes expõem os detalhes das suas transações na blockchain pública. Isso compromete sua privacidade e não é recomendado para a maioria das transações.",

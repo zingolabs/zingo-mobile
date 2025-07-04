@@ -544,6 +544,7 @@
     "showtip": "Başka bir adres seçmek için tıkla.",
     "verify": "Adresleri doğrula",
     "copy-address-button": "Adresi Kopyala",
+    "copy-ufvk-button": "Görüntüleme anahtarını kopyala",
     "modal-transparent": {
       "title": "Gizlilik uyarısı",
       "message": "Şeffaf adresler, işlem detaylarınızı herkese açık blok zincirinde ifşa eder. Bu, gizliliğinizi ortadan kaldırır ve çoğu işlem için önerilmez.",

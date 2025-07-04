@@ -524,6 +524,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
             {ufvk && (
               <ExpandableAddress
                 onCopy={doCopy}
+                title={translate('receive.copy-ufvk-button') as string}
                 address={ufvk}
                 style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
               />
@@ -561,6 +562,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 )}
                 <ExpandableAddress
                   onCopy={doCopy}
+                  title={translate('receive.copy-address-button') as string}
                   address={address.address}
                   style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
                 />
