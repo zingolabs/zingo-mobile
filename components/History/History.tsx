@@ -246,7 +246,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
     );
   };
 
-  //console.log('render History - 4', valueTransfers?.length);
+  //console.log('render History - 4', valueTransfersSliced.length);
+  //console.log(valueTransfersSliced[0]);
 
   return (
     <ToastProvider>

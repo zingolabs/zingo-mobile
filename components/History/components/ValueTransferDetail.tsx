@@ -85,6 +85,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     setComputingModalShow,
     navigationHome,
     closeAllModals,
+    valueTransfers,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
@@ -149,6 +150,30 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalLength]);
 
+  // magic modal make a copy of the parameter when use `show` -> unmutable props.
+  // when this component render (probably motivate by the parent)
+  // is the moment to get again the updated values to show in this component.
+  const getValueTransferAgain = (v: ValueTransferType) => {
+    if (!valueTransfers) {
+      return [] as ValueTransferType[];
+    }
+    return valueTransfers.filter((vtt: ValueTransferType) =>
+      vtt.txid === v.txid && vtt.address === v.address && vtt.poolType === v.poolType
+    );
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const vtNew = getValueTransferAgain(valueTransfer);
+    if (vtNew.length !== 1) {
+      // something really weird is happening...
+      clear();
+      hide();
+    } else {
+      setValueTransfer(vtNew[0]);
+    }
+  });
+
   const contactFound: (add: string) => boolean = (add: string) => {
     if (!add) {
       return false;
@@ -171,10 +196,18 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const moveValueTransferDetail = (indexParm: number, typeParm: number) => {
     // -1 -> Previous ValueTransfer
     //  1 -> Next ValueTransfer
-    if ((indexParm > 0 && typeParm === -1) || (indexParm < valueTransfersSliced.length - 1 && typeParm === 1)) {
+    if ((indexParm > 0 && typeParm === -1) ||
+        (indexParm < valueTransfersSliced.length - 1 && typeParm === 1)) {
       const newIndex = indexParm + typeParm;
-      setValueTransfer(valueTransfersSliced[newIndex]);
-      setValueTransferIndex(newIndex);
+      const vtNew = getValueTransferAgain(valueTransfersSliced[newIndex]);
+      if (vtNew.length !== 1) {
+        // something really weird is happening...
+        clear();
+        hide();
+      } else {
+        setValueTransfer(vtNew[0]);
+        setValueTransferIndex(newIndex);
+      }
     }
   };
 
@@ -241,7 +274,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     );
   };
 
-  //console.log('vt', vt, info.latestBlock - valueTransfer.blockheight);
+  //console.log('render History Detail', vt);
 
   //if (valueTransfer.status === RPCValueTransfersStatusEnum.calculated || valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) {
   //  console.log('server', info.latestBlock, 'VT', valueTransfer.blockheight, 'expire', GlobalConst.expireBlocks);
