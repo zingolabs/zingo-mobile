@@ -304,6 +304,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
+          noUfvkIcon={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
           closeScreen={() => {

@@ -272,9 +272,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           title={
             alone
               ? (translate('receive.title-basic-alone') as string)
-              : mode === ModeEnum.basic
-              ? (translate('receive.title-basic') as string)
-              : (translate('receive.title-advanced') as string)
+              : (translate('receive.title-address') as string)
           }
           screenName={screenName}
           toggleMenuDrawer={toggleMenuDrawer}

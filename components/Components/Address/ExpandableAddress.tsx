@@ -1,11 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React from 'react';
 import { TextStyle, View, Text, TouchableOpacity } from 'react-native';
 import Address from './Address';
 import { magicModal, MagicModalHideReason } from 'react-native-magic-modal';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types/ThemeType';
-import { ContextAppLoaded } from '../../../app/context';
 import { XIcon } from '../Icons/XIcon';
 
 type DefaultModalProps = {
@@ -13,10 +12,16 @@ type DefaultModalProps = {
   onClose: () => void;
   onCopy?: () => void;
   title?: string;
+  button?: string;
 };
 
-const DefaultModal: React.FunctionComponent<DefaultModalProps> = ({ address, onClose, onCopy, title }) => {
-  const { translate } = useContext(ContextAppLoaded);
+const DefaultModal: React.FunctionComponent<DefaultModalProps> = ({
+  address,
+  onClose,
+  onCopy,
+  title,
+  button,
+}) => {
   const { colors } = useTheme() as unknown as ThemeType;
 
   return (
@@ -56,7 +61,7 @@ const DefaultModal: React.FunctionComponent<DefaultModalProps> = ({ address, onC
 
         <View style={{ alignItems: 'flex-start' }}>
           <Text style={{ color: 'white', fontSize: 22, fontWeight: 'bold', marginBottom: 12 }}>
-            {translate('receive.title-basic') as string}
+            {title}
           </Text>
           <Text style={{ color: '#cbd5e1', fontSize: 16, marginBottom: 12 }}>{address}</Text>
           <TouchableOpacity
@@ -72,7 +77,7 @@ const DefaultModal: React.FunctionComponent<DefaultModalProps> = ({ address, onC
               borderRadius: 5,
               borderWidth: 1,
             }}>
-            <Text style={{ color: '#ccc', fontSize: 16 }}>{title}</Text>
+            <Text style={{ color: '#ccc', fontSize: 16 }}>{button}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -86,6 +91,7 @@ type ExpandableAddressProps = {
   renderModal?: (onClose: () => void) => React.ReactElement;
   onCopy?: () => void;
   title?: string;
+  button?: string;
 };
 
 const ExpandableAddress: React.FunctionComponent<ExpandableAddressProps> = ({
@@ -94,12 +100,13 @@ const ExpandableAddress: React.FunctionComponent<ExpandableAddressProps> = ({
   renderModal,
   onCopy,
   title,
+  button,
 }) => {
   const onClose = () => magicModal.hide({ reason: MagicModalHideReason.INTENTIONAL_HIDE });
 
   const onExpand = async () => {
     return magicModal.show(
-      () => (renderModal ? renderModal(onClose) : <DefaultModal address={address} onClose={onClose} onCopy={onCopy} title={title} />),
+      () => (renderModal ? renderModal(onClose) : <DefaultModal address={address} onClose={onClose} onCopy={onCopy} title={title} button={button} />),
       {},
     ).promise;
   };
