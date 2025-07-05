@@ -420,7 +420,9 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                       alignItems: 'center',
                       marginBottom: 10,
                     }}>
-                    {info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks &&
+                    {(valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
+                      valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) &&
+                      info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks &&
                       !readOnly && (
                       <Button
                         type={ButtonTypeEnum.Secondary}
