@@ -601,7 +601,11 @@ export default class RPC {
     this.fnSetSyncingStatus(ss as RPCSyncStatusType);
 
     // Close the poll timer if the sync finished(checked via promise above)
-    const inR: boolean = !!ss.scan_ranges && ss.scan_ranges.length > 0 && ss.percentage_total_outputs_scanned < 100;
+    const inR: boolean =
+      !!ss.scan_ranges &&
+      ss.scan_ranges.length > 0 &&
+      !!ss.percentage_total_outputs_scanned &&
+      ss.percentage_total_outputs_scanned < 100;
     if (!inR) {
       // here we can release the screen...
       this.keepAwake(false);
