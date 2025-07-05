@@ -632,8 +632,8 @@
     "confirmed": "Doğrulandı",
     "filter-withfunds": "Varlıklarla birlikte",
     "empty": "Henüz bir işlem yok.",
-    "resend": "İşlemi tekrar gönder",
-    "remove": "İşlemi kaldır",
+    "resend": "Tekrar gönder",
+    "remove": "Kaldır",
     "resend-title": "Tekrar Gönder",
     "remove-title": "Kaldır",
     "resend-error": "Yeniden gönderme hatası:",
@@ -641,7 +641,9 @@
     "resend-message": "",
     "remove-message": "",
     "resend-alert": "Bu işlemi yeniden göndermeyi onaylayın",
-    "remove-alert": "Bu işlemi cihazdan tamamen kaldırmayı onaylayın"
+    "remove-alert": "Başarısız işlemi cihazdan kaldırmak ve bakiyeyi geri yüklemek için onaylayın",
+    "remove-legend": "Bakiyeyi geri yüklemek için işlemi kaldırın",
+    "expired": "Süresi doldu - Bakiyeyi geri yüklemek için kaldırın"
   },
   "report": {
     "title": "Senkronizasyon / Yeniden Tarama Raporu",

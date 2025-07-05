@@ -632,8 +632,8 @@
     "confirmed": "Confirmed",
     "filter-withfunds": "With funds",
     "empty": "No Transactions yet.",
-    "resend": "Resend transaction",
-    "remove": "Remove transaction",
+    "resend": "Resend",
+    "remove": "Remove",
     "resend-title": "Resend",
     "remove-title": "Remove",
     "resend-error": "Error Resending :",
@@ -641,7 +641,9 @@
     "resend-message": "",
     "remove-message": "",
     "resend-alert": "Confirm to Resend this transaction again.",
-    "remove-alert": "Confirm to completely Remove this transaction from the device."
+    "remove-alert": "Confirm to remove failed transaction from device and restore balance",
+    "remove-legend": "Remove transaction to restore balance",
+    "expired": "Expired - Remove to restore balance"
   },
   "report": {
     "title": "Sync / Rescan Report",

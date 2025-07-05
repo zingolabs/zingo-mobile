@@ -86,6 +86,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     navigationHome,
     closeAllModals,
     valueTransfers,
+    readOnly,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
@@ -230,6 +231,8 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       actionStr = await RPCModule.removeTransactionProcess(valueTransfer.txid);
     }
 
+    console.log(actionStr);
+
     if (actionStr) {
       if (actionStr.toLowerCase().startsWith(GlobalConst.error)) {
         createAlert(
@@ -253,12 +256,12 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
         );
       }
 
+      closeAllModals();
       // change to the history screen, just in case.
       navigationHome?.navigate(RouteEnums.Home, {
         screen: translate('loadedapp.history-menu') as string,
         initial: false,
       });
-      closeAllModals();
     }
   };
 
@@ -403,37 +406,52 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             )}
           </View>
 
-          {valueTransfer.confirmations === 0 && ( /* not min confirmations apply */
+          {valueTransfer.confirmations === 0 && ( /* not min confirmations applied */
             <>
-              {(valueTransfer.status === RPCValueTransfersStatusEnum.calculated || valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) && (
-                <View
-                  style={{
-                    flexGrow: 1,
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginBottom: 10,
-                  }}>
-                  {info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks && (
+              {(valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
+                valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                valueTransfer.status === RPCValueTransfersStatusEnum.mempool) && (
+                <>
+                  <View
+                    style={{
+                      flexGrow: 1,
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginBottom: 10,
+                    }}>
+                    {info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks &&
+                      !readOnly && (
+                      <Button
+                        type={ButtonTypeEnum.Secondary}
+                        title={translate('history.resend') as string}
+                        style={{ marginRight: 10 }}
+                        onPress={() => {
+                          actionOnPress(TransactionActionEnum.resend);
+                        }}
+                        twoButtons={true}
+                      />
+                    )}
                     <Button
-                      type={ButtonTypeEnum.Secondary}
-                      title={translate('history.resend') as string}
-                      style={{ marginRight: 10 }}
+                      type={ButtonTypeEnum.Primary}
+                      title={translate('history.remove') as string}
                       onPress={() => {
-                        actionOnPress(TransactionActionEnum.resend);
+                        actionOnPress(TransactionActionEnum.remove);
                       }}
-                      twoButtons={true}
+                      twoButtons={info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks}
                     />
-                  )}
-                  <Button
-                    type={ButtonTypeEnum.Primary}
-                    title={translate('history.remove') as string}
-                    onPress={() => {
-                      actionOnPress(TransactionActionEnum.remove);
-                    }}
-                    twoButtons={info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks}
-                  />
-                </View>
+                  </View>
+                  <View
+                    style={{
+                      flexGrow: 1,
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginBottom: 10,
+                    }}>
+                    <FadeText style={{ fontSize: 11 }}>{translate('history.remove-legend') as string}</FadeText>
+                  </View>
+                </>
               )}
             </>
           )}

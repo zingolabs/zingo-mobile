@@ -632,8 +632,8 @@
     "confirmed": "Confirmada",
     "filter-withfunds": "Com fundos",
     "empty": "Nenhuma transação ainda.",
-    "resend": "Reenviar transação",
-    "remove": "Remover transação",
+    "resend": "Reenviar",
+    "remove": "Remover",
     "resend-title": "Reenviar",
     "remove-title": "Remover",
     "resend-error": "Erro ao reenviar :",
@@ -641,7 +641,9 @@
     "resend-message": "",
     "remove-message": "",
     "resend-alert": "Confirme para reenviar esta transação novamente.",
-    "remove-alert": "Confirme para excluir completamente esta transação do dispositivo."
+    "remove-alert": "Confirme para remover a transação com falha do dispositivo e restaurar o saldo",
+    "remove-legend": "Remover transação para restaurar o saldo",
+    "expired": "Expirada - Remover para restaurar o saldo"
   },
   "report": {
     "title": "Relatório de Sincronização / Rescan",
