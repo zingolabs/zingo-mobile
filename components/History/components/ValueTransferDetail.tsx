@@ -440,7 +440,10 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                       onPress={() => {
                         actionOnPress(TransactionActionEnum.remove);
                       }}
-                      twoButtons={info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks}
+                      twoButtons={
+                        (valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
+                        valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) &&
+                        info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks}
                     />
                   </View>
                   <View
