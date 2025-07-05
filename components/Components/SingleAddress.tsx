@@ -563,7 +563,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 )}
                 <ExpandableAddress
                   onCopy={doCopy}
-                  title={translate('receive.title-ufvk') as string}
+                  title={translate('receive.title-address') as string}
                   button={translate('receive.copy-address-button') as string}
                   address={address.address}
                   style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
