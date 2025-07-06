@@ -25,7 +25,6 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
-import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
 
 import FadeText from '../Components/FadeText';
@@ -355,7 +354,9 @@ const Send: React.FunctionComponent<SendProps> = ({
         addressPar,
         zenniesForZingo ? 'true' : 'false',
       );
-      console.log('=========================================== > spendable balance with address - ', Date.now() - start);
+      if (Date.now() - start > 4000) {
+        console.log('=========================================== > spendable balance with address - ', Date.now() - start);
+      }
       console.log(runSpendableBalanceStr);
       if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
@@ -432,7 +433,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           });
         } else {
           // Show the error message as a toast
-          addLastSnackbar({ message: target, screenName: screenName });
+          addLastSnackbar({ message: target, screenName: [screenName] });
         }
       } else {
         setAddressText(addressPar.replace(/[ \t\n\r]+/g, '')); // Remove spaces
@@ -700,7 +701,7 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
 
@@ -729,7 +730,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         createAlert(
           setBackgroundError,
           addLastSnackbar,
-          screenName,
+          [screenName, ScreenEnum.History],
           translate('send.confirm-title') as string,
           `${translate('send.Broadcast')} ${txid}`,
           true,
@@ -785,7 +786,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             createAlert(
               setBackgroundError,
               addLastSnackbar,
-              screenName,
+              [screenName, ScreenEnum.History],
               translate('send.confirm-title') as string,
               `${translate('send.Broadcast')} ${txid}`,
               true,
@@ -810,7 +811,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         createAlert(
           setBackgroundError,
           addLastSnackbar,
-          screenName,
+          [screenName],
           translate('send.sending-error') as string,
           `${customError ? customError : error}`,
           false,
@@ -892,7 +893,8 @@ const Send: React.FunctionComponent<SendProps> = ({
           }}
         />
       ),
-      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
     //}
   };
@@ -900,7 +902,8 @@ const Send: React.FunctionComponent<SendProps> = ({
   const setMemoModalShow = () => {
     return magicModal.show(
       () => <Memo message={memoText} includeUAMessage={includeUAMemoBoolean} setMessage={setMemoText} />,
-      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
@@ -925,7 +928,8 @@ const Send: React.FunctionComponent<SendProps> = ({
           sendPageState={buildSendState()}
         />
       ),
-      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
@@ -1456,6 +1460,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       style={{
                         width: '35%',
                         marginTop: 5,
+                        alignItems: 'flex-start',
                       }}>
                       <PriceFetcher setZecPrice={setZecPrice} screenName={screenName} textBefore={translate('send.nofetchprice') as string} />
                     </View>
@@ -1536,8 +1541,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                             privacy={privacy}
                           />
                         </View>
-                        <View style={{ marginLeft: 5, flexDirection: 'row', justifyContent: 'flex-start' }}>
-                          <View style={{ width: '40%' }} />
+                        <View style={{ marginLeft: 5, flexDirection: 'row', justifyContent: 'flex-start', marginTop: -10 }}>
+                          <View style={{ width: '5%' }} />
                           <PriceFetcher setZecPrice={setZecPrice} screenName={screenName} />
                         </View>
                       </View>
@@ -1553,28 +1558,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       justifyContent: 'space-between',
                       alignItems: 'center',
                     }}>
-                    <FadeText style={{ marginTop: 6, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <FadeText style={{ marginTop: 6, marginBottom: 5, marginRight: 5 }}>
-                        {translate('send.includeua') as string}
-                      </FadeText>
-                      <BouncyCheckbox
-                        testID="send.checkboxua"
-                        disabled={false}
-                        disableText
-                        isChecked={includeUAMemoBoolean}
-                        useBuiltInState={false}
-                        onPress={() => updateToField(null, null, null, null, !includeUAMemoBoolean)}
-                        unFillColor={colors.card}
-                        fillColor={colors.primary}
-                        innerIconStyle={{
-                          borderRadius: 5,
-                        }}
-                        iconStyle={{
-                          borderRadius: 5,
-                        }}
-                      />
-                    </View>
+                    <FadeText style={{ marginTop: 3, marginBottom: 5 }}>{translate('send.memo') as string}</FadeText>
                   </View>
                   <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
                     <View
@@ -1748,12 +1732,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                       Utils.parseStringLocaleToNumberFloat(amountText) <
                         Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
                     ) {
-                      addLastSnackbar({ message: `${translate('send.donation-minimum-message') as string}`, screenName: screenName });
+                      addLastSnackbar({ message: `${translate('send.donation-minimum-message') as string}`, screenName: [screenName] });
                       updateToField(null, Utils.getZenniesDonationAmount(), null, null, false);
                       return;
                     }
                     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-                      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
+                      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
                       return;
                     }
                     if (
@@ -1763,7 +1747,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       Utils.parseStringLocaleToNumberFloat(amountText) ===
                         Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
                     ) {
-                      addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, screenName: screenName });
+                      addLastSnackbar({ message: `${translate('send.sendall-message') as string}`, screenName: [screenName] });
                     }
                     // if the address is transparent - clean the memo field Just in Case.
                     if (!memoEnabled) {

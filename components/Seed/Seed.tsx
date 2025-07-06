@@ -73,7 +73,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     mode: ModeEnum.basic | ModeEnum.advanced,
     addLastSnackbar: (snackbar: SnackbarType) => void,
     snackbars: SnackbarType[],
-    removeFirstSnackbar: () => void,
+    removeFirstSnackbar: (s: ScreenEnum) => void,
     language: LanguageEnum;
   if (action === SeedActionEnum.new) {
     wallet = contextLoading.wallet;
@@ -284,7 +284,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                     addLastSnackbar({
                       message: translate('seed.tapcopy-seed-message') as string,
                       duration: SnackbarDurationEnum.short,
-                      screenName: screenName,
+                      screenName: [screenName],
                     });
                   }
                   setExpandSeed(true);
@@ -313,7 +313,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                       addLastSnackbar({
                         message: translate('seed.tapcopy-seed-message') as string,
                         duration: SnackbarDurationEnum.short,
-                        screenName: screenName,
+                        screenName: [screenName],
                       });
                     }
                   }
@@ -344,7 +344,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                     addLastSnackbar({
                       message: translate('seed.tapcopy-birthday-message') as string,
                       duration: SnackbarDurationEnum.short,
-                      screenName: screenName,
+                      screenName: [screenName],
                     });
                   }
                   setExpandBithday(true);

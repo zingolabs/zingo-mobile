@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, TouchableOpacity, TextInput } from 'react-native';
+import { View, TouchableOpacity, TextInput, Platform } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -17,6 +17,7 @@ import 'moment/locale/ru';
 import 'moment/locale/tr';
 import Utils from '../../app/utils';
 import { magicModal } from 'react-native-magic-modal';
+import { GlobalConst } from '../../app/AppState';
 //import { SecurityType } from '../../app/AppState';
 // @ts-ignore
 //import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
@@ -103,7 +104,8 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
       return magicModal.show(() => <ScannerAddress setAddress={(a: string) => {
             setAddress(a);
           }}
-        />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
+        // possible problem if scrolling vertically, if so change to `undefined`.
+        />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }
       ).promise;
     //}
   };
@@ -158,7 +160,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              {address && (
+              {address && !disabled && (
                 <TouchableOpacity
                   onPress={() => {
                     setAddress('');

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { View, ScrollView, RefreshControl, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
+import { View, ScrollView, RefreshControl, TouchableOpacity, ActivityIndicator, Dimensions, Platform } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -14,6 +14,7 @@ import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
 import {
   ButtonTypeEnum,
   FilterEnum,
+  GlobalConst,
   ScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
@@ -204,7 +205,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
           setPrivacyOption={setPrivacyOption}
         />
       ),
-      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
@@ -220,7 +222,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
           setServerOption={setServerOption}
         />
       ),
-      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
@@ -243,7 +246,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
     );
   };
 
-  //console.log('render History - 4', valueTransfers?.length);
+  //console.log('render History - 4', valueTransfersSliced.length);
+  //console.log(valueTransfersSliced[0]);
 
   return (
     <ToastProvider>

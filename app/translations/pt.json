@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.0 (243)",
+  "version": "zingo-2.0.0 (251)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -68,7 +68,7 @@
     "add": "Adicionar",
     "modify": "Modificar",
     "delete": "Excluir",
-    "empty": "Sem Contatos/Apelidos ainda.",
+    "empty": "Você ainda não salvou nenhum endereço novo.",
     "nochanges": "Nenhuma alteração registrada.",
     "fillboth": "Preencha todos os campos. ",
     "bothexists": "Esse contato e endereço já existem. ",
@@ -523,8 +523,8 @@
     "noaddress": "Sem Endereço",
     "unoprivkey": "Nenhum endereço unificado para importar a Chave de Gastos",
     "unoviewkey": "Nenhum endereço unificado para importar a Chave de Visualização completa",
-    "title-advanced": "Meus Endereços",
-    "title-basic": "Meu Endereço",
+    "title-address": "Meu Endereço",
+    "title-ufvk": "Minha Chave de Visualização",
     "title-basic-alone": "Meu Endereço de Recebimento",
     "newu-option": "Novo Endereço Unificado Diversificado",
     "danger-zone": "ZONA DE PERIGO",
@@ -544,6 +544,7 @@
     "showtip": "Toque para selecionar outro endereço.",
     "verify": "Verificar Endereços",
     "copy-address-button": "Copiar endereço",
+    "copy-ufvk-button": "Copiar chave visualização",
     "modal-transparent": {
       "title": "Aviso de Privacidade",
       "message": "Endereços transparentes expõem os detalhes das suas transações na blockchain pública. Isso compromete sua privacidade e não é recomendado para a maioria das transações.",
@@ -631,8 +632,8 @@
     "confirmed": "Confirmada",
     "filter-withfunds": "Com fundos",
     "empty": "Nenhuma transação ainda.",
-    "resend": "Reenviar transação",
-    "remove": "Remover transação",
+    "resend": "Reenviar",
+    "remove": "Remover",
     "resend-title": "Reenviar",
     "remove-title": "Remover",
     "resend-error": "Erro ao reenviar :",
@@ -640,7 +641,9 @@
     "resend-message": "",
     "remove-message": "",
     "resend-alert": "Confirme para reenviar esta transação novamente.",
-    "remove-alert": "Confirme para excluir completamente esta transação do dispositivo."
+    "remove-alert": "Confirme para remover a transação com falha do dispositivo e restaurar o saldo",
+    "remove-legend": "Remover transação para restaurar o saldo",
+    "expired": "Expirada - Remover para restaurar o saldo"
   },
   "report": {
     "title": "Relatório de Sincronização / Rescan",

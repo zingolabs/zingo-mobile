@@ -72,7 +72,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, clo
           addLastSnackbar({
             message: translate('receive.transparent.new-error') as string,
             duration: SnackbarDurationEnum.short,
-            screenName: screenName,
+            screenName: [screenName],
           });
 
           // return newAddressStr;

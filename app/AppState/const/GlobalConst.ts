@@ -30,4 +30,5 @@ export const GlobalConst = {
   keyChain: 'KeyChain',
   keyStore: 'KeyStore',
   utf8: 'utf8',
+  minConfirmations: 3,
 };

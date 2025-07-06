@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.0 (243)",
+  "version": "zingo-2.0.0 (251)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
@@ -68,7 +68,7 @@
     "add": "Add",
     "modify": "Modify",
     "delete": "Delete",
-    "empty": "No Contacts/Nicknames/Labels/Tags yet.",
+    "empty": "You haven't saved any new addresses yet.",
     "nochanges": "No changes registered. ",
     "fillboth": "Please fill out both fields. ",
     "bothexists": "This label and this address already exists. ",
@@ -523,8 +523,8 @@
     "noaddress": "No Address",
     "unoprivkey": "No Unified address to import the Spending Key",
     "unoviewkey": "No Unified address to import the Full Viewing Key",
-    "title-advanced": "My Address",
-    "title-basic": "My Address",
+    "title-address": "My Address",
+    "title-ufvk": "My Vewing Key",
     "title-basic-alone": "My Receiving Address",
     "newu-option": "Get new address",
     "danger-zone": "DANGER ZONE",
@@ -544,6 +544,7 @@
     "showtip": "Tap to select another address.",
     "verify": "Verify Addresses",
     "copy-address-button": "Copy address",
+    "copy-ufvk-button": "Copy viewing key",
     "modal-transparent": {
       "title": "Privacy Warning",
       "message": "Transparent addresses expose your transaction details on the public blockchain. This disintegrates your privacy and is not recommended for most transactions.",
@@ -631,8 +632,8 @@
     "confirmed": "Confirmed",
     "filter-withfunds": "With funds",
     "empty": "No Transactions yet.",
-    "resend": "Resend transaction",
-    "remove": "Remove transaction",
+    "resend": "Resend",
+    "remove": "Remove",
     "resend-title": "Resend",
     "remove-title": "Remove",
     "resend-error": "Error Resending :",
@@ -640,7 +641,9 @@
     "resend-message": "",
     "remove-message": "",
     "resend-alert": "Confirm to Resend this transaction again.",
-    "remove-alert": "Confirm to completely Remove this transaction from the device."
+    "remove-alert": "Confirm to remove failed transaction from device and restore balance",
+    "remove-legend": "Remove transaction to restore balance",
+    "expired": "Expired - Remove to restore balance"
   },
   "report": {
     "title": "Sync / Rescan Report",

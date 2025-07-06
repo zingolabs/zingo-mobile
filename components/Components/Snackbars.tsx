@@ -7,7 +7,7 @@ import { useToast } from 'react-native-toastier';
 
 type SnackbarProps = {
   snackbars: SnackbarType[];
-  removeFirstSnackbar: () => void;
+  removeFirstSnackbar: (s: ScreenEnum) => void;
   screenName: ScreenEnum;
 };
 
@@ -17,7 +17,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
   const snackingMessage = useRef<string>(undefined);
   const [duration, setDuration] = useState<number>(4000);
   const toast = useToast();
-  const snackbarsFiltered = snackbars.filter((s: SnackbarType) => s.screenName === screenName);
+  const snackbarsFiltered = snackbars.filter((s: SnackbarType) => s.screenName.includes(screenName));
 
   const handleSnackbarClose = useCallback(() => {
     if (snackbarsFiltered[0]?.message !== snackingMessage.current) {
@@ -28,10 +28,10 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
       //console.log('remove first snackbar', snackbarsFiltered[0]?.message, snackingMessage.current);
       snacking.current = false;
       snackingMessage.current = undefined;
-      removeFirstSnackbar();
+      removeFirstSnackbar(screenName);
       setDuration(4000);
     }, 0);
-  }, [removeFirstSnackbar, snackbarsFiltered]);
+  }, [removeFirstSnackbar, screenName, snackbarsFiltered]);
 
   // short  - 1 sec
   // long   - 4 sec
@@ -110,7 +110,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
     };
   }, [toast]);
 
-  //console.log('snackbars', snackbars, duration, snacking);
+  //console.log('snackbars', screenName, snackbarsFiltered);
 
   return <View />;
 };

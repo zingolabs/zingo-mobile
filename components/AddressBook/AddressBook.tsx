@@ -239,6 +239,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             }}>
             <TouchableOpacity
               onPress={() => {
+                cancel();
                 setFilter(FilterEnum.all);
                 setLoading(true);
               }}>
@@ -263,6 +264,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
+                cancel();
                 setFilter(FilterEnum.contacts);
                 setLoading(true);
               }}>
@@ -287,6 +289,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
+                cancel();
                 setFilter(FilterEnum.wallet);
                 setLoading(true);
               }}>

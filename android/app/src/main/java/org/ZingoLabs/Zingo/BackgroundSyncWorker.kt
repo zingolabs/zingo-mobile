@@ -35,24 +35,24 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 
 data class ScanRanges (
-    val priority : String,
-    val start_block : Long,
-    val end_block : Long
+    val priority : String = "",
+    val start_block : String = "",
+    val end_block : String = ""
 )
 
 data class SyncStatus (
-    val scan_ranges : List<ScanRanges>,
-    val sync_start_height : Long,
-    val session_blocks_scanned : Long,
-    val total_blocks_scanned : Long,
-    val percentage_session_blocks_scanned : Double,
-    val percentage_total_blocks_scanned : Double,
-    val session_sapling_outputs_scanned : Long,
-    val total_sapling_outputs_scanned : Long,
-    val session_orchard_outputs_scanned : Long,
-    val total_orchard_outputs_scanned : Long,
-    val percentage_session_outputs_scanned : Double,
-    val percentage_total_outputs_scanned : Double
+    val scan_ranges : List<ScanRanges> = emptyList(),
+    val sync_start_height : Long = 0L,
+    val session_blocks_scanned : Long = 0L,
+    val total_blocks_scanned : Long = 0L,
+    val percentage_session_blocks_scanned : Double = 0.0,
+    val percentage_total_blocks_scanned : Double = 0.0,
+    val session_sapling_outputs_scanned : Long = 0L,
+    val total_sapling_outputs_scanned : Long = 0L,
+    val session_orchard_outputs_scanned : Long = 0L,
+    val total_orchard_outputs_scanned : Long = 0L,
+    val percentage_session_outputs_scanned : Double = 0.0,
+    val percentage_total_outputs_scanned : Double = 0.0
 )
 
 class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {

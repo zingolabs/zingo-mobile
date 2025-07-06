@@ -101,7 +101,7 @@ const Info: React.FunctionComponent<InfoProps> = () => {
               screenName={screenName}
             />
             {(currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && (
-              <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
                 <DetailLine label={(currency === CurrencyEnum.USDTORCurrency ? translate('info.zecpricetor') : translate('info.zecprice')) as string} screenName={screenName}>
                   {zecPrice.zecPrice === -1 && (
                     <RegText color={colors.text}>{translate('info.errorgemini') as string}</RegText>

@@ -428,7 +428,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       createAlert(
         setBackgroundError,
         addLastSnackbar,
-        screenName,
+        [screenName],
         translate('send.sending-error') as string,
         `${customError ? customError : error}`,
         false,
@@ -463,7 +463,9 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         message={memo}
         includeUAMessage={true}
         setMessage={setMemo}
-      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
+      />,
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -474,7 +476,9 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         valueTransfersSliced={messagesSliced}
         totalLength={messagesFiltered ? messagesFiltered.length : 0}
         setPrivacyOption={setPrivacyOption}
-      />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }
+      />,
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -858,7 +862,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   <TouchableOpacity
                     onPress={() => {
                       if (!netInfo.isConnected) {
-                        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: screenName });
+                        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
                         return;
                       }
                       confirmSend();

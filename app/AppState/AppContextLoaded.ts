@@ -88,7 +88,7 @@ export default interface AppContextLoaded {
   // snackbar queue
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
-  removeFirstSnackbar: () => void;
+  removeFirstSnackbar: (s: ScreenEnum) => void;
 
   // if the App is stalled - restart is fired
   restartApp: (s: LoadedAppNavigationState) => void;

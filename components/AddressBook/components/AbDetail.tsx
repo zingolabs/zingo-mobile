@@ -186,7 +186,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         address={address}
         setAddress={updateAddress}
         setError={setErrorAddress}
-        disabled={action === AddressBookActionEnum.Delete}
+        disabled={action === AddressBookActionEnum.Delete || item.own}
         showLabel={true}
       />
       {(!!error || !!errorAddress) && (

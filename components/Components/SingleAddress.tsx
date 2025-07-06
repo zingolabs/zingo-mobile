@@ -1,9 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { View, ScrollView, TouchableOpacity, Text, Pressable } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Text, Pressable, Platform } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@react-navigation/native';
-import ViewShot from 'react-native-view-shot';
 
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -15,6 +14,7 @@ import 'moment/locale/tr';
 import {
   AddressKindEnum,
   ButtonTypeEnum,
+  GlobalConst,
   ModeEnum,
   ScreenEnum,
   SnackbarDurationEnum,
@@ -143,6 +143,7 @@ type SingleAddressProps = {
   NATShow?: () => void;
   VAShow?: () => void;
   changeIndex?: (index: number) => void;
+  hasTransparent?: boolean;
 };
 
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
@@ -156,6 +157,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   index,
   setIndex,
   changeIndex,
+  hasTransparent,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, language, mode, addressBook } = context;
@@ -169,7 +171,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const animatedHeight = useSharedValue(0);
   const animatedOpacity = useSharedValue(0);
 
-  const qrCodeRef = useRef<ViewShot>(null);
   const scrollViewRef = useRef<ScrollView>(null);
 
   const isBasic = ModeEnum.basic === mode;
@@ -239,26 +240,17 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
         ? (translate('seed.tapcopy-ufvk-message') as string)
         : (translate('history.addresscopied') as string),
       duration: SnackbarDurationEnum.short,
-      screenName: screenName,
+      screenName: [screenName],
     });
   };
 
   const doAddressList = () => {
     return magicModal.show(
       () => <AddressList addressKind={address ? address.addressKind : AddressKindEnum.u} setIndex={setIndex} />,
-      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
-
-  function onCopy() {
-    addLastSnackbar({
-      message: ufvk
-        ? (translate('seed.tapcopy-ufvk-message') as string)
-        : (translate('history.addresscopied') as string),
-      duration: SnackbarDurationEnum.short,
-      screenName: screenName,
-    });
-  }
 
   return (
     <View style={{ flexDirection: 'column', width: '100%' }}>
@@ -407,19 +399,17 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
               {ufvk ? (
                 <>
                   {expandQRAddress ? (
-                    <ViewShot ref={qrCodeRef} options={{ format: 'png', quality: 1 }}>
-                      <QRCode
-                        value={ufvk}
-                        size={200}
-                        ecl="L"
-                        backgroundColor={colors.text}
-                        logo={require('../../assets/img/logobig-zingo.png')}
-                        logoSize={30}
-                        logoBackgroundColor={colors.text}
-                        logoBorderRadius={5} /* android not soported */
-                        logoMargin={3}
-                      />
-                    </ViewShot>
+                    <QRCode
+                      value={ufvk}
+                      size={200}
+                      ecl="L"
+                      backgroundColor={colors.text}
+                      logo={require('../../assets/img/logobig-zingo.png')}
+                      logoSize={30}
+                      logoBackgroundColor={colors.text}
+                      logoBorderRadius={5} /* android not soported */
+                      logoMargin={3}
+                    />
                   ) : (
                     <View
                       style={{
@@ -430,32 +420,37 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         borderWidth: 1,
                         borderColor: colors.text,
                       }}>
-                      <Text
-                        style={{
-                          color: colors.zingo,
-                          textDecorationLine: 'underline',
-                          marginTop: 15,
-                          minHeight: 48,
-                        }}>
-                        {translate('seed.tapreveal') as string}
-                      </Text>
+                      <TouchableOpacity onPress={() => {
+                        setExpandQRAddress(true);
+                        setTimeout(() => {
+                          setExpandQRAddress(false);
+                        }, 5000);
+                      }}>
+                        <Text
+                          style={{
+                            color: colors.zingo,
+                            textDecorationLine: 'underline',
+                            marginTop: 15,
+                            minHeight: 48,
+                          }}>
+                          {translate('seed.tapreveal') as string}
+                        </Text>
+                      </TouchableOpacity>
                     </View>
                   )}
                 </>
               ) : (
-                <ViewShot ref={qrCodeRef} options={{ format: 'png', quality: 1 }}>
-                  <QRCode
-                    value={address ? address.address : ''}
-                    size={200}
-                    ecl="L"
-                    backgroundColor={colors.text}
-                    logo={require('../../assets/img/logobig-zingo.png')}
-                    logoSize={30}
-                    logoBackgroundColor={colors.text}
-                    logoBorderRadius={5} /* android not soported */
-                    logoMargin={3}
-                  />
-                </ViewShot>
+                <QRCode
+                  value={address ? address.address : ''}
+                  size={200}
+                  ecl="L"
+                  backgroundColor={colors.text}
+                  logo={require('../../assets/img/logobig-zingo.png')}
+                  logoSize={30}
+                  logoBackgroundColor={colors.text}
+                  logoBorderRadius={5} /* android not soported */
+                  logoMargin={3}
+                />
               )}
             </View>
             <View
@@ -526,42 +521,55 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 )}
               </View>
             </View>
-            <View
-              style={{
-                flexDirection: 'column',
-                width: '100%',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginBottom: 20,
-              }}>
-              {contactFromAddress() ? (
-                <Text
-                  style={{
-                    color: colors.zingo,
-                    fontSize: 16,
-                  }}>
-                  {contactFromAddress()}
-                </Text>
-              ) : (
-                <TouchableOpacity onPress={() => {
-                    NATShow && NATShow();
-                  }}>
+            {ufvk && (
+              <ExpandableAddress
+                onCopy={doCopy}
+                title={translate('receive.title-ufvk') as string}
+                button={translate('receive.copy-ufvk-button') as string}
+                address={ufvk}
+                style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
+              />
+            )}
+            {address && (
+              <View
+                style={{
+                  flexDirection: 'column',
+                  width: '100%',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginBottom: 20,
+                }}>
+                {contactFromAddress() ? (
                   <Text
                     style={{
                       color: colors.zingo,
-                      textDecorationLine: 'underline',
                       fontSize: 16,
                     }}>
-                    {translate('receive.add-tag') as string}
+                    {contactFromAddress()}
                   </Text>
-                </TouchableOpacity>
-              )}
-              <ExpandableAddress
-                onCopy={onCopy}
-                address={address ? address.address : ''}
-                style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
-              />
-            </View>
+                ) : (
+                  <TouchableOpacity onPress={() => {
+                      NATShow && NATShow();
+                    }}>
+                    <Text
+                      style={{
+                        color: colors.zingo,
+                        textDecorationLine: 'underline',
+                        fontSize: 16,
+                      }}>
+                      {translate('receive.add-tag') as string}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                <ExpandableAddress
+                  onCopy={doCopy}
+                  title={translate('receive.title-address') as string}
+                  button={translate('receive.copy-address-button') as string}
+                  address={address.address}
+                  style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
+                />
+              </View>
+            )}
             <View
               style={{
                 flexDirection: 'column',
@@ -570,7 +578,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 alignItems: 'center',
                 marginTop: 10,
               }}>
-              {!isBasic && (
+              {!isBasic && address && (
                 <>
                   {isUnified ? (
                     <Button
@@ -590,7 +598,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     />
                   )}
 
-                  {isUnified && (
+                  {isUnified && hasTransparent && (
                     <>
                       <Pressable
                         onPress={toggle}

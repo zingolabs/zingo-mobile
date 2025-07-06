@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.0 (243)",
+  "version": "zingo-2.0.0 (251)",
   "loading": "Yükleniyor...",
   "connectingserver": "Sunucuya bağlanılıyor...",
   "wait": "Lütfen bekleyin...",
@@ -68,7 +68,7 @@
     "add": "Ekle",
     "modify": "Düzenle",
     "delete": "Sil",
-    "empty": "Kişi yok/Takma ad/Etiket/Tag bulunmamaktadır.",
+    "empty": "Henüz yeni adres kaydetmediniz.",
     "nochanges": "Herhangi bir değişiklik kaydedilmedi ",
     "fillboth": "Lütfen her iki alanı da doldurun. ",
     "bothexists": "Bu etiket ve bu adres zaten mevcut ",
@@ -523,8 +523,8 @@
     "noaddress": "Adres Yok",
     "unoprivkey": "Harcamaya Anahtarını (Spending Key) içe aktarmak için birleştirilmiş (Unified) bir adres yok.",
     "unoviewkey": "Tam Görüntüleme Anahtarını (Full Viewing Key) içe aktarmak için birleştirilmiş (Unified) bir adres yok.",
-    "title-advanced": "Adresim",
-    "title-basic": "Adresim",
+    "title-address": "Adresim",
+    "title-ufvk": "Görüntüleme Anahtarım",
     "title-basic-alone": "Alıcı Adresim",
     "newu-option": "Yeni adres al",
     "danger-zone": "TEHLİKE BÖLGESİ",
@@ -544,6 +544,7 @@
     "showtip": "Başka bir adres seçmek için tıkla.",
     "verify": "Adresleri doğrula",
     "copy-address-button": "Adresi Kopyala",
+    "copy-ufvk-button": "Görüntüleme anahtarını kopyala",
     "modal-transparent": {
       "title": "Gizlilik uyarısı",
       "message": "Şeffaf adresler, işlem detaylarınızı herkese açık blok zincirinde ifşa eder. Bu, gizliliğinizi ortadan kaldırır ve çoğu işlem için önerilmez.",
@@ -631,8 +632,8 @@
     "confirmed": "Doğrulandı",
     "filter-withfunds": "Varlıklarla birlikte",
     "empty": "Henüz bir işlem yok.",
-    "resend": "İşlemi tekrar gönder",
-    "remove": "İşlemi kaldır",
+    "resend": "Tekrar gönder",
+    "remove": "Kaldır",
     "resend-title": "Tekrar Gönder",
     "remove-title": "Kaldır",
     "resend-error": "Yeniden gönderme hatası:",
@@ -640,7 +641,9 @@
     "resend-message": "",
     "remove-message": "",
     "resend-alert": "Bu işlemi yeniden göndermeyi onaylayın",
-    "remove-alert": "Bu işlemi cihazdan tamamen kaldırmayı onaylayın"
+    "remove-alert": "Başarısız işlemi cihazdan kaldırmak ve bakiyeyi geri yüklemek için onaylayın",
+    "remove-legend": "Bakiyeyi geri yüklemek için işlemi kaldırın",
+    "expired": "Süresi doldu - Bakiyeyi geri yüklemek için kaldırın"
   },
   "report": {
     "title": "Senkronizasyon / Yeniden Tarama Raporu",

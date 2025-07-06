@@ -19,18 +19,18 @@ struct ScanRanges: Decodable {
 }
 
 struct SyncStatus: Decodable {
-    let scan_ranges: [ScanRanges]
-    let sync_start_height: Int64
-    let session_blocks_scanned: Int64
-    let total_blocks_scanned: Int64
-    let percentage_session_blocks_scanned: Double
-    let percentage_total_blocks_scanned: Double
-    let session_sapling_outputs_scanned: Int64
-    let total_sapling_outputs_scanned: Int64
-    let session_orchard_outputs_scanned: Int64
-    let total_orchard_outputs_scanned: Int64
-    let percentage_session_outputs_scanned: Double
-    let percentage_total_outputs_scanned: Double
+    let scan_ranges: [ScanRanges]?
+    let sync_start_height: Int64?
+    let session_blocks_scanned: Int64?
+    let total_blocks_scanned: Int64?
+    let percentage_session_blocks_scanned: Double?
+    let percentage_total_blocks_scanned: Double?
+    let session_sapling_outputs_scanned: Int64?
+    let total_sapling_outputs_scanned: Int64?
+    let session_orchard_outputs_scanned: Int64?
+    let total_orchard_outputs_scanned: Int64?
+    let percentage_session_outputs_scanned: Double?
+    let percentage_total_outputs_scanned: Double?
 }
 
 @UIApplicationMain
@@ -336,14 +336,14 @@ extension AppDelegate {
                 // probably is an impossible case...
                 self.loadWalletFile()
             }
-            // else {
+            //else {
                 // the App is open, stop the sync first, just in case.
                 // with pepper-sync no need to stop the sync process here
-                //self.stopSyncingProcess()
+            //    self.stopSyncingProcess()
             //}
 
             // setting performance level & min confirmations
-            setConfigWalletToProd()
+            let _ = setConfigWalletToProd()
 
             // run the sync process.
             let syncing = runSync()

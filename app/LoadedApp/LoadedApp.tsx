@@ -821,7 +821,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         }
       } else {
         // Show the error message as a toast
-        this.addLastSnackbar({ message: target, screenName: this.screenName });
+        this.addLastSnackbar({ message: target, screenName: [this.screenName] });
       }
     }
   };
@@ -851,7 +851,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           setIsSeedViewModalOpen={this.setIsSeedViewModalOpen}
         />
       ),
-      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
@@ -866,7 +867,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           setPrivacyOption={this.setPrivacyOption}
         />
       ),
-      { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
     ).promise;
   };
 
@@ -930,13 +932,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (!isEqual(this.state.valueTransfers, valueTransfers) || this.state.valueTransfersTotal !== valueTransfersTotal) {
       // set somePending as well here when I know there is something new in ValueTransfers
       const pending: number =
-        valueTransfersTotal > 0 ? valueTransfers.filter((vt: ValueTransferType) => vt.confirmations === 0).length : 0;
-      // if a ValueTransfer go from 0 confirmations to > 0 -> Show a message about a ValueTransfer is confirmed
+        valueTransfersTotal > 0 ? valueTransfers.filter((vt: ValueTransferType) => vt.confirmations < GlobalConst.minConfirmations).length : 0;
+      // if a ValueTransfer go from 3 confirmations to > 3 -> Show a message about a ValueTransfer is confirmed
       this.state.valueTransfers &&
         this.state.valueTransfersTotal !== null &&
         this.state.valueTransfersTotal > 0 &&
         this.state.valueTransfers
-          .filter((vtOld: ValueTransferType) => !vtOld.confirmations || vtOld.confirmations === 0)
+          .filter((vtOld: ValueTransferType) => vtOld.confirmations < GlobalConst.minConfirmations)
           .forEach((vtOld: ValueTransferType) => {
             const vtNew = valueTransfers.filter(
               (vt: ValueTransferType) =>
@@ -945,7 +947,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             //console.log('old', vtOld);
             //console.log('new', vtNew);
             // the ValueTransfer is confirmed
-            if (vtNew.length > 0 && vtNew[0].confirmations > 0) {
+            if (vtNew.length > 0 && vtNew[0].confirmations >= GlobalConst.minConfirmations) {
               let message: string = '';
               let title: string = '';
               if (vtNew[0].kind === ValueTransferKindEnum.Received && vtNew[0].amount > 0) {
@@ -1012,7 +1014,15 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 title = this.state.translate('loadedapp.send-menu') as string;
               }
               if (message && title) {
-                createAlert(this.setBackgroundError, this.addLastSnackbar, this.screenName, title, message, true, this.state.translate);
+                createAlert(
+                  this.setBackgroundError,
+                  this.addLastSnackbar,
+                  [this.screenName],
+                  title,
+                  message,
+                  true,
+                  this.state.translate
+                );
               }
             }
             // the ValueTransfer is gone -> Likely Reverted by the server
@@ -1020,7 +1030,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               createAlert(
                 this.setBackgroundError,
                 this.addLastSnackbar,
-                this.screenName,
+                [this.screenName],
                 this.state.translate('loadedapp.send-menu') as string,
                 this.state.translate('loadedapp.valuetransfer-reverted') as string,
                 true,
@@ -1122,7 +1132,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   setComputingModalShow = () => {
     const { colors } = this.props.theme;
     // no swipping right in this modal.
-    return magicModal.show(() => <ComputingTxContent />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
+    return magicModal.show(() => <ComputingTxContent />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
   };
 
   setInfo = (newInfo: InfoType) => {
@@ -1207,17 +1217,21 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     const { colors } = this.props.theme;
     // Depending on the menu item, open the appropriate modal
     if (item === MenuItemEnum.About) {
-      return magicModal.show(() => <About />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }).promise;
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      return magicModal.show(() => <About />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.Rescan) {
-      return magicModal.show(() => <Rescan doRescan={this.doRescan} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }).promise;
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      return magicModal.show(() => <Rescan doRescan={this.doRescan} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.Info) {
-      return magicModal.show(() => <Info />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }).promise;
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      return magicModal.show(() => <Info />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
     } else if (item === MenuItemEnum.SyncReport) {
       return this.setSyncReportModalShow();
     } else if (item === MenuItemEnum.FundPools) {
       return this.setPoolsModalShow();
     } else if (item === MenuItemEnum.Insight) {
-      return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } })
         .promise;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
@@ -1236,7 +1250,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+          // possible problem if scrolling vertically, if so change to `undefined`.
+          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       } else {
         return magicModal.show(
@@ -1248,7 +1263,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+          // possible problem if scrolling vertically, if so change to `undefined`.
+          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       }
     } else if (item === MenuItemEnum.RestoreWalletBackup) {
@@ -1262,7 +1278,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+          // possible problem if scrolling vertically, if so change to `undefined`.
+          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       } else {
         return magicModal.show(
@@ -1274,7 +1291,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+          // possible problem if scrolling vertically, if so change to `undefined`.
+          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
         ).promise;
       }
     } else if (item === MenuItemEnum.LoadWalletFromSeed) {
@@ -1313,7 +1331,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setState({
         addressBookCurrentAddress: '',
       });
-      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } })
         .promise;
     } else if (item === MenuItemEnum.VoteForNym) {
       let update = false;
@@ -1400,7 +1419,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             if (toast && selectServer !== SelectServerEnum.offline) {
               this.addLastSnackbar({
                 message: `${this.state.translate('loadedapp.readingwallet')} ${value.uri}`,
-                screenName: this.screenName,
+                screenName: [this.screenName],
               });
             }
             await SettingsFileImpl.writeSettings(SettingsNameEnum.server, value);
@@ -1446,7 +1465,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+          // possible problem if scrolling vertically, if so change to `undefined`.
+          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
         );
       } else {
         magicModal.show(
@@ -1462,14 +1482,15 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               setPrivacyOption={this.setPrivacyOption}
             />
           ),
-          { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } },
+          // possible problem if scrolling vertically, if so change to `undefined`.
+          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
         );
       }
       //console.log(`Error Reading Wallet ${value} - ${error}`);
       if (toast) {
         this.addLastSnackbar({
           message: `${this.state.translate('loadedapp.readingwallet-error')} ${value.uri}`,
-          screenName: this.screenName,
+          screenName: [this.screenName],
         });
       }
 
@@ -1647,7 +1668,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
-        this.screenName,
+        [this.screenName],
         this.state.translate('loadedapp.changingwallet-label') as string,
         resultStr,
         false,
@@ -1671,7 +1692,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
-        this.screenName,
+        [this.screenName],
         this.state.translate('loadedapp.restoringwallet-label') as string,
         resultStr,
         false,
@@ -1704,7 +1725,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         //console.log(`Error change server ${value} - ${resultStr}`);
         this.addLastSnackbar({
           message: `${this.state.translate('loadedapp.changeservernew-error')} ${resultStrServer}`,
-          screenName: this.screenName,
+          screenName: [this.screenName],
         });
         return;
       } else {
@@ -1738,7 +1759,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
-          this.screenName,
+          [this.screenName],
           this.state.translate('loadedapp.changingwallet-label') as string,
           resultStr2,
           false,
@@ -1756,12 +1777,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
   setSyncReportModalShow = async () => {
     const { colors } = this.props.theme;
-    return magicModal.show(() => <SyncReport />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } }).promise;
+    // possible problem if scrolling vertically, if so change to `undefined`.
+    return magicModal.show(() => <SyncReport />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
   };
 
   setPoolsModalShow = async () => {
     const { colors } = this.props.theme;
-    return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
+    // possible problem if scrolling vertically, if so change to `undefined`.
+    return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } })
       .promise;
   };
 
@@ -1783,8 +1806,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({ snackbars: newSnackbars });
   };
 
-  removeFirstSnackbar = () => {
-    const newSnackbars = this.state.snackbars;
+  removeFirstSnackbar = (screenName: ScreenEnum) => {
+    const newSnackbars = this.state.snackbars.filter((s: SnackbarType) => s.screenName.includes(screenName));
     newSnackbars.shift();
     this.setState({ snackbars: newSnackbars });
   };
@@ -1796,7 +1819,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       addressBookCurrentAddress: address,
     });
-    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: 'right', style: { flex: 1, backgroundColor: colors.background } })
+    // possible problem if scrolling vertically, if so change to `undefined`.
+    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } })
       .promise;
   };
 

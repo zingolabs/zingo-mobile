@@ -109,10 +109,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
       setSyncInProgress(true);
     } else {
       setPercentageOutputsScanned(
-        Number(syncingStatus.percentage_total_outputs_scanned.toFixed(2).replace(/\.?0+$/, '')),
+        Number(syncingStatus.percentage_total_outputs_scanned?.toFixed(2).replace(/\.?0+$/, '')),
       );
       setSyncInProgress(
-        !!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length > 0 && syncingStatus.percentage_total_outputs_scanned < 100
+        !!syncingStatus.scan_ranges &&
+        syncingStatus.scan_ranges.length > 0 &&
+        !!syncingStatus.percentage_total_outputs_scanned &&
+        syncingStatus.percentage_total_outputs_scanned < 100
       );
     }
   }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);

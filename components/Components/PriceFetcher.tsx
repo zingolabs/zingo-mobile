@@ -73,17 +73,17 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
     }
 
     if (price === -1) {
-      addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}`, screenName: screenName });
+      addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}`, screenName: [screenName] });
       setLoading(false);
       return;
     }
     if (price === -2) {
-      addLastSnackbar({ message: `${translate('info.errorrpcmodule')} - ${error}`, screenName: screenName });
+      addLastSnackbar({ message: `${translate('info.errorrpcmodule')} - ${error}`, screenName: [screenName] });
       setLoading(false);
       return;
     }
     if (price <= 0) {
-      addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}`, screenName: screenName });
+      addLastSnackbar({ message: `${translate('info.errorgemini')} - ${error}`, screenName: [screenName] });
       setZecPrice(price, 0);
     } else {
       setZecPrice(price, Date.now());
@@ -117,16 +117,19 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
         <View
           style={{
             flexDirection: 'row',
+            flexWrap: 'wrap',
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: colors.card,
-            borderRadius: 10,
             margin: 0,
+            marginTop: 10,
             padding: 5,
             minWidth: 40,
             minHeight: 40,
+            rowGap: 5,
+            columnGap: 10,
           }}>
-          {textBefore && <RegText style={{ marginRight: 10, color: colors.text }}>{textBefore}</RegText>}
+          {textBefore && <RegText style={{ color: colors.text }}>{textBefore}</RegText>}
           <ActivityIndicator size="small" color={colors.primary} />
         </View>
       )}
@@ -137,19 +140,22 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
           <View
             style={{
               flexDirection: 'row',
+              flexWrap: 'wrap',
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: colors.card,
-              borderRadius: 10,
               margin: 0,
+              marginTop: 10,
               padding: 5,
               minWidth: 40,
               minHeight: 40,
+              rowGap: 5,
+              columnGap: 10,
             }}>
-            {textBefore && <RegText style={{ marginRight: 10, color: colors.text }}>{textBefore}</RegText>}
+            {textBefore && <RegText style={{ color: colors.text }}>{textBefore}</RegText>}
             <FontAwesomeIcon icon={faRefresh} size={20} color={colors.primary} />
             {refreshMinutes > 0 && (
-              <FadeText style={{ marginLeft: 5 }}>
+              <FadeText>
                 {formatMinutes(refreshMinutes) + translate('history.minago')}
               </FadeText>
             )}
