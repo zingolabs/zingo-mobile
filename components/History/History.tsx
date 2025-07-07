@@ -18,7 +18,7 @@ import 'moment/locale/tr';
 
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
+import { faAnglesUp, faAngleUp, faArrowCircleUp, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 
 import {
   ButtonTypeEnum,
@@ -451,17 +451,18 @@ const History: React.FunctionComponent<HistoryProps> = ({
                   position: 'absolute',
                   bottom: 30,
                   right: 10,
-                  paddingHorizontal: 12,
-                  paddingVertical: 16,
+                  paddingHorizontal: 10,
+                  paddingVertical: 15,
                   backgroundColor: colors.sideMenuBackground,
                   borderRadius: 50,
-                  opacity: 0.75,
-                  transform: [{ scale: pressed ? 0.92 : 1 }],
+                  transform: [{ scale: pressed ? 0.9 : 1 }],
+                  borderWidth: 1,
+                  borderColor: colors.zingo,
                 })}>
                 <FontAwesomeIcon
                   style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                  size={25}
-                  icon={faAnglesUp}
+                  size={20}
+                  icon={faAngleUp}
                   color={colors.zingo}
                 />
               </Pressable>
