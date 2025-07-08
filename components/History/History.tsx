@@ -219,7 +219,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         // Double-check position after scroll animation
         if (scrollViewRef.current) {
           const offset = scrollViewRef.current.getCurrentScrollOffset();
-          setIsAtTop(offset <= 20);
+          setIsAtTop(offset <= 100);
         }
       }, 800);
     }
@@ -238,7 +238,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   const handleScroll = useCallback(
     (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
-      const isTop = offsetY <= 20;
+      const isTop = offsetY <= 100;
 
       // If we're scrolling to top and we've reached the top, stop the scrolling state
       if (isScrollingToTop && isTop) {
@@ -249,10 +249,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
         }
       }
 
-      // Only update isAtTop if not currently scrolling to top (to prevent button flickering)
-      if (!isScrollingToTop) {
-        setIsAtTop(isTop);
-      }
+      // Always update isAtTop for manual scrolling
+      setIsAtTop(isTop);
 
       setShowFooter(offsetY > 0);
     },

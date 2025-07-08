@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   ScrollView,
@@ -268,11 +268,22 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
     }
   };
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset } = event.nativeEvent;
-    const isTop = contentOffset.y === 0;
+    const isTop = contentOffset.y <= 100;
+    
+    // Always update isAtTop for manual scrolling
     setIsAtTop(isTop);
-  };
+    
+    // If we're scrolling to top and we've reached the top, stop the scrolling state
+    if (isScrollingToTop && isTop) {
+      setIsScrollingToTop(false);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = null;
+      }
+    }
+  }, [isScrollingToTop]);
 
   const setMessagesAddressModalShow = (c: ContactType) => {
     return magicModal.show(() => <MessagesAddress

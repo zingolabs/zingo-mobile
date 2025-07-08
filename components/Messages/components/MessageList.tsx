@@ -326,7 +326,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
       const isBottom =
-        Math.round(contentOffset.y) >= Math.round(contentSize.height - layoutMeasurement.height - 20) && scrollable;
+        Math.round(contentOffset.y) >= Math.round(contentSize.height - layoutMeasurement.height - 100) && scrollable;
 
       // If we're scrolling to bottom and we've reached the bottom, stop the scrolling state
       if (isScrollingToBottom && isBottom) {
@@ -337,10 +337,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         }
       }
 
-      // Only update isAtBottom if not currently scrolling to bottom
-      if (!isScrollingToBottom) {
-        setIsAtBottom(isBottom);
-      }
+      // Always update isAtBottom for manual scrolling
+      setIsAtBottom(isBottom);
 
       if (isBottom && !firstScrollToBottomDone) {
         setFirstScrollToBottomDone(true);

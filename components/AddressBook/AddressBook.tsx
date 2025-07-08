@@ -205,7 +205,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset } = event.nativeEvent;
-    const isTop = contentOffset.y <= 20;
+    const isTop = contentOffset.y <= 100;
     
     // If we're scrolling to top and we've reached the top, stop the scrolling state
     if (isScrollingToTop && isTop) {
@@ -216,10 +216,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       }
     }
     
-    // Only update isAtTop if not currently scrolling to top
-    if (!isScrollingToTop) {
-      setIsAtTop(isTop);
-    }
+    // Always update isAtTop for manual scrolling
+    setIsAtTop(isTop);
   }, [isScrollingToTop]);
 
   //console.log('render Address Book - 4', currentItem, action, addressBook);
