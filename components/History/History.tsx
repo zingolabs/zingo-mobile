@@ -1,6 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { View, ScrollView, RefreshControl, TouchableOpacity, ActivityIndicator, Dimensions, Platform } from 'react-native';
+import {
+  View,
+  ScrollView,
+  RefreshControl,
+  TouchableOpacity,
+  ActivityIndicator,
+  Dimensions,
+  Platform,
+  Pressable,
+} from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -9,7 +18,7 @@ import 'moment/locale/tr';
 
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
+import { faAnglesUp, faAngleUp, faArrowCircleUp, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 
 import {
   ButtonTypeEnum,
@@ -189,7 +198,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   };
 
   const handleScroll = (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
-    const isTop = offsetY === 0;
+    const isTop = offsetY <= 0;
     setIsAtTop(isTop);
     setShowFooter(true);
   };
@@ -206,7 +215,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
         />
       ),
       // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
+      {
+        swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined,
+        style: { flex: 1, backgroundColor: colors.background },
+      },
     ).promise;
   };
 
@@ -223,7 +235,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
         />
       ),
       // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
+      {
+        swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined,
+        style: { flex: 1, backgroundColor: colors.background },
+      },
     ).promise;
   };
 
@@ -251,11 +266,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   return (
     <ToastProvider>
-      <Snackbars
-        snackbars={snackbars}
-        removeFirstSnackbar={removeFirstSnackbar}
-        screenName={screenName}
-      />
+      <Snackbars snackbars={snackbars} removeFirstSnackbar={removeFirstSnackbar} screenName={screenName} />
 
       <View
         accessible={true}
@@ -430,20 +441,31 @@ const History: React.FunctionComponent<HistoryProps> = ({
                   justifyContent: 'center',
                   marginTop: 30,
                 }}>
-                <FadeText style={{ color: colors.primary }}>
-                  {translate('history.empty') as string}
-                </FadeText>
+                <FadeText style={{ color: colors.primary }}>{translate('history.empty') as string}</FadeText>
               </View>
             )}
             {!isAtTop && (
-              <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 10 }}>
+              <Pressable
+                onPress={handleScrollToTop}
+                style={({ pressed }) => ({
+                  position: 'absolute',
+                  bottom: 30,
+                  right: 10,
+                  paddingHorizontal: 10,
+                  paddingVertical: 15,
+                  backgroundColor: colors.sideMenuBackground,
+                  borderRadius: 50,
+                  transform: [{ scale: pressed ? 0.9 : 1 }],
+                  borderWidth: 1,
+                  borderColor: colors.zingo,
+                })}>
                 <FontAwesomeIcon
                   style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                  size={50}
-                  icon={faAnglesUp}
+                  size={20}
+                  icon={faAngleUp}
                   color={colors.zingo}
                 />
-              </TouchableOpacity>
+              </Pressable>
             )}
           </>
         )}
