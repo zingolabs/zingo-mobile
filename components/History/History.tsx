@@ -18,7 +18,7 @@ import 'moment/locale/tr';
 
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAnglesUp, faAngleUp, faArrowCircleUp, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 import {
   ButtonTypeEnum,
@@ -107,6 +107,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [valueTransfersSliced, setValueTransfersSliced] = useState<ValueTransferType[]>([]);
   const [valueTransfersFiltered, setValueTransfersFiltered] = useState<ValueTransferType[]>([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
+  const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
   const [showFooter, setShowFooter] = useState<boolean>(false);
@@ -180,28 +182,80 @@ const History: React.FunctionComponent<HistoryProps> = ({
     setDataProvider(data => data.cloneWithRows(vtfs));
   }, [numVt, valueTransfersFiltered]);
 
+  const handleScrollToTop = useCallback(() => {
+    if (scrollViewRef.current && !isScrollingToTop) {
+      setIsScrollingToTop(true);
+
+      // Clear any existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
+      // Force set to top immediately for UI feedback
+      setIsAtTop(true);
+
+      // Try multiple scroll methods for reliability
+      try {
+        // Method 1: Use scrollToTop
+        scrollViewRef.current.scrollToTop(true);
+
+        // Method 2: Fallback to scrollToIndex if scrollToTop fails
+        setTimeout(() => {
+          if (scrollViewRef.current) {
+            try {
+              scrollViewRef.current.scrollToIndex(0, true);
+            } catch (e) {
+              console.log('scrollToIndex fallback failed:', e);
+            }
+          }
+        }, 100);
+      } catch (error) {
+        console.log('scrollToTop failed:', error);
+      }
+
+      // Set timeout to reset scrolling state - longer timeout for animation
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsScrollingToTop(false);
+        // Double-check position after scroll animation
+        if (scrollViewRef.current) {
+          const offset = scrollViewRef.current.getCurrentScrollOffset();
+          setIsAtTop(offset <= 100);
+        }
+      }, 800);
+    }
+  }, [isScrollingToTop]);
+
   useEffect(() => {
     if (scrollToTop) {
       handleScrollToTop();
       setScrollToTop(false);
     }
-  }, [scrollToTop, setScrollToTop]);
+  }, [scrollToTop, handleScrollToTop, setScrollToTop]);
 
   const loadMoreClicked = useCallback(() => {
     setNumVt(numVt + 50);
   }, [numVt]);
 
-  const handleScrollToTop = () => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToTop(true);
-    }
-  };
+  const handleScroll = useCallback(
+    (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
+      const isTop = offsetY <= 100;
 
-  const handleScroll = (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
-    const isTop = offsetY <= 0;
-    setIsAtTop(isTop);
-    setShowFooter(true);
-  };
+      // If we're scrolling to top and we've reached the top, stop the scrolling state
+      if (isScrollingToTop && isTop) {
+        setIsScrollingToTop(false);
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+          scrollTimeoutRef.current = null;
+        }
+      }
+
+      // Always update isAtTop for manual scrolling
+      setIsAtTop(isTop);
+
+      setShowFooter(offsetY > 0);
+    },
+    [isScrollingToTop],
+  );
 
   const setValueTransferDetailModalShow = (index: number, vt: ValueTransferType) => {
     return magicModal.show(
@@ -447,17 +501,19 @@ const History: React.FunctionComponent<HistoryProps> = ({
             {!isAtTop && (
               <Pressable
                 onPress={handleScrollToTop}
+                disabled={isScrollingToTop}
                 style={({ pressed }) => ({
                   position: 'absolute',
                   bottom: 30,
                   right: 10,
-                  paddingHorizontal: 10,
-                  paddingVertical: 15,
-                  backgroundColor: colors.sideMenuBackground,
+                  paddingHorizontal: 5,
+                  paddingVertical: 10,
+                  backgroundColor: isScrollingToTop ? colors.primaryDisabled : colors.sideMenuBackground,
                   borderRadius: 50,
                   transform: [{ scale: pressed ? 0.9 : 1 }],
                   borderWidth: 1,
-                  borderColor: colors.zingo,
+                  borderColor: isScrollingToTop ? colors.primaryDisabled : colors.zingo,
+                  opacity: isScrollingToTop ? 0.5 : 1,
                 })}>
                 <FontAwesomeIcon
                   style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
