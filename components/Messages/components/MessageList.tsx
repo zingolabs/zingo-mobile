@@ -16,6 +16,7 @@ import {
   KeyboardAvoidingView,
   TextInputEndEditingEventData,
   TextInputContentSizeChangeEventData,
+  Pressable,
 } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -769,10 +770,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               <View style={{ marginBottom: 10 }} />
             </ScrollView>
             {!isAtBottom && scrollable && !loading && firstScrollToBottomDone && (
-              <TouchableOpacity
+              <Pressable
                 onPress={handleScrollToBottom}
                 disabled={isScrollingToBottom}
-                style={{
+                style={({ pressed }) => ({
                   position: 'absolute',
                   bottom: 30,
                   right: 10,
@@ -780,17 +781,18 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   paddingVertical: 10,
                   backgroundColor: colors.sideMenuBackground,
                   borderRadius: 50,
+                  transform: [{ scale: pressed ? 0.9 : 1 }],
                   borderWidth: 1,
                   borderColor: colors.zingo,
                   opacity: isScrollingToBottom ? 0.5 : 1,
-                }}>
+                })}>
                 <FontAwesomeIcon
                   style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
                   size={20}
                   icon={faAngleDown}
                   color={colors.zingo}
                 />
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
           {!loading && firstScrollToBottomDone && address && selectServer !== SelectServerEnum.offline && (

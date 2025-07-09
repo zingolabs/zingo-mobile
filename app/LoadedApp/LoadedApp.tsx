@@ -1931,7 +1931,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           !!totalBalance &&
           (
             (totalBalance.totalOrchardBalance > 0 && totalBalance.confirmedOrchardBalance === 0) ||
-            (totalBalance.totalSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === 0)
+            (totalBalance.totalSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === 0) ||
+            (totalBalance.totalTransparentBalance > 0 && totalBalance.confirmedTransparentBalance === 0)
           ) &&
           somePending
         ) {
