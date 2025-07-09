@@ -22,7 +22,7 @@ import 'moment/locale/tr';
 
 import { useScrollToTop, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAnglesUp, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import {
   AddressBookFileClass,
@@ -637,7 +637,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 <FontAwesomeIcon
                   style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
                   size={20}
-                  icon={faAnglesUp}
+                  icon={faAngleUp}
                   color={colors.zingo}
                 />
               </TouchableOpacity>
