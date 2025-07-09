@@ -183,8 +183,8 @@ extension AppDelegate {
             // stop the sync process, can't wait to check if the process is over.
             // have no time here
             self.syncWorkItem?.cancel()
-            let stopStr = stopSync()
-            NSLog("BGTask startBackgroundTask - expirationHandler stop syncing: \(stopStr)")
+            //let stopStr = stopSync()
+            //NSLog("BGTask startBackgroundTask - expirationHandler stop syncing: \(stopStr)")
             
             let rpcmodule = RPCModule()
 

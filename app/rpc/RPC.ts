@@ -453,17 +453,6 @@ export default class RPC {
 
   //sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
-  // this is not used for now...
-  async stopSyncProcess(): Promise<void> {
-    let returnStop: string = await RPCModule.stopSyncProcess();
-    if (!returnStop || returnStop.toLowerCase().startsWith(GlobalConst.error)) {
-      console.log('SYNC STOP ERROR', returnStop);
-      return;
-    } else {
-      console.log('stop sync process. STOPPED', returnStop);
-    }
-  }
-
   async pauseSyncProcess(): Promise<void> {
     let returnPause: string = await RPCModule.pauseSyncProcess();
     if (!returnPause || returnPause.toLowerCase().startsWith(GlobalConst.error)) {

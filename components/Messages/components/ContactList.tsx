@@ -271,10 +271,10 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset } = event.nativeEvent;
     const isTop = contentOffset.y <= 100;
-    
+
     // Always update isAtTop for manual scrolling
     setIsAtTop(isTop);
-    
+
     // If we're scrolling to top and we've reached the top, stop the scrolling state
     if (isScrollingToTop && isTop) {
       setIsScrollingToTop(false);
@@ -619,12 +619,12 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               )}
             </ScrollView>
             {!isAtTop && (
-              <TouchableOpacity 
-                onPress={handleScrollToTop} 
+              <TouchableOpacity
+                onPress={handleScrollToTop}
                 disabled={isScrollingToTop}
-                style={{ 
-                  position: 'absolute', 
-                  bottom: 30, 
+                style={{
+                  position: 'absolute',
+                  bottom: 30,
                   right: 10,
                   paddingHorizontal: 5,
                   paddingVertical: 10,

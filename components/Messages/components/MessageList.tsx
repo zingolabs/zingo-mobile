@@ -26,7 +26,6 @@ import 'moment/locale/tr';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
-  faAnglesDown,
   faCircleUser,
   faXmark,
   faMagnifyingGlassPlus,
