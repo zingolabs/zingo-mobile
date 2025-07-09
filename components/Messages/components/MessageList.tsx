@@ -778,10 +778,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   right: 10,
                   paddingHorizontal: 5,
                   paddingVertical: 10,
-                  backgroundColor: isScrollingToBottom ? colors.primaryDisabled : colors.sideMenuBackground,
+                  backgroundColor: colors.sideMenuBackground,
                   borderRadius: 50,
                   borderWidth: 1,
-                  borderColor: isScrollingToBottom ? colors.primaryDisabled : colors.zingo,
+                  borderColor: colors.zingo,
                   opacity: isScrollingToBottom ? 0.5 : 1,
                 }}>
                 <FontAwesomeIcon

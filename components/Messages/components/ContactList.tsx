@@ -628,10 +628,10 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                   right: 10,
                   paddingHorizontal: 5,
                   paddingVertical: 10,
-                  backgroundColor: isScrollingToTop ? colors.primaryDisabled : colors.sideMenuBackground,
+                  backgroundColor: colors.sideMenuBackground,
                   borderRadius: 50,
                   borderWidth: 1,
-                  borderColor: isScrollingToTop ? colors.primaryDisabled : colors.zingo,
+                  borderColor: colors.zingo,
                   opacity: isScrollingToTop ? 0.5 : 1,
                 }}>
                 <FontAwesomeIcon
