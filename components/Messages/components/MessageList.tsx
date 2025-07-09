@@ -26,7 +26,6 @@ import 'moment/locale/tr';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
-  faAnglesDown,
   faCircleUser,
   faXmark,
   faMagnifyingGlassPlus,
@@ -779,10 +778,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                   right: 10,
                   paddingHorizontal: 5,
                   paddingVertical: 10,
-                  backgroundColor: isScrollingToBottom ? colors.primaryDisabled : colors.sideMenuBackground,
+                  backgroundColor: colors.sideMenuBackground,
                   borderRadius: 50,
                   borderWidth: 1,
-                  borderColor: isScrollingToBottom ? colors.primaryDisabled : colors.zingo,
+                  borderColor: colors.zingo,
                   opacity: isScrollingToBottom ? 0.5 : 1,
                 }}>
                 <FontAwesomeIcon

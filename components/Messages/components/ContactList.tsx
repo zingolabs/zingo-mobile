@@ -22,7 +22,7 @@ import 'moment/locale/tr';
 
 import { useScrollToTop, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAnglesUp, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import {
   AddressBookFileClass,
@@ -271,10 +271,10 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset } = event.nativeEvent;
     const isTop = contentOffset.y <= 100;
-    
+
     // Always update isAtTop for manual scrolling
     setIsAtTop(isTop);
-    
+
     // If we're scrolling to top and we've reached the top, stop the scrolling state
     if (isScrollingToTop && isTop) {
       setIsScrollingToTop(false);
@@ -619,25 +619,25 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               )}
             </ScrollView>
             {!isAtTop && (
-              <TouchableOpacity 
-                onPress={handleScrollToTop} 
+              <TouchableOpacity
+                onPress={handleScrollToTop}
                 disabled={isScrollingToTop}
-                style={{ 
-                  position: 'absolute', 
-                  bottom: 30, 
+                style={{
+                  position: 'absolute',
+                  bottom: 30,
                   right: 10,
                   paddingHorizontal: 5,
                   paddingVertical: 10,
-                  backgroundColor: isScrollingToTop ? colors.primaryDisabled : colors.sideMenuBackground,
+                  backgroundColor: colors.sideMenuBackground,
                   borderRadius: 50,
                   borderWidth: 1,
-                  borderColor: isScrollingToTop ? colors.primaryDisabled : colors.zingo,
+                  borderColor: colors.zingo,
                   opacity: isScrollingToTop ? 0.5 : 1,
                 }}>
                 <FontAwesomeIcon
                   style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
                   size={20}
-                  icon={faAnglesUp}
+                  icon={faAngleUp}
                   color={colors.zingo}
                 />
               </TouchableOpacity>

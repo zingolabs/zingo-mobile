@@ -24,7 +24,7 @@ import AlSummaryLine from './components/AlSummaryLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -94,18 +94,18 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
   const handleScrollToTop = useCallback(() => {
     if (scrollViewRef.current && !isScrollingToTop) {
       setIsScrollingToTop(true);
-      
+
       // Clear any existing timeout
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
       }
-      
+
       // Force set to top immediately for UI feedback
       setIsAtTop(true);
-      
+
       // Scroll to top
       scrollViewRef.current.scrollTo({ y: 0, animated: true });
-      
+
       // Set timeout to reset scrolling state
       scrollTimeoutRef.current = setTimeout(() => {
         setIsScrollingToTop(false);
@@ -120,7 +120,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset } = event.nativeEvent;
     const isTop = contentOffset.y <= 100;
-    
+
     // If we're scrolling to top and we've reached the top, stop the scrolling state
     if (isScrollingToTop && isTop) {
       setIsScrollingToTop(false);
@@ -129,7 +129,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
         scrollTimeoutRef.current = null;
       }
     }
-    
+
     // Always update isAtTop for manual scrolling
     setIsAtTop(isTop);
   }, [isScrollingToTop]);
@@ -250,25 +250,25 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
           )}
         </ScrollView>
         {!isAtTop && (
-          <TouchableOpacity 
-            onPress={handleScrollToTop} 
+          <TouchableOpacity
+            onPress={handleScrollToTop}
             disabled={isScrollingToTop}
-            style={{ 
-              position: 'absolute', 
-              bottom: 105, 
+            style={{
+              position: 'absolute',
+              bottom: 105,
               right: 10,
               paddingHorizontal: 5,
               paddingVertical: 10,
-              backgroundColor: isScrollingToTop ? colors.primaryDisabled : colors.sideMenuBackground,
+              backgroundColor: colors.sideMenuBackground,
               borderRadius: 50,
               borderWidth: 1,
-              borderColor: isScrollingToTop ? colors.primaryDisabled : colors.zingo,
+              borderColor: colors.zingo,
               opacity: isScrollingToTop ? 0.5 : 1,
             }}>
             <FontAwesomeIcon
               style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
               size={20}
-              icon={faAnglesUp}
+              icon={faAngleUp}
               color={colors.zingo}
             />
           </TouchableOpacity>
