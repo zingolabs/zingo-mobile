@@ -179,6 +179,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
             value={label}
             onChangeText={(text: string) => setLabel(text)}
             editable={action !== AddressBookActionEnum.Delete}
+            maxLength={50}
           />
         </View>
       </View>

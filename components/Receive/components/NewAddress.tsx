@@ -170,6 +170,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, clo
               placeholderTextColor={colors.placeholder}
               value={label}
               onChangeText={(text: string) => setLabel(text)}
+              maxLength={50}
             />
           </View>
         </View>
