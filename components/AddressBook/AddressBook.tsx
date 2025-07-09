@@ -69,6 +69,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const [currentItem, setCurrentItem] = useState<number | null>(null);
   const [action, setAction] = useState<AddressBookActionEnum | null>(null);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
+  const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
 
@@ -175,17 +177,48 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     cancel();
   };
 
-  const handleScrollToTop = () => {
-    if (scrollViewRef.current) {
+  const handleScrollToTop = useCallback(() => {
+    if (scrollViewRef.current && !isScrollingToTop) {
+      setIsScrollingToTop(true);
+      
+      // Clear any existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      
+      // Force set to top immediately for UI feedback
+      setIsAtTop(true);
+      
+      // Scroll to top
       scrollViewRef.current.scrollTo({ y: 0, animated: true });
+      
+      // Set timeout to reset scrolling state
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsScrollingToTop(false);
+        // Double-check position after scroll animation
+        if (scrollViewRef.current) {
+          setIsAtTop(true); // For ScrollView, assume success
+        }
+      }, 800);
     }
-  };
+  }, [isScrollingToTop]);
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset } = event.nativeEvent;
-    const isTop = contentOffset.y === 0;
+    const isTop = contentOffset.y <= 100;
+    
+    // If we're scrolling to top and we've reached the top, stop the scrolling state
+    if (isScrollingToTop && isTop) {
+      setIsScrollingToTop(false);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = null;
+      }
+    }
+    
+    // Always update isAtTop for manual scrolling
     setIsAtTop(isTop);
-  };
+  }, [isScrollingToTop]);
 
   //console.log('render Address Book - 4', currentItem, action, addressBook);
 
@@ -453,10 +486,24 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           )}
         </ScrollView>
         {!isAtTop && (
-          <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 105, right: 10 }}>
+          <TouchableOpacity 
+            onPress={handleScrollToTop} 
+            disabled={isScrollingToTop}
+            style={{ 
+              position: 'absolute', 
+              bottom: 105, 
+              right: 10,
+              paddingHorizontal: 5,
+              paddingVertical: 10,
+              backgroundColor: isScrollingToTop ? colors.primaryDisabled : colors.sideMenuBackground,
+              borderRadius: 50,
+              borderWidth: 1,
+              borderColor: isScrollingToTop ? colors.primaryDisabled : colors.zingo,
+              opacity: isScrollingToTop ? 0.5 : 1,
+            }}>
             <FontAwesomeIcon
               style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-              size={50}
+              size={20}
               icon={faAnglesUp}
               color={colors.zingo}
             />

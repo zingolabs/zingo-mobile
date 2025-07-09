@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   ScrollView,
@@ -89,6 +89,8 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
 
   const [contacts, setContacts] = useState<ContactType[]>([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
+  const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
   const [searchMode, setSearchMode] = useState<boolean>(false);
@@ -266,11 +268,22 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
     }
   };
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset } = event.nativeEvent;
-    const isTop = contentOffset.y === 0;
+    const isTop = contentOffset.y <= 100;
+    
+    // Always update isAtTop for manual scrolling
     setIsAtTop(isTop);
-  };
+    
+    // If we're scrolling to top and we've reached the top, stop the scrolling state
+    if (isScrollingToTop && isTop) {
+      setIsScrollingToTop(false);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = null;
+      }
+    }
+  }, [isScrollingToTop]);
 
   const setMessagesAddressModalShow = (c: ContactType) => {
     return magicModal.show(() => <MessagesAddress
@@ -606,10 +619,24 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               )}
             </ScrollView>
             {!isAtTop && (
-              <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 10 }}>
+              <TouchableOpacity 
+                onPress={handleScrollToTop} 
+                disabled={isScrollingToTop}
+                style={{ 
+                  position: 'absolute', 
+                  bottom: 30, 
+                  right: 10,
+                  paddingHorizontal: 5,
+                  paddingVertical: 10,
+                  backgroundColor: isScrollingToTop ? colors.primaryDisabled : colors.sideMenuBackground,
+                  borderRadius: 50,
+                  borderWidth: 1,
+                  borderColor: isScrollingToTop ? colors.primaryDisabled : colors.zingo,
+                  opacity: isScrollingToTop ? 0.5 : 1,
+                }}>
                 <FontAwesomeIcon
                   style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                  size={50}
+                  size={20}
                   icon={faAnglesUp}
                   color={colors.zingo}
                 />
