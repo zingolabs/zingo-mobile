@@ -54,6 +54,7 @@ exports[`Component Address Book Details - test Address Book Datails - Add - snap
     >
       <TextInput
         editable={true}
+        maxLength={50}
         onChangeText={[Function]}
         placeholder="text translated"
         placeholderTextColor="#888888"
@@ -452,6 +453,7 @@ exports[`Component Address Book Details - test Address Book Datails - Delete - s
     >
       <TextInput
         editable={false}
+        maxLength={50}
         onChangeText={[Function]}
         placeholder="text translated"
         placeholderTextColor="#888888"
@@ -852,6 +854,7 @@ exports[`Component Address Book Details - test Address Book Datails - Modify - s
     >
       <TextInput
         editable={true}
+        maxLength={50}
         onChangeText={[Function]}
         placeholder="text translated"
         placeholderTextColor="#888888"
