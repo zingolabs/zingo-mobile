@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.0 (255)",
+  "version": "zingo-2.0.0 (256)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -643,7 +643,8 @@
     "resend-alert": "Confirme para reenviar esta transação novamente.",
     "remove-alert": "Confirme para remover a transação com falha do dispositivo e restaurar o saldo",
     "remove-legend": "Remover transação para restaurar o saldo",
-    "expired": "Expirada - Remover para restaurar o saldo"
+    "expired": "Expirada - Remover para restaurar o saldo",
+    "waiting": "Fundos aguardando as confirmações mínimas"
   },
   "report": {
     "title": "Relatório de Sincronização / Rescan",

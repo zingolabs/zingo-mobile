@@ -368,29 +368,29 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
               borderColor: colors.border,
             }}>
             <BoldText style={{ textAlign: 'center', textTransform: 'capitalize', color: spendColor }}>
-              {valueTransfer.kind === ValueTransferKindEnum.Sent && valueTransfer.confirmations < GlobalConst.minConfirmations
+              {valueTransfer.kind === ValueTransferKindEnum.Sent && valueTransfer.confirmations === 0
                 ? (translate('history.sending') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Sent && valueTransfer.confirmations >= GlobalConst.minConfirmations
+                : valueTransfer.kind === ValueTransferKindEnum.Sent && valueTransfer.confirmations > 0
                 ? (translate('history.sent') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Received && valueTransfer.confirmations < GlobalConst.minConfirmations
+                : valueTransfer.kind === ValueTransferKindEnum.Received && valueTransfer.confirmations === 0
                 ? (translate('history.receiving') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Received && valueTransfer.confirmations >= GlobalConst.minConfirmations
+                : valueTransfer.kind === ValueTransferKindEnum.Received && valueTransfer.confirmations > 0
                 ? (translate('history.received') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.MemoToSelf && valueTransfer.confirmations < GlobalConst.minConfirmations
+                : valueTransfer.kind === ValueTransferKindEnum.MemoToSelf && valueTransfer.confirmations === 0
                 ? (translate('history.sendingtoself') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.MemoToSelf && valueTransfer.confirmations >= GlobalConst.minConfirmations
+                : valueTransfer.kind === ValueTransferKindEnum.MemoToSelf && valueTransfer.confirmations > 0
                 ? (translate('history.memotoself') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.SendToSelf && valueTransfer.confirmations < GlobalConst.minConfirmations
+                : valueTransfer.kind === ValueTransferKindEnum.SendToSelf && valueTransfer.confirmations === 0
                 ? (translate('history.sendingtoself') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.SendToSelf && valueTransfer.confirmations >= GlobalConst.minConfirmations
+                : valueTransfer.kind === ValueTransferKindEnum.SendToSelf && valueTransfer.confirmations > 0
                 ? (translate('history.sendtoself') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Shield && valueTransfer.confirmations < GlobalConst.minConfirmations
+                : valueTransfer.kind === ValueTransferKindEnum.Shield && valueTransfer.confirmations === 0
                 ? (translate('history.shielding') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Shield && valueTransfer.confirmations >= GlobalConst.minConfirmations
+                : valueTransfer.kind === ValueTransferKindEnum.Shield && valueTransfer.confirmations > 0
                 ? (translate('history.shield') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Rejection && valueTransfer.confirmations < GlobalConst.minConfirmations
+                : valueTransfer.kind === ValueTransferKindEnum.Rejection && valueTransfer.confirmations === 0
                 ? (translate('history.sending') as string)
-                : valueTransfer.kind === ValueTransferKindEnum.Rejection && valueTransfer.confirmations >= GlobalConst.minConfirmations
+                : valueTransfer.kind === ValueTransferKindEnum.Rejection && valueTransfer.confirmations > 0
                 ? (translate('history.rejection') as string)
                 : ''}
             </BoldText>
@@ -497,6 +497,20 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                         : 'none',
                   }}>
                   {(translate(`history.${valueTransfer.status}`) as string) + ' - ' + (translate('history.not-confirmed') as string)}
+                </FadeText>
+              )}
+              {valueTransfer.status === RPCValueTransfersStatusEnum.confirmed &&
+                valueTransfer.confirmations < GlobalConst.minConfirmations && (
+                <FadeText
+                  style={{
+                    color: colors.primaryDisabled,
+                    fontSize: 12,
+                    opacity: 1,
+                    fontWeight: '700',
+                    textAlign: 'left',
+                    textDecorationLine: 'none',
+                  }}>
+                  {(translate(`history.${valueTransfer.status}`) as string) + ' - ' + (translate('history.waiting') as string)}
                 </FadeText>
               )}
             </View>
