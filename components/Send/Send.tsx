@@ -217,12 +217,12 @@ const Send: React.FunctionComponent<SendProps> = ({
       (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
         ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
         : 0);
-    if (max >= 0) {
-      // if max is 0 then the user can send a memo with amount 0.
+    if (max > 0) {
+      // if max have to be more than 0, then the user can send a memo with amount 0 & some fee.
       setMaxAmount(max);
       setNegativeMaxAmount(false);
     } else {
-      // if max is less than 0 then the user CANNOT send anything.
+      // if max is 0 or less than 0 then the user CANNOT send anything  because of the fee
       setMaxAmount(0);
       setNegativeMaxAmount(true);
     }
@@ -289,6 +289,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         JSON.stringify(command === CommandEnum.send ? sendJson : sendallJson),
         command,
       );
+      //Alert.alert('Calculating the FEE ' + command, runProposeStr);
       if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
         console.log(runProposeStr);
@@ -297,14 +298,10 @@ const Send: React.FunctionComponent<SendProps> = ({
       } else {
         try {
           let runProposeJson: RPCSendProposeType & RPCSendallProposeType;
-          if (command === CommandEnum.send) {
-            runProposeJson = await JSON.parse(runProposeStr);
-          } else {
-            runProposeJson = await JSON.parse(runProposeStr);
-          }
+          runProposeJson = await JSON.parse(runProposeStr);
           if (runProposeJson.error) {
             // snack with error
-            console.log(runProposeJson.error);
+            console.log('SEND error', runProposeJson.error);
             setProposeSendLastError(runProposeJson.error);
             //Alert.alert('Calculating the FEE', runProposeJson.error);
           } else {
@@ -383,22 +380,15 @@ const Send: React.FunctionComponent<SendProps> = ({
       // max amount
       // don't need to substract the donation here.
       const max = spendableBalance;
-      if (max >= 0) {
-        // if max is 0 then the user can send a memo with amount 0.
+      if (max > 0) {
+        // if max have to be more than 0, then the user can send a memo with amount 0 & some fee.
         setMaxAmount(max);
         setNegativeMaxAmount(false);
-        //if (sendAllClick) {
-        //  updateToField(null, Utils.parseNumberFloatToStringLocale(max, 8), null, null, null);
-        //}
       } else {
-        // if max is less than 0 then the user CANNOT send anything.
+        // if max is 0 or less than 0 then the user CANNOT send anything  because of the fee
         setMaxAmount(0);
         setNegativeMaxAmount(true);
-        //if (sendAllClick) {
-        //  updateToField(null, '0', null, null, null);
-        //}
       }
-      //setSendAllClick(false);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -617,9 +607,10 @@ const Send: React.FunctionComponent<SendProps> = ({
         validAmount === 1 &&
         validMemo !== -1 &&
         fee > 0 &&
+        maxAmount > 0 &&
         !(!memoEnabled && Utils.parseStringLocaleToNumberFloat(amountText) === 0),
     );
-  }, [memoEnabled, amountText, validAddress, validAmount, validMemo, fee]);
+  }, [memoEnabled, amountText, validAddress, validAmount, validMemo, fee, maxAmount]);
 
   useEffect(() => {
     (async () => {
@@ -1187,7 +1178,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           addressText,
                           memoText,
                           includeUAMemoBoolean,
-                          CommandEnum.sendall,
+                          CommandEnum.send,
                         );
                         //setSendAllClick(true);
                         //setTimeout(() => {
@@ -1356,7 +1347,8 @@ const Send: React.FunctionComponent<SendProps> = ({
                         <FadeText>{')'}</FadeText>
                       </View>
                     )}
-                    {validAddress !== 0 && validAmount !== 0 && (
+                    {validAddress !== 0 && validAmount !== 0 &&
+                    (fee > 0 || proposeSendLastError) && (
                       <View
                         style={{
                           display: 'flex',
