@@ -2179,7 +2179,21 @@ exports[`Component Send - test Send no currency, privacy normal & mode basic - s
                     }
                     testID="undefined.big-part"
                   >
-                     0.5000
+                     0.6234
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "#c3c3c3",
+                        "fontSize": 25.2,
+                        "margin": 0,
+                        "marginBottom": 2.4,
+                        "padding": 0,
+                      }
+                    }
+                    testID="undefined.small-part"
+                  >
+                    5678
                   </Text>
                 </View>
               </View>

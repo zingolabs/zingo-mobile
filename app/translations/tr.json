@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.0 (254)",
+  "version": "zingo-2.0.0 (256)",
   "loading": "Yükleniyor...",
   "connectingserver": "Sunucuya bağlanılıyor...",
   "wait": "Lütfen bekleyin...",
@@ -643,7 +643,8 @@
     "resend-alert": "Bu işlemi yeniden göndermeyi onaylayın",
     "remove-alert": "Başarısız işlemi cihazdan kaldırmak ve bakiyeyi geri yüklemek için onaylayın",
     "remove-legend": "Bakiyeyi geri yüklemek için işlemi kaldırın",
-    "expired": "Süresi doldu - Bakiyeyi geri yüklemek için kaldırın"
+    "expired": "Süresi doldu - Bakiyeyi geri yüklemek için kaldırın",
+    "waiting": "Fonlar minimum onay bekliyor"
   },
   "report": {
     "title": "Senkronizasyon / Yeniden Tarama Raporu",

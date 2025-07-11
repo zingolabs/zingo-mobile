@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.0 (254)",
+  "version": "zingo-2.0.0 (256)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
@@ -643,7 +643,8 @@
     "resend-alert": "Confirm to Resend this transaction again.",
     "remove-alert": "Confirm to remove failed transaction from device and restore balance",
     "remove-legend": "Remove transaction to restore balance",
-    "expired": "Expired - Remove to restore balance"
+    "expired": "Expired - Remove to restore balance",
+    "waiting": "Funds waiting for the minimum confirmations"
   },
   "report": {
     "title": "Sync / Rescan Report",

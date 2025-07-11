@@ -5,8 +5,8 @@ import {
   ScrollView,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  TouchableOpacity,
   ActivityIndicator,
+  Pressable,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -250,10 +250,10 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
           )}
         </ScrollView>
         {!isAtTop && (
-          <TouchableOpacity
+          <Pressable
             onPress={handleScrollToTop}
             disabled={isScrollingToTop}
-            style={{
+            style={({ pressed }) => ({
               position: 'absolute',
               bottom: 105,
               right: 10,
@@ -261,17 +261,18 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
               paddingVertical: 10,
               backgroundColor: colors.sideMenuBackground,
               borderRadius: 50,
+              transform: [{ scale: pressed ? 0.9 : 1 }],
               borderWidth: 1,
               borderColor: colors.zingo,
               opacity: isScrollingToTop ? 0.5 : 1,
-            }}>
+            })}>
             <FontAwesomeIcon
               style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
               size={20}
               icon={faAngleUp}
               color={colors.zingo}
             />
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
     </ToastProvider>

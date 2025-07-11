@@ -327,29 +327,29 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                       color: amountColor,
                       fontSize: vt.confirmations < GlobalConst.minConfirmations ? 14 : 18,
                     }}>
-                    {vt.kind === ValueTransferKindEnum.Sent && vt.confirmations < GlobalConst.minConfirmations
+                    {vt.kind === ValueTransferKindEnum.Sent && vt.confirmations === 0
                       ? (translate('history.sending') as string)
-                      : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations >= GlobalConst.minConfirmations
+                      : vt.kind === ValueTransferKindEnum.Sent && vt.confirmations > 0
                       ? (translate('history.sent') as string)
-                      : vt.kind === ValueTransferKindEnum.Received && vt.confirmations < GlobalConst.minConfirmations
+                      : vt.kind === ValueTransferKindEnum.Received && vt.confirmations === 0
                       ? (translate('history.receiving') as string)
-                      : vt.kind === ValueTransferKindEnum.Received && vt.confirmations >= GlobalConst.minConfirmations
+                      : vt.kind === ValueTransferKindEnum.Received && vt.confirmations > 0
                       ? (translate('history.received') as string)
-                      : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations < GlobalConst.minConfirmations
+                      : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations === 0
                       ? (translate('history.sendingtoself') as string)
-                      : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations >= GlobalConst.minConfirmations
+                      : vt.kind === ValueTransferKindEnum.MemoToSelf && vt.confirmations > 0
                       ? (translate('history.memotoself') as string)
-                      : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations < GlobalConst.minConfirmations
+                      : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations === 0
                       ? (translate('history.sendingtoself') as string)
-                      : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations >= GlobalConst.minConfirmations
+                      : vt.kind === ValueTransferKindEnum.SendToSelf && vt.confirmations > 0
                       ? (translate('history.sendtoself') as string)
-                      : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations < GlobalConst.minConfirmations
+                      : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations === 0
                       ? (translate('history.shielding') as string)
-                      : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations >= GlobalConst.minConfirmations
+                      : vt.kind === ValueTransferKindEnum.Shield && vt.confirmations > 0
                       ? (translate('history.shield') as string)
-                      : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations < GlobalConst.minConfirmations
+                      : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations === 0
                       ? (translate('history.sending') as string)
-                      : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations >= GlobalConst.minConfirmations
+                      : vt.kind === ValueTransferKindEnum.Rejection && vt.confirmations > 0
                       ? (translate('history.rejection') as string)
                       : ''}
                   </FadeText>
@@ -375,7 +375,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 privacy={privacy}
               />
             </View>
-            {vt.confirmations < GlobalConst.minConfirmations && (
+            {vt.confirmations === 0 && (
               <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 {(vt.status === RPCValueTransfersStatusEnum.transmitted ||
                   vt.status === RPCValueTransfersStatusEnum.calculated) && (

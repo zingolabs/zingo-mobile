@@ -938,7 +938,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.state.valueTransfersTotal !== null &&
         this.state.valueTransfersTotal > 0 &&
         this.state.valueTransfers
-          .filter((vtOld: ValueTransferType) => vtOld.confirmations < GlobalConst.minConfirmations)
+          .filter((vtOld: ValueTransferType) => vtOld.confirmations === 0) // not confirmed
           .forEach((vtOld: ValueTransferType) => {
             const vtNew = valueTransfers.filter(
               (vt: ValueTransferType) =>
@@ -946,8 +946,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             );
             //console.log('old', vtOld);
             //console.log('new', vtNew);
-            // the ValueTransfer is confirmed
-            if (vtNew.length > 0 && vtNew[0].confirmations >= GlobalConst.minConfirmations) {
+            // the ValueTransfer is confirmed when the confirmations are > 0
+            if (vtNew.length > 0 && vtNew[0].confirmations > 0) {
               let message: string = '';
               let title: string = '';
               if (vtNew[0].kind === ValueTransferKindEnum.Received && vtNew[0].amount > 0) {
@@ -1026,17 +1026,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               }
             }
             // the ValueTransfer is gone -> Likely Reverted by the server
-            if (vtNew.length === 0) {
-              createAlert(
-                this.setBackgroundError,
-                this.addLastSnackbar,
-                [this.screenName],
-                this.state.translate('loadedapp.send-menu') as string,
-                this.state.translate('loadedapp.valuetransfer-reverted') as string,
-                true,
-                this.state.translate,
-              );
-            }
+            // this is really confusing...
+            //if (vtNew.length === 0) {
+            //  createAlert(
+            //    this.setBackgroundError,
+            //    this.addLastSnackbar,
+            //    [this.screenName],
+            //    this.state.translate('loadedapp.send-menu') as string,
+            //    this.state.translate('loadedapp.valuetransfer-reverted') as string,
+            //    true,
+            //    this.state.translate,
+            //  );
+            //}
           });
       // if some tx is confirmed the UI needs some time to
       // acomodate the bottom tabs.
@@ -1931,7 +1932,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           !!totalBalance &&
           (
             (totalBalance.totalOrchardBalance > 0 && totalBalance.confirmedOrchardBalance === 0) ||
-            (totalBalance.totalSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === 0)
+            (totalBalance.totalSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === 0) ||
+            (totalBalance.totalTransparentBalance > 0 && totalBalance.confirmedTransparentBalance === 0)
           ) &&
           somePending
         ) {
