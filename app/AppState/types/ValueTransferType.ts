@@ -7,6 +7,7 @@ export default interface ValueTransferType {
   kind: ValueTransferKindEnum;
   fee?: number;
   confirmations: number;
+  blockheight: number;
   time: number;
   zecPrice?: number;
   address?: string;

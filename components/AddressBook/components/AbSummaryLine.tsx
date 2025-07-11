@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { View, TouchableOpacity, Alert } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAddressCard, faQrcode, faTrashCan, faPencil, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faAddressCard, faQrcode, faTrashCan, faPencil, faPaperPlane, faWallet } from '@fortawesome/free-solid-svg-icons';
 
 import FadeText from '../../Components/FadeText';
 import {
@@ -22,6 +22,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 
 type AbSummaryLineProps = {
   index: number;
@@ -33,7 +34,6 @@ type AbSummaryLineProps = {
     action: AddressBookActionEnum,
     label: string,
     address: string,
-    uOrchardAddress: string,
     color: string,
   ) => void;
   addressProtected?: boolean;
@@ -52,12 +52,12 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
-  const displayAddress = item.address ? Utils.trimToSmall(item.address, 7) : 'Unknown';
-  const displayContact = item.label
+  const displayAddress: string = item.address ? Utils.trimToSmall(item.address, 7) : (translate('info.unknown') as string);
+  const displayContact: string = item.label
     ? item.label.length > 20
       ? Utils.trimToSmall(item.label, 8)
       : item.label
-    : 'Unknown';
+    : (translate('info.unknown') as string);
 
   const onPressDelete = () => {
     Alert.alert(
@@ -71,7 +71,6 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
               AddressBookActionEnum.Delete,
               item.label,
               item.address,
-              item.uOrchardAddress ? item.uOrchardAddress : '',
               item.color ? item.color : '',
             ),
         },
@@ -108,8 +107,8 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
               <FontAwesomeIcon
                 style={{ marginHorizontal: 10 }}
                 size={24}
-                icon={faAddressCard}
-                color={addressProtected ? colors.zingo : item.color ? item.color : colors.primarydisabled}
+                icon={item.own ? faWallet : faAddressCard}
+                color={addressProtected || item.own ? colors.zingo : item.color ? item.color : colors.primarydisabled}
               />
               <FadeText
                 style={{
@@ -149,7 +148,8 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           !(
             mode === ModeEnum.basic &&
             totalBalance &&
-            totalBalance.spendableOrchard + totalBalance.spendablePrivate <= 0
+            // because the action is related with `send`.
+            totalBalance.totalSpendableBalance <= 0
           ) && (
             <View style={{ width: 50, justifyContent: 'center', alignItems: 'center' }}>
               <TouchableOpacity

@@ -10,7 +10,7 @@ seednode.link is set to automatically track, or "host" any publicly facing Radic
 In brief, this means...
 * Installing Radicle or using provided binaries (currently updated every few days at https://files.radicle.xyz/latest/)
 * `rad auth` (creates a unique Network ID [NID] that signs rad repos and is used in Radicle routing information)
-* `rad init` (in a regular Git repo, creates a Repository Identifier [a fingerprint known as a RID] for a particular user's NID) 
+* `rad init` (in a regular Git repo, creates a Repository Identifier [a fingerprint known as a RID] for a particular user's NID)
 * `git push rad <branch>` (this pushes to a user's local Radicle Storage [a "remote" which holds copies of Radicle-enabled Git repos] from the repo's workspace. This readies the repo for the network.)
 * `radicle-node --connect z6MkixDzQ7GZsuNwFueAeTHoCNBXr2zQ1zA11jaVTqx9rMeX@seednode.link:10192` (seednode.link will track your project and seed it automatically)
 

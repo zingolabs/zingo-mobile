@@ -1,0 +1,1 @@
+Zingo! es un monedero privado y mensajero para Zcash.

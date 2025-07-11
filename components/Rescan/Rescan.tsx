@@ -14,13 +14,14 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { ButtonTypeEnum, SelectServerEnum, SnackbarDurationEnum } from '../../app/AppState';
+import 'moment/locale/tr';
+import { ButtonTypeEnum, ScreenEnum, SelectServerEnum, SnackbarDurationEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 
 type RescanProps = {
-  doRescan: () => void;
+  doRescan: () => Promise<void>;
 };
 
 const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
@@ -31,22 +32,35 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.Rescan;
 
-  const doRescanAndClose = () => {
+  const doRescanAndClose = async () => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
+    // was removed the `await` here because launching the rescan can
+    // take a lot of time and it's better the App responsive.
     doRescan();
     hide();
-    addLastSnackbar({
-      message: translate('loadedapp.syncing') as string,
-      duration: SnackbarDurationEnum.longer,
-    });
+    setTimeout(() => {
+      // because this message is between screens.
+      addLastSnackbar({
+        message: translate('loadedapp.syncing') as string,
+        duration: SnackbarDurationEnum.longer,
+        screenName: [screenName, ScreenEnum.LoadedApp],
+      });
+    }, 3 * 1000);
   };
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -56,14 +70,9 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('rescan.title') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

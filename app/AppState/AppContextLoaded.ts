@@ -1,9 +1,8 @@
 import TotalBalanceClass from './classes/TotalBalanceClass';
-import AddressClass from './classes/AddressClass';
+import UnifiedAddressClass from './classes/UnifiedAddressClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
-import SyncingStatusClass from './classes/SyncingStatusClass';
 
 import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
@@ -20,10 +19,13 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
+import { LoadedAppNavigationState } from '../types';
 import ValueTransferType from './types/ValueTransferType';
-import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
 import { HideReturn } from 'react-native-magic-modal';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
+import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
+import TransparentAddressClass from './classes/TransparentAddressClass';
+import { ScreenEnum } from './enums/ScreenEnum';
 
 export default interface AppContextLoaded {
   navigationHome: DrawerContentComponentProps['navigation'] | null;
@@ -32,9 +34,8 @@ export default interface AppContextLoaded {
   // The total confirmed and pending balance in this wallet
   totalBalance: TotalBalanceClass | null;
 
-  // List of all addresses in the wallet, including change addresses and addresses
-  // that don't have any balance or are unused
-  addresses: AddressClass[] | null;
+  // List of all diversified addresses of the wallet
+  addresses: (UnifiedAddressClass | TransparentAddressClass)[] | null;
 
   // List of all T and Z and O value transfers
   valueTransfers: ValueTransferType[] | null;
@@ -55,13 +56,13 @@ export default interface AppContextLoaded {
   walletSettings: WalletSettingsClass;
 
   // syncing Info about the status of the process
-  syncingStatus: SyncingStatusClass;
+  syncingStatus: RPCSyncStatusType;
 
   // wallet recovery info
   wallet: WalletType;
 
   // active UA in the wallet
-  uOrchardAddress: string;
+  defaultUnifiedAddress: string;
 
   // zec price in USD from internet
   zecPrice: ZecPriceType;
@@ -79,13 +80,18 @@ export default interface AppContextLoaded {
   // this wallet is watch-only (Readonly)
   readOnly: boolean;
 
+  // pools available
+  orchardPool: boolean;
+  saplingPool: boolean;
+  transparentPool: boolean;
+
   // snackbar queue
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
-  removeFirstSnackbar: () => void;
+  removeFirstSnackbar: (s: ScreenEnum) => void;
 
   // if the App is stalled - restart is fired
-  restartApp: (s: any) => void;
+  restartApp: (s: LoadedAppNavigationState) => void;
 
   // some ValueTransfer is pending?
   somePending: boolean;
@@ -104,13 +110,16 @@ export default interface AppContextLoaded {
   showSwipeableIcons: boolean;
 
   // refresh the different list in the App: history & messages
-  doRefresh: (s: RefreshScreenEnum) => void;
+  doRefresh: (s: ScreenEnum) => void;
 
   // fetch the ZEC price in USD
   setZecPrice: (p: number, d: number) => void;
 
   // donation address
   zenniesDonationAddress: string;
+
+  // zingolib Version
+  zingolibVersion: string;
 
   // settings
   server: ServerType;

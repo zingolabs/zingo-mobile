@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 
-import { render } from '@testing-library/react-native';
+import { render, RenderResult } from '@testing-library/react-native';
 import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
 import { AddressBook } from '../components/AddressBook';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
@@ -19,9 +19,9 @@ describe('Component Address Book - test', () => {
     state.addressBook = mockAddressBook;
     state.translate = mockTranslate;
     const onSet = jest.fn();
-    const ab: any = render(
+    const ab: RenderResult = render(
       <ContextAppLoadedProvider value={state}>
-        <AddressBook setAddressBook={onSet} setSecurityOption={onSet} />
+        <AddressBook setAddressBook={onSet} />
       </ContextAppLoadedProvider>,
     );
     expect(ab.toJSON()).toMatchSnapshot();

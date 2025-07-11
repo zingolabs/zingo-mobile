@@ -1,11 +1,12 @@
-import AddressClass from './classes/AddressClass';
+import UnifiedAddressClass from './classes/UnifiedAddressClass';
+import TransparentAddressClass from './classes/TransparentAddressClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import SettingsFileClass from './classes/SettingsFileClass';
-import SyncingStatusClass from './classes/SyncingStatusClass';
 import ToAddrClass from './classes/ToAddrClass';
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import WalletSettingsClass from './classes/WalletSettingsClass';
+import AddressBookFileClassObsolete from './classes/AddressBookFileClassObsolete';
 
 import InfoType from './types/InfoType';
 import SendJsonToTypeType from './types/SendJsonToTypeType';
@@ -21,6 +22,8 @@ import SecurityType from './types/SecurityType';
 import ServerUrisType from './types/ServerUrisType';
 import ValueTransferType from './types/ValueTransferType';
 import ContactType from './types/ContactType';
+import TransactionType from './types/TransactionType';
+import TxDetailType from './types/TxDetailType';
 
 import { CommandEnum } from './enums/CommandEnum';
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
@@ -51,7 +54,10 @@ import { SecurityTypeEnum } from './enums/SecurityTypeEnum';
 import { EventListenerEnum } from './enums/EventListenerEnum';
 import { ValueTransferKindEnum } from './enums/ValueTransferKindEnum';
 import { FilterEnum } from './enums/FilterEnum';
-import { RefreshScreenEnum } from './enums/RefreshScreenEnum';
+import { TransactionActionEnum } from './enums/TransactionActionEnum';
+import { AddressUnifiedTypeEnum } from './enums/AddressUnifiedTypeEnum';
+import { ZcashUriFieldEnum } from './enums/ZcashUriFieldEnum';
+import { ScreenEnum } from './enums/ScreenEnum';
 
 import { GlobalConst } from './const/GlobalConst';
 
@@ -65,14 +71,15 @@ export {
   AppStateLoading,
   AppContextLoading,
   AppContextLoaded,
-  AddressClass,
+  UnifiedAddressClass,
+  TransparentAddressClass,
   AddressBookFileClass,
   SendPageStateClass,
   SettingsFileClass,
-  SyncingStatusClass,
   ToAddrClass,
   TotalBalanceClass,
   WalletSettingsClass,
+  AddressBookFileClassObsolete,
   WalletType,
   SendJsonToTypeType,
   InfoType,
@@ -87,6 +94,8 @@ export {
   ServerUrisType,
   ValueTransferType,
   ContactType,
+  TransactionType,
+  TxDetailType,
   CommandEnum,
   AddressBookActionEnum,
   MenuItemEnum,
@@ -116,6 +125,9 @@ export {
   EventListenerEnum,
   ValueTransferKindEnum,
   FilterEnum,
-  RefreshScreenEnum,
+  TransactionActionEnum,
+  AddressUnifiedTypeEnum,
+  ZcashUriFieldEnum,
+  ScreenEnum,
   GlobalConst,
 };

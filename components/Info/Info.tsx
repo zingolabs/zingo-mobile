@@ -16,7 +16,8 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { ChainNameEnum, CurrencyEnum } from '../../app/AppState';
+import 'moment/locale/tr';
+import { ChainNameEnum, CurrencyEnum, ScreenEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -32,9 +33,16 @@ const Info: React.FunctionComponent<InfoProps> = () => {
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.Info;
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -44,14 +52,9 @@ const Info: React.FunctionComponent<InfoProps> = () => {
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('info.title') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -73,9 +76,10 @@ const Info: React.FunctionComponent<InfoProps> = () => {
             <DetailLine
               label={translate('info.version') as string}
               value={translate('zingo') + ' ' + translate('version')}
+              screenName={screenName}
             />
-            <DetailLine label={translate('info.serverversion') as string} value={info.version ? info.version : '-'} />
-            <DetailLine label={translate('info.zainod') as string} value={info.serverUri ? info.serverUri : '-'} />
+            <DetailLine label={translate('info.serverversion') as string} value={info.version ? info.version : '-' } screenName={screenName} />
+            <DetailLine label={translate('info.zainod') as string} value={info.serverUri ? info.serverUri : '-'} screenName={screenName} />
             <DetailLine
               label={translate('info.network') as string}
               value={
@@ -89,14 +93,16 @@ const Info: React.FunctionComponent<InfoProps> = () => {
                   ? 'Regtest'
                   : (translate('info.unknown') as string) + ' (' + info.chainName + ')'
               }
+              screenName={screenName}
             />
             <DetailLine
               label={translate('info.serverblock') as string}
               value={info.latestBlock ? info.latestBlock.toString() : '-'}
+              screenName={screenName}
             />
-            {currency === CurrencyEnum.USDCurrency && (
-              <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                <DetailLine label={translate('info.zecprice') as string}>
+            {(currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) && (
+              <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+                <DetailLine label={(currency === CurrencyEnum.USDTORCurrency ? translate('info.zecpricetor') : translate('info.zecprice')) as string} screenName={screenName}>
                   {zecPrice.zecPrice === -1 && (
                     <RegText color={colors.text}>{translate('info.errorgemini') as string}</RegText>
                   )}
@@ -106,7 +112,7 @@ const Info: React.FunctionComponent<InfoProps> = () => {
                   <CurrencyAmount price={zecPrice.zecPrice} amtZec={1} currency={currency} privacy={privacy} />
                 </DetailLine>
                 <View style={{ marginLeft: 5 }}>
-                  <PriceFetcher setZecPrice={setZecPrice} />
+                  <PriceFetcher setZecPrice={setZecPrice} screenName={screenName} />
                 </View>
               </View>
             )}

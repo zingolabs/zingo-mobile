@@ -24,6 +24,7 @@ import {
   SettingsNameEnum,
   SnackbarType,
   ButtonTypeEnum,
+  ScreenEnum,
 } from '../../app/AppState';
 import Header from '../Header';
 import Utils from '../../app/utils';
@@ -32,6 +33,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -51,6 +53,7 @@ type SeedProps = {
   action: SeedActionEnum;
   setPrivacyOption: (value: boolean) => Promise<void>;
   keepAwake?: (v: boolean) => void;
+  setIsSeedViewModalOpen?: (v: boolean) => void;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({
   onClickOK,
@@ -58,6 +61,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   action,
   setPrivacyOption,
   keepAwake,
+  setIsSeedViewModalOpen,
 }) => {
   const contextLoaded = useContext(ContextAppLoaded);
   const contextLoading = useContext(ContextAppLoading);
@@ -69,7 +73,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     mode: ModeEnum.basic | ModeEnum.advanced,
     addLastSnackbar: (snackbar: SnackbarType) => void,
     snackbars: SnackbarType[],
-    removeFirstSnackbar: () => void,
+    removeFirstSnackbar: (s: ScreenEnum) => void,
     language: LanguageEnum;
   if (action === SeedActionEnum.new) {
     wallet = contextLoading.wallet;
@@ -102,14 +106,16 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.Seed;
 
-  const [seedPhrase, setSeedPhrase] = useState<string>('');
-  const [birthdayNumber, setBirthdayNumber] = useState<string>('');
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
   const [expandSeed, setExpandSeed] = useState<boolean>(true);
   const [expandBirthday, setExpandBithday] = useState<boolean>(true);
   const [basicFirstViewSeed, setBasicFirstViewSeed] = useState<boolean>(true);
+
+  const seedPhrase = wallet.seed || '';
+  const birthdayNumber = (wallet.birthday && wallet.birthday.toString()) || '';
 
   useEffect(() => {
     if (keepAwake) {
@@ -156,9 +162,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     setTimes(
       action === SeedActionEnum.change || action === SeedActionEnum.backup || action === SeedActionEnum.server ? 1 : 0,
     );
-    setSeedPhrase(wallet.seed || '');
-    setBirthdayNumber((wallet.birthday && wallet.birthday.toString()) || '');
-  }, [action, wallet.seed, wallet.birthday, wallet, translate]);
+  }, [action, translate]);
 
   const onPressOK = () => {
     Alert.alert(
@@ -190,19 +194,25 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const onClickCancelHide = () => {
     onClickCancel();
     clear();
-    // when this screen is open from LoadingApp (new wallet)
-    // is using the standard modal from react-native
-    if (action !== SeedActionEnum.new) {
-      hide();
-    }
+    hiding();
   };
 
   const onClickOKHide = (seedPhraseParm: string, birthdayNumberParm: number) => {
     onClickOK(seedPhraseParm, birthdayNumberParm);
     clear();
+    hiding();
+  };
+
+  const hiding = async () => {
     // when this screen is open from LoadingApp (new wallet)
     // is using the standard modal from react-native
     if (action !== SeedActionEnum.new) {
+      setIsSeedViewModalOpen && setIsSeedViewModalOpen(false);
+      // the user just see the seed for the first time.
+      if (mode === ModeEnum.basic && !basicFirstViewSeed) {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
+        keepAwake && keepAwake(false);
+      }
       hide();
     }
   };
@@ -213,6 +223,12 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -222,14 +238,9 @@ const Seed: React.FunctionComponent<SeedProps> = ({
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('seed.title') + ' (' + translate(`seed.${action}`) + ')'}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -273,13 +284,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                     addLastSnackbar({
                       message: translate('seed.tapcopy-seed-message') as string,
                       duration: SnackbarDurationEnum.short,
+                      screenName: [screenName],
                     });
                   }
                   setExpandSeed(true);
                   if (privacy) {
                     setTimeout(() => {
                       setExpandSeed(false);
-                    }, 5000);
+                    }, 5 * 1000);
                   }
                 }
               }}>
@@ -301,6 +313,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                       addLastSnackbar({
                         message: translate('seed.tapcopy-seed-message') as string,
                         duration: SnackbarDurationEnum.short,
+                        screenName: [screenName],
                       });
                     }
                   }
@@ -331,13 +344,14 @@ const Seed: React.FunctionComponent<SeedProps> = ({
                     addLastSnackbar({
                       message: translate('seed.tapcopy-birthday-message') as string,
                       duration: SnackbarDurationEnum.short,
+                      screenName: [screenName],
                     });
                   }
                   setExpandBithday(true);
                   if (privacy) {
                     setTimeout(() => {
                       setExpandBithday(false);
-                    }, 5000);
+                    }, 5 * 1000);
                   }
                 }
               }}>
@@ -374,11 +388,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
             onPress={async () => {
               if (!seedPhrase) {
                 return;
-              }
-              // the user just see the seed for the first time.
-              if (mode === ModeEnum.basic && !basicFirstViewSeed && keepAwake) {
-                await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
-                keepAwake(false);
               }
               if (times === 0) {
                 onClickOKHide(seedPhrase, Number(birthdayNumber));

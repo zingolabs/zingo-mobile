@@ -12,6 +12,7 @@ type ButtonProps = {
   disabled?: boolean;
   onPress: () => void;
   style?: TextStyle;
+  textStyle?: TextStyle;
   accessible?: boolean;
   accessibilityLabel?: string;
   testID?: string;
@@ -24,13 +25,14 @@ const Button: React.FunctionComponent<ButtonProps> = ({
   disabled,
   onPress,
   style,
+  textStyle,
   accessible,
   accessibilityLabel,
   testID,
   twoButtons,
 }) => {
-  const { colors } = useTheme()  as ThemeType;
-  // type: Primary or Secondary
+  const { colors } = useTheme() as ThemeType;
+
   const styleButton: TextStyle =
     type === ButtonTypeEnum.Primary
       ? {
@@ -46,11 +48,23 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           borderWidth: 2,
           width: twoButtons ? '40%' : '80%',
         }
+      : type === ButtonTypeEnum.Tertiary
+      ? {
+          backgroundColor: colors.tertiary,
+          width: twoButtons ? '40%' : '80%',
+        }
+      : type === ButtonTypeEnum.Ghost
+      ? {
+          backgroundColor: 'transparent',
+          color: colors.money,
+        }
       : {
           // error
           backgroundColor: colors.primary,
+          width: twoButtons ? '40%' : '80%',
         };
-  const styleCommon: TextStyle = {
+
+  const styleButtonCommon: TextStyle = {
     padding: 0,
     paddingLeft: 20,
     paddingRight: 20,
@@ -62,6 +76,39 @@ const Button: React.FunctionComponent<ButtonProps> = ({
     justifyContent: 'center',
   };
 
+  const styleText: TextStyle =
+    type === ButtonTypeEnum.Primary
+      ? {
+          color: colors.background,
+        }
+      : type === ButtonTypeEnum.Secondary
+      ? {
+          color: disabled ? colors.primaryDisabled : colors.primary,
+        }
+      : type === ButtonTypeEnum.Tertiary
+      ? {
+          color: colors.text,
+        }
+      : type === ButtonTypeEnum.Ghost
+      ? {
+          color: colors.text,
+          textTransform: 'lowercase',
+        }
+      : {
+          // error
+          color: colors.background,
+        };
+  const styleTextCommon: TextStyle = {
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    fontSize: 16,
+    textAlign: 'center',
+  };
+
+  //if (type === ButtonTypeEnum.Tertiary) {
+  //  console.log(styleText, styleTextCommon);
+  //}
+
   return (
     <TouchableOpacity
       testID={testID}
@@ -69,7 +116,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
       accessibilityLabel={accessibilityLabel}
       style={{
         ...styleButton,
-        ...styleCommon,
+        ...styleButtonCommon,
         ...style,
       }}
       disabled={disabled}
@@ -87,12 +134,9 @@ const Button: React.FunctionComponent<ButtonProps> = ({
         }}>
         <Text
           style={{
-            color:
-              type === ButtonTypeEnum.Primary ? colors.background : disabled ? colors.primaryDisabled : colors.primary,
-            fontWeight: 'bold',
-            textTransform: 'uppercase',
-            fontSize: 16,
-            textAlign: 'center',
+            ...styleTextCommon,
+            ...styleText,
+            ...textStyle,
           }}>
           {title}
         </Text>

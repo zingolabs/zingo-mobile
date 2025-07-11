@@ -13,13 +13,13 @@ import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
-import RPCModule from '../../../app/RPCModule';
 import AddressItem from '../../Components/AddressItem';
 import simpleBiometrics from '../../../app/simpleBiometrics';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 
 import { ThemeType } from '../../../app/types';
 import Utils from '../../../app/utils';
@@ -29,8 +29,8 @@ import {
   PrivacyLevelFromEnum,
   GlobalConst,
   SendPageStateClass,
+  ScreenEnum,
 } from '../../../app/AppState';
-import { CurrencyEnum } from '../../../app/AppState';
 import { RPCAddressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
 import { RPCParseAddressStatusEnum } from '../../../app/rpc/enums/RPCParseAddressStatusEnum';
@@ -40,6 +40,7 @@ import { ToastProvider, useToast } from 'react-native-toastier';
 
 type ConfirmProps = {
   calculatedFee: number;
+  parseAddressInfoJSON: RPCParseAddressType;
   donationAmount: number;
   confirmSend: (s: SendPageStateClass) => void;
   sendAllAmount: boolean;
@@ -55,6 +56,7 @@ type ConfirmProps = {
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
   confirmSend,
   calculatedFee,
+  parseAddressInfoJSON,
   donationAmount,
   sendAllAmount,
   calculateFeeWithPropose,
@@ -66,7 +68,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     translate,
     currency,
     zecPrice,
-    uOrchardAddress,
+    defaultUnifiedAddress,
     privacy,
     totalBalance,
     addLastSnackbar,
@@ -81,6 +83,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.Confirm;
 
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
   const [sendingTotal, setSendingTotal] = useState<number>(0);
@@ -88,7 +91,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const memoTotal: string = Utils.buildMemo(
     sendPageState.toaddr.memo,
     sendPageState.toaddr.includeUAMemo,
-    uOrchardAddress,
+    defaultUnifiedAddress,
   );
 
   /**
@@ -108,21 +111,20 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
     const totalSpendable: number = Utils.parseStringLocaleToNumberFloat(
       Utils.parseNumberFloatToStringLocale(
-        totalBalance ? totalBalance.spendableOrchard + totalBalance.spendablePrivate : 0,
+        totalBalance ? totalBalance.totalSpendableBalance : 0,
         8,
       ),
     );
 
     console.log('total', totalAmount);
-    console.log('orchard', totalBalance?.spendableOrchard);
-    console.log('sapling', totalBalance?.spendablePrivate);
+    console.log('header spendable', totalBalance?.totalSpendableBalance);
 
     // amount + fee
-    if (totalAmount <= (totalBalance ? totalBalance.spendableOrchard : 0)) {
+    if (totalAmount <= (totalBalance ? totalBalance.confirmedOrchardBalance : 0)) {
       from = PrivacyLevelFromEnum.orchardPrivacyLevel;
-    } else if ((totalBalance ? totalBalance.spendableOrchard : 0) > 0 && totalAmount <= totalSpendable) {
+    } else if ((totalBalance ? totalBalance.confirmedOrchardBalance : 0) > 0 && totalAmount <= totalSpendable) {
       from = PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel;
-    } else if (totalAmount <= (totalBalance ? totalBalance.spendablePrivate : 0)) {
+    } else if (totalAmount <= (totalBalance ? totalBalance.confirmedSaplingBalance : 0)) {
       from = PrivacyLevelFromEnum.saplingPrivacyLevel;
     }
 
@@ -132,27 +134,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       return '-';
     }
 
-    const result: string = await RPCModule.execute(CommandEnum.parseAddress, sendPageState.toaddr.to);
-    if (result) {
-      if (result.toLowerCase().startsWith(GlobalConst.error)) {
-        return '-';
-      }
-    } else {
-      return '-';
-    }
-    let resultJSON = {} as RPCParseAddressType;
-    try {
-      resultJSON = await JSON.parse(result);
-    } catch (e) {
-      //console.log(e);
-      return '-';
-    }
-
     //console.log('parse-address', sendPageState.toaddr.to, resultJSON.status === RPCParseStatusEnum.successParse);
 
     if (
-      resultJSON.status !== RPCParseAddressStatusEnum.successAddressParse ||
-      resultJSON.chain_name !== server.chainName
+      parseAddressInfoJSON.status !== RPCParseAddressStatusEnum.successAddressParse ||
+      parseAddressInfoJSON.chain_name !== server.chainName
     ) {
       return '-';
     }
@@ -162,8 +148,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Private -> orchard to orchard (UA with orchard receiver)
     if (
       from === PrivacyLevelFromEnum.orchardPrivacyLevel &&
-      resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
-      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)
+      parseAddressInfoJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
+      parseAddressInfoJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)
     ) {
       return translate('send.private') as string;
     }
@@ -171,10 +157,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Private -> sapling to sapling (ZA or UA with sapling receiver and NO orchard receiver)
     if (
       from === PrivacyLevelFromEnum.saplingPrivacyLevel &&
-      (resultJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
-        (resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
-          resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver) &&
-          !resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)))
+      (parseAddressInfoJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
+        (parseAddressInfoJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
+          parseAddressInfoJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver) &&
+          !parseAddressInfoJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)))
     ) {
       return translate('send.private') as string;
     }
@@ -182,9 +168,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Amount Revealed -> orchard to sapling (ZA or UA with sapling receiver)
     if (
       from === PrivacyLevelFromEnum.orchardPrivacyLevel &&
-      (resultJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
-        (resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
-          resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver)))
+      (parseAddressInfoJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
+        (parseAddressInfoJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
+          parseAddressInfoJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver)))
     ) {
       return translate('send.amountrevealed') as string;
     }
@@ -192,8 +178,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // Amount Revealed -> sapling to orchard (UA with orchard receiver)
     if (
       from === PrivacyLevelFromEnum.saplingPrivacyLevel &&
-      resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
-      resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)
+      parseAddressInfoJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
+      parseAddressInfoJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver)
     ) {
       return translate('send.amountrevealed') as string;
     }
@@ -202,10 +188,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     // UA with sapling receiver)
     if (
       from === PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel &&
-      (resultJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
-        (resultJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
-          (resultJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver) ||
-            resultJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver))))
+      (parseAddressInfoJSON.address_kind === RPCAddressKindEnum.saplingAddressKind ||
+        (parseAddressInfoJSON.address_kind === RPCAddressKindEnum.unifiedAddressKind &&
+          (parseAddressInfoJSON.receivers_available?.includes(RPCReceiversEnum.orchardRPCReceiver) ||
+          parseAddressInfoJSON.receivers_available?.includes(RPCReceiversEnum.saplingRPCReceiver))))
     ) {
       return translate('send.amountrevealed') as string;
     }
@@ -215,8 +201,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       (from === PrivacyLevelFromEnum.orchardPrivacyLevel ||
         from === PrivacyLevelFromEnum.saplingPrivacyLevel ||
         from === PrivacyLevelFromEnum.orchardAndSaplingPrivacyLevel) &&
-      (resultJSON.address_kind === RPCAddressKindEnum.transparentAddressKind ||
-        resultJSON.address_kind === RPCAddressKindEnum.texAddressKind)
+      (parseAddressInfoJSON.address_kind === RPCAddressKindEnum.transparentAddressKind ||
+        parseAddressInfoJSON.address_kind === RPCAddressKindEnum.texAddressKind)
     ) {
       return translate('send.deshielded') as string;
     }
@@ -230,8 +216,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     sendPageState.toaddr.to,
     server.chainName,
     totalBalance,
-    totalBalance?.spendableOrchard,
-    totalBalance?.spendablePrivate,
+    totalBalance?.confirmedOrchardBalance,
+    totalBalance?.confirmedSaplingBalance,
     translate,
   ]);
 
@@ -244,7 +230,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     //console.log('BIOMETRIC --------> ', resultBio);
     if (resultBio === false) {
       // snack with Error
-      addLastSnackbar({ message: translate('biometrics-error') as string });
+      addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
     } else {
       confirmSend(sendPageState);
     }
@@ -275,6 +261,12 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -284,14 +276,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('send.confirm-title') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -348,29 +335,25 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
                 <RegText>{privacyLevel}</RegText>
               )}
             </View>
-            <View style={{ margin: 10 }}>
-              <FadeText>{translate('send.fee') as string}</FadeText>
-              <ZecAmount currencyName={info.currencyName} size={18} amtZec={calculatedFee} privacy={privacy} />
-            </View>
-            {currency === CurrencyEnum.USDCurrency && (
-              <View style={{ margin: 10, alignItems: 'flex-end' }}>
-                <FadeText style={{ opacity: 0 }}>{translate('send.fee') as string}</FadeText>
-                <CurrencyAmount
-                  style={{ fontSize: 18 }}
-                  amtZec={calculatedFee}
-                  price={zecPrice.zecPrice}
-                  currency={currency}
-                  privacy={privacy}
-                />
-              </View>
-            )}
+          </View>
+
+          <FadeText style={{ marginTop: 0, marginLeft: 10 }}>{translate('send.fee') as string}</FadeText>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10 }}>
+            <ZecAmount currencyName={info.currencyName} size={18} amtZec={calculatedFee} privacy={privacy} />
+            <CurrencyAmount
+              style={{ fontSize: 18 }}
+              amtZec={calculatedFee}
+              price={zecPrice.zecPrice}
+              currency={currency}
+              privacy={privacy}
+            />
           </View>
 
           {[sendPageState.toaddr].map(to => {
             return (
               <View key={`${to.id}-${to.to}`} style={{ margin: 10 }}>
                 <FadeText>{translate('send.to') as string}</FadeText>
-                <AddressItem address={to.to} withIcon={true} />
+                <AddressItem address={to.to} screenName={screenName} withIcon={true} />
 
                 {donationAmount > 0 && (
                   <>

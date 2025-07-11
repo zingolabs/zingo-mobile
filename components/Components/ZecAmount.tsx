@@ -59,7 +59,7 @@ const ZecAmount: React.FunctionComponent<ZecAmountProps> = ({
 
   const onPress = () => {
     setPrivacyHigh(false);
-    setTimeout(() => setPrivacyHigh(true), 5000);
+    setTimeout(() => setPrivacyHigh(true), 5 * 1000);
   };
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

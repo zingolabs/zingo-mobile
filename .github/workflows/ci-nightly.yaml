@@ -8,13 +8,13 @@ on:
 jobs:
   jest-test:
     uses: ./.github/workflows/jest-test.yaml
-    
+
   create-timestamp:
     uses: ./.github/workflows/create-timestamp.yaml
-    
+
   create-cache-key:
     uses: ./.github/workflows/create-cache-key.yaml
-    
+
   android-build:
     strategy:
       matrix:
@@ -46,7 +46,7 @@ jobs:
           - { abi: x86, api-level: 29, target: default }
       fail-fast: false
     uses: ./.github/workflows/android-ubuntu-integration-test-ci.yaml
-    needs: [create-timestamp, android-build]
+    needs: [create-timestamp, create-cache-key, android-build]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
@@ -61,12 +61,28 @@ jobs:
     needs: create-cache-key
     with:
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
-       
+
   ios-integration-test:
     strategy:
       fail-fast: false
     uses: ./.github/workflows/ios-integration-test.yaml
-    needs: [ create-timestamp, ios-build ]
+    needs: [ create-timestamp, create-cache-key, ios-build ]
     with:
       timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
       cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+
+  # we can revisit this when we are working on F-droid again.
+  #android-ubuntu-foss-script-artifact:
+  #  uses: ./.github/workflows/android-ubuntu-foss-script-artifact.yaml
+  #  needs: [create-timestamp, create-cache-key]
+  #  with:
+  #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+  #  secrets: inherit
+
+  #android-ubuntu-foss-artifact:
+  #  uses: ./.github/workflows/android-ubuntu-foss-artifact.yaml
+  #  needs: [create-timestamp, create-cache-key]
+  #  with:
+  #    timestamp: ${{ needs.create-timestamp.outputs.timestamp }}
+  #    cache-key: ${{ needs.create-cache-key.outputs.cache-key }}
+  #  secrets: inherit

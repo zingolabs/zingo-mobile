@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.11.2 (226)",
+  "version": "zingo-2.0.0 (256)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
@@ -14,11 +14,14 @@
   "biometricsfailed-button": "Unlock",
   "biometrics-title": "Authentication",
   "biometrics-message": "Please authenticate",
+  "biometrics-message-ios": "Please authenticate with your passcode",
   "biometrics-error": "For security you need to authenticate again to perform this action. You Always can change this in Settings",
   "close": "Close",
   "cancel": "Cancel",
+  "verify": "Verify",
   "save": "Save",
   "copy": "Copy",
+  "share": "Share",
   "confirm": "Confirm",
   "support": "Send Email",
   "menudrawer-acc": "Open Menu Drawer",
@@ -50,6 +53,11 @@
     "link-all": "Global",
     "link-anonymous": "Anonymous"
   },
+  "addresslist": {
+    "title": "Address List",
+    "unified": "Unified",
+    "transparent": "Transparent"
+  },
   "addressbook": {
     "title": "Address Book",
     "end": "End",
@@ -60,7 +68,7 @@
     "add": "Add",
     "modify": "Modify",
     "delete": "Delete",
-    "empty": "No Contacts/Nicknames/Labels/Tags yet.",
+    "empty": "You haven't saved any new addresses yet.",
     "nochanges": "No changes registered. ",
     "fillboth": "Please fill out both fields. ",
     "bothexists": "This label and this address already exists. ",
@@ -72,7 +80,7 @@
     "likely": "Likely: ",
     "thiswalletaddress": "This Wallet's Address",
     "addto": "Add to ",
-    "uorchardaddress": "Orchard UA:\n"
+    "filter-wallet": "Wallet"
   },
   "change-privacy-legend": ".\nTap to reveal the hidden values.",
   "txtcopied": "Text copied to Clipboard",
@@ -152,7 +160,7 @@
     "send-menu": "SEND",
     "receive-menu": "RECEIVE",
     "messages-menu": "MESSAGES",
-    "syncing": "Stopping the Synchronization to be able to reset the wallet.",
+    "syncing": "Stopping the Synchronization to be able to reset the wallet... Can take a few seconds.",
     "zcash-url": "You already have an address in the send screen",
     "connection-error": "This option requires an internet connection to be executed.",
     "tryingnewserver": "Trying to connect to the new Server... Can take a few seconds.",
@@ -203,7 +211,11 @@
       },
       {
         "value": "USD",
-        "text": "You can fetch the price for US Dollars besides ZEC."
+        "text": "You can fetch the price for US Dollars from internet."
+      },
+      {
+        "value": "USDTOR",
+        "text": "You can fetch the price for US Dollars from internet using Tor.\nTor is used to protect the user's IP address but may be unlawful in some countries. Use at your own discretion."
       }
     ],
     "languages": [
@@ -222,6 +234,10 @@
       {
         "value": "ru",
         "text": "All the information will be in Russian."
+      },
+      {
+        "value": "tr",
+        "text": "All the information will be in Turkish."
       }
     ],
     "sendalls": [
@@ -319,6 +335,7 @@
     "recoverywalletinfoondevice-title": "Store Wallet Recovery Info in the Device",
     "value-currency-": "No currency",
     "value-currency-USD": "US Dollar",
+    "value-currency-USDTOR": "US Dollar with Tor",
     "value-language-en": "English",
     "value-language-es": "Spanish",
     "value-language-pt": "Portuguese",
@@ -362,7 +379,8 @@
     "select-placeholder": "Choose a Server...",
     "value-language-ru": "Russian",
     "walletkeyssaved": "The last Wallet Recovery Info stored safely in the device.",
-    "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!"
+    "walletkeyswarning": "This is an experimental feature, that depends on the security of unaudited code to store your seed-phrase. Please do not use it with seeds that control significant funds!",
+    "value-language-tr": "Turkish"
   },
   "info": {
     "version": "Version",
@@ -371,6 +389,7 @@
     "network": "Network",
     "serverblock": "Server Block Height",
     "zecprice": "ZEC Price",
+    "zecpricetor": "ZEC Price with Tor",
     "unknown": "Unknown",
     "title": "Server Info",
     "resolution": "Device Screen",
@@ -388,12 +407,33 @@
   },
   "seed": {
     "buttontexts": {
-      "new": ["I have saved \n the seed"],
-      "change": ["", "Open New", "You really want \n to change your \n actual wallet", "Are you certain?"],
-      "server": ["", "Change Server", "You really want \n to change your \n actual server", "Are you certain?"],
-      "view": ["I have saved \n the seed"],
-      "restore": ["Restore Wallet"],
-      "backup": ["", "Restore", "You really want \n to restore your \n backup wallet", "Are you certain?"]
+      "new": [
+        "I have saved \n the seed"
+      ],
+      "change": [
+        "",
+        "Open New",
+        "You really want \n to change your \n actual wallet",
+        "Are you certain?"
+      ],
+      "server": [
+        "",
+        "Change Server",
+        "You really want \n to change your \n actual server",
+        "Are you certain?"
+      ],
+      "view": [
+        "I have saved \n the seed"
+      ],
+      "restore": [
+        "Restore Wallet"
+      ],
+      "backup": [
+        "",
+        "Restore",
+        "You really want \n to restore your \n backup wallet",
+        "Are you certain?"
+      ]
     },
     "title": "Seed",
     "new": "New",
@@ -421,7 +461,8 @@
     "birthday-acc": "Birthday Field",
     "tapreveal": "Tap to reveal",
     "showtransactions": "Show Transactions",
-    "youreceived": "You received"
+    "youreceived": "You received",
+    "tapcopy-ufvk-message": "Viewing Key copied to Clipboard"
   },
   "send": {
     "Broadcast": "Broadcasted and awaiting confirmation Tx:",
@@ -465,6 +506,7 @@
     "fetchpricetitle": "Fetch USD Price",
     "fetchpricebody": "Please confirm that you want to fetch the USD price from the Internet.",
     "fetch-button": "Fetch",
+    "fetchwithtor-button": "Fetch with Tor",
     "confirm-privacy-level": "Privacy Level",
     "private": "Private",
     "amountrevealed": "Amount Revealed",
@@ -481,11 +523,13 @@
     "noaddress": "No Address",
     "unoprivkey": "No Unified address to import the Spending Key",
     "unoviewkey": "No Unified address to import the Full Viewing Key",
-    "title-advanced": "My Addresses",
-    "title-basic": "My Address",
+    "title-address": "My Address",
+    "title-ufvk": "My Vewing Key",
     "title-basic-alone": "My Receiving Address",
-    "more": "more...",
-    "newu-option": "New Diversified Unified Address",
+    "newu-option": "Get new address",
+    "danger-zone": "DANGER ZONE",
+    "go-to-transparent": "Exposed transparent address",
+    "more": "View more...",
     "privkey-option": "Export Spending Key",
     "viewkey-option": "Export Full Viewing Key",
     "import-option": "Import Key...",
@@ -494,9 +538,32 @@
     "prev": "Prev",
     "next": "Next",
     "shielded-orchard": "Orchard",
-    "shielded-sapling": "Z-Sapling",
+    "shielded-sapling": "Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
-    "shielded-full": "Full"
+    "shielded-full": "Full",
+    "showtip": "Tap to select another address.",
+    "verify": "Verify Addresses",
+    "copy-address-button": "Copy address",
+    "copy-ufvk-button": "Copy viewing key",
+    "modal-transparent": {
+      "title": "Privacy Warning",
+      "message": "Transparent addresses expose your transaction details on the public blockchain. This disintegrates your privacy and is not recommended for most transactions.",
+      "recommendation": "Shielded addresses are recommended as they provide the highest level of privacy.",
+      "button": "I understand the risks, show tranparent addresses"
+    },
+    "transparent": {
+      "address-title": "Exposed transparent",
+      "newt-option": "New transparent address",
+      "warning": {
+        "title": "Privacy Warning",
+        "description": "You're viewing transparent addresses. These expose your transaction details publicly.",
+        "button": "Switch to Shielded Addresses (Recommended)"
+      },
+      "new-error": "Transparent address generation failed. Latest transparent address has not received funds."
+    },
+    "verification-success": "This address belongs to you and is safe for receiving funds.",
+    "verification-failure": "This address does not belong to you.",
+    "add-tag": "Add tag"
   },
   "history": {
     "shield-all": "Shield All funds",
@@ -564,13 +631,26 @@
     "mempool": "In Mempool",
     "confirmed": "Confirmed",
     "filter-withfunds": "With funds",
-    "empty": "No Transactions yet."
+    "empty": "No Transactions yet.",
+    "resend": "Resend",
+    "remove": "Remove",
+    "resend-title": "Resend",
+    "remove-title": "Remove",
+    "resend-error": "Error Resending :",
+    "remove-error": "Error Removing :",
+    "resend-message": "",
+    "remove-message": "",
+    "resend-alert": "Confirm to Resend this transaction again.",
+    "remove-alert": "Confirm to remove failed transaction from device and restore balance",
+    "remove-legend": "Remove transaction to restore balance",
+    "expired": "Expired - Remove to restore balance",
+    "waiting": "Funds waiting for the minimum confirmations"
   },
   "report": {
     "title": "Sync / Rescan Report",
-    "running": "The wallet is Syncing...",
-    "finished": "The wallet is Fully Synced",
-    "paused": "The wallet is waiting to start syncing...",
+    "running": "Syncing...",
+    "finished": "Fully Synced",
+    "paused": "Waiting to start syncing...",
     "server-title": "SERVER: ",
     "blocks": " Blocks. ",
     "wallet": "Wallet: ",
@@ -590,7 +670,14 @@
     "networkstatus": "Network Status (Internet)",
     "nointernet": "No Internet Connection.",
     "cellulardata": "Only Cellular Data.",
-    "connectionexpensive": "Connection Expensive."
+    "connectionexpensive": "Connection Expensive.",
+    "syncstatus": "Sync Status",
+    "map": "Nonlinear Scanning Map",
+    "legend": "Legend",
+    "scanned": "Scanned",
+    "scanning": "Scanning...",
+    "lowpriority": "Low priority",
+    "highpriority": "High priority"
   },
   "import": {
     "title": "Seed Phrase / Viewing Key",
@@ -620,12 +707,33 @@
   },
   "ufvk": {
     "buttontexts": {
-      "new": ["I have saved \n the Viewing Key"],
-      "change": ["", "Open New", "You really want \n to change your \n actual wallet", "Are you certain?"],
-      "server": ["", "Change Server", "You really want \n to change your \n actual server", "Are you certain?"],
-      "view": ["I have saved \n the Viewing Key"],
-      "restore": ["Restore Wallet"],
-      "backup": ["", "Restore", "You really want \n to restore your \n backup wallet", "Are you certain?"]
+      "new": [
+        "I have saved \n the Viewing Key"
+      ],
+      "change": [
+        "",
+        "Open New",
+        "You really want \n to change your \n actual wallet",
+        "Are you certain?"
+      ],
+      "server": [
+        "",
+        "Change Server",
+        "You really want \n to change your \n actual server",
+        "Are you certain?"
+      ],
+      "view": [
+        "I have saved \n the Viewing Key"
+      ],
+      "restore": [
+        "Restore Wallet"
+      ],
+      "backup": [
+        "",
+        "Restore",
+        "You really want \n to restore your \n backup wallet",
+        "Are you certain?"
+      ]
     },
     "privkey": "Spending/Private ",
     "viewkey": "Viewing Key ",
@@ -646,12 +754,13 @@
     "title": "Fund Pools",
     "orchard-title": "ORCHARD (UA)",
     "orchard-balance": "Total Balance",
-    "orchard-spendable-balance": "Spendable Balance",
+    "orchard-confirmed-balance": "Confirmed Balance",
     "sapling-title": "SAPLING (Private)",
     "sapling-balance": "Total Balance",
-    "sapling-spendable-balance": "Spendable Balance",
+    "sapling-confirmed-balance": "Confirmed Balance",
     "transparent-title": "TRANSPARENT",
     "transparent-balance": "Total Balance",
+    "transparent-confirmed-balance": "Confirmed Balance",
     "dust": "The transparent amount is too small to be shielded."
   },
   "uris": {

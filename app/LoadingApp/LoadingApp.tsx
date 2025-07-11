@@ -1,4 +1,3 @@
-
 import React, { Component, useState, useMemo, useEffect } from 'react';
 import {
   Alert,
@@ -15,7 +14,8 @@ import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
-import NetInfo, { NetInfoSubscription } from '@react-native-community/netinfo/src/index';
+import { RootStackParamList } from '../types';
+import NetInfo, { NetInfoSubscription, NetInfoState } from '@react-native-community/netinfo/src/index';
 
 import RPCModule from '../RPCModule';
 import {
@@ -27,7 +27,6 @@ import {
   ServerType,
   SecurityType,
   ServerUrisType,
-  CommandEnum,
   LanguageEnum,
   CurrencyEnum,
   ModeEnum,
@@ -44,9 +43,10 @@ import {
   GlobalConst,
   EventListenerEnum,
   AppContextLoading,
-  InfoType,
   ZecPriceType,
   BackgroundErrorType,
+  RestoreFromTypeEnum,
+  ScreenEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -63,7 +63,6 @@ import Launching from './components/Launching';
 import simpleBiometrics from '../simpleBiometrics';
 import selectingServer from '../selectingServer';
 import { isEqual } from 'lodash';
-import { RestoreFromTypeEnum } from '../AppState';
 import {
   createUpdateRecoveryWalletInfo,
   getRecoveryWalletInfo,
@@ -78,18 +77,20 @@ import { sendEmail } from '../sendEmail';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
 import StartMenu from './components/StartMenu';
 import { ToastProvider } from 'react-native-toastier';
+import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
 const pt = require('../translations/pt.json');
 const ru = require('../translations/ru.json');
+const tr = require('../translations/tr.json');
 
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 type LoadingAppProps = {
-  navigation: StackScreenProps<any>['navigation'];
-  route: StackScreenProps<any>['route'];
+  navigation: StackScreenProps<RootStackParamList, RouteEnums.LoadingApp>['navigation'];
+  route: StackScreenProps<RootStackParamList, RouteEnums.LoadingApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
 };
 
@@ -101,7 +102,7 @@ const SERVER_DEFAULT_0: ServerType = {
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as ThemeType;
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency);
+  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.USDCurrency); // by default USD
   const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [donation, setDonation] = useState<boolean>(false);
@@ -130,6 +131,7 @@ export default function LoadingApp(props: LoadingAppProps) {
       es: es,
       pt: pt,
       ru: ru,
+      tr: tr,
     }),
     [],
   );
@@ -159,6 +161,11 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else if (settings.version === '' || settings.version !== (translate('version') as string)) {
         // this is an update
         setFirstLaunchingMessage(true);
+        // The App needs to set the currency opt-in to USD by default
+        // only if the currency have `none`
+        if (settings.currency === CurrencyEnum.noCurrency) {
+          await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, CurrencyEnum.USDCurrency);
+        }
       }
 
       // new donation feature.
@@ -189,7 +196,8 @@ export default function LoadingApp(props: LoadingAppProps) {
         settings.language === LanguageEnum.en ||
         settings.language === LanguageEnum.es ||
         settings.language === LanguageEnum.pt ||
-        settings.language === LanguageEnum.ru
+        settings.language === LanguageEnum.ru ||
+        settings.language === LanguageEnum.tr
       ) {
         setLanguage(settings.language);
         i18n.locale = settings.language;
@@ -199,7 +207,8 @@ export default function LoadingApp(props: LoadingAppProps) {
           languageTag === LanguageEnum.en ||
           languageTag === LanguageEnum.es ||
           languageTag === LanguageEnum.pt ||
-          languageTag === LanguageEnum.ru
+          languageTag === LanguageEnum.ru ||
+          languageTag === LanguageEnum.tr
             ? (languageTag as LanguageEnum)
             : (fallback.languageTag as LanguageEnum);
         setLanguage(lang);
@@ -207,7 +216,11 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.language, lang);
         //console.log('apploading NO settings', languageTag);
       }
-      if (settings.currency === CurrencyEnum.noCurrency || settings.currency === CurrencyEnum.USDCurrency) {
+      if (
+        settings.currency === CurrencyEnum.noCurrency ||
+        settings.currency === CurrencyEnum.USDCurrency ||
+        settings.currency === CurrencyEnum.USDTORCurrency
+      ) {
         setCurrency(settings.currency);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, currency);
@@ -274,9 +287,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   //console.log('render loadingApp - 2', translate('version'));
 
   if (loading) {
-    return (
-      <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
-    );
+    return <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />;
   } else {
     return (
       <LoadingAppClass
@@ -304,8 +315,8 @@ export default function LoadingApp(props: LoadingAppProps) {
 }
 
 type LoadingAppClassProps = {
-  navigationApp: StackScreenProps<any>['navigation'];
-  route: StackScreenProps<any>['route'];
+  navigationApp: StackScreenProps<RootStackParamList, RouteEnums.LoadingApp>['navigation'];
+  route: StackScreenProps<RootStackParamList, RouteEnums.LoadingApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
   theme: ThemeType;
@@ -331,6 +342,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
   dim: EmitterSubscription;
   appstate: NativeEventSubscription;
   unsubscribeNetInfo: NetInfoSubscription;
+  screenName = ScreenEnum.LoadingApp;
 
   constructor(props: LoadingAppClassProps) {
     super(props);
@@ -339,16 +351,19 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       // context
       netInfo: {} as NetInfoType,
       wallet: {} as WalletType,
-      info: {} as InfoType,
       zecPrice: {} as ZecPriceType,
       background: props.background,
       translate: props.translate,
       backgroundError: {} as BackgroundErrorType,
       setBackgroundError: this.setBackgroundError,
       readOnly: false,
+      orchardPool: true,
+      saplingPool: true,
+      transparentPool: true,
       snackbars: [] as SnackbarType[],
       addLastSnackbar: this.addLastSnackbar,
       removeFirstSnackbar: this.removeFirstSnackbar,
+      zingolibVersion: '',
 
       // context settings
       server: props.server,
@@ -402,6 +417,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       },
       //actionButtonsDisabled: !netInfoState.isConnected ? true : false,
     });
+
+    this.fetchZingolibVersion();
 
     //console.log('DID MOUNT APPLOADING...', netInfoState);
 
@@ -464,6 +481,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.addLastSnackbar({
             message: this.state.translate('loadedapp.selectingserver') as string,
             duration: SnackbarDurationEnum.longer,
+            screenName: [this.screenName],
           });
         }, 10);
         // not a different one, can be the same.
@@ -487,7 +505,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     if (exists && exists !== GlobalConst.false) {
       this.setState({ walletExists: true });
-      let result: string = await RPCModule.loadExistingWallet(this.state.server.uri, this.state.server.chainName);
+      let result: string = await RPCModule.loadExistingWallet(
+        this.state.server.uri,
+        this.state.server.chainName,
+      );
       //let result = 'Error: pepe es guapo';
 
       // for testing
@@ -499,15 +520,19 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
           // here result can have an `error` field for watch-only which is actually OK.
-          const resultJson: RPCSeedType = await JSON.parse(result);
-          if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
+          const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(result);
+          //console.log('Load Wallet Exists result JSON', resultJson);
+          if (!resultJson.error) {
             // Load the wallet and navigate to the vts screen
             let readOnly: boolean = false;
-            const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
+            let orchardPool: boolean = false;
+            let saplingPool: boolean = false;
+            let transparentPool: boolean = false;
+            const walletKindStr: string = await RPCModule.walletKindInfo();
             //console.log('KIND...', walletKindStr);
             try {
               const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
-              //console.log('KIND... JSON', walletKindJSON);
+              console.log('KIND... JSON', walletKindJSON);
               // there are 4 kinds:
               // 1. seed
               // 2. USK
@@ -522,6 +547,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               } else {
                 readOnly = false;
               }
+              orchardPool = walletKindJSON.orchard;
+              saplingPool = walletKindJSON.sapling;
+              transparentPool = walletKindJSON.transparent;
               // if the seed & birthday are not stored in Keychain/Keystore, do it now.
               if (this.state.recoveryWalletInfoOnDevice) {
                 const wallet: WalletType = await RPC.rpcFetchWallet(readOnly);
@@ -533,26 +561,42 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                 }
               }
               this.setState({
-                readOnly: readOnly,
+                readOnly,
+                orchardPool,
+                saplingPool,
+                transparentPool,
                 actionButtonsDisabled: false,
               });
             } catch (e) {
               //console.log('CATCH ERROR', walletKindStr);
               this.setState({
                 readOnly,
+                orchardPool,
+                saplingPool,
+                transparentPool,
                 actionButtonsDisabled: false,
               });
-              this.addLastSnackbar({ message: walletKindStr });
+              this.addLastSnackbar({ message: walletKindStr, screenName: [this.screenName] });
             }
-            this.navigateToLoadedApp(readOnly);
+            // creating tor cliente if needed
+            if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
+              RPCModule.createTorClientProcess();
+            }
+            // if the App is restoring another wallet backup...
+            // needs to recalculate the Address Book.
+            const newWallet = !!this.props.route.params &&
+              (this.props.route.params.newWallet === true || this.props.route.params.newWallet === false)
+                ? this.props.route.params.newWallet
+                : false;
+            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, newWallet);
             //console.log('navigate to LoadedApp');
           } else {
             error = true;
             errorText = resultJson.error;
           }
-        } catch (e) {
+        } catch (e: unknown) {
           error = true;
-          errorText = JSON.stringify(e);
+          errorText = e instanceof Error ? e.message : String(e);
         }
       } else {
         error = true;
@@ -594,7 +638,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           } else {
             this.createNewWallet(false);
             this.setState({ actionButtonsDisabled: false });
-            this.navigateToLoadedApp(false);
+            this.navigateToLoadedApp(false, true, true, true, true);
             //console.log('navigate to LoadedApp');
           }
         }
@@ -640,7 +684,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       }
     });
 
-    this.unsubscribeNetInfo = NetInfo.addEventListener((state: any) => {
+    this.unsubscribeNetInfo = NetInfo.addEventListener((state: NetInfoState) => {
       const { screen } = this.state;
       const { isConnected, type, isConnectionExpensive } = this.state.netInfo;
       if (
@@ -753,11 +797,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         this.addLastSnackbar({
           message: this.state.translate('loadedapp.selectingserversame') as string,
           duration: SnackbarDurationEnum.long,
+          screenName: [this.screenName],
         });
       } else {
         this.addLastSnackbar({
           message: (this.state.translate('loadedapp.selectingserverbest') as string) + ' ' + fasterServer.uri,
           duration: SnackbarDurationEnum.long,
+          screenName: [this.screenName],
         });
       }
     }
@@ -788,6 +834,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       this.addLastSnackbar({
         message: this.state.translate('restarting') as string,
         duration: SnackbarDurationEnum.long,
+        screenName: [this.screenName],
       });
     }
     // if no internet connection -> show the error.
@@ -796,12 +843,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
+        [this.screenName],
         title,
         result,
         false,
         this.state.translate,
         sendEmail,
-        this.state.info.zingolib,
+        this.state.zingolibVersion,
       );
       this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
     } else {
@@ -811,12 +859,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         createAlert(
           this.setBackgroundError,
           this.addLastSnackbar,
+          [this.screenName],
           title,
           result,
           false,
           this.state.translate,
           sendEmail,
-          this.state.info.zingolib,
+          this.state.zingolibVersion,
         );
         this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
       } else {
@@ -827,6 +876,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.addLastSnackbar({
             message: this.state.translate('loadingapp.serverfirsttry') as string,
             duration: SnackbarDurationEnum.longer,
+            screenName: [this.screenName],
           });
           // a different server.
           const someServerIsWorking = await this.selectTheBestServer(true);
@@ -842,12 +892,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               createAlert(
                 this.setBackgroundError,
                 this.addLastSnackbar,
+                [this.screenName],
                 title,
                 result,
                 false,
                 this.state.translate,
                 sendEmail,
-                this.state.info.zingolib,
+                this.state.zingolibVersion,
               );
               this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
             }
@@ -855,12 +906,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             createAlert(
               this.setBackgroundError,
               this.addLastSnackbar,
+              [this.screenName],
               title,
               this.state.translate('loadingapp.noservers') as string,
               false,
               this.state.translate,
               sendEmail,
-              this.state.info.zingolib,
+              this.state.zingolibVersion,
             );
             this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
           }
@@ -869,17 +921,19 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           this.addLastSnackbar({
             message: this.state.translate('loadingapp.serversecondtry') as string,
             duration: SnackbarDurationEnum.longer,
+            screenName: [this.screenName],
           });
           setTimeout(() => {
             createAlert(
               this.setBackgroundError,
               this.addLastSnackbar,
+              [this.screenName],
               title,
               result,
               false,
               this.state.translate,
               sendEmail,
-              this.state.info.zingolib,
+              this.state.zingolibVersion,
             );
             this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
           }, 1000);
@@ -930,12 +984,12 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       const uri: string = parseServerURI(this.state.customServerUri, this.state.translate);
       const chainName = this.state.customServerChainName;
       if (uri.toLowerCase().startsWith(GlobalConst.error)) {
-        this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string });
+        this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, screenName: [this.screenName] });
         this.setState({ actionButtonsDisabled: false });
         return;
       }
 
-      this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string });
+      this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string, screenName: [this.screenName] });
 
       const cs = {
         uri: uri,
@@ -960,19 +1014,20 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       } else {
         this.addLastSnackbar({
           message: (this.state.translate('loadedapp.changeservernew-error') as string) + uri,
+          screenName: [this.screenName],
         });
       }
     }
     this.setState({ actionButtonsDisabled: false });
   };
 
-  navigateToLoadedApp = (readOnly: boolean) => {
+  navigateToLoadedApp = (readOnly: boolean, orchardPool: boolean, saplingPool: boolean, transparentPool: boolean, newWallet: boolean) => {
     this.props.navigationApp.reset({
       index: 0,
       routes: [
         {
           name: RouteEnums.LoadedApp,
-          params: { readOnly },
+          params: { readOnly, orchardPool, saplingPool, transparentPool, newWallet },
         },
       ],
     });
@@ -980,12 +1035,15 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
   createNewWallet = (goSeedScreen: boolean = true) => {
     if (!this.state.netInfo.isConnected || this.state.selectServer === SelectServerEnum.offline) {
-      this.addLastSnackbar({ message: this.state.translate('loadedapp.connection-error') as string });
+      this.addLastSnackbar({ message: this.state.translate('loadedapp.connection-error') as string, screenName: [this.screenName] });
       return;
     }
     this.setState({ actionButtonsDisabled: true });
     setTimeout(async () => {
-      let seed: string = await RPCModule.createNewWallet(this.state.server.uri, this.state.server.chainName);
+      let seed: string = await RPCModule.createNewWallet(
+        this.state.server.uri,
+        this.state.server.chainName,
+      );
 
       if (seed && !seed.toLowerCase().startsWith(GlobalConst.error)) {
         let seedJSON = {} as RPCSeedType;
@@ -996,30 +1054,32 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             createAlert(
               this.setBackgroundError,
               this.addLastSnackbar,
+              [this.screenName],
               this.state.translate('loadingapp.creatingwallet-label') as string,
               seedJSON.error,
               false,
               this.state.translate,
               sendEmail,
-              this.state.info.zingolib,
+              this.state.zingolibVersion,
             );
             return;
           }
-        } catch (e) {
+        } catch (e: unknown) {
           this.setState({ actionButtonsDisabled: false });
           createAlert(
             this.setBackgroundError,
             this.addLastSnackbar,
+            [this.screenName],
             this.state.translate('loadingapp.creatingwallet-label') as string,
-            JSON.stringify(e),
+            e instanceof Error ? e.message : String(e),
             false,
             this.state.translate,
             sendEmail,
-            this.state.info.zingolib,
+            this.state.zingolibVersion,
           );
           return;
         }
-        const wallet: WalletType = { seed: seedJSON.seed || '', birthday: seedJSON.birthday || 0 };
+        const wallet: WalletType = { seed: seedJSON.seed_phrase || '', birthday: seedJSON.birthday || 0 };
         // default values for wallet options
         this.setWalletOption(WalletOptionEnum.downloadMemos, DownloadMemosEnum.walletMemos);
         // storing the seed & birthday in KeyChain/KeyStore
@@ -1037,6 +1097,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           actionButtonsDisabled: false,
           walletExists: true,
         }));
+        // creating tor cliente if needed
+        if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
+          RPCModule.createTorClientProcess();
+        }
       } else {
         this.walletErrorHandle(seed, this.state.translate('loadingapp.creatingwallet-label') as string, 1, false);
       }
@@ -1052,12 +1116,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
+        [this.screenName],
         this.state.translate('loadingapp.emptyseedufvk-label') as string,
         this.state.translate('loadingapp.emptyseedufvk-error') as string,
         false,
         this.state.translate,
         sendEmail,
-        this.state.info.zingolib,
+        this.state.zingolibVersion,
       );
       return;
     }
@@ -1070,12 +1135,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       createAlert(
         this.setBackgroundError,
         this.addLastSnackbar,
+        [this.screenName],
         this.state.translate('loadingapp.invalidseedufvk-label') as string,
         this.state.translate('loadingapp.invalidseedufvk-error') as string,
         false,
         this.state.translate,
         sendEmail,
-        this.state.info.zingolib,
+        this.state.zingolibVersion,
       );
       return;
     }
@@ -1123,8 +1189,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
           // here result can have an `error` field for watch-only which is actually OK.
-          const resultJson: RPCSeedType = await JSON.parse(result);
-          if (!resultJson.error || (resultJson.error && resultJson.error.startsWith('This wallet is watch-only'))) {
+          const resultJson: RPCSeedType & RPCUfvkType = await JSON.parse(result);
+          if (!resultJson.error) {
             // storing the seed/ufvk & birthday in KeyChain/KeyStore
             if (this.state.recoveryWalletInfoOnDevice) {
               if (type === RestoreFromTypeEnum.seedRestoreFrom) {
@@ -1145,18 +1211,73 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             }
             // when restore a wallet never the user needs that the seed screen shows up with the first funds received.
             await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
-            this.setState({
-              actionButtonsDisabled: false,
-              readOnly: type === RestoreFromTypeEnum.seedRestoreFrom ? false : true,
-            });
-            this.navigateToLoadedApp(type === RestoreFromTypeEnum.seedRestoreFrom ? false : true);
+            // Load the wallet and navigate to the vts screen
+            let readOnly: boolean = false;
+            let orchardPool: boolean = false;
+            let saplingPool: boolean = false;
+            let transparentPool: boolean = false;
+            const walletKindStr: string = await RPCModule.walletKindInfo();
+            console.log('KIND...', walletKindStr);
+            try {
+              const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
+              //console.log('KIND... JSON', walletKindJSON);
+              // there are 4 kinds:
+              // 1. seed
+              // 2. USK
+              // 3. UFVK - watch-only wallet
+              // 4. No keys - watch-only wallet (possibly an error)
+
+              if (
+                walletKindJSON.kind === RPCWalletKindEnum.LoadedFromUnifiedFullViewingKey ||
+                walletKindJSON.kind === RPCWalletKindEnum.NoKeysFound
+              ) {
+                readOnly = true;
+              } else {
+                readOnly = false;
+              }
+              orchardPool = walletKindJSON.orchard;
+              saplingPool = walletKindJSON.sapling;
+              transparentPool = walletKindJSON.transparent;
+              // if the seed & birthday are not stored in Keychain/Keystore, do it now.
+              if (this.state.recoveryWalletInfoOnDevice) {
+                const wallet: WalletType = await RPC.rpcFetchWallet(readOnly);
+                await createUpdateRecoveryWalletInfo(wallet);
+              } else {
+                // needs to delete the seed from the Keychain/Keystore, do it now.
+                if (this.state.hasRecoveryWalletInfoSaved) {
+                  await removeRecoveryWalletInfo();
+                }
+              }
+              this.setState({
+                readOnly,
+                orchardPool,
+                saplingPool,
+                transparentPool,
+                actionButtonsDisabled: false,
+              });
+            } catch (e) {
+              //console.log('CATCH ERROR', walletKindStr);
+              this.setState({
+                readOnly,
+                orchardPool,
+                saplingPool,
+                transparentPool,
+                actionButtonsDisabled: false,
+              });
+              this.addLastSnackbar({ message: walletKindStr, screenName: [this.screenName] });
+            }
+            // creating tor cliente if needed
+            if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
+              RPCModule.createTorClientProcess();
+            }
+            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true);
           } else {
             error = true;
             errorText = resultJson.error;
           }
-        } catch (e) {
+        } catch (e: unknown) {
           error = true;
-          errorText = JSON.stringify(e);
+          errorText = e instanceof Error ? e.message : String(e);
         }
       } else {
         error = true;
@@ -1241,6 +1362,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
                   this.addLastSnackbar({
                     message: this.props.translate('txtcopied') as string,
                     duration: SnackbarDurationEnum.short,
+                    screenName: [this.screenName],
                   });
                 },
               },
@@ -1251,7 +1373,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           // IOS needs time to close the biometric screen.
           // but Android I don't think so, a little bit Just in case.
         },
-        Platform.OS === GlobalConst.platformOSios ? 2000 : 100,
+        Platform.OS === GlobalConst.platformOSios ? 2 * 1000 : 100,
       );
     }
   };
@@ -1263,6 +1385,35 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     });
     this.componentDidMount();
   };
+
+  async fetchZingolibVersion(): Promise<void> {
+    try {
+      const start = Date.now();
+      let zingolibStr: string = await RPCModule.getVersionInfo();
+      if (Date.now() - start) {
+        console.log('=========================================== > zingolib version - ', Date.now() - start);
+      }
+      if (zingolibStr) {
+        if (zingolibStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error zingolib version ${zingolibStr}`);
+          zingolibStr = GlobalConst.zingolibError;
+        }
+      } else {
+        console.log('Internal Error zingolib version');
+        zingolibStr = GlobalConst.zingolibNone;
+      }
+
+      //const start2 = Date.now();
+      this.setState({
+        zingolibVersion: zingolibStr,
+      });
+      //console.log('=========================================== > set zingolib version - ', Date.now() - start2);
+    } catch (error) {
+      console.log(`Critical Error info ${error}`);
+      return;
+    }
+  }
+
 
   render() {
     const {
@@ -1280,6 +1431,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       translate,
       hasRecoveryWalletInfoSaved,
       readOnly,
+      orchardPool,
+      saplingPool,
+      transparentPool,
     } = this.state;
 
     //console.log('render loadingAppClass - 3', this.state.privacy);
@@ -1288,16 +1442,19 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       // context
       netInfo: this.state.netInfo,
       wallet: this.state.wallet,
-      info: this.state.info,
       zecPrice: this.state.zecPrice,
       background: this.state.background,
       translate: this.state.translate,
       backgroundError: this.state.backgroundError,
       setBackgroundError: this.state.setBackgroundError,
       readOnly: this.state.readOnly,
+      orchardPool: this.state.orchardPool,
+      saplingPool: this.state.saplingPool,
+      transparentPool: this.state.transparentPool,
       snackbars: this.state.snackbars,
       addLastSnackbar: this.state.addLastSnackbar,
       removeFirstSnackbar: this.removeFirstSnackbar,
+      zingolibVersion: this.state.zingolibVersion,
 
       // settings
       server: this.state.server,
@@ -1315,13 +1472,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     return (
       <ToastProvider>
-        <ContextAppLoadingProvider value={context}>
-          <Snackbars
-            snackbars={snackbars}
-            removeFirstSnackbar={this.removeFirstSnackbar}
-            translate={translate}
-          />
+        <Snackbars
+          snackbars={snackbars}
+          removeFirstSnackbar={this.removeFirstSnackbar}
+          screenName={this.screenName}
+        />
 
+        <ContextAppLoadingProvider value={context}>
           {screen === 0 && (
             <Launching
               translate={translate}
@@ -1359,10 +1516,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               animationType="slide"
               transparent={true}
               visible={screen === 2}
-              onRequestClose={() => this.navigateToLoadedApp(readOnly)}>
+              onRequestClose={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true)}>
               <Seed
-                onClickOK={() => this.navigateToLoadedApp(readOnly)}
-                onClickCancel={() => this.navigateToLoadedApp(readOnly)}
+                onClickOK={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true)}
+                onClickCancel={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true)}
                 action={SeedActionEnum.new}
                 setPrivacyOption={this.setPrivacyOption}
               />

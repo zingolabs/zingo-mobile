@@ -9,6 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  TextInputEndEditingEventData,
+  NativeSyntheticEvent,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -21,9 +23,10 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import { ButtonTypeEnum, GlobalConst } from '../../app/AppState';
+import { ButtonTypeEnum, GlobalConst, ScreenEnum } from '../../app/AppState';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
 import { useMagicModal } from 'react-native-magic-modal';
@@ -37,12 +40,13 @@ type MemoProps = {
 };
 const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, setMessage }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, uOrchardAddress, snackbars, removeFirstSnackbar } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { translate, language, defaultUnifiedAddress, snackbars, removeFirstSnackbar } = context;
+  const { colors } = useTheme() as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.Memo;
 
   const [memo, setMemo] = useState<string>(message);
 
@@ -59,6 +63,12 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <KeyboardAvoidingView
         behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
@@ -69,13 +79,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
           marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
-        }}
-      >
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
+        }}>
 
         <View
           style={{
@@ -84,6 +88,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
           }}>
           <Header
             title={translate('send.memo') as string}
+            screenName={screenName}
             noBalance={true}
             noSyncingStatus={true}
             noDrawMenu={true}
@@ -135,7 +140,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
                 }}
                 value={memo}
                 onChangeText={(text: string) => setMemo(text)}
-                onEndEditing={(e: any) => setMemo(e.nativeEvent.text)}
+                onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => setMemo(e.nativeEvent.text)}
                 maxLength={GlobalConst.memoMaxLength}
               />
               {memo && (
@@ -158,10 +163,10 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
                   marginTop: 0,
                   fontWeight: 'bold',
                   color:
-                    Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress) > GlobalConst.memoMaxLength
+                    Utils.countMemoBytes(memo, includeUAMessage, defaultUnifiedAddress) > GlobalConst.memoMaxLength
                       ? 'red'
                       : colors.text,
-                }}>{`${Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress)} `}</FadeText>
+                }}>{`${Utils.countMemoBytes(memo, includeUAMessage, defaultUnifiedAddress)} `}</FadeText>
               <FadeText style={{ marginTop: 0 }}>{translate('loadedapp.of') as string}</FadeText>
               <FadeText style={{ marginTop: 0 }}>{' ' + GlobalConst.memoMaxLength.toString() + ' '}</FadeText>
             </View>
@@ -178,7 +183,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
               type={ButtonTypeEnum.Primary}
               title={translate('save') as string}
               onPress={doSaveAndClose}
-              disabled={Utils.countMemoBytes(memo, includeUAMessage, uOrchardAddress) > GlobalConst.memoMaxLength}
+              disabled={Utils.countMemoBytes(memo, includeUAMessage, defaultUnifiedAddress) > GlobalConst.memoMaxLength}
             />
           </View>
         </View>

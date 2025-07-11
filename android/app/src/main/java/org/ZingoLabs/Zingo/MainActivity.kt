@@ -19,7 +19,7 @@ class MainActivity : ReactActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("ON_CREATE", "Starting main activity")
-        super.onCreate(savedInstanceState)
+        super.onCreate(null)
     }
 
     override fun createReactActivityDelegate(): ReactActivityDelegate {

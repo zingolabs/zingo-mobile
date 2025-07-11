@@ -1,15 +1,25 @@
-import { SyncingStatusClass } from '../../app/AppState';
+import { RPCSyncScanRangePriorityStatusEnum } from '../../app/rpc/enums/RPCSyncScanRangePriorityStatusEnum';
+import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 
-export const mockSyncingStatus: SyncingStatusClass = new SyncingStatusClass();
+export const mockSyncingStatus: RPCSyncStatusType = {} as RPCSyncStatusType;
 
-mockSyncingStatus.syncID = 1;
-mockSyncingStatus.inProgress = true;
-mockSyncingStatus.currentBatch = 5;
-mockSyncingStatus.totalBatches = 50;
-mockSyncingStatus.currentBlock = 1800100;
-mockSyncingStatus.lastBlockWallet = 1800000;
-mockSyncingStatus.lastBlockServer = 1900100;
-mockSyncingStatus.secondsPerBatch = 122;
-mockSyncingStatus.processEndBlock = 1600100;
+mockSyncingStatus.scan_ranges = [
+  {
+    priority: RPCSyncScanRangePriorityStatusEnum.Scanned,
+    start_block: 2000000,
+    end_block: 2500000,
+  },
+];
+mockSyncingStatus.sync_start_height = 2000000;
+mockSyncingStatus.session_blocks_scanned = 0;
+mockSyncingStatus.total_blocks_scanned = 0;
+mockSyncingStatus.percentage_session_blocks_scanned = 0;
+mockSyncingStatus.percentage_total_blocks_scanned = 100;
+mockSyncingStatus.session_sapling_outputs_scanned = 0;
+mockSyncingStatus.total_sapling_outputs_scanned = 0;
+mockSyncingStatus.session_orchard_outputs_scanned = 0;
+mockSyncingStatus.total_orchard_outputs_scanned = 0;
+mockSyncingStatus.percentage_session_outputs_scanned = 0;
+mockSyncingStatus.percentage_total_outputs_scanned = 100;
 
 export default mockSyncingStatus;

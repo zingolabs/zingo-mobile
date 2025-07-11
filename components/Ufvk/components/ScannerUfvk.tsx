@@ -6,6 +6,7 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 import Header from '../../Header';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -14,6 +15,7 @@ import { ThemeType } from '../../../app/types';
 import { View } from 'react-native';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
+import { ScreenEnum } from '../../../app/AppState';
 
 type ScannerUfvkProps = {
   setUfvkText: (k: string) => void;
@@ -25,6 +27,7 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, c
   const { colors } = useTheme()  as ThemeType;
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const screenName = ScreenEnum.ScannerUfvk;
 
   const onRead = async (value: string) => {
     const scandata = value;
@@ -39,6 +42,12 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, c
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -48,14 +57,9 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, c
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('scanner.text') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

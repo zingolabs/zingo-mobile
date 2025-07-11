@@ -1,28 +1,32 @@
 export default class TotalBalanceClass {
-  // Total t address, confirmed and spendable
-  transparentBal: number;
+  // Total transparent, confirmed and unconfirmed
+  totalTransparentBalance: number;
 
   // Total private, confirmed + pending
-  privateBal: number;
+  totalSaplingBalance: number;
 
   // Total orchard, confirmed + pending
-  orchardBal: number;
+  totalOrchardBalance: number;
 
-  // Total private, confirmed funds that are spendable
-  spendablePrivate: number;
+  // Total transparent, only confirmed
+  confirmedTransparentBalance: number;
 
-  // Total orchard, confirmed funds that are spendable
-  spendableOrchard: number;
+  // Total private, confirmed funds
+  confirmedSaplingBalance: number;
 
-  // Total pending + spendable
-  total: number;
+  // Total orchard, confirmed funds
+  confirmedOrchardBalance: number;
+
+  // Total spendable
+  totalSpendableBalance: number;
 
   constructor() {
-    this.transparentBal = 0;
-    this.privateBal = 0;
-    this.spendablePrivate = 0;
-    this.orchardBal = 0;
-    this.spendableOrchard = 0;
-    this.total = 0;
+    this.totalTransparentBalance = 0;
+    this.totalSaplingBalance = 0;
+    this.totalOrchardBalance = 0;
+    this.confirmedTransparentBalance = 0;
+    this.confirmedSaplingBalance = 0;
+    this.confirmedOrchardBalance = 0;
+    this.totalSpendableBalance = 0;
   }
 }

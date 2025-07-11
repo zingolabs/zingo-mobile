@@ -14,20 +14,23 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { ScreenEnum } from '../../app/AppState';
 
 type AboutProps = {
 };
 const About: React.FunctionComponent<AboutProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, language, snackbars, removeFirstSnackbar } = context;
+  const { zingolibVersion, translate, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.About;
 
   const arrayTxtObject = translate('about.copyright');
   let arrayTxt: string[] = [];
@@ -35,10 +38,14 @@ const About: React.FunctionComponent<AboutProps> = () => {
     arrayTxt = arrayTxtObject as string[];
   }
 
-  console.log(top, bottom, right, left);
-
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -48,14 +55,9 @@ const About: React.FunctionComponent<AboutProps> = () => {
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('zingo') + ' ' + translate('version')}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -75,7 +77,7 @@ const About: React.FunctionComponent<AboutProps> = () => {
             padding: 20,
           }}>
           <FadeText>{arrayTxt[0]}</FadeText>
-          <DetailLine label={translate('info.zingolib') as string} value={info.zingolib} />
+          <DetailLine label={translate('info.zingolib') as string} value={zingolibVersion} screenName={screenName} />
           <View style={{ marginTop: 20 }}>
             {arrayTxt.map((txt: string, ind: number) => (
               <View key={txt.substring(0, 10)}>

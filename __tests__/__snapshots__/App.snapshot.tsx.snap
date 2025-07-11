@@ -1,41 +1,30 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component App - test App - snapshot 1`] = `
-<View
-  style={
-    [
-      {
-        "flex": 1,
-      },
-      undefined,
-    ]
+<MockedNavigator
+  initialRouteName="LoadingApp"
+  screenOptions={
+    {
+      "animation": "none",
+      "headerShown": false,
+    }
   }
 >
-  <MockedNavigator
-    initialRouteName="LoadingApp"
-    screenOptions={
+  <MockedScreen
+    name="LoadingApp"
+    options={
       {
         "animation": "none",
-        "headerShown": false,
       }
     }
-  >
-    <MockedScreen
-      name="LoadingApp"
-      options={
-        {
-          "animation": "none",
-        }
+  />
+  <MockedScreen
+    name="LoadedApp"
+    options={
+      {
+        "animation": "none",
       }
-    />
-    <MockedScreen
-      name="LoadedApp"
-      options={
-        {
-          "animation": "none",
-        }
-      }
-    />
-  </MockedNavigator>
-</View>
+    }
+  />
+</MockedNavigator>
 `;

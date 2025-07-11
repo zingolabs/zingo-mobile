@@ -1,4 +1,3 @@
-import RNBiometrics from 'react-native-easy-biometrics';
 import { GlobalConst, TranslateType } from './AppState';
 
 import ReactNativeBiometrics from 'react-native-biometrics';
@@ -25,12 +24,17 @@ const simpleBiometrics = async (props: simpleBiometricsProps) => {
   }
 
   try {
-    await RNBiometrics.requestBioAuth(
-      props.translate('biometrics-title') as string,
-      props.translate('biometrics-message') as string,
-    );
-    // Code to execute when authenticated
-    return true;
+    const result = await rnBiometrics.simplePrompt({
+      promptMessage: props.translate('biometrics-message') as string,
+      fallbackPromptMessage: props.translate('biometrics-message-ios') as string,
+    });
+    if (result.success) {
+      console.log('Biometric auth success');
+      return true;
+    } else {
+      console.log('Biometric auth cancelled or failed');
+      return false;
+    }
   } catch (e) {
     // Code to handle authentication failure
     console.log(e);

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, ScrollView, TouchableOpacity, Linking, Text } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Linking, Text, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -8,17 +8,24 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 
 import { useTheme } from '@react-navigation/native';
 
 import {
   AddressBookFileClass,
-  AddressClass,
   ChainNameEnum,
   SnackbarDurationEnum,
   ValueTransferType,
   ValueTransferKindEnum,
   GlobalConst,
+  ButtonTypeEnum,
+  SelectServerEnum,
+  RouteEnums,
+  TransactionActionEnum,
+  UnifiedAddressClass,
+  TransparentAddressClass,
+  ScreenEnum,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
@@ -37,6 +44,9 @@ import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTran
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import Button from '../../Components/Button';
+import RPCModule from '../../../app/RPCModule';
+import { createAlert } from '../../../app/createAlert';
 // this is for https. (primary)
 //import { faLock } from '@fortawesome/free-solid-svg-icons';
 
@@ -69,12 +79,21 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     zenniesDonationAddress,
     snackbars,
     removeFirstSnackbar,
+    setBackgroundError,
+    netInfo,
+    selectServer,
+    setComputingModalShow,
+    navigationHome,
+    closeAllModals,
+    valueTransfers,
+    readOnly,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.ValueTransferDetail;
 
   const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(vt);
   const [valueTransferIndex, setValueTransferIndex] = useState<number>(index);
@@ -88,7 +107,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
 
   useEffect(() => {
     const spendCo =
-      valueTransfer.confirmations === 0
+      valueTransfer.confirmations < GlobalConst.minConfirmations
         ? colors.primaryDisabled
         : valueTransfer.kind === ValueTransferKindEnum.Received || valueTransfer.kind === ValueTransferKindEnum.Shield
         ? colors.primary
@@ -132,18 +151,42 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalLength]);
 
+  // magic modal make a copy of the parameter when use `show` -> unmutable props.
+  // when this component render (probably motivate by the parent)
+  // is the moment to get again the updated values to show in this component.
+  const getValueTransferAgain = (v: ValueTransferType) => {
+    if (!valueTransfers) {
+      return [] as ValueTransferType[];
+    }
+    return valueTransfers.filter((vtt: ValueTransferType) =>
+      vtt.txid === v.txid && vtt.address === v.address && vtt.poolType === v.poolType
+    );
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const vtNew = getValueTransferAgain(valueTransfer);
+    if (vtNew.length !== 1) {
+      // something really weird is happening...
+      clear();
+      hide();
+    } else {
+      setValueTransfer(vtNew[0]);
+    }
+  });
+
   const contactFound: (add: string) => boolean = (add: string) => {
     if (!add) {
       return false;
     }
     const contact: AddressBookFileClass[] = addressBook.filter(
-      (ab: AddressBookFileClass) => ab.address === add || ab.uOrchardAddress === add,
+      (ab: AddressBookFileClass) => ab.address === add,
     );
     return contact.length >= 1;
   };
 
   const thisWalletAddress: (add: string) => boolean = (add: string) => {
-    const address: AddressClass[] = addresses ? addresses.filter((a: AddressClass) => a.address === add) : [];
+    const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses ? addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.address === add) : [];
     return address.length >= 1;
   };
 
@@ -154,17 +197,101 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const moveValueTransferDetail = (indexParm: number, typeParm: number) => {
     // -1 -> Previous ValueTransfer
     //  1 -> Next ValueTransfer
-    if ((indexParm > 0 && typeParm === -1) || (indexParm < valueTransfersSliced.length - 1 && typeParm === 1)) {
+    if ((indexParm > 0 && typeParm === -1) ||
+        (indexParm < valueTransfersSliced.length - 1 && typeParm === 1)) {
       const newIndex = indexParm + typeParm;
-      setValueTransfer(valueTransfersSliced[newIndex]);
-      setValueTransferIndex(newIndex);
+      const vtNew = getValueTransferAgain(valueTransfersSliced[newIndex]);
+      if (vtNew.length !== 1) {
+        // something really weird is happening...
+        clear();
+        hide();
+      } else {
+        setValueTransfer(vtNew[0]);
+        setValueTransferIndex(newIndex);
+      }
     }
   };
 
-  //console.log('vt', index, totalLength, isTheFirstMount, vt);
+  const runAction = async (action: TransactionActionEnum) => {
+    if (!setBackgroundError || !addLastSnackbar) {
+      return;
+    }
+    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
+      return;
+    }
+
+    // not use await here.
+    setComputingModalShow();
+
+    let actionStr: string;
+    if (action === TransactionActionEnum.resend) {
+      actionStr = await RPCModule.resendTransactionProcess(valueTransfer.txid);
+    } else {
+      actionStr = await RPCModule.removeTransactionProcess(valueTransfer.txid);
+    }
+
+    console.log(actionStr);
+
+    if (actionStr) {
+      if (actionStr.toLowerCase().startsWith(GlobalConst.error)) {
+        createAlert(
+          setBackgroundError,
+          addLastSnackbar,
+          [screenName],
+          translate(`history.${action}-title`) as string,
+          `${translate(`history.${action}-error`)} ${actionStr}`,
+          true,
+          translate,
+        );
+      } else {
+        createAlert(
+          setBackgroundError,
+          addLastSnackbar,
+          [screenName],
+          translate(`history.${action}-title`) as string,
+          `${translate(`history.${action}-message`)} ${actionStr}`,
+          true,
+          translate,
+        );
+      }
+
+      closeAllModals();
+      // change to the history screen, just in case.
+      navigationHome?.navigate(RouteEnums.Home, {
+        screen: translate('loadedapp.history-menu') as string,
+        initial: false,
+      });
+    }
+  };
+
+  const actionOnPress = (action: TransactionActionEnum) => {
+    Alert.alert(
+      translate(`history.${action}-title`) as string,
+      translate(`history.${action}-alert`) as string,
+      [
+        { text: translate('confirm') as string, onPress: () => runAction(action) },
+        { text: translate('cancel') as string, style: 'cancel' },
+      ],
+      { cancelable: false },
+    );
+  };
+
+  //console.log('render History Detail', vt);
+
+  //if (valueTransfer.status === RPCValueTransfersStatusEnum.calculated || valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) {
+  //  console.log('server', info.latestBlock, 'VT', valueTransfer.blockheight, 'expire', GlobalConst.expireBlocks);
+  //  console.log(info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks);
+  //}
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -174,17 +301,13 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('history.details') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
+          noUfvkIcon={true}
           setPrivacyOption={setPrivacyOption}
           addLastSnackbar={addLastSnackbar}
           closeScreen={() => {
@@ -283,7 +406,62 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
             )}
           </View>
 
-          {valueTransfer.confirmations === 0 && (
+          {valueTransfer.confirmations === 0 && ( /* not min confirmations applied */
+            <>
+              {(valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
+                valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                valueTransfer.status === RPCValueTransfersStatusEnum.mempool) && (
+                <>
+                  <View
+                    style={{
+                      flexGrow: 1,
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginBottom: 10,
+                    }}>
+                    {(valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
+                      valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) &&
+                      info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks &&
+                      !readOnly && (
+                      <Button
+                        type={ButtonTypeEnum.Secondary}
+                        title={translate('history.resend') as string}
+                        style={{ marginRight: 10 }}
+                        onPress={() => {
+                          actionOnPress(TransactionActionEnum.resend);
+                        }}
+                        twoButtons={true}
+                      />
+                    )}
+                    <Button
+                      type={ButtonTypeEnum.Primary}
+                      title={translate('history.remove') as string}
+                      onPress={() => {
+                        actionOnPress(TransactionActionEnum.remove);
+                      }}
+                      twoButtons={
+                        (valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
+                        valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) &&
+                        info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks}
+                    />
+                  </View>
+                  <View
+                    style={{
+                      flexGrow: 1,
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginBottom: 10,
+                    }}>
+                    <FadeText style={{ fontSize: 11 }}>{translate('history.remove-legend') as string}</FadeText>
+                  </View>
+                </>
+              )}
+            </>
+          )}
+
+          {valueTransfer.confirmations < GlobalConst.minConfirmations && (
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
               {(valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
                 valueTransfer.status === RPCValueTransfersStatusEnum.calculated) && (
@@ -294,29 +472,47 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                   size={15}
                 />
               )}
-              <FadeText
-                style={{
-                  color:
-                    valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
-                    valueTransfer.status === RPCValueTransfersStatusEnum.calculated
-                      ? colors.primary
-                      : colors.primaryDisabled,
-                  fontSize: 12,
-                  opacity: 1,
-                  fontWeight: '700',
-                  textAlign:
-                    valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
-                    valueTransfer.status === RPCValueTransfersStatusEnum.calculated
-                      ? 'center'
-                      : 'left',
-                  textDecorationLine:
-                    valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
-                    valueTransfer.status === RPCValueTransfersStatusEnum.calculated
-                      ? 'underline'
-                      : 'none',
-                }}>
-                {(translate(`history.${valueTransfer.status}`) as string) + ' - ' + (translate('history.not-confirmed') as string)}
-              </FadeText>
+              {(valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
+                valueTransfer.status === RPCValueTransfersStatusEnum.mempool) && (
+                <FadeText
+                  style={{
+                    color:
+                      valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                      valueTransfer.status === RPCValueTransfersStatusEnum.calculated
+                        ? colors.primary
+                        : colors.primaryDisabled,
+                    fontSize: 12,
+                    opacity: 1,
+                    fontWeight: '700',
+                    textAlign:
+                      valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                      valueTransfer.status === RPCValueTransfersStatusEnum.calculated
+                        ? 'center'
+                        : 'left',
+                    textDecorationLine:
+                      valueTransfer.status === RPCValueTransfersStatusEnum.transmitted ||
+                      valueTransfer.status === RPCValueTransfersStatusEnum.calculated
+                        ? 'underline'
+                        : 'none',
+                  }}>
+                  {(translate(`history.${valueTransfer.status}`) as string) + ' - ' + (translate('history.not-confirmed') as string)}
+                </FadeText>
+              )}
+              {valueTransfer.status === RPCValueTransfersStatusEnum.confirmed &&
+                valueTransfer.confirmations < GlobalConst.minConfirmations && (
+                <FadeText
+                  style={{
+                    color: colors.primaryDisabled,
+                    fontSize: 12,
+                    opacity: 1,
+                    fontWeight: '700',
+                    textAlign: 'left',
+                    textDecorationLine: 'none',
+                  }}>
+                  {(translate(`history.${valueTransfer.status}`) as string) + ' - ' + (translate('history.waiting') as string)}
+                </FadeText>
+              )}
             </View>
           )}
 
@@ -341,6 +537,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                     addLastSnackbar({
                       message: translate('history.txcopied') as string,
                       duration: SnackbarDurationEnum.short,
+                      screenName: [screenName],
                     });
                     setExpandTxid(true);
                   }
@@ -376,6 +573,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                 <FadeText>{translate('history.address') as string}</FadeText>
                 <AddressItem
                   address={valueTransfer.address}
+                  screenName={screenName}
                   withIcon={true}
                   withSendIcon={true}
                   addressProtected={addressProtected}
@@ -410,6 +608,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                       addLastSnackbar({
                         message: translate('history.memocopied') as string,
                         duration: SnackbarDurationEnum.short,
+                        screenName: [screenName],
                       });
                     }}>
                     <RegText selectable={true}>{memo}</RegText>
@@ -423,11 +622,13 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                         addLastSnackbar({
                           message: translate('history.address-http') as string,
                           duration: SnackbarDurationEnum.long,
+                          screenName: [screenName],
                         });
                       }
                       addLastSnackbar({
                         message: translate('history.addresscopied') as string,
                         duration: SnackbarDurationEnum.short,
+                        screenName: [screenName],
                       });
                     }}>
                     <RegText>{GlobalConst.replyTo}</RegText>
@@ -440,7 +641,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                         {!thisWalletAddress(memoUA) && (
                           <RegText style={{ opacity: 0.6 }}>{translate('addressbook.likely') as string}</RegText>
                         )}
-                        <AddressItem address={memoUA} onlyContact={true} />
+                        <AddressItem address={memoUA} screenName={screenName} onlyContact={true} />
                       </View>
                     )}
                     {!contactFound(memoUA) && thisWalletAddress(memoUA) && (

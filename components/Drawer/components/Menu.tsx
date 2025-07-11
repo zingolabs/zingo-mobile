@@ -12,16 +12,18 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { GlobalConst, MenuItemEnum, ModeEnum, SelectServerEnum } from '../../../app/AppState';
+import 'moment/locale/tr';
+import { GlobalConst, MenuItemEnum, ModeEnum, ScreenEnum, SelectServerEnum } from '../../../app/AppState';
 import { HideReturn } from 'react-native-magic-modal';
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 
 type MenuProps = {
   onItemSelected: (item: MenuItemEnum) => Promise<HideReturn<unknown> | undefined>;
+  screenName: ScreenEnum;
   navigation: DrawerContentComponentProps['navigation'];
 };
 
-const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, navigation }) => {
+const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, navigation }) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -65,7 +67,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, navigation }
       //console.log('BIOMETRIC --------> ', resultBio);
       if (resultBio === false) {
         // snack with Error & closing the menu.
-        addLastSnackbar({ message: translate('biometrics-error') as string });
+        addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
       } else {
         onItemSelected(value);
       }

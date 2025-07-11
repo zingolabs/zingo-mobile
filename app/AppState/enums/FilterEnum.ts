@@ -3,4 +3,5 @@ export enum FilterEnum {
   contacts = 'contacts',
   noContacts = 'no contacts',
   withFunds = 'withFunds',
+  wallet = 'wallet',
 }

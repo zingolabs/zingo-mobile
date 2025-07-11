@@ -22,4 +22,13 @@ export const GlobalConst = {
   keyKeyChain: 'ZINGO_SEED_BIRTHDAY',
   serviceKeyChain: 'ZINGO',
   replyTo: '\nReply to: \n',
+  expireBlocks: 40,
+  zingolib: 'Zingolib',
+  zingolibError: '<error>',
+  zingolibNone: '<none>',
+  transactionFilterThreshold: '500',
+  keyChain: 'KeyChain',
+  keyStore: 'KeyStore',
+  utf8: 'utf8',
+  minConfirmations: 3,
 };

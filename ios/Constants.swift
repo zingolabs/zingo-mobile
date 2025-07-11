@@ -14,4 +14,5 @@ enum Constants: String {
 
     case BackgroundFileName = "background.json"
     case ErrorPrefix = "error"
+    case SyncPrefix = "sync task"
 }

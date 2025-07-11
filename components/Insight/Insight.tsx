@@ -19,11 +19,12 @@ import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
-import { CommandEnum, SnackbarDurationEnum } from '../../app/AppState';
+import { ScreenEnum, SnackbarDurationEnum } from '../../app/AppState';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -49,11 +50,12 @@ type InsightProps = {
 const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
   const { info, translate, privacy, addLastSnackbar, language, snackbars, removeFirstSnackbar } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.Insight;
 
   const [pieAmounts, setPieAmounts] = useState<DataType[]>([]);
   const [expandAddress, setExpandAddress] = useState<boolean[]>([]);
@@ -70,21 +72,21 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
       let resultStr: string = '';
       switch (tab) {
         case 'sent':
-          resultStr = await RPCModule.execute(CommandEnum.valueToAddress, '');
+          resultStr = await RPCModule.getTotalValueToAddressInfo();
           //console.log('################# value', resultStr);
           break;
         case 'sends':
-          resultStr = await RPCModule.execute(CommandEnum.sendsToAddress, '');
+          resultStr = await RPCModule.getTotalSpendsToAddressInfo();
           //console.log('################# sends', resultStr);
           break;
         case 'memobytes':
-          resultStr = await RPCModule.execute(CommandEnum.memobytesToAddress, '');
+          resultStr = await RPCModule.getTotalMemobytesToAddressInfo();
           //console.log('################# memobytes', resultStr);
           break;
         default:
           break;
       }
-      let resultJSON: any;
+      let resultJSON: Record<string, unknown>;
       try {
         resultJSON = await JSON.parse(resultStr);
       } catch (e) {
@@ -163,6 +165,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
                   addLastSnackbar({
                     message: translate('history.addresscopied') as string,
                     duration: SnackbarDurationEnum.short,
+                    screenName: [screenName],
                   });
                   selectExpandAddress(index);
                 }
@@ -174,12 +177,7 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
                   flexWrap: 'wrap',
                 }}>
                 {item.address !== 'fee' && (
-                  <AddressItem
-                    address={item.address}
-                    oneLine={true}
-                    onlyContact={true}
-                    withIcon={true}
-                  />
+                  <AddressItem address={item.address} screenName={screenName} oneLine={true} onlyContact={true} withIcon={true} />
                 )}
                 {!expandAddress[index] && !!item.address && (
                   <RegText>
@@ -231,16 +229,22 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
   const renderExternalLabel = useCallback(
     (item: pieDataItem | undefined) => (
       <SvgText fontSize={12} fill={item?.color}>
-        {item?.value}
+        {Number(item?.value.toFixed(2))}
       </SvgText>
     ),
-    []
+    [],
   );
 
   //console.log('render insight');
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -250,14 +254,9 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('insight.title') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}

@@ -5,7 +5,6 @@ import org.junit.Test
 import org.junit.experimental.categories.Category
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.facebook.react.bridge.ReactApplicationContext
 
 object Seeds {
     const val ABANDON = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"
@@ -17,13 +16,14 @@ object Ufvk {
 }
 
 data class InitFromSeed (
-    val seed : String,
+    val seed_phrase : String,
     val birthday : Long,
-    val account_index: Long
+    val no_of_accounts: Long
 )
 
 data class InitFromUfvk (
-    val error : String
+    val ufvk : String,
+    val birthday : Long
 )
 
 data class ExportUfvk (
@@ -31,15 +31,22 @@ data class ExportUfvk (
     val birthday : Long
 )
 
-data class Addresses (
-	val address : String,
-	val receivers : Receivers
+data class UnifiedAddress (
+	val account : Long?,
+    val address_index : Long?,
+	val has_orchard : Boolean?,
+    val has_sapling : Boolean?,
+    val has_transparent : Boolean?,
+    val encoded_address : String?,
+    val error : String?
 )
 
-data class Receivers (
-	val transparent : String,
-	val sapling : String,
-	val orchard_exists : Boolean
+data class TransparentAddress (
+	val account : Long?,
+    val address_index : Long?,
+    val scope : String?,
+	val encoded_address : String?,
+    val error : String?
 )
 
 data class Info (
@@ -58,28 +65,37 @@ data class Height (
 	val height : Long
 )
 
-data class SyncStatus (
-	val sync_id : Long,
-    val in_progress : Boolean,
-    val last_error : String?
+data class ScanRanges (
+    val priority : String = "",
+    val start_block : String = "",
+    val end_block : String = ""
 )
 
-data class Sync (
-	val result : String,
-    val latest_block : Long,
-    val total_blocks_synced : Long
+data class SyncStatus (
+    val scan_ranges : List<ScanRanges> = emptyList(),
+    val sync_start_height : Long = 0L,
+    val session_blocks_scanned : Long = 0L,
+    val total_blocks_scanned : Long = 0L,
+    val percentage_session_blocks_scanned : Double = 0.0,
+    val percentage_total_blocks_scanned : Double = 0.0,
+    val session_sapling_outputs_scanned : Long = 0L,
+    val total_sapling_outputs_scanned : Long = 0L,
+    val session_orchard_outputs_scanned : Long = 0L,
+    val total_orchard_outputs_scanned : Long = 0L,
+    val percentage_session_outputs_scanned : Double = 0.0,
+    val percentage_total_outputs_scanned : Double = 0.0
 )
 
 data class Balance (
-    val sapling_balance : Long,
-    val verified_sapling_balance : Long,
-    val spendable_sapling_balance : Long,
-    val unverified_sapling_balance : Long,
-    val orchard_balance : Long,
-    val verified_orchard_balance : Long,
-    val spendable_orchard_balance : Long,
-    val unverified_orchard_balance : Long,
-    val transparent_balance : Long
+    val total_sapling_balance : Long,
+    val confirmed_sapling_balance : Long,
+    val unconfirmed_sapling_balance : Long,
+    val total_orchard_balance : Long,
+    val confirmed_orchard_balance : Long,
+    val unconfirmed_orchard_balance : Long,
+    val total_transparent_balance : Long,
+    val confirmed_transparent_balance : Long,
+    val unconfirmed_transparent_balance : Long
 )
 
 data class Send (
@@ -125,27 +141,36 @@ class ExecuteAddressesFromSeed {
         val chainhint = "main"
         val seed = Seeds.ABANDON
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
+
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
+        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val addressesJson: String = uniffi.zingo.executeCommand("addresses", "")
+        val addressesJson: String = uniffi.zingo.getUnifiedAddresses()
         println("\nAddresses:")
         println(addressesJson)
-        val addresses: List<Addresses> = mapper.readValue(addressesJson)
-        assertThat(addresses[0].address).isEqualTo("u16sw4v6wy7f4jzdny55yzl020tp3yqg3c85dc6n7mmq0urfm6adqg79hxmyk85ufn4lun4pfh5q48cc3kvxhxm3w978eqqecdd260gkzjrkun6z7m9mcrt2zszaj0mvk6ufux2zteqwh57cq906hz3rkg63duaeqsvjelv9h5srct0zq8rvlv23wz5hed7zuatqd7p6p4ztugc4t4w2g")
-        assertThat(addresses[0].receivers.transparent).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
-        assertThat(addresses[0].receivers.sapling).isEqualTo("zs16uhd4mux24se6wkm74vld0ec63d4dxt3d7m80l5xytreplkkllrrf9c7fj859mhp8tkcq9hxfvj")
-        assertThat(addresses[0].receivers.orchard_exists).isEqualTo(true)
+        val addresses: List<UnifiedAddress> = mapper.readValue(addressesJson)
+        assertThat(addresses[0].encoded_address).isEqualTo("u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd")
+        assertThat(addresses[0].has_orchard).isEqualTo(true)
+        assertThat(addresses[0].has_sapling).isEqualTo(false)
+        assertThat(addresses[0].has_transparent).isEqualTo(false)
+
+        val taddressesJson: String = uniffi.zingo.getTransparentAddresses()
+        println("\nT Addresses:")
+        println(taddressesJson)
+        val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
+        assertThat(taddresses[0].encoded_address).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
+        assertThat(taddresses[0].scope).isEqualTo("external")
     }
 }
 
@@ -159,33 +184,43 @@ class ExecuteAddressesFromUfvk {
         val chainhint = "main"
         val ufvk = Ufvk.ABANDON
         val birthday: ULong = 1u
-        val datadir = context.filesDir.path
-        val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(server, ufvk, birthday, datadir, chainhint, monitorMempool)
+        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(server, ufvk, birthday, chainhint)
         println("\nInit From UFVK:")
         println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
-        assertThat(initFromUfvk.error).startsWith("This wallet is watch-only")
 
-        val exportUfvkJson: String = uniffi.zingo.executeCommand("exportufvk", "")
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
+        assertThat(initFromUfvk.ufvk).isEqualTo(ufvk)
+        assertThat(initFromUfvk.birthday).isEqualTo(1)
+
+        val exportUfvkJson: String = uniffi.zingo.getUfvk()
         println("\nExport Ufvk:")
         println(exportUfvkJson)
         val exportUfvk: ExportUfvk = mapper.readValue(exportUfvkJson)
-        assertThat(exportUfvk.ufvk).isEqualTo(Ufvk.ABANDON)
+        assertThat(exportUfvk.ufvk).isEqualTo(ufvk)
         assertThat(exportUfvk.birthday).isEqualTo(1)
 
-        val addressesJson: String = uniffi.zingo.executeCommand("addresses", "")
+        val addressesJson: String = uniffi.zingo.getUnifiedAddresses()
         println("\nAddresses:")
         println(addressesJson)
-        val addresses: List<Addresses> = mapper.readValue(addressesJson)
-        assertThat(addresses[0].address).isEqualTo("u16sw4v6wy7f4jzdny55yzl020tp3yqg3c85dc6n7mmq0urfm6adqg79hxmyk85ufn4lun4pfh5q48cc3kvxhxm3w978eqqecdd260gkzjrkun6z7m9mcrt2zszaj0mvk6ufux2zteqwh57cq906hz3rkg63duaeqsvjelv9h5srct0zq8rvlv23wz5hed7zuatqd7p6p4ztugc4t4w2g")
-        assertThat(addresses[0].receivers.transparent).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
-        assertThat(addresses[0].receivers.sapling).isEqualTo("zs16uhd4mux24se6wkm74vld0ec63d4dxt3d7m80l5xytreplkkllrrf9c7fj859mhp8tkcq9hxfvj")
-        assertThat(addresses[0].receivers.orchard_exists).isEqualTo(true)
+        val addresses: List<UnifiedAddress> = mapper.readValue(addressesJson)
+        assertThat(addresses[0].encoded_address).isEqualTo("u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd")
+        assertThat(addresses[0].has_orchard).isEqualTo(true)
+        assertThat(addresses[0].has_sapling).isEqualTo(false)
+        assertThat(addresses[0].has_transparent).isEqualTo(false)
+
+        val taddressesJson: String = uniffi.zingo.getTransparentAddresses()
+        println("\nT Addresses:")
+        println(taddressesJson)
+        val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
+        assertThat(taddresses[0].encoded_address).isEqualTo("t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
+        assertThat(taddresses[0].scope).isEqualTo("external")
     }    
 }
 
@@ -199,20 +234,22 @@ class ExecuteVersionFromSeed {
         val chainhint = "main"
         val seed = Seeds.ABANDON
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
+
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
+        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val version: String = uniffi.zingo.executeCommand("version", "")
+        val version: String = uniffi.zingo.getVersion()
         println("\nVersion:")
         println(version)
         assertThat(version).isNotNull()
@@ -230,50 +267,61 @@ class ExecuteSyncFromSeed {
         val chainhint = "regtest"
         val seed = Seeds.ABANDON
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo(Seeds.ABANDON)
+
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
+        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val infoJson: String = uniffi.zingo.executeCommand("info", "")
+        val infoJson: String = uniffi.zingo.infoServer()
         println("\nInfo:")
         println(infoJson)
         val info: Info = mapper.readValue(infoJson)
         assertThat(info.latest_block_height).isGreaterThan(0)
 
-        var heightJson: String = uniffi.zingo.executeCommand("height", "")
+        var heightJson: String = uniffi.zingo.getLatestBlockWallet()
         println("\nHeight pre-sync:")
         println(heightJson)
         val heightPreSync: Height = mapper.readValue(heightJson)
         assertThat(heightPreSync.height).isEqualTo(0)
 
-        val syncJson: String = uniffi.zingo.executeCommand("sync", "")
+        val syncJson: String = uniffi.zingo.runSync()
         println("\nSync:")
         println(syncJson)
-        val sync: Sync = mapper.readValue(syncJson)
-        assertThat(sync.result).isEqualTo("success")
-        assertThat(sync.latest_block).isEqualTo(info.latest_block_height)
-        assertThat(sync.total_blocks_synced).isEqualTo(info.latest_block_height)
 
-        heightJson = uniffi.zingo.executeCommand("height", "")
+        var syncStatus: SyncStatus
+        while (true) {
+            val syncStatusJson: String = uniffi.zingo.statusSync()
+            println("\nSync status:")
+            println(syncStatusJson)
+            if (syncStatusJson.lowercase().startsWith("error")) {
+                println("Sync Error!:")
+                break
+            }
+            syncStatus = mapper.readValue(syncStatusJson)
+
+            if (syncStatus.percentage_total_outputs_scanned == 100.0) {
+                println("Sync completed!")
+                break
+            }
+
+            Thread.sleep(1000)
+        }
+
+        heightJson = uniffi.zingo.getLatestBlockWallet()
         println("\nHeight post-sync:")
         println(heightJson)
         val heightPostSync: Height = mapper.readValue(heightJson)
         assertThat(heightPostSync.height).isEqualTo(info.latest_block_height)
-
-        val syncStatusJson: String = uniffi.zingo.executeCommand("syncstatus", "")
-        println("\nSync status:")
-        println(syncStatusJson)
-        val syncStatus: SyncStatus = mapper.readValue(syncStatusJson)
-        assertThat(syncStatus.sync_id).isEqualTo(1)
     }
 }
 
@@ -286,36 +334,57 @@ class ExecuteSendFromOrchard {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
+
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
+        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        var syncJson: String = uniffi.zingo.executeCommand("sync", "")
+        var syncJson: String = uniffi.zingo.runSync()
         println("\nSync:")
         println(syncJson)
 
-        var balanceJson: String = uniffi.zingo.executeCommand("balance", "")
+        var syncStatusBefore: SyncStatus
+        while (true) {
+            val syncStatusBeforeJson: String = uniffi.zingo.statusSync()
+            println("\nSync status:")
+            println(syncStatusBeforeJson)
+            if (syncStatusBeforeJson.lowercase().startsWith("error")) {
+                println("Sync Error!:")
+                break
+            }
+            syncStatusBefore = mapper.readValue(syncStatusBeforeJson)
+
+            if (syncStatusBefore.percentage_total_outputs_scanned == 100.0) {
+                println("Sync completed!")
+                break
+            }
+
+            Thread.sleep(1000)
+        }
+
+        var balanceJson: String = uniffi.zingo.getBalance()
         println("\nBalance pre-send:")
         println(balanceJson)
         val balancePreSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePreSend.spendable_orchard_balance).isEqualTo(1000000)
-        assertThat(balancePreSend.transparent_balance).isEqualTo(0)
+        assertThat(balancePreSend.confirmed_orchard_balance).isEqualTo(1000000)
+        assertThat(balancePreSend.confirmed_transparent_balance).isEqualTo(0)
 
-        val addressesJson: String = uniffi.zingo.executeCommand("addresses", "")
-        println("\nAddresses:")
-        println(addressesJson)
-        val addresses: List<Addresses> = mapper.readValue(addressesJson)
+        val taddressesJson: String = uniffi.zingo.getTransparentAddresses()
+        println("\nT Addresses:")
+        println(taddressesJson)
+        val taddresses: List<TransparentAddress> = mapper.readValue(taddressesJson)
 
-        val send = Send(addresses[0].receivers.transparent, 100000, null)
+        val send = taddresses[0].encoded_address?.let { Send(it, 100000, null) }
 
         val proposeJson: String = uniffi.zingo.executeCommand("send", mapper.writeValueAsString(listOf(send)))
         println("\nPropose:")
@@ -325,15 +394,37 @@ class ExecuteSendFromOrchard {
         println("\nConfirm Txid:")
         println(confirmJson)
 
-        syncJson = uniffi.zingo.executeCommand("sync", "")
+        syncJson = uniffi.zingo.runSync()
         println("\nSync:")
         println(syncJson)
 
-        balanceJson = uniffi.zingo.executeCommand("balance", "")
+        var syncStatus: SyncStatus
+        while (true) {
+            val syncStatusJson: String = uniffi.zingo.statusSync()
+            println("\nSync status:")
+            println(syncStatusJson)
+            if (syncStatusJson.lowercase().startsWith("error")) {
+                println("Sync Error!:")
+                break
+            }
+            syncStatus = mapper.readValue(syncStatusJson)
+
+            if (syncStatus.percentage_total_outputs_scanned == 100.0) {
+                println("Sync completed!")
+                break
+            }
+
+            Thread.sleep(1000)
+        }
+
+        balanceJson = uniffi.zingo.getBalance()
         println("\nBalance post-send:")
         println(balanceJson)
         val balancePostSend: Balance = mapper.readValue(balanceJson)
-        assertThat(balancePostSend.transparent_balance).isEqualTo(100000)
+        assertThat(balancePostSend.total_orchard_balance).isEqualTo(885000)
+        // the transparent funds are unconfirmed...
+        assertThat(balancePostSend.confirmed_transparent_balance).isEqualTo(0)
+        assertThat(balancePostSend.unconfirmed_transparent_balance).isEqualTo(100000)
     }
 }
 
@@ -346,28 +437,50 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val monitorMempool = false
+        val tor = "false"
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
+
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
+        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val price: String = uniffi.zingo.executeCommand("updatecurrentprice", "")
+        val price: String = uniffi.zingo.zecPrice(tor)
         println("\nPrice:")
         println(price)
 
-        val syncJson: String = uniffi.zingo.executeCommand("sync", "")
+        val syncJson: String = uniffi.zingo.runSync()
         println("\nSync:")
         println(syncJson)
 
-        val valueTranfersJson: String = uniffi.zingo.getValueTransfers("50")
+        var syncStatus: SyncStatus
+        while (true) {
+            val syncStatusJson: String = uniffi.zingo.statusSync()
+            println("\nSync status:")
+            println(syncStatusJson)
+            if (syncStatusJson.lowercase().startsWith("error")) {
+                println("Sync Error!:")
+                break
+            }
+            syncStatus = mapper.readValue(syncStatusJson)
+
+            if (syncStatus.percentage_total_outputs_scanned == 100.0) {
+                println("Sync completed!")
+                break
+            }
+
+            Thread.sleep(1000)
+        }
+
+        val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
         println("\nValue Transfers:")
         println(valueTranfersJson)
         val valueTranfers: ValueTransfers = mapper.readValue(valueTranfersJson)
@@ -406,24 +519,45 @@ class ExecuteSaplingBalanceFromSeed {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-        assertThat(initFromSeed.seed).isEqualTo(Seeds.HOSPITAL)
+
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
+        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
-        val syncJson:String = uniffi.zingo.executeCommand("sync", "")
+        val syncJson:String = uniffi.zingo.runSync()
         println("\nSync:")
         println(syncJson)
-        
-        val valueTranfersJson: String = uniffi.zingo.getValueTransfers("50")
+
+        var syncStatus: SyncStatus
+        while (true) {
+            val syncStatusJson: String = uniffi.zingo.statusSync()
+            println("\nSync status:")
+            println(syncStatusJson)
+            if (syncStatusJson.lowercase().startsWith("error")) {
+                println("Sync Error!:")
+                break
+            }
+            syncStatus = mapper.readValue(syncStatusJson)
+
+            if (syncStatus.percentage_total_outputs_scanned == 100.0) {
+                println("Sync completed!")
+                break
+            }
+
+            Thread.sleep(1000)
+        }
+
+        val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
         println("\nValue Transfers:")
         println(valueTranfersJson)
 
@@ -431,34 +565,32 @@ class ExecuteSaplingBalanceFromSeed {
         // 1. Received in orchard pool =     +500_000
         // 2. Received in sapling pool =     +250_000
         // 3. Received in transparent pool = +250_000
-        // 4. Send - 100_000 + 20_000fee =   -120_000
+        // 4. Send - 100_000 + 20_000fee =   -110_000
         // 5. MemoToSelf orchard pool =       -10_000 (send-to-self)
-        // 6. MemoToSelf sapling pool =       -20_000 (send-to-self)
+        // 6. MemoToSelf sapling pool =       -10_000 (send-to-self)
         // 7. MemoToSelf transparent pool =   -15_000 (send-to-self)
-        // 9. Upgrading sapling pool =        -20_000 (shield)
+        // 8. Upgrading sapling pool =        -20_000 (shield)
         //
-        // orchard pool = 840_000
-        // sapling pool = 0
-        // transparent =  0
+        // orchard pool     = 710_000
+        // sapling pool     = 125_000
+        // transparent pool = 0
 
-        val balanceJson:String = uniffi.zingo.executeCommand("balance", "")
+        val balanceJson:String = uniffi.zingo.getBalance()
         println("\nBalance:")
         println(balanceJson)
         val balance: Balance = mapper.readValue(balanceJson)
 
-        assertThat(balance.orchard_balance).isEqualTo(715000)
-        assertThat(balance.verified_orchard_balance).isEqualTo(715000)
-        assertThat(balance.spendable_orchard_balance).isEqualTo(715000)
-        assertThat(balance.sapling_balance).isEqualTo(100000)
-        assertThat(balance.verified_sapling_balance).isEqualTo(100000)
-        assertThat(balance.spendable_sapling_balance).isEqualTo(100000)
-        assertThat(balance.transparent_balance).isEqualTo(0)
+        assertThat(balance.total_orchard_balance).isEqualTo(710000)
+        assertThat(balance.confirmed_orchard_balance).isEqualTo(710000)
+        assertThat(balance.total_sapling_balance).isEqualTo(125000)
+        assertThat(balance.confirmed_sapling_balance).isEqualTo(125000)
+        assertThat(balance.confirmed_transparent_balance).isEqualTo(0)
 
         // save the wallet file
         rpcModule.saveWalletFile()
 
         // change to Offline mode
-        val changeServerJson:String = uniffi.zingo.executeCommand("changeserver", "")
+        val changeServerJson:String = uniffi.zingo.changeServer("")
         println("\nChange Server:")
         println(changeServerJson)
         assertThat(changeServerJson.lowercase().startsWith("error")).isFalse()
@@ -480,24 +612,25 @@ class ExecuteParseAddresses {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        val seedResult = initFromSeed.seed
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
+        val seedResult = initFromSeed.seed_phrase
         val birthdayResult = initFromSeed.birthday
 
         assertThat(seedResult).isEqualTo(seed)
         assertThat(birthdayResult).isEqualTo(1)
 
-        val resultJson: String = uniffi.zingo.executeCommand("parse_address", "texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
+        val resultJson: String = uniffi.zingo.parseAddress("texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
         val result: ParseResult = mapper.readValue(resultJson)
         println("\nParsed Address:")
         println(result)
@@ -521,24 +654,25 @@ class ExecuteParseAddresses {
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
         val birthday:ULong = 1u
-        val datadir = context.filesDir.path
-        val monitorMempool = false
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, datadir, chainhint, monitorMempool)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        val seedResult = initFromSeed.seed
+        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
+        println(setConfigWallet)
+
+        val seedResult = initFromSeed.seed_phrase
         val birthdayResult = initFromSeed.birthday
 
         assertThat(seedResult).isEqualTo(seed)
         assertThat(birthdayResult).isEqualTo(1)
 
-        val wrongResultJson: String = uniffi.zingo.executeCommand("parse_address", "thiswontwork")
+        val wrongResultJson: String = uniffi.zingo.parseAddress("thiswontwork")
         val wrongResult: ParseResult = mapper.readValue(wrongResultJson)
         println("\nWrong Address:")
         println(wrongResult)
