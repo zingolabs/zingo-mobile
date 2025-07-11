@@ -14,15 +14,18 @@ import {
   ValueTransferType,
   ValueTransferKindEnum,
   AddressBookFileClass,
-  AddressClass,
   SnackbarDurationEnum,
   GlobalConst,
+  UnifiedAddressClass,
+  TransparentAddressClass,
+  ScreenEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
@@ -37,6 +40,7 @@ type MessageLineProps = {
   vt: ValueTransferType;
   setValueTransferDetailModalShow: (i: number, v: ValueTransferType) => Promise<HideReturn<unknown>>;
   messageAddress?: string;
+  screenName: ScreenEnum;
 };
 const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   index,
@@ -44,6 +48,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   month,
   setValueTransferDetailModalShow,
   messageAddress,
+  screenName,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, privacy, info, addressBook, addresses, addLastSnackbar } = context;
@@ -60,25 +65,20 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
 
   const contactFound = (add: string) => {
     if (!add) {
-      return { found: false, uOrchardAddress: '' };
+      return {
+        found: false,
+      };
     }
     const contact: AddressBookFileClass[] = addressBook.filter(
-      (ab: AddressBookFileClass) => ab.address === add || ab.uOrchardAddress === add,
+      (ab: AddressBookFileClass) => ab.address === add,
     );
-    let uOrchAdd: string = '';
-    if (contact.length === 1) {
-      uOrchAdd = contact[0].uOrchardAddress || '';
-    } else if (contact.length === 2) {
-      uOrchAdd = contact[0].uOrchardAddress || contact[1].uOrchardAddress || '';
-    }
     return {
       found: contact.length >= 1,
-      uOrchardAddress: uOrchAdd,
     };
   };
 
   const thisWalletAddress: (add: string) => boolean = (add: string) => {
-    const address: AddressClass[] = addresses ? addresses.filter((a: AddressClass) => a.address === add) : [];
+    const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses ? addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.address === add) : [];
     return address.length >= 1;
   };
 
@@ -123,7 +123,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
           }}>
           {!!vt.address && !messageAddress && (
             <View style={{ marginTop: -10, marginBottom: 10, marginLeft: 30 }}>
-              <AddressItem address={vt.address} oneLine={true} />
+              <AddressItem address={vt.address} screenName={screenName} oneLine={true} />
             </View>
           )}
           {(!!memo || !!memoUA) && (
@@ -136,6 +136,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                     addLastSnackbar({
                       message: translate('history.memocopied') as string,
                       duration: SnackbarDurationEnum.short,
+                      screenName: [screenName],
                     });
                   }}>
                   <RegText selectable={true}>{memo}</RegText>
@@ -150,16 +151,17 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                       addLastSnackbar({
                         message: translate('history.address-http') as string,
                         duration: SnackbarDurationEnum.long,
+                        screenName: [screenName],
                       });
                     }
                     addLastSnackbar({
                       message: translate('history.addresscopied') as string,
                       duration: SnackbarDurationEnum.short,
+                      screenName: [screenName],
                     });
                   }}>
                   {!thisWalletAddress(memoUA) &&
-                    memoUA !== messageAddress &&
-                    memoUA !== contactFound(memoUA).uOrchardAddress && (
+                    memoUA !== messageAddress && (
                       <>
                         <RegText>{GlobalConst.replyTo}</RegText>
                         <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
@@ -171,6 +173,7 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
                             )}
                             <AddressItem
                               address={memoUA}
+                              screenName={screenName}
                               onlyContact={true}
                             />
                           </View>

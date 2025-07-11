@@ -7,4 +7,5 @@ enum class Constants(val value: String) {
 
     BackgroundFileName("background.json"),
     ErrorPrefix("error"),
+    SyncPrefix("sync task"),
 }

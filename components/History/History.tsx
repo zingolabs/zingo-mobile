@@ -7,20 +7,24 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Dimensions,
+  Platform,
+  Pressable,
 } from 'react-native';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAnglesUp } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 import {
   ButtonTypeEnum,
   FilterEnum,
-  RefreshScreenEnum,
+  GlobalConst,
+  ScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
   ServerType,
@@ -36,9 +40,12 @@ import Header from '../Header';
 import { MessagesAddress } from '../Messages';
 import Utils from '../../app/utils';
 import { magicModal } from 'react-native-magic-modal';
-import { DataProvider, RecyclerListView, LayoutProvider } from 'recyclerlistview';
+import { DataProvider, RecyclerListView, LayoutProvider, RecyclerListViewProps } from 'recyclerlistview';
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
 import { isEqual } from 'lodash';
+import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
+import { ToastProvider } from 'react-native-toastier';
+import Snackbars from '../Components/Snackbars';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -88,331 +95,438 @@ const History: React.FunctionComponent<HistoryProps> = ({
     server,
     doRefresh,
     zenniesDonationAddress,
+    snackbars,
+    removeFirstSnackbar,
   } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
+  const screenName = ScreenEnum.History;
 
   const [numVt, setNumVt] = useState<number>(50);
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
   const [valueTransfersSliced, setValueTransfersSliced] = useState<ValueTransferType[]>([]);
+  const [valueTransfersFiltered, setValueTransfersFiltered] = useState<ValueTransferType[]>([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
+  const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
   const [showFooter, setShowFooter] = useState<boolean>(false);
-  const scrollViewRef = useRef<RecyclerListView<any, any>>(null);
+  const scrollViewRef = useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(null);
 
-  const layoutProvider = useMemo(() => new LayoutProvider(
-    (index: number) => {
-      if (index === 0) {
-        return ViewTypes.WITH_MONTH;
-      }
-      const lastData = valueTransfersSliced[index - 1];
-      let lasttxmonth = lastData && lastData.time ? moment(lastData.time * 1000).format('MMM YYYY') : '--- ----';
+  const layoutProvider = useMemo(
+    () =>
+      new LayoutProvider(
+        (index: number) => {
+          if (index === 0) {
+            return ViewTypes.WITH_MONTH;
+          }
+          const lastData = valueTransfersSliced[index - 1];
+          let lasttxmonth = lastData && lastData.time ? moment(lastData.time * 1000).format('MMM YYYY') : '--- ----';
 
-      const data = valueTransfersSliced[index];
-      let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
+          const data = valueTransfersSliced[index];
+          let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
 
-      if (txmonth !== lasttxmonth) {
-        return ViewTypes.WITH_MONTH;
-      } else {
-        return ViewTypes.WITHOUT_MONTH;
-      }
-    },
-    (type, dim) => {
-      if (type === ViewTypes.WITHOUT_MONTH) {
-        dim.width = Dimensions.get('window').width;
-        dim.height = 65;
-      } else if (type === ViewTypes.WITH_MONTH) {
-        dim.width = Dimensions.get('window').width;
-        dim.height = 95;
-      }
-    },
-  ), [valueTransfersSliced]);
+          if (txmonth !== lasttxmonth) {
+            return ViewTypes.WITH_MONTH;
+          } else {
+            return ViewTypes.WITHOUT_MONTH;
+          }
+        },
+        (type, dim) => {
+          if (type === ViewTypes.WITHOUT_MONTH) {
+            dim.width = Dimensions.get('window').width;
+            dim.height = 65;
+          } else if (type === ViewTypes.WITH_MONTH) {
+            dim.width = Dimensions.get('window').width;
+            dim.height = 95;
+          }
+        },
+      ),
+    [valueTransfersSliced],
+  );
 
-  const _dataProvider = useMemo(() => new DataProvider(
-    (r1: ValueTransferType, r2: ValueTransferType) => !isEqual(r1, r2)
-  ), []);
+  const _dataProvider = useMemo(
+    () => new DataProvider((r1: ValueTransferType, r2: ValueTransferType) => !isEqual(r1, r2)),
+    [],
+  );
 
   const [dataProvider, setDataProvider] = useState<DataProvider>(_dataProvider);
 
-  const fetchValueTransfersSliced = useMemo(() => {
+  const fetchValueTransfersFiltered = useMemo(() => {
     if (!valueTransfers) {
       return [] as ValueTransferType[];
     }
     // strictly show VT's with some amount on funds.
-    return valueTransfers
-      .filter((vt: ValueTransferType) => (filter === FilterEnum.withFunds ? vt.amount > 0 : true))
-      .slice(0, numVt);
-  }, [valueTransfers, numVt, filter]);
+    return valueTransfers.filter((vt: ValueTransferType) => (filter === FilterEnum.withFunds ? vt.amount > 0 : true));
+  }, [valueTransfers, filter]);
 
   useEffect(() => {
     if (valueTransfers !== null) {
-      const vts = fetchValueTransfersSliced;
-      setDataProvider((data) => data.cloneWithRows(vts));
-      setLoadMoreButton(numVt < (vts ? vts.length : 0));
-      setValueTransfersSliced(vts);
+      const vtf = fetchValueTransfersFiltered;
+      setValueTransfersFiltered(vtf);
+      setLoadMoreButton(numVt < vtf.length);
+      const vtfs = vtf.slice(0, numVt);
+      setValueTransfersSliced(vtfs);
+      setDataProvider(data => data.cloneWithRows(vtfs));
       setTimeout(() => {
         setLoading(false);
       }, 500);
     }
-  }, [fetchValueTransfersSliced, numVt, valueTransfers, server.chainName]);
+  }, [fetchValueTransfersFiltered, numVt, valueTransfers, server.chainName]);
+
+  useEffect(() => {
+    setLoadMoreButton(numVt < valueTransfersFiltered.length);
+    const vtfs = valueTransfersFiltered.slice(0, numVt);
+    setValueTransfersSliced(vtfs);
+    setDataProvider(data => data.cloneWithRows(vtfs));
+  }, [numVt, valueTransfersFiltered]);
+
+  const handleScrollToTop = useCallback(() => {
+    if (scrollViewRef.current && !isScrollingToTop) {
+      setIsScrollingToTop(true);
+
+      // Clear any existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
+      // Force set to top immediately for UI feedback
+      setIsAtTop(true);
+
+      // Try multiple scroll methods for reliability
+      try {
+        // Method 1: Use scrollToTop
+        scrollViewRef.current.scrollToTop(true);
+
+        // Method 2: Fallback to scrollToIndex if scrollToTop fails
+        setTimeout(() => {
+          if (scrollViewRef.current) {
+            try {
+              scrollViewRef.current.scrollToIndex(0, true);
+            } catch (e) {
+              console.log('scrollToIndex fallback failed:', e);
+            }
+          }
+        }, 100);
+      } catch (error) {
+        console.log('scrollToTop failed:', error);
+      }
+
+      // Set timeout to reset scrolling state - longer timeout for animation
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsScrollingToTop(false);
+        // Double-check position after scroll animation
+        if (scrollViewRef.current) {
+          const offset = scrollViewRef.current.getCurrentScrollOffset();
+          setIsAtTop(offset <= 100);
+        }
+      }, 800);
+    }
+  }, [isScrollingToTop]);
 
   useEffect(() => {
     if (scrollToTop) {
       handleScrollToTop();
       setScrollToTop(false);
     }
-  }, [scrollToTop, setScrollToTop]);
+  }, [scrollToTop, handleScrollToTop, setScrollToTop]);
 
   const loadMoreClicked = useCallback(() => {
     setNumVt(numVt + 50);
   }, [numVt]);
 
-  const handleScrollToTop = () => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToTop(true);
-    }
-  };
+  const handleScroll = useCallback(
+    (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
+      const isTop = offsetY <= 100;
 
-  const handleScroll = (_rawEvent: ScrollEvent, _offsetX: number, offsetY: number) => {
-    const isTop = offsetY === 0;
-    setIsAtTop(isTop);
-    setShowFooter(true);
-  };
+      // If we're scrolling to top and we've reached the top, stop the scrolling state
+      if (isScrollingToTop && isTop) {
+        setIsScrollingToTop(false);
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+          scrollTimeoutRef.current = null;
+        }
+      }
+
+      // Always update isAtTop for manual scrolling
+      setIsAtTop(isTop);
+
+      setShowFooter(offsetY > 0);
+    },
+    [isScrollingToTop],
+  );
 
   const setValueTransferDetailModalShow = (index: number, vt: ValueTransferType) => {
-    return magicModal.show(() => <ValueTransferDetail
-        index={index}
-        vt={vt}
-        valueTransfersSliced={valueTransfersSliced}
-        totalLength={valueTransfers !== null ? valueTransfers.length : 0}
-        setPrivacyOption={setPrivacyOption}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+    return magicModal.show(
+      () => (
+        <ValueTransferDetail
+          index={index}
+          vt={vt}
+          valueTransfersSliced={valueTransfersSliced}
+          totalLength={valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0}
+          setPrivacyOption={setPrivacyOption}
+        />
+      ),
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      {
+        swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined,
+        style: { flex: 1, backgroundColor: colors.background },
+      },
     ).promise;
   };
 
   const setMessagesAddressModalShow = (vt: ValueTransferType) => {
-    return magicModal.show(() => <MessagesAddress
-        setPrivacyOption={setPrivacyOption}
-        setScrollToBottom={setScrollToBottom}
-        scrollToBottom={scrollToBottom}
-        address={Utils.messagesAddress(vt)}
-        sendTransaction={sendTransaction}
-        setServerOption={setServerOption}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+    return magicModal.show(
+      () => (
+        <MessagesAddress
+          setPrivacyOption={setPrivacyOption}
+          setScrollToBottom={setScrollToBottom}
+          scrollToBottom={scrollToBottom}
+          address={Utils.messagesAddress(vt)}
+          sendTransaction={sendTransaction}
+          setServerOption={setServerOption}
+        />
+      ),
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      {
+        swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined,
+        style: { flex: 1, backgroundColor: colors.background },
+      },
     ).promise;
   };
 
-  const _rowRenderer = (type: any, data: ValueTransferType, index: number) => {
+  const rowRenderer = (type: string | number, data: ValueTransferType, index: number) => {
     let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
 
-    return <ValueTransferLine
-      index={index}
-      vt={data}
-      month={type === ViewTypes.WITH_MONTH ? txmonth : ''}
-      setValueTransferDetailModalShow={setValueTransferDetailModalShow}
-      nextLineWithSameTxid={
-        index >= valueTransfersSliced.length - 1
-          ? false
-          : valueTransfersSliced[index + 1].txid === data.txid
-      }
-      setMessagesAddressModalShow={setMessagesAddressModalShow}
-      addressProtected={data.address === zenniesDonationAddress}
-    />;
+    return (
+      <ValueTransferLine
+        index={index}
+        vt={data}
+        month={type === ViewTypes.WITH_MONTH ? txmonth : ''}
+        setValueTransferDetailModalShow={setValueTransferDetailModalShow}
+        nextLineWithSameTxid={
+          index >= valueTransfersSliced.length - 1 ? false : valueTransfersSliced[index + 1].txid === data.txid
+        }
+        setMessagesAddressModalShow={setMessagesAddressModalShow}
+        addressProtected={data.address === zenniesDonationAddress}
+        screenName={screenName}
+      />
+    );
   };
 
-  //console.log('render History - 4');
+  //console.log('render History - 4', valueTransfersSliced.length);
+  //console.log(valueTransfersSliced[0]);
 
   return (
-    <View
-      accessible={true}
-      accessibilityLabel={translate('history.title-acc') as string}
-      style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        width: '100%',
-        height: '100%',
-      }}>
-      <Header
-        testID="valuetransfer text"
-        title={translate('history.title') as string}
-        toggleMenuDrawer={toggleMenuDrawer}
-        setPrivacyOption={setPrivacyOption}
-        addLastSnackbar={addLastSnackbar /* context */}
-        setShieldingAmount={setShieldingAmount}
-        setScrollToTop={setScrollToTop}
-        setScrollToBottom={setScrollToBottom}
-        setBackgroundError={setBackgroundError /* context */}
-      />
+    <ToastProvider>
+      <Snackbars snackbars={snackbars} removeFirstSnackbar={removeFirstSnackbar} screenName={screenName} />
+
       <View
+        accessible={true}
+        accessibilityLabel={translate('history.title-acc') as string}
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: 'flex',
+          justifyContent: 'flex-start',
           width: '100%',
-          marginHorizontal: 5,
-          marginBottom: 2,
+          height: '100%',
         }}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            width: '100%',
-            marginTop: 10,
+        <Header
+          testID="valuetransfer text"
+          title={translate('history.title') as string}
+          toggleMenuDrawer={toggleMenuDrawer}
+          setPrivacyOption={setPrivacyOption}
+          addLastSnackbar={addLastSnackbar /* context */}
+          screenName={screenName}
+          setShieldingAmount={setShieldingAmount}
+          setScrollToTop={setScrollToTop}
+          setScrollToBottom={setScrollToBottom}
+          setBackgroundError={setBackgroundError /* context */}
+        />
+        <View
+          style={{
+            flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
+            width: '100%',
+            marginHorizontal: 5,
+            marginBottom: 2,
           }}>
-          <TouchableOpacity
-            onPress={() => {
-              setFilter(FilterEnum.all);
-              setLoading(true);
-              setShowFooter(false);
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              width: '100%',
+              marginTop: 10,
+              alignItems: 'center',
+              justifyContent: 'center',
             }}>
-            <View
-              style={{
-                backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
-                borderRadius: 15,
-                borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
-                borderWidth: 1,
-                paddingHorizontal: 10,
-                paddingVertical: 5,
-                marginHorizontal: 10,
+            <TouchableOpacity
+              onPress={() => {
+                setFilter(FilterEnum.all);
+                setLoading(true);
+                setShowFooter(false);
               }}>
-              <FadeText
+              <View
                 style={{
-                  color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
-                  fontWeight: 'bold',
+                  backgroundColor: filter === FilterEnum.all ? colors.primary : colors.sideMenuBackground,
+                  borderRadius: 15,
+                  borderColor: filter === FilterEnum.all ? colors.primary : colors.zingo,
+                  borderWidth: 1,
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                  marginRight: 10,
                 }}>
-                {translate('messages.filter-all') as string}
-              </FadeText>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setFilter(FilterEnum.withFunds);
-              setLoading(true);
-              setShowFooter(false);
-            }}>
-            <View
-              style={{
-                backgroundColor: filter === FilterEnum.withFunds ? colors.primary : colors.sideMenuBackground,
-                borderRadius: 15,
-                borderColor: filter === FilterEnum.withFunds ? colors.primary : colors.zingo,
-                borderWidth: 1,
-                paddingHorizontal: 10,
-                paddingVertical: 5,
-                marginHorizontal: 0,
-              }}>
-              <FadeText
-                style={{
-                  color: filter === FilterEnum.withFunds ? colors.sideMenuBackground : colors.zingo,
-                  fontWeight: 'bold',
-                }}>
-                {translate('history.filter-withfunds') as string}
-              </FadeText>
-            </View>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
-      {loading ? (
-        <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
-      ) : (
-        <>
-          {valueTransfersSliced &&
-            valueTransfersSliced.length > 0 && (
-            <RecyclerListView
-              ref={scrollViewRef}
-              renderAheadOffset={1000}
-              scrollViewProps={{
-                refreshControl: (
-                  <RefreshControl
-                    refreshing={false}
-                    onRefresh={() => doRefresh(RefreshScreenEnum.History)}
-                    tintColor={colors.text}
-                    title={translate('history.refreshing') as string}
-                  />
-                ),
-                style: {
-                  flexGrow: 1,
-                  marginTop: 10,
-                  width: '100%',
-                },
-              }}
-              onScroll={handleScroll}
-              scrollThrottle={100}
-              layoutProvider={layoutProvider}
-              dataProvider={dataProvider}
-              rowRenderer={_rowRenderer}
-              onEndReachedThreshold={0.75}
-              onEndReached={() => {
-                setShowFooter(true);
-              }}
-              disableRecycling={true}
-              renderFooter={() => (
-                <>
-                  {showFooter ? (
-                    <>
-                      {loadMoreButton ? (
-                        <View
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'flex-start',
-                            marginTop: 10,
-                            marginBottom: 30,
-                          }}>
-                          <Button
-                            type={ButtonTypeEnum.Secondary}
-                            title={translate('history.loadmore') as string}
-                            onPress={loadMoreClicked}
-                          />
-                        </View>
-                      ) : (
-                        <>
-                          {!!valueTransfersSliced && !!valueTransfersSliced.length ? (
-                            <View
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
-                                marginTop: 10,
-                                marginBottom: 30,
-                              }}>
-                              <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
-                            </View>
-                          ) : (
-                            <View
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
-                                marginTop: 10,
-                                marginBottom: 10,
-                              }}>
-                              <FadeText style={{ color: colors.primary }}>{translate('history.empty') as string}</FadeText>
-                            </View>
-                          )}
-                        </>
-                      )}
-                    </>
-                  ) : null}
-                </>
-              )}
-            />)
-          }
-          {!isAtTop && (
-            <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 10 }}>
-              <FontAwesomeIcon
-                style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                size={50}
-                icon={faAnglesUp}
-                color={colors.zingo}
-              />
+                <FadeText
+                  style={{
+                    color: filter === FilterEnum.all ? colors.sideMenuBackground : colors.zingo,
+                    fontWeight: 'bold',
+                  }}>
+                  {translate('messages.filter-all') as string}
+                </FadeText>
+              </View>
             </TouchableOpacity>
-          )}
-        </>
-      )}
-    </View>
+            <TouchableOpacity
+              onPress={() => {
+                setFilter(FilterEnum.withFunds);
+                setLoading(true);
+                setShowFooter(false);
+              }}>
+              <View
+                style={{
+                  backgroundColor: filter === FilterEnum.withFunds ? colors.primary : colors.sideMenuBackground,
+                  borderRadius: 15,
+                  borderColor: filter === FilterEnum.withFunds ? colors.primary : colors.zingo,
+                  borderWidth: 1,
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                }}>
+                <FadeText
+                  style={{
+                    color: filter === FilterEnum.withFunds ? colors.sideMenuBackground : colors.zingo,
+                    fontWeight: 'bold',
+                  }}>
+                  {translate('history.filter-withfunds') as string}
+                </FadeText>
+              </View>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+        {loading ? (
+          <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
+        ) : (
+          <>
+            {valueTransfersSliced && valueTransfersSliced.length > 0 ? (
+              <RecyclerListView
+                ref={scrollViewRef}
+                renderAheadOffset={500}
+                scrollViewProps={{
+                  refreshControl: (
+                    <RefreshControl
+                      refreshing={false}
+                      onRefresh={() => doRefresh(screenName)}
+                      tintColor={colors.text}
+                      title={translate('history.refreshing') as string}
+                    />
+                  ),
+                  style: {
+                    flexGrow: 1,
+                    marginTop: 10,
+                    width: '100%',
+                  },
+                }}
+                onScroll={handleScroll}
+                scrollThrottle={100}
+                layoutProvider={layoutProvider}
+                dataProvider={dataProvider}
+                rowRenderer={rowRenderer}
+                onEndReachedThreshold={0.75}
+                onEndReached={() => {
+                  setShowFooter(true);
+                }}
+                disableRecycling={true}
+                renderFooter={() => (
+                  <>
+                    {showFooter ? (
+                      <>
+                        {loadMoreButton ? (
+                          <View
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'flex-start',
+                              marginTop: 20,
+                              marginBottom: 60,
+                            }}>
+                            <Button
+                              type={ButtonTypeEnum.Secondary}
+                              title={translate('history.loadmore') as string}
+                              onPress={loadMoreClicked}
+                            />
+                          </View>
+                        ) : (
+                          <>
+                            {!!valueTransfersSliced && !!valueTransfersSliced.length && (
+                              <View
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'flex-start',
+                                  marginTop: 20,
+                                  marginBottom: 60,
+                                }}>
+                                <FadeText style={{ color: colors.primary }}>
+                                  {translate('history.end') as string}
+                                </FadeText>
+                              </View>
+                            )}
+                          </>
+                        )}
+                      </>
+                    ) : null}
+                  </>
+                )}
+              />
+            ) : (
+              <View
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 30,
+                }}>
+                <FadeText style={{ color: colors.primary }}>{translate('history.empty') as string}</FadeText>
+              </View>
+            )}
+            {!isAtTop && (
+              <Pressable
+                onPress={handleScrollToTop}
+                disabled={isScrollingToTop}
+                style={({ pressed }) => ({
+                  position: 'absolute',
+                  bottom: 30,
+                  right: 10,
+                  paddingHorizontal: 5,
+                  paddingVertical: 10,
+                  backgroundColor: colors.sideMenuBackground,
+                  borderRadius: 50,
+                  transform: [{ scale: pressed ? 0.9 : 1 }],
+                  borderWidth: 1,
+                  borderColor: colors.zingo,
+                  opacity: isScrollingToTop ? 0.5 : 1,
+                })}>
+                <FontAwesomeIcon
+                  style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
+                  size={20}
+                  icon={faAngleUp}
+                  color={colors.zingo}
+                />
+              </Pressable>
+            )}
+          </>
+        )}
+      </View>
+    </ToastProvider>
   );
 };
 

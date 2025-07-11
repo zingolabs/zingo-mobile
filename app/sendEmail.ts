@@ -1,6 +1,6 @@
 import { Alert, Linking } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
-import { TranslateType } from './AppState';
+import { GlobalConst, TranslateType } from './AppState';
 
 export const sendEmail = async (
   translate: (key: string) => TranslateType,
@@ -29,7 +29,7 @@ export const sendEmail = async (
       '\n' +
       zingoVersionEmail +
       '\n' +
-      (zingolibVersionEmail ? 'Zingolib: ' + zingolibVersionEmail : '') +
+      (zingolibVersionEmail ? GlobalConst.zingolib + ': ' + zingolibVersionEmail : '') +
       '\n\n' +
       bodyEmail,
   )}`;
@@ -38,8 +38,8 @@ export const sendEmail = async (
     .then(() => {
       console.log('Email client opened', url);
     })
-    .catch((err: any) => {
-      console.log('Error opening email client:', err);
+    .catch((err: unknown) => {
+      console.log('Error opening email client:', err instanceof Error ? err.message : String(err));
       Alert.alert(
         translate('loadedapp.email-error-title') as string,
         translate('loadedapp.email-error-body') as string,

@@ -2,6 +2,7 @@ import * as RNFS from 'react-native-fs';
 
 import {
   ChainNameEnum,
+  GlobalConst,
   SecurityType,
   SecurityTypeEnum,
   SelectServerEnum,
@@ -26,7 +27,7 @@ export default class SettingsFileImpl {
 
     //console.log(' settings write', newSettings);
 
-    RNFS.writeFile(fileName, JSON.stringify(newSettings), 'utf8')
+    RNFS.writeFile(fileName, JSON.stringify(newSettings), GlobalConst.utf8 as BufferEncoding)
       .then(() => {
         //console.log('FILE WRITTEN!')
       })
@@ -40,7 +41,7 @@ export default class SettingsFileImpl {
     const fileName = await this.getFileName();
 
     try {
-      const settings: SettingsFileClass = await JSON.parse((await RNFS.readFile(fileName, 'utf8')).toString());
+      const settings: SettingsFileClass = await JSON.parse((await RNFS.readFile(fileName, GlobalConst.utf8 as BufferEncoding)).toString());
       // If server as string is found, I need to convert to: ServerType
       // if not, I'm losing the value
       if (!settings.hasOwnProperty(SettingsNameEnum.server)) {

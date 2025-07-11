@@ -11,6 +11,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
     ]
   }
 >
+  <View />
   <View
     onLayout={[Function]}
     style={
@@ -29,7 +30,6 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
       ]
     }
   >
-    <View />
     <View
       style={
         {

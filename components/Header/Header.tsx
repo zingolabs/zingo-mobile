@@ -22,7 +22,6 @@ import {
   TranslateType,
   ModeEnum,
   CurrencyEnum,
-  SnackbarDurationEnum,
   PoolToShieldEnum,
   SnackbarType,
   ButtonTypeEnum,
@@ -30,6 +29,7 @@ import {
   CommandEnum,
   SelectServerEnum,
   RouteEnums,
+  ScreenEnum,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
@@ -49,14 +49,18 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 import Utils from '../../app/utils';
 import { RPCShieldProposeType } from '../../app/rpc/types/RPCShieldProposeType';
 import RPCModule from '../../app/RPCModule';
+import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
+import { isEqual } from 'lodash';
 
 type HeaderProps = {
   // general
   testID?: string;
   title: string;
+  screenName: ScreenEnum;
   // side menu
   noDrawMenu?: boolean;
   toggleMenuDrawer?: () => void;
@@ -66,7 +70,7 @@ type HeaderProps = {
   // syncing icons
   noSyncingStatus?: boolean;
   // ufvk
-  noUfvkIcon?: boolean
+  noUfvkIcon?: boolean;
   // privacy
   noPrivacy?: boolean;
   setPrivacyOption?: (value: boolean) => Promise<void>;
@@ -101,6 +105,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   noPrivacy,
   setPrivacyOption,
   addLastSnackbar,
+  screenName,
   receivedLegend,
   setShieldingAmount,
   setScrollToTop,
@@ -117,8 +122,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     zecPrice,
     readOnly,
     valueTransfersTotal,
-    wallet,
-    restartApp,
     somePending,
     security,
     language,
@@ -161,39 +164,33 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   const opacityValue = useRef(new Animated.Value(1)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
   const [showShieldButton, setShowShieldButton] = useState<boolean>(false);
-  const [blocksRemaining, setBlocksRemaining] = useState<number>(0);
+  const [percentageOutputsScanned, setPercentageOutputsScanned] = useState<number>(0);
+  const [syncInProgress, setSyncInProgress] = useState<boolean>(true);
   const [shieldingFee, setShieldingFee] = useState<number>(0);
   const [viewSyncStatus, setViewSyncStatus] = useState<boolean>(false);
 
   useEffect(() => {
-    let currentBl, lastBlockSe;
-    if (wallet.birthday < syncingStatus.currentBlock) {
-      currentBl = syncingStatus.currentBlock - wallet.birthday;
-      lastBlockSe = syncingStatus.lastBlockServer - wallet.birthday;
+    if (
+      !syncingStatus ||
+      isEqual(syncingStatus, {} as RPCSyncStatusType) ||
+      (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) ||
+      syncingStatus.percentage_total_outputs_scanned === 0
+    ) {
+      // if the App is waiting for the first fetching, let's put 0.
+      setPercentageOutputsScanned(0);
+      setSyncInProgress(true);
     } else {
-      currentBl = syncingStatus.currentBlock;
-      lastBlockSe = syncingStatus.lastBlockServer;
+      setPercentageOutputsScanned(
+        Number(syncingStatus.percentage_total_outputs_scanned?.toFixed(2).replace(/\.?0+$/, '')),
+      );
+      setSyncInProgress(
+        !!syncingStatus.scan_ranges &&
+        syncingStatus.scan_ranges.length > 0 &&
+        !!syncingStatus.percentage_total_outputs_scanned &&
+        syncingStatus.percentage_total_outputs_scanned < 100,
+      );
     }
-    let blocksRe = lastBlockSe - currentBl;
-    // just in case, this value is weird...
-    // if the syncing is still inProgress and this value is cero -> it is better for UX to see 1.
-    // this use case is really rare.
-    if (blocksRe <= 0) {
-      blocksRe = 0;
-    }
-    setBlocksRemaining(blocksRe);
-  }, [syncingStatus.currentBlock, syncingStatus.lastBlockServer, wallet.birthday]);
-
-  useEffect(() => {
-    if (syncingStatus.syncProcessStalled && addLastSnackbar && restartApp) {
-      // if the sync process is stalled -> let's restart the App.
-      addLastSnackbar({
-        message: translate('restarting') as string,
-        duration: SnackbarDurationEnum.short,
-      });
-      setTimeout(() => restartApp({ startingApp: false }), 3000);
-    }
-  }, [addLastSnackbar, restartApp, syncingStatus.syncProcessStalled, translate]);
+  }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);
 
   useEffect(() => {
     // when the App is syncing this can fired a lot of times
@@ -227,7 +224,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       }
     };
 
-    if (!readOnly && setShieldingAmount && selectServer !== SelectServerEnum.offline) {
+    if (
+      !readOnly && setShieldingAmount && selectServer !== SelectServerEnum.offline && somePending
+        ? 0
+        : (totalBalance ? totalBalance.confirmedTransparentBalance : 0) > 0
+    ) {
       (async () => {
         let proposeFee = 0;
         let proposeAmount = 0;
@@ -259,13 +260,15 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             //Alert.alert('Calculating the FEE', runProposeJson.error);
           }
         }
-
         setShieldingFee(proposeFee);
-        setShieldingAmount(proposeAmount);
+        setShieldingAmount && setShieldingAmount(proposeAmount);
         //console.log(proposeFee, proposeAmount);
       })();
+    } else {
+      setShieldingFee(0);
+      setShieldingAmount && setShieldingAmount(0);
     }
-  }, [readOnly, setShieldingAmount, totalBalance?.transparentBal, somePending, selectServer]);
+  }, [readOnly, setShieldingAmount, totalBalance, totalBalance?.confirmedTransparentBalance, somePending, selectServer]);
 
   useEffect(() => {
     setShowShieldButton(
@@ -292,7 +295,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       return;
     }
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-      addLastSnackbar({ message: translate('loadedapp.connection-error') as string });
+      addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
 
@@ -301,10 +304,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
     // not use await here.
     setComputingModalShow();
-    // We need to activate this flag because if the App is syncing
-    // while shielding, then it going to finish the current batch
-    // and after that it run the shield process.
-    await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.true);
     // because I don't what the user is doing, I need to the re-run the shield
     // command right before the confirmation
     await RPCModule.execute(CommandEnum.shield, '');
@@ -315,6 +314,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         createAlert(
           setBackgroundError,
           addLastSnackbar,
+          [screenName],
           translate(`history.shield-title-${pools}`) as string,
           `${translate(`history.shield-error-${pools}`)} ${shieldStr}`,
           true,
@@ -328,6 +328,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             createAlert(
               setBackgroundError,
               addLastSnackbar,
+              [screenName],
               translate(`history.shield-title-${pools}`) as string,
               `${translate(`history.shield-error-${pools}`)} ${shieldJSON.error}`,
               true,
@@ -337,6 +338,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             createAlert(
               setBackgroundError,
               addLastSnackbar,
+              [screenName],
               translate(`history.shield-title-${pools}`) as string,
               `${translate(`history.shield-message-${pools}`)} ${shieldJSON.txids.join(', ')}`,
               true,
@@ -347,6 +349,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           createAlert(
             setBackgroundError,
             addLastSnackbar,
+            [screenName],
             translate(`history.shield-title-${pools}`) as string,
             `${translate(`history.shield-message-${pools}`)} ${shieldStr}`,
             true,
@@ -354,7 +357,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           );
         }
       }
-      await RPC.rpcSetInterruptSyncAfterBatch(GlobalConst.false);
       // change to the history screen, just in case.
       navigationHome?.navigate(RouteEnums.Home, {
         screen: translate('loadedapp.history-menu') as string,
@@ -369,6 +371,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         setScrollToBottom(true);
       }
       closeAllModals();
+      setShieldingFee(0);
+      setShieldingAmount && setShieldingAmount(0);
     }
   };
 
@@ -393,20 +397,23 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     }
 
     if (!noSyncingStatus) {
-      if (syncingStatus.inProgress) {
+      if (syncInProgress) {
         animationRef.current?.start();
       } else {
         animationRef.current?.stop();
+        opacityValue.setValue(1);
       }
     } else {
       animationRef.current?.stop();
+      opacityValue.setValue(1);
     }
 
     return () => {
       animationRef.current?.stop();
+      opacityValue.setValue(1);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [syncingStatus.inProgress, noSyncingStatus]);
+  }, [syncInProgress, noSyncingStatus]);
 
   const calculateAmountToShield = (): string => {
     return Utils.parseNumberFloatToStringLocale(somePending ? 0 : shieldingAmount, 8);
@@ -442,7 +449,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     if (resultBio === false) {
       // snack with Error & closing the menu.
       if (addLastSnackbar) {
-        addLastSnackbar({ message: translate('biometrics-error') as string });
+        addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
       }
     } else {
       await setUfvkViewModalShow();
@@ -461,6 +468,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 : (((translate('settings.value-privacy-true') as string) +
                     translate('change-privacy-legend')) as string)
             }`,
+            screenName: [screenName],
           });
         setPrivacyOption && setPrivacyOption(!privacy);
       }}>
@@ -493,7 +501,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     </TouchableOpacity>
   );
 
-  //console.log('render header &&&&&&&&&&&&&&&&&&&&&', privacy);
+  //console.log('render header &&&&&&&&&&&&&&&&&&&&&', info.currencyName);
 
   return (
     <>
@@ -520,9 +528,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             }}>
             {!noSyncingStatus && selectServer !== SelectServerEnum.offline && (
               <View style={{ minHeight: 29, flexDirection: 'row' }}>
-                {netInfo.isConnected && !!syncingStatus.lastBlockServer && syncingStatus.syncID >= 0 ? (
+                {netInfo.isConnected && !(percentageOutputsScanned === 0) ? (
                   <>
-                    {!syncingStatus.inProgress && syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet && (
+                    {!syncInProgress && (
                       <View
                         style={{
                           alignItems: 'center',
@@ -551,7 +559,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         </View>
                       </View>
                     )}
-                    {syncingStatus.inProgress && (
+                    {syncInProgress && (
                       <View
                         style={{
                           alignItems: 'center',
@@ -581,17 +589,16 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                   {translate('syncing') as string}
                                 </FadeText>
                               )}
-                              {viewSyncStatus && blocksRemaining > 0 && (
+                              {viewSyncStatus && percentageOutputsScanned > 0 && (
                                 <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
                               )}
-                              {blocksRemaining > 0 && (
-                                <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${blocksRemaining}`}</FadeText>
+                              {percentageOutputsScanned > 0 && (
+                                <FadeText
+                                  style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned}%`}</FadeText>
                               )}
                             </View>
                           ) : (
-                            <TouchableOpacity
-                              testID="header.playicon"
-                              onPress={() => setSyncReportModalShow()}>
+                            <TouchableOpacity testID="header.playicon" onPress={() => setSyncReportModalShow()}>
                               <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                 <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={19} />
                                 {viewSyncStatus && (
@@ -599,11 +606,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                                     {translate('syncing') as string}
                                   </FadeText>
                                 )}
-                                {viewSyncStatus && blocksRemaining > 0 && (
+                                {viewSyncStatus && percentageOutputsScanned > 0 && (
                                   <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{' - '}</FadeText>
                                 )}
-                                {blocksRemaining > 0 && (
-                                  <FadeText style={{ fontSize: 10, marginLeft: 2 }}>{` ${blocksRemaining}`}</FadeText>
+                                {percentageOutputsScanned > 0 && (
+                                  <FadeText
+                                    style={{ fontSize: 10, marginLeft: 2 }}>{` ${percentageOutputsScanned}%`}</FadeText>
                                 )}
                               </View>
                             </TouchableOpacity>
@@ -628,8 +636,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           minWidth: 25,
                           minHeight: 25,
                         }}>
-                        <TouchableOpacity
-                          onPress={() => setSyncReportModalShow()}>
+                        <TouchableOpacity onPress={() => setSyncReportModalShow()}>
                           <View
                             testID="header.wifiicon"
                             style={{
@@ -639,9 +646,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                               padding: 3,
                             }}>
                             <FontAwesomeIcon icon={faWifi} color={colors.primaryDisabled} size={19} />
-                            <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
-                              {translate('connecting') as string}
-                            </FadeText>
+                            {false && (
+                              <FadeText style={{ fontSize: 10, marginLeft: 2 }}>
+                                {translate('connecting') as string}
+                              </FadeText>
+                            )}
                           </View>
                         </TouchableOpacity>
                       </View>
@@ -731,15 +740,19 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 currencyName={info.currencyName}
                 color={colors.text}
                 size={36}
-                amtZec={totalBalance ? totalBalance.total : 0}
+                amtZec={totalBalance
+                  ? totalBalance.confirmedOrchardBalance +
+                    totalBalance.confirmedSaplingBalance +
+                    totalBalance.confirmedTransparentBalance
+                  : 0}
                 privacy={privacy}
                 smallPrefix={true}
               />
               {mode !== ModeEnum.basic &&
                 totalBalance &&
-                (totalBalance.orchardBal !== totalBalance.spendableOrchard ||
-                  totalBalance.privateBal > 0 ||
-                  totalBalance.transparentBal > 0) && (
+                (totalBalance.totalOrchardBalance !== totalBalance.confirmedOrchardBalance ||
+                  totalBalance.totalSaplingBalance > 0 ||
+                  totalBalance.totalTransparentBalance > 0) && (
                   <TouchableOpacity onPress={() => setPoolsModalShow()}>
                     <View
                       style={{
@@ -762,7 +775,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             </View>
           )}
 
-          {receivedLegend && totalBalance && totalBalance.total > 0 && (
+          {receivedLegend && totalBalance && totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance > 0 && (
             <View
               style={{
                 flexDirection: 'row',
@@ -775,52 +788,55 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 currencyName={info.currencyName}
                 color={colors.primary}
                 size={18}
-                amtZec={totalBalance.total}
+                amtZec={totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance}
                 privacy={privacy}
               />
               <RegText color={colors.primary}>!!!</RegText>
             </View>
           )}
 
-          {currency === CurrencyEnum.USDCurrency && !noBalance && selectServer !== SelectServerEnum.offline && (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <CurrencyAmount
-                style={{ marginTop: 0, marginBottom: 0 }}
-                price={zecPrice.zecPrice}
-                amtZec={totalBalance ? totalBalance.total : 0}
-                currency={currency}
-                privacy={privacy}
-              />
-              <View style={{ marginLeft: 5 }}>
-                <PriceFetcher setZecPrice={setZecPrice} />
-              </View>
-            </View>
-          )}
-
-          {showShieldButton &&
+          {(currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) &&
             !noBalance &&
-            !calculateDisableButtonToShield() &&
-            valueTransfersTotal !== null && (
-              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <FadeText style={{ fontSize: 8 }}>
-                  {(translate(`history.shield-legend-${calculatePoolsToShield()}`) as string) +
-                    ` ${calculateAmountToShield()} ` +
-                    (translate('send.fee') as string) +
-                    ': ' +
-                    Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
-                    ' '}
-                </FadeText>
-                <View style={{ margin: 5, flexDirection: 'row' }}>
-                  <Button
-                    testID="header.shield"
-                    type={ButtonTypeEnum.Primary}
-                    title={translate(`history.shield-${calculatePoolsToShield()}`) as string}
-                    onPress={onPressShieldFunds}
-                    disabled={calculateDisableButtonToShield()}
-                  />
+            selectServer !== SelectServerEnum.offline && (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <CurrencyAmount
+                  style={{ marginTop: 0, marginBottom: 0 }}
+                  price={zecPrice.zecPrice}
+                  amtZec={totalBalance
+                    ? totalBalance.confirmedOrchardBalance +
+                      totalBalance.confirmedSaplingBalance +
+                      totalBalance.confirmedTransparentBalance
+                    : 0}
+                  currency={currency}
+                  privacy={privacy}
+                />
+                <View style={{ marginLeft: 5 }}>
+                  <PriceFetcher setZecPrice={setZecPrice} screenName={screenName} />
                 </View>
               </View>
             )}
+
+          {showShieldButton && !noBalance && !calculateDisableButtonToShield() && valueTransfersTotal !== null && (
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+              <FadeText style={{ fontSize: 8 }}>
+                {(translate(`history.shield-legend-${calculatePoolsToShield()}`) as string) +
+                  ` ${calculateAmountToShield()} ` +
+                  (translate('send.fee') as string) +
+                  ': ' +
+                  Utils.parseNumberFloatToStringLocale(shieldingFee, 8) +
+                  ' '}
+              </FadeText>
+              <View style={{ margin: 5, flexDirection: 'row' }}>
+                <Button
+                  testID="header.shield"
+                  type={ButtonTypeEnum.Primary}
+                  title={translate(`history.shield-${calculatePoolsToShield()}`) as string}
+                  onPress={onPressShieldFunds}
+                  disabled={calculateDisableButtonToShield()}
+                />
+              </View>
+            </View>
+          )}
         </View>
         <View
           style={{
@@ -842,7 +858,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             {readOnly && !noUfvkIcon && (
               <>
                 {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal <= 0) &&
-                !(mode === ModeEnum.basic && totalBalance && totalBalance.total <= 0) ? (
+                !(mode === ModeEnum.basic && totalBalance && totalBalance.totalOrchardBalance + totalBalance.totalSaplingBalance <= 0) ? (
                   <TouchableOpacity onPress={() => ufvkShowModal()}>
                     <FontAwesomeIcon icon={faSnowflake} size={24} color={colors.zingo} />
                   </TouchableOpacity>
@@ -874,12 +890,12 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 if (resultBio === false) {
                   // snack with Error & closing the menu.
                   if (addLastSnackbar) {
-                    addLastSnackbar({ message: translate('biometrics-error') as string });
+                    addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
                   }
                 } else {
                   navigationHome?.navigate(RouteEnums.Settings);
                 }
-            }}>
+              }}>
               <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
             </TouchableOpacity>
           ) : (
@@ -901,7 +917,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             width: '100%',
             marginVertical: 5,
           }}>
-          {noDrawMenu && closeScreen ? (
+          {closeScreen ? (
             <>
               <TouchableOpacity onPress={() => closeScreen()}>
                 <FontAwesomeIcon

@@ -3,9 +3,6 @@ export enum RPCValueTransfersKindEnum {
   memoToSelf = 'memo-to-self',
   shield = 'shield',
   received = 'received',
-  basic = 'basic',
+  sendToSelf = 'send-to-self',
   rejection = 'rejection',
-
-  // obsolete -> same as `basic`.
-  //sendToSelf = 'send-to-self',
 }

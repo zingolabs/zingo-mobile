@@ -1,4 +1,3 @@
 export type RPCSpendablebalanceType = {
-  balance?: number;
-  error?: string;
+  spendable_balance: number;
 };

@@ -11,6 +11,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
     ]
   }
 >
+  <View />
   <View
     style={
       {
@@ -23,7 +24,6 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
       }
     }
   >
-    <View />
     <View>
       <View
         style={
@@ -329,6 +329,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
             style={
               {
                 "flexDirection": "column",
+                "width": "100%",
               }
             }
           >
@@ -336,10 +337,48 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
               contentContainerStyle={
                 {
                   "alignItems": "center",
+                  "paddingBottom": 20,
+                }
+              }
+              style={
+                {
+                  "width": "100%",
                 }
               }
             >
               <View>
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                      "marginBottom": 5,
+                      "marginTop": 10,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "marginTop": 10,
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "alignItems": "center",
+                          "flexDirection": "row",
+                          "justifyContent": "center",
+                        }
+                      }
+                    />
+                  </View>
+                </View>
                 <View
                   style={
                     {
@@ -350,42 +389,7 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                     }
                   }
                 >
-                  <View
-                    accessibilityState={
-                      {
-                        "busy": undefined,
-                        "checked": undefined,
-                        "disabled": undefined,
-                        "expanded": undefined,
-                        "selected": undefined,
-                      }
-                    }
-                    accessibilityValue={
-                      {
-                        "max": undefined,
-                        "min": undefined,
-                        "now": undefined,
-                        "text": undefined,
-                      }
-                    }
-                    accessible={true}
-                    collapsable={false}
-                    focusable={true}
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
-                    style={
-                      {
-                        "opacity": 1,
-                      }
-                    }
-                  >
-                    <mockQRCode />
-                  </View>
+                  <mockQRCode />
                 </View>
                 <View
                   style={
@@ -402,8 +406,10 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                     style={
                       {
                         "alignItems": "center",
+                        "flexDirection": "row",
                         "justifyContent": "center",
-                        "width": 150,
+                        "marginBottom": 5,
+                        "marginTop": 20,
                       }
                     }
                   >
@@ -441,18 +447,99 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                         }
                       }
                     >
-                      <Text
+                      <View
                         style={
                           {
-                            "color": "#c3c3c3",
-                            "marginTop": 15,
-                            "minHeight": 48,
-                            "textDecorationLine": "underline",
+                            "borderColor": "#888888",
+                            "borderRadius": 30,
+                            "marginHorizontal": 10,
+                            "paddingHorizontal": 5,
+                            "paddingVertical": 5,
                           }
                         }
                       >
-                        text translated
-                      </Text>
+                        <RNSVGSvgView
+                          align="xMidYMid"
+                          bbHeight={24}
+                          bbWidth={24}
+                          fill="none"
+                          focusable={false}
+                          height={24}
+                          meetOrSlice={0}
+                          minX={0}
+                          minY={0}
+                          stroke="#ffffff"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          style={
+                            [
+                              {
+                                "backgroundColor": "transparent",
+                                "borderWidth": 0,
+                              },
+                              {
+                                "margin": 3,
+                              },
+                              {
+                                "flex": 0,
+                                "height": 24,
+                                "opacity": 0.9,
+                                "width": 24,
+                              },
+                            ]
+                          }
+                          vbHeight={24}
+                          vbWidth={24}
+                          width={24}
+                        >
+                          <RNSVGGroup
+                            fill={null}
+                            propList={
+                              [
+                                "fill",
+                                "stroke",
+                                "strokeWidth",
+                                "strokeLinecap",
+                                "strokeLinejoin",
+                              ]
+                            }
+                            stroke={
+                              {
+                                "payload": 4294967295,
+                                "type": 0,
+                              }
+                            }
+                            strokeLinecap={1}
+                            strokeLinejoin={1}
+                            strokeWidth={2}
+                          >
+                            <RNSVGRect
+                              fill={
+                                {
+                                  "payload": 4278190080,
+                                  "type": 0,
+                                }
+                              }
+                              height={14}
+                              rx={2}
+                              ry={2}
+                              width={14}
+                              x={8}
+                              y={8}
+                            />
+                            <RNSVGPath
+                              d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                              fill={
+                                {
+                                  "payload": 4278190080,
+                                  "type": 0,
+                                }
+                              }
+                            />
+                          </RNSVGGroup>
+                        </RNSVGSvgView>
+                      </View>
                     </View>
                   </View>
                 </View>
@@ -486,100 +573,63 @@ exports[`Component ShowUfvk - test ShowUfvk - snapshot 1`] = `
                   onStartShouldSetResponder={[Function]}
                   style={
                     {
+                      "alignItems": "center",
+                      "backgroundColor": "transparent",
+                      "borderRadius": 10,
+                      "color": "#ffffff",
+                      "justifyContent": "center",
+                      "maxWidth": "90%",
+                      "minHeight": 48,
+                      "minWidth": "30%",
                       "opacity": 1,
+                      "padding": 0,
+                      "paddingLeft": 20,
+                      "paddingRight": 20,
                     }
                   }
                 >
                   <View
                     style={
                       {
+                        "alignItems": "center",
                         "display": "flex",
                         "flexDirection": "row",
                         "justifyContent": "center",
-                        "marginBottom": 30,
+                        "margin": 0,
+                        "minHeight": 48,
+                        "minWidth": 48,
+                        "padding": 0,
                       }
                     }
                   >
-                    <View
+                    <Text
                       style={
                         {
-                          "alignItems": "flex-start",
-                          "display": "flex",
-                          "flexDirection": "row",
+                          "color": "#ffffff",
+                          "fontFamily": "monospace",
+                          "fontSize": 16,
+                          "fontWeight": "bold",
+                          "opacity": 0.8,
+                          "textAlign": "center",
+                          "textTransform": "lowercase",
                         }
                       }
                     >
-                      <View
-                        style={
-                          {
-                            "alignItems": "flex-start",
-                            "display": "flex",
-                            "flexDirection": "column",
-                            "marginRight": 10,
-                          }
-                        }
-                      >
-                        <View
-                          accessibilityState={
-                            {
-                              "busy": undefined,
-                              "checked": undefined,
-                              "disabled": undefined,
-                              "expanded": undefined,
-                              "selected": undefined,
-                            }
-                          }
-                          accessibilityValue={
-                            {
-                              "max": undefined,
-                              "min": undefined,
-                              "now": undefined,
-                              "text": undefined,
-                            }
-                          }
-                          accessible={true}
-                          collapsable={false}
-                          focusable={true}
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            {
-                              "opacity": 1,
-                            }
-                          }
-                        >
-                          <View
-                            style={
-                              {
-                                "display": "flex",
-                                "flexDirection": "column",
-                                "flexWrap": "wrap",
-                              }
-                            }
-                          >
-                            <Text
-                              style={
-                                {
-                                  "color": "#c3c3c3",
-                                  "fontSize": 18,
-                                  "fontWeight": "600",
-                                  "opacity": 1,
-                                }
-                              }
-                            >
-                              uview12...4567890
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                    </View>
+                      uview12345...1234567890
+                    </Text>
                   </View>
                 </View>
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "flexDirection": "column",
+                      "justifyContent": "center",
+                      "marginTop": 10,
+                      "width": "100%",
+                    }
+                  }
+                />
               </View>
             </RCTScrollView>
           </View>

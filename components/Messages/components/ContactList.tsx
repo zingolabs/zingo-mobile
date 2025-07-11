@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   ScrollView,
@@ -9,6 +9,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TextInput,
+  TextInputEndEditingEventData,
+  Platform,
+  Pressable,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -16,20 +19,23 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 
 import { useScrollToTop, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faAnglesUp, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import {
   AddressBookFileClass,
-  AddressClass,
   ContactType,
   FilterEnum,
-  RefreshScreenEnum,
+  GlobalConst,
+  ScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
   ServerType,
+  TransparentAddressClass,
+  UnifiedAddressClass,
   ValueTransferType,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
@@ -80,9 +86,12 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   const { colors } = useTheme()  as ThemeType;
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
+  const screenName = ScreenEnum.ContactList;
 
   const [contacts, setContacts] = useState<ContactType[]>([]);
   const [isAtTop, setIsAtTop] = useState<boolean>(true);
+  const [isScrollingToTop, setIsScrollingToTop] = useState<boolean>(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
   const [searchMode, setSearchMode] = useState<boolean>(false);
@@ -96,7 +105,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   var lastMonth = '';
 
   const thisWalletAddress: (add: string) => boolean = (add: string) => {
-    const address: AddressClass[] = addresses ? addresses.filter((a: AddressClass) => a.address === add) : [];
+    const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses ? addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.address === add) : [];
     return address.length >= 1;
   };
 
@@ -126,12 +135,11 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             // of the same external wallet/contact.
             const chatsToAdd = [] as ContactType[];
             const isContact = addressBook.filter(
-              (ab: AddressBookFileClass) => ab.address === contactAddress || ab.uOrchardAddress === contactAddress,
+              (ab: AddressBookFileClass) => ab.address === contactAddress,
             );
             if (isContact.length === 0) {
               chatsToAdd.push({
                 address: contactAddress,
-                uOrchardAddress: '',
                 label: '',
                 time: vt.time,
                 memos: vt.memos && vt.memos.length > 0 ? vt.memos : [],
@@ -144,7 +152,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               isContact.forEach((ab: AddressBookFileClass) => {
                 chatsToAdd.push({
                   address: ab.address,
-                  uOrchardAddress: ab.uOrchardAddress ? ab.uOrchardAddress : '',
                   label: ab.label,
                   time: vt.time,
                   memos: vt.memos && vt.memos.length > 0 ? vt.memos : [],
@@ -158,7 +165,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             }
             chatsToAdd.forEach((c: ContactType) => {
               const exists = cont.filter(
-                (ch: ContactType) => ch.address === c.address && ch.uOrchardAddress === c.uOrchardAddress,
+                (ch: ContactType) => ch.address === c.address,
               );
               //console.log(contactAddress, exists);
               let pushAddress = false;
@@ -179,7 +186,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                 if (searchText) {
                   if (
                     c.address.toLowerCase().includes(searchText.toLowerCase()) ||
-                    c.uOrchardAddress.toLowerCase().includes(searchText.toLowerCase()) ||
                     c.label.toLowerCase().includes(searchText.toLowerCase())
                   ) {
                     found = true;
@@ -206,7 +212,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         .forEach((ab: AddressBookFileClass) => {
           // must match the two addresses: full UA & only orchard UA.
           const exists = cont.filter(
-            (c: ContactType) => c.address === ab.address && c.uOrchardAddress === ab.uOrchardAddress,
+            (c: ContactType) => c.address === ab.address,
           );
           // ignore contacts with this wallet addresses
           if (exists.length === 0 && !thisWalletAddress(ab.address)) {
@@ -224,7 +230,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
             if (found) {
               cont.push({
                 address: ab.address,
-                uOrchardAddress: ab.uOrchardAddress || '',
                 label: ab.label,
                 time: 0,
                 memos: [],
@@ -264,11 +269,22 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
     }
   };
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset } = event.nativeEvent;
-    const isTop = contentOffset.y === 0;
+    const isTop = contentOffset.y <= 100;
+
+    // Always update isAtTop for manual scrolling
     setIsAtTop(isTop);
-  };
+
+    // If we're scrolling to top and we've reached the top, stop the scrolling state
+    if (isScrollingToTop && isTop) {
+      setIsScrollingToTop(false);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = null;
+      }
+    }
+  }, [isScrollingToTop]);
 
   const setMessagesAddressModalShow = (c: ContactType) => {
     return magicModal.show(() => <MessagesAddress
@@ -278,7 +294,9 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         address={Utils.messagesAddress(c)}
         sendTransaction={sendTransaction}
         setServerOption={setServerOption}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      />,
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -287,7 +305,9 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
         setPrivacyOption={setPrivacyOption}
         setScrollToBottom={setScrollToBottom}
         scrollToBottom={scrollToBottom}
-      />, { swipeDirection: undefined, style: { flex: 1, backgroundColor: colors.background } }
+      />,
+      // possible problem if scrolling vertically, if so change to `undefined`.
+      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }
     ).promise;
   };
 
@@ -296,6 +316,12 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -305,14 +331,9 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('messages.title-chats') as string}
+          screenName={screenName}
           toggleMenuDrawer={toggleMenuDrawer}
           noPrivacy={true}
           noBalance={true}
@@ -354,7 +375,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                   }}
                   value={searchTextField}
                   onChangeText={(text: string) => setSearchTextField(text.trim())}
-                  onEndEditing={(e: any) => {
+                  onEndEditing={(e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
                     setSearchTextField(e.nativeEvent.text.trim());
                   }}
                   editable={true}
@@ -541,7 +562,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               refreshControl={
                 <RefreshControl
                   refreshing={false}
-                  onRefresh={() => doRefresh(RefreshScreenEnum.ContactList)}
+                  onRefresh={() => doRefresh(screenName)}
                   tintColor={colors.text}
                   title={translate('history.refreshing') as string}
                 />
@@ -570,6 +591,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
                       month={month}
                       setMessagesAddressModalShow={setMessagesAddressModalShow}
                       addressProtected={c.address === zenniesDonationAddress}
+                      screenName={screenName}
                     />
                   );
                 })}
@@ -598,14 +620,29 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
               )}
             </ScrollView>
             {!isAtTop && (
-              <TouchableOpacity onPress={handleScrollToTop} style={{ position: 'absolute', bottom: 30, right: 10 }}>
+              <Pressable
+                onPress={handleScrollToTop}
+                disabled={isScrollingToTop}
+                style={({ pressed }) => ({
+                  position: 'absolute',
+                  bottom: 30,
+                  right: 10,
+                  paddingHorizontal: 5,
+                  paddingVertical: 10,
+                  backgroundColor: colors.sideMenuBackground,
+                  borderRadius: 50,
+                  transform: [{ scale: pressed ? 0.9 : 1 }],
+                  borderWidth: 1,
+                  borderColor: colors.zingo,
+                  opacity: isScrollingToTop ? 0.5 : 1,
+                })}>
                 <FontAwesomeIcon
                   style={{ marginLeft: 5, marginRight: 5, marginTop: 0 }}
-                  size={50}
-                  icon={faAnglesUp}
+                  size={20}
+                  icon={faAngleUp}
                   color={colors.zingo}
                 />
-              </TouchableOpacity>
+              </Pressable>
             )}
           </>
         )}

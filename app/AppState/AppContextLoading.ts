@@ -1,4 +1,3 @@
-import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
 import ZecPriceType from './types/ZecPriceType';
 import BackgroundType from './types/BackgroundType';
@@ -13,21 +12,25 @@ import { CurrencyEnum } from './enums/CurrencyEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
+import { ScreenEnum } from './enums/ScreenEnum';
 
 export default interface AppContextLoading {
   // context
   netInfo: NetInfoType;
   wallet: WalletType;
-  info: InfoType;
   zecPrice: ZecPriceType;
   background: BackgroundType;
   translate: (key: string) => TranslateType;
   backgroundError: BackgroundErrorType;
   setBackgroundError: (title: string, error: string) => void;
   readOnly: boolean;
+  orchardPool: boolean;
+  saplingPool: boolean;
+  transparentPool: boolean;
   snackbars: SnackbarType[];
   addLastSnackbar: (snackbar: SnackbarType) => void;
-  removeFirstSnackbar: () => void;
+  removeFirstSnackbar: (s: ScreenEnum) => void;
+  zingolibVersion: string;
 
   // context settings
   server: ServerType;

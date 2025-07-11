@@ -2,7 +2,6 @@ import { getNumberFormatSettings } from 'react-native-localize';
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import {
   ChainNameEnum,
-  CommandEnum,
   ContactType,
   GlobalConst,
   SendJsonToTypeType,
@@ -235,14 +234,14 @@ export default class Utils {
 
   static async getSendManyJSON(
     sendPageState: SendPageStateClass,
-    uOrchardAddress: string,
+    uAddress: string,
     server: ServerType,
     donation: boolean,
   ): Promise<SendJsonToTypeType[]> {
     let donationAddress: boolean = false;
     const json: Promise<SendJsonToTypeType[][]> = Promise.all(
       [sendPageState.toaddr].map(async (to: ToAddrClass) => {
-        const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uOrchardAddress);
+        const memo = Utils.buildMemo(to.memo, to.includeUAMemo, uAddress);
         const amount = parseInt((Utils.parseStringLocaleToNumberFloat(to.amount) * 10 ** 8).toFixed(0), 10);
 
         donationAddress =
@@ -252,7 +251,7 @@ export default class Utils {
 
         if (memo === '') {
           return [{ address: to.to, amount } as SendJsonToTypeType];
-        } else if (Buffer.byteLength(memo, 'utf8') <= GlobalConst.memoMaxLength) {
+        } else if (Buffer.byteLength(memo, GlobalConst.utf8 as BufferEncoding) <= GlobalConst.memoMaxLength) {
           return [{ address: to.to, amount, memo } as SendJsonToTypeType];
         } else {
           // If the memo is more than 511 bytes, then we split it into multiple transactions.
@@ -307,7 +306,7 @@ export default class Utils {
     serverChainName: string,
   ): Promise<{ isValid: boolean; onlyOrchardUA: string }> {
     //const start = Date.now();
-    const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
+    const result: string = await RPCModule.parseAddressInfo(address);
     //console.log('=========================================== > parse address - ', Date.now() - start);
     //console.log(result);
     let isValid: boolean = false;
@@ -348,7 +347,7 @@ export default class Utils {
 
   static async isValidOrchardOrSaplingAddress(address: string, serverChainName: string): Promise<boolean> {
     //const start = Date.now();
-    const result: string = await RPCModule.execute(CommandEnum.parseAddress, address);
+    const result: string = await RPCModule.parseAddressInfo(address);
     //console.log('=========================================== > parse address - ', Date.now() - start);
     //console.log(result);
     if (result) {
@@ -416,13 +415,13 @@ export default class Utils {
     return { memo: memoTotal, memoUA: '' };
   };
 
-  static buildMemo = (memo: string | undefined, includeUAMemo: boolean, uOrchardAddress: string): string => {
-    return `${memo || ''}${includeUAMemo ? GlobalConst.replyTo + uOrchardAddress : ''}`;
+  static buildMemo = (memo: string | undefined, includeUAMemo: boolean, uAddress: string): string => {
+    return `${memo || ''}${includeUAMemo ? GlobalConst.replyTo + uAddress : ''}`;
   };
 
-  static countMemoBytes = (memo: string | undefined, includeUAMemo: boolean, uOrchardAddress: string): number => {
-    const memoTotal = Utils.buildMemo(memo, includeUAMemo, uOrchardAddress);
-    const len = Buffer.byteLength(memoTotal, 'utf8');
+  static countMemoBytes = (memo: string | undefined, includeUAMemo: boolean, uAddress: string): number => {
+    const memoTotal = Utils.buildMemo(memo, includeUAMemo, uAddress);
+    const len = Buffer.byteLength(memoTotal, GlobalConst.utf8 as BufferEncoding);
     return len;
   };
 }

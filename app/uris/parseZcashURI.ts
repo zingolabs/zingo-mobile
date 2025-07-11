@@ -1,7 +1,7 @@
 import { Base64 } from 'js-base64';
 import Url from 'url-parse';
 import ZcashURITargetClass from './classes/ZcashURITargetClass';
-import { ServerType, TranslateType, GlobalConst } from '../AppState';
+import { ServerType, TranslateType, GlobalConst, ZcashUriFieldEnum } from '../AppState';
 import Utils from '../utils';
 
 const parseZcashURI = async (
@@ -68,7 +68,7 @@ const parseZcashURI = async (
     }
 
     switch (qName.toLowerCase()) {
-      case 'address':
+      case ZcashUriFieldEnum.address:
         if (typeof target.address !== 'undefined') {
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
@@ -82,19 +82,19 @@ const parseZcashURI = async (
         }
         target.address = value;
         break;
-      case 'label':
+      case ZcashUriFieldEnum.label:
         if (typeof target.label !== 'undefined') {
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
         target.label = value;
         break;
-      case 'message':
+      case ZcashUriFieldEnum.message:
         if (typeof target.message !== 'undefined') {
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
         target.message = value;
         break;
-      case 'memo':
+      case ZcashUriFieldEnum.memo:
         if (typeof target.memoBase64 !== 'undefined') {
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }
@@ -108,7 +108,7 @@ const parseZcashURI = async (
         }
 
         break;
-      case 'amount':
+      case ZcashUriFieldEnum.amount:
         if (typeof target.amount !== 'undefined') {
           return `${translate('uris.duplicateparameter')} "${qName}"`;
         }

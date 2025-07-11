@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { View, ScrollView, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -18,12 +18,11 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
-import { CommandEnum } from '../../app/AppState';
-import RPCModule from '../../app/RPCModule';
-import { RPCWalletKindType } from '../../app/rpc/types/RPCWalletKindType';
+import 'moment/locale/tr';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { ScreenEnum } from '../../app/AppState';
 
 type PoolsProps = {
   setPrivacyOption: (value: boolean) => Promise<void>;
@@ -31,35 +30,24 @@ type PoolsProps = {
 
 const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language, shieldingAmount, snackbars, removeFirstSnackbar } = context;
+  const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language, shieldingAmount, snackbars, removeFirstSnackbar, orchardPool, saplingPool, transparentPool } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.Pools;
 
-  const [orchardPool, setOrchardPool] = useState<boolean>(false);
-  const [saplingPool, setSaplingPool] = useState<boolean>(false);
-  const [transparentPool, setTransparentPool] = useState<boolean>(false);
-
-  useEffect(() => {
-    (async () => {
-      // checking the pools of this wallet
-      const walletKindStr: string = await RPCModule.execute(CommandEnum.walletKind, '');
-      try {
-        const walletKindJSON: RPCWalletKindType = await JSON.parse(walletKindStr);
-        //console.log(walletKindJSON);
-        setOrchardPool(walletKindJSON.orchard);
-        setSaplingPool(walletKindJSON.sapling);
-        setTransparentPool(walletKindJSON.transparent);
-      } catch (e) {}
-    })();
-  }, []);
-
-  //console.log('render pools. Balance:', totalBalance);
+  //console.log('render pools. Balance:', totalBalance, orchardPool, saplingPool, transparentPool);
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -69,14 +57,9 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('pools.title') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -106,30 +89,30 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
                     <BoldText>{translate('pools.orchard-title') as string}</BoldText>
 
                     <View style={{ display: 'flex', marginLeft: 25 }}>
-                      <DetailLine label={translate('pools.orchard-balance') as string}>
+                      <DetailLine label={translate('pools.orchard-balance') as string} screenName={screenName}>
                         <ZecAmount
                           testID="orchard-total-balance"
-                          amtZec={totalBalance.orchardBal}
+                          amtZec={totalBalance.totalOrchardBalance}
                           size={18}
                           currencyName={info.currencyName}
                           style={{
                             opacity:
-                              totalBalance.spendableOrchard > 0 &&
-                              totalBalance.spendableOrchard === totalBalance.orchardBal
+                              totalBalance.confirmedOrchardBalance > 0 &&
+                              totalBalance.confirmedOrchardBalance === totalBalance.totalOrchardBalance
                                 ? 1
                                 : 0.5,
                           }}
                           privacy={privacy}
                         />
                       </DetailLine>
-                      <DetailLine label={translate('pools.orchard-spendable-balance') as string}>
+                      <DetailLine label={translate('pools.orchard-confirmed-balance') as string} screenName={screenName}>
                         <ZecAmount
-                          testID="orchard-spendable-balance"
-                          amtZec={totalBalance.spendableOrchard}
+                          testID="orchard-confirmed-balance"
+                          amtZec={totalBalance.confirmedOrchardBalance}
                           size={18}
                           currencyName={info.currencyName}
                           color={
-                            totalBalance.spendableOrchard > 0 && totalBalance.spendableOrchard === totalBalance.orchardBal
+                            totalBalance.confirmedOrchardBalance > 0 && totalBalance.confirmedOrchardBalance === totalBalance.totalOrchardBalance
                               ? colors.primary
                               : 'red'
                           }
@@ -149,30 +132,30 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
                     <BoldText>{translate('pools.sapling-title') as string}</BoldText>
 
                     <View style={{ display: 'flex', marginLeft: 25 }}>
-                      <DetailLine label={translate('pools.sapling-balance') as string}>
+                      <DetailLine label={translate('pools.sapling-balance') as string} screenName={screenName}>
                         <ZecAmount
                           testID="sapling-total-balance"
-                          amtZec={totalBalance.privateBal}
+                          amtZec={totalBalance.totalSaplingBalance}
                           size={18}
                           currencyName={info.currencyName}
                           style={{
                             opacity:
-                              totalBalance.spendablePrivate > 0 &&
-                              totalBalance.spendablePrivate === totalBalance.privateBal
+                              totalBalance.confirmedSaplingBalance > 0 &&
+                              totalBalance.confirmedSaplingBalance === totalBalance.totalSaplingBalance
                                 ? 1
                                 : 0.5,
                           }}
                           privacy={privacy}
                         />
                       </DetailLine>
-                      <DetailLine label={translate('pools.sapling-spendable-balance') as string}>
+                      <DetailLine label={translate('pools.sapling-confirmed-balance') as string} screenName={screenName}>
                         <ZecAmount
-                          testID="sapling-spendable-balance"
-                          amtZec={totalBalance.spendablePrivate}
+                          testID="sapling-confirmed-balance"
+                          amtZec={totalBalance.confirmedSaplingBalance}
                           size={18}
                           currencyName={info.currencyName}
                           color={
-                            totalBalance.spendablePrivate > 0 && totalBalance.spendablePrivate === totalBalance.privateBal
+                            totalBalance.confirmedSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === totalBalance.totalSaplingBalance
                               ? colors.syncing
                               : 'red'
                           }
@@ -192,10 +175,20 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
                     <BoldText>{translate('pools.transparent-title') as string}</BoldText>
 
                     <View style={{ display: 'flex', marginLeft: 25 }}>
-                      <DetailLine label={translate('pools.transparent-balance') as string}>
+                      <DetailLine label={translate('pools.transparent-balance') as string} screenName={screenName}>
                         <ZecAmount
                           testID="transparent-balance"
-                          amtZec={totalBalance.transparentBal}
+                          amtZec={totalBalance.totalTransparentBalance}
+                          size={18}
+                          currencyName={info.currencyName}
+                          color={'red'}
+                          privacy={privacy}
+                        />
+                      </DetailLine>
+                      <DetailLine label={translate('pools.transparent-confirmed-balance') as string} screenName={screenName}>
+                        <ZecAmount
+                          testID="transparent-confirmed-balance"
+                          amtZec={totalBalance.confirmedTransparentBalance}
                           size={18}
                           currencyName={info.currencyName}
                           color={'red'}
@@ -206,7 +199,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
                   </>
                 )}
 
-                {transparentPool && totalBalance.transparentBal > 0 && shieldingAmount === 0 && (
+                {transparentPool && totalBalance.confirmedTransparentBalance > 0 && shieldingAmount === 0 && (
                   <View
                     style={{
                       display: 'flex',

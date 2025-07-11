@@ -91,3 +91,7 @@ buck-out/
 /rust/test_binaries/bins/
 
 .cxx
+
+# Keystore
+/android/app/Zingo.jks
+/android/local.zingo.jks.properties

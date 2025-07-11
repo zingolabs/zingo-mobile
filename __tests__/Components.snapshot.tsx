@@ -27,19 +27,19 @@ describe('Component Components - test', () => {
         privacy={true}
       />,
     );
-    expect(currencyAmount.toJSON()).toMatchSnapshot();
+    expect(currencyAmount).toMatchSnapshot();
   });
 
-  test('CurrencyAmount Normal Privacy - snapshot', () => {
+  test('CurrencyAmount Normal Privacy with TOR - snapshot', () => {
     const currencyAmount = render(
       <CurrencyAmount
         price={1.12345678}
         amtZec={39.99}
         style={{ backgroundColor: 'red' }}
-        currency={CurrencyEnum.USDCurrency}
+        currency={CurrencyEnum.USDTORCurrency}
       />,
     );
-    expect(currencyAmount.toJSON()).toMatchSnapshot();
+    expect(currencyAmount).toMatchSnapshot();
   });
 
   test('ZecAmount High Privacy - snapshot', () => {
@@ -53,7 +53,7 @@ describe('Component Components - test', () => {
         privacy={true}
       />,
     );
-    expect(zecAmount.toJSON()).toMatchSnapshot();
+    expect(zecAmount).toMatchSnapshot();
   });
 
   test('ZecAmount Normal Privacy - snapshot', () => {
@@ -66,22 +66,22 @@ describe('Component Components - test', () => {
         currencyName={CurrencyNameEnum.ZEC}
       />,
     );
-    expect(zecAmount.toJSON()).toMatchSnapshot();
+    expect(zecAmount).toMatchSnapshot();
   });
 
   test('BoldText - snapshot', () => {
     const boldText = render(<BoldText style={{ backgroundColor: 'red' }} children={'bold text'} />);
-    expect(boldText.toJSON()).toMatchSnapshot();
+    expect(boldText).toMatchSnapshot();
   });
 
   test('FadeText - snapshot', () => {
     const fadeText = render(<FadeText style={{ backgroundColor: 'red' }} children={'fade text'} />);
-    expect(fadeText.toJSON()).toMatchSnapshot();
+    expect(fadeText).toMatchSnapshot();
   });
 
   test('ErrorText - snapshot', () => {
     const errorText = render(<ErrorText style={{ backgroundColor: 'white' }} children={'error text'} />);
-    expect(errorText.toJSON()).toMatchSnapshot();
+    expect(errorText).toMatchSnapshot();
   });
 
   test('RegText - snapshot', () => {
@@ -89,6 +89,6 @@ describe('Component Components - test', () => {
     const regText = render(
       <RegText style={{ backgroundColor: 'white' }} color={'red'} onPress={onPress} children={'reg text'} />,
     );
-    expect(regText.toJSON()).toMatchSnapshot();
+    expect(regText).toMatchSnapshot();
   });
 });

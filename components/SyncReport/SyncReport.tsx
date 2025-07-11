@@ -12,28 +12,35 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 
 import Header from '../Header';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import RegText from '../Components/RegText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';
-import Utils from '../../app/utils';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { isEqual } from 'lodash';
+import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
+import { RPCSyncScanRangeStatusType } from '../../app/rpc/types/RPCSyncScanRangeStatusType';
+import { RPCSyncScanRangePriorityStatusEnum } from '../../app/rpc/enums/RPCSyncScanRangePriorityStatusEnum';
+import { ScreenEnum } from '../../app/AppState';
+//import { ModeEnum } from '../../app/AppState';
 
 type SyncReportProps = {
 };
 
 const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   const context = useContext(ContextAppLoaded);
-  const { syncingStatus, wallet, translate, background, language, netInfo, snackbars, removeFirstSnackbar } = context;
+  const { syncingStatus, wallet, translate, background, language, netInfo, snackbars, removeFirstSnackbar, info } = context; //mode
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.SyncReport;
 
   const [maxBlocks, setMaxBlocks] = useState<number>(0);
   const [points, setPoints] = useState<number[]>([]);
@@ -44,16 +51,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
   const [server1Percent, setServer1Percent] = useState<number>(0);
   const [server2Percent, setServer2Percent] = useState<number>(0);
   const [server3Percent, setServer3Percent] = useState<number>(0);
-  const [processEndBlockFixed, setProcessEndBlockFixed] = useState<number>(0);
-  const [walletOldSyncedPercent, setWalletOldSyncedPercent] = useState<number>(0);
-  const [walletNewSyncedPercent, setWalletNewSyncedPercent] = useState<number>(0);
-  const [walletForSyncedPercent, setWalletForSyncedPercent] = useState<number>(0);
-  const [wallet1, setWallet1] = useState<number>(0);
-  const [wallet2, setWallet2] = useState<number>(0);
-  const [wallet3, setWallet3] = useState<number>(0);
+
+  const [percentageOutputsScanned, setPercentageOutputsScanned] = useState<number>(0);
+  const [syncInProgress, setSyncInProgress] = useState<boolean>(true);
 
   useEffect(() => {
-    if (syncingStatus.lastBlockServer) {
+    if (info.latestBlock) {
       (async () => {
         const a = [
           0, 500000, 1000000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000, 5000000, 5500000, 6000000,
@@ -83,7 +86,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
           '10M',
         ];
         for (let i = 0; i < a.length; i++) {
-          if (syncingStatus.lastBlockServer < a[i]) {
+          if (info.latestBlock < a[i]) {
             setMaxBlocks(a[i]);
             setPoints(a.slice(0, i));
             setLabels(l.slice(0, i + 1));
@@ -92,29 +95,32 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
         }
       })();
     }
-  }, [syncingStatus.lastBlockServer]);
+  }, [info.latestBlock]);
 
   // because this screen is fired from more places than the menu.
   useEffect(() => {
-    setTimeout(() => setShowBackgroundLegend(false), 10000); // 10 seconds only
+    setTimeout(() => setShowBackgroundLegend(false), 10 * 1000); // 10 seconds only
   }, []);
 
   useEffect(() => {
-    // ref: https://github.com/zingolabs/zingo-mobile/issues/327
-    // I have to subtract 1 here, almost always.
-    // when end block process & last block wallet are equal, don't subtract anything.
-    // when end block process & wallet birthday are equal, don't subtract anything.
-    let processEndBlockFi = 0;
-    if (
-      syncingStatus.processEndBlock &&
-      syncingStatus.processEndBlock !== wallet.birthday &&
-      syncingStatus.processEndBlock < syncingStatus.lastBlockWallet
-    ) {
-      processEndBlockFi = syncingStatus.processEndBlock - 1;
+    if (!syncingStatus || isEqual(syncingStatus, {} as RPCSyncStatusType) || (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) || syncingStatus.percentage_total_outputs_scanned === 0) {
+      // if the App is waiting for the first fetching, let's put 0.
+      setPercentageOutputsScanned(0);
+      setSyncInProgress(true);
     } else {
-      processEndBlockFi = syncingStatus.processEndBlock;
+      setPercentageOutputsScanned(
+        Number(syncingStatus.percentage_total_outputs_scanned?.toFixed(2).replace(/\.?0+$/, '')),
+      );
+      setSyncInProgress(
+        !!syncingStatus.scan_ranges &&
+        syncingStatus.scan_ranges.length > 0 &&
+        !!syncingStatus.percentage_total_outputs_scanned &&
+        syncingStatus.percentage_total_outputs_scanned < 100
+      );
     }
+  }, [syncingStatus, syncingStatus.percentage_total_outputs_scanned, syncingStatus.scan_ranges]);
 
+  useEffect(() => {
     /*
     SERVER points:
     - server0 : first block of the server -> 0
@@ -125,7 +131,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
 
     const serv1: number = wallet.birthday || 0;
     const serv2: number =
-      syncingStatus.lastBlockServer && wallet.birthday ? syncingStatus.lastBlockServer - wallet.birthday : 0;
+      info.latestBlock && wallet.birthday ? info.latestBlock - wallet.birthday : 0;
     const serv3: number = maxBlocks ? maxBlocks - serv1 - serv2 : 0;
     const serv1Percent: number = (serv1 * 100) / maxBlocks;
     const serv2Percent: number = (serv2 * 100) / maxBlocks;
@@ -136,82 +142,18 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
       serverWallet : blocks of the wallet
     */
 
-    const servServer: number = syncingStatus.lastBlockServer || 0;
+    const servServer: number = info.latestBlock || 0;
     const servWallet: number =
-      syncingStatus.lastBlockServer && wallet.birthday ? syncingStatus.lastBlockServer - wallet.birthday : 0;
-
-    /*
-      WALLET points:
-      - wallet0 : birthday of the wallet
-      - wallet1 : first block of the sync process (endBlock)
-      - wallet2 : current block of the sync process
-      - wallet3 : empty part of the wallet bar
-
-      EDGE case: sometimes when you restore from seed & you don't remember the
-      birthday the sync process have to start from 419200... so your wallet have
-      this birthday. But sometimes in some point of the sync process the server can
-      give you the real birthday... so the process start point is older than the
-      birthday, even if it seems wrong/weird, this screen show the right info.
-    */
-
-    let wall1: number =
-      processEndBlockFi && wallet.birthday
-        ? processEndBlockFi >= wallet.birthday
-          ? processEndBlockFi - wallet.birthday
-          : processEndBlockFi
-        : 0;
-    let wall2: number =
-      syncingStatus.currentBlock && processEndBlockFi ? syncingStatus.currentBlock - processEndBlockFi : 0;
-
-    // It is really weird, but don't want any negative values in the UI.
-    if (wall1 < 0) {
-      wall1 = 0;
-    }
-    if (wall2 < 0) {
-      wall2 = 0;
-    }
-
-    const wall3: number =
-      syncingStatus.lastBlockServer && wallet.birthday
-        ? processEndBlockFi >= wallet.birthday
-          ? syncingStatus.lastBlockServer - wallet.birthday - wall1 - wall2
-          : syncingStatus.lastBlockServer - processEndBlockFi - wall1 - wall2
-        : 0;
-
-    let walletOldSyncedPer: number = (wall1 * 100) / servWallet;
-    let walletNewSyncedPer: number = (wall2 * 100) / servWallet;
-    if (walletOldSyncedPer < 0.01 && walletOldSyncedPer > 0) {
-      walletOldSyncedPer = 0.01;
-    }
-    if (walletOldSyncedPer > 100) {
-      walletOldSyncedPer = 100;
-    }
-    if (walletNewSyncedPer < 0.01 && walletNewSyncedPer > 0) {
-      walletNewSyncedPer = 0.01;
-    }
-    if (walletNewSyncedPer > 100) {
-      walletNewSyncedPer = 100;
-    }
-    const walletForSyncedPer: number = 100 - walletOldSyncedPer - walletNewSyncedPer;
+      info.latestBlock && wallet.birthday ? info.latestBlock - wallet.birthday : 0;
 
     setServerServer(servServer);
     setServerWallet(servWallet);
     setServer1Percent(serv1Percent);
     setServer2Percent(serv2Percent);
     setServer3Percent(serv3Percent);
-    setProcessEndBlockFixed(processEndBlockFi);
-    setWalletOldSyncedPercent(walletOldSyncedPer);
-    setWalletNewSyncedPercent(walletNewSyncedPer);
-    setWalletForSyncedPercent(walletForSyncedPer);
-    setWallet1(wall1);
-    setWallet2(wall2);
-    setWallet3(wall3);
   }, [
     maxBlocks,
-    syncingStatus.currentBlock,
-    syncingStatus.lastBlockServer,
-    syncingStatus.lastBlockWallet,
-    syncingStatus.processEndBlock,
+    info.latestBlock,
     wallet.birthday,
   ]);
 
@@ -219,6 +161,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -228,14 +176,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('report.title') as string}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -262,7 +205,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                 alignItems: 'flex-end',
                 marginHorizontal: 20,
               }}>
-              <DetailLine label={translate('report.networkstatus') as string}>
+              <DetailLine label={translate('report.networkstatus') as string} screenName={screenName}>
                 <View style={{ display: 'flex', flexDirection: 'column' }}>
                   {!netInfo.isConnected && <RegText color="red"> {translate('report.nointernet') as string} </RegText>}
                   {netInfo.type === NetInfoStateType.cellular && (
@@ -295,40 +238,28 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                   value={
                     //background.batches.toString() +
                     //translate('report.batches-date') +
-                    moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm a') +
-                    (Number(background.dateEnd) > 0
-                      ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm a')
+                    moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a') +
+                    (Number(background.dateEnd) > 0 && Number(background.date) !== Number(background.dateEnd)
+                      ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
                       : '')
                   }
+                  screenName={screenName}
                 />
                 {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
               </View>
             )}
-          {maxBlocks && netInfo.isConnected ? (
+          {!!maxBlocks && netInfo.isConnected ? (
             <>
               <View style={{ display: 'flex', marginHorizontal: 20, marginBottom: 30 }}>
                 <DetailLine
-                  label="Sync ID"
+                  label={translate('report.syncstatus') as string}
                   value={
-                    syncingStatus.syncID >= 0
-                      ? syncingStatus.syncID +
-                        ' - (' +
-                        (syncingStatus.inProgress
-                          ? (translate('report.running') as string)
-                          : syncingStatus.lastBlockServer === syncingStatus.lastBlockWallet
-                          ? (translate('report.finished') as string)
-                          : (translate('report.paused') as string)) +
-                        ')'
-                      : (translate('connectingserver') as string)
+                      syncInProgress
+                        ? ((translate('report.running') as string) + ` ${percentageOutputsScanned > 0 ? percentageOutputsScanned + '%' : ''}`)
+                        : (translate('report.finished') as string)
                   }
+                  screenName={screenName}
                 />
-                {!!syncingStatus.lastError && (
-                  <>
-                    <View style={{ height: 2, width: '100%', backgroundColor: 'red', marginTop: 10 }} />
-                    <DetailLine label="Last Error" value={syncingStatus.lastError} />
-                    <View style={{ height: 2, width: '100%', backgroundColor: 'red', marginBottom: 10 }} />
-                  </>
-                )}
 
                 <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }} />
 
@@ -467,235 +398,220 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
                     )}
 
                     <View
-                      style={{ height: 1, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }}
+                      style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15, marginBottom: 10 }}
                     />
                   </>
                 )}
 
-                {!!maxBlocks && syncingStatus.syncID >= 0 && (
+                {!!maxBlocks && percentageOutputsScanned > 0 && (
                   <>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        width: '100%',
-                        justifyContent: 'space-between',
-                        marginTop: 10,
-                      }}>
-                      <>
-                        <Text style={{ color: colors.primary }}>
-                          {processEndBlockFixed >= wallet.birthday ? wallet.birthday : processEndBlockFixed}
-                        </Text>
-                        <Text style={{ color: colors.primary }}>{syncingStatus.lastBlockServer}</Text>
-                      </>
-                    </View>
-                    <View
-                      style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
-                      <>
-                        <View
-                          style={{
-                            height: 10,
-                            borderLeftColor: colors.primary,
-                            borderLeftWidth: 1,
-                          }}
-                        />
-                        <View
-                          style={{
-                            height: 10,
-                            borderRightColor: colors.primary,
-                            borderRightWidth: 1,
-                          }}
-                        />
-                      </>
-                    </View>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        width: '100%',
-                        borderBottomColor: colors.primary,
-                        borderBottomWidth: 2,
-                        marginBottom: 0,
-                      }}>
-                      {walletOldSyncedPercent >= 0 && (
-                        <View
-                          style={{
-                            height: 10,
-                            width: `${walletOldSyncedPercent}%`,
-                            backgroundColor: 'lightyellow',
-                            borderLeftColor: colors.primary,
-                            borderLeftWidth: 1,
-                            borderRightColor: walletOldSyncedPercent === 100 ? colors.primary : 'lightyellow',
-                            borderRightWidth: walletOldSyncedPercent > 0 ? 1 : 0,
-                          }}
-                        />
-                      )}
-                      {walletNewSyncedPercent >= 0 && (
-                        <View
-                          style={{
-                            height: 10,
-                            width: `${walletNewSyncedPercent}%`,
-                            backgroundColor: 'orange',
-                            borderRightColor: 'orange',
-                            borderRightWidth: walletNewSyncedPercent > 0 ? 1 : 0,
-                          }}
-                        />
-                      )}
-                      {walletForSyncedPercent >= 0 && (
-                        <View
-                          style={{
-                            height: 10,
-                            backgroundColor: '#333333',
-                            borderRightColor: colors.primary,
-                            borderRightWidth: 1,
-                            width: `${walletForSyncedPercent}%`,
-                          }}
-                        />
-                      )}
-                    </View>
-                    {wallet1 > 0 && (
+                    <DetailLine
+                      label={translate('report.map') as string}
+                      screenName={screenName}
+                    >
                       <View
                         style={{
                           display: 'flex',
                           flexDirection: 'row',
                           width: '100%',
-                          justifyContent: 'flex-start',
-                          alignItems: 'center',
+                          justifyContent: 'space-between',
                           marginTop: 5,
                         }}>
-                        <Text style={{ color: colors.primary }}>{translate('report.syncedbefore') as string}</Text>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: 'lightyellow',
-                            margin: 5,
-                          }}
-                        />
-                        <Text style={{ color: colors.text }}>
-                          {wallet1 +
-                            (translate('report.blocks') as string) +
-                            Utils.parseNumberFloatToStringLocale(walletOldSyncedPercent, 2) +
-                            '%'}
-                        </Text>
+                        <>
+                          <Text style={{ color: colors.text }}>
+                            {wallet.birthday}
+                          </Text>
+                          <Text style={{ color: colors.text }}>{info.latestBlock}</Text>
+                        </>
                       </View>
-                    )}
-                    {wallet2 > 0 && (
+                      <View
+                        style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+                        <>
+                          <View
+                            style={{
+                              height: 10,
+                              borderLeftColor: colors.primary,
+                              borderLeftWidth: 1,
+                            }}
+                          />
+                          <View
+                            style={{
+                              height: 10,
+                              borderRightColor: colors.primary,
+                              borderRightWidth: 1,
+                            }}
+                          />
+                        </>
+                      </View>
                       <View
                         style={{
                           display: 'flex',
                           flexDirection: 'row',
-                          width: '100%',
                           justifyContent: 'flex-start',
-                          alignItems: 'center',
-                          marginTop: 5,
+                          width: '100%',
+                          borderBottomColor: 'green',
+                          borderBottomWidth: 0,
+                          marginBottom: 0,
                         }}>
-                        <Text style={{ color: colors.primary }}>{translate('report.syncednow') as string}</Text>
-                        <View
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: 'orange',
-                            margin: 5,
-                          }}
-                        />
-                        <Text testID="syncreport.syncednow" style={{ color: colors.text }}>
-                          {wallet2 +
-                            (translate('report.blocks') as string) +
-                            Utils.parseNumberFloatToStringLocale(walletNewSyncedPercent, 2) +
-                            '%'}
-                        </Text>
+                        {!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.map((range: RPCSyncScanRangeStatusType) => {
+                          const percent: number = ((range.end_block - range.start_block) * 100) / (info.latestBlock - wallet.birthday);
+                          return <View
+                            key={`${range.start_block.toString() + '-' + range.end_block.toString()}`}
+                            style={{
+                              height: 15,
+                              width: `${percent}%`,
+                              backgroundColor:
+                                range.priority === RPCSyncScanRangePriorityStatusEnum.Scanning
+                                  ? 'orange' /* Scanning */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.Scanned
+                                  ? 'green'  /* Scanned  */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.ScannedWithoutMapping
+                                  ? 'green'  /* Scanned  */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.Historic
+                                  ? 'gray'   /* Low priority */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.OpenAdjacent
+                                  ? 'blue'   /* High priority */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.FoundNote
+                                  ? 'blue'   /* High priority */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.ChainTip
+                                  ? 'blue'   /* High priority */
+                                  : range.priority === RPCSyncScanRangePriorityStatusEnum.Verify
+                                  ? 'blue'   /* High priority */
+                                  : 'red',   /* error somehow */
+                            }}
+                          />;
+                        }
+                        )}
                       </View>
-                    )}
-                    {wallet3 > 0 && (
+                    </DetailLine>
+                    <DetailLine
+                      label={translate('report.legend') as string}
+                      screenName={screenName}
+                    >
                       <View
                         style={{
                           display: 'flex',
-                          flexDirection: 'row',
                           width: '100%',
                           justifyContent: 'flex-start',
-                          alignItems: 'center',
+                          alignItems: 'flex-start',
                           marginTop: 5,
+                          marginLeft: 10,
                         }}>
-                        <Text style={{ color: colors.primary }}>{translate('report.notyetsynced') as string}</Text>
                         <View
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
-                            width: 10,
-                            height: 10,
-                            justifyContent: 'flex-start',
-                            backgroundColor: '#333333',
-                            margin: 5,
-                          }}
-                        />
-                        <Text testID="syncreport.notyetsynced" style={{ color: colors.text }}>
-                          {wallet3 +
-                            (translate('report.blocks') as string) +
-                            Utils.parseNumberFloatToStringLocale(walletForSyncedPercent, 2) +
-                            '%'}
-                        </Text>
+                            flexWrap: 'nowrap',
+                            }}>
+                          <View
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              width: 10,
+                              height: 10,
+                              justifyContent: 'flex-start',
+                              backgroundColor: 'green',
+                              margin: 5,
+                            }}
+                          />
+                          <Text style={{ color: colors.text, marginRight: 10 }}>
+                            {translate('report.scanned') as string}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            flexWrap: 'nowrap',
+                            }}>
+                          <View
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              width: 10,
+                              height: 10,
+                              justifyContent: 'flex-start',
+                              backgroundColor: 'orange',
+                              margin: 5,
+                            }}
+                          />
+                          <Text style={{ color: colors.text, marginRight: 10 }}>
+                            {translate('report.scanning') as string}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            flexWrap: 'nowrap',
+                            }}>
+                          <View
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              width: 10,
+                              height: 10,
+                              justifyContent: 'flex-start',
+                              backgroundColor: 'gray',
+                              margin: 5,
+                            }}
+                          />
+                          <Text style={{ color: colors.text, marginRight: 10 }}>
+                            {translate('report.lowpriority') as string}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            flexWrap: 'nowrap',
+                            }}>
+                          <View
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              width: 10,
+                              height: 10,
+                              justifyContent: 'flex-start',
+                              backgroundColor: 'blue',
+                              margin: 5,
+                            }}
+                          />
+                          <Text style={{ color: colors.text, marginRight: 10 }}>
+                            {translate('report.highpriority') as string}
+                          </Text>
+                        </View>
                       </View>
-                    )}
-
-                    <View style={{ height: 2, width: '100%', backgroundColor: 'white', marginTop: 15 }} />
-                  </>
-                )}
-
-                {syncingStatus.inProgress && syncingStatus.currentBatch > 0 && (
-                  <>
-                    <DetailLine
-                      testID="syncreport.currentbatch"
-                      label={translate('report.batches') as string}
-                      value={
-                        (translate('report.processingbatch') as string) +
-                        syncingStatus.currentBatch +
-                        (translate('report.totalbatches') as string) +
-                        syncingStatus.totalBatches
-                      }
-                    />
-                    <DetailLine
-                      testID="syncreport.blocksperbatch"
-                      label={translate('report.blocksperbatch') as string}
-                      value={syncingStatus.blocksPerBatch.toString()}
-                    />
-                    <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                      <DetailLine
-                        label={translate('report.secondsperbatch') as string}
-                        value={syncingStatus.secondsPerBatch.toString()}
-                      />
-                      <ActivityIndicator size="large" color={colors.primary} />
-                    </View>
-                  </>
-                )}
-                {syncingStatus.inProgress && syncingStatus.currentBlock > 0 && !!syncingStatus.lastBlockServer && (
-                  <>
-                    <View style={{ height: 2, width: '100%', backgroundColor: colors.primary, marginTop: 10 }} />
-                    <DetailLine
-                      label={translate('report.blocks-title') as string}
-                      value={
-                        (translate('report.processingblock') as string) +
-                        syncingStatus.currentBlock +
-                        (translate('report.totalblocks') as string) +
-                        syncingStatus.lastBlockServer
-                      }
-                    />
+                    </DetailLine>
                   </>
                 )}
               </View>
             </>
           ) : (
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-              {netInfo.isConnected && <DetailLine label="" value={translate('connectingserver') as string} />}
+            <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
+              <ActivityIndicator size="large" color={colors.primary} />
             </View>
           )}
+          {/*!!syncingStatus.lastError && mode === ModeEnum.advanced && (
+            <>
+              <View
+                style={{ height: 1, width: '100%', backgroundColor: 'white' }}
+              />
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'flex-end',
+                  marginHorizontal: 20,
+                }}>
+                <DetailLine label={'Last Sync Error'}>
+                  <View style={{ display: 'flex', flexDirection: 'column' }}>
+                    <RegText> {syncingStatus.lastError} </RegText>
+                  </View>
+                </DetailLine>
+              </View>
+            </>
+          )*/}
         </ScrollView>
       </View>
     </ToastProvider>

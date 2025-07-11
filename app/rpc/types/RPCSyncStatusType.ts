@@ -1,15 +1,18 @@
+import { RPCSyncScanRangeStatusType } from './RPCSyncScanRangeStatusType';
+
 export type RPCSyncStatusType = {
-  sync_id: number;
-  in_progress: boolean;
-  last_error: string;
-  start_block?: number;
-  end_block?: number;
-  synced_blocks?: number;
-  trial_decryptions_blocks?: number;
-  txn_scan_blocks?: number;
-  witnesses_updated?: number;
-  total_blocks?: number;
-  batch_num?: number;
-  batch_total?: number;
-  sync_interrupt?: boolean;
+  scan_ranges?: RPCSyncScanRangeStatusType[],
+  sync_start_height?: number,
+  session_blocks_scanned?: number,
+  total_blocks_scanned?: number,
+  percentage_session_blocks_scanned?: number,
+  percentage_total_blocks_scanned?: number,
+  session_sapling_outputs_scanned?: number,
+  total_sapling_outputs_scanned?: number,
+  session_orchard_outputs_scanned?: number,
+  total_orchard_outputs_scanned?: number,
+  percentage_session_outputs_scanned?: number,
+  percentage_total_outputs_scanned?: number,
+  // from poll sync
+  lastError?: string,
 };

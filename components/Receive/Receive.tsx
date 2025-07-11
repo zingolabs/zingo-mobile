@@ -1,26 +1,41 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState, ReactNode, useEffect } from 'react';
-import { Dimensions, TouchableOpacity, View } from 'react-native';
-import { TabView, TabBar, SceneRendererProps, Route, NavigationState, TabBarItem } from 'react-native-tab-view';
+import React, { useContext, useState, ReactNode, useEffect, useRef, useMemo, useCallback } from 'react';
+import { Keyboard, View } from 'react-native';
+import { TabView, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
 import { useTheme } from '@react-navigation/native';
 
 import SingleAddress from '../Components/SingleAddress';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
-import RegText from '../Components/RegText';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 
-import { AddressClass, AddressKindEnum, ModeEnum, ReceiverEnum } from '../../app/AppState';
-import FadeText from '../Components/FadeText';
-import { ShieldedEnum } from '../../app/AppState/enums/ShieldedEnum';
+import {
+  AddressKindEnum,
+  ModeEnum,
+  SecurityType,
+  UnifiedAddressClass,
+  TransparentAddressClass,
+  AddressBookFileClass,
+  ScreenEnum,
+} from '../../app/AppState';
+import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
+import NewAddress from './components/NewAddress';
+import VerifyAddress from './components/VerifyAddress';
+import { ToastProvider } from 'react-native-toastier';
+import Snackbars from '../Components/Snackbars';
+import NewAddressTag from './components/NewAddressTag';
 
 type ReceiveProps = {
   toggleMenuDrawer: () => void;
   alone: boolean;
+  setSecurityOption: (s: SecurityType) => Promise<void>;
+  setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
@@ -31,69 +46,133 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   // shielding
   // for receive
   alone,
+  setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addresses, uOrchardAddress, mode, language } = context;
-  const { colors } = useTheme()  as ThemeType;
+  const { translate, addresses, defaultUnifiedAddress, mode, language, snackbars, removeFirstSnackbar } = context;
+  const { colors } = useTheme() as ThemeType;
   moment.locale(language);
+  const screenName = ScreenEnum.Receive;
 
   const [index, setIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
+  const [sheetType, setSheetType] = useState<'NA' | 'VA' | 'NAT' | null>(null);
 
-  const [uFullAddr, setUFulladdr] = useState<AddressClass>({} as AddressClass);
-  const [uOrcharSaplingdAddr, setUOrcharSaplingdAddr] = useState<AddressClass>({} as AddressClass);
-  const [uOrchardAddr, setUOrchardAddr] = useState<AddressClass>({} as AddressClass);
-  const [zAddr, setZAddr] = useState<AddressClass>({} as AddressClass);
-  const [tAddr, setTAddr] = useState<AddressClass>({} as AddressClass);
-  const [shielded, setShielded] = useState<ShieldedEnum>(ShieldedEnum.uOrchard);
+  const [uAddr, setUAddr] = useState<UnifiedAddressClass[]>([]);
+  const [tAddr, setTAddr] = useState<TransparentAddressClass[]>([]);
+  const [uAddrIndex, setUAddrIndex] = useState<number | null>(null);
+  const [tAddrIndex, setTAddrIndex] = useState<number | null>(null);
 
-  const dimensions = {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-  };
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [indexBottomSheet, setIndexBottomSheet] = useState<number>(-1);
+
+  const NASnapPoints = useMemo(() =>
+    [
+      index === 0 ? '55%' : '40%',
+      '65%',
+      index === 0 ? '95%' : '80%',
+    ], [index]);
+
+  const VASnapPoints = useMemo(() =>
+    [
+      '40%',
+      '65%',
+    ], []);
+
+  const NAShow = useCallback(() => {
+    setSheetType('NA');
+    bottomSheetRef.current?.snapToIndex(0);
+    setIndexBottomSheet(0);
+  }, []);
+
+  const NAHide = useCallback(() => {
+    setSheetType(null);
+    Keyboard.dismiss();
+    bottomSheetRef.current?.snapToIndex(-1);
+    bottomSheetRef.current?.close();
+    setIndexBottomSheet(-1);
+  }, []);
+
+  const NATShow = useCallback(() => {
+    setSheetType('NAT');
+    bottomSheetRef.current?.snapToIndex(0);
+    setIndexBottomSheet(0);
+  }, []);
+
+  const NATHide = useCallback(() => {
+    setSheetType(null);
+    Keyboard.dismiss();
+    bottomSheetRef.current?.snapToIndex(-1);
+    bottomSheetRef.current?.close();
+    setIndexBottomSheet(-1);
+  }, []);
+
+  const VAShow = useCallback(() => {
+    setSheetType('VA');
+    bottomSheetRef.current?.snapToIndex(0);
+    setIndexBottomSheet(0);
+  }, []);
+
+  const VAHide = useCallback(() => {
+    setSheetType(null);
+    Keyboard.dismiss();
+    bottomSheetRef.current?.snapToIndex(-1);
+    bottomSheetRef.current?.close();
+    setIndexBottomSheet(-1);
+  }, []);
+
+  const handleSheetChanges = useCallback((ind: number) => {
+    //console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& handleSheetChanges', ind);
+    setIndexBottomSheet(ind);
+  }, []);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      if (indexBottomSheet > -1) {
+        bottomSheetRef.current?.snapToIndex(1);
+        setIndexBottomSheet(1);
+      }
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      if (indexBottomSheet > -1) {
+        bottomSheetRef.current?.snapToIndex(0);
+        setIndexBottomSheet(0);
+      }
+    });
+
+    return () => {
+      !!keyboardDidShowListener && keyboardDidShowListener.remove();
+      !!keyboardDidHideListener && keyboardDidHideListener.remove();
+    };
+  }, [indexBottomSheet]);
 
   useEffect(() => {
     if (addresses && addresses.length > 0) {
-      const uFullAdd =
+      // we offering now two types:
+      // 1. UA
+      // 2. T
+      const uAdd =
+        addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.addressKind === AddressKindEnum.u) ||
+        [];
+      // we are filtering only the `external` addresses... for now.
+      const tAdd =
         addresses.filter(
-          a =>
-            a.addressKind === AddressKindEnum.u &&
-            a.receivers.length === 3 &&
-            a.receivers.includes(ReceiverEnum.o) &&
-            a.receivers.includes(ReceiverEnum.z) &&
-            a.receivers.includes(ReceiverEnum.t),
+          (a: UnifiedAddressClass | TransparentAddressClass) =>
+            a.addressKind === AddressKindEnum.t && a.scope === RPCAddressScopeEnum.external,
         ) || [];
-      // this is a edge case but possible
-      // if you restore from ufvk with NO transparent receiver.
-      const uOrchardSaplingAdd =
-        addresses.filter(
-          a =>
-            a.addressKind === AddressKindEnum.u &&
-            a.receivers.length === 2 &&
-            a.receivers.includes(ReceiverEnum.o) &&
-            a.receivers.includes(ReceiverEnum.z),
-        ) || [];
-      const uOrchardAdd =
-        addresses.filter(
-          a => a.addressKind === AddressKindEnum.u && a.receivers.length === 1 && a.receivers === ReceiverEnum.o,
-        ) || [];
-      const zAdd = addresses.filter(a => a.addressKind === AddressKindEnum.z) || [];
-      const tAdd = addresses.filter(a => a.addressKind === AddressKindEnum.t) || [];
-      setUFulladdr(uFullAdd[0]);
-      setUOrcharSaplingdAddr(uOrchardSaplingAdd[0]);
-      setUOrchardAddr(uOrchardAdd[0]);
-      setZAddr(zAdd[0]);
-      setTAddr(tAdd[0]);
+      setUAddr(uAdd as UnifiedAddressClass[]);
+      setTAddr(tAdd as TransparentAddressClass[]);
+      setUAddrIndex(uAdd.length > 0 ? uAdd.length - 1 : 0);
+      setTAddrIndex(tAdd.length > 0 ? tAdd.length - 1 : 0);
     }
   }, [addresses]);
 
   useEffect(() => {
-    const basicModeRoutes = [{ key: 'uorchardaddr', title: translate('receive.u-title') as string }];
+    const basicModeRoutes = [{ key: 'uaddr', title: translate('receive.u-title') as string }];
     const advancedModeRoutes = [
-      { key: 'uorchardaddr', title: translate('receive.u-title') as string },
+      { key: 'uaddr', title: translate('receive.u-title') as string },
       { key: 'taddr', title: translate('receive.t-title') as string },
     ];
-    setShielded(ShieldedEnum.uOrchard);
     setRoutes(mode === ModeEnum.basic ? basicModeRoutes : advancedModeRoutes);
   }, [mode, translate]);
 
@@ -102,208 +181,84 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       route: Route;
     },
   ) => ReactNode = ({ route }) => {
+    let component: React.ReactNode;
     switch (route.key) {
-      case 'uorchardaddr': {
-        let uFull = translate('receive.noaddress') as string;
-        if (uFullAddr) {
-          uFull = uFullAddr.address;
-        }
-        let uOrchardSapling = translate('receive.noaddress') as string;
-        if (uOrcharSaplingdAddr) {
-          uOrchardSapling = uOrcharSaplingdAddr.address;
-        }
-        let uOrchard = translate('receive.noaddress') as string;
-        if (uOrchardAddr) {
-          uOrchard = uOrchardAddr.address;
-        }
-        let sapling = translate('receive.noaddress') as string;
-        if (zAddr) {
-          sapling = zAddr.address;
+      case 'uaddr': {
+        let uAddress = new UnifiedAddressClass(
+          0,
+          translate('receive.noaddress') as string,
+          AddressKindEnum.u,
+          false,
+          false,
+          false,
+        );
+        if (uAddrIndex !== null && uAddr.length > 0) {
+          uAddress = uAddr[uAddrIndex];
         }
 
-        return (
+        component = (
           <>
-            {!!addresses && !!uOrchardAddress && (
+            {!!addresses && !!defaultUnifiedAddress && (
               <>
-                {shielded === ShieldedEnum.uFull && (
-                  <SingleAddress address={uFull} index={0} total={1} prev={() => {}} next={() => {}} />
-                )}
-                {shielded === ShieldedEnum.uOrchardSapling && (
-                  <SingleAddress address={uOrchardSapling} index={0} total={1} prev={() => {}} next={() => {}} />
-                )}
-                {shielded === ShieldedEnum.uOrchard && (
-                  <SingleAddress address={uOrchard} index={0} total={1} prev={() => {}} next={() => {}} />
-                )}
-                {shielded === ShieldedEnum.sapling && (
-                  <SingleAddress address={sapling} index={0} total={1} prev={() => {}} next={() => {}} />
-                )}
+                <SingleAddress
+                  address={uAddress}
+                  screenName={screenName}
+                  index={uAddrIndex ? uAddrIndex : 0}
+                  setIndex={setUAddrIndex}
+                  total={uAddr.length}
+                  NAShow={NAShow}
+                  NATShow={NATShow}
+                  VAShow={VAShow}
+                  changeIndex={setIndex}
+                  hasTransparent={tAddr && tAddr.length > 0}
+                />
               </>
-            )}
-            {mode === ModeEnum.advanced && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 'auto',
-                  marginHorizontal: 5,
-                }}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setShielded(ShieldedEnum.uOrchard);
-                  }}>
-                  <View
-                    style={{
-                      backgroundColor: shielded === ShieldedEnum.uOrchard ? colors.primary : colors.sideMenuBackground,
-                      borderRadius: 15,
-                      borderColor: shielded === ShieldedEnum.uOrchard ? colors.primary : colors.zingo,
-                      borderWidth: 1,
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
-                      marginHorizontal: 5,
-                    }}>
-                    <FadeText
-                      style={{
-                        color: shielded === ShieldedEnum.uOrchard ? colors.sideMenuBackground : colors.zingo,
-                        fontWeight: 'bold',
-                      }}>
-                      {translate('receive.shielded-orchard') as string}
-                    </FadeText>
-                  </View>
-                </TouchableOpacity>
-                {uOrchardSapling && uOrcharSaplingdAddr && uOrcharSaplingdAddr.address && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setShielded(ShieldedEnum.uOrchardSapling);
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor:
-                          shielded === ShieldedEnum.uOrchardSapling ? colors.primary : colors.sideMenuBackground,
-                        borderRadius: 15,
-                        borderColor: shielded === ShieldedEnum.uOrchardSapling ? colors.primary : colors.zingo,
-                        borderWidth: 1,
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                        marginHorizontal: 5,
-                      }}>
-                      <FadeText
-                        style={{
-                          color: shielded === ShieldedEnum.uOrchardSapling ? colors.sideMenuBackground : colors.zingo,
-                          fontWeight: 'bold',
-                        }}>
-                        {translate('receive.shielded-orchard-sapling') as string}
-                      </FadeText>
-                    </View>
-                  </TouchableOpacity>
-                )}
-                <TouchableOpacity
-                  onPress={() => {
-                    setShielded(ShieldedEnum.uFull);
-                  }}>
-                  <View
-                    style={{
-                      backgroundColor: shielded === ShieldedEnum.uFull ? colors.primary : colors.sideMenuBackground,
-                      borderRadius: 15,
-                      borderColor: shielded === ShieldedEnum.uFull ? colors.primary : colors.zingo,
-                      borderWidth: 1,
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
-                      marginHorizontal: 5,
-                    }}>
-                    <FadeText
-                      style={{
-                        color: shielded === ShieldedEnum.uFull ? colors.sideMenuBackground : colors.zingo,
-                        fontWeight: 'bold',
-                      }}>
-                      {translate('receive.shielded-full') as string}
-                    </FadeText>
-                  </View>
-                </TouchableOpacity>
-                {sapling && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setShielded(ShieldedEnum.sapling);
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor:
-                          shielded === ShieldedEnum.sapling ? colors.primaryDisabled : colors.sideMenuBackground,
-                        borderRadius: 15,
-                        borderColor: shielded === ShieldedEnum.sapling ? colors.primaryDisabled : colors.zingo,
-                        borderWidth: 1,
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                        marginHorizontal: 10,
-                      }}>
-                      <FadeText
-                        style={{
-                          color: shielded === ShieldedEnum.sapling ? colors.sideMenuBackground : colors.zingo,
-                          fontWeight: 'bold',
-                        }}>
-                        {translate('receive.shielded-sapling') as string}
-                      </FadeText>
-                    </View>
-                  </TouchableOpacity>
-                )}
-              </View>
             )}
           </>
         );
+        break;
       }
       case 'taddr': {
-        let taddr = translate('receive.noaddress') as string;
-        if (tAddr) {
-          taddr = tAddr.address;
+        let tAddress = new TransparentAddressClass(
+          0,
+          translate('receive.noaddress') as string,
+          AddressKindEnum.t,
+          RPCAddressScopeEnum.external,
+        );
+        if (tAddrIndex !== null && tAddr.length > 0) {
+          tAddress = tAddr[tAddrIndex];
         }
 
-        return (
-          !!addresses &&
-          !!uOrchardAddress && <SingleAddress address={taddr} index={0} total={1} prev={() => {}} next={() => {}} />
+        component = (
+          <>
+            {!!addresses && !!defaultUnifiedAddress && (
+              <>
+                <SingleAddress
+                  address={tAddress}
+                  screenName={screenName}
+                  index={tAddrIndex ? tAddrIndex : 0}
+                  setIndex={setTAddrIndex}
+                  total={tAddr.length}
+                  NAShow={NAShow}
+                  NATShow={NATShow}
+                  VAShow={VAShow}
+                  changeIndex={setIndex}
+                />
+              </>
+            )}
+          </>
         );
+        break;
       }
     }
-  };
-
-  const renderLabelCustom: ({ route, focused, color }: {route: any, focused: any, color: any }) => ReactNode = ({ route, focused, color }) => {
-    const w = (dimensions.width - 50) / (mode === ModeEnum.basic ? 1 : 2);
-    //const w = route.key === 'uaddr' ? '40%' : '30%';
-    return (
-      <View
-        style={{
-          width: w,
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: 50,
-        }}>
-        <RegText
-          style={{
-            fontWeight: mode === ModeEnum.basic ? 'normal' : focused ? 'bold' : 'normal',
-            fontSize: mode === ModeEnum.basic ? 14 : focused ? 15 : 14,
-            color: color,
-          }}>
-          {route.title ? route.title : ''}
-        </RegText>
-        {route.key === 'uaddr' && mode === ModeEnum.basic && (
-          <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. zingo)</RegText>
-        )}
-        {route.key === 'zaddr' && mode === ModeEnum.basic && (
-          <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>
-            (e.g. ledger, old wallets)
-          </RegText>
-        )}
-        {route.key === 'taddr' && mode === ModeEnum.basic && (
-          <RegText style={{ fontSize: 11, color: focused ? colors.primary : color }}>(e.g. coinbase, gemini)</RegText>
-        )}
-      </View>
-    );
+    return <>{component}</>;
   };
 
   const renderTabBarPage: (
     props: SceneRendererProps & {
       navigationState: NavigationState<Route>;
     },
-  ) => ReactNode = props => {
+  ) => ReactNode = () => {
     return (
       <View
         accessible={true}
@@ -317,35 +272,78 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
           title={
             alone
               ? (translate('receive.title-basic-alone') as string)
-              : mode === ModeEnum.basic
-              ? (translate('receive.title-basic') as string)
-              : (translate('receive.title-advanced') as string)
+              : (translate('receive.title-address') as string)
           }
+          screenName={screenName}
           toggleMenuDrawer={toggleMenuDrawer}
           noBalance={true}
           noPrivacy={true}
-        />
-
-        <TabBar
-          {...props}
-          indicatorStyle={{ backgroundColor: colors.primary }}
-          style={{ backgroundColor: colors.background }}
-          renderTabBarItem={p => <TabBarItem {...p} key={p.route.key} label={renderLabelCustom} />}
         />
       </View>
     );
   };
 
-  const returnPage = (
-    <TabView
-      navigationState={{ index, routes }}
-      renderScene={renderScene}
-      renderTabBar={renderTabBarPage}
-      onIndexChange={setIndex}
-    />
+  const renderBackdrop = (props: BottomSheetBackdropProps) => (
+    <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} pressBehavior="close" />
   );
 
-  //console.log('render Receive - 4');
+  const returnPage = (
+    <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        renderTabBar={renderTabBarPage}
+        onIndexChange={setIndex}
+        swipeEnabled={false}
+      />
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={sheetType === 'NA' ? NASnapPoints : VASnapPoints}
+        enableDynamicSizing={false}
+        onChange={handleSheetChanges}
+        enablePanDownToClose
+        keyboardBehavior={'interactive'}
+        handleStyle={{ display: 'none' }}
+        backdropComponent={renderBackdrop}>
+        <BottomSheetView style={{ backgroundColor: colors.background, height: '100%' }}>
+          {sheetType === 'NA' && (
+            <NewAddress
+              addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
+              closeSheet={NAHide}
+              setAddressBook={setAddressBook}
+              screenName={screenName}
+            />
+          )}
+          {sheetType === 'NAT' && (
+            <NewAddressTag
+              address={index === 0 && uAddrIndex !== null
+                ? uAddr[uAddrIndex].address
+                : index === 1 && tAddrIndex !== null
+                ? tAddr[tAddrIndex].address
+                : ''}
+              closeSheet={NATHide}
+              setAddressBook={setAddressBook}
+            />
+          )}
+          {sheetType === 'VA' && (
+            <VerifyAddress
+              closeSheet={VAHide}
+              screenName={screenName}
+            />
+          )}
+        </BottomSheetView>
+      </BottomSheet>
+    </ToastProvider>
+  );
+
+  //console.log('render Receive - 4', uAddr, uAddrIndex, tAddr, tAddrIndex, defaultUnifiedAddress);
 
   return returnPage;
 };

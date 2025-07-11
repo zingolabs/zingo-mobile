@@ -14,8 +14,9 @@ import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 import RegText from '../Components/RegText';
-import { ButtonTypeEnum, ChainNameEnum, ModeEnum, UfvkActionEnum } from '../../app/AppState';
+import { ButtonTypeEnum, ChainNameEnum, ModeEnum, ScreenEnum, UfvkActionEnum } from '../../app/AppState';
 import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -43,6 +44,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
+  const screenName = ScreenEnum.ShowUfvk;
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
@@ -98,6 +100,12 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
 
   return (
     <ToastProvider>
+      <Snackbars
+        snackbars={snackbars}
+        removeFirstSnackbar={removeFirstSnackbar}
+        screenName={screenName}
+      />
+
       <View
         style={{
           marginTop: top,
@@ -107,14 +115,9 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           flex: 1,
           backgroundColor: colors.background,
         }}>
-        <Snackbars
-          snackbars={snackbars}
-          removeFirstSnackbar={removeFirstSnackbar}
-          translate={translate}
-        />
-
         <Header
           title={translate('ufvk.viewkey') + ' (' + translate(`seed.${action}`) + ')'}
+          screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}
           noDrawMenu={true}
@@ -138,7 +141,13 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
 
           <View style={{ display: 'flex', flexDirection: 'column', marginTop: 0, alignItems: 'center' }}>
             {!!wallet.ufvk && (
-              <SingleAddress address={wallet.ufvk} ufvk={true} index={0} total={1} prev={() => null} next={() => null} />
+              <SingleAddress
+                ufvk={wallet.ufvk}
+                screenName={screenName}
+                index={0}
+                setIndex={() => {}}
+                total={1}
+              />
             )}
             {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}
           </View>

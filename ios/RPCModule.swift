@@ -192,11 +192,17 @@ class RPCModule: NSObject {
   }
 
   func saveWalletInternal() throws {
-    let walletEncodedString = saveToB64()
-    if !walletEncodedString.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-      try self.saveWalletFile(walletEncodedString)
-    } else {
-      throw FileError.saveFileError("Error saving wallet error: \(walletEncodedString)")
+    do {
+      let walletEncodedString = saveToB64()
+      if !walletEncodedString.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
+        let size = (walletEncodedString.count * 3) / 4
+        NSLog("file size \(size)")
+        try self.saveWalletFile(walletEncodedString)
+      } else {
+        throw FileError.saveFileError("Couldn't save the wallet. \(walletEncodedString)")
+      }
+    } catch {
+      throw FileError.saveFileError("Couldn't save the wallet. Read/Write issue.")
     }
   }
 
@@ -206,7 +212,7 @@ class RPCModule: NSObject {
   }
 
   func fnCreateNewWallet(server: String, chainhint: String) throws -> String {
-    let seed = initNew(serveruri: server, datadir: try getDocumentsDirectory(), chainhint: chainhint, monitorMempool: true)
+    let seed = initNew(serveruri: server, chainhint: chainhint)
     let seedStr = String(seed)
     if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -231,7 +237,7 @@ class RPCModule: NSObject {
   }
   
   func fnRestoreWalletFromSeed(server: String, chainhint: String, restoreSeed: String, birthday: String) throws -> String {
-    let seed = initFromSeed(serveruri: server, seed: restoreSeed, birthday: UInt64(birthday) ?? 0, datadir: try getDocumentsDirectory(), chainhint: chainhint, monitorMempool: true)
+    let seed = initFromSeed(serveruri: server, seed: restoreSeed, birthday: UInt64(birthday) ?? 0, chainhint: chainhint)
     let seedStr = String(seed)
     if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -256,7 +262,7 @@ class RPCModule: NSObject {
   }
   
   func fnRestoreWalletFromUfvk(server: String, chainhint: String, restoreUfvk: String, birthday: String) throws -> String {
-    let ufvk = initFromUfvk(serveruri: server, ufvk: restoreUfvk, birthday: UInt64(birthday) ?? 0, datadir: try getDocumentsDirectory(), chainhint: chainhint, monitorMempool: true)
+    let ufvk = initFromUfvk(serveruri: server, ufvk: restoreUfvk, birthday: UInt64(birthday) ?? 0, chainhint: chainhint)
     let ufvkStr = String(ufvk)
     if !ufvkStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -281,7 +287,7 @@ class RPCModule: NSObject {
   }
 
   func fnLoadExistingWallet(server: String, chainhint: String) throws -> String {
-    let seed = initFromB64(serveruri: server, datab64: try self.readWalletUtf8String(), datadir: try getDocumentsDirectory(), chainhint: chainhint, monitorMempool: true)
+    let seed = initFromB64(serveruri: server, datab64: try self.readWalletUtf8String(), chainhint: chainhint)
     let seedStr = String(seed)
     return seedStr
   }
@@ -348,10 +354,10 @@ class RPCModule: NSObject {
   func doSave(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     let dict: [String: Any] = ["resolve": resolve]
     DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-          if let self = self {
-              self.fnDoSave(dict)
-          }
-      }
+        if let self = self {
+            self.fnDoSave(dict)
+        }
+    }
   }
 
   func fndoSaveBackup(_ dict: [AnyHashable: Any]) {
@@ -382,10 +388,10 @@ class RPCModule: NSObject {
   func doSaveBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     let dict: [String: Any] = ["resolve": resolve]
     DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-          if let self = self {
-              self.fndoSaveBackup(dict)
-          }
-      }    
+        if let self = self {
+            self.fndoSaveBackup(dict)
+        }
+    }
   }
 
   func doExecuteOnThread(_ dict: [String: Any]) {
@@ -394,19 +400,6 @@ class RPCModule: NSObject {
        let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       let resp = executeCommand(cmd: method, args: args)
       let respStr = String(resp)
-      if method == "sync" && !respStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-        // Also save the wallet after sync
-        do {
-          try self.saveWalletInternal()
-        } catch {
-          let err = "Error: [Native] Executing command. Saving wallet. \(error.localizedDescription)"
-          NSLog(err)
-          DispatchQueue.main.async {
-            resolve(err)
-          }
-          return
-        }
-      }
       DispatchQueue.main.async {
         resolve(respStr)
       }
@@ -431,7 +424,7 @@ class RPCModule: NSObject {
       }
   }
 
-  func fnGetLatestBlock(_ dict: [AnyHashable: Any]) {
+  func fnGetLatestBlockServerInfo(_ dict: [AnyHashable: Any]) {
     if let server = dict["server"] as? String,
        let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
       let resp = getLatestBlockServer(serveruri: server)
@@ -450,12 +443,40 @@ class RPCModule: NSObject {
     }
   }
   
-  @objc(getLatestBlock:resolve:reject:)
-  func getLatestBlock(_ server: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(getLatestBlockServerInfo:resolve:reject:)
+  func getLatestBlockServerInfo(_ server: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let dict: [String: Any] = ["server": server, "resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
-              self.fnGetLatestBlock(dict)
+              self.fnGetLatestBlockServerInfo(dict)
+          }
+      }
+  }
+
+  func fnGetLatestBlockWalletInfo(_ dict: [AnyHashable: Any]) {
+    if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+      let resp = getLatestBlockWallet()
+      let respStr = String(resp)
+      DispatchQueue.main.async {
+        resolve(respStr)
+      }
+    } else {
+      let err = "Error: [Native] Getting wallet latest block. Argument problem."
+      NSLog(err)
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+      }
+    }
+  }
+  
+  @objc(getLatestBlockWalletInfo:reject:)
+  func getLatestBlockWalletInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+          if let self = self {
+              self.fnGetLatestBlockWalletInfo(dict)
           }
       }
   }
@@ -517,9 +538,8 @@ class RPCModule: NSObject {
   }
 
   func fnGetValueTransfersList(_ dict: [AnyHashable: Any]) {
-      if let items = dict["items"] as? String,
-         let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = getValueTransfers(recentVtsToRetrive: items)
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getValueTransfers()
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
@@ -535,40 +555,12 @@ class RPCModule: NSObject {
       }
   }
 
-  @objc(getValueTransfersList:resolve:reject:)
-  func getValueTransfersList(_ items: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["items": items, "resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-          if let self = self {
-              self.fnGetValueTransfersList(dict)
-          }
-      }
-  }
-
-  func fnGetTransactionSummariesList(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = getTransactionSummaries()
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-      } else {
-          let err = "Error: [Native] Getting transaction summaries list. Command arguments problem."
-          NSLog(err)
-          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
-      }
-  }
-
-  @objc(getTransactionSummariesList:reject:)
-  func getTransactionSummariesList(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(getValueTransfersList:reject:)
+  func getValueTransfersList(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
       let dict: [String: Any] = ["resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
-              self.fnGetTransactionSummariesList(dict)
+              self.fnGetValueTransfersList(dict)
           }
       }
   }
@@ -600,4 +592,1045 @@ class RPCModule: NSObject {
         }
       }
   }
+
+  func fnPollSyncInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = pollSync()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] Sync poll info. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(pollSyncInfo:reject:)
+  func pollSyncInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnPollSyncInfo(dict)
+        }
+      }
+  }
+
+  func fnRunSyncProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = runSync()
+          let respStr = String(resp)
+          if !respStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
+            // Also save the wallet after sync
+            do {
+              try self.saveWalletInternal()
+            } catch {
+              let err = "Error: [Native] Executing command. Saving wallet. \(error.localizedDescription)"
+              NSLog(err)
+            }
+          }
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] Sync run process. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(runSyncProcess:reject:)
+  func runSyncProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnRunSyncProcess(dict)
+        }
+      }
+  }
+
+  func fnPauseSyncProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = pauseSync()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] Sync pause process. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(pauseSyncProcess:reject:)
+  func pauseSyncProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnPauseSyncProcess(dict)
+        }
+      }
+  }
+
+  func fnStopSyncProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = stopSync()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] Sync stop process. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(stopSyncProcess:reject:)
+  func stopSyncProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnStopSyncProcess(dict)
+        }
+      }
+  }
+
+  func fnStatusSyncInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = statusSync()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] Sync poll info. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(statusSyncInfo:reject:)
+  func statusSyncInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnStatusSyncInfo(dict)
+        }
+      }
+  }
+
+  func fnRunRescanProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = runRescan()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] Rescan run process. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(runRescanProcess:reject:)
+  func runRescanProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnRunRescanProcess(dict)
+        }
+      }
+  }
+
+  func fnInfoServerInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = infoServer()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] info server. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(infoServerInfo:reject:)
+  func infoServerInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnInfoServerInfo(dict)
+        }
+      }
+  }
+
+  func fnGetSeedInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getSeed()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] seed. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getSeedInfo:reject:)
+  func getSeedInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetSeedInfo(dict)
+        }
+      }
+  }
+
+  func fnGetUfvkInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getUfvk()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] ufvk. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getUfvkInfo:reject:)
+  func getUfvkInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetUfvkInfo(dict)
+        }
+      }
+  }
+
+  func fnChangeServerProcess(_ dict: [AnyHashable: Any]) {
+      if let server = dict["server"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = changeServer(serveruri: server)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] change server. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(changeServerProcess:resolve:reject:)
+  func changeServerProcess(_ server: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["server": server, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnChangeServerProcess(dict)
+        }
+      }
+  }
+
+  func fnWalletKindInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = walletKind()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] wallet kind. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(walletKindInfo:reject:)
+  func walletKindInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnWalletKindInfo(dict)
+        }
+      }
+  }
+
+  func fnParseAddressInfo(_ dict: [AnyHashable: Any]) {
+      if let address = dict["address"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = parseAddress(address: address)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] parse address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(parseAddressInfo:resolve:reject:)
+  func parseAddressInfo(_ address: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["address": address, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnParseAddressInfo(dict)
+        }
+      }
+  }
+
+  func fnParseUfvkInfo(_ dict: [AnyHashable: Any]) {
+      if let ufvk = dict["ufvk"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = parseUfvk(ufvk: ufvk)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] parse ufvk. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(parseUfvkInfo:resolve:reject:)
+  func parseUfvkInfo(_ ufvk: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["ufvk": ufvk, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnParseUfvkInfo(dict)
+        }
+      }
+  }
+
+  func fnGetVersionInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getVersion()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] version. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getVersionInfo:reject:)
+  func getVersionInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetVersionInfo(dict)
+        }
+      }
+  }
+
+  func fnGetMessagesInfo(_ dict: [AnyHashable: Any]) {
+      if let address = dict["address"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getMessages(address: address)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] messages. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getMessagesInfo:resolve:reject:)
+  func getMessagesInfo(_ address: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["address": address, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetMessagesInfo(dict)
+        }
+      }
+  }
+
+func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getBalance()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] balance. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getBalanceInfo:reject:)
+  func getBalanceInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetBalanceInfo(dict)
+        }
+      }
+  }
+
+  func fnGetTotalMemobytesToAddressInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getTotalMemobytesToAddress()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] memobytes to address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getTotalMemobytesToAddressInfo:reject:)
+  func getTotalMemobytesToAddressInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetTotalMemobytesToAddressInfo(dict)
+        }
+      }
+  }
+
+  func fnGetTotalValueToAddressInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getTotalValueToAddress()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] value to address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getTotalValueToAddressInfo:reject:)
+  func getTotalValueToAddressInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetTotalValueToAddressInfo(dict)
+        }
+      }
+  }
+
+  func fnGetTotalSpendsToAddressInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getTotalSpendsToAddress()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] spends to address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getTotalSpendsToAddressInfo:reject:)
+  func getTotalSpendsToAddressInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetTotalSpendsToAddressInfo(dict)
+        }
+      }
+  }
+
+  func fnZecPriceInfo(_ dict: [AnyHashable: Any]) {
+      if let tor = dict["tor"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let resp = zecPrice(tor: tor)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] zec price. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(zecPriceInfo:resolve:reject:)
+  func zecPriceInfo(_ tor: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["tor": tor, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnZecPriceInfo(dict)
+        }
+      }
+  }
+
+  func fnResendTransactionProcess(_ dict: [AnyHashable: Any]) {
+      if let txid = dict["txid"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let resp = resendTransaction(txid: txid)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] resend transaction. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(resendTransactionProcess:resolve:reject:)
+  func resendTransactionProcess(_ txid: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["txid": txid, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnResendTransactionProcess(dict)
+        }
+      }
+  }
+
+  func fnRemoveTransactionProcess(_ dict: [AnyHashable: Any]) {
+      if let txid = dict["txid"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let resp = removeTransaction(txid: txid)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] remove transaction. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(removeTransactionProcess:resolve:reject:)
+  func removeTransactionProcess(_ txid: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["txid": txid, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnRemoveTransactionProcess(dict)
+        }
+      }
+  }
+
+  func fnGetSpendableBalanceWithAddressInfo(_ dict: [AnyHashable: Any]) {
+      if let address = dict["address"] as? String,
+          let zennies = dict["zennies"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getSpendableBalanceWithAddress(address: address, zennies: zennies)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] spendable balance address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getSpendableBalanceWithAddressInfo:zennies:resolve:reject:)
+  func getSpendableBalanceWithAddressInfo(_ address: String, zennies: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["address": address, "zennies": zennies, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetSpendableBalanceWithAddressInfo(dict)
+        }
+      }
+  }
+
+  func fnGetSpendableBalanceTotalInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getSpendableBalanceTotal()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] spendable balance total. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getSpendableBalanceTotalInfo:reject:)
+  func getSpendableBalanceTotalInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetSpendableBalanceTotalInfo(dict)
+        }
+      }
+  }
+
+  func fnGetOptionWalletInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getOptionWallet()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] get option wallet. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getOptionWalletInfo:reject:)
+  func getOptionWalletInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetOptionWalletInfo(dict)
+        }
+      }
+  }
+
+  func fnSetOptionWalletProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = setOptionWallet()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] set option wallet. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(setOptionWalletProcess:reject:)
+  func setOptionWalletProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnSetOptionWalletProcess(dict)
+        }
+      }
+  }
+
+  func fnCreateTorClientProcess(_ dict: [AnyHashable: Any]) throws {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = createTorClient(datadir: try getDocumentsDirectory())
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] create tor client. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(createTorClientProcess:reject:)
+  func createTorClientProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          do {
+            try self.fnCreateTorClientProcess(dict)
+          } catch {
+            let err = "Error: [Native] create tor client. Document dir."
+            NSLog(err)
+            resolve(err)
+          }
+        }
+      }
+  }
+
+  func fnRemoveTorClientProcess(_ dict: [AnyHashable: Any]) throws {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = removeTorClient()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] remove tor client. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(removeTorClientProcess:reject:)
+  func removeTorClientProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          do {
+            try self.fnRemoveTorClientProcess(dict)
+          } catch {
+            let err = "Error: [Native] remove tor client. Document dir."
+            NSLog(err)
+            resolve(err)
+          }
+        }
+      }
+  }
+
+  func fnGetUnifiedAddressesInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getUnifiedAddresses()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] unified addresses. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getUnifiedAddressesInfo:reject:)
+  func getUnifiedAddressesInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetUnifiedAddressesInfo(dict)
+        }
+      }
+  }
+
+  func fnGetTransparentAddressesInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getTransparentAddresses()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] transparent addresses. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getTransparentAddressesInfo:reject:)
+  func getTransparentAddressesInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetTransparentAddressesInfo(dict)
+        }
+      }
+  }
+
+  func fnCreateNewUnifiedAddressProcess(_ dict: [AnyHashable: Any]) {
+      if let receivers = dict["receivers"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = createNewUnifiedAddress(receivers: receivers)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] create new unified address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(createNewUnifiedAddressProcess:resolve:reject:)
+  func createNewUnifiedAddressProcess(_ receivers: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["receivers": receivers, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnCreateNewUnifiedAddressProcess(dict)
+        }
+      }
+  }
+
+  func fnCreateNewTransparentAddressProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = createNewTransparentAddress()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] create new transparent address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(createNewTransparentAddressProcess:reject:)
+  func createNewTransparentAddressProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnCreateNewTransparentAddressProcess(dict)
+        }
+      }
+  }
+
+  func fnCheckMyAddressInfo(_ dict: [AnyHashable: Any]) {
+      if let address = dict["address"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = checkMyAddress(address: address)
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] create new unified address. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(checkMyAddressInfo:resolve:reject:)
+  func checkMyAddressInfo(_ address: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["address": address, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnCheckMyAddressInfo(dict)
+        }
+      }
+  }
+
+  func fnGetWalletSaveRequiredInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getWalletSaveRequired()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] get wallet save required. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getWalletSaveRequiredInfo:reject:)
+  func getWalletSaveRequiredInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetWalletSaveRequiredInfo(dict)
+        }
+      }
+  }
+
+  func fnSetConfigWalletToProdProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = setConfigWalletToProd()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] set wallet config prod. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(setConfigWalletToProdProcess:reject:)
+  func setConfigWalletToProdProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnSetConfigWalletToProdProcess(dict)
+        }
+      }
+  }
+
+  func fnGetConfigWalletPerformanceInfo(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = getConfigWalletPerformance()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] get wallet config performance level. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(getConfigWalletPerformanceInfo:reject:)
+  func getConfigWalletPerformanceInfo(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnGetConfigWalletPerformanceInfo(dict)
+        }
+      }
+  }
+
 }

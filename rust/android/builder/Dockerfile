@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 ARG android_ndk_ver=r27c
-# 27.2.12479018
+# 27.2.12479018 CLANG/LLVM 18
 
 # Install dependencies
 RUN apt update \
@@ -8,24 +8,13 @@ RUN apt update \
     && apt install -y --no-install-recommends --no-install-suggests \
     ca-certificates \
     build-essential \
-    gcc-10-aarch64-linux-gnu \
-    libc6-dev \
     cmake \
-    golang \
-    libclang1 \
-    llvm-dev \
-    libclang-dev \
-    libatomic1 \
-    clang \
     make \
     curl \
     automake \
     unzip \
     git \
-    g++-aarch64-linux-gnu \
-    libc6-dev-arm64-cross \
     protobuf-compiler \
-    libssl-dev \
     pkg-config \
     && update-ca-certificates
 
@@ -69,53 +58,3 @@ RUN echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
     && echo "linker = \"x86_64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
-
-# Install and setup OpenSSL
-WORKDIR /opt
-RUN curl -LO https://www.openssl.org/source/openssl-3.3.2.tar.gz -o openssl-3.3.2.tar.gz \
-    && tar xvf openssl-3.3.2.tar.gz \
-    && rm -rf openssl-3.3.2.tar.gz
-ENV OPENSSL_STATIC=yes
-WORKDIR /opt/openssl-3.3.2 
-RUN mkdir x86 \
-    && mkdir aarch64 \
-    && mkdir armv7 \
-    && mkdir x86_64
-
-RUN ./Configure --prefix=/opt/openssl-3.3.2/aarch64 android-arm64 \
-    -mno-outline-atomics \
-    -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 \
-    && make -j$(nproc) \
-    && make -j$(nproc) install \
-    && make clean \
-    && make distclean
-RUN ./Configure --prefix=/opt/openssl-3.3.2/armv7 android-arm \
-    -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 \
-    && make -j$(nproc) \
-    && make -j$(nproc) install \
-    && make clean \
-    && make distclean
-RUN ./Configure --prefix=/opt/openssl-3.3.2/x86 android-x86 \
-    -DBROKEN_CLANG_ATOMICS \
-    #-latomic \
-    -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 \
-    && make -j$(nproc) \
-    && make -j$(nproc) install \
-    && make clean \
-    && make distclean
-RUN ./Configure --prefix=/opt/openssl-3.3.2/x86_64 android-x86_64 \
-    -U__ANDROID_API__ \
-    -D__ANDROID_API__=24 \
-    && make -j$(nproc) \
-    && make -j$(nproc) install \
-    && make clean \
-    && make distclean
-
-# Apt clean up
-RUN apt autoremove -y \
-    && apt clean \
-    && rm -rf /var/lib/apt/lists/*
-

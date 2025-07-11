@@ -21,12 +21,14 @@ import {
   SelectServerEnum,
   ContactType,
   GlobalConst,
+  ScreenEnum,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
+import 'moment/locale/tr';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
@@ -41,6 +43,7 @@ type ContactLineProps = {
   c: ContactType;
   setMessagesAddressModalShow: (c: ContactType) => Promise<HideReturn<unknown>>;
   addressProtected?: boolean;
+  screenName: ScreenEnum;
 };
 const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   index,
@@ -48,6 +51,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   month,
   setMessagesAddressModalShow,
   addressProtected,
+  screenName,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, navigationHome, showSwipeableIcons, readOnly, selectServer, setSendPageState, closeAllModals } = context;
@@ -64,7 +68,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   const swipeableRef = useRef<Swipeable | null>(null);
 
   const getAmountColor = (_c: ContactType) => {
-    return _c.confirmations === 0
+    return _c.confirmations < GlobalConst.minConfirmations
       ? colors.primaryDisabled
       : _c.kind === ValueTransferKindEnum.Received || _c.kind === ValueTransferKindEnum.Shield
       ? colors.primary
@@ -317,7 +321,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                   {c.label ? (
                     <RegText>{c.label}</RegText>
                   ) : (
-                    <AddressItem address={c.address} oneLine={true} />
+                    <AddressItem address={c.address} screenName={screenName} oneLine={true} />
                   )}
                   <FadeText>{c.time ? moment((c.time || 0) * 1000).format('MMM D, h:mm a') : ''}</FadeText>
                 </View>

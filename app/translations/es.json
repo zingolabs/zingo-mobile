@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-1.11.2 (226)",
+  "version": "zingo-2.0.0 (256)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -14,11 +14,14 @@
   "biometricsfailed-button": "Desbloquear",
   "biometrics-title": "Autenticación",
   "biometrics-message": "Por favor autenticar",
+  "biometrics-message-ios": "Por favor autenticar con la clave",
   "biometrics-error": "Por seguridad necesitas autenticarte de nuevo para realizar esta acción. Siempre puedes cambiarlo en Parámetros",
   "close": "Cerrar",
   "cancel": "Cancelar",
+  "verify": "Verificar",
   "save": "Guardar",
   "copy": "Copiar",
+  "share": "Compartir",
   "confirm": "Confirmar",
   "support": "Enviar Email",
   "menudrawer-acc": "Abrir Menú Lateral",
@@ -50,6 +53,11 @@
     "link-all": "Global",
     "link-anonymous": "Anónimos"
   },
+  "addresslist": {
+    "title": "Lista de direcciones",
+    "unified": "Unificada",
+    "transparent": "Transparente"
+  },
   "addressbook": {
     "title": "Libreta de Direcciones",
     "end": "Fin",
@@ -60,7 +68,7 @@
     "add": "Añadir",
     "modify": "Modificar",
     "delete": "Borrar",
-    "empty": "Todavía no hay contactos en su libreta de direcciones.",
+    "empty": "Todavía no has guardado nuevas direcciones.",
     "nochanges": "No se han registrado cambios. ",
     "fillboth": "Por favor rellena ambos campos. ",
     "bothexists": "Esta etiqueta y esta dirección ya existen. ",
@@ -72,7 +80,7 @@
     "likely": "Probablemente: ",
     "thiswalletaddress": "La Dirección de este Monedero",
     "addto": "Añadir a ",
-    "uorchardaddress": "DU Orchard:\n"
+    "filter-wallet": "Monedero"
   },
   "change-privacy-legend": ".\nPulsar para revelar los valores ocultos.",
   "txtcopied": "Texto copiado al Portapapeles",
@@ -152,7 +160,7 @@
     "send-menu": "ENVIAR",
     "receive-menu": "RECIBIR",
     "messages-menu": "MENSAJES",
-    "syncing": "Deteniendo la Sincronización para poder resetear la billetera.",
+    "syncing": "Deteniendo la Sincronización para poder resetear la billetera... Puede llevar varios segundos.",
     "zcash-url": "Ya tienes una dirección en la pantalla de envío",
     "connection-error": "Esta opción necesita conexión a internet para ser ejecutada.",
     "tryingnewserver": "Intentando conectar con el nuevo Servidor... Puede llevar varios segundos.",
@@ -203,7 +211,11 @@
       },
       {
         "value": "USD",
-        "text": "Puedes consultar el precio para US Dólares aparte de ZEC."
+        "text": "Puedes consultar el precio para US Dólares de internet."
+      },
+      {
+        "value": "USDTOR",
+        "text": "Puedes consultar el precio para US Dólares de internet usando Tor.\nTor se usa para proteger la dirección IP del usuario, pero puede ser ilegal en algunos países. Úsalo bajo tu propio criterio."
       }
     ],
     "languages": [
@@ -222,6 +234,10 @@
       {
         "value": "ru",
         "text": "Toda la información estará en Ruso."
+      },
+      {
+        "value": "tr",
+        "text": "Toda la información estará en Turco."
       }
     ],
     "sendalls": [
@@ -319,6 +335,7 @@
     "recoverywalletinfoondevice-title": "Almacenar la información de recuperacion del monedero en el dispositivo",
     "value-currency-": "Sin moneda",
     "value-currency-USD": "US Dólares",
+    "value-currency-USDTOR": "US Dólares con Tor",
     "value-language-en": "Inglés",
     "value-language-es": "Español",
     "value-language-pt": "Portugués",
@@ -362,7 +379,8 @@
     "select-placeholder": "Elige un Servidor...",
     "value-language-ru": "Ruso",
     "walletkeyssaved": "La ultima información de recuperacion del Monedero almacenada de forma segura en el dispositivo.",
-    "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!"
+    "walletkeyswarning": "Esta es una función experimental que depende de la seguridad de código no auditado para almacenar tu frase semilla. ¡Por favor, no la utilices con semillas que controlen fondos significativos!",
+    "value-language-tr": "Turco"
   },
   "info": {
     "version": "Versión",
@@ -371,6 +389,7 @@
     "network": "Red",
     "serverblock": "Altura de Bloque del Servidor",
     "zecprice": "Precio del ZEC",
+    "zecpricetor": "Precio del ZEC with Tor",
     "unknown": "Desconocido",
     "title": "Información del Servidor",
     "resolution": "Pantalla",
@@ -442,7 +461,8 @@
     "birthday-acc": "Campo Cumpleaños",
     "tapreveal": "Pulsar para revelar",
     "showtransactions": "Ver Transacciones",
-    "youreceived": "Recibiste"
+    "youreceived": "Recibiste",
+    "tapcopy-ufvk-message": "Clave de visualización copiada al portapapeles"
   },
   "send": {
     "Broadcast": "Transmitida y esperando confirmación Tx:",
@@ -486,6 +506,7 @@
     "fetchpricetitle": "Consultar Precio USD",
     "fetchpricebody": "Por favor confirma que quieres recuperar/consultar el precio en USD de internet.",
     "fetch-button": "Consultar",
+    "fetchwithtor-button": "Consultar con Tor",
     "confirm-privacy-level": "Nivel de Privacidad",
     "private": "Privada",
     "amountrevealed": "Monto Revelado",
@@ -502,11 +523,13 @@
     "noaddress": "Sin Direcciones",
     "unoprivkey": "No hay ninguna dirección Unificada para exportar su Clave Privada",
     "unoviewkey": "No hay ninguna dirección Unificada para exportar su Clave de Visualización",
-    "title-advanced": "Mis Direcciones",
-    "title-basic": "Mi Dirección",
+    "title-address": "Mi Dirección",
+    "title-ufvk": "Mi Clave de Visualización",
     "title-basic-alone": "Mi Dirección de Recepción",
+    "newu-option": "Nueva dirección",
+    "danger-zone": "ZONA DE RIESGO",
+    "go-to-transparent": "Ir a dirección transparente expuesta",
     "more": "ver más...",
-    "newu-option": "Nueva Dirección Unificada Diversificada",
     "privkey-option": "Exportar la Clave para Gastar",
     "viewkey-option": "Exportar la Clave de Visualización Total",
     "import-option": "Importar una Clave...",
@@ -514,10 +537,33 @@
     "of": " de ",
     "prev": "Anterior",
     "next": "Siguiente",
-    "shielded-orchard": "Orchard",
-    "shielded-sapling": "Z-Sapling",
+    "shielded-orchard": "Solo Orchard",
+    "shielded-sapling": "Solo Sapling",
     "shielded-orchard-sapling": "Orchard+Sapling",
-    "shielded-full": "Completa"
+    "shielded-full": "Completa",
+    "showtip": "Tocar para seleccionar otra dirección.",
+    "verify": "Verificar direcciones",
+    "copy-address-button": "Copiar direccion",
+    "copy-ufvk-button": "Copiar clave visualización",
+    "modal-transparent": {
+      "title": "Advertencia de Privacidad",
+      "message": "Las direcciones transparentes exponen los detalles de sus transacciones en la blockchain. Esto destruye su privacidad y no se recomienda para la mayoría de las transacciones.",
+      "recommendation": "Se recomiendan las direcciones blindadas ya que brindan el mayor nivel de privacidad.",
+      "button": "Entiendo los riesgos, mostrar direcciones transparentes"
+    },
+    "transparent": {
+      "address-title": "Transparente expuesta",
+      "newt-option": "Nueva dirección transparente",
+      "warning": {
+        "title": "Advertencia de Privacidad",
+        "description": "Está viendo direcciones transparentes. Estas exponen los detalles de sus transacciones públicamente.",
+        "button": "Cambiar a Direcciones Blindadas (Recomendado)"
+      },
+      "new-error": "Error al generar la dirección transparente. La última dirección transparente no ha recibido fondos."
+    },
+    "verification-success": "Esta dirección te pertenece y es segura para recibir fondos.",
+    "verification-failure": "Esta dirección no te pertenece.",
+    "add-tag": "Añadir etiqueta"
   },
   "history": {
     "shield-all": "Blindar Todos\nlos fondos",
@@ -585,13 +631,26 @@
     "mempool": "En Mempool",
     "confirmed": "Confirmada",
     "filter-withfunds": "Con fondos",
-    "empty": "Todavía no hay transacciones."
+    "empty": "Todavía no hay transacciones.",
+    "resend": "Reenviar",
+    "remove": "Eliminar",
+    "resend-title": "Reenviar",
+    "remove-title": "Eliminar",
+    "resend-error": "Error Reenviando :",
+    "remove-error": "Error Eliminando :",
+    "resend-message": "",
+    "remove-message": "",
+    "resend-alert": "Confirmar para reenviar esta transacción de nuevo.",
+    "remove-alert": "Confirmar para eliminar la transacción fallida del dispositivo y restaurar el saldo",
+    "remove-legend": "Eliminar transacción para restablecer el saldo",
+    "expired": "Expirada - Eliminar para restablecer el saldo",
+    "waiting": "Fondos en espera de las confirmaciones mínimas"
   },
   "report": {
     "title": "Informe de Sincronización",
-    "running": "El monedero se está sincronizando...",
-    "finished": "El monedero está totalmente sincronizado",
-    "paused": "El monedero está esperando para empezar a sincronizar...",
+    "running": "Sincronizando...",
+    "finished": "Totalmente sincronizado",
+    "paused": "Esperando para empezar a sincronizar...",
     "server-title": "SERVIDOR: ",
     "blocks": " Bloques. ",
     "wallet": "Monedero: ",
@@ -611,7 +670,14 @@
     "networkstatus": "Estado de la Red (Internet)",
     "nointernet": "Sin conexión a Internet.",
     "cellulardata": "Usando solo Datos del Móvil.",
-    "connectionexpensive": "Conexión Costosa"
+    "connectionexpensive": "Conexión Costosa",
+    "syncstatus": "Estado de sincronización",
+    "map": "Mapa de escaneo no lineal",
+    "legend": "Leyenda",
+    "scanned": "Escaneado",
+    "scanning": "Escaneando...",
+    "lowpriority": "Baja prioridad",
+    "highpriority": "Alta prioridad"
   },
   "import": {
     "title": "Semilla / Clave de Visualización",
@@ -688,12 +754,13 @@
     "title": "Agrupaciones de Fondos",
     "orchard-title": "ORCHARD (UA)",
     "orchard-balance": "Cantidad Total",
-    "orchard-spendable-balance": "Cantidad para Gastar",
+    "orchard-confirmed-balance": "Cantidad confirmada",
     "sapling-title": "SAPLING (Privada)",
     "sapling-balance": "Cantidad Total",
-    "sapling-spendable-balance": "Cantidad para Gastar",
+    "sapling-confirmed-balance": "Cantidad confirmada",
     "transparent-title": "TRANSPARENTE",
     "transparent-balance": "Cantidad Total",
+    "transparent-confirmed-balance": "Cantidad Confirmada",
     "dust": "La cantidad transparente es demasiado pequeña para ser blindada."
   },
   "uris": {

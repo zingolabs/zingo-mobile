@@ -1,6 +1,6 @@
 export type RPCSeedType = {
-  seed?: string;
+  seed_phrase?: string;
   birthday?: number;
-  account_index?: number;
+  no_of_accounts?: number;
   error?: string;
 };

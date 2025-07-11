@@ -3,7 +3,7 @@ import RPCModule from './RPCModule';
 
 const calculateLatency = async (server: ServerUrisType, _index: number) => {
   const start: number = Date.now();
-  const resp: string = await RPCModule.getLatestBlock(server.uri);
+  const resp: string = await RPCModule.getLatestBlockServerInfo(server.uri);
 
   const end: number = Date.now();
   let latency = null;

@@ -13,8 +13,6 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import java.util.*
 import org.json.JSONObject
-import java.nio.charset.StandardCharsets
-import com.facebook.react.bridge.ReactApplicationContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
@@ -33,6 +31,29 @@ import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
 import org.ZingoLabs.Zingo.Constants.*
 import java.io.FileInputStream
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+
+data class ScanRanges (
+    val priority : String = "",
+    val start_block : String = "",
+    val end_block : String = ""
+)
+
+data class SyncStatus (
+    val scan_ranges : List<ScanRanges> = emptyList(),
+    val sync_start_height : Long = 0L,
+    val session_blocks_scanned : Long = 0L,
+    val total_blocks_scanned : Long = 0L,
+    val percentage_session_blocks_scanned : Double = 0.0,
+    val percentage_total_blocks_scanned : Double = 0.0,
+    val session_sapling_outputs_scanned : Long = 0L,
+    val total_sapling_outputs_scanned : Long = 0L,
+    val session_orchard_outputs_scanned : Long = 0L,
+    val total_orchard_outputs_scanned : Long = 0L,
+    val percentage_session_outputs_scanned : Double = 0.0,
+    val percentage_total_outputs_scanned : Double = 0.0
+)
 
 class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     private val rpcModule = RPCModule(MainApplication.getAppReactContext())
@@ -41,6 +62,8 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
     override fun doWork(): Result {
 
         Log.i("SCHEDULED_TASK_RUN", "Task running")
+
+        val mapper = jacksonObjectMapper()
 
         // save the background JSON file
         val timeStampStart = Date().time / 1000
@@ -56,27 +79,62 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             uniffi.zingo.initLogging()
 
             // check the Server, because the task can run without the App.
-            val balance = uniffi.zingo.executeCommand("balance", "")
+            val balance = uniffi.zingo.getBalance()
             Log.i("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
             if (balance.lowercase().startsWith(ErrorPrefix.value)) {
                 // this means this task is running with the App closed
                 loadWalletFile()
-            } else {
+            } 
+            //else {
                 // this means the App is open,
                 // stop syncing first, just in case.
-                stopSyncingProcess()
-            }
+                // with pepper-sync no need to stop sync process here
+            //    stopSyncingProcess()
+            //}
 
-            // interrupt sync to false, just in case it is true.
-            val noInterrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "false")
-            Log.i("SCHEDULED_TASK_RUN", "Not interrupting sync: $noInterrupting")
+            // setting performance level & min confirmations
+            uniffi.zingo.setConfigWalletToProd()
 
             // the task is running here blocking this execution until this process finished:
             // 1. finished the syncing.
 
-            Log.i("SCHEDULED_TASK_RUN", "sync BEGIN")
-            val syncing = uniffi.zingo.executeCommand("sync", "")
-            Log.i("SCHEDULED_TASK_RUN", "sync END: $syncing")
+            val syncing = uniffi.zingo.runSync()
+            Log.i("SCHEDULED_TASK_RUN", "sync LAUNCH: $syncing")
+
+            val startTime = System.currentTimeMillis()
+            val maxDurationMillis = 60 * 60 * 1000
+
+            var syncStatus: SyncStatus
+            while (true) {
+                val elapsed = System.currentTimeMillis() - startTime
+                if (elapsed > maxDurationMillis) {
+                    Log.w("SCHEDULED_TASK_RUN", "sync TIMEOUT after 1 hour")
+                    break
+                }
+
+                val syncStatusJson: String = uniffi.zingo.statusSync()
+                if (syncStatusJson.lowercase().startsWith(ErrorPrefix.value)) {
+                    Log.i("SCHEDULED_TASK_RUN", "sync STATUS ERROR: $syncStatusJson")
+                    break
+                }
+
+                try {
+                    syncStatus = mapper.readValue(syncStatusJson)
+
+                    val percent = syncStatus.percentage_total_outputs_scanned
+
+                    if (percent == 100.0) {
+                        Log.i("SCHEDULED_TASK_RUN", "sync COMPLETED %: $percent")
+                        break
+                    } else {
+                        Log.i("SCHEDULED_TASK_RUN", "sync STATUS %: $percent")
+                    }
+                } catch (e: Exception) {
+                    Log.e("SCHEDULED_TASK_RUN", "sync STATUS - parsing ERROR ${e.localizedMessage}")
+                }
+
+                Thread.sleep(5000)
+            }
 
         } else {
             Log.i("SCHEDULED_TASK_RUN", "No exists wallet file END")
@@ -113,7 +171,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             val settingsString = settingsBytes.toString(Charsets.UTF_8)
             val jsonObject = JSONObject(settingsString)
             val server = jsonObject.getJSONObject("server").getString("uri")
-            val chainhint = jsonObject.getJSONObject("server").getString("chain_name")
+            val chainhint = jsonObject.getJSONObject("server").getString("chainName")
             Log.i(
                 "SCHEDULED_TASK_RUN",
                 "Opening the wallet file - No App active - server: $server chain: $chainhint"
@@ -123,37 +181,13 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
     }
 
     private fun stopSyncingProcess() {
-        var status = uniffi.zingo.executeCommand("syncstatus", "")
-        Log.i("SCHEDULED_TASK_RUN", "status response $status")
-
-        var data: ByteArray = status.toByteArray(StandardCharsets.UTF_8)
-        var jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
-        var inProgressStr: String = jsonResp.optString("in_progress")
-        var inProgress: Boolean = inProgressStr.toBoolean()
-
-        Log.i("SCHEDULED_TASK_RUN", "in progress value $inProgress")
-
-        while (inProgress) {
-            // interrupt
-            val interrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "true")
-            Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $interrupting")
-
-            // blocking the thread for 0.5 seconds.
-            Thread.sleep(500)
-
-            status = uniffi.zingo.executeCommand("syncstatus", "")
-            Log.i("SCHEDULED_TASK_RUN", "status response $status")
-
-            data = status.toByteArray(StandardCharsets.UTF_8)
-            jsonResp = JSONObject(String(data, StandardCharsets.UTF_8))
-            inProgressStr = jsonResp.optString("in_progress")
-            inProgress = inProgressStr.toBoolean()
-
-            Log.i("SCHEDULED_TASK_RUN", "in progress value $inProgress")
+        val stop = uniffi.zingo.stopSync()
+        if (stop.lowercase().startsWith(ErrorPrefix.value)) {
+            // this means this task not have a valid lightclient
+            Log.i("SCHEDULED_TASK_RUN", stop)
+            return
         }
-
-        Log.i("SCHEDULED_TASK_RUN", "sync process STOPPED")
-
+        Log.i("SCHEDULED_TASK_RUN", "Stopping sync: $stop")
     }
 
 }
@@ -228,9 +262,9 @@ class BSCompanion {
 
         fun cancelExecutingTask() {
             val context = MainApplication.getAppContext() as Context
-            // run interrupt sync, just in case.
-            val interrupting = uniffi.zingo.executeCommand("interrupt_sync_after_batch", "true")
-            Log.i("SCHEDULED_TASK_RUN", "Interrupting sync: $interrupting")
+            // run pause sync, just in case.
+            //val stop = uniffi.zingo.stopSync()
+            //Log.i("SCHEDULED_TASK_RUN", "Stopping sync: $stop")
 
             Log.i("SCHEDULING_TASK", "Cancel background Task")
             WorkManager.getInstance(context)
