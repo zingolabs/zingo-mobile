@@ -602,7 +602,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     const version = await this.rpc.getWalletVersion();
     if (version && version < 32) {
       Alert.alert(
-        this.state.translate('loadedapp.migration-title') as string,
+        `${this.state.translate('loadedapp.migration-title')} v:${version}`,
         this.state.translate('loadedapp.migration-body') as string
       );
     }
