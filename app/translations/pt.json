@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.1 (257)",
+  "version": "zingo-2.0.1 (258)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -178,7 +178,7 @@
     "email-error-title": "Erro ao abrir o cliente de e-mail",
     "email-error-body": "Acesse as configurações do seu dispositivo e defina um aplicativo de e-mail padrão para enviar o relatório.",
     "migration-title": "Migração de carteira",
-    "migration-body": "O Zingo 2.0 realizará uma migração única para o novo mecanismo de sincronização. Isso levará algum tempo, durante o qual seu dispositivo precisará estar conectado à tomada e à rede Wi-Fi.\n\nAVISO: Durante a migração, seu saldo não estará correto! Não se preocupe! Seus fundos estão seguros e não serão afetados pela migração."
+    "migration-body": "Estamos migrando sua carteira para o novo sistema de sincronização. Mantenha seu dispositivo conectado à energia e ao Wi-Fi.\n\nSeu saldo mudará conforme a migração avança. Não se preocupe, seus fundos estão seguros!"
   },
   "rpc": {
     "parsebirthday-error": "Erro: Não foi possível analisar como um número:",

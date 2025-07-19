@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.1 (257)",
+  "version": "zingo-2.0.1 (258)",
   "loading": "Yükleniyor...",
   "connectingserver": "Sunucuya bağlanılıyor...",
   "wait": "Lütfen bekleyin...",
@@ -178,7 +178,7 @@
     "email-error-title": "E-posta istemcisi açılırken bir hata oluştu",
     "email-error-body": "Raporu gönderebilmek için cihazınızın Ayarlar bölümüne gidin ve varsayılan bir e-posta uygulaması belirleyin.",
     "migration-title": "Cüzdan geçişi",
-    "migration-body": "Zingo 2.0, yeni senkronizasyon motoruna tek seferlik bir geçiş gerçekleştirecek. Bu işlem biraz zaman alacak ve cihazınızın takılı ve Wi-Fi'ye bağlı olması gerekecek.\n\nUYARI: Geçiş sırasında bakiyeniz doğru olmayacak! Endişelenmeyin! Paranız güvende ve geçişten etkilenmeyecek."
+    "migration-body": "Cüzdanınızı yeni senkronizasyon sistemine taşıyoruz. Cihazınızı güç ve Wi-Fi'a bağlı tutun.\n\nBakiyeniz, taşıma işlemi ilerledikçe değişecektir. Endişelenmeyin, paranız güvende!"
   },
   "rpc": {
     "parsebirthday-error": "Hata: Sayı olarak ayrıştırılamadı:",

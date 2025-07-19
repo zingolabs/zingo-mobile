@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.1 (257)",
+  "version": "zingo-2.0.1 (258)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -178,7 +178,7 @@
     "email-error-title": "Error al abrir el cliente de correo electrónico",
     "email-error-body": "Ingresa a los Ajustes de tu dispositivo y configura una aplicación de correo predeterminada para enviar el reporte.",
     "migration-title": "Migración de la billetera",
-    "migration-body": "Zingo 2.0 realizará una única migración al nuevo motor de sincronización. Esto tomará un tiempo, durante el cual su dispositivo deberá estar conectado a la red eléctrica y a una red wifi.\n\nADVERTENCIA: ¡Durante la migración, su saldo no será correcto! ¡No se preocupe! Sus fondos están seguros y no se verán afectados por la migración."
+    "migration-body": "Estamos migrando tu billetera al nuevo sistema de sincronización. Mantén tu dispositivo conectado a la corriente y al wifi.\n\nTu saldo cambiará a medida que avance la migración. ¡No te preocupes, tus fondos están seguros!"
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",
