@@ -251,11 +251,16 @@ extension AppDelegate {
         
         let earlyMorningComponent = DateComponents(hour: 3, minute: Int.random(in: 0...60))
         let earlyMorning = Calendar.current.date(byAdding: earlyMorningComponent, to: tomorrow)
+      
+        //let oneMinuteLater = Date().addingTimeInterval(60)
+        //request.earliestBeginDate = oneMinuteLater
+
         request.earliestBeginDate = earlyMorning
         request.requiresExternalPower = true
         request.requiresNetworkConnectivity = true
       
         NSLog("BGTask scheduleBackgroundTask date calculated: \(String(describing: earlyMorning))")
+        //NSLog("BGTask scheduleBackgroundTask date calculated: \(String(describing: oneMinuteLater))")
         
         do {
             try BGTaskScheduler.shared.submit(request)
