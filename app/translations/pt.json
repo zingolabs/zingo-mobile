@@ -176,7 +176,9 @@
     "payment-made": "Pagamento efetuado\n",
     "valuetransfer-reverted": "A transação nunca foi confirmada por um validador.",
     "email-error-title": "Erro ao abrir o cliente de e-mail",
-    "email-error-body": "Acesse as configurações do seu dispositivo e defina um aplicativo de e-mail padrão para enviar o relatório."
+    "email-error-body": "Acesse as configurações do seu dispositivo e defina um aplicativo de e-mail padrão para enviar o relatório.",
+    "migration-title": "Migração de carteira",
+    "migration-body": "O Zingo 2.0 realizará uma migração única para o novo mecanismo de sincronização. Isso levará algum tempo, durante o qual seu dispositivo precisará estar conectado à tomada e à rede Wi-Fi.\n\nAVISO: Durante a migração, seu saldo não estará correto! Não se preocupe! Seus fundos estão seguros e não serão afetados pela migração."
   },
   "rpc": {
     "parsebirthday-error": "Erro: Não foi possível analisar como um número:",

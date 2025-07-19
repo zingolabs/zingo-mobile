@@ -271,6 +271,19 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.recoveryWalletInfoOnDevice, recoveryWalletInfoOnDevice);
       }
 
+      // if server uri is empty, fix this.
+      // it is a weird edge case
+      if (!settings.server.uri) {
+        if (
+          settings.selectServer === SelectServerEnum.auto ||
+          settings.selectServer === SelectServerEnum.custom ||
+          settings.selectServer === SelectServerEnum.list
+        ) {
+          setServer(server);
+          await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
+        }
+      }
+
       // for testing
       //await delay(5000);
 

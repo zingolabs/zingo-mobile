@@ -176,7 +176,9 @@
     "payment-made": "Ödeme yapıldı",
     "valuetransfer-reverted": "İşlem hiçbir zaman bir doğrulayıcı tarafından onaylanmadı.",
     "email-error-title": "E-posta istemcisi açılırken bir hata oluştu",
-    "email-error-body": "Raporu gönderebilmek için cihazınızın Ayarlar bölümüne gidin ve varsayılan bir e-posta uygulaması belirleyin."
+    "email-error-body": "Raporu gönderebilmek için cihazınızın Ayarlar bölümüne gidin ve varsayılan bir e-posta uygulaması belirleyin.",
+    "migration-title": "Cüzdan geçişi",
+    "migration-body": "Zingo 2.0, yeni senkronizasyon motoruna tek seferlik bir geçiş gerçekleştirecek. Bu işlem biraz zaman alacak ve cihazınızın takılı ve Wi-Fi'ye bağlı olması gerekecek.\n\nUYARI: Geçiş sırasında bakiyeniz doğru olmayacak! Endişelenmeyin! Paranız güvende ve geçişten etkilenmeyecek."
   },
   "rpc": {
     "parsebirthday-error": "Hata: Sayı olarak ayrıştırılamadı:",

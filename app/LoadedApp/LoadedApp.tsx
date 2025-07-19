@@ -598,6 +598,15 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       },
     });
 
+    // migration from Z1 to Z2. Wallet version 32 (first of Z2).
+    const version = await this.rpc.getWalletVersion();
+    if (version && version < 32) {
+      Alert.alert(
+        this.state.translate('loadedapp.migration-title') as string,
+        this.state.translate('loadedapp.migration-body') as string
+      );
+    }
+
     //console.log('DID MOUNT APPLOADED...', netInfoState);
 
     // Configure the RPC to start doing refreshes
@@ -932,7 +941,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (!isEqual(this.state.valueTransfers, valueTransfers) || this.state.valueTransfersTotal !== valueTransfersTotal) {
       // set somePending as well here when I know there is something new in ValueTransfers
       const pending: number =
-        valueTransfersTotal > 0 ? valueTransfers.filter((vt: ValueTransferType) => vt.confirmations < GlobalConst.minConfirmations).length : 0;
+        valueTransfersTotal > 0 ? valueTransfers.filter((vt: ValueTransferType) => vt.confirmations >= 0 && vt.confirmations < GlobalConst.minConfirmations).length : 0;
       // if a ValueTransfer go from 3 confirmations to > 3 -> Show a message about a ValueTransfer is confirmed
       this.state.valueTransfers &&
         this.state.valueTransfersTotal !== null &&

@@ -176,7 +176,9 @@
     "payment-made": "Pago realizado\n",
     "valuetransfer-reverted": "La transacción nunca fue confirmada por un validador.",
     "email-error-title": "Error al abrir el cliente de correo electrónico",
-    "email-error-body": "Ingresa a los Ajustes de tu dispositivo y configura una aplicación de correo predeterminada para enviar el reporte."
+    "email-error-body": "Ingresa a los Ajustes de tu dispositivo y configura una aplicación de correo predeterminada para enviar el reporte.",
+    "migration-title": "Migración de la billetera",
+    "migration-body": "Zingo 2.0 realizará una única migración al nuevo motor de sincronización. Esto tomará un tiempo, durante el cual su dispositivo deberá estar conectado a la red eléctrica y a una red wifi.\n\nADVERTENCIA: ¡Durante la migración, su saldo no será correcto! ¡No se preocupe! Sus fondos están seguros y no se verán afectados por la migración."
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",

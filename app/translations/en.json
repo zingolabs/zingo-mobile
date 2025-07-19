@@ -176,7 +176,9 @@
     "payment-made": "Payment made\n",
     "valuetransfer-reverted": "The transaction was never confirmed by a validator.",
     "email-error-title": "Error opening email client",
-    "email-error-body": "Go to your device's Settings and set a default email application to send the report."
+    "email-error-body": "Go to your device's Settings and set a default email application to send the report.",
+    "migration-title": "Wallet migration",
+    "migration-body": "Zingo 2.0 is going to perform a one-time migration to the new sync engine. This will take some time during which your device needs to be plugged in, and attached to WiFi.\n\nWARNING:  During the migration your balance will not be correct!  Don't worry! Your funds are safe and unaffected by the migration."
   },
   "rpc": {
     "parsebirthday-error": "Error: Couldn't parse as a number:",

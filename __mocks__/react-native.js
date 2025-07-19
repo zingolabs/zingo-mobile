@@ -45,6 +45,7 @@ jest.mock('react-native', () => {
     getWalletSaveRequiredInfo: jest.fn(() => '{}'),
     setConfigWalletToProdProcess: jest.fn(() => '{}'),
     getConfigWalletPerformanceInfo: jest.fn(() => '{}'),
+    getWalletVersionInfo: jest.fn(() => '{}'),
   };
   RN.View = jest.fn();
 
