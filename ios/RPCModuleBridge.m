@@ -197,5 +197,8 @@ RCT_EXTERN_METHOD(setConfigWalletToProdProcess:
 RCT_EXTERN_METHOD(getConfigWalletPerformanceInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getWalletVersionInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
 
 @end
