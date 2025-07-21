@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.0 (256)",
+  "version": "zingo-2.0.1 (258)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -176,7 +176,9 @@
     "payment-made": "Pago realizado\n",
     "valuetransfer-reverted": "La transacción nunca fue confirmada por un validador.",
     "email-error-title": "Error al abrir el cliente de correo electrónico",
-    "email-error-body": "Ingresa a los Ajustes de tu dispositivo y configura una aplicación de correo predeterminada para enviar el reporte."
+    "email-error-body": "Ingresa a los Ajustes de tu dispositivo y configura una aplicación de correo predeterminada para enviar el reporte.",
+    "migration-title": "Migración de la billetera",
+    "migration-body": "Estamos migrando tu billetera al nuevo sistema de sincronización. Mantén tu dispositivo conectado a la corriente y al wifi.\n\nTu saldo cambiará a medida que avance la migración. ¡No te preocupes, tus fondos están seguros!"
   },
   "rpc": {
     "parsebirthday-error": "Error: No es posible convertirlo en un número:",
