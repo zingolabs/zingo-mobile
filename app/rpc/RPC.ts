@@ -38,6 +38,7 @@ import { RPCSpendablebalanceType } from './types/RPCSpendablebalanceType';
 import { RPCWalletSaveRequiredType } from './types/RPCWalletSaveRequiredType';
 import { RPCConfigWalletPerformanceType } from './types/RPCConfigWalletPerformanceType';
 import { RPCPerformanceLevelEnum } from './enums/RPCPerformanceLevelEnum';
+import { RPCWalletVersionType } from './types/RPCWalletVersionType';
 
 export default class RPC {
   fnSetInfo: (info: InfoType) => void;
@@ -1032,6 +1033,31 @@ export default class RPC {
       return configWalletPerformanceJSON.performance_level;
     } catch (error) {
       console.log(`Critical Error wallet config performance ${error}`);
+      return;
+    }
+  }
+
+  async getWalletVersion(): Promise<number | undefined> {
+    try {
+      const start = Date.now();
+      const walletVersionStr: string = await RPCModule.getWalletVersionInfo();
+      if (Date.now() - start > 4000) {
+        console.log('=========================================== > wallet version - ', Date.now() - start);
+      }
+      if (walletVersionStr) {
+        if (walletVersionStr.toLowerCase().startsWith(GlobalConst.error)) {
+          console.log(`Error wallet version ${walletVersionStr}`);
+          return;
+        }
+      } else {
+        console.log('Internal Error wallet version');
+        return;
+      }
+      const walletVersionJSON: RPCWalletVersionType = await JSON.parse(walletVersionStr);
+
+      return walletVersionJSON.read_version;
+    } catch (error) {
+      console.log(`Critical Error wallet version ${error}`);
       return;
     }
   }

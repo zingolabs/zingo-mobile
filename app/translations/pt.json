@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.0 (256)",
+  "version": "zingo-2.0.1 (258)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -176,7 +176,9 @@
     "payment-made": "Pagamento efetuado\n",
     "valuetransfer-reverted": "A transação nunca foi confirmada por um validador.",
     "email-error-title": "Erro ao abrir o cliente de e-mail",
-    "email-error-body": "Acesse as configurações do seu dispositivo e defina um aplicativo de e-mail padrão para enviar o relatório."
+    "email-error-body": "Acesse as configurações do seu dispositivo e defina um aplicativo de e-mail padrão para enviar o relatório.",
+    "migration-title": "Migração de carteira",
+    "migration-body": "Estamos migrando sua carteira para o novo sistema de sincronização. Mantenha seu dispositivo conectado à energia e ao Wi-Fi.\n\nSeu saldo mudará conforme a migração avança. Não se preocupe, seus fundos estão seguros!"
   },
   "rpc": {
     "parsebirthday-error": "Erro: Não foi possível analisar como um número:",
