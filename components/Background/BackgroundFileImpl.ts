@@ -25,9 +25,14 @@ export default class BackgroundFileImpl {
 
   // Read the server background
   static async readBackground(): Promise<BackgroundType> {
-    const fileName = await this.getFileName();
-
     try {
+      const fileName = await this.getFileName();
+      const fileExits: boolean = await RNFS.exists(fileName);
+      if (!fileExits) {
+        console.log('background read file: The file does not exists');
+        return { batches: 0, message: '', date: 0, dateEnd: 0 } as BackgroundType;
+      }
+
       const rStr = (await RNFS.readFile(fileName, GlobalConst.utf8 as BufferEncoding)).toString();
       //console.log('background string', rStr);
       const r = JSON.parse(rStr) as BackgroundType;

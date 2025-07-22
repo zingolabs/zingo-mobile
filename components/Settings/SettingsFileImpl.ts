@@ -38,9 +38,15 @@ export default class SettingsFileImpl {
 
   // Read the server setting
   static async readSettings(): Promise<SettingsFileClass> {
-    const fileName = await this.getFileName();
-
     try {
+      const fileName = await this.getFileName();
+      const fileExits: boolean = await RNFS.exists(fileName);
+      if (!fileExits) {
+        console.log('settings read file: The file does not exists');
+        const settings: SettingsFileClass = { firstInstall: true, version: null } as SettingsFileClass;
+        return settings;
+      }
+
       const settings: SettingsFileClass = await JSON.parse((await RNFS.readFile(fileName, GlobalConst.utf8 as BufferEncoding)).toString());
       // If server as string is found, I need to convert to: ServerType
       // if not, I'm losing the value

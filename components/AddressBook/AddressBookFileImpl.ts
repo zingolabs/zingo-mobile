@@ -81,6 +81,12 @@ export default class AddressBookFileImpl {
   static async readAddressBook(): Promise<AddressBookFileClass[]> {
     try {
       const fileName = await this.getFileName();
+      const fileExits: boolean = await RNFS.exists(fileName);
+      if (!fileExits) {
+        console.log('address book read file: The file does not exists');
+        return [] as AddressBookFileClass[];
+      }
+
       const addressBook: AddressBookFileClass[] = await JSON.parse((await RNFS.readFile(fileName, GlobalConst.utf8 as BufferEncoding)).toString());
       return addressBook;
     } catch (err) {
