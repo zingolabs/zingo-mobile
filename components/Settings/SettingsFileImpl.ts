@@ -27,12 +27,12 @@ export default class SettingsFileImpl {
 
     //console.log(' settings write', newSettings);
 
-    RNFS.writeFile(fileName, JSON.stringify(newSettings), GlobalConst.utf8 as BufferEncoding)
+    RNFS.writeFile(fileName, JSON.stringify(newSettings), GlobalConst.utf8)
       .then(() => {
         //console.log('FILE WRITTEN!')
       })
-      .catch(() => {
-        //console.log(err.message)
+      .catch((err) => {
+        console.log('settings write file:', err.message);
       });
   }
 
@@ -47,7 +47,7 @@ export default class SettingsFileImpl {
         return settings;
       }
 
-      const settings: SettingsFileClass = await JSON.parse((await RNFS.readFile(fileName, GlobalConst.utf8 as BufferEncoding)).toString());
+      const settings: SettingsFileClass = await JSON.parse((await RNFS.readFile(fileName, GlobalConst.utf8)).toString());
       // If server as string is found, I need to convert to: ServerType
       // if not, I'm losing the value
       if (!settings.hasOwnProperty(SettingsNameEnum.server)) {

@@ -12,11 +12,12 @@ export default class BackgroundFileImpl {
     const fileName = await this.getFileName();
     const newBackground: BackgroundType = { batches: 0, message: '', date: 0, dateEnd: 0 };
 
-    RNFS.writeFile(fileName, JSON.stringify(newBackground), GlobalConst.utf8 as BufferEncoding)
+    RNFS.writeFile(fileName, JSON.stringify(newBackground), GlobalConst.utf8)
       .then(() => {
         //console.log('FILE WRITTEN!')
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log('background write file:', err.message);
         //console.log(err.message)
       });
   }
@@ -33,7 +34,7 @@ export default class BackgroundFileImpl {
         return { batches: 0, message: '', date: 0, dateEnd: 0 } as BackgroundType;
       }
 
-      const rStr = (await RNFS.readFile(fileName, GlobalConst.utf8 as BufferEncoding)).toString();
+      const rStr = (await RNFS.readFile(fileName, GlobalConst.utf8)).toString();
       //console.log('background string', rStr);
       const r = JSON.parse(rStr) as BackgroundType;
       //console.log('background json', r);

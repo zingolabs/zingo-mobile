@@ -87,7 +87,7 @@ export default class AddressBookFileImpl {
         return [] as AddressBookFileClass[];
       }
 
-      const addressBook: AddressBookFileClass[] = await JSON.parse((await RNFS.readFile(fileName, GlobalConst.utf8 as BufferEncoding)).toString());
+      const addressBook: AddressBookFileClass[] = await JSON.parse((await RNFS.readFile(fileName, GlobalConst.utf8)).toString());
       return addressBook;
     } catch (err) {
       // The File doesn't exist, so return nothing
@@ -99,11 +99,12 @@ export default class AddressBookFileImpl {
   static async writeAddressBook(newAddressBook: AddressBookFileClass[]): Promise<AddressBookFileClass[]> {
     try {
       const fileName = await this.getFileName();
-      RNFS.writeFile(fileName, JSON.stringify(newAddressBook), GlobalConst.utf8 as BufferEncoding)
+      RNFS.writeFile(fileName, JSON.stringify(newAddressBook), GlobalConst.utf8)
         .then(() => {
           //console.log('FILE WRITTEN!')
         })
-        .catch(() => {
+        .catch((err) => {
+          console.log('address book write file:', err.message);
           return [] as AddressBookFileClass[];
         });
       return newAddressBook;
