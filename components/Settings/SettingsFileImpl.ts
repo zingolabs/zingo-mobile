@@ -27,21 +27,27 @@ export default class SettingsFileImpl {
 
     //console.log(' settings write', newSettings);
 
-    RNFS.writeFile(fileName, JSON.stringify(newSettings), GlobalConst.utf8 as BufferEncoding)
+    RNFS.writeFile(fileName, JSON.stringify(newSettings), GlobalConst.utf8)
       .then(() => {
         //console.log('FILE WRITTEN!')
       })
-      .catch(() => {
-        //console.log(err.message)
+      .catch((err) => {
+        console.log('settings write file:', err.message);
       });
   }
 
   // Read the server setting
   static async readSettings(): Promise<SettingsFileClass> {
-    const fileName = await this.getFileName();
-
     try {
-      const settings: SettingsFileClass = await JSON.parse((await RNFS.readFile(fileName, GlobalConst.utf8 as BufferEncoding)).toString());
+      const fileName = await this.getFileName();
+      const fileExits: boolean = await RNFS.exists(fileName);
+      if (!fileExits) {
+        console.log('settings read file: The file does not exists');
+        const settings: SettingsFileClass = { firstInstall: true, version: null } as SettingsFileClass;
+        return settings;
+      }
+
+      const settings: SettingsFileClass = await JSON.parse((await RNFS.readFile(fileName, GlobalConst.utf8)).toString());
       // If server as string is found, I need to convert to: ServerType
       // if not, I'm losing the value
       if (!settings.hasOwnProperty(SettingsNameEnum.server)) {

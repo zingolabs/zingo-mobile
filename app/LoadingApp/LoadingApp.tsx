@@ -151,7 +151,7 @@ export default function LoadingApp(props: LoadingAppProps) {
 
       //I have to check what language and other things are in the settings
       const settings = await SettingsFileImpl.readSettings();
-      //console.log(settings);
+      console.log('LoadingApp', settings);
 
       // checking the version of the App in settings
       //console.log('versions, old:', settings.version, ' new:', translate('version') as string);
@@ -273,8 +273,9 @@ export default function LoadingApp(props: LoadingAppProps) {
 
       // if server uri is empty, fix this.
       // it is a weird edge case
-      if (!settings.server.uri) {
+      if (settings.server && !settings.server.uri) {
         if (
+          settings.selectServer &&
           settings.selectServer === SelectServerEnum.auto ||
           settings.selectServer === SelectServerEnum.custom ||
           settings.selectServer === SelectServerEnum.list
@@ -289,9 +290,8 @@ export default function LoadingApp(props: LoadingAppProps) {
 
       // reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
-      if (backgroundJson) {
-        setBackground(backgroundJson);
-      }
+      setBackground(backgroundJson);
+
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -957,9 +957,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
   fetchBackgroundSyncing = async () => {
     const backgroundJson: BackgroundType = await BackgroundFileImpl.readBackground();
-    if (backgroundJson) {
-      this.setState({ background: backgroundJson });
-    }
+    this.setState({ background: backgroundJson });
   };
 
   setCustomServerUri = (customServerUri: string) => {

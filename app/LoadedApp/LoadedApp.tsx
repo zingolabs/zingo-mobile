@@ -195,6 +195,7 @@ export default function LoadedApp(props: LoadedAppProps) {
 
       //I have to check what language is in the settings
       const settings = await SettingsFileImpl.readSettings();
+      console.log('LoadedApp', settings);
 
       // for testing
       //await delay(5000);
@@ -285,9 +286,7 @@ export default function LoadedApp(props: LoadedAppProps) {
 
       // reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
-      if (backgroundJson) {
-        setBackground(backgroundJson);
-      }
+      setBackground(backgroundJson);
 
       let sort: boolean = false;
       const zenniesAddress = await Utils.getZenniesDonationAddress(server.chainName);
