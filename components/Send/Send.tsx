@@ -184,10 +184,9 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const runSendPropose = async (
     proposeJSON: string,
-    command: CommandEnum.send | CommandEnum.sendall,
   ): Promise<string> => {
     try {
-      const proposeStr: string = await RPCModule.execute(command, proposeJSON);
+      const proposeStr: string = await RPCModule.execute(CommandEnum.send, proposeJSON);
       if (proposeStr) {
         if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error propose ${proposeStr}`);
@@ -242,7 +241,6 @@ const Send: React.FunctionComponent<SendProps> = ({
       addressPar: string,
       memoPar: string,
       includeUAMemoPar: boolean,
-      command: CommandEnum.send | CommandEnum.sendall,
     ): Promise<void> => {
       // if no address -> make no sense to run the propose
       if (!addressPar || validAddress !== 1) {
@@ -260,34 +258,19 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       let sendJson;
 
-      if (command === CommandEnum.send) {
-        const sendPageStateCalculateFee = new SendPageStateClass(new ToAddrClass(0));
-        sendPageStateCalculateFee.toaddr.to = addressPar;
-        sendPageStateCalculateFee.toaddr.memo = memoPar;
-        sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemoPar;
-        sendPageStateCalculateFee.toaddr.amount = amountPar;
+      const sendPageStateCalculateFee = new SendPageStateClass(new ToAddrClass(0));
+      sendPageStateCalculateFee.toaddr.to = addressPar;
+      sendPageStateCalculateFee.toaddr.memo = memoPar;
+      sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemoPar;
+      sendPageStateCalculateFee.toaddr.amount = amountPar;
 
-        sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, defaultUnifiedAddress, server, donation);
-        console.log('SEND', sendJson);
-      }
-
-      let sendallJson;
-
-      if (command === CommandEnum.sendall) {
-        let zenniesForZingo = donationAddress ? false : donation;
-        if (memoPar) {
-          sendallJson = { address: addressPar, memo: memoPar, zennies_for_zingo: zenniesForZingo };
-        } else {
-          sendallJson = { address: addressPar, zennies_for_zingo: zenniesForZingo };
-        }
-        console.log('SENDALL', sendallJson);
-      }
+      sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, defaultUnifiedAddress, server, donation);
+      console.log('SEND', sendJson);
 
       // fee
       let proposeFee = 0;
       const runProposeStr = await runSendPropose(
-        JSON.stringify(command === CommandEnum.send ? sendJson : sendallJson),
-        command,
+        JSON.stringify(sendJson),
       );
       //Alert.alert('Calculating the FEE ' + command, runProposeStr);
       if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -493,7 +476,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   ]);
 
   useEffect(() => {
-    calculateFeeWithPropose(amountText, addressText, memoText, includeUAMemoBoolean, CommandEnum.send);
+    calculateFeeWithPropose(amountText, addressText, memoText, includeUAMemoBoolean);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     calculateFeeWithPropose,
@@ -1178,7 +1161,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                           addressText,
                           memoText,
                           includeUAMemoBoolean,
-                          CommandEnum.send,
                         );
                         //setSendAllClick(true);
                         //setTimeout(() => {
@@ -1261,7 +1243,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                             addressText,
                             memoText,
                             includeUAMemoBoolean,
-                            CommandEnum.send,
                           );
                         }}
                         editable={true}
@@ -1511,7 +1492,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 addressText,
                                 memoText,
                                 includeUAMemoBoolean,
-                                CommandEnum.send,
                               );
                             }}
                             editable={true}
@@ -1599,7 +1579,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                             addressText,
                             e.nativeEvent.text,
                             includeUAMemoBoolean,
-                            CommandEnum.send,
                           );
                         }}
                         onContentSizeChange={(e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
