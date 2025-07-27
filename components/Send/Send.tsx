@@ -506,7 +506,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   ]);
 
   useEffect(() => {
-    calculateSpendableBalance(addressText);
+    if (!addressText.toLowerCase().startsWith(GlobalConst.zcash)) {
+      calculateSpendableBalance(addressText);
+    };
   }, [calculateSpendableBalance, addressText]);
 
   useEffect(() => {
