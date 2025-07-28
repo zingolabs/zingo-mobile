@@ -9,7 +9,6 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 import { GlobalConst, ScreenEnum } from '../../../app/AppState';
-import Utils from '../../../app/utils';
 import Header from '../../Header';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
@@ -26,7 +25,7 @@ type ScannerAddressProps = {
 
 const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddress }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, language, snackbars, removeFirstSnackbar } = context;
+  const { translate, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -40,7 +39,11 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
       setAddress(scannedAddress);
     } else {
       //console.log('not valid QR URI, adding prefix zcash:');
-      setAddress(GlobalConst.zcash + scannedAddress);
+      if (scannedAddress.toLowerCase().includes(':')) {
+        setAddress(scannedAddress);
+      } else {
+        setAddress(GlobalConst.zcash + scannedAddress);
+      }
     }
   };
 

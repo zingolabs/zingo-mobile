@@ -767,7 +767,7 @@
   },
   "uris": {
     "baduri": "Hata: Geçersiz URI.",
-    "notvalid": "Geçerli bir Zcash adresi değildi (Unified, Sapling veya Transparent)",
+    "notvalid": "Geçerli bir Zcash adresi değildi",
     "notvalidparameter": "Geçerli bir parametre olarak anlaşılamadı",
     "notvalidvalue": "Parametre değeri anlaşılamadı",
     "noindex": "Bilinmeyen indeks",
