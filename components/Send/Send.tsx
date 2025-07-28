@@ -50,7 +50,7 @@ import {
   SecurityType,
   ScreenEnum,
 } from '../../app/AppState';
-import { parseZcashURI, serverUris, ZcashURITargetClass } from '../../app/uris';
+import { parseZcashURI, serverUris } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
 import Utils from '../../app/utils';
 import ScannerAddress from './components/ScannerAddress';
@@ -409,21 +409,23 @@ const Send: React.FunctionComponent<SendProps> = ({
     includeUAMemoPar: boolean | null,
   ) => {
     if (addressPar !== null) {
-      setAddressText(addressPar);
+      //Alert.alert('', addressPar);
+      //setAddressText(addressPar);
       // Attempt to parse as URI if it starts with zcash
-      if (addressPar.toLowerCase().startsWith(GlobalConst.zcash)) {
-        const target: string | ZcashURITargetClass = await parseZcashURI(addressPar, translate, server);
+      if (addressPar.toLowerCase().startsWith(GlobalConst.zcash) || addressPar.toLowerCase().includes(':')) {
+        const { error, target } = await parseZcashURI(addressPar, translate, server);
 
-        if (typeof target !== 'string') {
+        if (target) {
           // redo the to addresses
           [target].forEach(tgt => {
             setAddressText(tgt.address || '');
-            setAmountText(Utils.parseNumberFloatToStringLocale(tgt.amount || 0, 8));
+            setAmountText(tgt.amount ? Utils.parseNumberFloatToStringLocale(tgt.amount, 8) : '');
             setMemoText(tgt.memoString || '');
           });
-        } else {
+        }
+        if (error) {
           // Show the error message as a toast
-          addLastSnackbar({ message: target, screenName: [screenName] });
+          addLastSnackbar({ message: error, screenName: [screenName] });
         }
       } else {
         setAddressText(addressPar.replace(/[ \t\n\r]+/g, '')); // Remove spaces
@@ -506,7 +508,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   ]);
 
   useEffect(() => {
-    calculateSpendableBalance(addressText);
+    if (!addressText.toLowerCase().startsWith(GlobalConst.zcash)) {
+      calculateSpendableBalance(addressText);
+    }
   }, [calculateSpendableBalance, addressText]);
 
   useEffect(() => {

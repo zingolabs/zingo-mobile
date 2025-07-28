@@ -767,7 +767,7 @@
   },
   "uris": {
     "baduri": "Error: URI errónea.",
-    "notvalid": "No era una dirección válida para zcash (Unificada, Sapling o Transparente)",
+    "notvalid": "No era una dirección válida para zcash",
     "notvalidparameter": "no fue entendido como un parámetro válido",
     "notvalidvalue": "No fue entendido como un valor válido",
     "noindex": "Indice desconocido",

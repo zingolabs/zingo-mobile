@@ -16,7 +16,7 @@ import { useToast } from 'react-native-toastier';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import RPCModule from '../../../app/RPCModule';
-import { parseZcashURI, ZcashURITargetClass } from '../../../app/uris';
+import { parseZcashURI } from '../../../app/uris';
 import TextInputAddress from '../../Components/TextInputAddress';
 import FadeText from '../../Components/FadeText';
 import RegText from '../../Components/RegText';
@@ -75,27 +75,25 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet
       setAddress('');
       return;
     }
-    let newAddress: string = addr;
     // Attempt to parse as URI if it starts with zcash
-    if (addr.toLowerCase().startsWith(GlobalConst.zcash)) {
-      const target: string | ZcashURITargetClass = await parseZcashURI(addr, translate, server);
+    if (addr.toLowerCase().startsWith(GlobalConst.zcash) || addr.toLowerCase().includes(':')) {
+      const { error, target } = await parseZcashURI(addr, translate, server);
       //console.log(targets);
 
-      if (typeof target !== 'string') {
+      if (target) {
         // redo the to addresses
         [target].forEach(tgt => {
-          newAddress = tgt.address || '';
+          setAddress(tgt.address || '');
         });
-      } else {
+      }
+      if (error) {
         // Show the error message as a toast
-        addLastSnackbar({ message: target, screenName: [screenName] });
+        addLastSnackbar({ message: error, screenName: [screenName] });
         //return;
       }
     } else {
-      newAddress = addr.replace(/[ \t\n\r]+/g, ''); // Remove spaces
+      setAddress(addr.replace(/[ \t\n\r]+/g, '')); // Remove spaces
     }
-
-    setAddress(newAddress);
   };
 
   return (
