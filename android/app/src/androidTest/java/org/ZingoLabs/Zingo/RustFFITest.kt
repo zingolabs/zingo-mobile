@@ -390,7 +390,7 @@ class ExecuteSendFromOrchard {
         println("\nPropose:")
         println(proposeJson)
 
-        val confirmJson: String = uniffi.zingo.confirm("")
+        val confirmJson: String = uniffi.zingo.confirm()
         println("\nConfirm Txid:")
         println(confirmJson)
 

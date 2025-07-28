@@ -206,7 +206,7 @@ export default class RPC {
 
   static async rpcShieldFunds(): Promise<string> {
     try {
-      const shieldStr: string = await RPCModule.confirmProcess('');
+      const shieldStr: string = await RPCModule.confirmProcess();
       //console.log(shieldStr);
       if (shieldStr) {
         if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -1300,7 +1300,7 @@ export default class RPC {
           }
           if (!sendError) {
             // creating the transaction
-            const sendStr: string = await RPCModule.confirmProcess('');
+            const sendStr: string = await RPCModule.confirmProcess();
             if (sendStr) {
               if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
                 console.log(`Error confirm ${sendStr}`);

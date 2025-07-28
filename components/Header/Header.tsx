@@ -201,7 +201,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           return 'Error: shield propose already running...';
         }
         runShieldProposeLock = true;
-        const proposeStr: string = await RPCModule.shieldProcess('');
+        const proposeStr: string = await RPCModule.shieldProcess();
         if (proposeStr) {
           if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error propose ${proposeStr}`);
@@ -305,7 +305,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     setComputingModalShow();
     // because I don't what the user is doing, I need to the re-run the shield
     // command right before the confirmation
-    await RPCModule.shieldProcess('');
+    await RPCModule.shieldProcess();
     const shieldStr = await RPC.rpcShieldFunds();
 
     if (shieldStr) {
