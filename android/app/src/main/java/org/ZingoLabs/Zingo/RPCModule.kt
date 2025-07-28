@@ -422,27 +422,6 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun execute(cmd: String, args: String, promise: Promise) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.executeCommand(cmd, args)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(resp)
-                }
-            } catch (e: Exception) {
-                val errorMessage = "Error: executing command '$cmd': ${e.localizedMessage}"
-                Log.e("MAIN", errorMessage, e)
-
-                withContext(Dispatchers.Main) {
-                    promise.resolve(errorMessage)
-                }
-            }
-        }
-    }
-
-    @ReactMethod
     fun doSave(promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -1382,6 +1361,69 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 }
             } catch (e: Exception) {
                 val errorMessage = "Error: get wallet version: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun sendProcess(send_json: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.send(send_json)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: send: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun shieldProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.shield()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: shield: ${e.localizedMessage}"
+                Log.e("MAIN", errorMessage, e)
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(errorMessage)
+                }
+            }
+        }
+    }
+
+    @ReactMethod
+    fun confirmProcess(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                uniffi.zingo.initLogging()
+                val resp = uniffi.zingo.confirm()
+
+                withContext(Dispatchers.Main) {
+                    promise.resolve(resp)
+                }
+            } catch (e: Exception) {
+                val errorMessage = "Error: confirm: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {

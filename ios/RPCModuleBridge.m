@@ -54,11 +54,6 @@ RCT_EXTERN_METHOD(doSave:
 RCT_EXTERN_METHOD(doSaveBackup:
     (RCTPromiseResolveBlock)resolve 
                   reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(execute:
-    (NSString)method 
-                  args:(NSString)args
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getLatestBlockServerInfo:
     (NSString)server 
                   resolve:(RCTPromiseResolveBlock)resolve
@@ -198,6 +193,16 @@ RCT_EXTERN_METHOD(getConfigWalletPerformanceInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getWalletVersionInfo:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(sendProcess:
+    (NSString)send_json
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(shieldProcess:
+    (RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(confirmProcess:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 

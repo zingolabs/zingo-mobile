@@ -35,7 +35,6 @@ import CurrencyAmount from '../Components/CurrencyAmount';
 import Button from '../Components/Button';
 import {
   AddressBookFileClass,
-  CommandEnum,
   SendPageStateClass,
   ToAddrClass,
   ModeEnum,
@@ -186,7 +185,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     proposeJSON: string,
   ): Promise<string> => {
     try {
-      const proposeStr: string = await RPCModule.execute(CommandEnum.send, proposeJSON);
+      const proposeStr: string = await RPCModule.sendProcess(proposeJSON);
       if (proposeStr) {
         if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error propose ${proposeStr}`);

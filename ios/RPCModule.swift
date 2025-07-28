@@ -394,36 +394,6 @@ class RPCModule: NSObject {
     }
   }
 
-  func doExecuteOnThread(_ dict: [String: Any]) {
-    if let method = dict["method"] as? String,
-       let args = dict["args"] as? String,
-       let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-      let resp = executeCommand(cmd: method, args: args)
-      let respStr = String(resp)
-      DispatchQueue.main.async {
-        resolve(respStr)
-      }
-    } else {
-      let err = "Error: [Native] Executing command. Command argument problem."
-      NSLog(err)
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        DispatchQueue.main.async {
-          resolve(err)
-        }
-      }
-    }
-  }
-
-  @objc(execute:args:resolve:reject:)
-  func execute(_ method: String, args: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["method": method, "args": args, "resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-          if let self = self {
-              self.doExecuteOnThread(dict)
-          }
-      }
-  }
-
   func fnGetLatestBlockServerInfo(_ dict: [AnyHashable: Any]) {
     if let server = dict["server"] as? String,
        let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
@@ -1660,4 +1630,90 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
         }
       }
   }
+
+  func fnSendProcess(_ dict: [AnyHashable: Any]) {
+    if let address = dict["send_json"] as? String,
+        let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+        let resp = send(send_json: send_json)
+        let respStr = String(resp)
+        DispatchQueue.main.async {
+          resolve(respStr)
+        }
+    } else {
+        let err = "Error: [Native] send. Command arguments problem."
+        NSLog(err)
+        if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
+    }
+  }
+
+  @objc(sendProcess:resolve:reject:)
+  func sendProcess(_ send_json: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["send_json": send_json, "resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnSendProcess(dict)
+        }
+      }
+  }
+
+  func fnShieldProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = shield()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] shield. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(shieldProcess:reject:)
+  func shieldProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnShieldProcess(dict)
+        }
+      }
+  }
+
+  func fnConfirmProcess(_ dict: [AnyHashable: Any]) {
+      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = confirm()
+          let respStr = String(resp)
+          DispatchQueue.main.async {
+            resolve(respStr)
+          }
+      } else {
+          let err = "Error: [Native] confirm. Command arguments problem."
+          NSLog(err)
+          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+            DispatchQueue.main.async {
+              resolve(err)
+            }
+          }
+      }
+  }
+
+  @objc(confirmProcess:reject:)
+  func confirmProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["resolve": resolve]
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        if let self = self {
+          self.fnConfirmProcess(dict)
+        }
+      }
+  }
+
 }

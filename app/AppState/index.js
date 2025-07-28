@@ -25,7 +25,6 @@ import ContactType from './types/ContactType';
 import TransactionType from './types/TransactionType';
 import TxDetailType from './types/TxDetailType';
 
-import { CommandEnum } from './enums/CommandEnum';
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
@@ -96,7 +95,6 @@ export {
   ContactType,
   TransactionType,
   TxDetailType,
-  CommandEnum,
   AddressBookActionEnum,
   MenuItemEnum,
   LanguageEnum,
