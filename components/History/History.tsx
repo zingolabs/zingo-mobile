@@ -50,6 +50,8 @@ import Snackbars from '../Components/Snackbars';
 const ViewTypes = {
   WITH_MONTH: 0,
   WITHOUT_MONTH: 1,
+  WITH_MONTH_REFRESH: 2,
+  WITHOUT_MONTH_REFRESH: 3,
 };
 
 type HistoryProps = {
@@ -118,28 +120,51 @@ const History: React.FunctionComponent<HistoryProps> = ({
     () =>
       new LayoutProvider(
         (index: number) => {
-          if (index === 0) {
-            return ViewTypes.WITH_MONTH;
-          }
           const lastData = valueTransfersSliced[index - 1];
-          let lasttxmonth = lastData && lastData.time ? moment(lastData.time * 1000).format('MMM YYYY') : '--- ----';
-
           const data = valueTransfersSliced[index];
+
+          if (index === 0) {
+            if (data.confirmations === 0 ) {
+              return ViewTypes.WITH_MONTH_REFRESH;
+            } else {
+              return ViewTypes.WITH_MONTH;
+            }
+          }
+
+          let lasttxmonth = lastData && lastData.time ? moment(lastData.time * 1000).format('MMM YYYY') : '--- ----';
           let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
 
           if (txmonth !== lasttxmonth) {
-            return ViewTypes.WITH_MONTH;
+            if (data.confirmations === 0 ) {
+              return ViewTypes.WITH_MONTH_REFRESH;
+            } else {
+              return ViewTypes.WITH_MONTH;
+            }
           } else {
-            return ViewTypes.WITHOUT_MONTH;
+            if (data.confirmations === 0) {
+              return ViewTypes.WITHOUT_MONTH_REFRESH;
+            } else {
+              return ViewTypes.WITHOUT_MONTH;
+            }
           }
         },
         (type, dim) => {
           if (type === ViewTypes.WITHOUT_MONTH) {
+            // two lines
             dim.width = Dimensions.get('window').width;
-            dim.height = 65;
+            dim.height = 70;
+          } else if (type === ViewTypes.WITHOUT_MONTH_REFRESH) {
+            // three lines
+            dim.width = Dimensions.get('window').width;
+            dim.height = 70 + 15;
           } else if (type === ViewTypes.WITH_MONTH) {
+            // two lines with month
             dim.width = Dimensions.get('window').width;
-            dim.height = 95;
+            dim.height = 105;
+          } else if (type === ViewTypes.WITH_MONTH_REFRESH) {
+            // three lines with month
+            dim.width = Dimensions.get('window').width;
+            dim.height = 105 + 15;
           }
         },
       ),
@@ -303,7 +328,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
       <ValueTransferLine
         index={index}
         vt={data}
-        month={type === ViewTypes.WITH_MONTH ? txmonth : ''}
+        month={type === ViewTypes.WITH_MONTH || type === ViewTypes.WITH_MONTH_REFRESH ? txmonth : ''}
         setValueTransferDetailModalShow={setValueTransferDetailModalShow}
         nextLineWithSameTxid={
           index >= valueTransfersSliced.length - 1 ? false : valueTransfersSliced[index + 1].txid === data.txid
