@@ -47,6 +47,7 @@ import {
   BackgroundErrorType,
   RestoreFromTypeEnum,
   ScreenEnum,
+  LaunchingModeEnum,
 } from '../AppState';
 import { parseServerURI, serverUris } from '../uris';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
@@ -109,7 +110,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum.basic | ModeEnum.advanced>(ModeEnum.advanced); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
-  const [firstLaunchingMessage, setFirstLaunchingMessage] = useState<boolean>(false);
+  const [firstLaunchingMessage, setFirstLaunchingMessage] = useState<LaunchingModeEnum>(LaunchingModeEnum.opening);
   const [loading, setLoading] = useState<boolean>(true);
   const [security, setSecurity] = useState<SecurityType>({
     startApp: true,
@@ -157,10 +158,10 @@ export default function LoadingApp(props: LoadingAppProps) {
       //console.log('versions, old:', settings.version, ' new:', translate('version') as string);
       if (settings.version === null) {
         // this is a fresh install
-        setFirstLaunchingMessage(false);
+        setFirstLaunchingMessage(LaunchingModeEnum.installing);
       } else if (settings.version === '' || settings.version !== (translate('version') as string)) {
         // this is an update
-        setFirstLaunchingMessage(true);
+        setFirstLaunchingMessage(LaunchingModeEnum.updating);
         // The App needs to set the currency opt-in to USD by default
         // only if the currency have `none`
         if (settings.currency === CurrencyEnum.noCurrency) {
@@ -300,7 +301,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   //console.log('render loadingApp - 2', translate('version'));
 
   if (loading) {
-    return <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />;
+    return <Launching translate={translate} firstLaunchingMessage={LaunchingModeEnum.opening} biometricsFailed={false} />;
   } else {
     return (
       <LoadingAppClass
@@ -341,7 +342,7 @@ type LoadingAppClassProps = {
   privacy: boolean;
   mode: ModeEnum;
   background: BackgroundType;
-  firstLaunchingMessage: boolean;
+  firstLaunchingMessage: LaunchingModeEnum;
   security: SecurityType;
   selectServer: SelectServerEnum;
   donationAlert: boolean;
@@ -601,7 +602,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               (this.props.route.params.newWallet === true || this.props.route.params.newWallet === false)
                 ? this.props.route.params.newWallet
                 : false;
-            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, newWallet);
+            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, newWallet, this.state.firstLaunchingMessage);
             //console.log('navigate to LoadedApp');
           } else {
             error = true;
@@ -651,7 +652,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           } else {
             this.createNewWallet(false);
             this.setState({ actionButtonsDisabled: false });
-            this.navigateToLoadedApp(false, true, true, true, true);
+            this.navigateToLoadedApp(false, true, true, true, true, this.state.firstLaunchingMessage);
             //console.log('navigate to LoadedApp');
           }
         }
@@ -1032,13 +1033,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.setState({ actionButtonsDisabled: false });
   };
 
-  navigateToLoadedApp = (readOnly: boolean, orchardPool: boolean, saplingPool: boolean, transparentPool: boolean, newWallet: boolean) => {
+  navigateToLoadedApp = (readOnly: boolean, orchardPool: boolean, saplingPool: boolean, transparentPool: boolean, newWallet: boolean, firstLaunchingMessage: LaunchingModeEnum) => {
     this.props.navigationApp.reset({
       index: 0,
       routes: [
         {
           name: RouteEnums.LoadedApp,
-          params: { readOnly, orchardPool, saplingPool, transparentPool, newWallet },
+          params: { readOnly, orchardPool, saplingPool, transparentPool, newWallet, firstLaunchingMessage },
         },
       ],
     });
@@ -1281,7 +1282,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
               RPCModule.createTorClientProcess();
             }
-            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true);
+            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true, this.state.firstLaunchingMessage);
           } else {
             error = true;
             errorText = resultJson.error;
@@ -1527,10 +1528,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               animationType="slide"
               transparent={true}
               visible={screen === 2}
-              onRequestClose={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true)}>
+              onRequestClose={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true, firstLaunchingMessage)}>
               <Seed
-                onClickOK={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true)}
-                onClickCancel={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true)}
+                onClickOK={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true, firstLaunchingMessage)}
+                onClickCancel={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true, firstLaunchingMessage)}
                 action={SeedActionEnum.new}
                 setPrivacyOption={this.setPrivacyOption}
               />

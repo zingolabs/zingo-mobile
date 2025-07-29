@@ -5,9 +5,16 @@
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
   "workingonit": "Estamos trabalhando neste recurso.",
-  "firstlaunchingmessage-title": "Otimizando a Zingo",
-  "firstlaunchingmessage-body": "Isso pode demorar um pouco, dependendo do histórico de transações. Por favor, mantenha o aplicativo aberto até que o processo termine",
-  "firstlaunchingmessage-footer": "Obrigado.",
+  "updating" : {
+    "firstlaunchingmessage-title": "Otimizando a Zingo",
+    "firstlaunchingmessage-body": "Isso pode demorar um pouco, dependendo do histórico de transações. Por favor, mantenha o aplicativo aberto até que o processo termine",
+    "firstlaunchingmessage-footer": "Obrigado."
+  },
+  "installing" : {
+    "firstlaunchingmessage-title": "Instalando o Zingo",
+    "firstlaunchingmessage-body": "Criando uma nova carteira. Mantenha o aplicativo aberto até que o processo seja concluído.",
+    "firstlaunchingmessage-footer": "Obrigado."
+  },
   "biometricsfailed-title": "Bem-vindo!",
   "biometricsfailed-body": "Por questões de segurança, o aplicativo está bloqueado.",
   "biometricsfailed-footer": "Use o método de autenticação para desbloquear.",

@@ -65,6 +65,7 @@ import {
   AddressKindEnum,
   AddressBookFileClassObsolete,
   ScreenEnum,
+  LaunchingModeEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
@@ -174,6 +175,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const saplingPool = props.route.params ? props.route.params.saplingPool : false;
   const transparentPool = props.route.params ? props.route.params.transparentPool : false;
   const newWallet = props.route.params ? props.route.params.newWallet : false;
+  const firstLaunchingMessage = props.route.params ? props.route.params.firstLaunchingMessage : LaunchingModeEnum.opening;
 
   useEffect(() => {
     (async () => {
@@ -311,6 +313,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         (a: AddressBookFileClassObsolete) => a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('color') || !a.hasOwnProperty('own'),
       );
       console.log('Address Book -> TO UPDATE', toUpdate);
+      console.log('Address Book items', ab.length);
       if (toUpdate.length > 0) {
         const randomColors = Utils.generateColorList(toUpdate.length);
         for (let i = 0; i < toUpdate.length; i++) {
@@ -355,29 +358,32 @@ export default function LoadedApp(props: LoadedAppProps) {
       // in the Address Book belong to this new/restored wallet.
       if (newWallet) {
         toUpdate = ab.filter((a: AddressBookFileClass) => !!a.address);
-        for (let i = 0; i < toUpdate.length; i++) {
-          const a = toUpdate[i];
-          let own: boolean;
-          // verify this address as own or not
-          const checkStr = await RPCModule.checkMyAddressInfo(a.address);
-          //console.log(checkStr);
-          if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
-            const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
-            own = checkJSON.is_wallet_address;
-          } else {
-            // error
-            own = false;
+        // always have one -> Zennies.
+        if (toUpdate.length > 1) {
+          for (let i = 0; i < toUpdate.length; i++) {
+            const a = toUpdate[i];
+            let own: boolean;
+            // verify this address as own or not
+            const checkStr = await RPCModule.checkMyAddressInfo(a.address);
+            //console.log(checkStr);
+            if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
+              const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
+              own = checkJSON.is_wallet_address;
+            } else {
+              // error
+              own = false;
+            }
+            ab = await AddressBookFileImpl.updateColorAndOwnItem(
+              a.label,
+              a.address,
+              a.color ? a.color : '',
+              own,
+            );
           }
-          ab = await AddressBookFileImpl.updateColorAndOwnItem(
-            a.label,
-            a.address,
-            a.color ? a.color : '',
-            own,
-          );
+          sort = true;
         }
-        sort = true;
       }
-      let abSorted = ab;
+      let abSorted = [] as AddressBookFileClass[];
       if (sort) {
         // this is a good place to sort properly these data
         // if anything changed.
@@ -386,10 +392,13 @@ export default function LoadedApp(props: LoadedAppProps) {
           const bLabel = b.label;
           return aLabel.localeCompare(bLabel);
         });
+      } else {
+        abSorted = ab;
       }
       setAddressBook(abSorted);
       await AddressBookFileImpl.writeAddressBook(abSorted);
       setLoading(false);
+      console.log('LoadedApp functional component - finished');
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -398,7 +407,7 @@ export default function LoadedApp(props: LoadedAppProps) {
 
   if (loading) {
     return (
-      <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
+      <Launching translate={translate} firstLaunchingMessage={LaunchingModeEnum.opening} biometricsFailed={false} />
     );
   } else {
     return (
@@ -425,6 +434,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         zenniesDonationAddress={zenniesDonationAddress}
+        firstLaunchingMessage={firstLaunchingMessage}
       />
     );
   }
@@ -474,6 +484,7 @@ type LoadedAppClassProps = {
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   zenniesDonationAddress: string;
+  firstLaunchingMessage: LaunchingModeEnum;
 };
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
@@ -597,16 +608,19 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       },
     });
 
-    // migration from Z1 to Z2. Wallet version 32 (first of Z2).
-    const version = await this.rpc.getWalletVersion();
-    if (version && version < 32) {
-      Alert.alert(
-        `${this.state.translate('loadedapp.migration-title')} v:${version}`,
-        this.state.translate('loadedapp.migration-body') as string
-      );
+    // not for fresh installing
+    if (this.props.firstLaunchingMessage !== LaunchingModeEnum.installing) {
+      // migration from Z1 to Z2. Wallet version 32 (first of Z2).
+      const version = await this.rpc.getWalletVersion();
+      if (version && version < 32) {
+        Alert.alert(
+          `${this.state.translate('loadedapp.migration-title')} v:${version}`,
+          this.state.translate('loadedapp.migration-body') as string
+        );
+      }
     }
 
-    //console.log('DID MOUNT APPLOADED...', netInfoState);
+    console.log('DID MOUNT APPLOADED...', netInfoState);
 
     // Configure the RPC to start doing refreshes
     await this.rpc.clearTimers();

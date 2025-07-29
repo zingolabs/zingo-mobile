@@ -11,7 +11,7 @@ import { LoadedAppClass } from '../app/LoadedApp';
 // Importa el módulo I18n
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { I18n } from 'i18n-js';
-import { LanguageEnum, ModeEnum, SelectServerEnum, CurrencyEnum } from '../app/AppState';
+import { LanguageEnum, ModeEnum, SelectServerEnum, CurrencyEnum, LaunchingModeEnum } from '../app/AppState';
 import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockLoadedAppNavigation } from '../__mocks__/dataMocks/mockLoadedAppNavigation';
@@ -40,6 +40,7 @@ describe('Component LoadedApp - test', () => {
     const toggleTheme = jest.fn();
     const selectServer = SelectServerEnum.auto;
     const zenniesDonationAddress = 'xxxxxxxxxxxxxxxxx';
+    const firstLaunchingMessage = LaunchingModeEnum.opening;
     const loadedapp = render(
       <LoadedAppClass
         navigationApp={mockLoadedAppNavigation}
@@ -65,6 +66,7 @@ describe('Component LoadedApp - test', () => {
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         zenniesDonationAddress={zenniesDonationAddress}
+        firstLaunchingMessage={firstLaunchingMessage}
       />,
     );
     expect(loadedapp.toJSON()).toMatchSnapshot();

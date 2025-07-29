@@ -5,9 +5,16 @@
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
-  "firstlaunchingmessage-title": "Optimizing Zingo",
-  "firstlaunchingmessage-body": "This may take a while, depending on the transaction history. Please keep the app open until the process finishes.",
-  "firstlaunchingmessage-footer": "Thanks.",
+  "updating" : {
+    "firstlaunchingmessage-title": "Optimizing Zingo",
+    "firstlaunchingmessage-body": "This may take a while, depending on the transaction history. Please keep the app open until the process finishes.",
+    "firstlaunchingmessage-footer": "Thanks."
+  },
+  "installing" : {
+    "firstlaunchingmessage-title": "Installing Zingo",
+    "firstlaunchingmessage-body": "Creating a new wallet. Please keep the app open until the process finishes.",
+    "firstlaunchingmessage-footer": "Thanks."
+  },
   "biometricsfailed-title": "Welcome!",
   "biometricsfailed-body": "For security, the application is locked.",
   "biometricsfailed-footer": "Use the authentication method to unlock.",
