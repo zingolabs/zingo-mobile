@@ -29,15 +29,11 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, c
   moment.locale(language);
   const screenName = ScreenEnum.ScannerUfvk;
 
-  const onRead = async (value: string) => {
-    const scandata = value;
-
+  const onRead = async (scandata: string) => {
     if (!scandata) {
       return;
     }
-
     setUfvkText(scandata);
-    closeModal();
   };
 
   return (
@@ -67,7 +63,7 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, c
           noUfvkIcon={true}
           closeScreen={closeModal}
         />
-        <Scanner onRead={onRead} />
+        <Scanner onRead={onRead} onClose={() => closeModal()} />
       </View>
     </ToastProvider>
   );

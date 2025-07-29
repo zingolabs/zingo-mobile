@@ -70,7 +70,7 @@ import Utils from '../utils';
 import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider } from '../context';
-import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
+import { parseZcashURI, serverUris } from '../uris';
 import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
@@ -789,10 +789,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     // Attempt to parse as URI if it starts with zcash
     // only if it is a spendable wallet
     if (url && url.startsWith(GlobalConst.zcash) && !this.state.readOnly) {
-      const target: string | ZcashURITargetClass = await parseZcashURI(url, this.state.translate, this.state.server);
+      const { error, target } = await parseZcashURI(url, this.state.translate, this.state.server);
       //console.log(targets);
 
-      if (typeof target !== 'string') {
+      if (target) {
         let update = false;
         if (
           this.state.sendPageState.toaddr.to &&
@@ -817,7 +817,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             const to = new ToAddrClass(0);
 
             to.to = tgt.address || '';
-            to.amount = Utils.parseNumberFloatToStringLocale(tgt.amount || 0, 8);
+            to.amount = tgt.amount ? Utils.parseNumberFloatToStringLocale(tgt.amount, 8) : '';
             to.memo = tgt.memoString || '';
 
             uriToAddr = to;
@@ -827,9 +827,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
           this.setSendPageState(newSendPageState);
         }
-      } else {
+      }
+      if (error) {
         // Show the error message as a toast
-        this.addLastSnackbar({ message: target, screenName: [this.screenName] });
+        this.addLastSnackbar({ message: error, screenName: [this.screenName] });
       }
     }
   };

@@ -9,7 +9,6 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 import { GlobalConst, ScreenEnum } from '../../../app/AppState';
-import Utils from '../../../app/utils';
 import Header from '../../Header';
 import { useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../../app/types';
@@ -26,7 +25,7 @@ type ScannerAddressProps = {
 
 const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddress }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, language, snackbars, removeFirstSnackbar } = context;
+  const { translate, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -36,30 +35,23 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
 
   const validateAddress = async (scannedAddress: string) => {
     if (scannedAddress.toLowerCase().startsWith(GlobalConst.zcash)) {
+      //console.log('valid QR URI');
       setAddress(scannedAddress);
-      hide();
-      return;
-    }
-
-    const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
-      scannedAddress,
-      server.chainName,
-    );
-
-    if (validAddress.isValid) {
-      setAddress(scannedAddress);
-      hide();
+    } else {
+      //console.log('not valid QR URI, adding prefix zcash:');
+      if (scannedAddress.toLowerCase().includes(':')) {
+        setAddress(scannedAddress);
+      } else {
+        setAddress(GlobalConst.zcash + scannedAddress);
+      }
     }
   };
 
-  const onRead = (value: string) => {
-    const scandata = value;
-
+  const onRead = async (scandata: string) => {
     if (!scandata) {
       return;
     }
-
-    validateAddress(scandata);
+    await validateAddress(scandata);
   };
 
   return (
@@ -92,7 +84,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
             hide();
           }}
         />
-        <Scanner onRead={onRead} />
+        <Scanner onRead={onRead} onClose={() => hide()} />
       </View>
     </ToastProvider>
   );
