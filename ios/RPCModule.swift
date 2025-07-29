@@ -1632,9 +1632,9 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   }
 
   func fnSendProcess(_ dict: [AnyHashable: Any]) {
-    if let address = dict["send_json"] as? String,
+    if let send_json = dict["send_json"] as? String,
         let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-        let resp = send(send_json: send_json)
+        let resp = send(sendJson: send_json)
         let respStr = String(resp)
         DispatchQueue.main.async {
           resolve(respStr)
