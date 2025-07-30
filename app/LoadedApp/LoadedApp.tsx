@@ -620,7 +620,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
     }
 
-    console.log('DID MOUNT APPLOADED...', netInfoState);
+    //console.log('DID MOUNT APPLOADED...');
 
     // Configure the RPC to start doing refreshes
     await this.rpc.clearTimers();
@@ -1458,7 +1458,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             // creating tor cliente if needed
             // we have two buttons to fetch -> we need tor client Just in case.
             if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
-              RPCModule.createTorClientProcess();
+              await RPCModule.createTorClientProcess();
             }
             return;
           } else {
@@ -2099,7 +2099,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                       </Tab.Navigator>
                     ) : (
                       <>
-                        {valueTransfersTotal === null || addresses === null || totalBalance === null ? (
+                        {addresses === null ? (
                           <Loading backgroundColor={colors.background} spinColor={colors.primary} />
                         ) : (
                           <Tab.Navigator

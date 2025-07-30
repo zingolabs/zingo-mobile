@@ -20,7 +20,7 @@ export const createAlert = async (
     if (toast) {
       setTimeout(() => {
         addLastSnackbar({ message: error, screenName: screenName });
-      }, 1000);
+      }, 1 * 1000);
     } else {
       if (sendEmail) {
         // with email button

@@ -796,7 +796,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           sendEmail,
           zingolibVersion,
         );
-      }, 1000);
+      }, 1 * 1000);
       closeAllModals();
     });
   };
@@ -1610,7 +1610,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           } else {
                             setTimeout(() => {
                               scrollToEnd();
-                            }, 1000);
+                            }, 1 * 1000);
                           }
                         }}
                       />
