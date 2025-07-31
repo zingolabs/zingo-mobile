@@ -141,6 +141,8 @@ cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
 cargo install --version 3.5.4 cargo-ndk
 
 export LIBCLANG_PATH=/usr/lib/llvm-16/lib
+export CARGO_NDK_PLATFORM=24
+export CARGO_NDK_ANDROID_PLATFORM=24
 
 export CARGO_FEATURE_STD="true"
 export OPENSSL_DIR=/opt/openssl-3.3.2/aarch64

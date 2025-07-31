@@ -165,6 +165,8 @@ jobs:
           CC: ${{ env.CC }}24-clang
           CARGO_FEATURE_STD: ${{ env.CARGO_FEATURE_STD }}
           LIBCLANG_PATH: /usr/lib/llvm-18/lib
+          CARGO_NDK_PLATFORM: 24
+          CARGO_NDK_ANDROID_PLATFORM: 24
 
       - name: LLVM Strip
         working-directory: ./rust/target
