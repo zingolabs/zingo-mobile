@@ -22,7 +22,7 @@ export CMAKE_C_FLAGS=$CFLAGS
 export CMAKE_CXX_FLAGS=$CFLAGS
 export CMAKE_SHARED_LINKER_FLAGS=$LDFLAGS
 
-android_ndk_ver="r27c"
+android_ndk_ver="r27d"
 
 apt update \
     && apt upgrade -y \
@@ -138,7 +138,7 @@ cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
     generate ./src/zingo.udl --language kotlin \
     --out-dir ./src
 
-cargo install --version 3.5.4 cargo-ndk
+cargo install --version 4.0.1 cargo-ndk
 
 export LIBCLANG_PATH=/usr/lib/llvm-16/lib
 export CARGO_NDK_PLATFORM=24

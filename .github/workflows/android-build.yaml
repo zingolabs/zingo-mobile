@@ -150,7 +150,7 @@ jobs:
           echo "CARGO_FEATURE_STD=false" >> $GITHUB_ENV
 
       - name: Cargo NDK
-        run: cargo install --version 3.5.4 cargo-ndk
+        run: cargo install --version 4.0.1 cargo-ndk
 
       - name: Cargo build
         working-directory: ./rust/lib
