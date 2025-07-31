@@ -1,6 +1,6 @@
 FROM ubuntu:latest
-ARG android_ndk_ver=r27c
-# 27.2.12479018 CLANG/LLVM 18
+ARG android_ndk_ver=r27d
+# 27.3.13750724 CLANG/LLVM 18
 
 # Install dependencies
 RUN apt update \
@@ -42,19 +42,19 @@ RUN rustup target add \
     armv7-linux-androideabi \
     i686-linux-android \
     x86_64-linux-android
-RUN echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml \
-    && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
-    && echo "linker = \"aarch64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
-    && echo "" >> $CARGO_HOME/config.toml
-RUN echo "[target.armv7-linux-androideabi]" >> $CARGO_HOME/config.toml \
+RUN    echo "[target.armv7-linux-androideabi]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
     && echo "linker = \"armv7a-linux-androideabi24-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
-RUN echo "[target.i686-linux-android]" >> $CARGO_HOME/config.toml \
+RUN    echo "[target.i686-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
     && echo "linker = \"i686-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
-RUN echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml \
+RUN    echo "[target.aarch64-linux-android]" >> $CARGO_HOME/config.toml \
+    && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
+    && echo "linker = \"aarch64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
+    && echo "" >> $CARGO_HOME/config.toml
+RUN    echo "[target.x86_64-linux-android]" >> $CARGO_HOME/config.toml \
     && echo "ar = \"llvm-ar\"" >> $CARGO_HOME/config.toml \
     && echo "linker = \"x86_64-linux-android24-clang\"" >> $CARGO_HOME/config.toml \
     && echo "" >> $CARGO_HOME/config.toml
