@@ -11,7 +11,7 @@ import { LoadingAppClass } from '../app/LoadingApp';
 // Importa el módulo I18n
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { I18n } from 'i18n-js';
-import { LanguageEnum, ModeEnum, SelectServerEnum, CurrencyEnum } from '../app/AppState';
+import { LanguageEnum, ModeEnum, SelectServerEnum, CurrencyEnum, LaunchingModeEnum } from '../app/AppState';
 import { mockLoadingAppNavigation } from '../__mocks__/dataMocks/mockLoadingAppNavigation';
 import { mockLoadingAppRoute } from '../__mocks__/dataMocks/mockLoadingAppRoute';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
@@ -32,7 +32,7 @@ describe('Component LoadingApp - test', () => {
     const donation = false;
     const privacy = false;
     const mode = ModeEnum.basic;
-    const firstLaunchingMessage = false;
+    const firstLaunchingMessage = LaunchingModeEnum.opening;
     const toggleTheme = jest.fn();
     const selectServer = SelectServerEnum.auto;
     const donationAlert = false;

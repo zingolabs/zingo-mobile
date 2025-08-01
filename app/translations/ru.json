@@ -1,13 +1,20 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.1 (260)",
+  "version": "zingo-2.0.2 (263)",
   "loading": "загрузка...",
   "connectingserver": "Подключение к серверу...",
   "wait": "Пожалуйста, подождите...",
   "workingonit": "Мы работаем над этой функцией.",
-  "firstlaunchingmessage-title": "Оптимизация Zingo",
-  "firstlaunchingmessage-body": "Это может занять некоторое время, в зависимости от объёма операций. Пожалуйста, не закрывайте приложение до завершения процесса.",
-  "firstlaunchingmessage-footer": "Спасибо.",
+  "updating" : {
+    "firstlaunchingmessage-title": "Оптимизация Zingo",
+    "firstlaunchingmessage-body": "Это может занять некоторое время, в зависимости от объёма операций. Пожалуйста, не закрывайте приложение до завершения процесса.",
+    "firstlaunchingmessage-footer": "Спасибо."
+  },
+  "installing" : {
+    "firstlaunchingmessage-title": "Создание нового кошелька",
+    "firstlaunchingmessage-body": "Не закрывайте приложение до завершения процесса.",
+    "firstlaunchingmessage-footer": "Спасибо."
+  },
   "biometricsfailed-title": "Добро пожаловать!",
   "biometricsfailed-body": "В целях безопасности приложение заблокировано.",
   "biometricsfailed-footer": "Пройдите авторизацию для разблокировки.",

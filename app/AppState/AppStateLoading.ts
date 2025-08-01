@@ -1,5 +1,6 @@
 import { ChainNameEnum } from './enums/ChainNameEnum';
 import { AppStateStatus } from 'react-native';
+import { LaunchingModeEnum } from './enums/LaunchingModeEnum';
 
 export default interface AppStateLoading {
   // state
@@ -15,7 +16,7 @@ export default interface AppStateLoading {
   startingApp: boolean;
   serverErrorTries: number;
   donationAlert: boolean;
-  firstLaunchingMessage: boolean;
+  firstLaunchingMessage: LaunchingModeEnum;
   hasRecoveryWalletInfoSaved: boolean;
 
   // eslint-disable-next-line semi

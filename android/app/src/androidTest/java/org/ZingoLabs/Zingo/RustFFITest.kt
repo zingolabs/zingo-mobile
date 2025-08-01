@@ -386,11 +386,11 @@ class ExecuteSendFromOrchard {
 
         val send = taddresses[0].encoded_address?.let { Send(it, 100000, null) }
 
-        val proposeJson: String = uniffi.zingo.executeCommand("send", mapper.writeValueAsString(listOf(send)))
+        val proposeJson: String = uniffi.zingo.send(mapper.writeValueAsString(listOf(send)))
         println("\nPropose:")
         println(proposeJson)
 
-        val confirmJson: String = uniffi.zingo.executeCommand("confirm", "")
+        val confirmJson: String = uniffi.zingo.confirm()
         println("\nConfirm Txid:")
         println(confirmJson)
 

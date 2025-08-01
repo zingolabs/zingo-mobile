@@ -25,7 +25,6 @@ import { ThemeType } from '../../../app/types';
 import Utils from '../../../app/utils';
 import {
   ButtonTypeEnum,
-  CommandEnum,
   PrivacyLevelFromEnum,
   GlobalConst,
   SendPageStateClass,
@@ -49,7 +48,6 @@ type ConfirmProps = {
     address: string,
     memo: string,
     includeUAMemo: boolean,
-    command: CommandEnum.send | CommandEnum.sendall,
   ) => Promise<void>;
   sendPageState: SendPageStateClass;
 };
@@ -254,7 +252,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       sendPageState.toaddr.to,
       sendPageState.toaddr.memo,
       sendPageState.toaddr.includeUAMemo,
-      CommandEnum.send,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

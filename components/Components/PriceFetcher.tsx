@@ -92,7 +92,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
     // the app needs time to recover the price from the context.
     setTimeout(() => {
       setLoading(false);
-    }, 1000);
+    }, 1 * 1000);
   };
 
   const onPressFetchAlert = () => {

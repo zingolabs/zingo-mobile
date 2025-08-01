@@ -85,12 +85,6 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 // this means this task is running with the App closed
                 loadWalletFile()
             } 
-            //else {
-                // this means the App is open,
-                // stop syncing first, just in case.
-                // with pepper-sync no need to stop sync process here
-            //    stopSyncingProcess()
-            //}
 
             // setting performance level & min confirmations
             uniffi.zingo.setConfigWalletToProd()
@@ -180,16 +174,6 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         }
     }
 
-    private fun stopSyncingProcess() {
-        val stop = uniffi.zingo.stopSync()
-        if (stop.lowercase().startsWith(ErrorPrefix.value)) {
-            // this means this task not have a valid lightclient
-            Log.i("SCHEDULED_TASK_RUN", stop)
-            return
-        }
-        Log.i("SCHEDULED_TASK_RUN", "Stopping sync: $stop")
-    }
-
 }
 
 class BSCompanion {
@@ -262,9 +246,6 @@ class BSCompanion {
 
         fun cancelExecutingTask() {
             val context = MainApplication.getAppContext() as Context
-            // run pause sync, just in case.
-            //val stop = uniffi.zingo.stopSync()
-            //Log.i("SCHEDULED_TASK_RUN", "Stopping sync: $stop")
 
             Log.i("SCHEDULING_TASK", "Cancel background Task")
             WorkManager.getInstance(context)

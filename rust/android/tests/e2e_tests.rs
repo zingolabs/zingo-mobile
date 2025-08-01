@@ -1,8 +1,6 @@
 #[cfg(not(feature = "regchest"))]
 use zingolib::testutils::scenarios;
 
-use darkside_tests::utils::{prepare_darksidewalletd, DarksideHandler};
-
 // ubuntu ci runner
 #[cfg(feature = "ci")]
 const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
@@ -292,32 +290,6 @@ async fn transaction_history(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
-// darkside is not working with regchest
-async fn darkside_simple_sync(abi: &str) {
-    let darkside_handler = DarksideHandler::new(Some(20000));
-
-    let server_id = zingolib::config::construct_lightwalletd_uri(Some(format!(
-        "http://127.0.0.1:{}",
-        darkside_handler.grpc_port
-    )));
-    prepare_darksidewalletd(server_id.clone(), true)
-        .await
-        .unwrap();
-
-    #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "darkside_simple_sync");
-    #[cfg(feature = "ci")]
-    let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test_ci(abi, "darkside_simple_sync");
-
-    println!("Exit Code: {}", exit_code);
-    println!("Output: {}", output);
-    println!("Error: {}", error);
-
-    assert_eq!(exit_code, 0);
-}
-
 mod e2e {
     mod x86_32 {
         const ABI: &str = "x86";
@@ -387,12 +359,6 @@ mod e2e {
             crate::transaction_history(ABI).await;
         }
 
-        mod darkside {
-            #[tokio::test]
-            async fn darkside_simple_sync() {
-                crate::darkside_simple_sync(super::ABI).await;
-            }
-        }
     }
 
     mod x86_64 {
@@ -463,12 +429,6 @@ mod e2e {
             crate::transaction_history(ABI).await;
         }
 
-        mod darkside {
-            #[tokio::test]
-            async fn darkside_simple_sync() {
-                crate::darkside_simple_sync(super::ABI).await;
-            }
-        }
     }
 
     mod arm32 {
@@ -539,12 +499,6 @@ mod e2e {
             crate::transaction_history(ABI).await;
         }
 
-        mod darkside {
-            #[tokio::test]
-            async fn darkside_simple_sync() {
-                crate::darkside_simple_sync(super::ABI).await;
-            }
-        }
     }
 
     mod arm64 {
@@ -615,11 +569,5 @@ mod e2e {
             crate::transaction_history(ABI).await;
         }
 
-        mod darkside {
-            #[tokio::test]
-            async fn darkside_simple_sync() {
-                crate::darkside_simple_sync(super::ABI).await;
-            }
-        }
     }
 }

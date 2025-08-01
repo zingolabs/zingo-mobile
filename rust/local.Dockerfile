@@ -1,4 +1,4 @@
-FROM zingodevops/android_builder:015 AS build_android
+FROM zingodevops/android_builder:016 AS build_android
 
 RUN apt update \
     && apt upgrade -y \
@@ -28,16 +28,13 @@ RUN cargo run --release --features=uniffi/cli --bin uniffi-bindgen \
     generate ./src/zingo.udl --language kotlin \ 
     --out-dir ./src
 
-RUN cargo install --version 3.5.4 cargo-ndk
+RUN cargo install --version 4.0.1 cargo-ndk
 
 ENV LIBCLANG_PATH=/usr/lib/llvm-18/lib
+# forcing to 24 API LEVEL
+ENV CARGO_NDK_PLATFORM=24
+ENV CARGO_NDK_ANDROID_PLATFORM=24
 
-# this is for indexmap 1.9.3 -> forcing `features = ["std"]`
-ENV CARGO_FEATURE_STD=true
-#-mno-outline-atomics
-ENV CARGO_FEATURE_STD=false
-
-#-DBROKEN_CLANG_ATOMICS
 RUN cargo ndk --target x86_64-linux-android build --release -Z build-std
 RUN llvm-strip --strip-all ../target/x86_64-linux-android/release/libzingo.so
 RUN llvm-objcopy \

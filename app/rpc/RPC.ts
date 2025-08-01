@@ -5,7 +5,6 @@ import {
   WalletType,
   //WalletSettingsClass,
   TranslateType,
-  CommandEnum,
   ChainNameEnum,
   //WalletOptionEnum,
   CurrencyNameEnum,
@@ -207,7 +206,7 @@ export default class RPC {
 
   static async rpcShieldFunds(): Promise<string> {
     try {
-      const shieldStr: string = await RPCModule.execute(CommandEnum.confirm, '');
+      const shieldStr: string = await RPCModule.confirmProcess();
       //console.log(shieldStr);
       if (shieldStr) {
         if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -665,64 +664,6 @@ export default class RPC {
 
     this.fetchSyncPollLock = false;
   }
-
-  /*
-  async fetchWalletSettings(): Promise<void> {
-    try {
-      if (this.fetchWalletSettingsLock) {
-        return;
-      }
-      this.fetchWalletSettingsLock = true;
-      //const start = Date.now();
-      const downloadMemosStr: string = await RPCModule.getOptionWalletInfo(); //CommandEnum.getoption, WalletOptionEnum.downloadMemos);
-      //console.log('=========================================== > dowload memos - ', Date.now() - start);
-      if (downloadMemosStr) {
-        if (downloadMemosStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error download memos ${downloadMemosStr}`);
-          this.fetchWalletSettingsLock = false;
-          return;
-        }
-      } else {
-        console.log('Internal Error download memos');
-        this.fetchWalletSettingsLock = false;
-        return;
-      }
-      const downloadMemosJson: RPCGetOptionType = await JSON.parse(downloadMemosStr);
-
-      //const start2 = Date.now();
-      const transactionFilterThresholdStr: string = await RPCModule.getOptionWalletInfo();
-      //  CommandEnum.getoption,
-      //  WalletOptionEnum.transactionFilterThreshold,
-      //);
-      //console.log('=========================================== > filter threshold - ', Date.now() - start2);
-      if (transactionFilterThresholdStr) {
-        if (transactionFilterThresholdStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error transaction filter threshold ${transactionFilterThresholdStr}`);
-          this.fetchWalletSettingsLock = false;
-          return;
-        }
-      } else {
-        console.log('Internal Error transaction filter threshold');
-        this.fetchWalletSettingsLock = false;
-        return;
-      }
-      const transactionFilterThresholdJson: RPCGetOptionType = await JSON.parse(transactionFilterThresholdStr);
-
-      const walletSettings = new WalletSettingsClass();
-      walletSettings.downloadMemos = downloadMemosJson.download_memos || '';
-      walletSettings.transactionFilterThreshold = transactionFilterThresholdJson.transaction_filter_threshold || '';
-
-      //const start3 = Date.now();
-      this.fnSetWalletSettings(walletSettings);
-      //console.log('=========================================== > set wallet settings - ', Date.now() - start3);
-      this.fetchWalletSettingsLock = false;
-    } catch (error) {
-      console.log(`Critical Error wallet settings ${error}`);
-      this.fetchWalletSettingsLock = false;
-      return;
-    }
-  }
-  */
 
   async fetchInfoAndServerHeight(): Promise<void> {
     try {
@@ -1341,7 +1282,7 @@ export default class RPC {
       try {
         console.log('send JSON', sendJson);
         // creating the propose
-        const proposeStr: string = await RPCModule.execute(CommandEnum.send, JSON.stringify(sendJson));
+        const proposeStr: string = await RPCModule.sendProcess(JSON.stringify(sendJson));
         if (proposeStr) {
           if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error propose ${proposeStr}`);
@@ -1359,7 +1300,7 @@ export default class RPC {
           }
           if (!sendError) {
             // creating the transaction
-            const sendStr: string = await RPCModule.execute(CommandEnum.confirm, '');
+            const sendStr: string = await RPCModule.confirmProcess();
             if (sendStr) {
               if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
                 console.log(`Error confirm ${sendStr}`);

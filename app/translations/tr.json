@@ -1,13 +1,20 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.1 (260)",
+  "version": "zingo-2.0.2 (263)",
   "loading": "Yükleniyor...",
   "connectingserver": "Sunucuya bağlanılıyor...",
   "wait": "Lütfen bekleyin...",
   "workingonit": "Bu özellik üzerinde çalışıyoruz.",
-  "firstlaunchingmessage-title": "Zingo optimize ediliyor",
-  "firstlaunchingmessage-body": "Bu işlem, işlem geçmişine bağlı olarak biraz zaman alabilir. Lütfen işlem tamamlanana kadar uygulamayı açık tutun.",
-  "firstlaunchingmessage-footer": "Teşekkürler.",
+  "updating" : {
+    "firstlaunchingmessage-title": "Zingo optimize ediliyor",
+    "firstlaunchingmessage-body": "Bu işlem, işlem geçmişine bağlı olarak biraz zaman alabilir. Lütfen işlem tamamlanana kadar uygulamayı açık tutun.",
+    "firstlaunchingmessage-footer": "Teşekkürler."
+  },
+  "installing" : {
+    "firstlaunchingmessage-title": "Yeni bir cüzdan oluşturuluyor",
+    "firstlaunchingmessage-body": "Lütfen işlem bitene kadar uygulamayı açık tutun.",
+    "firstlaunchingmessage-footer": "Teşekkürler."
+  },
   "biometricsfailed-title": "Hoş geldiniz!",
   "biometricsfailed-body": "Güvenlik Nedeniyle, uygulama kilitlendi.",
   "biometricsfailed-footer": "Kilidi açmak için kimlik doğrulama yöntemini kullanın.",
