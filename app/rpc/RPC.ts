@@ -575,8 +575,8 @@ export default class RPC {
     try {
       ss = await JSON.parse(returnStatus);
       ss.lastError = this.lastPollSyncError;
-    } catch (e) {
-      console.log('SYNC STATUS ERROR - PARSE JSON', returnStatus);
+    } catch (error) {
+      console.log('SYNC STATUS ERROR - PARSE JSON', returnStatus, error);
       this.fetchSyncStatusLock = false;
       return;
     }
@@ -643,8 +643,8 @@ export default class RPC {
     let sp = {} as RPCSyncPollType;
     try {
       sp = await JSON.parse(returnPoll);
-    } catch (e) {
-      console.log('SYNC POLL ERROR - PARSE JSON', e, returnPoll);
+    } catch (error) {
+      console.log('SYNC POLL ERROR - PARSE JSON', returnPoll, error);
       this.fetchSyncPollLock = false;
       return;
     }
