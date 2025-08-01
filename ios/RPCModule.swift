@@ -656,34 +656,6 @@ class RPCModule: NSObject {
       }
   }
 
-  func fnStopSyncProcess(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = stopSync()
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
-      } else {
-          let err = "Error: [Native] Sync stop process. Command arguments problem."
-          NSLog(err)
-          if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-            DispatchQueue.main.async {
-              resolve(err)
-            }
-          }
-      }
-  }
-
-  @objc(stopSyncProcess:reject:)
-  func stopSyncProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        if let self = self {
-          self.fnStopSyncProcess(dict)
-        }
-      }
-  }
-
   func fnStatusSyncInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           let resp = statusSync()

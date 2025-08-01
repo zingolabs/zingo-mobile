@@ -91,8 +91,6 @@ class AppDelegate: RCTAppDelegate {
     if #available(iOS 13.0, *) {
         // cancel existing sync process (if any).
         NSLog("BGTask foreground")
-        // with pepper-sync no need to stop the sync process here
-        //self.stopSyncingProcess()
 
         // cancel bg task
         if let task = self.bgTask {
@@ -107,8 +105,6 @@ class AppDelegate: RCTAppDelegate {
     if #available(iOS 13.0, *) {
         // Cancel existing sync process (if any).
         NSLog("BGTask background")
-        // with pepper-sync no need to stop the sync process here
-        //self.stopSyncingProcess()
 
         // Cancel bg task
         if let task = self.bgTask {
@@ -183,8 +179,6 @@ extension AppDelegate {
             // stop the sync process, can't wait to check if the process is over.
             // have no time here
             self.syncWorkItem?.cancel()
-            //let stopStr = stopSync()
-            //NSLog("BGTask startBackgroundTask - expirationHandler stop syncing: \(stopStr)")
             
             let rpcmodule = RPCModule()
 
@@ -299,16 +293,6 @@ extension AppDelegate {
         }
     }
 
-    func stopSyncingProcess() {
-        NSLog("BGTask stopSyncingProcess")
-        let stopStr = stopSync()
-        if stopStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-            NSLog("BGTask stopSyncingProcess - \(stopStr)")
-            return
-        }
-        NSLog("BGTask stopSyncingProcess - status response \(stopStr)")
-    }
-
     func syncingProcessBackgroundTask() {
         let rpcmodule = RPCModule()
 
@@ -341,11 +325,6 @@ extension AppDelegate {
                 // probably is an impossible case...
                 self.loadWalletFile()
             }
-            //else {
-                // the App is open, stop the sync first, just in case.
-                // with pepper-sync no need to stop the sync process here
-            //    self.stopSyncingProcess()
-            //}
 
             // setting performance level & min confirmations
             let _ = setConfigWalletToProd()
