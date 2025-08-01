@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.2 (262)",
+  "version": "zingo-2.0.2 (263)",
   "loading": "Yükleniyor...",
   "connectingserver": "Sunucuya bağlanılıyor...",
   "wait": "Lütfen bekleyin...",
@@ -11,8 +11,8 @@
     "firstlaunchingmessage-footer": "Teşekkürler."
   },
   "installing" : {
-    "firstlaunchingmessage-title": "Zingo yükleniyor",
-    "firstlaunchingmessage-body": "Yeni bir cüzdan oluşturuluyor. Lütfen işlem bitene kadar uygulamayı açık tutun.",
+    "firstlaunchingmessage-title": "Yeni bir cüzdan oluşturuluyor",
+    "firstlaunchingmessage-body": "Lütfen işlem bitene kadar uygulamayı açık tutun.",
     "firstlaunchingmessage-footer": "Teşekkürler."
   },
   "biometricsfailed-title": "Hoş geldiniz!",

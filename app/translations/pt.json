@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.2 (262)",
+  "version": "zingo-2.0.2 (263)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -11,8 +11,8 @@
     "firstlaunchingmessage-footer": "Obrigado."
   },
   "installing" : {
-    "firstlaunchingmessage-title": "Instalando o Zingo",
-    "firstlaunchingmessage-body": "Criando uma nova carteira. Mantenha o aplicativo aberto até que o processo seja concluído.",
+    "firstlaunchingmessage-title": "Criando uma nova carteira",
+    "firstlaunchingmessage-body": "Mantenha o aplicativo aberto até que o processo seja concluído.",
     "firstlaunchingmessage-footer": "Obrigado."
   },
   "biometricsfailed-title": "Bem-vindo!",

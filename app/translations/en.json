@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.2 (262)",
+  "version": "zingo-2.0.2 (263)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
@@ -11,8 +11,8 @@
     "firstlaunchingmessage-footer": "Thanks."
   },
   "installing" : {
-    "firstlaunchingmessage-title": "Installing Zingo",
-    "firstlaunchingmessage-body": "Creating a new wallet. Please keep the app open until the process finishes.",
+    "firstlaunchingmessage-title": "Creating a new wallet",
+    "firstlaunchingmessage-body": "Please keep the app open until the process finishes.",
     "firstlaunchingmessage-footer": "Thanks."
   },
   "biometricsfailed-title": "Welcome!",
