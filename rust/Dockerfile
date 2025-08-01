@@ -38,6 +38,20 @@ ENV AR=llvm-ar
 ENV LD=ld
 ENV RANLIB=llvm-ranlib
 
+# aarch64
+# this is for indexmap 1.9.3 -> forcing `features = ["std"]`
+ENV CARGO_FEATURE_STD=true
+ENV CC=aarch64-linux-android24-clang
+
+ENV CFLAGS_aarch64_linux_android="-mno-outline-atomics"
+ENV CXXFLAGS_aarch64_linux_android="-mno-outline-atomics"
+RUN cargo ndk --target aarch64-linux-android build --release -Z build-std
+RUN llvm-strip --strip-all ../target/aarch64-linux-android/release/libzingo.so
+RUN llvm-objcopy \
+    --remove-section .comment \
+    ../target/aarch64-linux-android/release/libzingo.so
+RUN sha256sum ../target/aarch64-linux-android/release/libzingo.so
+
 # armv7
 ENV CARGO_FEATURE_STD=false
 ENV CC=armv7a-linux-androideabi24-clang
@@ -60,19 +74,6 @@ RUN llvm-objcopy \
     --remove-section .comment \
     ../target/i686-linux-android/release/libzingo.so
 RUN sha256sum ../target/i686-linux-android/release/libzingo.so
-
-# aarch64
-# this is for indexmap 1.9.3 -> forcing `features = ["std"]`
-ENV CARGO_FEATURE_STD=true
-ENV CC=aarch64-linux-android24-clang
-
-#-mno-outline-atomics
-RUN cargo ndk --target aarch64-linux-android build --release -Z build-std
-RUN llvm-strip --strip-all ../target/aarch64-linux-android/release/libzingo.so
-RUN llvm-objcopy \
-    --remove-section .comment \
-    ../target/aarch64-linux-android/release/libzingo.so
-RUN sha256sum ../target/aarch64-linux-android/release/libzingo.so
 
 # x86_64
 ENV CARGO_FEATURE_STD=false
