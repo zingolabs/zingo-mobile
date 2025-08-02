@@ -215,7 +215,7 @@ class RPCModule: NSObject {
     serveruri: String, 
     chainhint: String, 
     performancelevel: String, 
-    minconfirmations: String,
+    minconfirmations: String
   ) throws -> String {
     let seed = initNew(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
@@ -232,7 +232,7 @@ class RPCModule: NSObject {
     performancelevel: String, 
     minconfirmations: String, 
     resolve: @escaping RCTPromiseResolveBlock, 
-    reject: @escaping RCTPromiseRejectBlock,
+    reject: @escaping RCTPromiseRejectBlock
   ) {
     do {
       let seedStr = try self.fnCreateNewWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
@@ -254,7 +254,7 @@ class RPCModule: NSObject {
     serveruri: String, 
     chainhint: String, 
     performancelevel: String, 
-    minconfirmations: String,
+    minconfirmations: String
   ) throws -> String {
     let seed = initFromSeed(seed: restoreSeed, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
@@ -273,7 +273,7 @@ class RPCModule: NSObject {
     performancelevel: String,
     minconfirmations: String,
     resolve: @escaping RCTPromiseResolveBlock, 
-    reject: @escaping RCTPromiseRejectBlock,
+    reject: @escaping RCTPromiseRejectBlock
   ) {
     do {
       let seedStr = try self.fnRestoreWalletFromSeed(restoreSeed: restoreSeed, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
@@ -295,7 +295,7 @@ class RPCModule: NSObject {
     serveruri: String, 
     chainhint: String, 
     performancelevel: String, 
-    minconfirmations: String,
+    minconfirmations: String
   ) throws -> String {
     let ufvk = initFromUfvk(ufvk: restoreUfvk, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let ufvkStr = String(ufvk)
@@ -314,7 +314,7 @@ class RPCModule: NSObject {
     performancelevel: String,
     minconfirmations: String,
     resolve: @escaping RCTPromiseResolveBlock, 
-    reject: @escaping RCTPromiseRejectBlock,
+    reject: @escaping RCTPromiseRejectBlock
   ) {
     do {
       let ufvkStr = try self.fnRestoreWalletFromUfvk(restoreUfvk: restoreUfvk, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
@@ -334,7 +334,7 @@ class RPCModule: NSObject {
     serveruri: String, 
     chainhint: String,
     performancelevel: String, 
-    minconfirmations: String,
+    minconfirmations: String
   ) throws -> String {
     let seed = initFromB64(datab64: try self.readWalletUtf8String(), serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
@@ -348,7 +348,7 @@ class RPCModule: NSObject {
     performancelevel: String, 
     minconfirmations: String,
     resolve: @escaping RCTPromiseResolveBlock, 
-    reject: @escaping RCTPromiseRejectBlock,
+    reject: @escaping RCTPromiseRejectBlock
   ) {
     do {
       let seedStr = try self.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
