@@ -98,6 +98,7 @@ import { ToastProvider } from 'react-native-toastier';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCCheckAddressType } from '../rpc/types/RPCCheckAddressType';
+import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -156,6 +157,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
+  const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const [zenniesDonationAddress, setZenniesDonationAddress] = useState<string>('');
   const file = useMemo(
     () => ({
@@ -284,6 +286,16 @@ export default function LoadedApp(props: LoadedAppProps) {
         setRecoveryWalletInfoOnDevice(settings.recoveryWalletInfoOnDevice);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.recoveryWalletInfoOnDevice, recoveryWalletInfoOnDevice);
+      }
+      if (
+        settings.performanceLevel === RPCPerformanceLevelEnum.High ||
+        settings.performanceLevel === RPCPerformanceLevelEnum.Low ||
+        settings.performanceLevel === RPCPerformanceLevelEnum.Maximum ||
+        settings.performanceLevel === RPCPerformanceLevelEnum.Medium
+      ) {
+        setPerformanceLevel(settings.performanceLevel);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.performanceLevel, performanceLevel);
       }
 
       // reading background task info
@@ -435,6 +447,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         zenniesDonationAddress={zenniesDonationAddress}
         firstLaunchingMessage={firstLaunchingMessage}
+        performanceLevel={performanceLevel}
       />
     );
   }
@@ -485,6 +498,7 @@ type LoadedAppClassProps = {
   recoveryWalletInfoOnDevice: boolean;
   zenniesDonationAddress: string;
   firstLaunchingMessage: LaunchingModeEnum;
+  performanceLevel: RPCPerformanceLevelEnum;
 };
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
@@ -567,6 +581,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       selectServer: props.selectServer,
       rescanMenu: props.rescanMenu,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
+      performanceLevel: props.performanceLevel,
 
       // state
       appStateStatus: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
@@ -591,6 +606,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setWallet,
       props.readOnly,
       props.server,
+      props.performanceLevel,
     );
 
     this.appstate = {} as NativeEventSubscription;
@@ -1431,7 +1447,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       //   The App have to go to the initial screen
       // - the seed exists and the App can open the wallet in the new server.
       //   But I have to restart the sync if needed.
-      let result: string = await RPCModule.loadExistingWallet(value.uri, value.chainName);
+      let result: string = await RPCModule.loadExistingWallet(
+        value.uri,
+        value.chainName,
+        this.state.performanceLevel,
+        GlobalConst.minConfirmations.toString()
+      );
       //console.log('load existing wallet', result);
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
@@ -1651,6 +1672,23 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       const wallet: WalletType = await RPC.rpcFetchWallet(this.state.readOnly);
       await createUpdateRecoveryWalletInfo(wallet);
     }
+
+    // Refetch the settings to update
+    //this.rpc.fetchWalletSettings();
+  };
+
+  setPerformanceLevelOption = async (value: RPCPerformanceLevelEnum): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.performanceLevel, value);
+    this.setState({
+      performanceLevel: value as RPCPerformanceLevelEnum,
+    });
+
+    // change it in zingolib as well.
+    const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(
+      this.state.performanceLevel,
+      GlobalConst.minConfirmations.toString()
+    );
+    console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET', setConfigWallet);
 
     // Refetch the settings to update
     //this.rpc.fetchWalletSettings();
@@ -1942,6 +1980,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       selectServer: this.state.selectServer,
       rescanMenu: this.state.rescanMenu,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
+      performanceLevel: this.state.performanceLevel,
     };
 
     const fnTabBarIcon = (route: { name: string; key: string }, focused: boolean) => {
@@ -2147,6 +2186,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                       setSelectServerOption={this.setSelectServerOption}
                       setRescanMenuOption={this.setRescanMenuOption}
                       setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
+                      setPerformanceLevelOption={this.setPerformanceLevelOption}
                       toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
                     />
                   </>

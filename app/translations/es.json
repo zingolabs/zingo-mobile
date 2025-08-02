@@ -309,6 +309,24 @@
         "text": "No guardar absolutamente nada en el dispositivo referente al monedero."
       }
     ],
+    "performancelevels": [
+      {
+        "value": "Maximum",
+        "text": "For very powerful devices."
+      },
+      {
+        "value": "High",
+        "text": "For devices with a lot of Memory."
+      },
+      {
+        "value": "Medium",
+        "text": "For regular devices."
+      },
+      {
+        "value": "Low",
+        "text": "For old devices."
+      }
+    ],
     "nochanges": "No se han registrado cambios.",
     "ismemo": "Necesitas escoger una opción de Memos para poder guardar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder guardar.",
@@ -342,6 +360,7 @@
     "mode-title": "Cambiar entre Modo Básico o Avanzado",
     "rescanmenu-title": "LA OPCIÓN DE MENU RE-ESCANEAR",
     "recoverywalletinfoondevice-title": "Almacenar la información de recuperacion del monedero en el dispositivo",
+    "performancelevel-title": "Zingolib Performance Level",
     "value-currency-": "Sin moneda",
     "value-currency-USD": "US Dólares",
     "value-currency-USDTOR": "US Dólares con Tor",
@@ -365,6 +384,10 @@
     "value-rescanmenu-false": "Desactivar",
     "value-recoverywalletinfoondevice-true": "Activar",
     "value-recoverywalletinfoondevice-false": "Desactivar",
+    "value-performancelevel-Maximum": "Maximum",
+    "value-performancelevel-High": "High",
+    "value-performancelevel-Medium": "Medium",
+    "value-performancelevel-Low": "Low",
     "security-title": "USAR LA SEGURIDAD DEL DISPOSITIVO",
     "security-startapp": "Al inicar la aplicación",
     "security-foregroundapp": "Aplicación va a Primer Plano",

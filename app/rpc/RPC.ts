@@ -77,6 +77,7 @@ export default class RPC {
 
   readOnly: boolean;
   server: ServerType;
+  performanceLevel: RPCPerformanceLevelEnum;
 
   lastPollSyncError: string;
   walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
@@ -95,6 +96,7 @@ export default class RPC {
     fnSetWallet: (wallet: WalletType) => void,
     readOnly: boolean,
     server: ServerType,
+    performanceLevel: RPCPerformanceLevelEnum,
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetValueTransfersList = fnSetValueTransfersList;
@@ -131,6 +133,7 @@ export default class RPC {
 
     this.readOnly = readOnly;
     this.server = server;
+    this.performanceLevel = performanceLevel;
 
     this.lastPollSyncError = '';
   }
@@ -297,14 +300,14 @@ export default class RPC {
     //console.log('+++++++++++++++++ interval update 5 secs ALL', this.timers);
     this.sanitizeTimers();
 
-    if (this.walletConfigPerformanceLevel !== RPCPerformanceLevelEnum.Medium) {
+    if (this.walletConfigPerformanceLevel !== this.performanceLevel) {
       const performance = await this.getConfigWalletPerformance();
       this.walletConfigPerformanceLevel = performance;
       console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL', performance);
-      if (performance !== RPCPerformanceLevelEnum.Medium) {
-        const setConfigWallet = await RPCModule.setConfigWalletToProdProcess();
+      if (performance !== this.performanceLevel) {
+        const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(this.performanceLevel, GlobalConst.minConfirmations.toString());
         console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET', setConfigWallet);
-        // I need to be sure in this point that the performance level is Medium
+        // I need to be sure in this point that the performance level is the selected setting
         await RPCModule.doSave();
         const performanceChanged = await this.getConfigWalletPerformance();
         this.walletConfigPerformanceLevel = performanceChanged;

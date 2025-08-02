@@ -19,6 +19,7 @@ import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockBackground } from '../__mocks__/dataMocks/mockBackground';
 import { mockSecurity } from '../__mocks__/dataMocks/mockSecurity';
+import { RPCPerformanceLevelEnum } from '../app/rpc/enums/RPCPerformanceLevelEnum';
 
 // test suite
 describe('Component LoadingApp - test', () => {
@@ -29,6 +30,7 @@ describe('Component LoadingApp - test', () => {
     const sendAll = false;
     const rescanMenu = false;
     const recoveryWalletInfoOnDevice = true;
+    const performanceLevel = RPCPerformanceLevelEnum.Medium;
     const donation = false;
     const privacy = false;
     const mode = ModeEnum.basic;
@@ -57,6 +59,7 @@ describe('Component LoadingApp - test', () => {
         donationAlert={donationAlert}
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
+        performanceLevel={performanceLevel}
       />,
     );
     expect(loadingapp.toJSON()).toMatchSnapshot();

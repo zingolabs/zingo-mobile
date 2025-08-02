@@ -22,27 +22,35 @@ RCT_EXTERN_METHOD(deleteExistingWalletBackup:
     (RCTPromiseResolveBlock)resolve 
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(createNewWallet:
-    (NSString)server 
+    (NSString)serveruri 
                   chainhint:(NSString)chainhint
+                  performancelevel:(NSString)performancelevel
+                  minconfirmations:(NSString)minconfirmations
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(restoreWalletFromSeed:
     (NSString)restoreSeed 
                   birthday:(NSString)birthday
-                  server:(NSString)server
+                  serveruri:(NSString)serveruri
                   chainhint:(NSString)chainhint
+                  performancelevel:(NSString)performancelevel
+                  minconfirmations:(NSString)minconfirmations
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(restoreWalletFromUfvk:
     (NSString)restoreUfvk 
                   birthday:(NSString)birthday
-                  server:(NSString)server
+                  serveruri:(NSString)serveruri
                   chainhint:(NSString)chainhint
+                  performancelevel:(NSString)performancelevel
+                  minconfirmations:(NSString)minconfirmations
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(loadExistingWallet:
-    (NSString)server 
+    (NSString)serveruri 
                   chainhint:(NSString)chainhint
+                  performancelevel:(NSString)performancelevel
+                  minconfirmations:(NSString)minconfirmations
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(restoreExistingWalletBackup:
@@ -55,7 +63,7 @@ RCT_EXTERN_METHOD(doSaveBackup:
     (RCTPromiseResolveBlock)resolve 
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getLatestBlockServerInfo:
-    (NSString)server 
+    (NSString)serveruri 
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getLatestBlockWalletInfo:
@@ -98,7 +106,7 @@ RCT_EXTERN_METHOD(getUfvkInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(changeServerProcess:
-    (NSString)server 
+    (NSString)serveruri 
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(walletKindInfo:
@@ -184,7 +192,9 @@ RCT_EXTERN_METHOD(getWalletSaveRequiredInfo:
     (RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(setConfigWalletToProdProcess:
-    (RCTPromiseResolveBlock)resolve
+    (NSString)performancelevel
+                  minconfirmations:(NSString)minconfirmations
+                  resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getConfigWalletPerformanceInfo:
     (RCTPromiseResolveBlock)resolve

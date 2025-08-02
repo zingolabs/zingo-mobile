@@ -309,6 +309,24 @@
         "text": "Не храните на устройстве любые данные, связанные с кошельком."
       }
     ],
+    "performancelevels": [
+      {
+        "value": "Maximum",
+        "text": "For very powerful devices."
+      },
+      {
+        "value": "High",
+        "text": "For devices with a lot of Memory."
+      },
+      {
+        "value": "Medium",
+        "text": "For regular devices."
+      },
+      {
+        "value": "Low",
+        "text": "For old devices."
+      }
+    ],
     "nochanges": "Изменения не зарегистрированы.",
     "ismemo": "Вам необходимо выбрать опцию сохранения заметок для загрузки.",
     "isthreshold": "Вам необходимо выбрать порог фильтрации транзакций для сохранения.",
@@ -342,6 +360,7 @@
     "mode-title": "Переключение между основным или расширенным режимом",
     "rescanmenu-title": "ОТПРАВЛЕНИЕ РЕШЕНУ",
     "recoverywalletinfoondevice-title": "Сохраните данные для восстановления кошелька на устройстве",
+    "performancelevel-title": "Zingolib Performance Level",
     "value-currency-": "Без указания валюты",
     "value-currency-USD": "Доллар США",
     "value-currency-USDTOR": "Доллар США с Tor",
@@ -365,6 +384,10 @@
     "value-rescanmenu-false": "Отключить",
     "value-recoverywalletinfoondevice-true": "Включить",
     "value-recoverywalletinfoondevice-false": "Отключить",
+    "value-performancelevel-Maximum": "Maximum",
+    "value-performancelevel-High": "High",
+    "value-performancelevel-Medium": "Medium",
+    "value-performancelevel-Low": "Low",
     "security-title": "ПРИМЕНИТЬ ЗАЩИТУ ДЛЯ ЭКРАНОВ И ОПЦИЙ УСТРОЙСТВА",
     "security-startapp": "При запуске приложения",
     "security-foregroundapp": "Когда приложение переходит в активный режим",

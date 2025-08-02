@@ -309,6 +309,24 @@
         "text": "Não salve nada relacionado à carteira no dispositivo."
       }
     ],
+    "performancelevels": [
+      {
+        "value": "Maximum",
+        "text": "For very powerful devices."
+      },
+      {
+        "value": "High",
+        "text": "For devices with a lot of Memory."
+      },
+      {
+        "value": "Medium",
+        "text": "For regular devices."
+      },
+      {
+        "value": "Low",
+        "text": "For old devices."
+      }
+    ],
     "nochanges": "Nenhuma alteração registrada.",
     "ismemo": "Você precisa escolher a opção MEMO para salvar.",
     "isthreshold": "Você precisa escolher a opção Limite para salvar.",
@@ -342,6 +360,7 @@
     "mode-title": "Alterar entre o modo Básico ou Avançado",
     "rescanmenu-title": "A OPÇÃO DE MENU RESCAN",
     "recoverywalletinfoondevice-title": "Armazene informações de recuperação da carteira no dispositivo",
+    "performancelevel-title": "Zingolib Performance Level",
     "value-currency-": "Sem Saldo",
     "value-currency-USD": "US Dólares",
     "value-currency-USDTOR": "US Dólares com Tor",
@@ -365,6 +384,10 @@
     "value-rescanmenu-false": "Desabilitar",
     "value-recoverywalletinfoondevice-true": "Habilitar",
     "value-recoverywalletinfoondevice-false": "Desabilitar",
+    "value-performancelevel-Maximum": "Maximum",
+    "value-performancelevel-High": "High",
+    "value-performancelevel-Medium": "Medium",
+    "value-performancelevel-Low": "Low",
     "security-title": "APLICAR SEGURANÇA DO DISPOSITIVO PARA AS TELAS/OPÇÕES",
     "security-startapp": "Quando o App inicia",
     "security-foregroundapp": "Quando o aplicativo vai para o primeiro plano",

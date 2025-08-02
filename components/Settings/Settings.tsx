@@ -51,6 +51,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfo';
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
+import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
 
 type SettingsProps = {
   setWalletOption: (walletOption: string, value: string) => Promise<void>;
@@ -70,6 +71,7 @@ type SettingsProps = {
   setSelectServerOption: (value: string) => Promise<void>;
   setRescanMenuOption: (value: boolean) => Promise<void>;
   setRecoveryWalletInfoOnDeviceOption: (value: boolean) => Promise<void>;
+  setPerformanceLevelOption: (value: RPCPerformanceLevelEnum) => Promise<void>;
   toggleMenuDrawer: () => void;
 };
 
@@ -91,6 +93,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   setSelectServerOption,
   setRescanMenuOption,
   setRecoveryWalletInfoOnDeviceOption,
+  setPerformanceLevelOption,
   toggleMenuDrawer,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -110,6 +113,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     selectServer: selectServerContext,
     rescanMenu: rescanMenuContext,
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
+    performanceLevel: performanceLevelContext,
     readOnly,
     navigationHome,
     snackbars,
@@ -171,6 +175,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     RECOVERYWALLETINFOONDEVICE = recoveryWalletInfoOnDevicesArray as Options[];
   }
 
+  const performanceLevelsArray = translate('settings.performancelevels');
+  let PERFORMANCELEVELMENU: Options[] = [];
+  if (typeof performanceLevelsArray === 'object') {
+    PERFORMANCELEVELMENU = performanceLevelsArray as Options[];
+  }
+
   const { colors } = useTheme()  as ThemeType;
   moment.locale(languageContext);
   const screenName = ScreenEnum.Settings;
@@ -206,6 +216,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(
     recoveryWalletInfoOnDeviceContext,
   );
+  const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(performanceLevelContext);
 
   const [autoIcon, setAutoIcon] = useState<IconDefinition>(farCircle);
   const [listIcon, setListIcon] = useState<IconDefinition>(farCircle);
@@ -215,6 +226,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
   const [hasRecoveryWalletInfoSaved, setHasRecoveryWalletInfoSaved] = useState<boolean>(false);
   const [storageRecoveryWalletInfo, setStorageRecoveryWalletInfo] = useState<string>('');
+  const [showDeveloperOptions, setShowDeveloperOptions] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
@@ -326,7 +338,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer &&
       rescanMenuContext === rescanMenu &&
-      recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice
+      recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
+      performanceLevelContext === performanceLevel
     ) {
       setDisabledButton(true);
     } else {
@@ -356,6 +369,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     recoveryWalletInfoOnDeviceContext,
     rescanMenu,
     rescanMenuContext,
+    performanceLevel,
+    performanceLevelContext,
     securityContext,
     selectServer,
     selectServerContext,
@@ -400,7 +415,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       isEqual(securityContext, securityObject()) &&
       selectServerContext === selectServer &&
       rescanMenuContext === rescanMenu &&
-      recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice
+      recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
+      performanceLevelContext === performanceLevel
     ) {
       addLastSnackbar({ message: translate('settings.nochanges') as string, screenName: [screenName] });
       return;
@@ -533,6 +549,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     if (recoveryWalletInfoOnDeviceContext !== recoveryWalletInfoOnDevice) {
       await setRecoveryWalletInfoOnDeviceOption(recoveryWalletInfoOnDevice);
     }
+    if (performanceLevelContext !== performanceLevel) {
+      await setPerformanceLevelOption(performanceLevel);
+    }
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
@@ -583,6 +602,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setChangeWalletScreen(securityContext.changeWalletScreen);
       setRestoreWalletBackupScreen(securityContext.restoreWalletBackupScreen);
       setRecoveryWalletInfoOnDevice(recoveryWalletInfoOnDeviceContext);
+      setPerformanceLevel(performanceLevelContext);
       setMemos(walletSettings.downloadMemos);
       setFilter(walletSettings.transactionFilterThreshold);
     }
@@ -1167,18 +1187,38 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 )}
 
                 <View style={{ display: 'flex', margin: 10 }}>
-                  <FadeText
-                    style={{
-                      color: colors.primary,
-                      textAlign: 'center',
-                      marginVertical: 10,
-                      padding: 5,
-                      borderColor: 'red',
-                      borderWidth: 1,
-                    }}>
-                    {translate('settings.walletkeyswarning') as string}
-                  </FadeText>
+                  <TouchableOpacity onLongPress={() => setShowDeveloperOptions(true)}>
+                    <FadeText
+                      style={{
+                        color: colors.primary,
+                        textAlign: 'center',
+                        marginVertical: 10,
+                        padding: 5,
+                        borderColor: 'red',
+                        borderWidth: 1,
+                      }}>
+                      {translate('settings.walletkeyswarning') as string}
+                    </FadeText>
+                  </TouchableOpacity>
                 </View>
+
+                {showDeveloperOptions && (
+                  <>
+                    <View style={{ display: 'flex', margin: 10 }}>
+                      <BoldText>{translate('settings.performancelevel-title') as string}</BoldText>
+                    </View>
+
+                    <View style={{ display: 'flex', marginLeft: 25 }}>
+                      {optionsRadio(
+                        PERFORMANCELEVELMENU,
+                        setPerformanceLevel as React.Dispatch<React.SetStateAction<string | boolean>>,
+                        String,
+                        performanceLevel,
+                        'performancelevel',
+                      )}
+                    </View>
+                  </>
+                )}
               </>
             )}
           </ScrollView>

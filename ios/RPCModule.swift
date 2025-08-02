@@ -211,8 +211,13 @@ class RPCModule: NSObject {
     try self.saveWalletBackupFile(walletString)
   }
 
-  func fnCreateNewWallet(server: String, chainhint: String) throws -> String {
-    let seed = initNew(serveruri: server, chainhint: chainhint)
+  func fnCreateNewWallet(
+    serveruri: String, 
+    chainhint: String, 
+    performancelevel: String, 
+    minconfirmations: String,
+  ) throws -> String {
+    let seed = initNew(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
     if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -220,10 +225,17 @@ class RPCModule: NSObject {
     return seedStr
   }
 
-  @objc(createNewWallet:chainhint:resolve:reject:)
-  func createNewWallet(_ server: String, chainhint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(createNewWallet:chainhint:performancelevel:minconfirmations:resolve:reject:)
+  func createNewWallet(
+    _ serveruri: String, 
+    chainhint: String, 
+    performancelevel: String, 
+    minconfirmations: String, 
+    resolve: @escaping RCTPromiseResolveBlock, 
+    reject: @escaping RCTPromiseRejectBlock,
+  ) {
     do {
-      let seedStr = try self.fnCreateNewWallet(server: server, chainhint: chainhint)
+      let seedStr = try self.fnCreateNewWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
       DispatchQueue.main.async {
         resolve(seedStr)
       }
@@ -236,8 +248,15 @@ class RPCModule: NSObject {
     }
   }
   
-  func fnRestoreWalletFromSeed(server: String, chainhint: String, restoreSeed: String, birthday: String) throws -> String {
-    let seed = initFromSeed(serveruri: server, seed: restoreSeed, birthday: UInt64(birthday) ?? 0, chainhint: chainhint)
+  func fnRestoreWalletFromSeed(
+    restoreSeed: String, 
+    birthday: String, 
+    serveruri: String, 
+    chainhint: String, 
+    performancelevel: String, 
+    minconfirmations: String,
+  ) throws -> String {
+    let seed = initFromSeed(seed: restoreSeed, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
     if !seedStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -245,10 +264,19 @@ class RPCModule: NSObject {
     return seedStr
   }
 
-  @objc(restoreWalletFromSeed:birthday:server:chainhint:resolve:reject:)
-  func restoreWalletFromSeed(_ restoreSeed: String, birthday: String, server: String, chainhint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(restoreWalletFromSeed:birthday:serveruri:chainhint:performancelevel:minconfirmations:resolve:reject:)
+  func restoreWalletFromSeed(
+    _ restoreSeed: String, 
+    birthday: String, 
+    serveruri: String, 
+    chainhint: String, 
+    performancelevel: String,
+    minconfirmations: String,
+    resolve: @escaping RCTPromiseResolveBlock, 
+    reject: @escaping RCTPromiseRejectBlock,
+  ) {
     do {
-      let seedStr = try self.fnRestoreWalletFromSeed(server: server, chainhint: chainhint, restoreSeed: restoreSeed, birthday: birthday)
+      let seedStr = try self.fnRestoreWalletFromSeed(restoreSeed: restoreSeed, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
       DispatchQueue.main.async {
         resolve(seedStr)
       }
@@ -261,8 +289,15 @@ class RPCModule: NSObject {
     }
   }
   
-  func fnRestoreWalletFromUfvk(server: String, chainhint: String, restoreUfvk: String, birthday: String) throws -> String {
-    let ufvk = initFromUfvk(serveruri: server, ufvk: restoreUfvk, birthday: UInt64(birthday) ?? 0, chainhint: chainhint)
+  func fnRestoreWalletFromUfvk(
+    restoreUfvk: String, 
+    birthday: String,
+    serveruri: String, 
+    chainhint: String, 
+    performancelevel: String, 
+    minconfirmations: String,
+  ) throws -> String {
+    let ufvk = initFromUfvk(ufvk: restoreUfvk, birthday: UInt32(birthday) ?? 0, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let ufvkStr = String(ufvk)
     if !ufvkStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
       try self.saveWalletInternal()
@@ -270,10 +305,19 @@ class RPCModule: NSObject {
     return ufvkStr
   }
 
-  @objc(restoreWalletFromUfvk:birthday:server:chainhint:resolve:reject:)
-  func restoreWalletFromUfvk(_ restoreUfvk: String, birthday: String, server: String, chainhint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(restoreWalletFromUfvk:birthday:serveruri:chainhint:performancelevel:minconfirmations:resolve:reject:)
+  func restoreWalletFromUfvk(
+    _ restoreUfvk: String, 
+    birthday: String, 
+    serveruri: String, 
+    chainhint: String, 
+    performancelevel: String,
+    minconfirmations: String,
+    resolve: @escaping RCTPromiseResolveBlock, 
+    reject: @escaping RCTPromiseRejectBlock,
+  ) {
     do {
-      let ufvkStr = try self.fnRestoreWalletFromUfvk(server: server, chainhint: chainhint, restoreUfvk: restoreUfvk, birthday: birthday)
+      let ufvkStr = try self.fnRestoreWalletFromUfvk(restoreUfvk: restoreUfvk, birthday: birthday, serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
       DispatchQueue.main.async {
         resolve(ufvkStr)
       }
@@ -286,16 +330,28 @@ class RPCModule: NSObject {
     }
   }
 
-  func fnLoadExistingWallet(server: String, chainhint: String) throws -> String {
-    let seed = initFromB64(serveruri: server, datab64: try self.readWalletUtf8String(), chainhint: chainhint)
+  func fnLoadExistingWallet(
+    serveruri: String, 
+    chainhint: String,
+    performancelevel: String, 
+    minconfirmations: String,
+  ) throws -> String {
+    let seed = initFromB64(datab64: try self.readWalletUtf8String(), serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
     let seedStr = String(seed)
     return seedStr
   }
 
-  @objc(loadExistingWallet:chainhint:resolve:reject:)
-  func loadExistingWallet(_ server: String, chainhint: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(loadExistingWallet:chainhint:performancelevel:minconfirmations:resolve:reject:)
+  func loadExistingWallet(
+    _ serveruri: String, 
+    chainhint: String, 
+    performancelevel: String, 
+    minconfirmations: String,
+    resolve: @escaping RCTPromiseResolveBlock, 
+    reject: @escaping RCTPromiseRejectBlock,
+  ) {
     do {
-      let seedStr = try self.fnLoadExistingWallet(server: server, chainhint: chainhint)
+      let seedStr = try self.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: performancelevel, minconfirmations: minconfirmations)
       DispatchQueue.main.async {
         resolve(seedStr)
       }
@@ -395,9 +451,9 @@ class RPCModule: NSObject {
   }
 
   func fnGetLatestBlockServerInfo(_ dict: [AnyHashable: Any]) {
-    if let server = dict["server"] as? String,
+    if let serveruri = dict["serveruri"] as? String,
        let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-      let resp = getLatestBlockServer(serveruri: server)
+      let resp = getLatestBlockServer(serveruri: serveruri)
       let respStr = String(resp)
       DispatchQueue.main.async {
         resolve(respStr)
@@ -414,8 +470,8 @@ class RPCModule: NSObject {
   }
   
   @objc(getLatestBlockServerInfo:resolve:reject:)
-  func getLatestBlockServerInfo(_ server: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["server": server, "resolve": resolve]
+  func getLatestBlockServerInfo(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["serveruri": serveruri, "resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
           if let self = self {
               self.fnGetLatestBlockServerInfo(dict)
@@ -797,9 +853,9 @@ class RPCModule: NSObject {
   }
 
   func fnChangeServerProcess(_ dict: [AnyHashable: Any]) {
-      if let server = dict["server"] as? String,
+      if let serveruri = dict["serveruri"] as? String,
           let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = changeServer(serveruri: server)
+          let resp = changeServer(serveruri: serveruri)
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
@@ -816,8 +872,8 @@ class RPCModule: NSObject {
   }
 
   @objc(changeServerProcess:resolve:reject:)
-  func changeServerProcess(_ server: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["server": server, "resolve": resolve]
+  func changeServerProcess(_ serveruri: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["serveruri": serveruri, "resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnChangeServerProcess(dict)
@@ -1520,8 +1576,10 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   }
 
   func fnSetConfigWalletToProdProcess(_ dict: [AnyHashable: Any]) {
-      if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = setConfigWalletToProd()
+      if let performancelevel = dict["performancelevel"] as? String,
+          let minconfirmations = dict["minconfirmations"] as? String,
+          let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
+          let resp = setConfigWalletToProd(performancelevel: performancelevel, minconfirmations: UInt32(minconfirmations) ?? 0)
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
@@ -1537,9 +1595,9 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
       }
   }
 
-  @objc(setConfigWalletToProdProcess:reject:)
-  func setConfigWalletToProdProcess(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-      let dict: [String: Any] = ["resolve": resolve]
+  @objc(setConfigWalletToProdProcess:minconfirmations:resolve:reject:)
+  func setConfigWalletToProdProcess(_ performancelevel: String, minconfirmations: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+      let dict: [String: Any] = ["performancelevel": performancelevel, "minconfirmations": minconfirmations, "resolve": resolve]
       DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         if let self = self {
           self.fnSetConfigWalletToProdProcess(dict)

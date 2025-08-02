@@ -1,3 +1,4 @@
+import { RPCPerformanceLevelEnum } from '../../rpc/enums/RPCPerformanceLevelEnum';
 import { CurrencyEnum } from '../enums/CurrencyEnum';
 import { LanguageEnum } from '../enums/LanguageEnum';
 import { ModeEnum } from '../enums/ModeEnum';
@@ -25,6 +26,7 @@ export default class SettingsFileClass {
   firstUpdateWithDonation: boolean;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
+  performanceLevel: RPCPerformanceLevelEnum;
 
   constructor(
     server: ServerType,
@@ -42,6 +44,7 @@ export default class SettingsFileClass {
     firstUpdateWithDonation: boolean,
     rescanMenu: boolean,
     recoveryWalletInfoOnDevice: boolean,
+    performanceLevel: RPCPerformanceLevelEnum,
   ) {
     this.server = server;
     this.currency = currency;
@@ -58,5 +61,6 @@ export default class SettingsFileClass {
     this.firstUpdateWithDonation = firstUpdateWithDonation;
     this.rescanMenu = rescanMenu;
     this.recoveryWalletInfoOnDevice = recoveryWalletInfoOnDevice;
+    this.performanceLevel = performanceLevel;
   }
 }

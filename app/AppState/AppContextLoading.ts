@@ -13,6 +13,7 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ScreenEnum } from './enums/ScreenEnum';
+import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 
 export default interface AppContextLoading {
   // context
@@ -44,6 +45,7 @@ export default interface AppContextLoading {
   selectServer: SelectServerEnum;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
+  performanceLevel: RPCPerformanceLevelEnum;
 
   // eslint-disable-next-line semi
 }
