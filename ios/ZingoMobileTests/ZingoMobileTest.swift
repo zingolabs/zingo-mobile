@@ -35,7 +35,7 @@ class ZingoMobileTests: XCTestCase {
     let serverOK = "https://zec.rocks:443"
     let chainhint = "main"
     // create a new wallet
-    let newWalletOK = try rpcmodule.fnCreateNewWallet(serveruri: serverOK, chainhint: chainhint, "Medium", "1")
+    let newWalletOK = try rpcmodule.fnCreateNewWallet(serveruri: serverOK, chainhint: chainhint, performancelevel: "Medium", minconfirmations: "1")
     NSLog("Test create New Wallet OK \(newWalletOK)")
     XCTAssertFalse(newWalletOK.lowercased().hasPrefix(errorPrefix), "Create New Wallet fails \(newWalletOK)")
 
@@ -67,7 +67,7 @@ class ZingoMobileTests: XCTestCase {
     let serverOK = "https://zec.rocks:443"
     let chainhint = "main"
     // create a new wallet, expecting ERROR.
-    let newWalletKO = try rpcmodule.fnCreateNewWallet(serveruri: serverKO, chainhint: chainhint, "Medium", "1")
+    let newWalletKO = try rpcmodule.fnCreateNewWallet(serveruri: serverKO, chainhint: chainhint, performancelevel: "Medium", minconfirmations: "1")
     NSLog("Test create New Wallet KO \(newWalletKO)")
     XCTAssertTrue(newWalletKO.lowercased().hasPrefix(errorPrefix), "Create New Wallet NOT fails, and it have to \(newWalletKO)")
 
