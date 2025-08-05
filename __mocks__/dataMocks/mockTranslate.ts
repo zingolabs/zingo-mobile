@@ -1,4 +1,5 @@
 import { CurrencyEnum, DownloadMemosEnum, LanguageEnum } from '../../app/AppState';
+import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
 
 export const mockTranslate = (p: string) => {
   if (p === 'about.copyright') {
@@ -33,8 +34,7 @@ export const mockTranslate = (p: string) => {
         text: 'text all',
       },
     ];
-  }
-  if (p === 'settings.currencies') {
+  } else if (p === 'settings.currencies') {
     return [
       {
         value: '',
@@ -49,8 +49,7 @@ export const mockTranslate = (p: string) => {
         text: 'text USD TOR',
       },
     ];
-  }
-  if (p === 'settings.languages') {
+  } else if (p === 'settings.languages') {
     return [
       {
         value: LanguageEnum.en,
@@ -73,8 +72,7 @@ export const mockTranslate = (p: string) => {
         text: 'text tr',
       },
     ];
-  }
-  if (p === 'settings.sendalls') {
+  } else if (p === 'settings.sendalls') {
     return [
       {
         value: true,
@@ -85,8 +83,7 @@ export const mockTranslate = (p: string) => {
         text: 'text false',
       },
     ];
-  }
-  if (p === 'settings.donations') {
+  } else if (p === 'settings.donations') {
     return [
       {
         value: true,
@@ -97,8 +94,7 @@ export const mockTranslate = (p: string) => {
         text: 'text false',
       },
     ];
-  }
-  if (p === 'settings.rescanmenus') {
+  } else if (p === 'settings.rescanmenus') {
     return [
       {
         value: true,
@@ -118,6 +114,25 @@ export const mockTranslate = (p: string) => {
       {
         value: false,
         text: 'text false',
+      },
+    ];
+  } else if (p === 'settings.performancelevels') {
+    return [
+      {
+        value: RPCPerformanceLevelEnum.High,
+        text: 'text high',
+      },
+      {
+        value: RPCPerformanceLevelEnum.Low,
+        text: 'text low',
+      },
+      {
+        value: RPCPerformanceLevelEnum.Maximum,
+        text: 'text maximum',
+      },
+      {
+        value: RPCPerformanceLevelEnum.Medium,
+        text: 'text medium',
       },
     ];
   } else {

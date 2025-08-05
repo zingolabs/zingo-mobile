@@ -128,13 +128,13 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun createNewWallet(server: String, chainhint: String, promise: Promise) {
+    fun createNewWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         // Log.i("MAIN", "Creating new wallet")
 
         uniffi.zingo.initLogging()
 
         // Create a seed
-        val resp = uniffi.zingo.initNew(server, chainhint)
+        val resp = uniffi.zingo.initNew(serveruri, chainhint, performancelevel, minconfirmations.toUInt())
         // Log.i("MAIN-Seed", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -145,12 +145,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun restoreWalletFromSeed(seed: String, birthday: String, server: String, chainhint: String, promise: Promise) {
+    fun restoreWalletFromSeed(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         // Log.i("MAIN", "Restoring wallet with seed $seed")
 
         uniffi.zingo.initLogging()
 
-        val resp = uniffi.zingo.initFromSeed(server, seed, birthday.toULong(), chainhint)
+        val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
         // Log.i("MAIN", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -161,12 +161,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun restoreWalletFromUfvk(ufvk: String, birthday: String, server: String, chainhint: String, promise: Promise) {
+    fun restoreWalletFromUfvk(ufvk: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
         // Log.i("MAIN", "Restoring wallet with ufvk $ufvk")
 
         uniffi.zingo.initLogging()
 
-        val resp = uniffi.zingo.initFromUfvk(server, ufvk, birthday.toULong(), chainhint)
+        val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
         // Log.i("MAIN", resp)
 
         if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
@@ -177,11 +177,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun loadExistingWallet(server: String, chainhint: String, promise: Promise) {
-        promise.resolve(loadExistingWalletNative(server, chainhint))
+    fun loadExistingWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
+        promise.resolve(loadExistingWalletNative(serveruri, chainhint, performancelevel, minconfirmations))
     }
 
-    fun loadExistingWalletNative(server: String, chainhint: String): String {
+    fun loadExistingWalletNative(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String): String {
         // Read the file
         val fileBytes = readFile(WalletFileName.value)
 
@@ -342,11 +342,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
         Log.i("MAIN", "file size: $middle8w")
 
-        return uniffi.zingo.initFromB64(
-            server,
-            fileb64.toString(),
-            chainhint
-        )
+        return uniffi.zingo.initFromB64(fileb64.toString(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
     }
 
     @ReactMethod
@@ -464,17 +460,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun getLatestBlockServerInfo(server: String, promise: Promise) {
+    fun getLatestBlockServerInfo(serveruri: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.getLatestBlockServer(server)
+                val resp = uniffi.zingo.getLatestBlockServer(serveruri)
 
                 withContext(Dispatchers.Main) {
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: getting latest block server: ${e.localizedMessage}"
+                val errorMessage = "Error: getting latest block serveruri: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -709,7 +705,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: info server: ${e.localizedMessage}"
+                val errorMessage = "Error: server info: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -762,17 +758,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun changeServerProcess(server: String, promise: Promise) {
+    fun changeServerProcess(serveruri: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.changeServer(server)
+                val resp = uniffi.zingo.changeServer(serveruri)
 
                 withContext(Dispatchers.Main) {
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: change server: ${e.localizedMessage}"
+                val errorMessage = "Error: change serveruri: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1287,11 +1283,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     @ReactMethod
-    fun setConfigWalletToProdProcess(promise: Promise) {
+    fun setConfigWalletToProdProcess(performancelevel: String, minconfirmations: String, promise: Promise) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 uniffi.zingo.initLogging()
-                val resp = uniffi.zingo.setConfigWalletToProd()
+                val resp = uniffi.zingo.setConfigWalletToProd(performancelevel, minconfirmations.toUInt())
 
                 withContext(Dispatchers.Main) {
                     promise.resolve(resp)

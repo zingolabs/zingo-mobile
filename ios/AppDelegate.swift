@@ -326,9 +326,6 @@ extension AppDelegate {
                 self.loadWalletFile()
             }
 
-            // setting performance level & min confirmations
-            let _ = setConfigWalletToProd()
-
             // run the sync process.
             let syncing = runSync()
             let syncingStr = String(syncing)
@@ -432,16 +429,16 @@ extension AppDelegate {
         guard let contentData = content.data(using: .utf8),
               let jsonObject = try? JSONSerialization.jsonObject(with: contentData, options: []) as? [String: Any],
               let server = jsonObject["server"] as? [String: Any],
-              let serverURI = server["uri"] as? String,
+              let serveruri = server["uri"] as? String,
               let chainhint = server["chainName"] as? String else {
             NSLog("Error: Unable to parse JSON object from file at path \(fileName)")
             return
         }
 
-        NSLog("Opening the wallet file - No App active - server: \(serverURI) chain: \(chainhint)")
+        NSLog("Opening the wallet file - No App active - serveruri: \(serveruri) chain: \(chainhint)")
         let rpcmodule = RPCModule()
         do {
-          _ = try rpcmodule.fnLoadExistingWallet(server: serverURI, chainhint: chainhint)
+          _ = try rpcmodule.fnLoadExistingWallet(serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: "3")
         } catch {
           NSLog("Error: Unable to load the wallet. error: \(error.localizedDescription)")
         }

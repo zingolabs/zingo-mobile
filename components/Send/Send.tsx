@@ -68,7 +68,6 @@ import 'moment/locale/ru';
 import 'moment/locale/tr';
 import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
-import { RPCSendallProposeType } from '../../app/rpc/types/RPCSendallProposeType';
 import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
 import { magicModal } from 'react-native-magic-modal';
@@ -279,7 +278,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         //Alert.alert('Calculating the FEE', runProposeStr);
       } else {
         try {
-          let runProposeJson: RPCSendProposeType & RPCSendallProposeType;
+          let runProposeJson: RPCSendProposeType;
           runProposeJson = await JSON.parse(runProposeStr);
           if (runProposeJson.error) {
             // snack with error
@@ -287,12 +286,12 @@ const Send: React.FunctionComponent<SendProps> = ({
             setProposeSendLastError(runProposeJson.error);
             //Alert.alert('Calculating the FEE', runProposeJson.error);
           } else {
-            if (runProposeJson.fee) {
+            if (runProposeJson.fee !== undefined) {
               console.log('FEE', runProposeJson.fee);
               proposeFee = runProposeJson.fee / 10 ** 8;
               setProposeSendLastError('');
             }
-            if (runProposeJson.amount) {
+            if (runProposeJson.amount !== undefined) {
               const newAmount =
                 runProposeJson.amount / 10 ** 8 -
                 (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
@@ -352,8 +351,8 @@ const Send: React.FunctionComponent<SendProps> = ({
           }
         } catch (e) {
           // snack with error
-          console.log('SPENDABLEBALANCE error', runSpendableBalanceStr);
-          setSpendableBalanceLastError(runSpendableBalanceStr);
+          console.log('SPENDABLEBALANCE error', runSpendableBalanceStr, e instanceof Error ? e.message : String(e));
+          setSpendableBalanceLastError(runSpendableBalanceStr + ' ' + (e instanceof Error ? e.message : String(e)));
           //Alert.alert('Calculating the FEE', runProposeJson.error);
         }
       }
@@ -1332,7 +1331,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       </View>
                     )}
                     {validAddress !== 0 && validAmount !== 0 &&
-                    (fee > 0 || proposeSendLastError) && (
+                    (fee > 0 || !!proposeSendLastError) && (
                       <View
                         style={{
                           display: 'flex',

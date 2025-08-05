@@ -48,6 +48,7 @@ describe('Component Settings - test', () => {
           setSelectServerOption={onSetOption}
           setRescanMenuOption={onSetOption}
           setRecoveryWalletInfoOnDeviceOption={onSetOption}
+          setPerformanceLevelOption={onSetOption}
           toggleMenuDrawer={toggle}
         />
       </ContextAppLoadedProvider>,

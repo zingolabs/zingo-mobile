@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.2 (263)",
+  "version": "zingo-2.0.2 (264)",
   "loading": "Yükleniyor...",
   "connectingserver": "Sunucuya bağlanılıyor...",
   "wait": "Lütfen bekleyin...",
@@ -309,6 +309,24 @@
         "text": "Cüzdanla ilgili hiçbir şey cihazda kaydedilmesin."
       }
     ],
+    "performancelevels": [
+      {
+        "value": "Maximum",
+        "text": "For very powerful devices."
+      },
+      {
+        "value": "High",
+        "text": "For devices with a lot of Memory."
+      },
+      {
+        "value": "Medium",
+        "text": "For regular devices."
+      },
+      {
+        "value": "Low",
+        "text": "For old devices."
+      }
+    ],
     "nochanges": "Herhangi bir değişiklik kaydedilmedi.",
     "ismemo": "Kaydetmek için notları indirme seçeneğini seçmeniz gerekiyor.",
     "isthreshold": "Kaydetmek için işlem filtre eşiği seçeneğini seçmeniz gerekiyor.",
@@ -342,6 +360,7 @@
     "mode-title": "Temel ve Gelişmiş Mod arasında geçiş yapın.",
     "rescanmenu-title": "YENİDEN TARA SEÇENEĞİ",
     "recoverywalletinfoondevice-title": "Cüzdan Kurtarma Bilgilerini Cihaza Kaydet",
+    "performancelevel-title": "Zingolib Performance Level",
     "value-currency-": "Para birimi yok",
     "value-currency-USD": "Amerikan doları",
     "value-currency-USDTOR": "Tor ağı üzerinden ABD Doları",
@@ -365,6 +384,10 @@
     "value-rescanmenu-false": "Etkin değil",
     "value-recoverywalletinfoondevice-true": "Etkin",
     "value-recoverywalletinfoondevice-false": "Etkin değil",
+    "value-performancelevel-Maximum": "Maximum",
+    "value-performancelevel-High": "High",
+    "value-performancelevel-Medium": "Medium",
+    "value-performancelevel-Low": "Low",
     "security-title": "Ekranlara/Ayarlara Cihaz Güvenliğini Uygula",
     "security-startapp": "Uygulama başladığında",
     "security-foregroundapp": "Uygulama ön plana geçtiğinde",

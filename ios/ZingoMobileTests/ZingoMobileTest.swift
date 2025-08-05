@@ -35,12 +35,12 @@ class ZingoMobileTests: XCTestCase {
     let serverOK = "https://zec.rocks:443"
     let chainhint = "main"
     // create a new wallet
-    let newWalletOK = try rpcmodule.fnCreateNewWallet(server: serverOK, chainhint: chainhint)
+    let newWalletOK = try rpcmodule.fnCreateNewWallet(serveruri: serverOK, chainhint: chainhint, performancelevel: "Medium", minconfirmations: "1")
     NSLog("Test create New Wallet OK \(newWalletOK)")
     XCTAssertFalse(newWalletOK.lowercased().hasPrefix(errorPrefix), "Create New Wallet fails \(newWalletOK)")
 
     // load wallet from file
-    let loadWalletOK = try rpcmodule.fnLoadExistingWallet(server: serverOK, chainhint: chainhint)
+    let loadWalletOK = try rpcmodule.fnLoadExistingWallet(serveruri: serverOK, chainhint: chainhint, performancelevel: "Medium", minconfirmations: "3")
     NSLog("Test Load Wallet OK \(loadWalletOK)")
     XCTAssertFalse(loadWalletOK.lowercased().hasPrefix(errorPrefix), "Load Wallet from file fails \(loadWalletOK)")
 
@@ -67,18 +67,18 @@ class ZingoMobileTests: XCTestCase {
     let serverOK = "https://zec.rocks:443"
     let chainhint = "main"
     // create a new wallet, expecting ERROR.
-    let newWalletKO = try rpcmodule.fnCreateNewWallet(server: serverKO, chainhint: chainhint)
+    let newWalletKO = try rpcmodule.fnCreateNewWallet(serveruri: serverKO, chainhint: chainhint, performancelevel: "Medium", minconfirmations: "1")
     NSLog("Test create New Wallet KO \(newWalletKO)")
     XCTAssertTrue(newWalletKO.lowercased().hasPrefix(errorPrefix), "Create New Wallet NOT fails, and it have to \(newWalletKO)")
 
     if (try rpcmodule.fileExists(Constants.WalletFileName.rawValue) == "true") {
       // load wallet from file, expecting ERROR.
-      let loadWalletKO = try rpcmodule.fnLoadExistingWallet(server: serverKO, chainhint: chainhint)
+      let loadWalletKO = try rpcmodule.fnLoadExistingWallet(serveruri: serverKO, chainhint: chainhint, performancelevel: "Medium", minconfirmations: "3")
       NSLog("Test create Load Wallet KO \(loadWalletKO)")
       XCTAssertTrue(newWalletKO.lowercased().hasPrefix(errorPrefix), "Load Wallet from file NOT fails, and it have to \(newWalletKO)")
       
       // load wallet from file, expecting CORRUPT WALLET BUG.
-      let loadWalletOK = try rpcmodule.fnLoadExistingWallet(server: serverOK, chainhint: chainhint)
+      let loadWalletOK = try rpcmodule.fnLoadExistingWallet(serveruri: serverOK, chainhint: chainhint, performancelevel: "Medium", minconfirmations: "3")
       NSLog("Test create Load Wallet KO \(loadWalletOK)")
       XCTAssertFalse(loadWalletOK.lowercased().hasPrefix(errorPrefix), "Load Wallet from file fails \(loadWalletOK)")
     } else {
