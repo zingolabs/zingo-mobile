@@ -2,7 +2,6 @@ jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
 
   RN.NativeModules.RPCModule = {
-    execute: jest.fn(() => '{}'),
     getLatestBlockServerInfo: jest.fn(() => '{}'),
     getLatestBlockWalletInfo: jest.fn(() => '{}'),
     walletExists: jest.fn(() => 'false'),
@@ -13,7 +12,6 @@ jest.mock('react-native', () => {
     pollSyncInfo: jest.fn(() => '{}'),
     runSyncProcess: jest.fn(() => '{}'),
     pauseSyncProcess: jest.fn(() => '{}'),
-    stopSyncProcess: jest.fn(() => '{}'),
     statusSyncInfo: jest.fn(() => '{}'),
     runRescanProcess: jest.fn(() => '{}'),
     infoServerInfo: jest.fn(() => '{}'),
@@ -46,6 +44,9 @@ jest.mock('react-native', () => {
     setConfigWalletToProdProcess: jest.fn(() => '{}'),
     getConfigWalletPerformanceInfo: jest.fn(() => '{}'),
     getWalletVersionInfo: jest.fn(() => '{}'),
+    sendProcess: jest.fn(() => '{}'),
+    shieldProcess: jest.fn(() => '{}'),
+    confirmProcess: jest.fn(() => '{}'),
   };
   RN.View = jest.fn();
 

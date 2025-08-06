@@ -1,13 +1,20 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.1 (260)",
+  "version": "zingo-2.0.2 (264)",
   "loading": "загрузка...",
   "connectingserver": "Подключение к серверу...",
   "wait": "Пожалуйста, подождите...",
   "workingonit": "Мы работаем над этой функцией.",
-  "firstlaunchingmessage-title": "Оптимизация Zingo",
-  "firstlaunchingmessage-body": "Это может занять некоторое время, в зависимости от объёма операций. Пожалуйста, не закрывайте приложение до завершения процесса.",
-  "firstlaunchingmessage-footer": "Спасибо.",
+  "updating" : {
+    "firstlaunchingmessage-title": "Оптимизация Zingo",
+    "firstlaunchingmessage-body": "Это может занять некоторое время, в зависимости от объёма операций. Пожалуйста, не закрывайте приложение до завершения процесса.",
+    "firstlaunchingmessage-footer": "Спасибо."
+  },
+  "installing" : {
+    "firstlaunchingmessage-title": "Создание нового кошелька",
+    "firstlaunchingmessage-body": "Не закрывайте приложение до завершения процесса.",
+    "firstlaunchingmessage-footer": "Спасибо."
+  },
   "biometricsfailed-title": "Добро пожаловать!",
   "biometricsfailed-body": "В целях безопасности приложение заблокировано.",
   "biometricsfailed-footer": "Пройдите авторизацию для разблокировки.",
@@ -302,6 +309,24 @@
         "text": "Не храните на устройстве любые данные, связанные с кошельком."
       }
     ],
+    "performancelevels": [
+      {
+        "value": "Maximum",
+        "text": "For very powerful devices."
+      },
+      {
+        "value": "High",
+        "text": "For devices with a lot of Memory."
+      },
+      {
+        "value": "Medium",
+        "text": "For regular devices."
+      },
+      {
+        "value": "Low",
+        "text": "For old devices."
+      }
+    ],
     "nochanges": "Изменения не зарегистрированы.",
     "ismemo": "Вам необходимо выбрать опцию сохранения заметок для загрузки.",
     "isthreshold": "Вам необходимо выбрать порог фильтрации транзакций для сохранения.",
@@ -335,6 +360,7 @@
     "mode-title": "Переключение между основным или расширенным режимом",
     "rescanmenu-title": "ОТПРАВЛЕНИЕ РЕШЕНУ",
     "recoverywalletinfoondevice-title": "Сохраните данные для восстановления кошелька на устройстве",
+    "performancelevel-title": "Zingolib Performance Level",
     "value-currency-": "Без указания валюты",
     "value-currency-USD": "Доллар США",
     "value-currency-USDTOR": "Доллар США с Tor",
@@ -358,6 +384,10 @@
     "value-rescanmenu-false": "Отключить",
     "value-recoverywalletinfoondevice-true": "Включить",
     "value-recoverywalletinfoondevice-false": "Отключить",
+    "value-performancelevel-Maximum": "Maximum",
+    "value-performancelevel-High": "High",
+    "value-performancelevel-Medium": "Medium",
+    "value-performancelevel-Low": "Low",
     "security-title": "ПРИМЕНИТЬ ЗАЩИТУ ДЛЯ ЭКРАНОВ И ОПЦИЙ УСТРОЙСТВА",
     "security-startapp": "При запуске приложения",
     "security-foregroundapp": "Когда приложение переходит в активный режим",
@@ -767,7 +797,7 @@
   },
   "uris": {
     "baduri": "Ошибка: нерабочий URI-адрес.",
-    "notvalid": "Не является допустимым адресом zcash (Унифицированным, Sapling или Прозрачным)",
+    "notvalid": "Не является допустимым адресом zcash",
     "notvalidparameter": "недопустимый параметр",
     "notvalidvalue": "Значение параметра непонятно",
     "noindex": "Неизвестный индекс",

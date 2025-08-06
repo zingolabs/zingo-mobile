@@ -1,4 +1,4 @@
-import { RouteEnums } from '../AppState';
+import { LaunchingModeEnum, RouteEnums } from '../AppState';
 
 /**
  * Root navigation parameter list for the main stack navigator
@@ -30,4 +30,5 @@ export type LoadedAppNavigationState = {
   saplingPool: boolean;
   transparentPool: boolean;
   newWallet: boolean;
+  firstLaunchingMessage: LaunchingModeEnum;
 };

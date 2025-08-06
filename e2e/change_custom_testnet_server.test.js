@@ -45,7 +45,7 @@ describe('Change the Server.', () => {
     await waitFor(element(by.text('CONFIRM'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.text('CONFIRM')).tap();
 
-    // restart the App with the new testnet server, without any wallet.
+    // restart the App with the new testnet serveruri, without any wallet.
     // create a new wallet in testnet
     await waitFor(element(by.id('loadingapp.createnewwallet'))).toBeVisible().withTimeout(sync_timeout);
     await element(by.id('loadingapp.createnewwallet')).tap();

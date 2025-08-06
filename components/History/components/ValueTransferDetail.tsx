@@ -513,7 +513,9 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                     textAlign: 'left',
                     textDecorationLine: 'none',
                   }}>
-                  {(translate(`history.${valueTransfer.status}`) as string) + ' - ' + (translate('history.waiting') as string)}
+                  {(translate(`history.${valueTransfer.status}`) as string) + ' - ' +
+                    (translate('history.waiting') as string) + ' (' +
+                    GlobalConst.minConfirmations.toString() + ')'}
                 </FadeText>
               )}
             </View>

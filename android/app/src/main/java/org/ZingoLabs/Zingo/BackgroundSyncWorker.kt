@@ -78,22 +78,13 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         if (exists) {
             uniffi.zingo.initLogging()
 
-            // check the Server, because the task can run without the App.
+            // check the Server because the task can run without the App.
             val balance = uniffi.zingo.getBalance()
             Log.i("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
             if (balance.lowercase().startsWith(ErrorPrefix.value)) {
                 // this means this task is running with the App closed
                 loadWalletFile()
             } 
-            //else {
-                // this means the App is open,
-                // stop syncing first, just in case.
-                // with pepper-sync no need to stop sync process here
-            //    stopSyncingProcess()
-            //}
-
-            // setting performance level & min confirmations
-            uniffi.zingo.setConfigWalletToProd()
 
             // the task is running here blocking this execution until this process finished:
             // 1. finished the syncing.
@@ -170,24 +161,14 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             file.close()
             val settingsString = settingsBytes.toString(Charsets.UTF_8)
             val jsonObject = JSONObject(settingsString)
-            val server = jsonObject.getJSONObject("server").getString("uri")
+            val serveruri = jsonObject.getJSONObject("server").getString("uri")
             val chainhint = jsonObject.getJSONObject("server").getString("chainName")
             Log.i(
                 "SCHEDULED_TASK_RUN",
-                "Opening the wallet file - No App active - server: $server chain: $chainhint"
+                "Opening the wallet file - No App active - serveruri: $serveruri chain: $chainhint"
             )
-            rpcModule.loadExistingWalletNative(server, chainhint)
+            rpcModule.loadExistingWalletNative(serveruri, chainhint, "Medium", "3")
         }
-    }
-
-    private fun stopSyncingProcess() {
-        val stop = uniffi.zingo.stopSync()
-        if (stop.lowercase().startsWith(ErrorPrefix.value)) {
-            // this means this task not have a valid lightclient
-            Log.i("SCHEDULED_TASK_RUN", stop)
-            return
-        }
-        Log.i("SCHEDULED_TASK_RUN", "Stopping sync: $stop")
     }
 
 }
@@ -262,9 +243,6 @@ class BSCompanion {
 
         fun cancelExecutingTask() {
             val context = MainApplication.getAppContext() as Context
-            // run pause sync, just in case.
-            //val stop = uniffi.zingo.stopSync()
-            //Log.i("SCHEDULED_TASK_RUN", "Stopping sync: $stop")
 
             Log.i("SCHEDULING_TASK", "Cancel background Task")
             WorkManager.getInstance(context)

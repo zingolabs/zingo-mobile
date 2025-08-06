@@ -25,7 +25,6 @@ import ContactType from './types/ContactType';
 import TransactionType from './types/TransactionType';
 import TxDetailType from './types/TxDetailType';
 
-import { CommandEnum } from './enums/CommandEnum';
 import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
@@ -58,6 +57,7 @@ import { TransactionActionEnum } from './enums/TransactionActionEnum';
 import { AddressUnifiedTypeEnum } from './enums/AddressUnifiedTypeEnum';
 import { ZcashUriFieldEnum } from './enums/ZcashUriFieldEnum';
 import { ScreenEnum } from './enums/ScreenEnum';
+import { LaunchingModeEnum } from './enums/LaunchingModeEnum';
 
 import { GlobalConst } from './const/GlobalConst';
 
@@ -96,7 +96,6 @@ export {
   ContactType,
   TransactionType,
   TxDetailType,
-  CommandEnum,
   AddressBookActionEnum,
   MenuItemEnum,
   LanguageEnum,
@@ -129,5 +128,6 @@ export {
   AddressUnifiedTypeEnum,
   ZcashUriFieldEnum,
   ScreenEnum,
+  LaunchingModeEnum,
   GlobalConst,
 };

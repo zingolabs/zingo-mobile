@@ -1,13 +1,20 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.1 (260)",
+  "version": "zingo-2.0.2 (264)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
   "workingonit": "Estamos trabalhando neste recurso.",
-  "firstlaunchingmessage-title": "Otimizando a Zingo",
-  "firstlaunchingmessage-body": "Isso pode demorar um pouco, dependendo do histórico de transações. Por favor, mantenha o aplicativo aberto até que o processo termine",
-  "firstlaunchingmessage-footer": "Obrigado.",
+  "updating" : {
+    "firstlaunchingmessage-title": "Otimizando a Zingo",
+    "firstlaunchingmessage-body": "Isso pode demorar um pouco, dependendo do histórico de transações. Por favor, mantenha o aplicativo aberto até que o processo termine",
+    "firstlaunchingmessage-footer": "Obrigado."
+  },
+  "installing" : {
+    "firstlaunchingmessage-title": "Criando uma nova carteira",
+    "firstlaunchingmessage-body": "Mantenha o aplicativo aberto até que o processo seja concluído.",
+    "firstlaunchingmessage-footer": "Obrigado."
+  },
   "biometricsfailed-title": "Bem-vindo!",
   "biometricsfailed-body": "Por questões de segurança, o aplicativo está bloqueado.",
   "biometricsfailed-footer": "Use o método de autenticação para desbloquear.",
@@ -302,6 +309,24 @@
         "text": "Não salve nada relacionado à carteira no dispositivo."
       }
     ],
+    "performancelevels": [
+      {
+        "value": "Maximum",
+        "text": "For very powerful devices."
+      },
+      {
+        "value": "High",
+        "text": "For devices with a lot of Memory."
+      },
+      {
+        "value": "Medium",
+        "text": "For regular devices."
+      },
+      {
+        "value": "Low",
+        "text": "For old devices."
+      }
+    ],
     "nochanges": "Nenhuma alteração registrada.",
     "ismemo": "Você precisa escolher a opção MEMO para salvar.",
     "isthreshold": "Você precisa escolher a opção Limite para salvar.",
@@ -335,6 +360,7 @@
     "mode-title": "Alterar entre o modo Básico ou Avançado",
     "rescanmenu-title": "A OPÇÃO DE MENU RESCAN",
     "recoverywalletinfoondevice-title": "Armazene informações de recuperação da carteira no dispositivo",
+    "performancelevel-title": "Zingolib Performance Level",
     "value-currency-": "Sem Saldo",
     "value-currency-USD": "US Dólares",
     "value-currency-USDTOR": "US Dólares com Tor",
@@ -358,6 +384,10 @@
     "value-rescanmenu-false": "Desabilitar",
     "value-recoverywalletinfoondevice-true": "Habilitar",
     "value-recoverywalletinfoondevice-false": "Desabilitar",
+    "value-performancelevel-Maximum": "Maximum",
+    "value-performancelevel-High": "High",
+    "value-performancelevel-Medium": "Medium",
+    "value-performancelevel-Low": "Low",
     "security-title": "APLICAR SEGURANÇA DO DISPOSITIVO PARA AS TELAS/OPÇÕES",
     "security-startapp": "Quando o App inicia",
     "security-foregroundapp": "Quando o aplicativo vai para o primeiro plano",
@@ -767,7 +797,7 @@
   },
   "uris": {
     "baduri": "Error: Erro na URI .",
-    "notvalid": "não era um endereço zcash válido (Unificado, Sapling ou Transparente)",
+    "notvalid": "não era um endereço zcash válido",
     "notvalidparameter": "não foi entendido como um parâmetro válido",
     "notvalidvalue": "Não entendi o valor do parâmetro",
     "noindex": "Index desconhecido",

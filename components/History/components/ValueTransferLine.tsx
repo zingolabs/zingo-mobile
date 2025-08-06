@@ -243,21 +243,34 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   //}
   //if (index === 0) {
   //  vt.confirmations = 0;
-  //  vt.status = RPCValueTransfersStatusEnum.transmitted;
+  //  vt.status = RPCValueTransfersStatusEnum.mempool;
   //}
   //if (index === 1) {
   //  vt.confirmations = 0;
   //  vt.status = RPCValueTransfersStatusEnum.mempool;
   //}
+  //if (index === 2 ) {
+  //  vt.confirmations = 0;
+  //  vt.status = RPCValueTransfersStatusEnum.mempool;
+  //}
+  //if (index === 3 ) {
+  //  vt.confirmations = 0;
+  //  vt.status = RPCValueTransfersStatusEnum.mempool;
+  //}
 
   return (
-    <View testID={`vt-${index + 1}`} style={{ display: 'flex', flexDirection: 'column' }}>
+    <View
+      testID={`vt-${index + 1}`}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+      }}>
       {month !== '' && (
         <View
           style={{
             paddingLeft: 15,
-            paddingTop: 5,
-            paddingBottom: 5,
+            paddingTop: 10,
+            paddingBottom: 0,
             borderTopWidth: 1,
             borderBottomWidth: 1,
             borderColor: colors.card,
@@ -287,7 +300,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 vt.status === RPCValueTransfersStatusEnum.calculated
                   ? 'center'
                   : 'flex-start',
-              marginTop: 15,
+              marginTop: 10,
               paddingBottom: 10,
               borderBottomWidth: nextLineWithSameTxid ? (Platform.OS === GlobalConst.platformOSandroid ? 1 : 0.5) : 1.5,
               borderBottomColor: nextLineWithSameTxid ? colors.primaryDisabled : colors.border,

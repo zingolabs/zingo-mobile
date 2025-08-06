@@ -8,38 +8,37 @@ const parseZcashURI = async (
   uri: string,
   translate: (key: string) => TranslateType,
   server: ServerType,
-): Promise<string | ZcashURITargetClass> => {
+): Promise<{ error: string, target: ZcashURITargetClass }> => {
   if (!uri || uri === '') {
-    return translate('uris.baduri') as string;
+    return { error: translate('uris.baduri') as string, target: new ZcashURITargetClass() };
   }
 
   const parsedUri = new Url(uri, true);
   if (!parsedUri || parsedUri.protocol.toLowerCase() !== GlobalConst.zcash) {
-    return translate('uris.baduri') as string;
+    return { error: translate('uris.baduri') as string, target: new ZcashURITargetClass() };
   }
+
   //console.log(parsedUri);
 
+  const errors: string[] = [];
   const targets: Map<number, ZcashURITargetClass> = new Map();
 
   // The first address is special, it can be the "host" part of the URI
   const address = parsedUri.pathname;
-  //console.log(address);
+  console.log(address);
 
+  // Has to have at least 1 element
+  const t = new ZcashURITargetClass();
   if (address) {
+    t.address = address;
     const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
       address,
       server.chainName,
     );
 
     if (!validAddress.isValid) {
-      return `"${address || ''}" ${translate('uris.notvalid')}`;
+      errors.push(`${translate('uris.notvalid')}`);
     }
-  }
-
-  // Has to have at least 1 element
-  const t = new ZcashURITargetClass();
-  if (address) {
-    t.address = address;
   }
   targets.set(0, t);
 
@@ -49,11 +48,13 @@ const parseZcashURI = async (
   for (const [q, value] of Object.entries(params)) {
     const [qName, qIdxS, extra] = q.split('.');
     if (typeof extra !== 'undefined') {
-      return `"${q}" ${translate('uris.notvalidparameter')}`;
+      errors.push(`"${q}" ${translate('uris.notvalidparameter')}`);
+      continue;
     }
 
     if (typeof value !== 'string') {
-      return `${translate('uris.notvalidvalue')} "${q}"`;
+      errors.push(`${translate('uris.notvalidvalue')} "${q}"`);
+      continue;
     }
 
     const qIdx = parseInt(qIdxS, 10) || 0;
@@ -64,13 +65,15 @@ const parseZcashURI = async (
 
     const target = targets.get(qIdx);
     if (!target) {
-      return `${translate('uris.noindex')} ${qIdx}`;
+      errors.push(`${translate('uris.noindex')} ${qIdx}`);
+      continue;
     }
 
     switch (qName.toLowerCase()) {
       case ZcashUriFieldEnum.address:
         if (typeof target.address !== 'undefined') {
-          return `${translate('uris.duplicateparameter')} "${qName}"`;
+          errors.push(`${translate('uris.duplicateparameter')} "${qName}"`);
+          break;
         }
         const validAddress: { isValid: boolean; onlyOrchardUA: string } = await Utils.isValidAddress(
           value,
@@ -78,89 +81,68 @@ const parseZcashURI = async (
         );
 
         if (!validAddress.isValid) {
-          return `"${value}" ${translate('uris.notvalid')}`;
+          errors.push(`${translate('uris.notvalid')}`);
         }
         target.address = value;
         break;
       case ZcashUriFieldEnum.label:
         if (typeof target.label !== 'undefined') {
-          return `${translate('uris.duplicateparameter')} "${qName}"`;
+          errors.push(`${translate('uris.duplicateparameter')} "${qName}"`);
+        } else {
+          target.label = value;
         }
-        target.label = value;
         break;
       case ZcashUriFieldEnum.message:
         if (typeof target.message !== 'undefined') {
-          return `${translate('uris.duplicateparameter')} "${qName}"`;
+          errors.push(`${translate('uris.duplicateparameter')} "${qName}"`);
+        } else {
+          target.message = value;
         }
-        target.message = value;
         break;
       case ZcashUriFieldEnum.memo:
         if (typeof target.memoBase64 !== 'undefined') {
-          return `${translate('uris.duplicateparameter')} "${qName}"`;
+          errors.push(`${translate('uris.duplicateparameter')} "${qName}"`);
+        } else {
+          // Parse as base64
+          try {
+            target.memoString = Base64.decode(value);
+            target.memoBase64 = value;
+          } catch (e) {
+            errors.push(`${translate('uris.base64')} "${value}"`);
+          }
         }
-
-        // Parse as base64
-        try {
-          target.memoString = Base64.decode(value);
-          target.memoBase64 = value;
-        } catch (e) {
-          return `${translate('uris.base64')} "${value}"`;
-        }
-
         break;
       case ZcashUriFieldEnum.amount:
         if (typeof target.amount !== 'undefined') {
-          return `${translate('uris.duplicateparameter')} "${qName}"`;
+          errors.push(`${translate('uris.duplicateparameter')} "${qName}"`);
+          break;
         }
         const a = parseFloat(value);
         if (isNaN(a)) {
-          return `${translate('uris.amount')} "${value}"`;
+          errors.push(`${translate('uris.amount')} "${value}"`);
+          break;
         }
-
         target.amount = a;
         break;
       default:
-        return `${translate('uris.noparameter')} "${qName}"`;
+        errors.push(`${translate('uris.noparameter')} "${qName}"`);
     }
   }
 
-  // Make sure everyone has at least an amount and address
-  if (targets.size > 1) {
-    for (const [key, value] of targets) {
-      if (typeof value.amount === 'undefined') {
-        return `${key}. ${translate('uris.noamount')}`;
-      }
+  // using only the first one.
+  const firstTarget = targets.get(0);
 
-      if (typeof value.address === 'undefined') {
-        return `${key}. ${translate('uris.noaddress')}`;
-      }
-    }
-  } else {
-    // If there is only 1 entry, make sure it has at least an address
-    if (!targets.get(0)) {
-      return translate('uris.oneentry') as string;
-    }
-
-    if (typeof targets.get(0)?.address === 'undefined') {
-      return `${0}. ${translate('uris.noaddress')}`;
-    }
+  if (!firstTarget) {
+    errors.push(translate('uris.oneentry') as string);
+    return { error: errors.join(', '), target: new ZcashURITargetClass()};
   }
 
-  // Convert to plain array
-  const ans: ZcashURITargetClass[] = new Array(targets.size);
-  targets &&
-    targets.forEach((tgt, idx) => {
-      ans[idx] = tgt;
-    });
+  // If there is only 1 entry, make sure it has at least an address
+  if (typeof firstTarget?.address === 'undefined') {
+    errors.push(`${0}. ${translate('uris.noaddress')}`);
+  }
 
-  // Make sure no elements were skipped
-  //const testAns: ZcashURITarget[] = ans;
-  //if (testAns.includes(undefined)) {
-  //  return 'Some indexes were missing';
-  //}
-
-  // if the URI have several addresses I get only the first one.
-  return ans[0];
+  return { error: errors.join(', '), target: firstTarget };
 };
 
 export default parseZcashURI;

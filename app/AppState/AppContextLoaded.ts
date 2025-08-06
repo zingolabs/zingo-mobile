@@ -26,6 +26,7 @@ import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
+import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 
 export default interface AppContextLoaded {
   navigationHome: DrawerContentComponentProps['navigation'] | null;
@@ -133,6 +134,7 @@ export default interface AppContextLoaded {
   selectServer: SelectServerEnum;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
+  performanceLevel: RPCPerformanceLevelEnum;
 
   // modals
   setComputingModalShow: () => Promise<HideReturn<unknown>>;

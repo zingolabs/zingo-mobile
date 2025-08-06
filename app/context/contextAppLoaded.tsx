@@ -22,6 +22,7 @@ import {
 } from '../AppState';
 
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
+import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
   navigationHome: null,
@@ -86,6 +87,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   setSyncReportModalShow: () => new Promise(resolve => resolve),
   setPoolsModalShow: () => new Promise(resolve => resolve),
   zingolibVersion: '',
+  performanceLevel: RPCPerformanceLevelEnum.Medium,
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

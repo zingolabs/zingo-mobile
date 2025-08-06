@@ -65,12 +65,13 @@ import {
   AddressKindEnum,
   AddressBookFileClassObsolete,
   ScreenEnum,
+  LaunchingModeEnum,
 } from '../AppState';
 import Utils from '../utils';
 import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider } from '../context';
-import { parseZcashURI, serverUris, ZcashURITargetClass } from '../uris';
+import { parseZcashURI, serverUris } from '../uris';
 import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
@@ -97,6 +98,7 @@ import { ToastProvider } from 'react-native-toastier';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCCheckAddressType } from '../rpc/types/RPCCheckAddressType';
+import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -155,6 +157,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
+  const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const [zenniesDonationAddress, setZenniesDonationAddress] = useState<string>('');
   const file = useMemo(
     () => ({
@@ -174,6 +177,7 @@ export default function LoadedApp(props: LoadedAppProps) {
   const saplingPool = props.route.params ? props.route.params.saplingPool : false;
   const transparentPool = props.route.params ? props.route.params.transparentPool : false;
   const newWallet = props.route.params ? props.route.params.newWallet : false;
+  const firstLaunchingMessage = props.route.params ? props.route.params.firstLaunchingMessage : LaunchingModeEnum.opening;
 
   useEffect(() => {
     (async () => {
@@ -283,6 +287,16 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.recoveryWalletInfoOnDevice, recoveryWalletInfoOnDevice);
       }
+      if (
+        settings.performanceLevel === RPCPerformanceLevelEnum.High ||
+        settings.performanceLevel === RPCPerformanceLevelEnum.Low ||
+        settings.performanceLevel === RPCPerformanceLevelEnum.Maximum ||
+        settings.performanceLevel === RPCPerformanceLevelEnum.Medium
+      ) {
+        setPerformanceLevel(settings.performanceLevel);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.performanceLevel, performanceLevel);
+      }
 
       // reading background task info
       const backgroundJson = await BackgroundFileImpl.readBackground();
@@ -311,6 +325,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         (a: AddressBookFileClassObsolete) => a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('color') || !a.hasOwnProperty('own'),
       );
       console.log('Address Book -> TO UPDATE', toUpdate);
+      console.log('Address Book items', ab.length);
       if (toUpdate.length > 0) {
         const randomColors = Utils.generateColorList(toUpdate.length);
         for (let i = 0; i < toUpdate.length; i++) {
@@ -355,29 +370,32 @@ export default function LoadedApp(props: LoadedAppProps) {
       // in the Address Book belong to this new/restored wallet.
       if (newWallet) {
         toUpdate = ab.filter((a: AddressBookFileClass) => !!a.address);
-        for (let i = 0; i < toUpdate.length; i++) {
-          const a = toUpdate[i];
-          let own: boolean;
-          // verify this address as own or not
-          const checkStr = await RPCModule.checkMyAddressInfo(a.address);
-          //console.log(checkStr);
-          if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
-            const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
-            own = checkJSON.is_wallet_address;
-          } else {
-            // error
-            own = false;
+        // always have one -> Zennies.
+        if (toUpdate.length > 1) {
+          for (let i = 0; i < toUpdate.length; i++) {
+            const a = toUpdate[i];
+            let own: boolean;
+            // verify this address as own or not
+            const checkStr = await RPCModule.checkMyAddressInfo(a.address);
+            //console.log(checkStr);
+            if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
+              const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
+              own = checkJSON.is_wallet_address;
+            } else {
+              // error
+              own = false;
+            }
+            ab = await AddressBookFileImpl.updateColorAndOwnItem(
+              a.label,
+              a.address,
+              a.color ? a.color : '',
+              own,
+            );
           }
-          ab = await AddressBookFileImpl.updateColorAndOwnItem(
-            a.label,
-            a.address,
-            a.color ? a.color : '',
-            own,
-          );
+          sort = true;
         }
-        sort = true;
       }
-      let abSorted = ab;
+      let abSorted = [] as AddressBookFileClass[];
       if (sort) {
         // this is a good place to sort properly these data
         // if anything changed.
@@ -386,10 +404,13 @@ export default function LoadedApp(props: LoadedAppProps) {
           const bLabel = b.label;
           return aLabel.localeCompare(bLabel);
         });
+      } else {
+        abSorted = ab;
       }
       setAddressBook(abSorted);
       await AddressBookFileImpl.writeAddressBook(abSorted);
       setLoading(false);
+      console.log('LoadedApp functional component - finished');
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -398,7 +419,7 @@ export default function LoadedApp(props: LoadedAppProps) {
 
   if (loading) {
     return (
-      <Launching translate={translate} firstLaunchingMessage={false} biometricsFailed={false} />
+      <Launching translate={translate} firstLaunchingMessage={LaunchingModeEnum.opening} biometricsFailed={false} />
     );
   } else {
     return (
@@ -425,6 +446,8 @@ export default function LoadedApp(props: LoadedAppProps) {
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         zenniesDonationAddress={zenniesDonationAddress}
+        firstLaunchingMessage={firstLaunchingMessage}
+        performanceLevel={performanceLevel}
       />
     );
   }
@@ -474,6 +497,8 @@ type LoadedAppClassProps = {
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   zenniesDonationAddress: string;
+  firstLaunchingMessage: LaunchingModeEnum;
+  performanceLevel: RPCPerformanceLevelEnum;
 };
 
 type LoadedAppClassState = AppStateLoaded & AppContextLoaded;
@@ -556,6 +581,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       selectServer: props.selectServer,
       rescanMenu: props.rescanMenu,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
+      performanceLevel: props.performanceLevel,
 
       // state
       appStateStatus: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
@@ -580,6 +606,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setWallet,
       props.readOnly,
       props.server,
+      props.performanceLevel,
     );
 
     this.appstate = {} as NativeEventSubscription;
@@ -597,16 +624,19 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       },
     });
 
-    // migration from Z1 to Z2. Wallet version 32 (first of Z2).
-    const version = await this.rpc.getWalletVersion();
-    if (version && version < 32) {
-      Alert.alert(
-        `${this.state.translate('loadedapp.migration-title')} v:${version}`,
-        this.state.translate('loadedapp.migration-body') as string
-      );
+    // not for fresh installing
+    if (this.props.firstLaunchingMessage !== LaunchingModeEnum.installing) {
+      // migration from Z1 to Z2. Wallet version 32 (first of Z2).
+      const version = await this.rpc.getWalletVersion();
+      if (version && version < 32) {
+        Alert.alert(
+          `${this.state.translate('loadedapp.migration-title')} v:${version}`,
+          this.state.translate('loadedapp.migration-body') as string
+        );
+      }
     }
 
-    //console.log('DID MOUNT APPLOADED...', netInfoState);
+    //console.log('DID MOUNT APPLOADED...');
 
     // Configure the RPC to start doing refreshes
     await this.rpc.clearTimers();
@@ -789,10 +819,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     // Attempt to parse as URI if it starts with zcash
     // only if it is a spendable wallet
     if (url && url.startsWith(GlobalConst.zcash) && !this.state.readOnly) {
-      const target: string | ZcashURITargetClass = await parseZcashURI(url, this.state.translate, this.state.server);
+      const { error, target } = await parseZcashURI(url, this.state.translate, this.state.server);
       //console.log(targets);
 
-      if (typeof target !== 'string') {
+      if (target) {
         let update = false;
         if (
           this.state.sendPageState.toaddr.to &&
@@ -817,7 +847,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             const to = new ToAddrClass(0);
 
             to.to = tgt.address || '';
-            to.amount = Utils.parseNumberFloatToStringLocale(tgt.amount || 0, 8);
+            to.amount = tgt.amount ? Utils.parseNumberFloatToStringLocale(tgt.amount, 8) : '';
             to.memo = tgt.memoString || '';
 
             uriToAddr = to;
@@ -827,9 +857,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
           this.setSendPageState(newSendPageState);
         }
-      } else {
+      }
+      if (error) {
         // Show the error message as a toast
-        this.addLastSnackbar({ message: target, screenName: [this.screenName] });
+        this.addLastSnackbar({ message: error, screenName: [this.screenName] });
       }
     }
   };
@@ -1416,7 +1447,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       //   The App have to go to the initial screen
       // - the seed exists and the App can open the wallet in the new server.
       //   But I have to restart the sync if needed.
-      let result: string = await RPCModule.loadExistingWallet(value.uri, value.chainName);
+      let result: string = await RPCModule.loadExistingWallet(
+        value.uri,
+        value.chainName,
+        this.state.performanceLevel,
+        GlobalConst.minConfirmations.toString()
+      );
       //console.log('load existing wallet', result);
       if (result && !result.toLowerCase().startsWith(GlobalConst.error)) {
         try {
@@ -1443,7 +1479,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             // creating tor cliente if needed
             // we have two buttons to fetch -> we need tor client Just in case.
             if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
-              RPCModule.createTorClientProcess();
+              await RPCModule.createTorClientProcess();
             }
             return;
           } else {
@@ -1636,6 +1672,23 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       const wallet: WalletType = await RPC.rpcFetchWallet(this.state.readOnly);
       await createUpdateRecoveryWalletInfo(wallet);
     }
+
+    // Refetch the settings to update
+    //this.rpc.fetchWalletSettings();
+  };
+
+  setPerformanceLevelOption = async (value: RPCPerformanceLevelEnum): Promise<void> => {
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.performanceLevel, value);
+    this.setState({
+      performanceLevel: value as RPCPerformanceLevelEnum,
+    });
+
+    // change it in zingolib as well.
+    const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(
+      this.state.performanceLevel,
+      GlobalConst.minConfirmations.toString()
+    );
+    console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET', setConfigWallet);
 
     // Refetch the settings to update
     //this.rpc.fetchWalletSettings();
@@ -1927,6 +1980,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       selectServer: this.state.selectServer,
       rescanMenu: this.state.rescanMenu,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
+      performanceLevel: this.state.performanceLevel,
     };
 
     const fnTabBarIcon = (route: { name: string; key: string }, focused: boolean) => {
@@ -2084,7 +2138,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                       </Tab.Navigator>
                     ) : (
                       <>
-                        {valueTransfersTotal === null || addresses === null || totalBalance === null ? (
+                        {addresses === null ? (
                           <Loading backgroundColor={colors.background} spinColor={colors.primary} />
                         ) : (
                           <Tab.Navigator
@@ -2132,6 +2186,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                       setSelectServerOption={this.setSelectServerOption}
                       setRescanMenuOption={this.setRescanMenuOption}
                       setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
+                      setPerformanceLevelOption={this.setPerformanceLevelOption}
                       toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
                     />
                   </>

@@ -10,11 +10,12 @@ export enum SettingsNameEnum {
   security = 'security',
   selectServer = 'selectServer',
   rescanMenu = 'rescanMenu',
+  recoveryWalletInfoOnDevice = 'recoveryWalletInfoOnDevice',
+  performanceLevel = 'performanceLevel',
 
   // internal management
   firstInstall = 'firstInstall',
   basicFirstViewSeed = 'basicFirstViewSeed',
   version = 'version',
   firstUpdateWithDonation = 'firstUpdateWithDonation',
-  recoveryWalletInfoOnDevice = 'recoveryWalletInfoOnDevice',
 }

@@ -1,6 +1,6 @@
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../app/types';
-import { RouteEnums } from '../../app/AppState';
+import { LaunchingModeEnum, RouteEnums } from '../../app/AppState';
 
 export const mockLoadedAppRoute: RouteProp<RootStackParamList, RouteEnums.LoadedApp> = {
   key: 'LoadedApp-test',
@@ -11,5 +11,6 @@ export const mockLoadedAppRoute: RouteProp<RootStackParamList, RouteEnums.Loaded
     saplingPool: true,
     transparentPool: true,
     newWallet: false,
+    firstLaunchingMessage: LaunchingModeEnum.opening,
   },
 };

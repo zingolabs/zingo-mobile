@@ -1,13 +1,20 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.1 (260)",
+  "version": "zingo-2.0.2 (264)",
   "loading": "Yükleniyor...",
   "connectingserver": "Sunucuya bağlanılıyor...",
   "wait": "Lütfen bekleyin...",
   "workingonit": "Bu özellik üzerinde çalışıyoruz.",
-  "firstlaunchingmessage-title": "Zingo optimize ediliyor",
-  "firstlaunchingmessage-body": "Bu işlem, işlem geçmişine bağlı olarak biraz zaman alabilir. Lütfen işlem tamamlanana kadar uygulamayı açık tutun.",
-  "firstlaunchingmessage-footer": "Teşekkürler.",
+  "updating" : {
+    "firstlaunchingmessage-title": "Zingo optimize ediliyor",
+    "firstlaunchingmessage-body": "Bu işlem, işlem geçmişine bağlı olarak biraz zaman alabilir. Lütfen işlem tamamlanana kadar uygulamayı açık tutun.",
+    "firstlaunchingmessage-footer": "Teşekkürler."
+  },
+  "installing" : {
+    "firstlaunchingmessage-title": "Yeni bir cüzdan oluşturuluyor",
+    "firstlaunchingmessage-body": "Lütfen işlem bitene kadar uygulamayı açık tutun.",
+    "firstlaunchingmessage-footer": "Teşekkürler."
+  },
   "biometricsfailed-title": "Hoş geldiniz!",
   "biometricsfailed-body": "Güvenlik Nedeniyle, uygulama kilitlendi.",
   "biometricsfailed-footer": "Kilidi açmak için kimlik doğrulama yöntemini kullanın.",
@@ -302,6 +309,24 @@
         "text": "Cüzdanla ilgili hiçbir şey cihazda kaydedilmesin."
       }
     ],
+    "performancelevels": [
+      {
+        "value": "Maximum",
+        "text": "For very powerful devices."
+      },
+      {
+        "value": "High",
+        "text": "For devices with a lot of Memory."
+      },
+      {
+        "value": "Medium",
+        "text": "For regular devices."
+      },
+      {
+        "value": "Low",
+        "text": "For old devices."
+      }
+    ],
     "nochanges": "Herhangi bir değişiklik kaydedilmedi.",
     "ismemo": "Kaydetmek için notları indirme seçeneğini seçmeniz gerekiyor.",
     "isthreshold": "Kaydetmek için işlem filtre eşiği seçeneğini seçmeniz gerekiyor.",
@@ -335,6 +360,7 @@
     "mode-title": "Temel ve Gelişmiş Mod arasında geçiş yapın.",
     "rescanmenu-title": "YENİDEN TARA SEÇENEĞİ",
     "recoverywalletinfoondevice-title": "Cüzdan Kurtarma Bilgilerini Cihaza Kaydet",
+    "performancelevel-title": "Zingolib Performance Level",
     "value-currency-": "Para birimi yok",
     "value-currency-USD": "Amerikan doları",
     "value-currency-USDTOR": "Tor ağı üzerinden ABD Doları",
@@ -358,6 +384,10 @@
     "value-rescanmenu-false": "Etkin değil",
     "value-recoverywalletinfoondevice-true": "Etkin",
     "value-recoverywalletinfoondevice-false": "Etkin değil",
+    "value-performancelevel-Maximum": "Maximum",
+    "value-performancelevel-High": "High",
+    "value-performancelevel-Medium": "Medium",
+    "value-performancelevel-Low": "Low",
     "security-title": "Ekranlara/Ayarlara Cihaz Güvenliğini Uygula",
     "security-startapp": "Uygulama başladığında",
     "security-foregroundapp": "Uygulama ön plana geçtiğinde",
@@ -767,7 +797,7 @@
   },
   "uris": {
     "baduri": "Hata: Geçersiz URI.",
-    "notvalid": "Geçerli bir Zcash adresi değildi (Unified, Sapling veya Transparent)",
+    "notvalid": "Geçerli bir Zcash adresi değildi",
     "notvalidparameter": "Geçerli bir parametre olarak anlaşılamadı",
     "notvalidvalue": "Parametre değeri anlaşılamadı",
     "noindex": "Bilinmeyen indeks",

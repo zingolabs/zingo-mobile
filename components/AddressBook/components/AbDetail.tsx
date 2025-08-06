@@ -14,7 +14,7 @@ import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import TextInputAddress from '../../Components/TextInputAddress';
-import { ZcashURITargetClass, parseZcashURI } from '../../../app/uris';
+import { parseZcashURI } from '../../../app/uris';
 import Button from '../../Components/Button';
 import FadeText from '../../Components/FadeText';
 import moment from 'moment';
@@ -113,27 +113,25 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
       setAddress('');
       return;
     }
-    let newAddress: string = addr;
     // Attempt to parse as URI if it starts with zcash
-    if (addr.toLowerCase().startsWith(GlobalConst.zcash)) {
-      const target: string | ZcashURITargetClass = await parseZcashURI(addr, translate, server);
+    if (addr.toLowerCase().startsWith(GlobalConst.zcash) || addr.toLowerCase().includes(':')) {
+      const {error: errorTarget, target } = await parseZcashURI(addr, translate, server);
       //console.log(targets);
 
-      if (typeof target !== 'string') {
+      if (target) {
         // redo the to addresses
         [target].forEach(tgt => {
-          newAddress = tgt.address || '';
+          setAddress(tgt.address || '');
         });
-      } else {
+      }
+      if (errorTarget) {
         // Show the error message as a toast
-        setError(target);
+        setError(errorTarget);
         //return;
       }
     } else {
-      newAddress = addr.replace(/[ \t\n\r]+/g, ''); // Remove spaces
+      setAddress(addr.replace(/[ \t\n\r]+/g, '')); // Remove spaces
     }
-
-    setAddress(newAddress);
   };
 
   //console.log('render Ab Detail - 5', index, address, label);
