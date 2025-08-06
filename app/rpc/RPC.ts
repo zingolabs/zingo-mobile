@@ -5,7 +5,6 @@ import {
   WalletType,
   //WalletSettingsClass,
   TranslateType,
-  CommandEnum,
   ChainNameEnum,
   //WalletOptionEnum,
   CurrencyNameEnum,
@@ -78,6 +77,7 @@ export default class RPC {
 
   readOnly: boolean;
   server: ServerType;
+  performanceLevel: RPCPerformanceLevelEnum;
 
   lastPollSyncError: string;
   walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
@@ -96,6 +96,7 @@ export default class RPC {
     fnSetWallet: (wallet: WalletType) => void,
     readOnly: boolean,
     server: ServerType,
+    performanceLevel: RPCPerformanceLevelEnum,
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetValueTransfersList = fnSetValueTransfersList;
@@ -132,6 +133,7 @@ export default class RPC {
 
     this.readOnly = readOnly;
     this.server = server;
+    this.performanceLevel = performanceLevel;
 
     this.lastPollSyncError = '';
   }
@@ -207,7 +209,7 @@ export default class RPC {
 
   static async rpcShieldFunds(): Promise<string> {
     try {
-      const shieldStr: string = await RPCModule.execute(CommandEnum.confirm, '');
+      const shieldStr: string = await RPCModule.confirmProcess();
       //console.log(shieldStr);
       if (shieldStr) {
         if (shieldStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -298,14 +300,14 @@ export default class RPC {
     //console.log('+++++++++++++++++ interval update 5 secs ALL', this.timers);
     this.sanitizeTimers();
 
-    if (this.walletConfigPerformanceLevel !== RPCPerformanceLevelEnum.Medium) {
+    if (this.walletConfigPerformanceLevel !== this.performanceLevel) {
       const performance = await this.getConfigWalletPerformance();
       this.walletConfigPerformanceLevel = performance;
       console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PERFORMANCE LEVEL', performance);
-      if (performance !== RPCPerformanceLevelEnum.Medium) {
-        const setConfigWallet = await RPCModule.setConfigWalletToProdProcess();
+      if (performance !== this.performanceLevel) {
+        const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(this.performanceLevel, GlobalConst.minConfirmations.toString());
         console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET', setConfigWallet);
-        // I need to be sure in this point that the performance level is Medium
+        // I need to be sure in this point that the performance level is the selected setting
         await RPCModule.doSave();
         const performanceChanged = await this.getConfigWalletPerformance();
         this.walletConfigPerformanceLevel = performanceChanged;
@@ -576,8 +578,8 @@ export default class RPC {
     try {
       ss = await JSON.parse(returnStatus);
       ss.lastError = this.lastPollSyncError;
-    } catch (e) {
-      console.log('SYNC STATUS ERROR - PARSE JSON', returnStatus);
+    } catch (error) {
+      console.log('SYNC STATUS ERROR - PARSE JSON', returnStatus, error);
       this.fetchSyncStatusLock = false;
       return;
     }
@@ -644,8 +646,8 @@ export default class RPC {
     let sp = {} as RPCSyncPollType;
     try {
       sp = await JSON.parse(returnPoll);
-    } catch (e) {
-      console.log('SYNC POLL ERROR - PARSE JSON', e, returnPoll);
+    } catch (error) {
+      console.log('SYNC POLL ERROR - PARSE JSON', returnPoll, error);
       this.fetchSyncPollLock = false;
       return;
     }
@@ -665,64 +667,6 @@ export default class RPC {
 
     this.fetchSyncPollLock = false;
   }
-
-  /*
-  async fetchWalletSettings(): Promise<void> {
-    try {
-      if (this.fetchWalletSettingsLock) {
-        return;
-      }
-      this.fetchWalletSettingsLock = true;
-      //const start = Date.now();
-      const downloadMemosStr: string = await RPCModule.getOptionWalletInfo(); //CommandEnum.getoption, WalletOptionEnum.downloadMemos);
-      //console.log('=========================================== > dowload memos - ', Date.now() - start);
-      if (downloadMemosStr) {
-        if (downloadMemosStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error download memos ${downloadMemosStr}`);
-          this.fetchWalletSettingsLock = false;
-          return;
-        }
-      } else {
-        console.log('Internal Error download memos');
-        this.fetchWalletSettingsLock = false;
-        return;
-      }
-      const downloadMemosJson: RPCGetOptionType = await JSON.parse(downloadMemosStr);
-
-      //const start2 = Date.now();
-      const transactionFilterThresholdStr: string = await RPCModule.getOptionWalletInfo();
-      //  CommandEnum.getoption,
-      //  WalletOptionEnum.transactionFilterThreshold,
-      //);
-      //console.log('=========================================== > filter threshold - ', Date.now() - start2);
-      if (transactionFilterThresholdStr) {
-        if (transactionFilterThresholdStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error transaction filter threshold ${transactionFilterThresholdStr}`);
-          this.fetchWalletSettingsLock = false;
-          return;
-        }
-      } else {
-        console.log('Internal Error transaction filter threshold');
-        this.fetchWalletSettingsLock = false;
-        return;
-      }
-      const transactionFilterThresholdJson: RPCGetOptionType = await JSON.parse(transactionFilterThresholdStr);
-
-      const walletSettings = new WalletSettingsClass();
-      walletSettings.downloadMemos = downloadMemosJson.download_memos || '';
-      walletSettings.transactionFilterThreshold = transactionFilterThresholdJson.transaction_filter_threshold || '';
-
-      //const start3 = Date.now();
-      this.fnSetWalletSettings(walletSettings);
-      //console.log('=========================================== > set wallet settings - ', Date.now() - start3);
-      this.fetchWalletSettingsLock = false;
-    } catch (error) {
-      console.log(`Critical Error wallet settings ${error}`);
-      this.fetchWalletSettingsLock = false;
-      return;
-    }
-  }
-  */
 
   async fetchInfoAndServerHeight(): Promise<void> {
     try {
@@ -1341,7 +1285,7 @@ export default class RPC {
       try {
         console.log('send JSON', sendJson);
         // creating the propose
-        const proposeStr: string = await RPCModule.execute(CommandEnum.send, JSON.stringify(sendJson));
+        const proposeStr: string = await RPCModule.sendProcess(JSON.stringify(sendJson));
         if (proposeStr) {
           if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
             console.log(`Error propose ${proposeStr}`);
@@ -1359,7 +1303,7 @@ export default class RPC {
           }
           if (!sendError) {
             // creating the transaction
-            const sendStr: string = await RPCModule.execute(CommandEnum.confirm, '');
+            const sendStr: string = await RPCModule.confirmProcess();
             if (sendStr) {
               if (sendStr.toLowerCase().startsWith(GlobalConst.error)) {
                 console.log(`Error confirm ${sendStr}`);

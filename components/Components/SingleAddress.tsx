@@ -424,7 +424,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                         setExpandQRAddress(true);
                         setTimeout(() => {
                           setExpandQRAddress(false);
-                        }, 5000);
+                        }, 5 * 1000);
                       }}>
                         <Text
                           style={{

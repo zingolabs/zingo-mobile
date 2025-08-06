@@ -13,6 +13,7 @@ import {
 } from '../../app/AppState';
 import { serverUris } from '../../app/uris';
 import { isEqual } from 'lodash';
+import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
 
 export default class SettingsFileImpl {
   static async getFileName() {
@@ -196,6 +197,10 @@ export default class SettingsFileImpl {
       if (!settings.hasOwnProperty(SettingsNameEnum.recoveryWalletInfoOnDevice)) {
         // doing backup of seed & birthday in the device -> false by default.
         settings.recoveryWalletInfoOnDevice = false;
+      }
+      if (!settings.hasOwnProperty(SettingsNameEnum.performanceLevel)) {
+        // by default medium
+        settings.performanceLevel = RPCPerformanceLevelEnum.Medium;
       }
       return settings;
     } catch (err) {

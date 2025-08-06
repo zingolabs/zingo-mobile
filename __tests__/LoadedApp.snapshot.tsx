@@ -11,7 +11,7 @@ import { LoadedAppClass } from '../app/LoadedApp';
 // Importa el módulo I18n
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { I18n } from 'i18n-js';
-import { LanguageEnum, ModeEnum, SelectServerEnum, CurrencyEnum } from '../app/AppState';
+import { LanguageEnum, ModeEnum, SelectServerEnum, CurrencyEnum, LaunchingModeEnum } from '../app/AppState';
 import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockLoadedAppNavigation } from '../__mocks__/dataMocks/mockLoadedAppNavigation';
@@ -20,6 +20,7 @@ import { mockServer } from '../__mocks__/dataMocks/mockServer';
 import { mockBackground } from '../__mocks__/dataMocks/mockBackground';
 import { mockSecurity } from '../__mocks__/dataMocks/mockSecurity';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
+import { RPCPerformanceLevelEnum } from '../app/rpc/enums/RPCPerformanceLevelEnum';
 
 // test suite
 describe('Component LoadedApp - test', () => {
@@ -30,6 +31,7 @@ describe('Component LoadedApp - test', () => {
     const sendAll = false;
     const rescanMenu = false;
     const recoveryWalletInfoOnDevice = true;
+    const performanceLevel = RPCPerformanceLevelEnum.Medium;
     const donation = false;
     const privacy = false;
     const mode = ModeEnum.basic;
@@ -40,6 +42,7 @@ describe('Component LoadedApp - test', () => {
     const toggleTheme = jest.fn();
     const selectServer = SelectServerEnum.auto;
     const zenniesDonationAddress = 'xxxxxxxxxxxxxxxxx';
+    const firstLaunchingMessage = LaunchingModeEnum.opening;
     const loadedapp = render(
       <LoadedAppClass
         navigationApp={mockLoadedAppNavigation}
@@ -65,6 +68,8 @@ describe('Component LoadedApp - test', () => {
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         zenniesDonationAddress={zenniesDonationAddress}
+        firstLaunchingMessage={firstLaunchingMessage}
+        performanceLevel={performanceLevel}
       />,
     );
     expect(loadedapp.toJSON()).toMatchSnapshot();

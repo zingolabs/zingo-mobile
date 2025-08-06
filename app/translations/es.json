@@ -1,13 +1,20 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.1 (260)",
+  "version": "zingo-2.0.2 (264)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
   "workingonit": "Estamos trabajando en esta funcionalidad.",
-  "firstlaunchingmessage-title": "Optimizando Zingo",
-  "firstlaunchingmessage-body": "Esto puede tardar un poco, dependiendo del historial de transacciones. Mantenga la aplicación abierta hasta que finalice el proceso.",
-  "firstlaunchingmessage-footer": "Gracias.",
+  "updating" : {
+    "firstlaunchingmessage-title": "Optimizando Zingo",
+    "firstlaunchingmessage-body": "Esto puede tardar un poco, dependiendo del historial de transacciones. Mantenga la aplicación abierta hasta que finalice el proceso.",
+    "firstlaunchingmessage-footer": "Gracias."
+  },
+  "installing" : {
+    "firstlaunchingmessage-title": "Creando una nueva billetera",
+    "firstlaunchingmessage-body": "Por favor, mantenga la aplicación abierta hasta que finalice el proceso.",
+    "firstlaunchingmessage-footer": "Gracias."
+  },
   "biometricsfailed-title": "¡Bienvenido!",
   "biometricsfailed-body": "Por seguridad, la aplicación está bloqueada.",
   "biometricsfailed-footer": "Usa el método de autenticación para desbloquear.",
@@ -302,6 +309,24 @@
         "text": "No guardar absolutamente nada en el dispositivo referente al monedero."
       }
     ],
+    "performancelevels": [
+      {
+        "value": "Maximum",
+        "text": "For very powerful devices."
+      },
+      {
+        "value": "High",
+        "text": "For devices with a lot of Memory."
+      },
+      {
+        "value": "Medium",
+        "text": "For regular devices."
+      },
+      {
+        "value": "Low",
+        "text": "For old devices."
+      }
+    ],
     "nochanges": "No se han registrado cambios.",
     "ismemo": "Necesitas escoger una opción de Memos para poder guardar.",
     "isthreshold": "Necesitas escoger una opción de umbral para poder guardar.",
@@ -335,6 +360,7 @@
     "mode-title": "Cambiar entre Modo Básico o Avanzado",
     "rescanmenu-title": "LA OPCIÓN DE MENU RE-ESCANEAR",
     "recoverywalletinfoondevice-title": "Almacenar la información de recuperacion del monedero en el dispositivo",
+    "performancelevel-title": "Zingolib Performance Level",
     "value-currency-": "Sin moneda",
     "value-currency-USD": "US Dólares",
     "value-currency-USDTOR": "US Dólares con Tor",
@@ -358,6 +384,10 @@
     "value-rescanmenu-false": "Desactivar",
     "value-recoverywalletinfoondevice-true": "Activar",
     "value-recoverywalletinfoondevice-false": "Desactivar",
+    "value-performancelevel-Maximum": "Maximum",
+    "value-performancelevel-High": "High",
+    "value-performancelevel-Medium": "Medium",
+    "value-performancelevel-Low": "Low",
     "security-title": "USAR LA SEGURIDAD DEL DISPOSITIVO",
     "security-startapp": "Al inicar la aplicación",
     "security-foregroundapp": "Aplicación va a Primer Plano",
@@ -767,7 +797,7 @@
   },
   "uris": {
     "baduri": "Error: URI errónea.",
-    "notvalid": "No era una dirección válida para zcash (Unificada, Sapling o Transparente)",
+    "notvalid": "No era una dirección válida para zcash",
     "notvalidparameter": "no fue entendido como un parámetro válido",
     "notvalidvalue": "No fue entendido como un valor válido",
     "noindex": "Indice desconocido",

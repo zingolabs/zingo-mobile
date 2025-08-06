@@ -35,7 +35,6 @@ import CurrencyAmount from '../Components/CurrencyAmount';
 import Button from '../Components/Button';
 import {
   AddressBookFileClass,
-  CommandEnum,
   SendPageStateClass,
   ToAddrClass,
   ModeEnum,
@@ -50,7 +49,7 @@ import {
   SecurityType,
   ScreenEnum,
 } from '../../app/AppState';
-import { parseZcashURI, serverUris, ZcashURITargetClass } from '../../app/uris';
+import { parseZcashURI, serverUris } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
 import Utils from '../../app/utils';
 import ScannerAddress from './components/ScannerAddress';
@@ -69,7 +68,6 @@ import 'moment/locale/ru';
 import 'moment/locale/tr';
 import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
-import { RPCSendallProposeType } from '../../app/rpc/types/RPCSendallProposeType';
 import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
 import { magicModal } from 'react-native-magic-modal';
@@ -184,10 +182,9 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const runSendPropose = async (
     proposeJSON: string,
-    command: CommandEnum.send | CommandEnum.sendall,
   ): Promise<string> => {
     try {
-      const proposeStr: string = await RPCModule.execute(command, proposeJSON);
+      const proposeStr: string = await RPCModule.sendProcess(proposeJSON);
       if (proposeStr) {
         if (proposeStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error propose ${proposeStr}`);
@@ -242,7 +239,6 @@ const Send: React.FunctionComponent<SendProps> = ({
       addressPar: string,
       memoPar: string,
       includeUAMemoPar: boolean,
-      command: CommandEnum.send | CommandEnum.sendall,
     ): Promise<void> => {
       // if no address -> make no sense to run the propose
       if (!addressPar || validAddress !== 1) {
@@ -260,34 +256,19 @@ const Send: React.FunctionComponent<SendProps> = ({
 
       let sendJson;
 
-      if (command === CommandEnum.send) {
-        const sendPageStateCalculateFee = new SendPageStateClass(new ToAddrClass(0));
-        sendPageStateCalculateFee.toaddr.to = addressPar;
-        sendPageStateCalculateFee.toaddr.memo = memoPar;
-        sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemoPar;
-        sendPageStateCalculateFee.toaddr.amount = amountPar;
+      const sendPageStateCalculateFee = new SendPageStateClass(new ToAddrClass(0));
+      sendPageStateCalculateFee.toaddr.to = addressPar;
+      sendPageStateCalculateFee.toaddr.memo = memoPar;
+      sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemoPar;
+      sendPageStateCalculateFee.toaddr.amount = amountPar;
 
-        sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, defaultUnifiedAddress, server, donation);
-        console.log('SEND', sendJson);
-      }
-
-      let sendallJson;
-
-      if (command === CommandEnum.sendall) {
-        let zenniesForZingo = donationAddress ? false : donation;
-        if (memoPar) {
-          sendallJson = { address: addressPar, memo: memoPar, zennies_for_zingo: zenniesForZingo };
-        } else {
-          sendallJson = { address: addressPar, zennies_for_zingo: zenniesForZingo };
-        }
-        console.log('SENDALL', sendallJson);
-      }
+      sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, defaultUnifiedAddress, server, donation);
+      console.log('SEND', sendJson);
 
       // fee
       let proposeFee = 0;
       const runProposeStr = await runSendPropose(
-        JSON.stringify(command === CommandEnum.send ? sendJson : sendallJson),
-        command,
+        JSON.stringify(sendJson),
       );
       //Alert.alert('Calculating the FEE ' + command, runProposeStr);
       if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -297,7 +278,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         //Alert.alert('Calculating the FEE', runProposeStr);
       } else {
         try {
-          let runProposeJson: RPCSendProposeType & RPCSendallProposeType;
+          let runProposeJson: RPCSendProposeType;
           runProposeJson = await JSON.parse(runProposeStr);
           if (runProposeJson.error) {
             // snack with error
@@ -305,12 +286,12 @@ const Send: React.FunctionComponent<SendProps> = ({
             setProposeSendLastError(runProposeJson.error);
             //Alert.alert('Calculating the FEE', runProposeJson.error);
           } else {
-            if (runProposeJson.fee) {
+            if (runProposeJson.fee !== undefined) {
               console.log('FEE', runProposeJson.fee);
               proposeFee = runProposeJson.fee / 10 ** 8;
               setProposeSendLastError('');
             }
-            if (runProposeJson.amount) {
+            if (runProposeJson.amount !== undefined) {
               const newAmount =
                 runProposeJson.amount / 10 ** 8 -
                 (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
@@ -370,8 +351,8 @@ const Send: React.FunctionComponent<SendProps> = ({
           }
         } catch (e) {
           // snack with error
-          console.log('SPENDABLEBALANCE error', runSpendableBalanceStr);
-          setSpendableBalanceLastError(runSpendableBalanceStr);
+          console.log('SPENDABLEBALANCE error', runSpendableBalanceStr, e instanceof Error ? e.message : String(e));
+          setSpendableBalanceLastError(runSpendableBalanceStr + ' ' + (e instanceof Error ? e.message : String(e)));
           //Alert.alert('Calculating the FEE', runProposeJson.error);
         }
       }
@@ -409,21 +390,23 @@ const Send: React.FunctionComponent<SendProps> = ({
     includeUAMemoPar: boolean | null,
   ) => {
     if (addressPar !== null) {
-      setAddressText(addressPar);
+      //Alert.alert('', addressPar);
+      //setAddressText(addressPar);
       // Attempt to parse as URI if it starts with zcash
-      if (addressPar.toLowerCase().startsWith(GlobalConst.zcash)) {
-        const target: string | ZcashURITargetClass = await parseZcashURI(addressPar, translate, server);
+      if (addressPar.toLowerCase().startsWith(GlobalConst.zcash) || addressPar.toLowerCase().includes(':')) {
+        const { error, target } = await parseZcashURI(addressPar, translate, server);
 
-        if (typeof target !== 'string') {
+        if (target) {
           // redo the to addresses
           [target].forEach(tgt => {
             setAddressText(tgt.address || '');
-            setAmountText(Utils.parseNumberFloatToStringLocale(tgt.amount || 0, 8));
+            setAmountText(tgt.amount ? Utils.parseNumberFloatToStringLocale(tgt.amount, 8) : '');
             setMemoText(tgt.memoString || '');
           });
-        } else {
+        }
+        if (error) {
           // Show the error message as a toast
-          addLastSnackbar({ message: target, screenName: [screenName] });
+          addLastSnackbar({ message: error, screenName: [screenName] });
         }
       } else {
         setAddressText(addressPar.replace(/[ \t\n\r]+/g, '')); // Remove spaces
@@ -493,7 +476,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   ]);
 
   useEffect(() => {
-    calculateFeeWithPropose(amountText, addressText, memoText, includeUAMemoBoolean, CommandEnum.send);
+    calculateFeeWithPropose(amountText, addressText, memoText, includeUAMemoBoolean);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     calculateFeeWithPropose,
@@ -506,7 +489,9 @@ const Send: React.FunctionComponent<SendProps> = ({
   ]);
 
   useEffect(() => {
-    calculateSpendableBalance(addressText);
+    if (!addressText.toLowerCase().startsWith(GlobalConst.zcash)) {
+      calculateSpendableBalance(addressText);
+    }
   }, [calculateSpendableBalance, addressText]);
 
   useEffect(() => {
@@ -810,7 +795,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           sendEmail,
           zingolibVersion,
         );
-      }, 1000);
+      }, 1 * 1000);
       closeAllModals();
     });
   };
@@ -1178,7 +1163,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                           addressText,
                           memoText,
                           includeUAMemoBoolean,
-                          CommandEnum.send,
                         );
                         //setSendAllClick(true);
                         //setTimeout(() => {
@@ -1261,7 +1245,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                             addressText,
                             memoText,
                             includeUAMemoBoolean,
-                            CommandEnum.send,
                           );
                         }}
                         editable={true}
@@ -1348,7 +1331,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       </View>
                     )}
                     {validAddress !== 0 && validAmount !== 0 &&
-                    (fee > 0 || proposeSendLastError) && (
+                    (fee > 0 || !!proposeSendLastError) && (
                       <View
                         style={{
                           display: 'flex',
@@ -1511,7 +1494,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                                 addressText,
                                 memoText,
                                 includeUAMemoBoolean,
-                                CommandEnum.send,
                               );
                             }}
                             editable={true}
@@ -1599,7 +1581,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                             addressText,
                             e.nativeEvent.text,
                             includeUAMemoBoolean,
-                            CommandEnum.send,
                           );
                         }}
                         onContentSizeChange={(e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
@@ -1628,7 +1609,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                           } else {
                             setTimeout(() => {
                               scrollToEnd();
-                            }, 1000);
+                            }, 1 * 1000);
                           }
                         }}
                       />

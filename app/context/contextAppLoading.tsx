@@ -15,6 +15,7 @@ import {
   SelectServerEnum,
   SnackbarType,
 } from '../AppState';
+import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,
@@ -51,6 +52,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   rescanMenu: false,
   recoveryWalletInfoOnDevice: false,
   zingolibVersion: '',
+  performanceLevel: RPCPerformanceLevelEnum.Medium,
 };
 
 export const ContextAppLoading = React.createContext(defaultAppContextLoading);

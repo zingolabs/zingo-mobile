@@ -137,21 +137,17 @@ class ExecuteAddressesFromSeed {
     fun executeAddressesFromSeed() {
         val mapper = jacksonObjectMapper()
 
-        val server = "http://10.0.2.2:20000"
+        val serveruri = "http://10.0.2.2:20000"
         val chainhint = "main"
         val seed = Seeds.ABANDON
-        val birthday:ULong = 1u
-
+        
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-
-        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
-        println(setConfigWallet)
 
         assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
@@ -180,21 +176,17 @@ class ExecuteAddressesFromUfvk {
     fun executeAddressFromUfvk() {
         val mapper = jacksonObjectMapper()
 
-        val server = "http://10.0.2.2:20000"
+        val serveruri = "http://10.0.2.2:20000"
         val chainhint = "main"
         val ufvk = Ufvk.ABANDON
-        val birthday: ULong = 1u
-
+        
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(server, ufvk, birthday, chainhint)
+        val initFromUfvkJson: String = uniffi.zingo.initFromUfvk(ufvk, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit From UFVK:")
         println(initFromUfvkJson)
         val initFromUfvk: InitFromUfvk = mapper.readValue(initFromUfvkJson)
-
-        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
-        println(setConfigWallet)
 
         assertThat(initFromUfvk.ufvk).isEqualTo(ufvk)
         assertThat(initFromUfvk.birthday).isEqualTo(1)
@@ -230,21 +222,17 @@ class ExecuteVersionFromSeed {
     fun executeVersionFromSeed() {
         val mapper = jacksonObjectMapper()
 
-        val server = "http://10.0.2.2:20000"
+        val serveruri = "http://10.0.2.2:20000"
         val chainhint = "main"
         val seed = Seeds.ABANDON
-        val birthday:ULong = 1u
-
+        
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-
-        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
-        println(setConfigWallet)
 
         assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
@@ -263,21 +251,17 @@ class ExecuteSyncFromSeed {
     fun executeSyncFromSeed() {
         val mapper = jacksonObjectMapper()
 
-        val server = "http://10.0.2.2:20000"
+        val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
         val seed = Seeds.ABANDON
-        val birthday:ULong = 1u
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-
-        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
-        println(setConfigWallet)
 
         assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
         assertThat(initFromSeed.birthday).isEqualTo(1)
@@ -330,21 +314,17 @@ class ExecuteSendFromOrchard {
     fun executeSendFromOrchard() {
         val mapper = jacksonObjectMapper()
 
-        val server = "http://10.0.2.2:20000"
+        val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
-        val birthday:ULong = 1u
-
+        
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-
-        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
-        println(setConfigWallet)
 
         assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
@@ -386,11 +366,11 @@ class ExecuteSendFromOrchard {
 
         val send = taddresses[0].encoded_address?.let { Send(it, 100000, null) }
 
-        val proposeJson: String = uniffi.zingo.executeCommand("send", mapper.writeValueAsString(listOf(send)))
+        val proposeJson: String = uniffi.zingo.send(mapper.writeValueAsString(listOf(send)))
         println("\nPropose:")
         println(proposeJson)
 
-        val confirmJson: String = uniffi.zingo.executeCommand("confirm", "")
+        val confirmJson: String = uniffi.zingo.confirm()
         println("\nConfirm Txid:")
         println(confirmJson)
 
@@ -433,22 +413,18 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
     fun updateCurrentPriceAndValueTransfersFromSeed() {
         val mapper = jacksonObjectMapper()
 
-        val server = "http://10.0.2.2:20000"
+        val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
-        val birthday:ULong = 1u
         val tor = "false"
 
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-
-        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
-        println(setConfigWallet)
 
         assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
@@ -515,21 +491,17 @@ class ExecuteSaplingBalanceFromSeed {
 
         val rpcModule = RPCModule(MainApplication.getAppReactContext())
 
-        val server = "http://10.0.2.2:20000"
+        val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
-        val birthday:ULong = 1u
-
+        
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-
-        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
-        println(setConfigWallet)
 
         assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
         assertThat(initFromSeed.birthday).isEqualTo(1)
@@ -591,12 +563,12 @@ class ExecuteSaplingBalanceFromSeed {
 
         // change to Offline mode
         val changeServerJson:String = uniffi.zingo.changeServer("")
-        println("\nChange Server:")
+        println("\nChange Serveruri:")
         println(changeServerJson)
         assertThat(changeServerJson.lowercase().startsWith("error")).isFalse()
 
         // open the wallet with no server - Offline mode
-        val loadWalletJson: String = rpcModule.loadExistingWalletNative("", "main")
+        val loadWalletJson: String = rpcModule.loadExistingWalletNative("", "main", "Medium", "1")
         println("\nLoad Wallet:")
         println(loadWalletJson)
     }
@@ -608,21 +580,17 @@ class ExecuteParseAddresses {
     fun ExecuteParseAddressForTex() {
         val mapper = jacksonObjectMapper()
 
-        val server = "http://10.0.2.2:20000"
+        val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
-        val birthday:ULong = 1u
-
+        
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-
-        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
-        println(setConfigWallet)
 
         val seedResult = initFromSeed.seed_phrase
         val birthdayResult = initFromSeed.birthday
@@ -650,21 +618,17 @@ class ExecuteParseAddresses {
     fun ExecuteParseAddresInvalid() {
         val mapper = jacksonObjectMapper()
 
-        val server = "http://10.0.2.2:20000"
+        val serveruri = "http://10.0.2.2:20000"
         val chainhint = "regtest"
         val seed = Seeds.HOSPITAL
-        val birthday:ULong = 1u
-
+        
         val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
         println(setCrytoProvider)
 
-        val initFromSeedJson: String = uniffi.zingo.initFromSeed(server, seed, birthday, chainhint)
+        val initFromSeedJson: String = uniffi.zingo.initFromSeed(seed, 1u, serveruri, chainhint, "Medium", 1u)
         println("\nInit from seed:")
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
-
-        val setConfigWallet: String = uniffi.zingo.setConfigWalletToTest()
-        println(setConfigWallet)
 
         val seedResult = initFromSeed.seed_phrase
         val birthdayResult = initFromSeed.birthday

@@ -8,10 +8,11 @@ import { ThemeType } from '../../app/types';
 import { View } from 'react-native';
 
 type ScannerProps = {
-  onRead: (value: string) => void;
+  onRead: (value: string) => Promise<void>;
+  onClose: () => void;
 };
 
-const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead }) => {
+const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead, onClose }) => {
   const { colors } = useTheme()  as ThemeType;
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
@@ -25,12 +26,14 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead }) => {
     codeTypes: ['qr', 'ean-13'],
     onCodeScanned: (codes: Code[]) => {
       setActive(false);
+      //console.log(codes[0].value);
       onRead(codes && codes[0] && codes[0].value ? codes[0].value.trim() : '');
+      onClose();
     },
   });
 
-  console.log('permission', hasPermission);
-  console.log('device', device);
+  //console.log('permission', hasPermission);
+  //console.log('device', device);
 
   return (
     <View

@@ -199,7 +199,7 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
                   </>
                 )}
 
-                {transparentPool && totalBalance.confirmedTransparentBalance > 0 && shieldingAmount === 0 && (
+                {transparentPool && totalBalance.confirmedTransparentBalance > 0 && shieldingAmount === 0 && !somePending && (
                   <View
                     style={{
                       display: 'flex',

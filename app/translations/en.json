@@ -1,13 +1,20 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.1 (260)",
+  "version": "zingo-2.0.2 (264)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
-  "firstlaunchingmessage-title": "Optimizing Zingo",
-  "firstlaunchingmessage-body": "This may take a while, depending on the transaction history. Please keep the app open until the process finishes.",
-  "firstlaunchingmessage-footer": "Thanks.",
+  "updating" : {
+    "firstlaunchingmessage-title": "Optimizing Zingo",
+    "firstlaunchingmessage-body": "This may take a while, depending on the transaction history. Please keep the app open until the process finishes.",
+    "firstlaunchingmessage-footer": "Thanks."
+  },
+  "installing" : {
+    "firstlaunchingmessage-title": "Creating a new wallet",
+    "firstlaunchingmessage-body": "Please keep the app open until the process finishes.",
+    "firstlaunchingmessage-footer": "Thanks."
+  },
   "biometricsfailed-title": "Welcome!",
   "biometricsfailed-body": "For security, the application is locked.",
   "biometricsfailed-footer": "Use the authentication method to unlock.",
@@ -302,6 +309,24 @@
         "text": "Do not save anything related to the wallet on the device."
       }
     ],
+    "performancelevels": [
+      {
+        "value": "Maximum",
+        "text": "For very powerful devices."
+      },
+      {
+        "value": "High",
+        "text": "For devices with a lot of Memory."
+      },
+      {
+        "value": "Medium",
+        "text": "For regular devices."
+      },
+      {
+        "value": "Low",
+        "text": "For old devices."
+      }
+    ],
     "nochanges": "No changes registered.",
     "ismemo": "You need to choose the download memos option to save.",
     "isthreshold": "You need to choose the transaction filter threshold option to save.",
@@ -335,6 +360,7 @@
     "mode-title": "Switch between Basic or Advanced Mode",
     "rescanmenu-title": "THE RESCAN MENU OPTION",
     "recoverywalletinfoondevice-title": "Store Wallet Recovery Info in the Device",
+    "performancelevel-title": "Zingolib Performance Level",
     "value-currency-": "No currency",
     "value-currency-USD": "US Dollar",
     "value-currency-USDTOR": "US Dollar with Tor",
@@ -358,6 +384,10 @@
     "value-rescanmenu-false": "Disable",
     "value-recoverywalletinfoondevice-true": "Enable",
     "value-recoverywalletinfoondevice-false": "Disable",
+    "value-performancelevel-Maximum": "Maximum",
+    "value-performancelevel-High": "High",
+    "value-performancelevel-Medium": "Medium",
+    "value-performancelevel-Low": "Low",
     "security-title": "APPLY DEVICE SECURITY TO SCREENS/OPTIONS",
     "security-startapp": "When the App starts",
     "security-foregroundapp": "When the App go to the Foreground",
@@ -767,7 +797,7 @@
   },
   "uris": {
     "baduri": "Error: Bad URI.",
-    "notvalid": "Was not a valid zcash address (Unified, Sapling or Transparent)",
+    "notvalid": "Was not a valid zcash address",
     "notvalidparameter": "was not understood as a valid parameter",
     "notvalidvalue": "Didn't understand parameter value",
     "noindex": "Unknown index",
