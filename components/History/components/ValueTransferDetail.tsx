@@ -432,20 +432,26 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                         onPress={() => {
                           actionOnPress(TransactionActionEnum.resend);
                         }}
-                        twoButtons={true}
+                        twoButtons={
+                          valueTransfer.kind !== ValueTransferKindEnum.Received
+                        }
                       />
                     )}
-                    <Button
-                      type={ButtonTypeEnum.Primary}
-                      title={translate('history.remove') as string}
-                      onPress={() => {
-                        actionOnPress(TransactionActionEnum.remove);
-                      }}
-                      twoButtons={
-                        (valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
-                        valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) &&
-                        info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks}
-                    />
+                    {valueTransfer.kind !== ValueTransferKindEnum.Received && (
+                      <Button
+                        type={ButtonTypeEnum.Primary}
+                        title={translate('history.remove') as string}
+                        onPress={() => {
+                          actionOnPress(TransactionActionEnum.remove);
+                        }}
+                        twoButtons={
+                          (valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
+                          valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) &&
+                          info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks &&
+                          !readOnly
+                        }
+                      />
+                      )}
                   </View>
                   <View
                     style={{
