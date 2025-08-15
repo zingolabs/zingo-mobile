@@ -432,30 +432,38 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                         onPress={() => {
                           actionOnPress(TransactionActionEnum.resend);
                         }}
-                        twoButtons={true}
+                        twoButtons={
+                          valueTransfer.kind !== ValueTransferKindEnum.Received
+                        }
                       />
                     )}
-                    <Button
-                      type={ButtonTypeEnum.Primary}
-                      title={translate('history.remove') as string}
-                      onPress={() => {
-                        actionOnPress(TransactionActionEnum.remove);
-                      }}
-                      twoButtons={
-                        (valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
-                        valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) &&
-                        info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks}
-                    />
-                  </View>
-                  <View
-                    style={{
-                      flexGrow: 1,
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginBottom: 10,
-                    }}>
-                    <FadeText style={{ fontSize: 11 }}>{translate('history.remove-legend') as string}</FadeText>
+                    {valueTransfer.kind !== ValueTransferKindEnum.Received && (
+                      <>
+                        <Button
+                          type={ButtonTypeEnum.Primary}
+                          title={translate('history.remove') as string}
+                          onPress={() => {
+                            actionOnPress(TransactionActionEnum.remove);
+                          }}
+                          twoButtons={
+                            (valueTransfer.status === RPCValueTransfersStatusEnum.calculated ||
+                            valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) &&
+                            info.latestBlock - valueTransfer.blockheight < GlobalConst.expireBlocks &&
+                            !readOnly
+                          }
+                        />
+                        <View
+                          style={{
+                            flexGrow: 1,
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginBottom: 10,
+                          }}>
+                          <FadeText style={{ fontSize: 11 }}>{translate('history.remove-legend') as string}</FadeText>
+                        </View>
+                      </>
+                    )}
                   </View>
                 </>
               )}
