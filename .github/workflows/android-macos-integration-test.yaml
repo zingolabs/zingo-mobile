@@ -48,7 +48,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust
-          key: cargo-android-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          key: cargo-android-${{ env.ABI }}---
 
       - name: Build and archive tests
         working-directory: ./rust
@@ -125,7 +125,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust
-          key: cargo-android-${{ env.ABI }}-${{ env.CACHE-KEY }}
+          key: cargo-android-${{ env.ABI }}---
 
       - name: Native rust cache
         uses: actions/cache/restore@v4
