@@ -193,6 +193,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust
+          key: rust-cargo-android-${{ env.ABI }}-${{ env.CACHE-KEY }}
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:010

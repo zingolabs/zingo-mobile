@@ -101,6 +101,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust
+          key: rust-cargo-android-${{ env.ARCH }}-${{ env.CACHE-KEY }}
 
       - name: Cargo default nightly
         run: rustup default nightly
