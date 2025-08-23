@@ -89,7 +89,7 @@ jobs:
   android-e2e-test-script:
     needs: [ android-e2e-avd-cache ]
     name: Android e2e test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         partition: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]

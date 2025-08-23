@@ -29,7 +29,7 @@ env:
 jobs:
   android-ubuntu-integration-test-ci-avd-cache:
     name: Avd Cache Integration
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
