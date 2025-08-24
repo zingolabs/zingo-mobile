@@ -71,12 +71,6 @@ jobs:
           sudo rustup upgrade
           sudo rustup default nightly
 
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust
-          key: cargo-ios-${{ env.ARCH }}---
-
       - name: AWS libcrypto rust building
         run: sudo cargo install --force --locked bindgen-cli
 
