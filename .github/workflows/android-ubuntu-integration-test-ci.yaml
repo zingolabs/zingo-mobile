@@ -184,16 +184,16 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Install nextest
-        uses: taiki-e/install-action@v2
-        with:
-          tool: nextest
-
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust
           key: cargo-android-${{ env.ABI }}---
+
+      - name: Install nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: nextest
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:010
