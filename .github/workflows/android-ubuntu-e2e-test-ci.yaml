@@ -29,7 +29,7 @@ env:
 jobs:
   android-ubuntu-e2e-test-ci-avd-cache:
     name: Avd Cache e2e
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
@@ -212,6 +212,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust
+          key: cargo-android-${{ env.ABI }}---
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:010

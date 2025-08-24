@@ -74,8 +74,8 @@ jobs:
       - name: AWS libcrypto rust building
         run: sudo cargo install --force --locked bindgen-cli
 
-      - name: rustup show
-        run: sudo rustup show
+      - name: Install protoc
+        run: brew install protobuf
 
       - name: Cargo uniffi swift
         working-directory: rust/lib
