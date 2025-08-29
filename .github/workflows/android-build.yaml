@@ -60,7 +60,7 @@ jobs:
     name: Build native rust & kotlin uniffi
     needs: android-check-build-cache
     if: ${{ needs.android-check-build-cache.outputs.native-cache-found != 'true' || needs.android-check-build-cache.outputs.kotlin-cache-found != 'true' }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
       image: zingodevops/android_builder:016
     env:
@@ -76,6 +76,7 @@ jobs:
             golang \
             clang-18 \
             libclang-18-dev \
+            protobuf-compiler \
             gcc \
             g++
 
@@ -97,13 +98,14 @@ jobs:
           cd rust
           cargo update -p zingolib --aggressive
 
+      - name: Cargo default nightly
+        run: rustup default nightly
+
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust
-
-      - name: Cargo default nightly
-        run: rustup default nightly
+          key: cargo-android-${{ env.ARCH }}---
 
       - name: AWS libcrypto rust building
         run: cargo install --force --locked bindgen-cli
