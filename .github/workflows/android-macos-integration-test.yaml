@@ -41,13 +41,14 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Install nextest
-        uses: taiki-e/install-action@nextest
-
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust
+          key: cargo-android-${{ env.ABI }}---
+
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
 
       - name: Build and archive tests
         working-directory: ./rust
@@ -117,13 +118,14 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Install nextest
-        uses: taiki-e/install-action@nextest
-
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust
+          key: cargo-android-${{ env.ABI }}---
+
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
 
       - name: Native rust cache
         uses: actions/cache/restore@v4
