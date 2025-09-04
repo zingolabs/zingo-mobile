@@ -312,7 +312,14 @@ const Send: React.FunctionComponent<SendProps> = ({
       setFee(proposeFee);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [addresses, donation, server, translate, defaultUnifiedAddress, validAddress, validAmount, validMemo],
+    [donation, server, defaultUnifiedAddress, validAddress, validAmount, validMemo, donationAddress,
+    /* added */ spendable, maxAmount, somePending, stillConfirming, info.latestBlock],
+    // The App have to re-calculate de fee if some of these data changed:
+    // - spendable
+    // - maxAmount
+    // - somePending
+    // - stillConfirming
+    // - info.latestBlock
   );
 
   const calculateSpendableBalance = useCallback(
