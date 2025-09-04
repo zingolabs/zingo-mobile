@@ -223,6 +223,7 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				0FBED7DF2353FDD6646C03B2 /* [CP] Embed Pods Frameworks */,
 				91F0E930AF5C9F8186067673 /* [CP] Copy Pods Resources */,
+				1F67CE4E2E6798530075192B /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -314,14 +315,35 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		1F67CE4E2E6798530075192B /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\n\n# Solo para Archive/Release\nif [ \"${CONFIGURATION}\" != \"Release\" ]; then\n  exit 0\nfi\n\n# Ruta donde guardaste el dSYM de Hermes\nHERMES_DSYM_SRC=\"${PROJECT_DIR}/vendor/hermes-dsyms/RN-0.78.0/ios-arm64/release/react-native-artifacts-0.78.0-hermes-framework-dSYM-release/iphoneos/hermes.framework.dSYM\"\n\n# Carpeta donde Xcode recopila los dSYM al archivar\nDSYM_DST=\"${DWARF_DSYM_FOLDER_PATH}\"\n\nif [ -d \"${HERMES_DSYM_SRC}\" ]; then\n  echo \"Copiando Hermes dSYM a ${DSYM_DST}\"\n  rsync -a \"${HERMES_DSYM_SRC}\" \"${DSYM_DST}/\"\nelse\n  echo \"ERROR: No se encontró Hermes.framework.dSYM en ${HERMES_DSYM_SRC}\" >&2\n  exit 1\nfi\n";
 		};
 		3BEA36EAAA8A472C9B5F8171 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -353,9 +375,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile/Pods-ZingoMobile-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -370,9 +396,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -387,9 +417,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ZingoMobile-ZingoMobileTests/Pods-ZingoMobile-ZingoMobileTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -550,7 +584,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ZingoMobile/ZingoMobile.entitlements;
-				CURRENT_PROJECT_VERSION = 268;
+				CURRENT_PROJECT_VERSION = 270;
 				DEPLOYMENT_POSTPROCESSING = YES;
 				DEVELOPMENT_TEAM = 788KRST4S8;
 				ENABLE_BITCODE = NO;
@@ -568,7 +602,7 @@
 					"$(PROJECT_DIR)",
 					"$(inherited)",
 				);
-				MARKETING_VERSION = 2.0.5;
+				MARKETING_VERSION = 2.0.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -592,7 +626,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ZingoMobile/ZingoMobile.entitlements;
-				CURRENT_PROJECT_VERSION = 268;
+				CURRENT_PROJECT_VERSION = 270;
 				DEPLOYMENT_POSTPROCESSING = YES;
 				DEVELOPMENT_TEAM = 788KRST4S8;
 				ENABLE_BITCODE = NO;
@@ -610,7 +644,7 @@
 					"$(PROJECT_DIR)",
 					"$(inherited)",
 				);
-				MARKETING_VERSION = 2.0.5;
+				MARKETING_VERSION = 2.0.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -695,10 +729,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -770,10 +801,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
