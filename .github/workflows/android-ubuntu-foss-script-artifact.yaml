@@ -23,7 +23,7 @@ jobs:
       image: registry.gitlab.com/fdroid/fdroidserver:buildserver-bookworm
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
