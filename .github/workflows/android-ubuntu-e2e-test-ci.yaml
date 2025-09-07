@@ -228,7 +228,7 @@ jobs:
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v4
         with:
-          build-root-directory: ./android
+          gradle-version: wrapper
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
 
       - name: Native rust cache
