@@ -189,7 +189,7 @@ jobs:
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: rust
+          workspaces: rust -> rust/target
           cache-on-failure: true
 
       - name: Install nextest
