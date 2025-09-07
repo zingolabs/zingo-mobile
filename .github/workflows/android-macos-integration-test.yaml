@@ -40,11 +40,12 @@ jobs:
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
+          cache-workspaces: rust -> rust/target
 
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: rust
+          workspaces: rust -> rust/target
           cache-on-failure: true
 
       - name: Install nextest
@@ -117,11 +118,12 @@ jobs:
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
+          cache-workspaces: rust -> rust/target
 
       - name: Cargo cache
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: rust
+          workspaces: rust -> rust/target
           cache-on-failure: true
 
       - name: Install nextest
@@ -156,7 +158,7 @@ jobs:
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v4
         with:
-          build-root-directory: ./android
+          gradle-version: wrapper
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
 
       - name: AVD cache
