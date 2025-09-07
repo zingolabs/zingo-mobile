@@ -28,7 +28,7 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
@@ -85,7 +85,7 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
@@ -100,12 +100,6 @@ jobs:
 
       - name: Cargo default nightly
         run: rustup default nightly
-
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust
-          key: cargo-android-${{ env.ARCH }}---
 
       - name: AWS libcrypto rust building
         run: cargo install --force --locked bindgen-cli
@@ -198,7 +192,7 @@ jobs:
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
