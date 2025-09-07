@@ -68,6 +68,12 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      - name: Gradle cache warming up
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          build-root-directory: ./android
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
+
       - name: Check AVD cache
         uses: actions/cache/restore@v4
         id: avd-cache
