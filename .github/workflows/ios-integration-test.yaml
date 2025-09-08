@@ -64,6 +64,8 @@ jobs:
           command: |
             set -eo pipefail
             cd ios
+            rm -rf build/reports 2>dev/null || true
+            rm -rf build/DerivedData 2>dev/null || true
             mkdir -p build/reports build/DerivedData
             xcodebuild test \
               -workspace ZingoMobile.xcworkspace \
