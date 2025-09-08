@@ -68,6 +68,19 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Gradle setup cache (write-only)
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
+          cache-write-only: true
+          cache-read-only: false
+
       - name: Check AVD cache
         uses: actions/cache/restore@v4
         id: avd-cache
@@ -201,11 +214,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Gradle setup
+      - name: Gradle setup cache (read-only)
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: wrapper
-          cache-disabled: true
+          cache-write-only: false
+          cache-read-only: true
 
       - name: Native rust cache
         uses: actions/cache/restore@v4
