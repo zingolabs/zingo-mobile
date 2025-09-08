@@ -160,7 +160,10 @@ jobs:
         with:
           gradle-version: wrapper
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
-
+          gradle-home-cache-cleanup: true
+          gradle-home-cache-excludes: |
+            caches/transforms-*
+            caches/*/transforms/*
       - name: AVD cache
         uses: actions/cache@v4
         id: avd-cache
