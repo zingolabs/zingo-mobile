@@ -42,12 +42,6 @@ jobs:
           toolchain: stable
           cache-workspaces: rust -> rust/target
 
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust -> rust/target
-          cache-on-failure: true
-
       - name: Install nextest
         uses: taiki-e/install-action@nextest
 
@@ -120,12 +114,6 @@ jobs:
           toolchain: stable
           cache-workspaces: rust -> rust/target
 
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust -> rust/target
-          cache-on-failure: true
-
       - name: Install nextest
         uses: taiki-e/install-action@nextest
 
@@ -164,7 +152,7 @@ jobs:
           gradle-home-cache-excludes: |
             caches/transforms-*
             caches/*/transforms/*
-            
+
       - name: AVD cache
         uses: actions/cache@v4
         id: avd-cache
