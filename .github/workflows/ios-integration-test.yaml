@@ -62,10 +62,31 @@ jobs:
           timeout_minutes: 60
           max_attempts: 3
           command: |
+            set -eo pipefail
             cd ios
+            mkdir -p build/reports build/DerivedData
             xcodebuild test \
               -workspace ZingoMobile.xcworkspace \
               -scheme ZingoMobile \
               -sdk iphonesimulator \
               -configuration Debug \
-              -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2'
+              -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2' \
+              -derivedDataPath "build/DerivedData" \
+              -resultBundlePath "build/reports/ZingoMobile-${TIMESTAMP}.xcresult"
+
+      - name: Upload iOS test reports (.xcresult)
+        if: ${{ always() && !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-integration-reports-ios-${{ env.TIMESTAMP }}
+          path: ios/build/reports/ZingoMobile-${{ env.TIMESTAMP }}.xcresult
+
+      - name: Upload DerivedData logs (optional)
+        if: ${{ always() && !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-integration-derived-logs-ios-${{ env.TIMESTAMP }}
+          path: |
+            ios/build/DerivedData/Logs/Test
+            ios/build/DerivedData/Logs/CrashReporter
+          if-no-files-found: ignore
