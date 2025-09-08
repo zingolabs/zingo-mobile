@@ -42,12 +42,6 @@ jobs:
           toolchain: stable
           cache-workspaces: rust -> rust/target
 
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust -> rust/target
-          cache-on-failure: true
-
       - name: Install nextest
         uses: taiki-e/install-action@nextest
 
@@ -120,12 +114,6 @@ jobs:
           toolchain: stable
           cache-workspaces: rust -> rust/target
 
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust -> rust/target
-          cache-on-failure: true
-
       - name: Install nextest
         uses: taiki-e/install-action@nextest
 
@@ -155,11 +143,11 @@ jobs:
       - name: Add emulator to PATH
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
 
-      - name: Gradle cache
+      - name: Gradle setup
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: wrapper
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
+          cache-disabled: true
 
       - name: AVD cache
         uses: actions/cache@v4
