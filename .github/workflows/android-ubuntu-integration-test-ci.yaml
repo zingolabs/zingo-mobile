@@ -264,7 +264,7 @@ jobs:
           working-directory: ./rust
 
       - name: Upload test reports
-        if: ${{ ! cancelled() }}
+        if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: test-integration-reports-${{ env.ABI }}-${{ matrix.test }}-${{ env.TIMESTAMP }}
