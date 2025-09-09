@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export RUSTFLAGS="-C debuginfo=1 -C split-debuginfo=off -C symbol-mangling-version=v0"
+
 ln -s $(which node) /usr/local/bin/node
 
 cd ../lib
