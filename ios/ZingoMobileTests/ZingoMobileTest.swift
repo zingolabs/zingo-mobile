@@ -103,7 +103,7 @@ struct Balance: Codable {
     let unconfirmed_transparent_balance: Int64
 }
 
-struct Send: Codable {
+struct SendResult: Codable {
     let address: String
     let amount: Int64
     let memo: String?
@@ -146,13 +146,13 @@ private func isError(_ s: String) -> Bool {
 
 private func setCryptoProvider() {
     // Ajusta el espacio de nombres si tu UniFFI genera otro wrapper.
-    _ = zingo.setCryptoDefaultProviderToRing()
+    _ = setCryptoDefaultProviderToRing()
 }
 
 private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
     let t0 = Date()
     while Date().timeIntervalSince(t0) < timeoutSeconds {
-        let statusJson = zingo.statusSync()
+        let statusJson = statusSync()
         if isError(statusJson) {
             XCTFail("Sync Error: \(statusJson)")
             return
@@ -174,13 +174,13 @@ final class ExecuteAddressesFromSeedTests: XCTestCase {
         let chainhint = "main"
         let seed = Seeds.ABANDON
 
-        let initJson = zingo.initFromSeed(seed, UInt32(1), serveruri, chainhint, "Medium", UInt32(1))
+        let initJson = initFromSeed(seed: seed, birthday:UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
         print("\nInit from seed:\n\(initJson)")
         let initRes: InitFromSeed = try decodeJSON(initJson)
         XCTAssertEqual(initRes.seed_phrase, Seeds.ABANDON)
         XCTAssertEqual(initRes.birthday, 1)
 
-        let addrsJson = zingo.getUnifiedAddresses()
+        let addrsJson = getUnifiedAddresses()
         print("\nAddresses:\n\(addrsJson)")
         let addrs: [UnifiedAddress] = try decodeJSON(addrsJson)
         XCTAssertEqual(addrs[0].encoded_address, "u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd")
@@ -188,7 +188,7 @@ final class ExecuteAddressesFromSeedTests: XCTestCase {
         XCTAssertEqual(addrs[0].has_sapling, false)
         XCTAssertEqual(addrs[0].has_transparent, false)
 
-        let tAddrsJson = zingo.getTransparentAddresses()
+        let tAddrsJson = getTransparentAddresses()
         print("\nT Addresses:\n\(tAddrsJson)")
         let tAddrs: [TransparentAddress] = try decodeJSON(tAddrsJson)
         XCTAssertEqual(tAddrs[0].encoded_address, "t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
@@ -204,19 +204,19 @@ final class ExecuteAddressesFromUfvkTests: XCTestCase {
         let chainhint = "main"
         let ufvk = UfvkConst.ABANDON
 
-        let initJson = zingo.initFromUfvk(ufvk, UInt32(1), serveruri, chainhint, "Medium", UInt32(1))
+        let initJson = initFromUfvk(ufvk: ufvk, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
         print("\nInit From UFVK:\n\(initJson)")
         let initRes: InitFromUfvk = try decodeJSON(initJson)
         XCTAssertEqual(initRes.ufvk, ufvk)
         XCTAssertEqual(initRes.birthday, 1)
 
-        let exportJson = zingo.getUfvk()
+        let exportJson = getUfvk()
         print("\nExport Ufvk:\n\(exportJson)")
         let exportRes: ExportUfvk = try decodeJSON(exportJson)
         XCTAssertEqual(exportRes.ufvk, ufvk)
         XCTAssertEqual(exportRes.birthday, 1)
 
-        let addrsJson = zingo.getUnifiedAddresses()
+        let addrsJson = getUnifiedAddresses()
         print("\nAddresses:\n\(addrsJson)")
         let addrs: [UnifiedAddress] = try decodeJSON(addrsJson)
         XCTAssertEqual(addrs[0].encoded_address, "u1gsqvqxx6lmmqg05uvx57gjdg5j3a54nxw09z4vq4z0yp7dfdcjrqk5wq64quwzrufmujd5e8xu5jn7cyewjaptxc8lsqwa2lk559u4cd")
@@ -224,7 +224,7 @@ final class ExecuteAddressesFromUfvkTests: XCTestCase {
         XCTAssertEqual(addrs[0].has_sapling, false)
         XCTAssertEqual(addrs[0].has_transparent, false)
 
-        let tAddrsJson = zingo.getTransparentAddresses()
+        let tAddrsJson = getTransparentAddresses()
         print("\nT Addresses:\n\(tAddrsJson)")
         let tAddrs: [TransparentAddress] = try decodeJSON(tAddrsJson)
         XCTAssertEqual(tAddrs[0].encoded_address, "t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
@@ -237,14 +237,15 @@ final class ExecuteVersionFromSeedTests: XCTestCase {
         setCryptoProvider()
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "main"
+        let seed = Seeds.ABANDON
 
-        let initJson = zingo.initFromSeed(Seeds.ABANDON, UInt32(1), serveruri, chainhint, "Medium", UInt32(1))
+        let initJson = initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
         print("\nInit from seed:\n\(initJson)")
         let initRes: InitFromSeed = try decodeJSON(initJson)
         XCTAssertEqual(initRes.seed_phrase, Seeds.ABANDON)
         XCTAssertEqual(initRes.birthday, 1)
 
-        let version = zingo.getVersion()
+        let version = getVersion()
         print("\nVersion:\n\(version)")
         XCTAssertFalse(version.isEmpty)
     }
@@ -255,27 +256,28 @@ final class ExecuteSyncFromSeedTests: XCTestCase {
         setCryptoProvider()
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "regtest"
+        let seed = Seeds.ABANDON
 
-        let initJson = zingo.initFromSeed(Seeds.ABANDON, UInt32(1), serveruri, chainhint, "Medium", UInt32(1))
+        let initJson = initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
         print("\nInit from seed:\n\(initJson)")
         _ = try decodeJSON(initJson) as InitFromSeed
 
-        let infoJson = zingo.infoServer()
+        let infoJson = infoServer()
         print("\nInfo:\n\(infoJson)")
         let info: Info = try decodeJSON(infoJson)
         XCTAssertGreaterThan(info.latest_block_height, 0)
 
-        let hPreJson = zingo.getLatestBlockWallet()
+        let hPreJson = getLatestBlockWallet()
         print("\nHeight pre-sync:\n\(hPreJson)")
         let hPre: Height = try decodeJSON(hPreJson)
         XCTAssertEqual(hPre.height, 0)
 
-        let syncJson = zingo.runSync()
+        let syncJson = runSync()
         print("\nSync:\n\(syncJson)")
 
         waitForSyncOrFail()
 
-        let hPostJson = zingo.getLatestBlockWallet()
+        let hPostJson = getLatestBlockWallet()
         print("\nHeight post-sync:\n\(hPostJson)")
         let hPost: Height = try decodeJSON(hPostJson)
         XCTAssertEqual(hPost.height, info.latest_block_height)
@@ -291,20 +293,20 @@ final class ExecuteSendFromOrchardTests: XCTestCase {
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
 
-        let initJson = zingo.initFromSeed(seed, UInt32(1), serveruri, chainhint, "Medium", UInt32(1))
+        let initJson = initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
         print("\nInit from seed:\n\(initJson)")
         _ = try decodeJSON(initJson) as InitFromSeed
 
-        _ = zingo.runSync()
+        _ = runSync()
         waitForSyncOrFail()
 
-        var balJson = zingo.getBalance()
+        var balJson = getBalance()
         print("\nBalance pre-send:\n\(balJson)")
         var bal: Balance = try decodeJSON(balJson)
         XCTAssertEqual(bal.confirmed_orchard_balance, 1_000_000)
         XCTAssertEqual(bal.confirmed_transparent_balance, 0)
 
-        let tAddrsJson = zingo.getTransparentAddresses()
+        let tAddrsJson = getTransparentAddresses()
         print("\nT Addresses:\n\(tAddrsJson)")
         let tAddrs: [TransparentAddress] = try decodeJSON(tAddrsJson)
         guard let taddr = tAddrs.first?.encoded_address else {
@@ -312,19 +314,19 @@ final class ExecuteSendFromOrchardTests: XCTestCase {
             return
         }
 
-        let send = Send(address: taddr, amount: 100_000, memo: nil)
-        let sendBodyData = try JSONEncoder().encode([send])
+        let sendJson = SendResult(address: taddr, amount: 100_000, memo: nil)
+        let sendBodyData = try JSONEncoder().encode([sendJson])
         let sendBody = String(data: sendBodyData, encoding: .utf8)!
-        let proposeJson = zingo.send(sendBody)
+        let proposeJson = send(sendJson: sendBody)
         print("\nPropose:\n\(proposeJson)")
 
-        let confirmJson = zingo.confirm()
+        let confirmJson = confirm()
         print("\nConfirm Txid:\n\(confirmJson)")
 
-        _ = zingo.runSync()
+        _ = runSync()
         waitForSyncOrFail()
 
-        balJson = zingo.getBalance()
+        balJson = getBalance()
         print("\nBalance post-send:\n\(balJson)")
         bal = try decodeJSON(balJson)
         XCTAssertEqual(bal.total_orchard_balance, 885_000)
@@ -342,17 +344,17 @@ final class UpdateCurrentPriceAndValueTransfersFromSeedTests: XCTestCase {
         let seed = Seeds.HOSPITAL
         let tor = "false"
 
-        let initJson = zingo.initFromSeed(seed, UInt32(1), serveruri, chainhint, "Medium", UInt32(1))
+        let initJson = initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
         print("\nInit from seed:\n\(initJson)")
         _ = try decodeJSON(initJson) as InitFromSeed
 
-        let price = zingo.zecPrice(tor)
+        let price = zecPrice(tor: tor)
         print("\nPrice:\n\(price)")
 
-        _ = zingo.runSync()
+        _ = runSync()
         waitForSyncOrFail()
 
-        let vtJson = zingo.getValueTransfers()
+        let vtJson = getValueTransfers()
         print("\nValue Transfers:\n\(vtJson)")
         let vts: ValueTransfers = try decodeJSON(vtJson)
         XCTAssertEqual(vts.value_transfers.count, 3)
@@ -384,17 +386,17 @@ final class ExecuteSaplingBalanceFromSeedTests: XCTestCase {
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
 
-        let initJson = zingo.initFromSeed(seed, UInt32(1), serveruri, chainhint, "Medium", UInt32(1))
+        let initJson = initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
         print("\nInit from seed:\n\(initJson)")
         _ = try decodeJSON(initJson) as InitFromSeed
 
-        _ = zingo.runSync()
+        _ = runSync()
         waitForSyncOrFail()
 
-        let vtJson = zingo.getValueTransfers()
+        let vtJson = getValueTransfers()
         print("\nValue Transfers:\n\(vtJson)")
 
-        let balJson = zingo.getBalance()
+        let balJson = getBalance()
         print("\nBalance:\n\(balJson)")
         let bal: Balance = try decodeJSON(balJson)
 
@@ -407,16 +409,16 @@ final class ExecuteSaplingBalanceFromSeedTests: XCTestCase {
 
         // Guardar wallet vía RPCModule
         let rpc = RPCModule()
-        rpc.saveWalletFile()
+        try rpc.saveWalletInternal()
 
         // Cambiar a Offline
-        let changeJson = zingo.changeServer("")
+        let changeJson = changeServer(serveruri: "")
         print("\nChange Serveruri:\n\(changeJson)")
         XCTAssertFalse(isError(changeJson))
 
         // Cargar wallet sin server (Offline)
         // Ajusta la firma si tu método se llama diferente (por ej. fnLoadExistingWalletNative)
-        let loadJson = try rpc.loadExistingWalletNative("", chainhint: "main", performancelevel: "Medium", minconfirmations: "1")
+        let loadJson = try rpc.fnLoadExistingWallet(serveruri: "", chainhint: "main", performancelevel: "Medium", minconfirmations: "1")
         print("\nLoad Wallet:\n\(loadJson)")
     }
 }
@@ -429,11 +431,11 @@ final class ExecuteParseAddressesTests: XCTestCase {
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
 
-        let initJson = zingo.initFromSeed(seed, UInt32(1), serveruri, chainhint, "Medium", UInt32(1))
+        let initJson = initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
         print("\nInit from seed:\n\(initJson)")
         _ = try decodeJSON(initJson) as InitFromSeed
 
-        let resJson = zingo.parseAddress("texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
+        let resJson = parseAddress(address: "texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
         print("\nParsed Address:\n\(resJson)")
         let res: ParseResult = try decodeJSON(resJson)
 
@@ -448,11 +450,11 @@ final class ExecuteParseAddressesTests: XCTestCase {
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
 
-        let initJson = zingo.initFromSeed(seed, UInt32(1), serveruri, chainhint, "Medium", UInt32(1))
+        let initJson = initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
         print("\nInit from seed:\n\(initJson)")
         _ = try decodeJSON(initJson) as InitFromSeed
 
-        let wrongJson = zingo.parseAddress("thiswontwork")
+        let wrongJson = parseAddress(address: "thiswontwork")
         print("\nWrong Address:\n\(wrongJson)")
         let wrong: ParseResult = try decodeJSON(wrongJson)
 
