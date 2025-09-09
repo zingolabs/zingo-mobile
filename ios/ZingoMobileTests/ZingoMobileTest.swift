@@ -331,8 +331,8 @@ final class ExecuteSendFromOrchardTests: XCTestCase {
         let confirmJson = confirm()
         print("\nConfirm Txid:\n\(confirmJson)")
 
-        syncJson = runSync()
-        print("\nSync:\n\(syncJson)")
+        let syncJson2 = runSync()
+        print("\nSync:\n\(syncJson2)")
 
         waitForSyncOrFail()
 
