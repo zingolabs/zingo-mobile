@@ -59,13 +59,11 @@ jobs:
       - name: Run IOS integration tests
         uses: nick-fields/retry@v3
         with:
-          timeout_minutes: 60
-          max_attempts: 3
+          timeout_minutes: 90
+          max_attempts: 1
           command: |
             set -eo pipefail
             cd ios
-            rm -rf ./build/reports 2>dev/null || true
-            rm -rf ./build/DerivedData 2>dev/null || true
             mkdir -p build/reports build/DerivedData
             xcodebuild test \
               -workspace ZingoMobile.xcworkspace \
