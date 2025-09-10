@@ -175,7 +175,7 @@ jobs:
       - name: Run integration tests
         working-directory: ./rust
         run: |
-          cargo nextest run integration::${{ env.NEXTEST-ABI }} --verbose --profile ci \
+          cargo nextest run android_integration::${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive-${{ env.ABI }}.tar.zst \
             --partition count:${{ matrix.partition}}/6
 

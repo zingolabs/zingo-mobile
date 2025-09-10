@@ -187,8 +187,8 @@ async fn execute_parse_addresses() {
     assert_eq!(exit_code, 0);
 }
 
-mod integration {
-    mod ios {
+mod ios_integration {
+    mod universal {
         #[tokio::test]
         async fn offline_testsuite() {
             crate::offline_testsuite().await;

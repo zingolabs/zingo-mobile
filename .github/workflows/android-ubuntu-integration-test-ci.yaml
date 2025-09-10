@@ -274,7 +274,7 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: cargo nextest run integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci regchest" --verbose --release
+          script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci regchest" --verbose --release
           working-directory: ./rust
 
       - name: Upload test reports

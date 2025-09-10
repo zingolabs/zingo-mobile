@@ -38,19 +38,19 @@ network in a docker container. Before running tests, pull the latest Regchest im
    by specifying the api level and target. However, using other images with the cargo test runner
    is still under development.
 2. To run the integration tests. From the `rust` directory, run: <br />
-   `cargo nextest run integration` <br />
+   `cargo nextest run android_integration` <br />
    Specify to run specific ABI: <br />
-   `cargo nextest run integration::x86_64` <br />
-   `cargo nextest run integration::x86_32` <br />
-   `cargo nextest run integration::arm64` <br />
-   `cargo nextest run integration::arm32` <br />
+   `cargo nextest run android_integration::x86_64` <br />
+   `cargo nextest run android_integration::x86_32` <br />
+   `cargo nextest run android_integration::arm64` <br />
+   `cargo nextest run android_integration::arm32` <br />
    Specify to run a specific test on all ABIs: <br />
    `cargo nextest run test_name` <br />
    Specify to run a specific ABI and test: <br />
-   `cargo nextest run integration::x86_64::test_name`
+   `cargo nextest run android_integration::x86_64::test_name`
 
 To run tests with Regchest, add the `--features regchest` flag, for example: <br />
-`cargo nextest run integration --features regchest`
+`cargo nextest run android_integration --features regchest`
 
 For more information on running integration tests on non-default AVDs, run: <br />
 `./scripts/integration_tests.sh -h` <br />
