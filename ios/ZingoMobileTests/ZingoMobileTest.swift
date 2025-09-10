@@ -167,8 +167,8 @@ private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
     XCTFail("Sync timeout after \(timeoutSeconds) seconds")
 }
 
-final class ExecuteAddressesFromSeedTests: XCTestCase {
-    func testExecuteAddressesFromSeed() throws {
+final class OfflineTestSuite: XCTestCase {
+    func executeAddressesFromSeed() throws {
         setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
@@ -195,10 +195,8 @@ final class ExecuteAddressesFromSeedTests: XCTestCase {
         XCTAssertEqual(tAddrs[0].encoded_address, "t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
         XCTAssertEqual(tAddrs[0].scope, "external")
     }
-}
 
-final class ExecuteAddressesFromUfvkTests: XCTestCase {
-    func testExecuteAddressFromUfvk() throws {
+    func executeAddressFromUfvk() throws {
         setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
@@ -231,10 +229,8 @@ final class ExecuteAddressesFromUfvkTests: XCTestCase {
         XCTAssertEqual(tAddrs[0].encoded_address, "t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
         XCTAssertEqual(tAddrs[0].scope, "external")
     }
-}
 
-final class ExecuteVersionFromSeedTests: XCTestCase {
-    func testExecuteVersionFromSeed() throws {
+    func executeVersionFromSeed() throws {
         setCryptoProvider()
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "main"
@@ -252,8 +248,8 @@ final class ExecuteVersionFromSeedTests: XCTestCase {
     }
 }
 
-final class ExecuteSyncFromSeedTests: XCTestCase {
-    func testExecuteSyncFromSeed() throws {
+final class ExecuteSyncFromSeed: XCTestCase {
+    func executeSyncFromSeed() throws {
         setCryptoProvider()
         let serveruri = "http://10.0.2.2:20000"
         let chainhint = "regtest"
@@ -287,8 +283,8 @@ final class ExecuteSyncFromSeedTests: XCTestCase {
     }
 }
 
-final class ExecuteSendFromOrchardTests: XCTestCase {
-    func testExecuteSendFromOrchard() throws {
+final class ExecuteSendFromOrchard: XCTestCase {
+    func executeSendFromOrchard() throws {
         setCryptoProvider()
         let mapper = JSONEncoder() // para el body del send
 
@@ -345,8 +341,8 @@ final class ExecuteSendFromOrchardTests: XCTestCase {
     }
 }
 
-final class UpdateCurrentPriceAndValueTransfersFromSeedTests: XCTestCase {
-    func testUpdateCurrentPriceAndValueTransfersFromSeed() throws {
+final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
+    func updateCurrentPriceAndValueTransfersFromSeed() throws {
         setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
@@ -393,8 +389,8 @@ final class UpdateCurrentPriceAndValueTransfersFromSeedTests: XCTestCase {
     }
 }
 
-final class ExecuteSaplingBalanceFromSeedTests: XCTestCase {
-    func testExecuteSaplingBalanceFromSeed() throws {
+final class ExecuteSaplingBalanceFromSeed: XCTestCase {
+    func executeSaplingBalanceFromSeed() throws {
         setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"
@@ -442,8 +438,8 @@ final class ExecuteSaplingBalanceFromSeedTests: XCTestCase {
     }
 }
 
-final class ExecuteParseAddressesTests: XCTestCase {
-    func testExecuteParseAddressForTex() throws {
+final class ExecuteParseAddresses: XCTestCase {
+    func executeParseAddressForTex() throws {
         setCryptoProvider()
 
         let serveruri = "http://10.0.2.2:20000"

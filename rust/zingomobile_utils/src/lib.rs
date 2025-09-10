@@ -80,6 +80,58 @@ pub fn android_integration_test_ci(abi: &str, test_name: &str) -> (i32, String, 
     (exit_code, stdout, stderr)
 }
 
+pub fn ios_integration_test(test_name: &str) -> (i32, String, String) {
+    let command: String;
+    let arg: String;
+    {
+        command = "sh".to_string();
+        arg = "-c".to_string();
+    }
+
+    let output = Command::new(command)
+        .arg(arg)
+        .arg(format!(
+            r#"
+            cd $(git rev-parse --show-toplevel)
+            ./scripts/ios_integration_tests.sh -e {test_name}
+            "#
+        ))
+        .output()
+        .expect("Failed to execute command");
+
+    let exit_code = output.status.code().unwrap_or(-1);
+    let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+    let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+
+    (exit_code, stdout, stderr)
+}
+
+pub fn ios_integration_test_ci(test_name: &str) -> (i32, String, String) {
+    let command: String;
+    let arg: String;
+    {
+        command = "sh".to_string();
+        arg = "-c".to_string();
+    }
+
+    let output = Command::new(command)
+        .arg(arg)
+        .arg(format!(
+            r#"
+            cd $(git rev-parse --show-toplevel)
+            ./scripts/ci/ios_integration_tests_ci.sh -e {test_name}
+            "#
+        ))
+        .output()
+        .expect("Failed to execute command");
+
+    let exit_code = output.status.code().unwrap_or(-1);
+    let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+    let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+
+    (exit_code, stdout, stderr)
+}
+
 pub fn android_e2e_test(abi: &str, test_name: &str) -> (i32, String, String) {
     let command: String;
     let arg: String;

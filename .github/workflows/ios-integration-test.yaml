@@ -19,6 +19,18 @@ jobs:
   ios-integration-test:
     name: IOS Integration test
     runs-on: macos-13
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [
+          "offline_testsuite",
+          "execute_sync_from_seed",
+          "execute_send_from_orchard",
+          "execute_currentprice_and_value_transfers_from_seed",
+          "execute_sapling_balance_from_seed",
+          "execute_parse_addresses"
+        ]
+
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -57,22 +69,8 @@ jobs:
         run: pod install
 
       - name: Run IOS integration tests
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 90
-          max_attempts: 1
-          command: |
-            set -eo pipefail
-            cd ios
-            mkdir -p build/reports build/DerivedData
-            xcodebuild test \
-              -workspace ZingoMobile.xcworkspace \
-              -scheme ZingoMobile \
-              -sdk iphonesimulator \
-              -configuration Debug \
-              -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2' \
-              -derivedDataPath "build/DerivedData" \
-              -resultBundlePath "build/reports/ZingoMobile-${TIMESTAMP}.xcresult"
+        working-directory: ./rust
+        run: cargo nextest run integration::ios::${{ matrix.test }} --features "ci regchest" --verbose --release
 
       - name: Upload iOS test reports (.xcresult)
         if: ${{ always() && !cancelled() }}

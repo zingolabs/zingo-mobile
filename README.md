@@ -80,8 +80,5 @@ lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Tests
    Specify to run a specific ABI and test: <br />
    `cargo nextest run e2e::x86_64::test_name`
 
-Regchest is still under development and currently not able to run darkside end-to-end tests: <br />
-`cargo nextest run e2e --features regchest -E 'not test(darkside)'`
-
 # Troubleshooting
 For notes on known issues and problems, see the [trouble-shooting notes](./TROUBLESHOOTING.md).
