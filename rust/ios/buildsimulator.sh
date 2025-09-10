@@ -2,6 +2,8 @@
 
 ln -s $(which node) /usr/local/bin/node
 
+cargo install --force --locked bindgen-cli
+
 cd ../lib
 cargo run --release --bin uniffi-bindgen generate ./src/zingo.udl --language swift --out-dir ./Generated
 cargo build --release --target aarch64-apple-ios-sim -Z build-std

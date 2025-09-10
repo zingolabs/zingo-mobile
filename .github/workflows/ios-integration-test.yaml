@@ -61,6 +61,32 @@ jobs:
         working-directory: rust/lib/Generated
         run: cp ./*.* ../../../ios
 
+      - name: Install protoc
+        run: brew install protobuf
+
+      - name: Install docker
+        run: |
+          brew install --head colima
+          brew install --formula docker
+          colima start
+
+      - name: Colima status
+        run: colima status
+
+      - name: Pull regchest docker image
+        run: docker pull zingodevops/regchest:010
+
+      - name: Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache-workspaces: rust -> rust/target
+
+      - name: Install nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: nextest
+
       - name: Yarn
         run: yarn
 
