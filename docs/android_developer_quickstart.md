@@ -1,7 +1,7 @@
 # Android
 ## Prerequisites
 1. Yarn
-2. NodeJS (recommended version 17+)
+2. NodeJS (recommended version 22.18.0 or higher)
 3. Rust (https://www.rust-lang.org/tools/install)
 4. Docker (Docker Engine)
 5. OpenJDK 18 (https://jdk.java.net/archive/)
