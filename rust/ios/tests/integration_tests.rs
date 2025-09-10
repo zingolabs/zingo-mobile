@@ -137,7 +137,7 @@ async fn execute_sapling_balance_from_seed() {
         zingomobile_utils::ios_integration_test("ZingoMobileTests/ExecuteSaplingBalanceFromSeed");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::aios_integration_test_ci("ZingoMobileTests/ExecuteSaplingBalanceFromSeed");
+        zingomobile_utils::ios_integration_test_ci("ZingoMobileTests/ExecuteSaplingBalanceFromSeed");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
