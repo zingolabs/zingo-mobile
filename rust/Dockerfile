@@ -15,6 +15,7 @@ WORKDIR /opt/zingo/rust/lib/
 
 # add the local rust code into the container
 COPY android/ /opt/zingo/rust/android/
+COPY ios/ /opt/zingo/rust/
 COPY lib/ /opt/zingo/rust/lib/
 COPY Cargo.lock /opt/zingo/rust/Cargo.lock
 COPY Cargo.toml /opt/zingo/rust/Cargo.toml
