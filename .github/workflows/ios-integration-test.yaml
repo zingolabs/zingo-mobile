@@ -41,15 +41,6 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Install nvm with node 22.18.0
-        run: |
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-          export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-          nvm install 22.18.0
-          nvm use 22.18.0
-
       - name: Native rust cache
         uses: actions/cache/restore@v4
         with:
@@ -91,6 +82,18 @@ jobs:
 
       - name: Pull regchest docker image
         run: docker pull zingodevops/regchest:010
+
+      - name: Install nvm with node 22.18.0
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+          nvm install 22.18.0
+          nvm use 22.18.0
+
+      - name: Node setup
+        run: ln -s $(which node) /usr/local/bin/node
 
       - name: Yarn
         run: yarn
