@@ -21,7 +21,7 @@ pub fn android_integration_test(abi: &str, test_name: &str) -> (i32, String, Str
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
-            ./scripts/integration_tests.sh -a {abi} -e {test_name}
+            ./scripts/android_integration_tests.sh -a {abi} -e {test_name}
             "#
         ))
         .output()
@@ -33,7 +33,7 @@ pub fn android_integration_test(abi: &str, test_name: &str) -> (i32, String, Str
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
-            ./scripts/integration_tests.sh -a {} -e {} -A
+            ./scripts/android_integration_tests.sh -a {} -e {} -A
             "#,
             abi, test_name
         ))
@@ -67,7 +67,7 @@ pub fn android_integration_test_ci(abi: &str, test_name: &str) -> (i32, String, 
         .arg(format!(
             r#"
             cd $(git rev-parse --show-toplevel)
-            ./scripts/ci/integration_tests_ci.sh -a {abi} -e {test_name}
+            ./scripts/ci/android_integration_tests_ci.sh -a {abi} -e {test_name}
             "#
         ))
         .output()

@@ -99,22 +99,29 @@ jobs:
         working-directory: ios
         run: pod install
 
-      - name: Run IOS integration tests
-        working-directory: ./rust
-        run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
+      - name: Create AVD and generate snapshot for caching
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 90
+          max_attempts: 1
+          command: ./scripts/ios_integration_tests.sh -e ${{ matrix.test }}
+
+      #- name: Run IOS integration tests
+      #  working-directory: ./rust
+      #  run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
 
       - name: Upload iOS test reports (.xcresult)
         if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-integration-reports-ios-${{ env.TIMESTAMP }}
-          path: ios/build/reports/ZingoMobile-${{ env.TIMESTAMP }}.xcresult
+          name: test-ios-integration-reports-${{ matrix.test }}
+          path: ios/build/reports/ZingoMobile-${{ matrix.test }}.xcresult
 
       - name: Upload DerivedData logs (optional)
         if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-integration-derived-logs-ios-${{ env.TIMESTAMP }}
+          name: test-ios-integration-derived-logs-${{ matrix.test }}
           path: |
             ios/build/DerivedData/Logs/Test
             ios/build/DerivedData/Logs/CrashReporter

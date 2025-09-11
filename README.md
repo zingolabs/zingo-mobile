@@ -32,8 +32,8 @@ network in a docker container. Before running tests, pull the latest Regchest im
 
 ### Integration Tests
 1. Create quick-boot snapshots to speed up AVD launch times. From the root directory, run: <br />
-   `./scripts/integration_tests.sh -a x86_64 -s` <br />
-   `./scripts/integration_tests.sh -a x86 -s` <br />
+   `./scripts/android_integration_tests.sh -a x86_64 -s` <br />
+   `./scripts/android_integration_tests.sh -a x86 -s` <br />
    By default, this uses default API 29 system images. Other images may be used for testing
    by specifying the api level and target. However, using other images with the cargo test runner
    is still under development.
@@ -53,7 +53,7 @@ To run tests with Regchest, add the `--features regchest` flag, for example: <br
 `cargo nextest run android_integration --features regchest`
 
 For more information on running integration tests on non-default AVDs, run: <br />
-`./scripts/integration_tests.sh -h` <br />
+`./scripts/android_integration_tests.sh -h` <br />
 Without the cargo test runner these emulated android devices will not be able to connect to a
 lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
 
