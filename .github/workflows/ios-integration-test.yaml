@@ -99,12 +99,12 @@ jobs:
         working-directory: ios
         run: pod install
 
-      - name: Create AVD and generate snapshot for caching
+      - name: Run IOS integration tests (script test)
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 90
           max_attempts: 1
-          command: ./scripts/ios_integration_tests_ci.sh -e ${{ matrix.test }}
+          command: ./scripts/ci/ios_integration_tests_ci.sh -e ${{ matrix.test }}
 
       #- name: Run IOS integration tests
       #  working-directory: ./rust
