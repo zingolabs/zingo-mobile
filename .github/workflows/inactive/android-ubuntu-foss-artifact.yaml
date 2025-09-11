@@ -3,16 +3,12 @@ name: Android Ubuntu FOSS Artifact
 on:
   workflow_call:
     inputs:
-      timestamp:
-        required: true
-        type: string
       cache-key:
         required: true
         type: string
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
-  TIMESTAMP: ${{ inputs.timestamp }}
   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
 
 jobs:

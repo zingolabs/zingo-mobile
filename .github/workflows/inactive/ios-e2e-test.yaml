@@ -3,16 +3,12 @@ name: IOS e2e test
 on:
   workflow_call:
     inputs:
-      timestamp:
-        required: true
-        type: string
       cache-key:
         required: true
         type: string
 
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
-  TIMESTAMP: ${{ inputs.timestamp }}
   REPO-OWNER: ${{ github.repository_owner }}
 
 jobs:

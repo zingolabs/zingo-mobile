@@ -3,13 +3,9 @@ name: Android Ubuntu FOSS Script Artifact
 on:
   workflow_call:
     inputs:
-      timestamp:
-        required: true
-        type: string
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
-  TIMESTAMP: ${{ inputs.timestamp }}
   ZINGO_JKS_BASE64: ${{ secrets.ZINGO_JKS_BASE64 }}
   KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
   KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
