@@ -89,7 +89,7 @@ jobs:
           nvm use 22.18.0
 
       - name: Node setup
-        run: ln -s $(which node) /usr/local/bin/node
+        run: sudo ln -sfn $(which node) /usr/local/bin/node
 
       - name: Yarn
         run: yarn
