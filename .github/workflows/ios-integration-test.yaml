@@ -76,7 +76,7 @@ jobs:
       - name: Grant permissions
         run: |
           sudo chmod 777 ~/.colima/default/docker.sock
-          sudo chmod 777 ./scripts/ci/integration_tests_ci.sh
+          sudo chmod 777 ./scripts/ci/ios_integration_tests_ci.sh
 
       - name: Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
