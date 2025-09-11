@@ -50,11 +50,6 @@ jobs:
           nvm install 22.18.0
           nvm use 22.18.0
 
-      - name: Grant permissions
-        run: |
-          sudo chmod 777 ~/.colima/default/docker.sock
-          sudo chmod 777 ./scripts/ci/integration_tests_ci.sh
-
       - name: Native rust cache
         uses: actions/cache/restore@v4
         with:
@@ -77,6 +72,11 @@ jobs:
 
       - name: Colima status
         run: colima status
+
+      - name: Grant permissions
+        run: |
+          sudo chmod 777 ~/.colima/default/docker.sock
+          sudo chmod 777 ./scripts/ci/integration_tests_ci.sh
 
       - name: Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
