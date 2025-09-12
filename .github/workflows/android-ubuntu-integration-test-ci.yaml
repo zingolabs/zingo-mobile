@@ -68,6 +68,19 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Gradle setup cache (write-only)
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
+          cache-write-only: true
+          cache-read-only: false
+
       - name: Check AVD cache
         uses: actions/cache/restore@v4
         id: avd-cache
@@ -168,7 +181,7 @@ jobs:
       - name: Grant permissions
         run: |
           sudo chmod 777 /var/run/docker.sock
-          sudo chmod 777 ./scripts/ci/integration_tests_ci.sh
+          sudo chmod 777 ./scripts/ci/android_integration_tests_ci.sh
 
       - name: Enable KVM
         run: |
@@ -201,11 +214,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Gradle setup
+      - name: Gradle setup cache (read-only)
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: wrapper
-          cache-disabled: true
+          cache-write-only: false
+          cache-read-only: true
 
       - name: Native rust cache
         uses: actions/cache/restore@v4
@@ -260,11 +274,11 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: cargo nextest run integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci regchest" --verbose --release
+          script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci regchest" --verbose --release
           working-directory: ./rust
 
       - name: Upload test reports
-        if: ${{ ! cancelled() }}
+        if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: test-integration-reports-${{ env.ABI }}-${{ matrix.test }}-${{ env.TIMESTAMP }}

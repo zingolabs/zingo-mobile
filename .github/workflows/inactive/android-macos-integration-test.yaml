@@ -164,7 +164,7 @@ jobs:
         with:
           timeout_minutes: 60
           max_attempts: 3
-          command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
+          command: ./scripts/android_integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
       - name: Download archive
         uses: actions/download-artifact@v4
@@ -175,12 +175,12 @@ jobs:
       - name: Run integration tests
         working-directory: ./rust
         run: |
-          cargo nextest run integration::${{ env.NEXTEST-ABI }} --verbose --profile ci \
+          cargo nextest run android_integration::${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive-${{ env.ABI }}.tar.zst \
             --partition count:${{ matrix.partition}}/6
 
       - name: Upload test reports
-        if: ${{ ! cancelled() }}
+        if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: test-reports-${{ env.ABI }}-${{ matrix.partition}}-${{ env.TIMESTAMP }}

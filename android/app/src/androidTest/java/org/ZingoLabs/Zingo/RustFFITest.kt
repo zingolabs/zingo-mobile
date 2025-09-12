@@ -149,7 +149,7 @@ class ExecuteAddressesFromSeed {
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         val addressesJson: String = uniffi.zingo.getUnifiedAddresses()
@@ -234,7 +234,7 @@ class ExecuteVersionFromSeed {
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         val version: String = uniffi.zingo.getVersion()
@@ -263,7 +263,7 @@ class ExecuteSyncFromSeed {
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.ABANDON)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         val infoJson: String = uniffi.zingo.infoServer()
@@ -326,7 +326,7 @@ class ExecuteSendFromOrchard {
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         var syncJson: String = uniffi.zingo.runSync()
@@ -426,7 +426,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         val price: String = uniffi.zingo.zecPrice(tor)
@@ -503,7 +503,7 @@ class ExecuteSaplingBalanceFromSeed {
         println(initFromSeedJson)
         val initFromSeed: InitFromSeed = mapper.readValue(initFromSeedJson)
 
-        assertThat(initFromSeed.seed_phrase).isEqualTo(Seeds.HOSPITAL)
+        assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
         val syncJson:String = uniffi.zingo.runSync()

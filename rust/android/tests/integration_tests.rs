@@ -6,8 +6,8 @@ use zingolib::testutils::scenarios;
 const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
 
 // macos ci runner
-#[cfg(target_os = "macos")]
-const UNIX_SOCKET: Option<&str> = Some("unix:///Users/runner/.colima/default/docker.sock");
+//#[cfg(target_os = "macos")]
+//const UNIX_SOCKET: Option<&str> = Some("unix:///Users/runner/.colima/default/docker.sock");
 
 #[cfg(all(not(feature = "ci"), feature = "regchest", not(target_os = "macos")))]
 const UNIX_SOCKET: Option<&str> = None;
@@ -196,7 +196,7 @@ async fn execute_parse_addresses(abi: &str) {
     assert_eq!(exit_code, 0);
 }
 
-mod integration {
+mod android_integration {
     mod x86_32 {
         const ABI: &str = "x86";
 

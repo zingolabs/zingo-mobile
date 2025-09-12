@@ -1,7 +1,7 @@
 # iOS
 ## Prerequisites
 1. Yarn
-2. NodeJS (recommended version 17+)
+2. NodeJS (recommended version 22.18.0 or higher)
 3. Rust (https://www.rust-lang.org/tools/install)
 4. Rustup iOS targets (`rustup target add aarch64-apple-ios aarch64-apple-ios-sim`)
 5. Cargo-lipo (`cargo install cargo-lipo`)
