@@ -47,7 +47,7 @@ xcodebuild test \
     -configuration Debug \
     -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2' \
     -derivedDataPath "build/DerivedData" \
-    -resultBundlePath "build/reports/ZingoMobile-${test_name}.xcresult"
+    -resultBundlePath "build/reports/ZingoMobile-Test.xcresult" \
     -only-testing:"${test_name}"
 
 if [ $? -ne 0 ]; then
