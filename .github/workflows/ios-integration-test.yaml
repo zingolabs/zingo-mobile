@@ -95,16 +95,17 @@ jobs:
         working-directory: ios
         run: pod install
 
-      - name: Run IOS integration tests (script test)
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 90
-          max_attempts: 1
-          command: ./scripts/ci/ios_integration_tests_ci.sh -e ${{ matrix.test }}
+      # to test just the script
+      #- name: Run IOS integration tests (script test)
+      #  uses: nick-fields/retry@v2
+      #  with:
+      #    timeout_minutes: 90
+      #    max_attempts: 1
+      #    command: ./scripts/ci/ios_integration_tests_ci.sh
 
-      #- name: Run IOS integration tests
-      #  working-directory: ./rust
-      #  run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
+      - name: Run IOS integration tests
+        working-directory: ./rust
+        run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
 
       - name: Upload iOS test reports (.xcresult)
         if: ${{ always() && !cancelled() }}
