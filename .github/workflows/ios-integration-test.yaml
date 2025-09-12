@@ -112,7 +112,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-ios-integration-reports-${{ matrix.test }}
-          path: ios/build/reports/ZingoMobile-${{ matrix.test }}.xcresult
+          path: ios/build/reports/ZingoMobile-Test.xcresult
 
       - name: Upload DerivedData logs (optional)
         if: ${{ always() && !cancelled() }}
