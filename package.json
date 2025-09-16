@@ -16,7 +16,7 @@
     "build:release:split": "cd android && ./gradlew assembleRelease -PsplitApk=true && cd ..",
     "build:debug": "cd android && ./gradlew assembleDebug && cd ..",
     "build:debug:split": "cd android && ./gradlew assembleDebug -PsplitApk=true && cd ..",
-    "cargo:update": "cd rust && cargo update -p zingolib --aggressive && cd ..",
+    "cargo:update": "cd rust && cargo update -p zingolib -p regchest_utils --aggressive && cd ..",
     "cargo:clean": "cd rust && cargo clean && cd .."
   },
   "dependencies": {

@@ -96,7 +96,7 @@ jobs:
           sed -i "/^zingolib/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
           if cat rust/lib/Cargo.toml | grep "^zingolib" | grep -q "branch"; then exit 1; fi
           cd rust
-          cargo update -p zingolib --aggressive
+          cargo update -p zingolib -p regchest_utils --aggressive
 
       - name: Cargo default nightly
         run: rustup default nightly
