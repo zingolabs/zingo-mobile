@@ -245,6 +245,20 @@ jobs:
       - name: Yarn install
         run: yarn
 
+      - name: Pull regchest docker image
+        run: docker pull zingodevops/ci-build:009
+
+      - name: Extract binaries & params from image
+        run: |
+          set -euxo pipefail
+          cid=$(docker create zingodevops/ci-build:009)
+          mkdir -p rust/test_binaries/bins
+          docker cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
+          docker cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
+          docker cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
+          docker cp "$cid":/root/.zcash-params   ../
+          docker rm "$cid"
+
       - name: Run Build
         working-directory: android
         run: ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release -PsplitApk=true
@@ -262,20 +276,6 @@ jobs:
           sudo apt-get clean
           echo "Disk space after post-build cleanup:"
           df -h
-
-      - name: Pull regchest docker image
-        run: docker pull zingodevops/ci-build:009
-
-      - name: Extract binaries & params from image
-        run: |
-          set -euxo pipefail
-          cid=$(docker create zingodevops/ci-build:009)
-          mkdir -p rust/test_binaries/bins
-          docker cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
-          docker cp "$cid":/root/.zcash-params   /github/home
-          docker rm "$cid"
 
       - name: Run Integration Test
         uses: reactivecircus/android-emulator-runner@v2
