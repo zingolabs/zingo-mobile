@@ -206,10 +206,6 @@ jobs:
         with:
           tool: nextest
 
-      - name: Pull regchest docker image
-      #  run: docker pull zingodevops/regchest:011
-        run: docker pull zingodevops/ci-build:009
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -266,6 +262,10 @@ jobs:
           sudo apt-get clean
           echo "Disk space after post-build cleanup:"
           df -h
+
+      - name: Pull regchest docker image
+      #  run: docker pull zingodevops/regchest:011
+        run: docker pull zingodevops/ci-build:009
 
       - name: create binaries dir
         run: mkdir -p ./rust/test_binaries/bins
