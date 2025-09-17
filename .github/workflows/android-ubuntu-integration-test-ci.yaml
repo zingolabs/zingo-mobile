@@ -256,7 +256,6 @@ jobs:
           docker cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
           docker cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
           docker cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
-          docker cp "$cid":/root/.zcash-params   ../
           docker rm "$cid"
 
       - name: Run Build
