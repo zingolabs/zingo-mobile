@@ -117,9 +117,6 @@ jobs:
     name: Android Ubuntu Integration test
     needs: android-ubuntu-integration-test-ci-avd-cache
     runs-on: ubuntu-24.04
-    container:
-      image: zingodevops/ci-build:009
-      options: --security-opt seccomp=unconfined
     strategy:
       fail-fast: false
       matrix:
@@ -209,9 +206,9 @@ jobs:
         with:
           tool: nextest
 
-      #- name: Pull regchest docker image
+      - name: Pull regchest docker image
       #  run: docker pull zingodevops/regchest:011
-      #  run: docker pull zingodevops/ci-build:009
+        run: docker pull zingodevops/ci-build:009
 
       - name: Setup Java
         uses: actions/setup-java@v4
