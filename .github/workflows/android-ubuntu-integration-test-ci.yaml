@@ -117,6 +117,9 @@ jobs:
     name: Android Ubuntu Integration test
     needs: android-ubuntu-integration-test-ci-avd-cache
     runs-on: ubuntu-24.04
+    container:
+      image: zingodevops/ci-build:009
+      options: --security-opt seccomp=unconfined
     strategy:
       fail-fast: false
       matrix:
@@ -129,6 +132,7 @@ jobs:
           "execute_parse_addresses"
         ]
     env:
+      RUSTFLAGS: -D warnings
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
       - name: Set envs for zingolib CI
@@ -205,8 +209,9 @@ jobs:
         with:
           tool: nextest
 
-      - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:011
+      #- name: Pull regchest docker image
+      #  run: docker pull zingodevops/regchest:011
+      #  run: docker pull zingodevops/ci-build:009
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -265,6 +270,15 @@ jobs:
           echo "Disk space after post-build cleanup:"
           df -h
 
+      - name: create binaries dir
+        run: mkdir -p ./rust/test_binaries/bins
+
+      - name: Symlink lightwalletd and zcash binaries
+        run: ln -s /usr/bin/lightwalletd /usr/bin/zcashd /usr/bin/zcash-cli ./rust/test_binaries/bins/
+
+      - name: Symlink zcash parameters
+        run: ln -s /root/.zcash-params /github/home
+
       - name: Run Integration Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -274,7 +288,7 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci regchest" --verbose --release
+          script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci" --verbose --release
           working-directory: ./rust
 
       - name: Upload test reports
