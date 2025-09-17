@@ -13,7 +13,7 @@ const UNIX_SOCKET: Option<&str> = None;
 
 async fn tex_send_address(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let local_net =
         scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
@@ -43,7 +43,7 @@ async fn tex_send_address(abi: &str) {
 
 async fn shielding(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let local_net =
         scenarios::funded_transparent_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
@@ -72,7 +72,7 @@ async fn shielding(abi: &str) {
 
 async fn parse_invalid_address(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let local_net =
         scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
@@ -103,7 +103,7 @@ async fn parse_invalid_address(abi: &str) {
 
 async fn reload_while_tx_pending(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let local_net =
         scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
@@ -149,7 +149,7 @@ async fn change_custom_server(abi: &str) {
 
 async fn change_custom_regtest_server(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let local_net =
         scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
@@ -236,7 +236,7 @@ async fn screen_awake(abi: &str) {
 
 async fn send(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let local_net =
         scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =

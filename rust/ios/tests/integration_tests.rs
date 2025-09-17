@@ -22,7 +22,7 @@ async fn offline_testsuite() {
 
 async fn execute_sync_from_seed() {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let local_net =
         scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
@@ -53,7 +53,7 @@ async fn execute_sync_from_seed() {
 
 async fn execute_send_from_orchard() {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let local_net =
         scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
@@ -84,7 +84,7 @@ async fn execute_send_from_orchard() {
 
 async fn execute_currentprice_and_value_transfers_from_seed() {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let local_net =
         scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
@@ -119,7 +119,7 @@ async fn execute_currentprice_and_value_transfers_from_seed() {
 
 async fn execute_sapling_balance_from_seed() {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let local_net =
         scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker = match regchest_utils::launch(
@@ -154,7 +154,7 @@ async fn execute_sapling_balance_from_seed() {
 
 async fn execute_parse_addresses() {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let local_net =
         scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker = match regchest_utils::launch(
