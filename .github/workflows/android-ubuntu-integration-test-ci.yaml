@@ -264,17 +264,18 @@ jobs:
           df -h
 
       - name: Pull regchest docker image
-      #  run: docker pull zingodevops/regchest:011
         run: docker pull zingodevops/ci-build:009
 
-      - name: create binaries dir
-        run: mkdir -p ./rust/test_binaries/bins
-
-      - name: Symlink lightwalletd and zcash binaries
-        run: ln -s /usr/bin/lightwalletd /usr/bin/zcashd /usr/bin/zcash-cli ./rust/test_binaries/bins/
-
-      - name: Symlink zcash parameters
-        run: ln -s /root/.zcash-params /github/home
+      - name: Extract binaries & params from image
+        run: |
+          set -euxo pipefail
+          cid=$(docker create zingodevops/ci-build:009)
+          mkdir -p rust/test_binaries/bins
+          docker cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
+          docker cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
+          docker cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
+          docker cp "$cid":/root/.zcash-params   /github/home
+          docker rm "$cid"
 
       - name: Run Integration Test
         uses: reactivecircus/android-emulator-runner@v2
