@@ -26,7 +26,8 @@ jobs:
           "execute_sapling_balance_from_seed",
           "execute_parse_addresses"
         ]
-
+    env:
+      RUSTFLAGS: -D warnings
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -99,11 +100,15 @@ jobs:
         run: |
           set -euxo pipefail
           cid=$(docker create zingodevops/ci-build:009)
-          mkdir -p test_binaries/bins
-          docker cp "$cid":/usr/bin/lightwalletd test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcashd       test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcash-cli    test_binaries/bins/
+          mkdir -p rust/test_binaries/bins
+          docker cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
+          docker cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
+          docker cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
           docker rm "$cid"
+
+      - name: Set test workspace dir
+        working-directory: ./rust
+        run: echo "CARGO_WORKSPACE_DIR=$PWD" >> $GITHUB_ENV
 
       - name: Run IOS integration tests
         working-directory: ./rust
