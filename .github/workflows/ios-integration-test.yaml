@@ -76,8 +76,8 @@ jobs:
         with:
           tool: nextest
 
-      - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:011
+      - name: Pull ci-build docker image
+        run: docker pull zingodevops/ci-build:009
       
       - name: Install nvm with node 20.9.0
         run: |
@@ -94,6 +94,16 @@ jobs:
       - name: Pod Install
         working-directory: ios
         run: pod install
+
+      - name: Extract binaries & params from image
+        run: |
+          set -euxo pipefail
+          cid=$(docker create zingodevops/ci-build:009)
+          mkdir -p test_binaries/bins
+          docker cp "$cid":/usr/bin/lightwalletd test_binaries/bins/
+          docker cp "$cid":/usr/bin/zcashd       test_binaries/bins/
+          docker cp "$cid":/usr/bin/zcash-cli    test_binaries/bins/
+          docker rm "$cid"
 
       - name: Run IOS integration tests
         working-directory: ./rust
