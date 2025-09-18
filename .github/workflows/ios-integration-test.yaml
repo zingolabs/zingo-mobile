@@ -76,6 +76,9 @@ jobs:
         with:
           tool: nextest
 
+      - name: Pull regchest docker image
+        run: docker pull zingodevops/regchest:011
+      
       - name: Install nvm with node 20.9.0
         run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
@@ -92,22 +95,9 @@ jobs:
         working-directory: ios
         run: pod install
 
-      - name: Pull ci-build docker image
-        run: docker pull zingodevops/ci-build:009
-
-      - name: Extract binaries & params from image
-        run: |
-          set -euxo pipefail
-          cid=$(docker create zingodevops/ci-build:009)
-          sudo mkdir -p rust/test_binaries/bins
-          sudo docker cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
-          sudo docker cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
-          sudo docker cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
-          sudo docker rm "$cid"
-
       - name: Run IOS integration tests
         working-directory: ./rust
-        run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci" --verbose --release
+        run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
 
       - name: Upload iOS test reports (.xcresult)
         if: ${{ always() && !cancelled() }}
