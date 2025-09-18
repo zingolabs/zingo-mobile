@@ -2,15 +2,12 @@
 use zingolib::testutils::scenarios;
 
 // ubuntu ci runner
-#[cfg(feature = "ci", feature = "regchest")]
+#[cfg(all(feature = "ci", feature = "regchest"))]
 const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
 
 // macos ci runner
 //#[cfg(feature = "ci", feature = "regchest")]
 //const UNIX_SOCKET: Option<&str> = Some("`/Users/runner/.colima/default/docker.sock`");
-
-#[cfg(all(not(feature = "ci"), feature = "regchest"))]
-const UNIX_SOCKET: Option<&str> = None;
 
 async fn tex_send_address(abi: &str) {
     #[cfg(not(feature = "regchest"))]
