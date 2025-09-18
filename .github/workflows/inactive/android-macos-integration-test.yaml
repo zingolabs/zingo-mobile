@@ -47,7 +47,7 @@ jobs:
 
       - name: Build and archive tests
         working-directory: ./rust
-        run: cargo nextest archive --verbose --features "regchest" --archive-file nextest-archive-${{ env.ABI }}.tar.zst
+        run: cargo nextest archive --verbose --features "ci" --archive-file nextest-archive-${{ env.ABI }}.tar.zst
 
       - name: Upload archive
         uses: actions/upload-artifact@v4
