@@ -101,9 +101,9 @@ jobs:
           set -euxo pipefail
           cid=$(docker create zingodevops/ci-build:009)
           mkdir -p rust/test_binaries/bins
-          docker cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
+          docker ln -s "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
+          docker ln -s "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
+          docker ln -s "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
           docker rm "$cid"
 
       - name: Set test workspace dir
