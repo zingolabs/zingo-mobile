@@ -107,7 +107,7 @@ jobs:
 
       - name: Run IOS integration tests
         working-directory: ./rust
-        run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
+        run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci" --verbose --release
 
       - name: Upload iOS test reports (.xcresult)
         if: ${{ always() && !cancelled() }}
