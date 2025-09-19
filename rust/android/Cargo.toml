@@ -9,7 +9,7 @@ ci = []
 regchest = []
 
 [dev-dependencies]
-zingolib = { workspace = true, features = [ "test-elevation" ] }
+zingolib = { workspace = true }
 pepper-sync = { workspace = true }
 zingomobile_utils = { workspace = true }
 regchest_utils = { workspace = true }
