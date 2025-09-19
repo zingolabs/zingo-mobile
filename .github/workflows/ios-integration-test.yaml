@@ -97,6 +97,7 @@ jobs:
         run: pod install
 
       - name: Build for testing
+        working-directory: ios
         run: |
           set -euxo pipefail
           rm -rf build/reports build/DerivedData
