@@ -58,9 +58,6 @@ jobs:
           brew install --formula docker
           colima start
 
-      - name: Colima status
-        run: colima status
-
       - name: Grant permissions
         run: |
           sudo chmod 777 ~/.colima/default/docker.sock
@@ -96,7 +93,7 @@ jobs:
         working-directory: ios
         run: pod install
 
-      - name: Build for testing
+      - name: Run Build
         working-directory: ios
         run: |
           set -euxo pipefail
@@ -116,14 +113,14 @@ jobs:
         working-directory: ./rust
         run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
 
-      - name: Upload iOS test reports (.xcresult)
+      - name: Upload IOS test reports (.xcresult)
         if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: test-ios-integration-reports-${{ matrix.test }}.xcresult
           path: ios/build/reports/ZingoMobile-Test.xcresult
 
-      - name: Upload DerivedData logs (optional)
+      - name: Upload IOS DerivedData logs (optional)
         if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:

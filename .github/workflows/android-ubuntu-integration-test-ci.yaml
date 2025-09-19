@@ -276,7 +276,7 @@ jobs:
           echo "Disk space after post-build cleanup:"
           df -h
 
-      - name: Run Integration Test
+      - name: Run Android Integration Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ env.API-LEVEL }}
