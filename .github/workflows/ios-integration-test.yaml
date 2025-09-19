@@ -54,9 +54,11 @@ jobs:
 
       - name: Install docker
         run: |
-          brew install --head colima
-          brew install --formula docker
-          colima start
+          set -euxo pipefail
+          brew install colima lima docker qemu
+          colima version || true
+          limactl --version || true
+          qemu-system-aarch64 --version || true
 
       - name: Grant permissions
         run: |
