@@ -13,7 +13,7 @@ env:
 jobs:
   create-cache-key:
     name: Create cache key
-    runs-on: macos-13
+    runs-on: macos-15
     env:
       RUSTUP_HOME: /root/.rustup
     outputs:
