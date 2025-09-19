@@ -90,6 +90,8 @@ jobs:
       - name: Install rust Target
         run: sudo rustup target add aarch64-apple-ios-sim x86_64-apple-ios
 
+      # this issue is solved in bindgen 0.70
+      # But we have a dependency that are using a incompatible version 0.69.
       - name: Cargo env for iOS sim (bindgen/cc)
         shell: bash
         run: |
