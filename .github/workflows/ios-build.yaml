@@ -90,13 +90,17 @@ jobs:
       - name: Install rust Target
         run: sudo rustup target add aarch64-apple-ios-sim x86_64-apple-ios
 
-      - name: iOS sim SDK + bindgen fix
+      - name: Cargo env for iOS sim (bindgen/cc)
+        shell: bash
         run: |
+          mkdir -p .cargo
           SDKROOT="$(xcrun --sdk iphonesimulator --show-sdk-path)"
-          echo "SDKROOT=$SDKROOT" >> $GITHUB_ENV
-          echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64_apple_ios_sim=--target=arm64-apple-ios-simulator -isysroot ${SDKROOT}' >> $GITHUB_ENV
-          echo 'CFLAGS_aarch64_apple_ios_sim=--target=arm64-apple-ios-simulator -isysroot ${SDKROOT}' >> $GITHUB_ENV
-          echo 'CXXFLAGS_aarch64_apple_ios_sim=--target=arm64-apple-ios-simulator -isysroot ${SDKROOT}' >> $GITHUB_ENV
+          cat > .cargo/config.toml <<EOF
+          [env]
+          BINDGEN_EXTRA_CLANG_ARGS_aarch64_apple_ios_sim = "--target=arm64-apple-ios-simulator -isysroot $SDKROOT"
+          CFLAGS_aarch64_apple_ios_sim = "--target=arm64-apple-ios-simulator -isysroot $SDKROOT"
+          CXXFLAGS_aarch64_apple_ios_sim = "--target=arm64-apple-ios-simulator -isysroot $SDKROOT"
+          EOF
 
       - name: Cargo lipo universal library
         working-directory: rust/lib
