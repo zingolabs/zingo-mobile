@@ -92,9 +92,11 @@ jobs:
 
       - name: iOS sim SDK + bindgen fix
         run: |
-          export SDKROOT="$(xcrun --sdk iphonesimulator --show-sdk-path)"
-          echo "SDKROOT=${SDKROOT}" >> $GITHUB_ENV
+          SDKROOT="$(xcrun --sdk iphonesimulator --show-sdk-path)"
+          echo "SDKROOT=$SDKROOT" >> $GITHUB_ENV
           echo 'BINDGEN_EXTRA_CLANG_ARGS_aarch64_apple_ios_sim=--target=arm64-apple-ios-simulator -isysroot ${SDKROOT}' >> $GITHUB_ENV
+          echo 'CFLAGS_aarch64_apple_ios_sim=--target=arm64-apple-ios-simulator -isysroot ${SDKROOT}' >> $GITHUB_ENV
+          echo 'CXXFLAGS_aarch64_apple_ios_sim=--target=arm64-apple-ios-simulator -isysroot ${SDKROOT}' >> $GITHUB_ENV
 
       - name: Cargo lipo universal library
         working-directory: rust/lib
