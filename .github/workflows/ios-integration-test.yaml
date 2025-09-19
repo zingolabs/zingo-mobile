@@ -96,6 +96,21 @@ jobs:
         working-directory: ios
         run: pod install
 
+      - name: Build for testing
+        run: |
+          set -euxo pipefail
+          rm -rf build/reports build/DerivedData
+          mkdir -p build/reports build/DerivedData
+
+          xcodebuild build-for-testing \
+            -workspace ZingoMobile.xcworkspace \
+            -scheme ZingoMobile \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2' \
+            -derivedDataPath "build/DerivedData" \
+            -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult"
+
       - name: Run IOS integration tests
         working-directory: ./rust
         run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
