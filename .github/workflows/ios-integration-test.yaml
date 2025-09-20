@@ -14,7 +14,7 @@ env:
 jobs:
   ios-integration-test:
     name: IOS Integration test
-    runs-on: macos-15
+    runs-on: macos-13
     strategy:
       fail-fast: false
       matrix:
@@ -54,12 +54,9 @@ jobs:
 
       - name: Install docker
         run: |
-          set -euxo pipefail
-          brew install colima lima docker qemu
-          colima start -f
-          colima version || true
-          limactl --version || true
-          qemu-system-aarch64 --version || true
+          brew install --head colima
+          brew install --formula docker
+          colima start
 
       - name: Grant permissions
         run: |
