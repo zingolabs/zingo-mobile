@@ -56,7 +56,8 @@ jobs:
         run: |
           set -euxo pipefail
           brew install colima lima docker qemu
-          brew services start colima
+          brew services start colima || true
+          colima start
           colima version || true
           limactl --version || true
           qemu-system-aarch64 --version || true
