@@ -26,7 +26,8 @@ jobs:
           "execute_sapling_balance_from_seed",
           "execute_parse_addresses"
         ]
-
+    env:
+      RUSTFLAGS: -D warnings
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -57,9 +58,6 @@ jobs:
           brew install --formula docker
           colima start
 
-      - name: Colima status
-        run: colima status
-
       - name: Grant permissions
         run: |
           sudo chmod 777 ~/.colima/default/docker.sock
@@ -76,9 +74,9 @@ jobs:
         with:
           tool: nextest
 
-      - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:010
-
+      - name: Pull docker image
+        run: docker pull zingodevops/regchest:011
+      
       - name: Install nvm with node 20.9.0
         run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
@@ -95,26 +93,34 @@ jobs:
         working-directory: ios
         run: pod install
 
-      # to test just the script
-      #- name: Run IOS integration tests (script test)
-      #  uses: nick-fields/retry@v2
-      #  with:
-      #    timeout_minutes: 90
-      #    max_attempts: 1
-      #    command: ./scripts/ci/ios_integration_tests_ci.sh
+      - name: Run Build
+        working-directory: ios
+        run: |
+          set -euxo pipefail
+          rm -rf build/reports build/DerivedData
+          mkdir -p build/reports build/DerivedData
+
+          xcodebuild build-for-testing \
+            -workspace ZingoMobile.xcworkspace \
+            -scheme ZingoMobile \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2' \
+            -derivedDataPath "build/DerivedData" \
+            -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult"
 
       - name: Run IOS integration tests
         working-directory: ./rust
         run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
 
-      - name: Upload iOS test reports (.xcresult)
+      - name: Upload IOS test reports (.xcresult)
         if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: test-ios-integration-reports-${{ matrix.test }}.xcresult
           path: ios/build/reports/ZingoMobile-Test.xcresult
 
-      - name: Upload DerivedData logs (optional)
+      - name: Upload IOS DerivedData logs (optional)
         if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:

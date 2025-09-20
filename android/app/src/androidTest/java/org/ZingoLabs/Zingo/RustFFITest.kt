@@ -456,13 +456,15 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
             Thread.sleep(1000)
         }
 
+        val recipientAddress = "uregtest1az7w9w3tdegf0srnsgqyqfhyfrpx2h6u4pkc2yq3ja552vzhwkjqgy4fu6a6kcu9280ppajamj2gcq9lx9x0zxdrsns94ml3e443a7t2dm50382mhtkleydrq74q5xlh6sel5u0qlrvflf20qgljzszd2ht9jmerwwahct9rtuc3nqdk"
+
         val valueTranfersJson: String = uniffi.zingo.getValueTransfers()
         println("\nValue Transfers:")
         println(valueTranfersJson)
         val valueTranfers: ValueTransfers = mapper.readValue(valueTranfersJson)
         // the value transfers have 3 items for 3 different txs
         // 1. Received - 1_000_000 - orchard (1 item)
-        // 2. Sent - 110_000 - uregtest1zkuzfv5m3... (1 item)
+        // 2. Sent - 110_000 - uregtest1az7w9w3t... (1 item)
         // 3. memoToSelf - 10_000 (1 item)
         assertThat(valueTranfers.value_transfers.size).isEqualTo(3)
         // third item have to be a `fee` from the last `Sent` with the same txid
@@ -472,7 +474,7 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         assertThat(valueTranfers.value_transfers[0].transaction_fee).isEqualTo(20000)
         // second item have to be a `Sent`
         assertThat(valueTranfers.value_transfers[1].kind).isEqualTo("sent")
-        assertThat(valueTranfers.value_transfers[1].recipient_address).isEqualTo("uregtest1zkuzfv5m3yhv2j4fmvq5rjurkxenxyq8r7h4daun2zkznrjaa8ra8asgdm8wwgwjvlwwrxx7347r8w0ee6dqyw4rufw4wg9djwcr6frzkezmdw6dud3wsm99eany5r8wgsctlxquu009nzd6hsme2tcsk0v3sgjvxa70er7h27z5epr67p5q767s2z5gt88paru56mxpm6pwz0cu35m")
+        assertThat(valueTranfers.value_transfers[1].recipient_address).isEqualTo(recipientAddress)
         assertThat(valueTranfers.value_transfers[1].status).isEqualTo("confirmed")
         assertThat(valueTranfers.value_transfers[1].value).isEqualTo(100000)
         assertThat(valueTranfers.value_transfers[1].transaction_fee).isEqualTo(10000)

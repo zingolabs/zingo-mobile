@@ -365,6 +365,8 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
 
         waitForSyncOrFail()
 
+        let recipientAddress = "uregtest1az7w9w3tdegf0srnsgqyqfhyfrpx2h6u4pkc2yq3ja552vzhwkjqgy4fu6a6kcu9280ppajamj2gcq9lx9x0zxdrsns94ml3e443a7t2dm50382mhtkleydrq74q5xlh6sel5u0qlrvflf20qgljzszd2ht9jmerwwahct9rtuc3nqdk"
+
         let vtJson = getValueTransfers()
         print("\nValue Transfers:\n\(vtJson)")
         let vts: ValueTransfers = try decodeJSON(vtJson)
@@ -377,7 +379,7 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
         XCTAssertEqual(vts.value_transfers[0].transaction_fee, 20_000)
 
         XCTAssertEqual(vts.value_transfers[1].kind, "sent")
-        XCTAssertEqual(vts.value_transfers[1].recipient_address, "uregtest1zkuzfv5m3yhv2j4fmvq5rjurkxenxyq8r7h4daun2zkznrjaa8ra8asgdm8wwgwjvlwwrxx7347r8w0ee6dqyw4rufw4wg9djwcr6frzkezmdw6dud3wsm99eany5r8wgsctlxquu009nzd6hsme2tcsk0v3sgjvxa70er7h27z5epr67p5q767s2z5gt88paru56mxpm6pwz0cu35m")
+        XCTAssertEqual(vts.value_transfers[1].recipient_address, recipientAddress)
         XCTAssertEqual(vts.value_transfers[1].status, "confirmed")
         XCTAssertEqual(vts.value_transfers[1].value, 100_000)
         XCTAssertEqual(vts.value_transfers[1].transaction_fee, 10_000)

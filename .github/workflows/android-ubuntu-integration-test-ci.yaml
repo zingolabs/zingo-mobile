@@ -129,6 +129,7 @@ jobs:
           "execute_parse_addresses"
         ]
     env:
+      RUSTFLAGS: -D warnings
       CACHE-KEY: ${{ inputs.cache-key }}
     steps:
       - name: Set envs for zingolib CI
@@ -205,9 +206,6 @@ jobs:
         with:
           tool: nextest
 
-      - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:010
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -247,6 +245,19 @@ jobs:
       - name: Yarn install
         run: yarn
 
+      - name: Pull ci-build docker image
+        run: docker pull zingodevops/ci-build:009
+
+      - name: Extract binaries & params from image
+        run: |
+          set -euxo pipefail
+          cid=$(docker create zingodevops/ci-build:009)
+          mkdir -p rust/test_binaries/bins
+          docker cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
+          docker cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
+          docker cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
+          docker rm "$cid"
+
       - name: Run Build
         working-directory: android
         run: ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release -PsplitApk=true
@@ -265,7 +276,7 @@ jobs:
           echo "Disk space after post-build cleanup:"
           df -h
 
-      - name: Run Integration Test
+      - name: Run Android Integration Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ env.API-LEVEL }}
@@ -274,7 +285,7 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci regchest" --verbose --release
+          script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci" --verbose --release
           working-directory: ./rust
 
       - name: Upload test reports

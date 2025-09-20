@@ -23,7 +23,7 @@ env:
 jobs:
   android-build-test-artifacts:
     name: Android Build test artifacts
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -47,7 +47,7 @@ jobs:
 
       - name: Build and archive tests
         working-directory: ./rust
-        run: cargo nextest archive --verbose --features "regchest" --archive-file nextest-archive-${{ env.ABI }}.tar.zst
+        run: cargo nextest archive --verbose --features "ci" --archive-file nextest-archive-${{ env.ABI }}.tar.zst
 
       - name: Upload archive
         uses: actions/upload-artifact@v4
@@ -57,7 +57,7 @@ jobs:
 
   android-integration-test:
     name: Android Integration test
-    runs-on: macos-13
+    runs-on: macos-15
     needs: android-build-test-artifacts
     strategy:
       fail-fast: false
@@ -107,7 +107,7 @@ jobs:
         run: colima status
 
       - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:010
+        run: docker pull zingodevops/regchest:011
 
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:

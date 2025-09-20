@@ -2,15 +2,12 @@
 use zingolib::testutils::scenarios;
 
 // ubuntu ci runner
-#[cfg(feature = "ci")]
+#[cfg(all(feature = "ci", feature = "regchest"))]
 const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
 
 // macos ci runner
-//#[cfg(target_os = "macos")]
+//#[cfg(feature = "ci", feature = "regchest")]
 //const UNIX_SOCKET: Option<&str> = Some("unix:///Users/runner/.colima/default/docker.sock");
-
-#[cfg(all(not(feature = "ci"), feature = "regchest", not(target_os = "macos")))]
-const UNIX_SOCKET: Option<&str> = None;
 
 async fn offline_testsuite(abi: &str) {
     #[cfg(not(feature = "ci"))]
@@ -29,7 +26,7 @@ async fn offline_testsuite(abi: &str) {
 
 async fn execute_sync_from_seed(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let _local_net =
         scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
@@ -60,7 +57,7 @@ async fn execute_sync_from_seed(abi: &str) {
 
 async fn execute_send_from_orchard(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let _local_net =
         scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
@@ -91,7 +88,7 @@ async fn execute_send_from_orchard(abi: &str) {
 
 async fn execute_currentprice_and_value_transfers_from_seed(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let _local_net =
         scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
@@ -128,7 +125,7 @@ async fn execute_currentprice_and_value_transfers_from_seed(abi: &str) {
 
 async fn execute_sapling_balance_from_seed(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let _local_net =
         scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker = match regchest_utils::launch(
@@ -163,7 +160,7 @@ async fn execute_sapling_balance_from_seed(abi: &str) {
 
 async fn execute_parse_addresses(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let (_regtest_manager, _child_process_handler) =
+    let _local_net =
         scenarios::funded_orchard_sapling_transparent_shielded_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker = match regchest_utils::launch(

@@ -36,19 +36,14 @@ fi
 
 cd ios
 
-rm -rf build/reports
-rm -rf build/DerivedData
-mkdir -p build/reports build/DerivedData
+XCTESTRUN=$(find build/DerivedData/Build/Products -name "*.xctestrun" | head -n1)
 
-xcodebuild test \
-    -workspace ZingoMobile.xcworkspace \
-    -scheme ZingoMobile \
-    -sdk iphonesimulator \
-    -configuration Debug \
-    -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2' \
-    -derivedDataPath "build/DerivedData" \
-    -resultBundlePath "build/reports/ZingoMobile-Test.xcresult" \
-    -only-testing:"${test_name}"
+# just run the test
+xcodebuild test-without-building \
+  -xctestrun "$XCTESTRUN" \
+  -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2' \
+  -resultBundlePath "build/reports/ZingoMobile-Test.xcresult" \
+  -only-testing:"${test_name}"
 
 if [ $? -ne 0 ]; then
     echo -e "\nIntegration tests FAILED"
