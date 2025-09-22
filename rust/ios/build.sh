@@ -1,8 +1,11 @@
 #!/bin/bash
 
-export RUSTFLAGS="-C debuginfo=1 -C split-debuginfo=off -C symbol-mangling-version=v0"
+# not working on xcode
+#export RUSTFLAGS="-C debuginfo=1 -C split-debuginfo=off -C symbol-mangling-version=v0"
 
 ln -s $(which node) /usr/local/bin/node
+
+cargo install --force --locked bindgen-cli
 
 cd ../lib
 cargo run --release --bin uniffi-bindgen generate ./src/zingo.udl --language swift --out-dir ./Generated

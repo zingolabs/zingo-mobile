@@ -14,7 +14,7 @@ env:
 jobs:
   ios-check-build-cache:
     name: Check build cache
-    runs-on: macos-13
+    runs-on: macos-15
     outputs:
       ios-cache-found: ${{ steps.ios-set-cache-found.outputs.ios-cache-found }}
     steps:
@@ -43,7 +43,7 @@ jobs:
     name: Build native rust & swift uniffi
     needs: ios-check-build-cache
     if: ${{ needs.ios-check-build-cache.outputs.ios-cache-found != 'true' }}
-    runs-on: macos-14
+    runs-on: macos-15
     env:
       RUSTUP_HOME: /root/.rustup
     steps:
@@ -63,7 +63,7 @@ jobs:
           sudo sed -i '' "/^zingolib/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
           if cat rust/lib/Cargo.toml | grep "^zingolib" | grep -q "branch"; then exit 1; fi
           cd rust
-          sudo cargo update -p zingolib --aggressive
+          sudo cargo update -p zingolib -p regchest_utils --aggressive
 
       - name: Cargo default nightly
         run: |
@@ -90,6 +90,20 @@ jobs:
       - name: Install rust Target
         run: sudo rustup target add aarch64-apple-ios-sim x86_64-apple-ios
 
+      # this issue is solved in bindgen 0.70
+      # But we have a dependency that are using a incompatible version 0.69.
+      - name: Cargo env for iOS sim (bindgen/cc)
+        shell: bash
+        run: |
+          mkdir -p .cargo
+          SDKROOT="$(xcrun --sdk iphonesimulator --show-sdk-path)"
+          cat > .cargo/config.toml <<EOF
+          [env]
+          BINDGEN_EXTRA_CLANG_ARGS_aarch64_apple_ios_sim = "--target=arm64-apple-ios-simulator -isysroot $SDKROOT"
+          CFLAGS_aarch64_apple_ios_sim = "--target=arm64-apple-ios-simulator -isysroot $SDKROOT"
+          CXXFLAGS_aarch64_apple_ios_sim = "--target=arm64-apple-ios-simulator -isysroot $SDKROOT"
+          EOF
+
       - name: Cargo lipo universal library
         working-directory: rust/lib
         run: |
@@ -109,7 +123,7 @@ jobs:
   cache-native-ios-uniffi:
     name: Cache native rust
     needs: ios-build
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}

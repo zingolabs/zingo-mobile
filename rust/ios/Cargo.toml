@@ -1,5 +1,5 @@
 [package]
-name = "rustandroid"
+name = "rustios"
 version = "2.0.0"
 authors = ["Zingolabs <zingo@zingolabs.com>"]
 edition = "2024"

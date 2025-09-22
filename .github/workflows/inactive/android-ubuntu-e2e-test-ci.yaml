@@ -204,12 +204,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
-
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust
-          cache-on-failure: true
+          cache-workspaces: rust -> rust/target
 
       - name: Install nextest
         uses: taiki-e/install-action@v2
@@ -217,7 +212,7 @@ jobs:
           tool: nextest
 
       - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:010
+        run: docker pull zingodevops/regchest:011
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -225,11 +220,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Gradle cache
+      - name: Gradle setup
         uses: gradle/actions/setup-gradle@v4
         with:
-          build-root-directory: ./android
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
+          gradle-version: wrapper
+          cache-disabled: true
 
       - name: Native rust cache
         uses: actions/cache/restore@v4
@@ -298,7 +293,7 @@ jobs:
           pre-emulator-launch-script: top -b -n1 | head -n 20
 
       - name: Upload test reports
-        if: ${{ ! cancelled() }}
+        if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: test-e2e-reports-${{ env.ABI }}-${{ matrix.test }}-${{ env.TIMESTAMP }}

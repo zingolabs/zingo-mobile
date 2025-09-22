@@ -18,7 +18,7 @@ env:
 jobs:
   android-check-build-cache:
     name: Check build cache
-    runs-on: macos-13
+    runs-on: macos-15
     outputs:
       native-cache-found: ${{ steps.native-set-cache-found.outputs.native-cache-found }}
       kotlin-cache-found: ${{ steps.kotlin-set-cache-found.outputs.kotlin-cache-found }}
@@ -96,7 +96,7 @@ jobs:
           sed -i "/^zingolib/ s/branch = \"dev\"/rev = \"${{ env.zingolib_ref }}\"/" "rust/lib/Cargo.toml"
           if cat rust/lib/Cargo.toml | grep "^zingolib" | grep -q "branch"; then exit 1; fi
           cd rust
-          cargo update -p zingolib --aggressive
+          cargo update -p zingolib -p regchest_utils --aggressive
 
       - name: Cargo default nightly
         run: rustup default nightly
@@ -185,7 +185,7 @@ jobs:
   cache-native-android-uniffi:
     name: Cache native rust
     needs: android-build
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}

@@ -24,7 +24,7 @@ From the `rust/android/lightwalletd_bin` directory run: <br />
 Alternatively, integration tests and end-to-end tests can be run on non-linux hosts with Regchest
 (https://github.com/zingolabs/zingo-regchest). Regchest manages the zcash/lightwalletd regtest
 network in a docker container. Before running tests, pull the latest Regchest image from docker: <br />
-`docker pull zingodevops/regchest:010`
+`docker pull zingodevops/regchest:011`
 
 ### Yarn Tests
 1. From the root directory, run: <br />
@@ -32,28 +32,28 @@ network in a docker container. Before running tests, pull the latest Regchest im
 
 ### Integration Tests
 1. Create quick-boot snapshots to speed up AVD launch times. From the root directory, run: <br />
-   `./scripts/integration_tests.sh -a x86_64 -s` <br />
-   `./scripts/integration_tests.sh -a x86 -s` <br />
+   `./scripts/android_integration_tests.sh -a x86_64 -s` <br />
+   `./scripts/android_integration_tests.sh -a x86 -s` <br />
    By default, this uses default API 29 system images. Other images may be used for testing
    by specifying the api level and target. However, using other images with the cargo test runner
    is still under development.
 2. To run the integration tests. From the `rust` directory, run: <br />
-   `cargo nextest run integration` <br />
+   `cargo nextest run android_integration` <br />
    Specify to run specific ABI: <br />
-   `cargo nextest run integration::x86_64` <br />
-   `cargo nextest run integration::x86_32` <br />
-   `cargo nextest run integration::arm64` <br />
-   `cargo nextest run integration::arm32` <br />
+   `cargo nextest run android_integration::x86_64` <br />
+   `cargo nextest run android_integration::x86_32` <br />
+   `cargo nextest run android_integration::arm64` <br />
+   `cargo nextest run android_integration::arm32` <br />
    Specify to run a specific test on all ABIs: <br />
    `cargo nextest run test_name` <br />
    Specify to run a specific ABI and test: <br />
-   `cargo nextest run integration::x86_64::test_name`
+   `cargo nextest run android_integration::x86_64::test_name`
 
 To run tests with Regchest, add the `--features regchest` flag, for example: <br />
-`cargo nextest run integration --features regchest`
+`cargo nextest run android_integration --features regchest`
 
 For more information on running integration tests on non-default AVDs, run: <br />
-`./scripts/integration_tests.sh -h` <br />
+`./scripts/android_integration_tests.sh -h` <br />
 Without the cargo test runner these emulated android devices will not be able to connect to a
 lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Testsuite" may be tested.
 
@@ -79,9 +79,6 @@ lightwalletd/zcashd regtest network. Therefore, only tests in the "Offline Tests
    `cargo nextest run e2e::arm32` <br />
    Specify to run a specific ABI and test: <br />
    `cargo nextest run e2e::x86_64::test_name`
-
-Regchest is still under development and currently not able to run darkside end-to-end tests: <br />
-`cargo nextest run e2e --features regchest -E 'not test(darkside)'`
 
 # Troubleshooting
 For notes on known issues and problems, see the [trouble-shooting notes](./TROUBLESHOOTING.md).
