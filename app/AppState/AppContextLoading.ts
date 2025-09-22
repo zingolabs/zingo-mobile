@@ -47,5 +47,5 @@ export default interface AppContextLoading {
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
 
-  // eslint-disable-next-line semi
+   
 }

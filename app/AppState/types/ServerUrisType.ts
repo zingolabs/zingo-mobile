@@ -8,5 +8,5 @@ export default interface ServerUrisType {
   latency: number | null;
   obsolete: boolean;
 
-  // eslint-disable-next-line semi
+   
 }

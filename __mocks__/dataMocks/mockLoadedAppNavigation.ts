@@ -22,6 +22,6 @@ export const mockLoadedAppNavigation: StackNavigationProp<RootStackParamList, Ro
   popToTop: jest.fn(),
   popTo: jest.fn(),
   preload: jest.fn(),
-  setStateForNextRouteNamesChange: jest.fn(),
   navigateDeprecated: jest.fn(),
+  replaceParams: jest.fn(),
 };

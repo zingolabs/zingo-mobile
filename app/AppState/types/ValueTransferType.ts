@@ -15,5 +15,5 @@ export default interface ValueTransferType {
   memos?: string[];
   poolType?: PoolEnum;
   status: RPCValueTransfersStatusEnum;
-  // eslint-disable-next-line semi
+   
 }

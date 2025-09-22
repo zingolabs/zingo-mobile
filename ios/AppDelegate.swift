@@ -34,7 +34,11 @@ struct SyncStatus: Decodable {
 }
 
 @UIApplicationMain
-class AppDelegate: RCTAppDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
+  var window: UIWindow?
+  var reactNativeDelegate: ReactNativeDelegate?
+  var reactNativeFactory: RCTReactNativeFactory?
+
   private let bcgTaskId = "Zingo_Processing_Task_ID"
   private let bcgSchedulerTaskId = "Zingo_Processing_Scheduler_Task_ID"
   private var monitor: NWPathMonitor?
@@ -44,30 +48,46 @@ class AppDelegate: RCTAppDelegate {
   private var timeStampStrStart: String? = nil
   private var syncWorkItem: DispatchWorkItem?
   
-  override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-    self.moduleName = "Zingo"
-    self.dependencyProvider = RCTAppDependencyProvider()
-    
-    // You can add your custom initial props in the dictionary below.
-    // They will be passed down to the ViewController used by React Native.
-    self.initialProps = [:]
+  func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+  ) -> Bool {
+    let delegate = ReactNativeDelegate()
+    let factory = RCTReactNativeFactory(delegate: delegate)
+    delegate.dependencyProvider = RCTAppDependencyProvider()
+ 
+    reactNativeDelegate = delegate
+    reactNativeFactory = factory
+ 
+    window = UIWindow(frame: UIScreen.main.bounds)
+ 
+    factory.startReactNative(
+      withModuleName: "Zingo",
+      in: window,
+      launchOptions: launchOptions
+    )
 
     if #available(iOS 13.0, *) {
       NSLog("BGTask registerTasks")
       self.handleBackgroundTask()
     }
-
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+ 
+    return true
   }
 
-  override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-    return RCTLinkingManager.application(app, open: url, options: options)
+  override func application(
+    _ application: UIApplication, 
+    open url: URL, 
+    options: [UIApplication.OpenURLOptionsKey : Any] = [:]
+  ) -> Bool {
+    return RCTLinkingManager.application(application, open: url, options: options)
   }
 
   override func application(
     _ application: UIApplication,
     continue userActivity: NSUserActivity,
-    restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+    restorationHandler: @escaping ([UIUserActivityRestoring]?
+  ) -> Void) -> Bool {
         return RCTLinkingManager.application(
             application,
             continue: userActivity,

@@ -12,5 +12,5 @@ export default interface SecurityType {
   seedScreen?: boolean;
   ufvkScreen?: boolean;
 
-  // eslint-disable-next-line semi
+   
 }

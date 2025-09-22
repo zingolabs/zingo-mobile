@@ -7,5 +7,5 @@ export default interface InfoType {
   latestBlock: number;
   version: string;
   currencyName: CurrencyNameEnum;
-  // eslint-disable-next-line semi
+   
 }

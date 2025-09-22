@@ -143,5 +143,5 @@ export default interface AppContextLoaded {
   setSyncReportModalShow: () => Promise<HideReturn<unknown>>;
   setPoolsModalShow: () => Promise<HideReturn<unknown>>;
 
-  // eslint-disable-next-line semi
+   
 }
