@@ -3,22 +3,31 @@ name: IOS Integration test
 on:
   workflow_call:
     inputs:
-      timestamp:
-        required: true
-        type: string
       cache-key:
         required: true
         type: string
 
 env:
   CACHE-KEY: ${{ inputs.cache-key }}
-  TIMESTAMP: ${{ inputs.timestamp }}
   REPO-OWNER: ${{ github.repository_owner }}
 
 jobs:
   ios-integration-test:
     name: IOS Integration test
     runs-on: macos-13
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [
+          "offline_testsuite",
+          "execute_sync_from_seed",
+          "execute_send_from_orchard",
+          "execute_currentprice_and_value_transfers_from_seed",
+          "execute_sapling_balance_from_seed",
+          "execute_parse_addresses"
+        ]
+    env:
+      RUSTFLAGS: -D warnings
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -28,15 +37,6 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
-
-      - name: Install nvm with node 20.9.0
-        run: |
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-          export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-          nvm install 20.9.0
-          nvm use 20.9.0
 
       - name: Native rust cache
         uses: actions/cache/restore@v4
@@ -49,6 +49,43 @@ jobs:
         working-directory: rust/lib/Generated
         run: cp ./*.* ../../../ios
 
+      - name: Install protoc
+        run: brew install protobuf
+
+      - name: Install docker
+        run: |
+          brew install --head colima
+          brew install --formula docker
+          colima start
+
+      - name: Grant permissions
+        run: |
+          sudo chmod 777 ~/.colima/default/docker.sock
+          sudo chmod 777 ./scripts/ci/ios_integration_tests_ci.sh
+
+      - name: Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache-workspaces: rust -> rust/target
+
+      - name: Install nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: nextest
+
+      - name: Pull docker image
+        run: docker pull zingodevops/regchest:011
+      
+      - name: Install nvm with node 20.9.0
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+          nvm install 20.9.0
+          nvm use 20.9.0
+
       - name: Yarn
         run: yarn
 
@@ -56,16 +93,39 @@ jobs:
         working-directory: ios
         run: pod install
 
+      - name: Run Build
+        working-directory: ios
+        run: |
+          set -euxo pipefail
+          rm -rf build/reports build/DerivedData
+          mkdir -p build/reports build/DerivedData
+
+          xcodebuild build-for-testing \
+            -workspace ZingoMobile.xcworkspace \
+            -scheme ZingoMobile \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2' \
+            -derivedDataPath "build/DerivedData" \
+            -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult"
+
       - name: Run IOS integration tests
-        uses: nick-fields/retry@v3
+        working-directory: ./rust
+        run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
+
+      - name: Upload IOS test reports (.xcresult)
+        if: ${{ always() && !cancelled() }}
+        uses: actions/upload-artifact@v4
         with:
-          timeout_minutes: 60
-          max_attempts: 3
-          command: |
-            cd ios
-            xcodebuild test \
-              -workspace ZingoMobile.xcworkspace \
-              -scheme ZingoMobile \
-              -sdk iphonesimulator \
-              -configuration Debug \
-              -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2'
+          name: test-ios-integration-reports-${{ matrix.test }}.xcresult
+          path: ios/build/reports/ZingoMobile-Test.xcresult
+
+      - name: Upload IOS DerivedData logs (optional)
+        if: ${{ always() && !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-ios-integration-derived-logs-${{ matrix.test }}
+          path: |
+            ios/build/DerivedData/Logs/Test
+            ios/build/DerivedData/Logs/CrashReporter
+          if-no-files-found: ignore

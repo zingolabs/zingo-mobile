@@ -3,16 +3,12 @@ name: Android Ubuntu FOSS Artifact
 on:
   workflow_call:
     inputs:
-      timestamp:
-        required: true
-        type: string
       cache-key:
         required: true
         type: string
 
 env:
   REPO-OWNER: ${{ github.repository_owner }}
-  TIMESTAMP: ${{ inputs.timestamp }}
   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
 
 jobs:
@@ -31,11 +27,11 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
-      - name: Gradle cache
+      - name: Gradle setup
         uses: gradle/actions/setup-gradle@v4
         with:
-          build-root-directory: ./android
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'}}
+          gradle-version: wrapper
+          cache-disabled: true
 
       - name: Native rust cache arm64-v8a
         uses: actions/cache/restore@v4

@@ -23,7 +23,7 @@ env:
 jobs:
   android-build-test-artifacts:
     name: Android Build test artifacts
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -40,19 +40,14 @@ jobs:
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
-
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust
-          cache-on-failure: true
+          cache-workspaces: rust -> rust/target
 
       - name: Install nextest
         uses: taiki-e/install-action@nextest
 
       - name: Build and archive tests
         working-directory: ./rust
-        run: cargo nextest archive --verbose --features "regchest" --archive-file nextest-archive-${{ env.ABI }}.tar.zst
+        run: cargo nextest archive --verbose --features "ci" --archive-file nextest-archive-${{ env.ABI }}.tar.zst
 
       - name: Upload archive
         uses: actions/upload-artifact@v4
@@ -62,7 +57,7 @@ jobs:
 
   android-integration-test:
     name: Android Integration test
-    runs-on: macos-13
+    runs-on: macos-15
     needs: android-build-test-artifacts
     strategy:
       fail-fast: false
@@ -112,17 +107,12 @@ jobs:
         run: colima status
 
       - name: Pull regchest docker image
-        run: docker pull zingodevops/regchest:010
+        run: docker pull zingodevops/regchest:011
 
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
-
-      - name: Cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: rust
-          cache-on-failure: true
+          cache-workspaces: rust -> rust/target
 
       - name: Install nextest
         uses: taiki-e/install-action@nextest
@@ -153,11 +143,11 @@ jobs:
       - name: Add emulator to PATH
         run: echo "${ANDROID_SDK_ROOT}/emulator" >> $GITHUB_PATH
 
-      - name: Gradle cache
+      - name: Gradle setup
         uses: gradle/actions/setup-gradle@v4
         with:
-          build-root-directory: ./android
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
+          gradle-version: wrapper
+          cache-disabled: true
 
       - name: AVD cache
         uses: actions/cache@v4
@@ -174,7 +164,7 @@ jobs:
         with:
           timeout_minutes: 60
           max_attempts: 3
-          command: ./scripts/integration_tests.sh -a ${{ env.AVD-ARCH }} -s
+          command: ./scripts/android_integration_tests.sh -a ${{ env.AVD-ARCH }} -s
 
       - name: Download archive
         uses: actions/download-artifact@v4
@@ -185,12 +175,12 @@ jobs:
       - name: Run integration tests
         working-directory: ./rust
         run: |
-          cargo nextest run integration::${{ env.NEXTEST-ABI }} --verbose --profile ci \
+          cargo nextest run android_integration::${{ env.NEXTEST-ABI }} --verbose --profile ci \
             --archive-file nextest-archive-${{ env.ABI }}.tar.zst \
             --partition count:${{ matrix.partition}}/6
 
       - name: Upload test reports
-        if: ${{ ! cancelled() }}
+        if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: test-reports-${{ env.ABI }}-${{ matrix.partition}}-${{ env.TIMESTAMP }}
