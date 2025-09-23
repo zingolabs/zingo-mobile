@@ -63,23 +63,30 @@ jobs:
           brew update
           brew install qemu
           brew install docker
-          brew install colima
           
           # Remove any existing lima so we can install the old one cleanly
           brew uninstall --ignore-dependencies lima
           
           # Create a throwaway tap and extract the specific lima version into it
           brew tap-new local/old-lima
-          brew extract --version=0.23.2 lima local/old-lima
+          brew extract --version=0.22.0 lima local/old-lima
 
           # Install the extracted version and pin it to avoid accidental upgrades
-          brew install local/old-lima/lima@0.23.2
-          brew pin lima@0.23.2
+          brew install local/old-lima/lima@0.22.0
+          brew pin lima@0.22.0
 
           # Replace limactl with the no-HVF build (if you really need this patch)
-          LIMACTL_PATH="$(brew --prefix lima@0.23.2)/bin/limactl"
+          LIMACTL_PATH="$(brew --prefix lima@0.22.0)/bin/limactl"
           sudo curl -L -o "${LIMACTL_PATH}" https://github.com/mikekazakov/lima-nohvf/raw/master/limactl
           sudo chmod +x "${LIMACTL_PATH}"
+
+          brew tap-new local/old-colima
+          brew extract --version=0.7.3 colima local/old-colima
+
+          brew edit local/old-colima/colima@0.7.3
+
+          brew install --build-from-source local/old-colima/colima@0.7.3
+          brew pin colima@0.7.3
 
           # Start Colima with your options
           colima start --network-address --arch arm64 --vm-type=qemu
