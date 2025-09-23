@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
