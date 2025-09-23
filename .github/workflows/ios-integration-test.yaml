@@ -14,7 +14,7 @@ env:
 jobs:
   ios-integration-test:
     name: IOS Integration test
-    runs-on: macos-13
+    runs-on: macos-15
     strategy:
       fail-fast: false
       matrix:
@@ -29,9 +29,9 @@ jobs:
     env:
       RUSTFLAGS: -D warnings
     steps:
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '16.1'
+      #- uses: maxim-lobanov/setup-xcode@v1
+      #  with:
+      #    xcode-version: '16.1'
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
@@ -57,9 +57,12 @@ jobs:
 
       - name: Install docker
         run: |
-          brew install --head colima
-          brew install --formula docker
-          colima start
+          brew update
+          brew install docker
+          brew install colima
+          LIMACTL_PATH=$(brew --prefix)/bin/limactl
+          sudo curl -L -o $LIMACTL_PATH https://github.com/mikekazakov/lima-nohvf/raw/master/limactl && sudo chmod +x $LIMACTL_PATH
+          colima start --network-address --arch arm64 --vm-type=qemu
 
       - name: Grant permissions
         run: |
