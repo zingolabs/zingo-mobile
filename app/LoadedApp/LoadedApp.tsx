@@ -83,7 +83,7 @@ import { AddressBook } from '../../components/AddressBook';
 import { AddressBookFileImpl } from '../../components/AddressBook';
 import simpleBiometrics from '../simpleBiometrics';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
-import { createUpdateRecoveryWalletInfo, removeRecoveryWalletInfo } from '../recoveryWalletInfo';
+import { createUpdateRecoveryWalletInfo, removeRecoveryWalletInfo } from '../recoveryWalletInfov10';
 
 import History from '../../components/History';
 import Send from '../../components/Send';

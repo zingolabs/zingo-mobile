@@ -1,3 +1,5 @@
+// this code was for react-native-keychain v9
+/*
 import * as Keychain from 'react-native-keychain';
 import { GlobalConst, WalletType } from './AppState';
 
@@ -82,3 +84,4 @@ export const removeRecoveryWalletInfo = async (): Promise<void> => {
     console.log('no keys to remove');
   }
 };
+*/

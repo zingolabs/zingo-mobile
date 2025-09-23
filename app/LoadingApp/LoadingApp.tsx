@@ -69,7 +69,7 @@ import {
   getRecoveryWalletInfo,
   hasRecoveryWalletInfo,
   removeRecoveryWalletInfo,
-} from '../recoveryWalletInfo';
+} from '../recoveryWalletInfov10';
 
 // no lazy load because slowing down screens.
 import Seed from '../../components/Seed';

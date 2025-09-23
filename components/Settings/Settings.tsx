@@ -48,7 +48,7 @@ import { isEqual } from 'lodash';
 import ChainTypeToggle from '../Components/ChainTypeToggle';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
-import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfo';
+import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
