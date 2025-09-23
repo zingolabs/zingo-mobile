@@ -29,7 +29,8 @@ jobs:
     env:
       RUSTFLAGS: -D warnings
     steps:
-      - uses: maxim-lobanov/setup-xcode@v1
+      - name: Xcode 16.1
+        uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '16.1'
       - name: Set envs for zingolib CI
@@ -57,16 +58,30 @@ jobs:
 
       - name: Install docker
         run: |
+          set -euxo pipefail
+
           brew update
           brew install qemu
           brew install docker
           brew install colima
-          # specifically install an outdated version of lima - 0.23.2 as with 1.0.1 there are network connectivity issues
+          
+          # Remove any existing lima so we can install the old one cleanly
           brew uninstall --ignore-dependencies lima
-          curl https://raw.githubusercontent.com/Homebrew/homebrew-core/45464b6c4788a80be3f131ab5e2a4468cdfa960c/Formula/l/lima.rb > lima.rb
-          brew install lima.rb                
-          LIMACTL_PATH=$(brew --prefix)/bin/limactl
-          sudo curl -L -o $LIMACTL_PATH https://github.com/mikekazakov/lima-nohvf/raw/master/limactl && sudo chmod +x $LIMACTL_PATH
+          
+          # Create a throwaway tap and extract the specific lima version into it
+          brew tap-new local/old-lima
+          brew extract --version=0.23.2 lima local/old-lima
+
+          # Install the extracted version and pin it to avoid accidental upgrades
+          brew install local/old-lima/lima@0.23.2
+          brew pin lima@0.23.2
+
+          # Replace limactl with the no-HVF build (if you really need this patch)
+          LIMACTL_PATH="$(brew --prefix lima@0.23.2)/bin/limactl"
+          curl -L -o "${LIMACTL_PATH}" https://github.com/mikekazakov/lima-nohvf/raw/master/limactl
+          chmod +x "${LIMACTL_PATH}"
+
+          # Start Colima with your options
           colima start --network-address --arch arm64 --vm-type=qemu
 
       - name: Grant permissions
