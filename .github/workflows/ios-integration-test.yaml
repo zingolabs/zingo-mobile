@@ -29,6 +29,9 @@ jobs:
     env:
       RUSTFLAGS: -D warnings
     steps:
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.1'
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
