@@ -78,8 +78,8 @@ jobs:
 
           # Replace limactl with the no-HVF build (if you really need this patch)
           LIMACTL_PATH="$(brew --prefix lima@0.23.2)/bin/limactl"
-          curl -L -o "${LIMACTL_PATH}" https://github.com/mikekazakov/lima-nohvf/raw/master/limactl
-          chmod +x "${LIMACTL_PATH}"
+          sudo curl -L -o "${LIMACTL_PATH}" https://github.com/mikekazakov/lima-nohvf/raw/master/limactl
+          sudo chmod +x "${LIMACTL_PATH}"
 
           # Start Colima with your options
           colima start --network-address --arch arm64 --vm-type=qemu
