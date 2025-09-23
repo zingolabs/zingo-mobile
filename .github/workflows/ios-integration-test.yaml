@@ -64,9 +64,6 @@ jobs:
           brew install qemu
           brew install docker
           
-          # Remove any existing lima so we can install the old one cleanly
-          brew uninstall --ignore-dependencies lima
-          
           # Create a throwaway tap and extract the specific lima version into it
           brew tap-new local/old-lima
           brew extract --version=0.22.0 lima local/old-lima
