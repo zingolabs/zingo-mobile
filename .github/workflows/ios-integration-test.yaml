@@ -14,7 +14,7 @@ env:
 jobs:
   ios-integration-test:
     name: IOS Integration test
-    runs-on: macos-14
+    runs-on: macos-15
     strategy:
       fail-fast: false
       matrix:
