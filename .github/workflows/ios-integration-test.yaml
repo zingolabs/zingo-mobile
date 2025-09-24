@@ -63,7 +63,13 @@ jobs:
           brew update
           brew install qemu
           brew install docker
-          
+
+          brew tap-new local/old-colima
+          brew extract --version=0.7.3 colima local/old-colima
+
+          brew install local/old-colima/colima@0.7.3
+          brew pin colima@0.7.3
+
           # Create a throwaway tap and extract the specific lima version into it
           brew tap-new local/old-lima
           brew extract --version=0.22.0 lima local/old-lima
@@ -76,14 +82,6 @@ jobs:
           LIMACTL_PATH="$(brew --prefix lima@0.22.0)/bin/limactl"
           sudo curl -L -o "${LIMACTL_PATH}" https://github.com/mikekazakov/lima-nohvf/raw/master/limactl
           sudo chmod +x "${LIMACTL_PATH}"
-
-          brew tap-new local/old-colima
-          brew extract --version=0.7.3 colima local/old-colima
-
-          brew edit local/old-colima/colima@0.7.3
-
-          brew install --build-from-source local/old-colima/colima@0.7.3
-          brew pin colima@0.7.3
 
           # Start Colima with your options
           colima start --network-address --arch arm64 --vm-type=qemu
