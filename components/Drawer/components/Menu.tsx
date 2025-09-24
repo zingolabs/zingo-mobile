@@ -76,7 +76,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
       // properly
       setTimeout(() => {
         onItemSelected(value);
-      }, Platform.OS === GlobalConst.platformOSandroid ? 500 : 0);
+      }, Platform.OS === GlobalConst.platformOSandroid ? 500 : 500);
     }
   };
 

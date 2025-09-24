@@ -50,7 +50,6 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-	 	<!-- Do not change NSAllowsArbitraryLoads to true, or you will risk app rejection! -->
 		<key>NSAllowsArbitraryLoads</key>
 		<false/>
 		<key>NSAllowsLocalNetworking</key>
@@ -58,10 +57,14 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Zingo needs access to the camera to scan address QRCodes</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Zingo export/share address QRCodes as images</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Allow Zingo to use FaceID to improve the security and privacy?</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Zingo does not use any Location Features</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Zingo export/share address QRCodes as images</string>
+	<key>RCTNewArchEnabled</key>
+	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -88,7 +91,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSFaceIDUsageDescription</key>
-	<string>Allow Zingo to use FaceID to improve the security and privacy?</string>
 </dict>
 </plist>

@@ -75,7 +75,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     return true
   }
 
-  override func application(
+  func application(
     _ application: UIApplication, 
     open url: URL, 
     options: [UIApplication.OpenURLOptionsKey : Any] = [:]
@@ -83,7 +83,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     return RCTLinkingManager.application(application, open: url, options: options)
   }
 
-  override func application(
+  func application(
     _ application: UIApplication,
     continue userActivity: NSUserActivity,
     restorationHandler: @escaping ([UIUserActivityRestoring]?
@@ -95,19 +95,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     )
   }
 
-  override func sourceURL(for bridge: RCTBridge) -> URL? {
-    self.bundleURL()
-  }
-
-  override func bundleURL() -> URL? {
-#if DEBUG
-    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
-#else
-    Bundle.main.url(forResource: "main", withExtension: "jsbundle")
-#endif
-  }
-
-  override func applicationWillEnterForeground(_ application: UIApplication) {
+  func applicationWillEnterForeground(_ application: UIApplication) {
     if #available(iOS 13.0, *) {
         // cancel existing sync process (if any).
         NSLog("BGTask foreground")
@@ -121,7 +109,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
   }
 
-  override func applicationDidEnterBackground(_ application: UIApplication) {
+  func applicationDidEnterBackground(_ application: UIApplication) {
     if #available(iOS 13.0, *) {
         // Cancel existing sync process (if any).
         NSLog("BGTask background")
@@ -138,6 +126,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NSLog("BGTask background - scheduleSchedulerBackgroundTask")
         self.scheduleSchedulerBackgroundTask()
     }
+  }
+}
+
+class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
+  override func sourceURL(for bridge: RCTBridge) -> URL? {
+    self.bundleURL()
+  }
+
+  override func bundleURL() -> URL? {
+#if DEBUG
+    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+#else
+    Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+#endif
   }
 }
 
