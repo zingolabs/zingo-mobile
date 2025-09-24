@@ -135,7 +135,7 @@ jobs:
             -scheme ZingoMobile \
             -sdk iphonesimulator \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.6' \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
             -derivedDataPath "build/DerivedData" \
             -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult"
 

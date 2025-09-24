@@ -67,7 +67,6 @@
     "react-native-toastier": "^2.0.4",
     "react-native-vision-camera": "^4.7.2",
     "react-native-worklets": "^0.5.1",
-    "react-native-worklets-core": "^1.6.2",
     "recyclerlistview": "^4.2.3",
     "url-parse": "^1.5.10"
   },
