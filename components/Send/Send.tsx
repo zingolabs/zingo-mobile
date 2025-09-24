@@ -1053,6 +1053,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               },
                             }}
                             pickerProps={{
+                              mode: 'dropdown',
                               itemStyle: {
                                 color: colors.background,
                               },
@@ -1060,13 +1061,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                             fixAndroidTouchableBug={true}
                             value={
                               pickerTempSelectedAddress && Platform.OS === GlobalConst.platformOSios
-                                ? pickerTempSelectedAddress
-                                : addressText
+                                ? (pickerTempSelectedAddress ?? ' ')
+                                : (addressText ?? ' ')
                             }
                             items={itemsPicker}
                             placeholder={{
                               label: translate('addressbook.select-placeholder') as string,
-                              value: addressText,
+                              value: null,
                               color: colors.primary,
                             }}
                             useNativeAndroidPickerStyle={false}

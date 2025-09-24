@@ -893,16 +893,17 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           },
                         }}
                         pickerProps={{
+                          mode: 'dropdown',
                           itemStyle: {
                             color: colors.background,
                           },
                         }}
                         fixAndroidTouchableBug={true}
-                        value={listServerUri}
+                        value={(listServerUri ?? ' ')}
                         items={itemsPicker}
                         placeholder={{
                           label: translate('settings.select-placeholder') as string,
-                          value: listServerUri,
+                          value: null,
                           color: colors.primary,
                         }}
                         useNativeAndroidPickerStyle={false}

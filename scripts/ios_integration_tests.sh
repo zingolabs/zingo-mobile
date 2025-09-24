@@ -45,7 +45,7 @@ xcodebuild test \
     -scheme ZingoMobile \
     -sdk iphonesimulator \
     -configuration Debug \
-    -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2' \
+    -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.6' \
     -derivedDataPath "build/DerivedData" \
     -resultBundlePath "build/reports/ZingoMobile-Test.xcresult" \
     -only-testing:"${test_name}"
