@@ -29,10 +29,10 @@ jobs:
     env:
       RUSTFLAGS: -D warnings
     steps:
-      - name: Xcode 16.1
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '16.1'
+      #- name: Xcode 16.1
+      #  uses: maxim-lobanov/setup-xcode@v1
+      #  with:
+      #    xcode-version: '16.1'
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
@@ -78,18 +78,14 @@ jobs:
 
           brew uninstall --ignore-dependencies colima || true
 
-          # Instala Colima 0.7.3 como binario standalone (no brew)
-          sudo curl -L -o /usr/local/bin/colima \
-            https://github.com/abiosoft/colima/releases/download/v0.7.3/colima-Darwin-arm64
+          sudo curl -L -o /usr/local/bin/colima https://github.com/abiosoft/colima/releases/download/v0.7.3/colima-Darwin-arm64
           sudo chmod +x /usr/local/bin/colima
 
-          # Verificaciones (opcionales)
           /usr/local/bin/colima version || true
           limactl version || true
 
           brew developer off
 
-          # Start Colima with your options
           colima start --network-address --arch arm64 --vm-type=qemu
 
       - name: Grant permissions
