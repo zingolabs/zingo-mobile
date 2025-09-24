@@ -197,6 +197,10 @@ android {
 
     packagingOptions {
         jniLibs.useLegacyPackaging = true  // Ensures stable binary layout
+        pickFirst 'lib/arm64-v8a/libfbjni.so'
+        pickFirst 'lib/armeabi-v7a/libfbjni.so'
+        pickFirst 'lib/x86/libfbjni.so'
+        pickFirst 'lib/x86_64/libfbjni.so'
     }
 
     testOptions {
