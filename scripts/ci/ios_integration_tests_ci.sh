@@ -41,7 +41,7 @@ XCTESTRUN=$(find build/DerivedData/Build/Products -name "*.xctestrun" | head -n1
 # just run the test
 xcodebuild test-without-building \
   -xctestrun "$XCTESTRUN" \
-  -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+  -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
   -resultBundlePath "build/reports/ZingoMobile-Test.xcresult" \
   -only-testing:"${test_name}"
 

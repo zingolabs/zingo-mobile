@@ -29,10 +29,10 @@ jobs:
     env:
       RUSTFLAGS: -D warnings
     steps:
-      #- name: Xcode 16.1
-      #  uses: maxim-lobanov/setup-xcode@v1
-      #  with:
-      #    xcode-version: '16.1'
+      - name: Xcode 16.4
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4'
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
@@ -135,7 +135,7 @@ jobs:
             -scheme ZingoMobile \
             -sdk iphonesimulator \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -derivedDataPath "build/DerivedData" \
             -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult"
 

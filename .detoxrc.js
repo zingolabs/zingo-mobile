@@ -14,12 +14,12 @@ module.exports = {
     'ios.debug': {
       type: 'ios.app',
       binaryPath: 'ios/build/Build/Products/Debug-iphonesimulator/Zingo.app',
-      build: "xcodebuild -workspace ios/ZingoMobile.xcworkspace -scheme ZingoMobile -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5'"
+      build: "xcodebuild -workspace ios/ZingoMobile.xcworkspace -scheme ZingoMobile -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'"
     },
     'ios.release': {
       type: 'ios.app',
       binaryPath: 'ios/build/Build/Products/Release-iphonesimulator/Zingo.app',
-      build: "xcodebuild -workspace ios/ZingoMobile.xcworkspace -scheme ZingoMobile -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5'"
+      build: "xcodebuild -workspace ios/ZingoMobile.xcworkspace -scheme ZingoMobile -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'"
     },
     'android.debug': {
       type: 'android.apk',
@@ -72,7 +72,7 @@ module.exports = {
       type: 'ios.simulator',
       device: {
         type: 'iPhone 16',
-        os: 'iOS 18.5'
+        os: 'iOS latest'
       }
     },
     attached: {
