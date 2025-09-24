@@ -134,10 +134,10 @@ jobs:
             -workspace ZingoMobile.xcworkspace \
             -scheme ZingoMobile \
             -sdk iphonesimulator \
-            -configuration Debug \
+            -configuration Release \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -derivedDataPath "build/DerivedData" \
-            -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult"
+            -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult" | xcpretty -c
 
       - name: Run IOS integration tests
         working-directory: ./rust
