@@ -30,7 +30,6 @@ jobs:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
       - name: Build for testing
-        working-directory: ios
         run: |
           set -euxo pipefail
           rm -rf build/reports build/DerivedData || true
@@ -57,6 +56,7 @@ jobs:
 
   ios-integration-test:
     name: IOS Integration test
+    needs: build-for-testing
     runs-on: macos-15
     strategy:
       fail-fast: false
