@@ -77,6 +77,23 @@ jobs:
           name: xctestrun-and-products
           path: ios/build/DerivedData/Build/Products
 
+      - name: Upload IOS build reports (.xcresult)
+        if: ${{ always() && !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-ios-integration-build-reports.xcresult
+          path: ios/build/reports/ZingoMobile-BuildForTesting.xcresult
+
+      - name: Upload IOS build DerivedData logs (optional)
+        if: ${{ always() && !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-ios-integration-build-derived-logs
+          path: |
+            ios/build/DerivedData/Logs/Test
+            ios/build/DerivedData/Logs/CrashReporter
+          if-no-files-found: ignore
+
       - name: Cleaning up
         run: |
           rm -rf build/reports build/DerivedData || true
@@ -194,14 +211,14 @@ jobs:
         if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-ios-integration-reports-${{ matrix.test }}.xcresult
+          name: test-ios-integration-test-reports-${{ matrix.test }}.xcresult
           path: ios/build/reports/ZingoMobile-Test.xcresult
 
       - name: Upload IOS DerivedData logs (optional)
         if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-ios-integration-derived-logs-${{ matrix.test }}
+          name: test-ios-integration-test-derived-logs-${{ matrix.test }}
           path: |
             ios/build/DerivedData/Logs/Test
             ios/build/DerivedData/Logs/CrashReporter
