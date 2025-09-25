@@ -29,6 +29,36 @@ jobs:
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
+      - name: Native rust cache
+        uses: actions/cache/restore@v4
+        with:
+          path: rust/lib/Generated
+          key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
+          fail-on-cache-miss: true
+
+      - name: Copy libs to ios folder
+        working-directory: rust/lib/Generated
+        run: cp ./*.* ../../../ios
+
+      - name: Install protoc
+        run: brew install protobuf
+
+      - name: Install nvm with node 20.9.0
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+          nvm install 20.9.0
+          nvm use 20.9.0
+
+      - name: Yarn
+        run: yarn
+
+      - name: Pod Install
+        working-directory: ios
+        run: pod install
+
       - name: Build for testing
         run: |
           set -euxo pipefail
@@ -85,20 +115,6 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: ${{ env.REPO-OWNER }}/zingo-mobile
-
-      - name: Native rust cache
-        uses: actions/cache/restore@v4
-        with:
-          path: rust/lib/Generated
-          key: native-ios-uniffi-universal-${{ env.CACHE-KEY }}
-          fail-on-cache-miss: true
-
-      - name: Copy libs to ios folder
-        working-directory: rust/lib/Generated
-        run: cp ./*.* ../../../ios
-
-      - name: Install protoc
-        run: brew install protobuf
 
       - name: Install docker
         run: |
