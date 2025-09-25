@@ -40,9 +40,6 @@ jobs:
         working-directory: rust/lib/Generated
         run: cp ./*.* ../../../ios
 
-      - name: Install protoc
-        run: brew install protobuf
-
       - name: Install nvm with node 20.9.0
         run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
@@ -75,8 +72,8 @@ jobs:
             -quiet
 
           mkdir -p build_out
-          cp -R build/DerivedData/Build/Products out/Products
-          cp $(find build/DerivedData/Build/Products -name "*.xctestrun" | head -n 1) out/ZingoMobile.xctestrun
+          cp -R build/DerivedData/Build/Products build_out/Products
+          cp $(find build/DerivedData/Build/Products -name "*.xctestrun" | head -n 1) build_out/ZingoMobile.xctestrun
 
       - name: Upload Build Result
         uses: actions/upload-artifact@v4
