@@ -12,6 +12,49 @@ env:
   REPO-OWNER: ${{ github.repository_owner }}
 
 jobs:
+  build-for-testing:
+    runs-on: macos-15
+    steps:
+      - name: Xcode 16.4
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4'
+
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+
+      - name: Build for testing
+        working-directory: ios
+        run: |
+          set -euxo pipefail
+          rm -rf build/reports build/DerivedData || true
+          mkdir -p build/reports build/DerivedData
+          xcodebuild build-for-testing \
+            -workspace ios/ZingoMobile.xcworkspace \
+            -scheme ZingoMobile \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -derivedDataPath "build/DerivedData" \
+            -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult" \
+            -quiet
+
+          mkdir -p out
+          cp -R build/DerivedData/Build/Products out/Products
+          cp $(find build/DerivedData/Build/Products -name "*.xctestrun" | head -n 1) out/ZingoMobile.xctestrun
+
+      - name: Upload Build Result
+        uses: actions/upload-artifact@v4
+        with:
+          name: xctestrun-and-products
+          path: ios/out
+
   ios-integration-test:
     name: IOS Integration test
     runs-on: macos-15
@@ -33,6 +76,7 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '16.4'
+
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
@@ -119,25 +163,15 @@ jobs:
       - name: Yarn
         run: yarn
 
+      - name: Download Build Result
+        uses: actions/download-artifact@v4
+        with:
+          name: xctestrun-and-products
+          path: ios/build_in
+
       - name: Pod Install
         working-directory: ios
         run: pod install
-
-      - name: Run Build
-        working-directory: ios
-        run: |
-          set -euxo pipefail
-          rm -rf build/reports build/DerivedData
-          mkdir -p build/reports build/DerivedData
-
-          xcodebuild build-for-testing \
-            -workspace ZingoMobile.xcworkspace \
-            -scheme ZingoMobile \
-            -sdk iphonesimulator \
-            -configuration Release \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
-            -derivedDataPath "build/DerivedData" \
-            -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult" | xcpretty -c
 
       - name: Run IOS integration tests
         working-directory: ./rust
