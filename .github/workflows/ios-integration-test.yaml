@@ -67,20 +67,20 @@ jobs:
             -scheme ZingoMobile \
             -sdk iphonesimulator \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
             -derivedDataPath "build/DerivedData" \
             -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult" \
             -quiet
 
-          mkdir -p build_out
-          cp -R build/DerivedData/Build/Products build_out/Products
-          cp $(find build/DerivedData/Build/Products -name "*.xctestrun" | head -n 1) build_out/ZingoMobile.xctestrun
+          mkdir -p build_artifacts
+          cp -R build/DerivedData/Build/Products build_artifacts/Products
+          cp $(find build/DerivedData/Build/Products -name "*.xctestrun" | head -n 1) build_artifacts/ZingoMobile.xctestrun
 
       - name: Upload Build Result
         uses: actions/upload-artifact@v4
         with:
           name: xctestrun-and-products
-          path: ios/build_out
+          path: ios/build_artifacts
 
   ios-integration-test:
     name: IOS Integration test
@@ -185,7 +185,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: xctestrun-and-products
-          path: ios/build_in
+          path: ios/build_artifacts
 
       - name: Run IOS integration tests
         working-directory: ./rust

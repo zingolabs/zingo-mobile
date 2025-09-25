@@ -36,14 +36,14 @@ fi
 
 cd ios
 
-XCTESTRUN="build_in/ZingoMobile.xctestrun"
+XCTESTRUN="build_artifacts/ZingoMobile.xctestrun"
 
 # just run the test
 xcodebuild test-without-building \
   -xctestrun "$XCTESTRUN" \
-  -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+  -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
   -resultBundlePath "build/reports/ZingoMobile-Test.xcresult" \
-  -only-testing:"${test_name}" | xcpretty -c
+  -only-testing:"${test_name}"
 
 if [ $? -ne 0 ]; then
     echo -e "\nIntegration tests FAILED"
