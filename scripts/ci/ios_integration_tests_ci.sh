@@ -36,7 +36,7 @@ fi
 
 cd ios
 
-XCTESTRUN="build_artifacts/ZingoMobile.xctestrun"
+XCTESTRUN=$(find build/DerivedData/Build/Products -name "*.xctestrun" | head -n 1)
 
 # just run the test
 xcodebuild test-without-building \

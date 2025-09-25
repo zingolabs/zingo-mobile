@@ -60,7 +60,6 @@ jobs:
         working-directory: ios
         run: |
           set -euxo pipefail
-          rm -rf build/reports build/DerivedData || true
           mkdir -p build/reports build/DerivedData
           xcodebuild build-for-testing \
             -workspace ZingoMobile.xcworkspace \
@@ -72,15 +71,15 @@ jobs:
             -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult" \
             -quiet
 
-          mkdir -p build_artifacts
-          cp -R build/DerivedData/Build/Products build_artifacts/Products
-          cp $(find build/DerivedData/Build/Products -name "*.xctestrun" | head -n 1) build_artifacts/ZingoMobile.xctestrun
-
       - name: Upload Build Result
         uses: actions/upload-artifact@v4
         with:
           name: xctestrun-and-products
-          path: ios/build_artifacts
+          path: ios/build/DerivedData/Build/Products
+
+      - name: Cleaning up
+        run: |
+          rm -rf build/reports build/DerivedData || true
 
   ios-integration-test:
     name: IOS Integration test
@@ -185,7 +184,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: xctestrun-and-products
-          path: ios/build_artifacts
+          path: ios/build/DerivedData/Build/Products
 
       - name: Run IOS integration tests
         working-directory: ./rust
