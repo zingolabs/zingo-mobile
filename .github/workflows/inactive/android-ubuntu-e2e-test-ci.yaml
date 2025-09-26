@@ -296,5 +296,5 @@ jobs:
         if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-e2e-reports-${{ env.ABI }}-${{ matrix.test }}-${{ env.TIMESTAMP }}
+          name: test-android-e2e-reports-${{ env.ABI }}-${{ matrix.test }}-${{ env.TIMESTAMP }}
           path: android/app/build/outputs/e2e_test_reports
