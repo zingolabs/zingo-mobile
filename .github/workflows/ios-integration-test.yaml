@@ -24,6 +24,11 @@ jobs:
         run: |
           xcodebuild -runFirstLaunch || true
 
+      - name: Info 1
+        run: |
+          xcrun simctl list runtimes
+          xcrun simctl list devices
+
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
@@ -59,6 +64,11 @@ jobs:
       - name: Pod Install
         working-directory: ios
         run: pod install
+
+      - name: Info 2
+        run: |
+          xcrun simctl list runtimes
+          xcrun simctl list devices
 
       - name: Build for testing
         working-directory: ios
@@ -128,6 +138,11 @@ jobs:
       - name: First launch
         run: |
           xcodebuild -runFirstLaunch || true
+
+      - name: Info 1
+        run: |
+          xcrun simctl list runtimes
+          xcrun simctl list devices
 
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -210,6 +225,11 @@ jobs:
         with:
           name: xctestrun-and-products
           path: ios/build/DerivedData/Build/Products
+
+      - name: Info 2
+        run: |
+          xcrun simctl list runtimes
+          xcrun simctl list devices
 
       - name: Run IOS integration tests
         working-directory: ./rust
