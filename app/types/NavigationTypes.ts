@@ -1,12 +1,14 @@
-import { LaunchingModeEnum, RouteEnums } from '../AppState';
+import { AddressKindEnum, LaunchingModeEnum, RouteEnum, SeedActionEnum, SelectServerEnum, SendPageStateClass, ServerType, UfvkActionEnum, ValueTransferType } from '../AppState';
+import { RPCParseAddressType } from '../rpc/types/RPCParseAddressType';
 
 /**
  * Root navigation parameter list for the main stack navigator
  * This defines the structure of parameters passed between main app screens
  */
-export type RootStackParamList = {
-  [RouteEnums.LoadingApp]: LoadingAppNavigationState | undefined;
-  [RouteEnums.LoadedApp]: LoadedAppNavigationState | undefined;
+export type AppStackParamList = {
+  // Stack
+  [RouteEnum.LoadingApp]: LoadingAppNavigationState | undefined;
+  [RouteEnum.LoadedApp]: LoadedAppNavigationState | undefined;
 };
 
 /**
@@ -19,7 +21,6 @@ export type LoadingAppNavigationState = {
   biometricsFailed?: boolean;
   newWallet?: boolean;
 };
-
 /**
  * Navigation state used for internal app navigation within LoadedApp
  * Used for methods like navigateToLoadedApp
@@ -31,4 +32,97 @@ export type LoadedAppNavigationState = {
   transparentPool: boolean;
   newWallet: boolean;
   firstLaunchingMessage: LaunchingModeEnum;
+};
+
+/**
+ * Root drawer parameter list for the main stack navigator
+ * This defines the structure of parameters passed between main app screens
+ */
+export type AppDrawerParamList = {
+  // Drawer no params
+  [RouteEnum.Home]: undefined;
+  [RouteEnum.Settings]: undefined;
+  [RouteEnum.About]: undefined;
+  [RouteEnum.Rescan]: undefined;
+  [RouteEnum.Info]: undefined;
+  [RouteEnum.Insight]: undefined;
+  [RouteEnum.Computing]: undefined;
+  [RouteEnum.SyncReport]: undefined;
+  [RouteEnum.Pools]: undefined;
+  [RouteEnum.ContactList]: undefined;
+  [RouteEnum.AddressBook]: undefined;
+
+  // Drawer with params
+  [RouteEnum.AddressList]: AddressListNavigationState | undefined;
+  [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
+  [RouteEnum.ValueTransferDetail]: ValueTransferDetailNavigationState | undefined;
+  [RouteEnum.MessagesAddress]: MessagesAddressNavigationState | undefined;
+  [RouteEnum.MessagesAll]: MessagesAllNavigationState | undefined;
+  [RouteEnum.Memo]: MemoNavigationState | undefined;
+  [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
+  [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
+  [RouteEnum.Seed]: SeedNavigationState | undefined;
+};
+
+export type AddressListNavigationState = {
+  addressKind: AddressKindEnum;
+  setIndex: (n: number) => void;
+};
+
+export type ScannerAddressNavigationState = {
+  setAddress: (a: string) => void;
+};
+
+export type ValueTransferDetailNavigationState = {
+  index: number;
+  vt: ValueTransferType;
+  valueTransfersSliced: ValueTransferType[];
+  totalLength: number;
+};
+
+export type MessagesAddressNavigationState = {
+  setScrollToBottom: (value: boolean) => void;
+  scrollToBottom: boolean;
+  address: string;
+  sendTransaction: (s: SendPageStateClass) => Promise<String>;
+  setServerOption: (
+    value: ServerType,
+    selectServer: SelectServerEnum,
+    toast: boolean,
+    sameServerChainName: boolean,
+  ) => Promise<void>;
+};
+
+export type MemoNavigationState = {
+  message: string;
+  includeUAMessage: boolean;
+  setMessage: (m: string) => void;
+};
+
+export type ConfirmNavigationState = {
+  calculatedFee: number;
+  parseAddressInfoJSON: RPCParseAddressType;
+  donationAmount: number;
+  confirmSend: (s: SendPageStateClass) => void;
+  sendAllAmount: boolean;
+  calculateFeeWithPropose: (
+    amount: string,
+    address: string,
+    memo: string,
+    includeUAMemo: boolean,
+  ) => Promise<void>;
+  sendPageState: SendPageStateClass;
+};
+
+export type MessagesAllNavigationState = {
+  setScrollToBottom: (value: boolean) => void;
+  scrollToBottom: boolean;
+};
+
+export type UfvkNavigationState = {
+  action: UfvkActionEnum;
+};
+
+export type SeedNavigationState = {
+  action: SeedActionEnum;
 };

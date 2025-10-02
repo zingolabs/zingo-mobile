@@ -21,7 +21,6 @@ import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { LoadedAppNavigationState } from '../types';
 import ValueTransferType from './types/ValueTransferType';
-import { HideReturn } from 'react-native-magic-modal';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
@@ -101,7 +100,7 @@ export default interface AppContextLoaded {
   addressBook: AddressBookFileClass[];
 
   // helpers to open the address book modal from different places in the App
-  launchAddressBook: (add: string) => Promise<HideReturn<unknown>>;
+  launchAddressBook: (add: string) => void;
   addressBookCurrentAddress: string;
 
   // is calculated in the header & needed in the send screen
@@ -122,6 +121,9 @@ export default interface AppContextLoaded {
   // zingolib Version
   zingolibVersion: string;
 
+  // Change the privacy everywhere
+  setPrivacyOption: (value: boolean) => Promise<void>;
+
   // settings
   server: ServerType;
   currency: CurrencyEnum;
@@ -137,11 +139,9 @@ export default interface AppContextLoaded {
   performanceLevel: RPCPerformanceLevelEnum;
 
   // modals
-  setComputingModalShow: () => Promise<HideReturn<unknown>>;
-  closeAllModals: () => void;
-  setUfvkViewModalShow: () => Promise<HideReturn<unknown>>;
-  setSyncReportModalShow: () => Promise<HideReturn<unknown>>;
-  setPoolsModalShow: () => Promise<HideReturn<unknown>>;
-
+  setComputingModalShow: () => void;
+  setUfvkViewModalShow: () => void;
+  setSyncReportModalShow: () => void;
+  setPoolsModalShow: () => void;
    
 }

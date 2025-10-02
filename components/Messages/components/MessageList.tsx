@@ -38,6 +38,7 @@ import {
   AddressBookFileClass,
   ButtonTypeEnum,
   GlobalConst,
+  RouteEnum,
   ScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
@@ -49,24 +50,20 @@ import {
 import { ThemeType } from '../../../app/types';
 import FadeText from '../../Components/FadeText';
 import Button from '../../Components/Button';
-import ValueTransferDetail from '../../History/components/ValueTransferDetail';
 import MessageLine from './MessageLine';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import AddressItem from '../../Components/AddressItem';
-import Memo from '../../Memo';
 import { sendEmail } from '../../../app/sendEmail';
 import { createAlert } from '../../../app/createAlert';
 import selectingServer from '../../../app/selectingServer';
 import { serverUris } from '../../../app/uris';
 import Utils from '../../../app/utils';
-import { magicModal } from 'react-native-magic-modal';
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../../Components/Snackbars';
 
 type MessageListProps = {
   toggleMenuDrawer: () => void;
-  setPrivacyOption: (value: boolean) => Promise<void>;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
   address?: string;
@@ -82,7 +79,6 @@ type MessageListProps = {
 
 const MessageList: React.FunctionComponent<MessageListProps> = ({
   toggleMenuDrawer,
-  setPrivacyOption,
   setScrollToBottom,
   scrollToBottom,
   address,
@@ -107,6 +103,8 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     zingolibVersion,
     snackbars,
     removeFirstSnackbar,
+    setPrivacyOption,
+    navigationHome,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -494,33 +492,20 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   ]);
 
   const setMemoModalShow = () => {
-    return magicModal.show(
-      () => <Memo message={memo} includeUAMessage={true} setMessage={setMemo} />,
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      {
-        swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined,
-        style: { flex: 1, backgroundColor: colors.background },
-      },
-    ).promise;
+    navigationHome?.navigate(RouteEnum.Memo, { 
+      message: memo,
+      includeUAMessage: true,
+      setMessage: setMemo,
+    });
   };
 
   const setValueTransferDetailModalShow = async (index: number, vt: ValueTransferType) => {
-    return magicModal.show(
-      () => (
-        <ValueTransferDetail
-          index={index}
-          vt={vt}
-          valueTransfersSliced={messagesSliced}
-          totalLength={messagesFiltered ? messagesFiltered.length : 0}
-          setPrivacyOption={setPrivacyOption}
-        />
-      ),
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      {
-        swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined,
-        style: { flex: 1, backgroundColor: colors.background },
-      },
-    ).promise;
+    navigationHome?.navigate(RouteEnum.ValueTransferDetail, {
+      index: index,
+      vt: vt,
+      valueTransfersSliced: messagesSliced,
+      totalLength: messagesFiltered ? messagesFiltered.length : 0,
+    });
   };
 
   //if (address) {

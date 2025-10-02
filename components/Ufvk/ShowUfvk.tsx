@@ -1,12 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { View, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import Button from '../Components/Button';
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import SingleAddress from '../Components/SingleAddress';
@@ -16,10 +17,12 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 import RegText from '../Components/RegText';
-import { ButtonTypeEnum, ChainNameEnum, ModeEnum, ScreenEnum, UfvkActionEnum } from '../../app/AppState';
-import { useMagicModal } from 'react-native-magic-modal';
+import { ButtonTypeEnum, ChainNameEnum, ModeEnum, RouteEnum, ScreenEnum, SnackbarDurationEnum, UfvkActionEnum } from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
+import ExpandedAddress from '../Receive/components/ExpandedAddress';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type TextsType = {
   new: string[];
@@ -30,17 +33,29 @@ type TextsType = {
   backup: string[];
 };
 
-type ShowUfvkProps = {
+type ShowUfvkProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Ufvk> & {
   onClickOK: () => void;
   onClickCancel: () => void;
-  action: UfvkActionEnum;
-  setPrivacyOption: (value: boolean) => Promise<void>;
 };
-const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCancel, action, setPrivacyOption }) => {
+const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
+  navigation,
+  route,
+  onClickOK, 
+  onClickCancel 
+}) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, wallet, server, mode, addLastSnackbar, language, snackbars, removeFirstSnackbar } = context;
+  const { 
+    translate, 
+    wallet, 
+    server, 
+    mode, 
+    addLastSnackbar, 
+    language, 
+    snackbars, 
+    removeFirstSnackbar, 
+    setPrivacyOption,
+  } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
@@ -48,7 +63,32 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
 
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
+  const [sheetType, setSheetType] = useState<'EA' | null>(null);
+  const [action, setAction] = useState<UfvkActionEnum>(route && route.params ? route.params.action : UfvkActionEnum.view);
 
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  const EASnapPoints = useMemo(() =>
+    [
+      '40%',
+    ], []);
+
+  const EAShow = useCallback(() => {
+    setSheetType('EA');
+    bottomSheetRef.current?.snapToIndex(0);
+  }, []);
+
+  const EAHide = useCallback(() => {
+    setSheetType(null);
+    bottomSheetRef.current?.snapToIndex(-1);
+    bottomSheetRef.current?.close();
+  }, []);
+
+  useEffect(() => {
+    const _action = route && route.params ? route.params.action : UfvkActionEnum.view;
+    setAction(_action);
+  }, [route, route.params, route.params?.action]);
+    
   useEffect(() => {
     const buttonTextsArray = translate('ufvk.buttontexts');
     let buttonTexts = {} as TextsType;
@@ -89,15 +129,32 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
   const onClickCancelHide = () => {
     onClickCancel();
     clear();
-    hide();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
   };
 
   const onClickOKHide = () => {
     onClickOK();
     clear();
-    hide();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
   };
 
+  const renderBackdrop = (props: BottomSheetBackdropProps) => (
+    <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} pressBehavior="close" />
+  );
+
+  const doCopy = () => {
+    Clipboard.setString(wallet.ufvk ? wallet.ufvk : '');
+    addLastSnackbar({
+      message: (translate('seed.tapcopy-ufvk-message') as string),
+      duration: SnackbarDurationEnum.short,
+      screenName: [screenName],
+    });
+  };
+  
   return (
     <ToastProvider>
       <Snackbars
@@ -147,6 +204,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
                 index={0}
                 setIndex={() => {}}
                 total={1}
+                EAShow={EAShow}
               />
             )}
             {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}
@@ -187,6 +245,27 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({ onClickOK, onClickCa
           />
         </View>
       </View>
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={EASnapPoints}
+        enableDynamicSizing={false}
+        enablePanDownToClose
+        keyboardBehavior={'interactive'}
+        handleStyle={{ display: 'none' }}
+        backdropComponent={renderBackdrop}>
+        <BottomSheetView style={{ backgroundColor: colors.background, height: '100%' }}>
+          {sheetType === 'EA' && (
+            <ExpandedAddress
+                onCopy={doCopy}
+                closeSheet={EAHide}
+                title={translate('receive.title-address') as string}
+                button={translate('receive.copy-address-button') as string}
+                address={wallet.ufvk ? wallet.ufvk : ''}
+              />
+          )}
+        </BottomSheetView>
+      </BottomSheet>
     </ToastProvider>
   );
 };

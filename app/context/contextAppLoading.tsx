@@ -53,6 +53,7 @@ export const defaultAppContextLoading: AppContextLoading = {
   recoveryWalletInfoOnDevice: false,
   zingolibVersion: '',
   performanceLevel: RPCPerformanceLevelEnum.Medium,
+  setPrivacyOption: async () => {},
 };
 
 export const ContextAppLoading = React.createContext(defaultAppContextLoading);

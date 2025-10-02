@@ -1,12 +1,9 @@
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../../app/types';
-
-export const mockNavigation: StackScreenProps<RootStackParamList>['navigation'] = {
-  // Propiedades y métodos necesarios para la navegación
+export default {
   navigate: jest.fn(),
   goBack: jest.fn(),
   dispatch: jest.fn(),
-  reset: jest.fn(),
+  addListener: jest.fn(),
+  removeListener: jest.fn(),
   isFocused: jest.fn(),
   canGoBack: jest.fn(),
   getParent: jest.fn(),
@@ -14,8 +11,7 @@ export const mockNavigation: StackScreenProps<RootStackParamList>['navigation'] 
   getState: jest.fn(),
   setParams: jest.fn(),
   setOptions: jest.fn(),
-  addListener: jest.fn(),
-  removeListener: jest.fn(),
+  reset: jest.fn(),
   replace: jest.fn(),
   push: jest.fn(),
   pop: jest.fn(),
@@ -24,4 +20,4 @@ export const mockNavigation: StackScreenProps<RootStackParamList>['navigation'] 
   preload: jest.fn(),
   navigateDeprecated: jest.fn(),
   replaceParams: jest.fn(),
-};
+} as any;

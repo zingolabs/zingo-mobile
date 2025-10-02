@@ -17,7 +17,7 @@ import {
   ValueTransferKindEnum,
   SendPageStateClass,
   ToAddrClass,
-  RouteEnums,
+  RouteEnum,
   SelectServerEnum,
   ContactType,
   GlobalConst,
@@ -35,13 +35,12 @@ import AddressItem from '../../Components/AddressItem';
 import Utils from '../../../app/utils';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
 import RegText from '../../Components/RegText';
-import { HideReturn } from 'react-native-magic-modal';
 
 type ContactLineProps = {
   index: number;
   month: string;
   c: ContactType;
-  setMessagesAddressModalShow: (c: ContactType) => Promise<HideReturn<unknown>>;
+  setMessagesAddressModalShow: (c: ContactType) => void;
   addressProtected?: boolean;
   screenName: ScreenEnum;
 };
@@ -54,7 +53,15 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   screenName,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, navigationHome, showSwipeableIcons, readOnly, selectServer, setSendPageState, closeAllModals } = context;
+  const { 
+    translate, 
+    language, 
+    navigationHome, 
+    showSwipeableIcons, 
+    readOnly, 
+    selectServer, 
+    setSendPageState, 
+  } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
@@ -201,10 +208,8 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                     sendPageState.toaddr.to = c.address ? c.address : '';
                     setSendPageState(sendPageState);
-                    closeAllModals();
-                    navigationHome?.navigate(RouteEnums.Home, {
+                    navigationHome?.navigate(RouteEnum.Home, {
                       screen: translate('loadedapp.send-menu'),
-                      initial: false,
                     });
                     swipeable.reset();
                   }}>

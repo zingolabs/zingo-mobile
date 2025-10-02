@@ -6,61 +6,38 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import { LoadingAppClass } from '../app/LoadingApp';
+import { LoadingApp } from '../app/LoadingApp';
+import { StackScreenProps } from '@react-navigation/stack';
+import { AppStackParamList } from '../app/types';
+import { RouteEnum } from '../app/AppState';
+import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-// Importa el módulo I18n
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { I18n } from 'i18n-js';
-import { LanguageEnum, ModeEnum, SelectServerEnum, CurrencyEnum, LaunchingModeEnum } from '../app/AppState';
-import { mockLoadingAppNavigation } from '../__mocks__/dataMocks/mockLoadingAppNavigation';
-import { mockLoadingAppRoute } from '../__mocks__/dataMocks/mockLoadingAppRoute';
-import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
-import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
-import { mockServer } from '../__mocks__/dataMocks/mockServer';
-import { mockBackground } from '../__mocks__/dataMocks/mockBackground';
-import { mockSecurity } from '../__mocks__/dataMocks/mockSecurity';
-import { RPCPerformanceLevelEnum } from '../app/rpc/enums/RPCPerformanceLevelEnum';
+jest.mock('react-native-localize', () => ({
+  findBestLanguageTag: jest.fn().mockImplementation((supportedLocales) => {
+    return { languageTag: supportedLocales?.[0] || 'en', isRTL: false };
+  }),
+}));
 
+jest.mock('i18n-js');
+
+function makeDrawerProps(): StackScreenProps<AppStackParamList, RouteEnum.LoadingApp> {
+  return {
+    navigation: mockNavigation,
+    route: {
+      key: 'Key-1',
+      name: RouteEnum.LoadingApp,
+      params: undefined,
+    },
+  };
+}
 // test suite
 describe('Component LoadingApp - test', () => {
   //snapshot test
   test('LoadingApp - snapshot', () => {
-    const language = LanguageEnum.en;
-    const currency = CurrencyEnum.noCurrency;
-    const sendAll = false;
-    const rescanMenu = false;
-    const recoveryWalletInfoOnDevice = true;
-    const performanceLevel = RPCPerformanceLevelEnum.Medium;
-    const donation = false;
-    const privacy = false;
-    const mode = ModeEnum.basic;
-    const firstLaunchingMessage = LaunchingModeEnum.opening;
     const toggleTheme = jest.fn();
-    const selectServer = SelectServerEnum.auto;
-    const donationAlert = false;
+    const props = makeDrawerProps();
     const loadingapp = render(
-      <LoadingAppClass
-        navigationApp={mockLoadingAppNavigation}
-        route={mockLoadingAppRoute}
-        toggleTheme={toggleTheme}
-        translate={mockTranslate}
-        theme={mockTheme}
-        language={language}
-        currency={currency}
-        server={mockServer}
-        sendAll={sendAll}
-        donation={donation}
-        privacy={privacy}
-        mode={mode}
-        background={mockBackground}
-        firstLaunchingMessage={firstLaunchingMessage}
-        security={mockSecurity}
-        selectServer={selectServer}
-        donationAlert={donationAlert}
-        rescanMenu={rescanMenu}
-        recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
-        performanceLevel={performanceLevel}
-      />,
+      <LoadingApp {...props} toggleTheme={toggleTheme} />,
     );
     expect(loadingapp.toJSON()).toMatchSnapshot();
   });

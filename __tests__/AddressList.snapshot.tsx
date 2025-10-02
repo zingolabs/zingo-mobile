@@ -10,8 +10,24 @@ import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/contex
 import { AddressList } from '../components/AddressList';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
-import { AddressKindEnum } from '../app/AppState';
+import { AddressKindEnum, RouteEnum } from '../app/AppState';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { AppDrawerParamList } from '../app/types';
+import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
+function makeDrawerProps(ak: AddressKindEnum): DrawerScreenProps<AppDrawerParamList, RouteEnum.AddressList> {
+  return {
+    navigation: mockNavigation,
+    route: {
+      key: 'Key-1',
+      name: RouteEnum.AddressList,
+      params: {
+        addressKind: ak,
+        setIndex: jest.fn(),
+      },
+    },
+  };
+}
 // test suite
 describe('Component Unified Address List - test', () => {
   //snapshot test
@@ -19,10 +35,10 @@ describe('Component Unified Address List - test', () => {
     const state = defaultAppContextLoaded;
     state.addresses = mockAddresses;
     state.translate = mockTranslate;
-    const onSet = jest.fn();
+    const props = makeDrawerProps(AddressKindEnum.u);
     const al: any = render(
       <ContextAppLoadedProvider value={state}>
-        <AddressList addressKind={AddressKindEnum.u} setIndex={onSet} />
+        <AddressList {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(al.toJSON()).toMatchSnapshot();
@@ -32,10 +48,10 @@ describe('Component Unified Address List - test', () => {
     const state = defaultAppContextLoaded;
     state.addresses = mockAddresses;
     state.translate = mockTranslate;
-    const onSet = jest.fn();
+    const props = makeDrawerProps(AddressKindEnum.t);
     const al: any = render(
       <ContextAppLoadedProvider value={state}>
-        <AddressList addressKind={AddressKindEnum.t} setIndex={onSet} />
+        <AddressList {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(al.toJSON()).toMatchSnapshot();

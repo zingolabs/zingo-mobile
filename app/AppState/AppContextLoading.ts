@@ -32,6 +32,7 @@ export default interface AppContextLoading {
   addLastSnackbar: (snackbar: SnackbarType) => void;
   removeFirstSnackbar: (s: ScreenEnum) => void;
   zingolibVersion: string;
+  setPrivacyOption: (value: boolean) => Promise<void>;
 
   // context settings
   server: ServerType;

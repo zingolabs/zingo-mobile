@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -16,7 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import Button from '../Components/Button';
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import moment from 'moment';
@@ -26,38 +26,51 @@ import 'moment/locale/ru';
 import 'moment/locale/tr';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import { ButtonTypeEnum, GlobalConst, ScreenEnum } from '../../app/AppState';
+import { ButtonTypeEnum, GlobalConst, RouteEnum, ScreenEnum } from '../../app/AppState';
 import FadeText from '../Components/FadeText';
 import Utils from '../../app/utils';
-import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type MemoProps = {
-  message: string;
-  includeUAMessage: boolean;
-  setMessage: (m: string) => void;
-};
-const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, setMessage }) => {
+type MemoProps =  DrawerScreenProps<AppDrawerParamList, RouteEnum.Memo>;
+
+const Memo: React.FunctionComponent<MemoProps> = ({
+  navigation,
+  route,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, defaultUnifiedAddress, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme() as ThemeType;
-  const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Memo;
 
-  const [memo, setMemo] = useState<string>(message);
+  const [memo, setMemo] = useState<string>(route && route.params ? route.params.message : '');
+  const [includeUAMessage, setIncludeUAMessage] = useState<boolean>(route && route.params ? route.params.includeUAMessage : false);
+  const [setMessage, setSetMessage] = useState<(m: string) => void>(route && route.params ? route.params.setMessage : () => {});
 
   const dimensions = {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
   };
 
+  useEffect(() => {
+    const _message = route && route.params ? route.params.message : '';
+    const _includeUAMessage = route && route.params ? route.params.includeUAMessage : false;
+    const _setMessage = route && route.params ? route.params.setMessage : () => {};
+    setMemo(_message);
+    setIncludeUAMessage(_includeUAMessage);
+    setSetMessage(_setMessage);
+  }, [route, route.params, route.params?.includeUAMessage, route.params?.message, route.params?.setMessage]);
+
   const doSaveAndClose = () => {
     setMessage(memo);
-    hide();
+    clear();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
     Keyboard.dismiss();
   };
 
@@ -96,7 +109,9 @@ const Memo: React.FunctionComponent<MemoProps> = ({ message, includeUAMessage, s
             noUfvkIcon={true}
             closeScreen={() => {
               clear();
-              hide();
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              }
             }}
           />
           <ScrollView

@@ -12,7 +12,7 @@ import {
   SendPageStateClass,
   ToAddrClass,
   ModeEnum,
-  RouteEnums,
+  RouteEnum,
   SelectServerEnum,
 } from '../../../app/AppState';
 import Utils from '../../../app/utils';
@@ -48,7 +48,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   addressProtected,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, navigationHome, readOnly, mode, totalBalance, language, selectServer, setSendPageState, closeAllModals } = context;
+  const { translate, navigationHome, readOnly, mode, totalBalance, language, selectServer, setSendPageState } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
@@ -159,10 +159,8 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
-                  closeAllModals();
-                  navigationHome?.navigate(RouteEnums.Home, {
+                  navigationHome?.navigate(RouteEnum.Home, {
                     screen: translate('loadedapp.send-menu'),
-                    initial: false,
                   });
                 }}>
                 <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />

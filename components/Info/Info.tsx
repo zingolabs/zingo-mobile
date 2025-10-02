@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 
 import DetailLine from '../Components/DetailLine';
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
@@ -17,19 +17,29 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { ChainNameEnum, CurrencyEnum, ScreenEnum } from '../../app/AppState';
-import { useMagicModal } from 'react-native-magic-modal';
+import { ChainNameEnum, CurrencyEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type InfoProps = {
-};
+type InfoProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Info>;
 
-const Info: React.FunctionComponent<InfoProps> = () => {
+const Info: React.FunctionComponent<InfoProps> = ({
+  navigation,
+}) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, currency, zecPrice, privacy, language, setZecPrice, snackbars, removeFirstSnackbar } = context;
+  const { 
+    info, 
+    translate, 
+    currency, 
+    zecPrice, 
+    privacy, 
+    language, 
+    setZecPrice, 
+    snackbars, 
+    removeFirstSnackbar,
+  } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
@@ -62,7 +72,9 @@ const Info: React.FunctionComponent<InfoProps> = () => {
           noUfvkIcon={true}
           closeScreen={() => {
             clear();
-            hide();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
           }}
         />
         <ScrollView

@@ -1781,7 +1781,6 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
             "width": "80%",
           }
         }
-        testID="seed.button.ok"
       >
         <View
           style={

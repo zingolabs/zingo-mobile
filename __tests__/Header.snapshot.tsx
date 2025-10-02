@@ -50,7 +50,6 @@ describe('Component Header - test', () => {
           testID="valuetransfer text"
           toggleMenuDrawer={onFunction}
           setBackgroundError={onFunction}
-          setPrivacyOption={onFunction}
           addLastSnackbar={onFunction}
           setShieldingAmount={onFunction}
         />

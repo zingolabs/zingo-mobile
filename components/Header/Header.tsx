@@ -27,7 +27,7 @@ import {
   ButtonTypeEnum,
   GlobalConst,
   SelectServerEnum,
-  RouteEnums,
+  RouteEnum,
   ScreenEnum,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
@@ -129,7 +129,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     selectServer,
     setZecPrice,
     setComputingModalShow,
-    closeAllModals,
     setUfvkViewModalShow,
     setSyncReportModalShow,
     setPoolsModalShow,
@@ -359,9 +358,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         }
       }
       // change to the history screen, just in case.
-      navigationHome?.navigate(RouteEnums.Home, {
+      navigationHome?.navigate(RouteEnum.Home, {
         screen: translate('loadedapp.history-menu') as string,
-        initial: false,
       });
       // scroll to top in history, just in case.
       if (setScrollToTop) {
@@ -371,7 +369,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       if (setScrollToBottom) {
         setScrollToBottom(true);
       }
-      closeAllModals();
       setShieldingFee(0);
       setShieldingAmount && setShieldingAmount(0);
     }
@@ -502,7 +499,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     </TouchableOpacity>
   );
 
-  //console.log('render header &&&&&&&&&&&&&&&&&&&&&', info.currencyName);
+  //console.log('Render header &&&&&&&&&&&&&&&&&&&&&');
 
   return (
     <>
@@ -894,7 +891,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
                   }
                 } else {
-                  navigationHome?.navigate(RouteEnums.Settings);
+                  navigationHome?.navigate(RouteEnum.Settings);
                 }
               }}>
               <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />

@@ -15,21 +15,21 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 import { faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import FadeText from '../Components/FadeText';
-import RegText from '../Components/RegText';
-import Button from '../Components/Button';
-import ScannerUfvk from './components/ScannerUfvk';
-import { ThemeType } from '../../app/types';
-import { ContextAppLoading } from '../../app/context';
-import Header from '../Header';
-import RPCModule from '../../app/RPCModule';
+import FadeText from '../../../components/Components/FadeText';
+import RegText from '../../../components/Components/RegText';
+import Button from '../../../components/Components/Button';
+import ScannerUfvk from './ScannerUfvk';
+import { ThemeType } from '../../types';
+import { ContextAppLoading } from '../../context';
+import Header from '../../../components/Header';
+import RPCModule from '../../RPCModule';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { ButtonTypeEnum, GlobalConst, ScreenEnum, SelectServerEnum } from '../../app/AppState';
-import Snackbars from '../Components/Snackbars';
+import { ButtonTypeEnum, GlobalConst, ScreenEnum, SelectServerEnum } from '../../AppState';
+import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
 // @ts-ignore
 //import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
@@ -52,17 +52,17 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   const [latestBlock, setLatestBlock] = useState<number>(0);
 
   useEffect(() => {
-      if (!netInfo.isConnected || selectServer !== SelectServerEnum.offline) {
-        (async () => {
-          const resp: string = await RPCModule.getLatestBlockServerInfo(server.uri);
-          //console.log(resp);
-          if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
-            setLatestBlock(Number(resp));
-          } else {
-            //console.log('error latest block', resp);
-          }
-        })();
-      }
+    if (!netInfo.isConnected || selectServer !== SelectServerEnum.offline) {
+      (async () => {
+        const resp: string = await RPCModule.getLatestBlockServerInfo(server.uri);
+        //console.log(resp);
+        if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
+          setLatestBlock(Number(resp));
+        } else {
+          //console.log('error latest block', resp);
+        }
+      })();
+    }
   }, [server, selectServer, netInfo.isConnected]);
 
   useEffect(() => {

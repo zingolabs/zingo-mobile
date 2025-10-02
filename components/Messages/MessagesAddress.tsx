@@ -1,6 +1,7 @@
 
 import React, { useContext } from 'react';
-import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppState';
+//import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppState';
+import { RouteEnum } from '../../app/AppState';
 //import MessageList from './components/MessageList';
 
 import { ContextAppLoaded } from '../../app/context';
@@ -9,34 +10,23 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-//import { useMagicModal } from 'react-native-magic-modal';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { AppDrawerParamList } from '../../app/types';
 //import { useToast } from 'react-native-toastier';
 
-type MessagesAddressProps = {
-  setPrivacyOption: (value: boolean) => Promise<void>;
-  setScrollToBottom: (value: boolean) => void;
-  scrollToBottom: boolean;
-  address: string;
-  sendTransaction: (s: SendPageStateClass) => Promise<String>;
-  setServerOption: (
-    value: ServerType,
-    selectServer: SelectServerEnum,
-    toast: boolean,
-    sameServerChainName: boolean,
-  ) => Promise<void>;
-};
+type MessagesAddressProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.MessagesAddress>;
 
 const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
-  //setPrivacyOption,
-  //setScrollToBottom,
-  //scrollToBottom,
-  //address,
-  //sendTransaction,
-  //setServerOption,
+  //navigation,
+  //route,
 }) => {
+  //const setScrollToBottom = route.params.setScrollToBottom;
+  //const scrollToBottom = route.params.scrollToBottom;
+  //const address = route.params.address;
+  //const sendTransaction = route.params.sendTransaction;
+  //const setServerOption = route.params.setServerOption;
   const context = useContext(ContextAppLoaded);
   const { language } = context;
-  //const { hide } = useMagicModal();
   moment.locale(language);
   //const { clear } = useToast();
 
@@ -53,7 +43,9 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
       setServerOption={setServerOption}
       closeModal={() => {
         clear();
-        hide();
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        }
       }}
     />
   );

@@ -24,6 +24,7 @@ import {
   ButtonTypeEnum,
   FilterEnum,
   GlobalConst,
+  RouteEnum,
   ScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
@@ -33,13 +34,10 @@ import {
 import { ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
-import ValueTransferDetail from './components/ValueTransferDetail';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
-import { MessagesAddress } from '../Messages';
 import Utils from '../../app/utils';
-import { magicModal } from 'react-native-magic-modal';
 import { DataProvider, RecyclerListView, LayoutProvider, RecyclerListViewProps } from 'recyclerlistview';
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
 import { isEqual } from 'lodash';
@@ -58,7 +56,6 @@ type HistoryProps = {
   // side menu
   toggleMenuDrawer: () => void;
   // privacy
-  setPrivacyOption: (value: boolean) => Promise<void>;
   // addLastSnackbar from context
   // shielding / sending
   setShieldingAmount: (value: number) => void;
@@ -78,7 +75,6 @@ type HistoryProps = {
 
 const History: React.FunctionComponent<HistoryProps> = ({
   toggleMenuDrawer,
-  setPrivacyOption,
   setShieldingAmount,
   setScrollToTop,
   scrollToTop,
@@ -99,6 +95,8 @@ const History: React.FunctionComponent<HistoryProps> = ({
     zenniesDonationAddress,
     snackbars,
     removeFirstSnackbar,
+    setPrivacyOption,
+    navigationHome,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -283,42 +281,22 @@ const History: React.FunctionComponent<HistoryProps> = ({
   );
 
   const setValueTransferDetailModalShow = (index: number, vt: ValueTransferType) => {
-    return magicModal.show(
-      () => (
-        <ValueTransferDetail
-          index={index}
-          vt={vt}
-          valueTransfersSliced={valueTransfersSliced}
-          totalLength={valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0}
-          setPrivacyOption={setPrivacyOption}
-        />
-      ),
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      {
-        swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined,
-        style: { flex: 1, backgroundColor: colors.background },
-      },
-    ).promise;
+    navigationHome?.navigate(RouteEnum.ValueTransferDetail, { 
+      index: index, 
+      vt: vt,
+      valueTransfersSliced: valueTransfersSliced,
+      totalLength: valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0
+    });
   };
 
   const setMessagesAddressModalShow = (vt: ValueTransferType) => {
-    return magicModal.show(
-      () => (
-        <MessagesAddress
-          setPrivacyOption={setPrivacyOption}
-          setScrollToBottom={setScrollToBottom}
-          scrollToBottom={scrollToBottom}
-          address={Utils.messagesAddress(vt)}
-          sendTransaction={sendTransaction}
-          setServerOption={setServerOption}
-        />
-      ),
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      {
-        swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined,
-        style: { flex: 1, backgroundColor: colors.background },
-      },
-    ).promise;
+    navigationHome?.navigate(RouteEnum.MessagesAddress, {
+      setScrollToBottom: setScrollToBottom,
+      scrollToBottom: scrollToBottom,
+      address: Utils.messagesAddress(vt),
+      sendTransaction: sendTransaction,
+      setServerOption: setServerOption,
+    });
   };
 
   const rowRenderer = (type: string | number, data: ValueTransferType, index: number) => {

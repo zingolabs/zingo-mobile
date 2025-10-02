@@ -14,7 +14,6 @@ import { useTheme } from '@react-navigation/native';
 import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../types';
 import NetInfo, { NetInfoSubscription, NetInfoState } from '@react-native-community/netinfo/src/index';
 
 import RPCModule from '../RPCModule';
@@ -34,9 +33,8 @@ import {
   ChainNameEnum,
   DownloadMemosEnum,
   SnackbarDurationEnum,
-  SeedActionEnum,
   SettingsNameEnum,
-  RouteEnums,
+  RouteEnum,
   WalletOptionEnum,
   SnackbarType,
   AppStateStatusEnum,
@@ -72,14 +70,15 @@ import {
 } from '../recoveryWalletInfov10';
 
 // no lazy load because slowing down screens.
-import Seed from '../../components/Seed';
-import ImportUfvk from '../../components/Ufvk/ImportUfvk';
+import ImportUfvk from './components/ImportUfvk';
 import { sendEmail } from '../sendEmail';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
 import StartMenu from './components/StartMenu';
 import { ToastProvider } from 'react-native-toastier';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import NewSeed from './components/NewSeed';
+import { AppStackParamList } from '../types';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -91,8 +90,8 @@ const tr = require('../translations/tr.json');
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 type LoadingAppProps = {
-  navigation: StackScreenProps<RootStackParamList, RouteEnums.LoadingApp>['navigation'];
-  route: StackScreenProps<RootStackParamList, RouteEnums.LoadingApp>['route'];
+  navigation: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['navigation'];
+  route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
 };
 
@@ -154,7 +153,7 @@ export default function LoadingApp(props: LoadingAppProps) {
 
       //I have to check what language and other things are in the settings
       const settings = await SettingsFileImpl.readSettings();
-      console.log('LoadingApp', settings);
+      //console.log('LoadingApp', settings);
 
       // checking the version of the App in settings
       //console.log('versions, old:', settings.version, ' new:', translate('version') as string);
@@ -342,8 +341,8 @@ export default function LoadingApp(props: LoadingAppProps) {
 }
 
 type LoadingAppClassProps = {
-  navigationApp: StackScreenProps<RootStackParamList, RouteEnums.LoadingApp>['navigation'];
-  route: StackScreenProps<RootStackParamList, RouteEnums.LoadingApp>['route'];
+  navigationApp: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['navigation'];
+  route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
   theme: ThemeType;
@@ -392,6 +391,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       addLastSnackbar: this.addLastSnackbar,
       removeFirstSnackbar: this.removeFirstSnackbar,
       zingolibVersion: '',
+      setPrivacyOption: this.setPrivacyOption,
 
       // context settings
       server: props.server,
@@ -409,7 +409,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
       // state
       appStateStatus: AppState.currentState,
-      screen: !!props.route.params && !!props.route.params.screen ? props.route.params.screen : 0,
+      screen: props.route && props.route.params && props.route.params.screen ? props.route.params.screen : 0,
       actionButtonsDisabled: false,
       walletExists: false,
       customServerShow: false,
@@ -417,12 +417,14 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       customServerChainName: ChainNameEnum.mainChainName,
       customServerOffline: false,
       biometricsFailed:
-        !!props.route.params &&
+        props.route &&
+        props.route.params &&
         (props.route.params.biometricsFailed === true || props.route.params.biometricsFailed === false)
           ? props.route.params.biometricsFailed
           : false,
       startingApp:
-        !!props.route.params && (props.route.params.startingApp === true || props.route.params.startingApp === false)
+        props.route &&
+        props.route.params && (props.route.params.startingApp === true || props.route.params.startingApp === false)
           ? props.route.params.startingApp
           : true,
       serverErrorTries: 0,
@@ -615,7 +617,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             }
             // if the App is restoring another wallet backup...
             // needs to recalculate the Address Book.
-            const newWallet = !!this.props.route.params &&
+            const newWallet = this.props.route && this.props.route.params &&
               (this.props.route.params.newWallet === true || this.props.route.params.newWallet === false)
                 ? this.props.route.params.newWallet
                 : false;
@@ -1055,7 +1057,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       index: 0,
       routes: [
         {
-          name: RouteEnums.LoadedApp,
+          name: RouteEnum.LoadedApp,
           params: { readOnly, orchardPool, saplingPool, transparentPool, newWallet, firstLaunchingMessage },
         },
       ],
@@ -1486,6 +1488,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       addLastSnackbar: this.state.addLastSnackbar,
       removeFirstSnackbar: this.removeFirstSnackbar,
       zingolibVersion: this.state.zingolibVersion,
+      setPrivacyOption: this.setPrivacyOption,
 
       // settings
       server: this.state.server,
@@ -1549,11 +1552,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               transparent={true}
               visible={screen === 2}
               onRequestClose={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true, firstLaunchingMessage)}>
-              <Seed
+              <NewSeed
                 onClickOK={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true, firstLaunchingMessage)}
-                onClickCancel={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true, firstLaunchingMessage)}
-                action={SeedActionEnum.new}
-                setPrivacyOption={this.setPrivacyOption}
               />
             </Modal>
           )}

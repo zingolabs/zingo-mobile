@@ -12,7 +12,21 @@ import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockWallet } from '../__mocks__/dataMocks/mockWallet';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { AppDrawerParamList } from '../app/types';
+import { RouteEnum } from '../app/AppState';
+import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
+function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Rescan> {
+  return {
+    navigation: mockNavigation,
+    route: {
+      key: 'Key-1',
+      name: RouteEnum.Rescan,
+      params: undefined,
+    },
+  };
+}
 // test suite
 describe('Component Rescan - test', () => {
   //snapshot test
@@ -22,10 +36,11 @@ describe('Component Rescan - test', () => {
   state.totalBalance = mockTotalBalance;
   state.wallet = mockWallet;
   const onRescan = jest.fn();
+  const props = makeDrawerProps();
   test('Rescan - snapshot', () => {
     const rescan = render(
       <ContextAppLoadedProvider value={state}>
-        <Rescan doRescan={onRescan} />
+        <Rescan {...props} doRescan={onRescan} />
       </ContextAppLoadedProvider>,
     );
     expect(rescan.toJSON()).toMatchSnapshot();

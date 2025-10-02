@@ -11,7 +11,7 @@ import {
   ToAddrClass,
   ModeEnum,
   SnackbarDurationEnum,
-  RouteEnums,
+  RouteEnum,
   SelectServerEnum,
   ScreenEnum,
 } from '../../app/AppState';
@@ -60,7 +60,6 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     language,
     selectServer,
     setSendPageState,
-    closeAllModals,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -199,10 +198,8 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                   const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                   sendPageState.toaddr.to = address;
                   setSendPageState(sendPageState);
-                  closeAllModals();
-                  navigationHome?.navigate(RouteEnums.Home, {
+                  navigationHome?.navigate(RouteEnum.Home, {
                     screen: translate('loadedapp.send-menu'),
-                    initial: false,
                   });
                 }}>
                 <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faPaperPlane} color={colors.primary} />

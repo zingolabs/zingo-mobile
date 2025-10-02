@@ -20,7 +20,7 @@ import FadeText from '../Components/FadeText';
 import BoldText from '../Components/BoldText';
 import { checkServerURI, parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Components/Button';
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -41,7 +41,7 @@ import {
   WalletOptionEnum,
   ButtonTypeEnum,
   GlobalConst,
-  RouteEnums,
+  RouteEnum,
   ScreenEnum,
 } from '../../app/AppState';
 import { isEqual } from 'lodash';
@@ -52,8 +52,9 @@ import { hasRecoveryWalletInfo } from '../../app/recoveryWalletInfov10';
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type SettingsProps = {
+type SettingsProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Settings> & {
   setWalletOption: (walletOption: string, value: string) => Promise<void>;
   setServerOption: (
     value: ServerType,
@@ -65,7 +66,6 @@ type SettingsProps = {
   setLanguageOption: (value: LanguageEnum, reset: boolean) => Promise<void>;
   setSendAllOption: (value: boolean) => Promise<void>;
   setDonationOption: (value: boolean) => Promise<void>;
-  setPrivacyOption: (value: boolean) => Promise<void>;
   setModeOption: (value: string) => Promise<void>;
   setSecurityOption: (value: SecurityType) => Promise<void>;
   setSelectServerOption: (value: string) => Promise<void>;
@@ -81,13 +81,13 @@ type Options = {
 };
 
 const Settings: React.FunctionComponent<SettingsProps> = ({
+  navigation,
   setWalletOption,
   setServerOption,
   setCurrencyOption,
   setLanguageOption,
   setSendAllOption,
   setDonationOption,
-  setPrivacyOption,
   setModeOption,
   setSecurityOption,
   setSelectServerOption,
@@ -115,9 +115,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     performanceLevel: performanceLevelContext,
     readOnly,
-    navigationHome,
     snackbars,
     removeFirstSnackbar,
+    setPrivacyOption,
   } = context;
 
   const memosArray = translate('settings.memos');
@@ -606,7 +606,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setMemos(walletSettings.downloadMemos);
       setFilter(walletSettings.transactionFilterThreshold);
     }
-    navigationHome?.navigate(RouteEnums.Home);
+    navigation.navigate(RouteEnum.Home);
   };
 
   const optionsRadio = (

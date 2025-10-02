@@ -37,7 +37,6 @@ describe('Component History - test', () => {
       <ContextAppLoadedProvider value={state}>
         <History
           toggleMenuDrawer={onFunction}
-          setPrivacyOption={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           scrollToTop={false}
@@ -62,7 +61,6 @@ describe('Component History - test', () => {
       <ContextAppLoadedProvider value={state}>
         <History
           toggleMenuDrawer={onFunction}
-          setPrivacyOption={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           scrollToTop={false}

@@ -45,22 +45,19 @@ import {
   ServerUrisType,
   ServerType,
   SelectServerEnum,
-  RouteEnums,
+  RouteEnum,
   SecurityType,
   ScreenEnum,
 } from '../../app/AppState';
 import { parseZcashURI, serverUris } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
 import Utils from '../../app/utils';
-import ScannerAddress from './components/ScannerAddress';
-import Confirm from './components/Confirm';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
 import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
-import Memo from '../Memo';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -70,7 +67,6 @@ import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
 import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
-import { magicModal } from 'react-native-magic-modal';
 // @ts-ignore
 //import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
@@ -82,8 +78,6 @@ type SendProps = {
   // side menu
   toggleMenuDrawer: () => void;
   // privacy
-  setPrivacyOption: (value: boolean) => Promise<void>;
-  // addLastSnackbar from context
   // shielding
   setShieldingAmount: (value: number) => void;
   setScrollToTop: (value: boolean) => void;
@@ -104,7 +98,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   sendTransaction,
   clearToAddr,
   toggleMenuDrawer,
-  setPrivacyOption,
   setShieldingAmount,
   setScrollToTop,
   setScrollToBottom,
@@ -137,13 +130,13 @@ const Send: React.FunctionComponent<SendProps> = ({
     setZecPrice,
     zenniesDonationAddress,
     setComputingModalShow,
-    closeAllModals,
     setPoolsModalShow,
     //security,
     currency,
     zingolibVersion,
     snackbars,
     removeFirstSnackbar,
+    setPrivacyOption,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -659,18 +652,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   };
 
-  const buildSendState = () => {
-    return {
-      toaddr: {
-        to: addressText,
-        amount: amountText,
-        amountCurrency: amountCurrencyText,
-        memo: memoText,
-        includeUAMemo: includeUAMemoBoolean,
-      },
-    } as SendPageStateClass;
-  };
-
   const clearState = () => {
     setAddressText('');
     setAmountText('');
@@ -701,9 +682,8 @@ const Send: React.FunctionComponent<SendProps> = ({
         // Clear the fields
         clearState();
 
-        navigationHome?.navigate(RouteEnums.Home, {
+        navigationHome?.navigate(RouteEnum.Home, {
           screen: translate('loadedapp.history-menu') as string,
-          initial: false,
         });
 
         // scroll to top in history, just in case.
@@ -719,7 +699,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           true,
           translate,
         );
-        closeAllModals();
         // the app send successfully on the first attemp.
 
         return;
@@ -757,9 +736,8 @@ const Send: React.FunctionComponent<SendProps> = ({
             // Clear the fields
             clearState();
 
-            navigationHome?.navigate(RouteEnums.Home, {
+            navigationHome?.navigate(RouteEnum.Home, {
               screen: translate('loadedapp.history-menu') as string,
-              initial: false,
             });
 
             // scroll to top in history, just in case.
@@ -775,7 +753,6 @@ const Send: React.FunctionComponent<SendProps> = ({
               true,
               translate,
             );
-            closeAllModals();
             // the app send successfully on the second attemp.
 
             return;
@@ -803,7 +780,6 @@ const Send: React.FunctionComponent<SendProps> = ({
           zingolibVersion,
         );
       }, 1 * 1000);
-      closeAllModals();
     });
   };
 
@@ -830,90 +806,35 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const setQrcodeModalShow = () => {
-    //if (Platform.OS === GlobalConst.platformOSandroid) {
-    //  let changed: boolean = false;
-    //  if (security.foregroundApp) {
-    //    // deactivate temporarily this
-    //    changed = true;
-    //    const newSecurity = {
-    //      startApp: security.startApp,
-    //      foregroundApp: false,
-    //      sendConfirm: security.sendConfirm,
-    //      seedUfvkScreen: security.seedUfvkScreen,
-    //      rescanScreen: security.rescanScreen,
-    //      settingsScreen: security.settingsScreen,
-    //      changeWalletScreen: security.changeWalletScreen,
-    //      restoreWalletBackupScreen: security.restoreWalletBackupScreen,
-    //    } as SecurityType;
-    //    setSecurityOption(newSecurity);
-    //  }
-    //  BarcodeZxingScan.showQrReader(async (a: string) => {
-    //    updateToField(a, null, null, null, null);
-    //  });
-    //  if (changed) {
-    //    // activate again in 5 seconds
-    //    setTimeout(() => {
-    //      const newSecurity = {
-    //        startApp: security.startApp,
-    //        foregroundApp: true,
-    //        sendConfirm: security.sendConfirm,
-    //        seedUfvkScreen: security.seedUfvkScreen,
-    //        rescanScreen: security.rescanScreen,
-    //        settingsScreen: security.settingsScreen,
-    //        changeWalletScreen: security.changeWalletScreen,
-    //        restoreWalletBackupScreen: security.restoreWalletBackupScreen,
-    //      } as SecurityType;
-    //      setSecurityOption(newSecurity);
-    //    }, 5 * 1000);
-    //  }
-    //  return;
-    //} else {
-    return magicModal.show(
-      () => (
-        <ScannerAddress
-          setAddress={(a: string) => {
-            updateToField(a, null, null, null, null);
-          }}
-        />
-      ),
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-    ).promise;
-    //}
+    navigationHome?.navigate(RouteEnum.ScannerAddress, { 
+      setAddress: (a: string) => updateToField(a, null, null, null, null) 
+    })
   };
 
   const setMemoModalShow = () => {
-    return magicModal.show(
-      () => <Memo message={memoText} includeUAMessage={includeUAMemoBoolean} setMessage={setMemoText} />,
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-    ).promise;
+    navigationHome?.navigate(RouteEnum.Memo, { 
+      message: memoText,
+      includeUAMessage: includeUAMemoBoolean,
+      setMessage: setMemoText,
+    });
   };
 
-  const setConfirmModalShow = (parseAddressInfoJSON: RPCParseAddressType) => {
-    return magicModal.show(
-      () => (
-        <Confirm
-          calculatedFee={fee}
-          parseAddressInfoJSON={parseAddressInfoJSON}
-          donationAmount={
-            donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
-              ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
-              : 0
-          }
-          confirmSend={confirmSend}
-          sendAllAmount={
-            mode !== ModeEnum.basic &&
-            Utils.parseStringLocaleToNumberFloat(amountText) ===
-              Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
-          }
-          calculateFeeWithPropose={calculateFeeWithPropose}
-          sendPageState={buildSendState()}
-        />
-      ),
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-    ).promise;
+  const setConfirmModalShow = async (parseAddressInfoJSON: RPCParseAddressType) => {
+    await updateToField(addressText, amountText, amountCurrencyText, memoText, includeUAMemoBoolean);
+    navigationHome?.navigate(RouteEnum.Confirm, {
+      calculatedFee: fee,
+      parseAddressInfoJSON: parseAddressInfoJSON,
+      donationAmount:
+        donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+          ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
+          : 0,
+      confirmSend: confirmSend,
+      sendAllAmount:
+        mode !== ModeEnum.basic &&
+        Utils.parseStringLocaleToNumberFloat(amountText) ===
+          Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
+      calculateFeeWithPropose: calculateFeeWithPropose,
+    });
   };
 
   //console.log(

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { ContextAppLoaded } from '../../../app/context';
 import Scanner from '../../Scanner';
@@ -8,30 +8,37 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { GlobalConst, ScreenEnum } from '../../../app/AppState';
+import { GlobalConst, RouteEnum, ScreenEnum } from '../../../app/AppState';
 import Header from '../../Header';
 import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useMagicModal } from 'react-native-magic-modal';
 import { View } from 'react-native';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type ScannerAddressProps = {
-  setAddress: (address: string) => void;
-};
+type ScannerAddressProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.ScannerAddress>;
 
-const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddress }) => {
+const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ 
+  navigation,
+  route,
+ }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.ScannerAddress;
+
+  const [setAddress, setSetAddress] = useState<(a: string) => void>(route && route.params ? route.params.setAddress : () => {});
+
+  useEffect(() => {
+    const _setAddress = route && route.params ? route.params.setAddress : () => {};
+    setSetAddress(_setAddress);
+  }, [route, route.params, route.params?.setAddress]);
 
   const validateAddress = async (scannedAddress: string) => {
     if (scannedAddress.toLowerCase().startsWith(GlobalConst.zcash)) {
@@ -81,10 +88,17 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({ setAddre
           noUfvkIcon={true}
           closeScreen={() => {
             clear();
-            hide();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
           }}
         />
-        <Scanner onRead={onRead} onClose={() => hide()} />
+        <Scanner onRead={onRead} onClose={() => {
+          clear();
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }} />
       </View>
     </ToastProvider>
   );

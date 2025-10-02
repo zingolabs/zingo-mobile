@@ -6,71 +6,45 @@ import 'react-native';
 import React from 'react';
 
 import { render } from '@testing-library/react-native';
-import { LoadedAppClass } from '../app/LoadedApp';
+import { LoadedApp } from '../app/LoadedApp';
+import { StackScreenProps } from '@react-navigation/stack';
+import { AppStackParamList } from '../app/types';
+import { LaunchingModeEnum, RouteEnum } from '../app/AppState';
+import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
-// Importa el módulo I18n
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { I18n } from 'i18n-js';
-import { LanguageEnum, ModeEnum, SelectServerEnum, CurrencyEnum, LaunchingModeEnum } from '../app/AppState';
-import { mockTheme } from '../__mocks__/dataMocks/mockTheme';
-import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
-import { mockLoadedAppNavigation } from '../__mocks__/dataMocks/mockLoadedAppNavigation';
-import { mockLoadedAppRoute } from '../__mocks__/dataMocks/mockLoadedAppRoute';
-import { mockServer } from '../__mocks__/dataMocks/mockServer';
-import { mockBackground } from '../__mocks__/dataMocks/mockBackground';
-import { mockSecurity } from '../__mocks__/dataMocks/mockSecurity';
-import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
-import { RPCPerformanceLevelEnum } from '../app/rpc/enums/RPCPerformanceLevelEnum';
+jest.mock('react-native-localize', () => ({
+  findBestLanguageTag: jest.fn().mockImplementation((supportedLocales) => {
+    return { languageTag: supportedLocales?.[0] || 'en', isRTL: false };
+  }),
+}));
 
+jest.mock('i18n-js');
+
+function makeDrawerProps(): StackScreenProps<AppStackParamList, RouteEnum.LoadedApp> {
+  return {
+    navigation: mockNavigation,
+    route: {
+      key: 'Key-1',
+      name: RouteEnum.LoadedApp,
+      params: {
+        readOnly: false,
+        orchardPool: true,
+        saplingPool: true,
+        transparentPool: true,
+        newWallet: false,
+        firstLaunchingMessage: LaunchingModeEnum.opening,
+      },
+    },
+  };
+}
 // test suite
 describe('Component LoadedApp - test', () => {
   //snapshot test
   test('LoadedApp - snapshot', () => {
-    const language = LanguageEnum.en;
-    const currency = CurrencyEnum.noCurrency;
-    const sendAll = false;
-    const rescanMenu = false;
-    const recoveryWalletInfoOnDevice = true;
-    const performanceLevel = RPCPerformanceLevelEnum.Medium;
-    const donation = false;
-    const privacy = false;
-    const mode = ModeEnum.basic;
-    const readOnly = false;
-    const orchardPool = true;
-    const saplingPool = true;
-    const transparentPool = true;
     const toggleTheme = jest.fn();
-    const selectServer = SelectServerEnum.auto;
-    const zenniesDonationAddress = 'xxxxxxxxxxxxxxxxx';
-    const firstLaunchingMessage = LaunchingModeEnum.opening;
+    const props = makeDrawerProps();
     const loadedapp = render(
-      <LoadedAppClass
-        navigationApp={mockLoadedAppNavigation}
-        route={mockLoadedAppRoute}
-        toggleTheme={toggleTheme}
-        translate={mockTranslate}
-        theme={mockTheme}
-        language={language}
-        currency={currency}
-        server={mockServer}
-        sendAll={sendAll}
-        donation={donation}
-        privacy={privacy}
-        mode={mode}
-        background={mockBackground}
-        readOnly={readOnly}
-        orchardPool={orchardPool}
-        saplingPool={saplingPool}
-        transparentPool={transparentPool}
-        addressBook={mockAddressBook}
-        security={mockSecurity}
-        selectServer={selectServer}
-        rescanMenu={rescanMenu}
-        recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
-        zenniesDonationAddress={zenniesDonationAddress}
-        firstLaunchingMessage={firstLaunchingMessage}
-        performanceLevel={performanceLevel}
-      />,
+      <LoadedApp {...props} toggleTheme={toggleTheme} />,
     );
     expect(loadedapp.toJSON()).toMatchSnapshot();
   });

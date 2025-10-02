@@ -23,7 +23,7 @@ import {
   GlobalConst,
   SendPageStateClass,
   ToAddrClass,
-  RouteEnums,
+  RouteEnum,
   SelectServerEnum,
   ScreenEnum,
 } from '../../../app/AppState';
@@ -37,16 +37,15 @@ import 'moment/locale/tr';
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
-import { HideReturn } from 'react-native-magic-modal';
 //import Utils from '../../../app/utils';
 
 type ValueTransferLineProps = {
   index: number;
   month: string;
   vt: ValueTransferType;
-  setValueTransferDetailModalShow: (i: number, v: ValueTransferType) => Promise<HideReturn<unknown>>;
+  setValueTransferDetailModalShow: (i: number, vt: ValueTransferType) => void;
   nextLineWithSameTxid: boolean;
-  setMessagesAddressModalShow: (vt: ValueTransferType) => Promise<HideReturn<unknown>>;
+  setMessagesAddressModalShow: (vt: ValueTransferType) => void;
   addressProtected?: boolean;
   screenName: ScreenEnum;
 };
@@ -71,7 +70,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     readOnly,
     selectServer,
     setSendPageState,
-    closeAllModals,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
@@ -218,10 +216,8 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                     sendPageState.toaddr.to = vt.address ? vt.address : '';
                     setSendPageState(sendPageState);
-                    closeAllModals();
-                    navigationHome?.navigate(RouteEnums.Home, {
+                    navigationHome?.navigate(RouteEnum.Home, {
                       screen: translate('loadedapp.send-menu'),
-                      initial: false,
                     });
                     swipeable.reset();
                   }}>
@@ -282,6 +278,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       <TouchableOpacity
         style={{ zIndex: 999 }}
         onPress={() => {
+          console.log(index, vt);
           setValueTransferDetailModalShow(index, vt);
           swipeableRef?.current?.reset();
         }}>

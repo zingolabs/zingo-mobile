@@ -10,7 +10,6 @@ import {
   ActivityIndicator,
   TextInput,
   TextInputEndEditingEventData,
-  Platform,
   Pressable,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -29,7 +28,7 @@ import {
   AddressBookFileClass,
   ContactType,
   FilterEnum,
-  GlobalConst,
+  RouteEnum,
   ScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
@@ -38,21 +37,19 @@ import {
   UnifiedAddressClass,
   ValueTransferType,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import FadeText from '../../Components/FadeText';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
-import { MessagesAddress, MessagesAll } from '../../Messages';
 import Utils from '../../../app/utils';
 import ContactLine from './ContactLine';
 import RegText from '../../Components/RegText';
-import { magicModal } from 'react-native-magic-modal';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type ContactListProps = {
+type ContactListProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.ContactList> & {
   toggleMenuDrawer?: () => void;
-  setPrivacyOption: (value: boolean) => Promise<void>;
   setScrollToTop: (value: boolean) => void;
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
@@ -69,8 +66,8 @@ type ContactListProps = {
 };
 
 const ContactList: React.FunctionComponent<ContactListProps> = ({
+  navigation,
   toggleMenuDrawer,
-  setPrivacyOption,
   setScrollToTop,
   scrollToTop,
   setScrollToBottom,
@@ -81,8 +78,18 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   noDrawMenu,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, valueTransfers, language, server, addressBook, addresses, doRefresh, zenniesDonationAddress, snackbars, removeFirstSnackbar } =
-    context;
+  const { 
+    translate, 
+    valueTransfers, 
+    language, 
+    server, 
+    addressBook, 
+    addresses, 
+    doRefresh, 
+    zenniesDonationAddress, 
+    snackbars, 
+    removeFirstSnackbar,
+  } = context;
   const { colors } = useTheme()  as ThemeType;
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
@@ -287,28 +294,20 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
   }, [isScrollingToTop]);
 
   const setMessagesAddressModalShow = (c: ContactType) => {
-    return magicModal.show(() => <MessagesAddress
-        setPrivacyOption={setPrivacyOption}
-        setScrollToBottom={setScrollToBottom}
-        scrollToBottom={scrollToBottom}
-        address={Utils.messagesAddress(c)}
-        sendTransaction={sendTransaction}
-        setServerOption={setServerOption}
-      />,
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }
-    ).promise;
+    navigation.navigate(RouteEnum.MessagesAddress, {
+      setScrollToBottom: setScrollToBottom,
+      scrollToBottom: scrollToBottom,
+      address: Utils.messagesAddress(c),
+      sendTransaction: sendTransaction,
+      setServerOption: setServerOption,
+    });
   };
 
   const setMessagesAllModalShow = () => {
-    return magicModal.show(() => <MessagesAll
-        setPrivacyOption={setPrivacyOption}
-        setScrollToBottom={setScrollToBottom}
-        scrollToBottom={scrollToBottom}
-      />,
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }
-    ).promise;
+    navigation.navigate(RouteEnum.MessagesAll, {
+      setScrollToBottom: setScrollToBottom,
+      scrollToBottom: scrollToBottom,
+    });
   };
 
   //console.log('render Contacts', filter, searchMode);

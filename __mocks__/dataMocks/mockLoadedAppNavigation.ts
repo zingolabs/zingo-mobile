@@ -1,8 +1,8 @@
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../app/types';
-import { RouteEnums } from '../../app/AppState';
+import { AppStackParamList } from '../../app/types';
+import { RouteEnum } from '../../app/AppState';
 
-export const mockLoadedAppNavigation: StackNavigationProp<RootStackParamList, RouteEnums.LoadedApp> = {
+export const mockLoadedAppNavigation: StackNavigationProp<AppStackParamList, RouteEnum.LoadedApp> = {
   navigate: jest.fn(),
   goBack: jest.fn(),
   dispatch: jest.fn(),

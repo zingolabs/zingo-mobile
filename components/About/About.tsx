@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 
 import FadeText from '../Components/FadeText';
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import DetailLine from '../Components/DetailLine';
@@ -15,18 +15,17 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
-import { ScreenEnum } from '../../app/AppState';
+import { RouteEnum, ScreenEnum } from '../../app/AppState';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type AboutProps = {
-};
-const About: React.FunctionComponent<AboutProps> = () => {
+type AboutProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.About>;
+
+const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
   const context = useContext(ContextAppLoaded);
   const { zingolibVersion, translate, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
@@ -37,6 +36,8 @@ const About: React.FunctionComponent<AboutProps> = () => {
   if (typeof arrayTxtObject === 'object') {
     arrayTxt = arrayTxtObject as string[];
   }
+
+  //console.log('Render About');
 
   return (
     <ToastProvider>
@@ -65,7 +66,9 @@ const About: React.FunctionComponent<AboutProps> = () => {
           noUfvkIcon={true}
           closeScreen={() => {
             clear();
-            hide();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
           }}
         />
         <ScrollView

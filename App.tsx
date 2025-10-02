@@ -6,8 +6,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
-import { ThemeType, RootStackParamList } from './app/types';
-import { ModeEnum, RouteEnums } from './app/AppState';
+import { ThemeType, AppStackParamList } from './app/types';
+import { ModeEnum, RouteEnum } from './app/AppState';
 
 import { LogBox, StatusBar } from 'react-native';
 
@@ -113,7 +113,7 @@ const basicTheme: ThemeType = {
   },
 };
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createStackNavigator<AppStackParamList>();
 
 const App: React.FunctionComponent = () => {
   const [theme, setTheme] = useState<ThemeType>(advancedTheme);
@@ -133,12 +133,12 @@ const App: React.FunctionComponent = () => {
             backgroundColor: theme.colors.background,
           }}>
           <Stack.Navigator
-            initialRouteName={RouteEnums.LoadingApp}
+            initialRouteName={RouteEnum.LoadingApp}
             screenOptions={{ headerShown: false, animation: 'none' }}>
-            <Stack.Screen name={RouteEnums.LoadingApp} options={{ animation: 'none' }}>
+            <Stack.Screen name={RouteEnum.LoadingApp} options={{ animation: 'none' }}>
               {props => <LoadingApp {...props} toggleTheme={toggleTheme} />}
             </Stack.Screen>
-            <Stack.Screen name={RouteEnums.LoadedApp} options={{ animation: 'none' }}>
+            <Stack.Screen name={RouteEnum.LoadedApp} options={{ animation: 'none' }}>
               {props => <LoadedApp {...props} toggleTheme={toggleTheme} />}
             </Stack.Screen>
           </Stack.Navigator>

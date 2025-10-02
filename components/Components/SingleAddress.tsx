@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { View, ScrollView, TouchableOpacity, Text, Pressable, Platform } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Text, Pressable } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@react-navigation/native';
 
@@ -14,8 +14,8 @@ import 'moment/locale/tr';
 import {
   AddressKindEnum,
   ButtonTypeEnum,
-  GlobalConst,
   ModeEnum,
+  RouteEnum,
   ScreenEnum,
   SnackbarDurationEnum,
   TransparentAddressClass,
@@ -23,114 +23,18 @@ import {
 } from '../../app/AppState';
 import RegText from './RegText';
 import FadeText from './FadeText';
-import { AddressList } from '../AddressList';
-import { magicModal, MagicModalHideReason, useMagicModal } from 'react-native-magic-modal';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import ExpandableAddress from './Address/ExpandableAddress';
 import Button from './Button';
 import { CopyIcon } from './Icons/CopyIcon';
 import { ChevronDown, ChevronUp } from './Icons/Chevron';
 import { EyeIcon } from './Icons/EyeIcon';
-import { XIcon } from './Icons/XIcon';
 import { TriangleAlert } from './Icons/TriangleAlert';
 import { ShieldIcon } from './Icons/ShieldIcon';
 import { ListIcon } from './Icons/ListIcon';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
-
-type ConfirmationModalReturn = {
-  success: boolean;
-};
-
-const ConfirmationModal = () => {
-  const { hide } = useMagicModal<ConfirmationModalReturn>();
-  const { colors } = useTheme() as ThemeType;
-  const { translate } = useContext(ContextAppLoaded);
-
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%',
-      }}>
-      <View
-        style={{
-          width: '90%',
-          padding: 16,
-          borderRadius: 8,
-          backgroundColor: colors.modal,
-          position: 'relative',
-        }}>
-        <TouchableOpacity
-          onPress={() => hide({ success: false })}
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            zIndex: 1,
-          }}
-          hitSlop={10}>
-          <XIcon color={colors.zingo} size={24} />
-        </TouchableOpacity>
-        <View
-          style={{
-            height: 2,
-            width: '100%',
-            marginBottom: 6,
-          }}
-        />
-
-        <View>
-          <Text style={{ color: colors.money, fontSize: 25, fontWeight: 'bold', marginBottom: 12 }}>
-            {translate('receive.modal-transparent.title') as string}
-          </Text>
-          <Text style={{ color: colors.money, fontSize: 16, marginBottom: 12 }}>
-            {translate('receive.modal-transparent.message') as string}
-          </Text>
-          <Text style={{ color: colors.zingo, fontSize: 16, marginBottom: 16 }}>
-            {translate('receive.modal-transparent.recommendation') as string}
-          </Text>
-          <TouchableOpacity
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: colors.warning.background,
-              padding: 12,
-              borderRadius: 8,
-              borderColor: colors.warning.border,
-              borderWidth: 2,
-            }}
-            onPress={() => hide({ success: true })}>
-            <TriangleAlert size={15} style={{ marginRight: 8 }} color={colors.warning.title} />
-
-            <Text style={{ color: colors.warning.title, fontSize: 12 }}>
-              {translate('receive.modal-transparent.button') as string}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-  );
-};
-
-const handleConfirmationFlow = async (onSuccess: () => void) => {
-  const result = await magicModal.show<ConfirmationModalReturn>(() => <ConfirmationModal />).promise;
-
-  if (result.reason !== MagicModalHideReason.INTENTIONAL_HIDE) {
-    return;
-  }
-
-  if (!result.data.success) {
-    return;
-  }
-
-  onSuccess();
-};
+import Address from './Address/Address';
 
 type SingleAddressProps = {
   address?: UnifiedAddressClass | TransparentAddressClass;
@@ -142,8 +46,12 @@ type SingleAddressProps = {
   NAShow?: () => void;
   NATShow?: () => void;
   VAShow?: () => void;
+  TWShow?: () => void;
+  EAShow?: () => void;
   changeIndex?: (index: number) => void;
   hasTransparent?: boolean;
+  showMoreOptions?: boolean;
+  setShowMoreOptions?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
@@ -153,19 +61,22 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   NAShow,
   NATShow,
   VAShow,
+  TWShow,
+  EAShow,
   total,
   index,
   setIndex,
   changeIndex,
   hasTransparent,
+  showMoreOptions,
+  setShowMoreOptions,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, privacy, addLastSnackbar, language, mode, addressBook } = context;
+  const { translate, privacy, addLastSnackbar, language, mode, addressBook, navigationHome } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
-  const [showMoreOptions, setShowMoreOptions] = useState(false);
   const contentHeight = useRef(0);
 
   const animatedHeight = useSharedValue(0);
@@ -177,7 +88,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   const isUnified = address?.addressKind === AddressKindEnum.u;
 
   const toggle = () => {
-    setShowMoreOptions(prev => {
+    setShowMoreOptions && setShowMoreOptions(prev => {
       const next = !prev;
 
       animatedHeight.value = withTiming(next ? contentHeight.current : 0, {
@@ -223,10 +134,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
 
   useEffect(() => {
     return () => {
-      setShowMoreOptions(false);
+      setShowMoreOptions && setShowMoreOptions(false);
       animatedStyle.height = 0;
     };
-  }, [animatedStyle]);
+  }, [animatedStyle, setShowMoreOptions]);
 
   function contactFromAddress() {
     const contact = addressBook.find(c => c.address === address?.address);
@@ -245,11 +156,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   };
 
   const doAddressList = () => {
-    return magicModal.show(
-      () => <AddressList addressKind={address ? address.addressKind : AddressKindEnum.u} setIndex={setIndex} />,
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-    ).promise;
+    navigationHome?.navigate(RouteEnum.AddressList, {
+      addressKind: address ? address.addressKind : AddressKindEnum.u, 
+      setIndex: setIndex
+    });
   };
 
   return (
@@ -522,13 +432,11 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
               </View>
             </View>
             {ufvk && (
-              <ExpandableAddress
-                onCopy={doCopy}
-                title={translate('receive.title-ufvk') as string}
-                button={translate('receive.copy-ufvk-button') as string}
-                address={ufvk}
-                style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
-              />
+              <Address
+                  address={ufvk}
+                  style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
+                  onPress={EAShow}
+                />
             )}
             {address && (
               <View
@@ -561,12 +469,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     </Text>
                   </TouchableOpacity>
                 )}
-                <ExpandableAddress
-                  onCopy={doCopy}
-                  title={translate('receive.title-address') as string}
-                  button={translate('receive.copy-address-button') as string}
+                <Address
                   address={address.address}
                   style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
+                  onPress={EAShow}
                 />
               </View>
             )}
@@ -660,11 +566,9 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                               width: '80%',
                             }}
                             onPress={() => {
-                              handleConfirmationFlow(() => {
-                                setShowMoreOptions(false);
-                                animatedHeight.value = 0;
-                                changeIndex && changeIndex(1);
-                              });
+                              TWShow && TWShow();
+                              setShowMoreOptions && setShowMoreOptions(false);
+                              animatedHeight.value = 0;
                             }}>
                             <Text style={{ color: colors.text }}>
                               {translate('receive.go-to-transparent') as string}

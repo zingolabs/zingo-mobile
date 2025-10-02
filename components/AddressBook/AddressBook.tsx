@@ -17,8 +17,8 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, FilterEnum, GlobalConst, ScreenEnum } from '../../app/AppState';
-import { ThemeType } from '../../app/types';
+import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, FilterEnum, GlobalConst, RouteEnum, ScreenEnum } from '../../app/AppState';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import AbDetail from './components/AbDetail';
@@ -29,20 +29,20 @@ import AddressBookFileImpl from './AddressBookFileImpl';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import Utils from '../../app/utils';
-import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import RPCModule from '../../app/RPCModule';
 import { RPCCheckAddressType } from '../../app/rpc/types/RPCCheckAddressType';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type AddressBookProps = {
+type AddressBookProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.AddressBook> & {
   setAddressBook: (ab: AddressBookFileClass[]) => void;
-  //setSecurityOption: (s: SecurityType) => Promise<void>;
 };
 
+
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({
+  navigation,
   setAddressBook,
-  //setSecurityOption,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -55,7 +55,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
@@ -133,7 +132,10 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     setCurrentItem(null);
     setAction(null);
     if (addressBookCurrentAddress) {
-      hide();
+      clear();
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      }
     }
   };
 
@@ -153,7 +155,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       let own: boolean;
       // verify this address as own or not
       const checkStr = await RPCModule.checkMyAddressInfo(address);
-      console.log(checkStr);
+      //console.log(checkStr);
       if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
         const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
         own = checkJSON.is_wallet_address;
@@ -250,7 +252,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           noUfvkIcon={true}
           closeScreen={() => {
             clear();
-            hide();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
           }}
         />
         <View

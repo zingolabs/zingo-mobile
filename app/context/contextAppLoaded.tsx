@@ -70,7 +70,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   restartApp: () => {},
   somePending: false,
   addressBook: [] as AddressBookFileClass[],
-  launchAddressBook: () => new Promise(resolve => resolve),
+  launchAddressBook: () => {},
   addressBookCurrentAddress: '',
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
@@ -81,13 +81,13 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   doRefresh: () => {},
   setZecPrice: () => {},
   zenniesDonationAddress: '',
-  setComputingModalShow: () => new Promise(resolve => resolve),
-  closeAllModals: () => {},
-  setUfvkViewModalShow: () => new Promise(resolve => resolve),
-  setSyncReportModalShow: () => new Promise(resolve => resolve),
-  setPoolsModalShow: () => new Promise(resolve => resolve),
+  setComputingModalShow: () => {},
+  setUfvkViewModalShow: () => {},
+  setSyncReportModalShow: () => {},
+  setPoolsModalShow: () => {},
   zingolibVersion: '',
   performanceLevel: RPCPerformanceLevelEnum.Medium,
+  setPrivacyOption: async () => {},
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

@@ -21,7 +21,7 @@ import {
   GlobalConst,
   ButtonTypeEnum,
   SelectServerEnum,
-  RouteEnums,
+  RouteEnum,
   TransactionActionEnum,
   UnifiedAddressClass,
   TransparentAddressClass,
@@ -31,7 +31,7 @@ import Utils from '../../../app/utils';
 import RegText from '../../Components/RegText';
 import ZecAmount from '../../Components/ZecAmount';
 import FadeText from '../../Components/FadeText';
-import { ThemeType } from '../../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import BoldText from '../../Components/BoldText';
@@ -41,29 +41,20 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 // this is for http. (red)
 import { faTriangleExclamation, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
-import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import Button from '../../Components/Button';
 import RPCModule from '../../../app/RPCModule';
 import { createAlert } from '../../../app/createAlert';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 // this is for https. (primary)
 //import { faLock } from '@fortawesome/free-solid-svg-icons';
 
-type ValueTransferDetailProps = {
-  index: number;
-  vt: ValueTransferType;
-  valueTransfersSliced: ValueTransferType[];
-  totalLength: number;
-  setPrivacyOption: (value: boolean) => Promise<void>;
-};
+type ValueTransferDetailProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.ValueTransferDetail>;
 
 const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = ({
-  index,
-  vt,
-  valueTransfersSliced,
-  totalLength,
-  setPrivacyOption,
+  navigation,
+  route,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -84,19 +75,19 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     selectServer,
     setComputingModalShow,
     navigationHome,
-    closeAllModals,
-    valueTransfers,
     readOnly,
+    setPrivacyOption,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
   const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.ValueTransferDetail;
 
-  const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(vt);
-  const [valueTransferIndex, setValueTransferIndex] = useState<number>(index);
+  const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(route && route.params ? route.params.vt : {} as ValueTransferType);
+  const [valueTransferIndex, setValueTransferIndex] = useState<number>(route && route.params ? route.params.index : 0);
+  const [valueTransfersSliced, setValueTransfersSliced] = useState<ValueTransferType[]>(route && route.params ? route.params.valueTransfersSliced : [] as ValueTransferType[]);
+  const [totalLength, setTotalLength] = useState<number>(route && route.params ? route.params.totalLength : 0);
   const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
   const [showNavigator, setShowNavigator] = useState<boolean>(true);
@@ -105,6 +96,24 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
 
   const { memo, memoUA } = Utils.splitMemo(valueTransfer.memos);
 
+  useEffect(() => {
+    const _index = route && route.params ? route.params.index : 0;
+    const _vt = route && route.params ? route.params.vt : {} as ValueTransferType;
+    const _valueTransfersSliced = route && route.params ? route.params.valueTransfersSliced : [] as ValueTransferType[];
+    const _totalLength = route && route.params ? route.params.totalLength : 0;
+    setValueTransferIndex(_index);
+    setValueTransfer(_vt);
+    setValueTransfersSliced(_valueTransfersSliced);
+    setTotalLength(_totalLength);
+  }, [
+    route, 
+    route.params, 
+    route.params?.index,
+    route.params?.vt,
+    route.params?.valueTransfersSliced,
+    route.params?.totalLength,
+  ]);
+  
   useEffect(() => {
     const spendCo =
       valueTransfer.confirmations >= 0 &&
@@ -152,30 +161,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalLength]);
 
-  // magic modal make a copy of the parameter when use `show` -> unmutable props.
-  // when this component render (probably motivate by the parent)
-  // is the moment to get again the updated values to show in this component.
-  const getValueTransferAgain = (v: ValueTransferType) => {
-    if (!valueTransfers) {
-      return [] as ValueTransferType[];
-    }
-    return valueTransfers.filter((vtt: ValueTransferType) =>
-      vtt.txid === v.txid && vtt.address === v.address && vtt.poolType === v.poolType
-    );
-  };
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    const vtNew = getValueTransferAgain(valueTransfer);
-    if (vtNew.length !== 1) {
-      // something really weird is happening...
-      clear();
-      hide();
-    } else {
-      setValueTransfer(vtNew[0]);
-    }
-  });
-
   const contactFound: (add: string) => boolean = (add: string) => {
     if (!add) {
       return false;
@@ -201,15 +186,8 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     if ((indexParm > 0 && typeParm === -1) ||
         (indexParm < valueTransfersSliced.length - 1 && typeParm === 1)) {
       const newIndex = indexParm + typeParm;
-      const vtNew = getValueTransferAgain(valueTransfersSliced[newIndex]);
-      if (vtNew.length !== 1) {
-        // something really weird is happening...
-        clear();
-        hide();
-      } else {
-        setValueTransfer(vtNew[0]);
-        setValueTransferIndex(newIndex);
-      }
+      setValueTransfer(valueTransfersSliced[newIndex]);
+      setValueTransferIndex(newIndex);
     }
   };
 
@@ -257,11 +235,9 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
         );
       }
 
-      closeAllModals();
       // change to the history screen, just in case.
-      navigationHome?.navigate(RouteEnums.Home, {
+      navigationHome?.navigate(RouteEnum.Home, {
         screen: translate('loadedapp.history-menu') as string,
-        initial: false,
       });
     }
   };
@@ -278,7 +254,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     );
   };
 
-  //console.log('render History Detail', vt);
+  console.log('render History Detail', valueTransferIndex, valueTransfer);
 
   //if (valueTransfer.status === RPCValueTransfersStatusEnum.calculated || valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) {
   //  console.log('server', info.latestBlock, 'VT', valueTransfer.blockheight, 'expire', GlobalConst.expireBlocks);
@@ -313,7 +289,9 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
           addLastSnackbar={addLastSnackbar}
           closeScreen={() => {
             clear();
-            hide();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
           }}
         />
         {showNavigator && (

@@ -77,7 +77,7 @@ const Snackbars: React.FunctionComponent<SnackbarProps> = ({ snackbars, removeFi
           marginBottom: 100,
           padding: 0,
           paddingLeft: 20,
-          paddingRight: 5,
+          paddingRight: 15,
         },
       });
     }

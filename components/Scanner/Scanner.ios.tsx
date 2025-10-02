@@ -25,15 +25,18 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead, onClose }) => 
   const codeScanner = useCodeScanner({
     codeTypes: ['qr', 'ean-13'],
     onCodeScanned: (codes: Code[]) => {
-      setActive(false);
+      // since this screen is not a modal
+      // have to be a ctive all the time
+      setActive(true);
       //console.log(codes[0].value);
       onRead(codes && codes[0] && codes[0].value ? codes[0].value.trim() : '');
       onClose();
     },
   });
 
-  //console.log('permission', hasPermission);
-  //console.log('device', device);
+  console.log('permission', hasPermission);
+  console.log('device', device);
+  console.log('active', active);
 
   return (
     <View
