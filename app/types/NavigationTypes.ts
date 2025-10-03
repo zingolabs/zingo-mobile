@@ -50,9 +50,9 @@ export type AppDrawerParamList = {
   [RouteEnum.SyncReport]: undefined;
   [RouteEnum.Pools]: undefined;
   [RouteEnum.ContactList]: undefined;
-  [RouteEnum.AddressBook]: undefined;
 
   // Drawer with params
+  [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;
   [RouteEnum.AddressList]: AddressListNavigationState | undefined;
   [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
   [RouteEnum.ValueTransferDetail]: ValueTransferDetailNavigationState | undefined;
@@ -62,6 +62,10 @@ export type AppDrawerParamList = {
   [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
   [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
   [RouteEnum.Seed]: SeedNavigationState | undefined;
+};
+
+export type AddressBookNavigationState = {
+  currentAddress: string;
 };
 
 export type AddressListNavigationState = {

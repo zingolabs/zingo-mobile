@@ -14,9 +14,9 @@ export enum RouteEnum {
   SyncReport = 'SyncReport',
   Pools = 'Pools',
   ContactList = 'ContactList',
-  AddressBook = 'AddressBook',
 
   // Drawer with params
+  AddressBook = 'AddressBook',
   AddressList = 'AddressList',
   ScannerAddress = 'ScannerAddress',
   ValueTransferDetail = 'ValueTransferDetail',

@@ -562,7 +562,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       somePending: false,
       addressBook: props.addressBook,
       launchAddressBook: this.launchAddressBook,
-      addressBookCurrentAddress: '',
       shieldingAmount: 0,
       showSwipeableIcons: true,
       doRefresh: this.doRefresh,
@@ -1781,10 +1780,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   // close modal make sense because this is called
   // in a component which can live in differents screens
   launchAddressBook = (address: string) => {
-    this.setState({
-      addressBookCurrentAddress: address,
+    this.state.navigationHome?.navigate(RouteEnum.AddressBook, {
+      currentAddress: address,
     });
-    this.state.navigationHome?.navigate(RouteEnum.AddressBook);
   };
 
   setScrollToTop = (value: boolean) => {
@@ -1854,7 +1852,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       removeFirstSnackbar: this.state.removeFirstSnackbar,
       addressBook: this.state.addressBook,
       launchAddressBook: this.state.launchAddressBook,
-      addressBookCurrentAddress: this.state.addressBookCurrentAddress,
       shieldingAmount: this.state.shieldingAmount,
       restartApp: this.state.restartApp,
       somePending: this.state.somePending,

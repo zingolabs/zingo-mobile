@@ -71,7 +71,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   somePending: false,
   addressBook: [] as AddressBookFileClass[],
   launchAddressBook: () => {},
-  addressBookCurrentAddress: '',
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
   rescanMenu: false,

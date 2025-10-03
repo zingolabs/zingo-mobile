@@ -36,7 +36,7 @@ type AbDetailProps = {
     address: string,
     color: string,
   ) => void;
-  addressBookCurrentAddress?: string;
+  currentAddress?: string;
   //setSecurityOption: (s: SecurityType) => Promise<void>;
   navigation: DrawerScreenProps<AppDrawerParamList, RouteEnum.AddressBook>['navigation'];
 };
@@ -46,7 +46,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   cancel,
   action: actionProp,
   doAction,
-  addressBookCurrentAddress,
+  currentAddress,
   //setSecurityOption,
   navigation,
 }) => {
@@ -62,8 +62,8 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   const [errorAddress, setErrorAddress] = useState<string>('');
 
   useEffect(() => {
-    if (addressBookCurrentAddress) {
-      setAddress(addressBookCurrentAddress);
+    if (currentAddress) {
+      setAddress(currentAddress);
     }
     if (item.label !== label && item.address !== address) {
       setAction(AddressBookActionEnum.Add);
@@ -104,7 +104,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
     actionProp,
     address,
     addressBook,
-    addressBookCurrentAddress,
+    currentAddress,
     error,
     item.address,
     item.label,

@@ -101,7 +101,6 @@ export default interface AppContextLoaded {
 
   // helpers to open the address book modal from different places in the App
   launchAddressBook: (add: string) => void;
-  addressBookCurrentAddress: string;
 
   // is calculated in the header & needed in the send screen
   shieldingAmount: number;

@@ -42,6 +42,7 @@ type AddressBookProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.AddressB
 
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   navigation,
+  route,
   setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
@@ -49,7 +50,6 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
     translate,
     language,
     addressBook,
-    addressBookCurrentAddress,
     zenniesDonationAddress,
     snackbars,
     removeFirstSnackbar,
@@ -73,6 +73,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
+  const [currentAddress, setCurrentAddress] = useState<string>(!!route.params && route.params.currentAddress !== undefined ? route.params.currentAddress : '');
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -98,6 +99,15 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   }, [addressBook, zenniesDonationAddress]);
 
   useEffect(() => {
+    const _currentAddress = !!route.params && route.params.currentAddress !== undefined ? route.params.currentAddress : '';
+    setCurrentAddress(_currentAddress);
+  }, [
+    route, 
+    route.params,
+    route.params?.currentAddress,
+  ]);
+
+  useEffect(() => {
     (async () => {
       const abf = await fetchAddressBookFiltered;
       const abp = await fetchAddressBookProtected;
@@ -106,8 +116,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       setAddressBookSliced(abf.slice(0, numAb));
       setAddressBookProtected(abp);
       // find the current address
-      if (addressBookCurrentAddress) {
-        const index: number = abf.findIndex((i: AddressBookFileClass) => i.address === addressBookCurrentAddress);
+      if (currentAddress) {
+        const index: number = abf.findIndex((i: AddressBookFileClass) => i.address === currentAddress);
         if (index === -1) {
           setAction(AddressBookActionEnum.Add);
         } else {
@@ -117,7 +127,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
       }
       setLoading(false);
     })();
-  }, [addressBookCurrentAddress, fetchAddressBookProtected, fetchAddressBookFiltered, numAb, addressBook]);
+  }, [currentAddress, fetchAddressBookProtected, fetchAddressBookFiltered, numAb, addressBook]);
 
   const loadMoreClicked = useCallback(() => {
     setNumAb(numAb + 50);
@@ -131,8 +141,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const cancel = () => {
     setCurrentItem(null);
     setAction(null);
-    if (addressBookCurrentAddress) {
+    if (currentAddress) {
       clear();
+      setCurrentAddress('');
       if (navigation.canGoBack()) {
         navigation.goBack();
       }
@@ -372,7 +383,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               cancel={cancel}
               action={action}
               doAction={doAction}
-              addressBookCurrentAddress={addressBookCurrentAddress}
+              currentAddress={currentAddress}
               navigation={navigation}
             />
           )}
@@ -387,7 +398,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               navigation={navigation}
             />
           )}
-          {!addressBookCurrentAddress && addressBookSliced.length === 0 && currentItem !== -1 && !loading && (
+          {!currentAddress && addressBookSliced.length === 0 && currentItem !== -1 && !loading && (
             <View
               style={{
                 height: 150,
@@ -403,7 +414,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             <ActivityIndicator style={{ marginTop: 7, marginRight: 7 }} size={25} color={colors.primaryDisabled} />
           ) : (
             <>
-              {!addressBookCurrentAddress &&
+              {!currentAddress &&
                 addressBookSliced.map((aBItem, index) => {
                   return (
                     <View key={`container-${index}-${aBItem.label}`}>
@@ -421,7 +432,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                     </View>
                   );
                 })}
-              {!addressBookCurrentAddress &&
+              {!currentAddress &&
                 addressBookSliced.map((aBItem, index) => {
                   return (
                     <View key={`container-${index}-${aBItem.label}`}>
@@ -439,7 +450,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                     </View>
                   );
                 })}
-              {!addressBookCurrentAddress &&
+              {!currentAddress &&
                 addressBookProtected.map((aBItem, index) => {
                   return (
                     <View key={`container-${index}-${aBItem.label}`}>
@@ -476,7 +487,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             </View>
           ) : (
             <>
-              {!addressBookCurrentAddress && !!addressBookSliced && !!addressBookSliced.length && !loading && (
+              {!currentAddress && !!addressBookSliced && !!addressBookSliced.length && !loading && (
                 <View
                   style={{
                     height: 150,
