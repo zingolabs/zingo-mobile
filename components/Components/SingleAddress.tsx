@@ -52,6 +52,7 @@ type SingleAddressProps = {
   hasTransparent?: boolean;
   showMoreOptions?: boolean;
   setShowMoreOptions?: React.Dispatch<React.SetStateAction<boolean>>;
+  navigation: any;
 };
 
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
@@ -70,9 +71,10 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   hasTransparent,
   showMoreOptions,
   setShowMoreOptions,
+  navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, privacy, addLastSnackbar, language, mode, addressBook, navigationHome } = context;
+  const { translate, privacy, addLastSnackbar, language, mode, addressBook } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
 
@@ -156,7 +158,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   };
 
   const doAddressList = () => {
-    navigationHome?.navigate(RouteEnum.AddressList, {
+    navigation.navigate(RouteEnum.AddressList, {
       addressKind: address ? address.addressKind : AddressKindEnum.u, 
       setIndex: setIndex
     });

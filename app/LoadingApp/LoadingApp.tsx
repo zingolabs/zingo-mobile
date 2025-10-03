@@ -409,7 +409,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
       // state
       appStateStatus: AppState.currentState,
-      screen: props.route && props.route.params && props.route.params.screen ? props.route.params.screen : 0,
+      screen: !!props.route.params && props.route.params.screen !== undefined ? props.route.params.screen : 0,
       actionButtonsDisabled: false,
       walletExists: false,
       customServerShow: false,
@@ -417,16 +417,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       customServerChainName: ChainNameEnum.mainChainName,
       customServerOffline: false,
       biometricsFailed:
-        props.route &&
-        props.route.params &&
-        (props.route.params.biometricsFailed === true || props.route.params.biometricsFailed === false)
-          ? props.route.params.biometricsFailed
-          : false,
+        !!props.route.params && props.route.params.biometricsFailed !== undefined ? props.route.params.biometricsFailed : false,
       startingApp:
-        props.route &&
-        props.route.params && (props.route.params.startingApp === true || props.route.params.startingApp === false)
-          ? props.route.params.startingApp
-          : true,
+        !!props.route.params && props.route.params.startingApp !== undefined ? props.route.params.startingApp : true,
       serverErrorTries: 0,
       donationAlert: props.donationAlert,
       firstLaunchingMessage: props.firstLaunchingMessage,
@@ -617,10 +610,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             }
             // if the App is restoring another wallet backup...
             // needs to recalculate the Address Book.
-            const newWallet = this.props.route && this.props.route.params &&
-              (this.props.route.params.newWallet === true || this.props.route.params.newWallet === false)
-                ? this.props.route.params.newWallet
-                : false;
+            const newWallet = !!this.props.route.params && this.props.route.params.newWallet !== undefined ? this.props.route.params.newWallet : false;
             this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, newWallet, this.state.firstLaunchingMessage);
             //console.log('navigate to LoadedApp');
           } else {

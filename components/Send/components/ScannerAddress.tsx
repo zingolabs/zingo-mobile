@@ -25,6 +25,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
   navigation,
   route,
  }) => {
+  const setAddress = !!route.params && route.params.setAddress !== undefined ? route.params.setAddress : () => {};
   const context = useContext(ContextAppLoaded);
   const { translate, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
@@ -33,14 +34,21 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
   const { clear } = useToast();
   const screenName = ScreenEnum.ScannerAddress;
 
-  const [setAddress, setSetAddress] = useState<(a: string) => void>(route && route.params ? route.params.setAddress : () => {});
+  const [active, setActive] = useState<boolean>(
+    !!route.params && route.params.active !== undefined ? route.params.active : false
+  );
 
   useEffect(() => {
-    const _setAddress = route && route.params ? route.params.setAddress : () => {};
-    setSetAddress(_setAddress);
-  }, [route, route.params, route.params?.setAddress]);
+    const _active = 
+      !!route.params && route.params.active !== undefined ? route.params.active : false;
+    setActive(_active);
+  }, [
+    route, 
+    route.params, 
+    route.params?.active
+  ]);
 
-  const validateAddress = async (scannedAddress: string) => {
+  const validateAddress = (scannedAddress: string) => {
     if (scannedAddress.toLowerCase().startsWith(GlobalConst.zcash)) {
       //console.log('valid QR URI');
       setAddress(scannedAddress);
@@ -58,7 +66,7 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
     if (!scandata) {
       return;
     }
-    await validateAddress(scandata);
+    validateAddress(scandata);
   };
 
   return (
@@ -88,17 +96,23 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
           noUfvkIcon={true}
           closeScreen={() => {
             clear();
+            setActive(false);
             if (navigation.canGoBack()) {
               navigation.goBack();
             }
           }}
         />
-        <Scanner onRead={onRead} onClose={() => {
-          clear();
-          if (navigation.canGoBack()) {
-            navigation.goBack();
-          }
-        }} />
+        <Scanner 
+          active={active}
+          onRead={onRead} 
+          onClose={() => {
+            clear();
+            setActive(false);
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
+          }}
+        />
       </View>
     </ToastProvider>
   );

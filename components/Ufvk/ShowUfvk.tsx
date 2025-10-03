@@ -64,7 +64,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   const [times, setTimes] = useState<number>(0);
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
   const [sheetType, setSheetType] = useState<'EA' | null>(null);
-  const [action, setAction] = useState<UfvkActionEnum>(route && route.params ? route.params.action : UfvkActionEnum.view);
+  const [action, setAction] = useState<UfvkActionEnum>(!!route.params && route.params.action !== undefined ? route.params.action : UfvkActionEnum.view);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -85,9 +85,13 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   }, []);
 
   useEffect(() => {
-    const _action = route && route.params ? route.params.action : UfvkActionEnum.view;
+    const _action = !!route.params && route.params.action !== undefined ? route.params.action : UfvkActionEnum.view;
     setAction(_action);
-  }, [route, route.params, route.params?.action]);
+  }, [
+    route, 
+    route.params, 
+    route.params?.action
+  ]);
     
   useEffect(() => {
     const buttonTextsArray = translate('ufvk.buttontexts');
@@ -205,6 +209,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
                 setIndex={() => {}}
                 total={1}
                 EAShow={EAShow}
+                navigation={navigation}
               />
             )}
             {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}

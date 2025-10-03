@@ -63,7 +63,7 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, c
           noUfvkIcon={true}
           closeScreen={closeModal}
         />
-        <Scanner onRead={onRead} onClose={() => closeModal()} />
+        <Scanner onRead={onRead} onClose={() => closeModal()} active={true} />
       </View>
     </ToastProvider>
   );

@@ -91,7 +91,6 @@ import Settings from '../../components/Settings';
 import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
-import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import MessageList from '../../components/Messages/components/MessageList';
 import { ToastProvider } from 'react-native-toastier';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
@@ -105,6 +104,7 @@ import { MessagesAddress, MessagesAll } from '../../components/Messages';
 import Memo from '../../components/Memo';
 import Confirm from '../../components/Send/components/Confirm';
 import { AppStackParamList } from '../types';
+import { DrawerContentComponentProps } from '@react-navigation/drawer';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -178,12 +178,12 @@ export default function LoadedApp(props: LoadedAppProps) {
   const i18n = useMemo(() => new I18n(file), [file]);
 
   const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
-  const readOnly = props.route && props.route.params ? props.route.params.readOnly : false;
-  const orchardPool = props.route && props.route.params ? props.route.params.orchardPool : false;
-  const saplingPool = props.route && props.route.params ? props.route.params.saplingPool : false;
-  const transparentPool = props.route && props.route.params ? props.route.params.transparentPool : false;
-  const newWallet = props.route && props.route.params ? props.route.params.newWallet : false;
-  const firstLaunchingMessage = props.route && props.route.params ? props.route.params.firstLaunchingMessage : LaunchingModeEnum.opening;
+  const readOnly = !!props.route.params && props.route.params.readOnly !== undefined ? props.route.params.readOnly : false;
+  const orchardPool = !!props.route.params && props.route.params.orchardPool !== undefined ? props.route.params.orchardPool : false;
+  const saplingPool = !!props.route.params && props.route.params.saplingPool !== undefined ? props.route.params.saplingPool : false;
+  const transparentPool = !!props.route.params && props.route.params.transparentPool !== undefined ? props.route.params.transparentPool : false;
+  const newWallet = !!props.route.params && props.route.params.newWallet !== undefined ? props.route.params.newWallet : false;
+  const firstLaunchingMessage = !!props.route.params && props.route.params.firstLaunchingMessage !== undefined ? props.route.params.firstLaunchingMessage : LaunchingModeEnum.opening;
 
   useEffect(() => {
     (async () => {
@@ -758,6 +758,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
       this.state.navigationHome?.navigate(RouteEnum.Home, {
         screen: this.state.translate('loadedapp.send-menu'),
+        params: undefined,
       });
     }
 
@@ -1798,7 +1799,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
   };
 
-  setNavigation = (navigationHome: DrawerContentComponentProps['navigation']) => {
+  setNavigationHome = (navigationHome: DrawerContentComponentProps['navigation']) => {
     if (!this.state.navigationHome) {
       this.setState({
         navigationHome,
@@ -1935,9 +1936,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           <GestureHandlerRootView>
             <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnum.Home} screenName={this.screenName}>
               <Drawer.Screen name={RouteEnum.Home}>
-                {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {
+                {props => {
                   useEffect(() => {
-                    this.setNavigation(navigation);
+                    this.setNavigationHome(props.navigation);
                   });
                   return (
                   <>
@@ -1975,7 +1976,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                         <Tab.Screen name={translate('loadedapp.history-menu') as string}>
                           {() => (
                             <History
-                              toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                               setShieldingAmount={this.setShieldingAmount /* header */}
                               setScrollToTop={this.setScrollToTop /* header & history */}
                               scrollToTop={scrollToTop /* history */}
@@ -1999,7 +2000,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                             <Tab.Screen name={translate('loadedapp.send-menu') as string}>
                               {() => (
                                 <Send
-                                  toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                                  toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                                   setShieldingAmount={this.setShieldingAmount /* header */}
                                   setScrollToTop={this.setScrollToTop /* header & send */}
                                   setScrollToBottom={this.setScrollToBottom /* header & send */}
@@ -2014,7 +2015,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                         <Tab.Screen name={translate('loadedapp.receive-menu') as string}>
                           {() => (
                             <Receive
-                              toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                               alone={false /* receive */}
                               setSecurityOption={this.setSecurityOption}
                               setAddressBook={this.setAddressBook}
@@ -2024,7 +2025,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                         <Tab.Screen name={translate('loadedapp.messages-menu') as string}>
                           {() => (
                             <MessageList
-                              toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                               setScrollToBottom={this.setScrollToBottom /* header & messages */}
                               scrollToBottom={scrollToBottom /* messages */}
                               sendTransaction={this.sendTransaction /* messages */}
@@ -2049,7 +2050,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                             <Tab.Screen name={translate('loadedapp.history-menu') as string}>
                               {() => (
                                 <Receive
-                                  toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                                  toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                                   alone={true /* receive */}
                                   setSecurityOption={this.setSecurityOption}
                                   setAddressBook={this.setAddressBook}
@@ -2096,7 +2097,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.Ufvk}>
                 {props => {
-                  const action = props.route && props.route.params ? props.route.params.action : UfvkActionEnum.view;
+                  const action = !!props.route.params && props.route.params.action !== undefined ? props.route.params.action : UfvkActionEnum.view;
                   if (action === UfvkActionEnum.view ) {
                     return (
                       <ShowUfvk {...props}
@@ -2134,7 +2135,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.Seed}>
                 {props => {
-                  const action = props.route && props.route.params ? props.route.params.action : SeedActionEnum.view;
+                  const action = !!props.route.params && props.route.params.action !== undefined ? props.route.params.action : SeedActionEnum.view;
                   if (action === SeedActionEnum.view ) {
                     return (
                       <Seed {...props}

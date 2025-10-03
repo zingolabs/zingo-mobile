@@ -83,15 +83,19 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const [expandSeed, setExpandSeed] = useState<boolean>(true);
   const [expandBirthday, setExpandBithday] = useState<boolean>(true);
   const [basicFirstViewSeed, setBasicFirstViewSeed] = useState<boolean>(true);
-  const [action, setAction] = useState<SeedActionEnum>(route && route.params ? route.params.action : SeedActionEnum.view);
+  const [action, setAction] = useState<SeedActionEnum>(!!route.params && route.params.action !== undefined ? route.params.action : SeedActionEnum.view);
 
   const seedPhrase = wallet.seed || '';
   const birthdayNumber = (wallet.birthday && wallet.birthday.toString()) || '';
 
   useEffect(() => {
-    const _action = route && route.params ? route.params.action : SeedActionEnum.view;
+    const _action = !!route.params && route.params.action !== undefined ? route.params.action : SeedActionEnum.view;
     setAction(_action);
-  }, [route, route.params, route.params?.action]);
+  }, [
+    route, 
+    route.params, 
+    route.params?.action
+  ]);
 
   useEffect(() => {
     if (keepAwake) {

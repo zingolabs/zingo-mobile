@@ -39,6 +39,7 @@ const Memo: React.FunctionComponent<MemoProps> = ({
   navigation,
   route,
 }) => {
+  const setMessage = !!route.params && route.params.setMessage !== undefined ? route.params.setMessage : () => {};
   const context = useContext(ContextAppLoaded);
   const { translate, language, defaultUnifiedAddress, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme() as ThemeType;
@@ -47,9 +48,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({
   const { clear } = useToast();
   const screenName = ScreenEnum.Memo;
 
-  const [memo, setMemo] = useState<string>(route && route.params ? route.params.message : '');
-  const [includeUAMessage, setIncludeUAMessage] = useState<boolean>(route && route.params ? route.params.includeUAMessage : false);
-  const [setMessage, setSetMessage] = useState<(m: string) => void>(route && route.params ? route.params.setMessage : () => {});
+  const [memo, setMemo] = useState<string>(!!route.params && route.params.message !== undefined ? route.params.message : '');
+  const [includeUAMessage, setIncludeUAMessage] = useState<boolean>(!!route.params && route.params.includeUAMessage !== undefined ? route.params.includeUAMessage : false);
 
   const dimensions = {
     width: Dimensions.get('window').width,
@@ -57,13 +57,16 @@ const Memo: React.FunctionComponent<MemoProps> = ({
   };
 
   useEffect(() => {
-    const _message = route && route.params ? route.params.message : '';
-    const _includeUAMessage = route && route.params ? route.params.includeUAMessage : false;
-    const _setMessage = route && route.params ? route.params.setMessage : () => {};
+    const _message = !!route.params && route.params.message !== undefined ? route.params.message : '';
+    const _includeUAMessage = !!route.params && route.params.includeUAMessage !== undefined ? route.params.includeUAMessage : false;
     setMemo(_message);
     setIncludeUAMessage(_includeUAMessage);
-    setSetMessage(_setMessage);
-  }, [route, route.params, route.params?.includeUAMessage, route.params?.message, route.params?.setMessage]);
+  }, [
+    route, 
+    route.params, 
+    route.params?.includeUAMessage, 
+    route.params?.message
+  ]);
 
   const doSaveAndClose = () => {
     setMessage(memo);

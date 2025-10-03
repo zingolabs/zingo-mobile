@@ -71,6 +71,7 @@ export type AddressListNavigationState = {
 
 export type ScannerAddressNavigationState = {
   setAddress: (a: string) => void;
+  active: boolean;
 };
 
 export type ValueTransferDetailNavigationState = {
@@ -78,6 +79,27 @@ export type ValueTransferDetailNavigationState = {
   vt: ValueTransferType;
   valueTransfersSliced: ValueTransferType[];
   totalLength: number;
+};
+
+export type MemoNavigationState = {
+  message: string;
+  includeUAMessage: boolean;
+  setMessage: (m: string) => void;
+};
+
+export type ConfirmNavigationState = {
+  calculatedFee: number;
+  parseAddressInfoJSON: RPCParseAddressType;
+  donationAmount: number;
+  confirmSend: (s: SendPageStateClass) => Promise<void>;
+  sendAllAmount: boolean;
+  calculateFeeWithPropose: (
+    amount: string,
+    address: string,
+    memo: string,
+    includeUAMemo: boolean,
+  ) => Promise<void>;
+  sendPageState: SendPageStateClass;
 };
 
 export type MessagesAddressNavigationState = {
@@ -91,27 +113,6 @@ export type MessagesAddressNavigationState = {
     toast: boolean,
     sameServerChainName: boolean,
   ) => Promise<void>;
-};
-
-export type MemoNavigationState = {
-  message: string;
-  includeUAMessage: boolean;
-  setMessage: (m: string) => void;
-};
-
-export type ConfirmNavigationState = {
-  calculatedFee: number;
-  parseAddressInfoJSON: RPCParseAddressType;
-  donationAmount: number;
-  confirmSend: (s: SendPageStateClass) => void;
-  sendAllAmount: boolean;
-  calculateFeeWithPropose: (
-    amount: string,
-    address: string,
-    memo: string,
-    includeUAMemo: boolean,
-  ) => Promise<void>;
-  sendPageState: SendPageStateClass;
 };
 
 export type MessagesAllNavigationState = {

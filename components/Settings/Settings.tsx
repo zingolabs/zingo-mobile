@@ -893,7 +893,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                           },
                         }}
                         pickerProps={{
-                          mode: 'dropdown',
+                          mode: 'dialog',
                           itemStyle: {
                             color: colors.background,
                           },

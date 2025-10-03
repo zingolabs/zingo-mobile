@@ -84,10 +84,10 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const { clear } = useToast();
   const screenName = ScreenEnum.ValueTransferDetail;
 
-  const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(route && route.params ? route.params.vt : {} as ValueTransferType);
-  const [valueTransferIndex, setValueTransferIndex] = useState<number>(route && route.params ? route.params.index : 0);
-  const [valueTransfersSliced, setValueTransfersSliced] = useState<ValueTransferType[]>(route && route.params ? route.params.valueTransfersSliced : [] as ValueTransferType[]);
-  const [totalLength, setTotalLength] = useState<number>(route && route.params ? route.params.totalLength : 0);
+  const [valueTransfer, setValueTransfer] = useState<ValueTransferType>(!!route.params && route.params.vt !== undefined ? route.params.vt : {} as ValueTransferType);
+  const [valueTransferIndex, setValueTransferIndex] = useState<number>(!!route.params && route.params.index !== undefined ? route.params.index : 0);
+  const [valueTransfersSliced, setValueTransfersSliced] = useState<ValueTransferType[]>(!!route.params && route.params.valueTransfersSliced !== undefined ? route.params.valueTransfersSliced : [] as ValueTransferType[]);
+  const [totalLength, setTotalLength] = useState<number>(!!route.params && route.params.totalLength !== undefined ? route.params.totalLength : 0);
   const [spendColor, setSpendColor] = useState<string>(colors.primaryDisabled);
   const [expandTxid, setExpandTxid] = useState<boolean>(false);
   const [showNavigator, setShowNavigator] = useState<boolean>(true);
@@ -97,10 +97,10 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const { memo, memoUA } = Utils.splitMemo(valueTransfer.memos);
 
   useEffect(() => {
-    const _index = route && route.params ? route.params.index : 0;
-    const _vt = route && route.params ? route.params.vt : {} as ValueTransferType;
-    const _valueTransfersSliced = route && route.params ? route.params.valueTransfersSliced : [] as ValueTransferType[];
-    const _totalLength = route && route.params ? route.params.totalLength : 0;
+    const _index = !!route.params && route.params.index !== undefined ? route.params.index : 0;
+    const _vt = !!route.params && route.params.vt !== undefined ? route.params.vt : {} as ValueTransferType;
+    const _valueTransfersSliced = !!route.params && route.params.valueTransfersSliced !== undefined ? route.params.valueTransfersSliced : [] as ValueTransferType[];
+    const _totalLength = !!route.params && route.params.totalLength !== undefined ? route.params.totalLength : 0;
     setValueTransferIndex(_index);
     setValueTransfer(_vt);
     setValueTransfersSliced(_valueTransfersSliced);

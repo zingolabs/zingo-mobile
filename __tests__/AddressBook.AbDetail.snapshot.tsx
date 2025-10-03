@@ -11,6 +11,7 @@ import AbDetail from '../components/AddressBook/components/AbDetail';
 import { AddressBookActionEnum, AddressBookFileClass } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
+import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
 // test suite
 describe('Component Address Book Details - test', () => {
@@ -29,6 +30,7 @@ describe('Component Address Book Details - test', () => {
           cancel={onCancel}
           action={AddressBookActionEnum.Add}
           doAction={onAction}
+          navigation={mockNavigation}
         />
       </ContextAppLoadedProvider>,
     );
@@ -43,6 +45,7 @@ describe('Component Address Book Details - test', () => {
           cancel={onCancel}
           action={AddressBookActionEnum.Modify}
           doAction={onAction}
+          navigation={mockNavigation}
         />
       </ContextAppLoadedProvider>,
     );
@@ -57,6 +60,7 @@ describe('Component Address Book Details - test', () => {
           cancel={onCancel}
           action={AddressBookActionEnum.Delete}
           doAction={onAction}
+          navigation={mockNavigation}
         />
       </ContextAppLoadedProvider>,
     );

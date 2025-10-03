@@ -8,9 +8,10 @@ import {
   AddressBookFileClass,
   ButtonTypeEnum,
   GlobalConst,
+  RouteEnum,
   //SecurityType,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import TextInputAddress from '../../Components/TextInputAddress';
@@ -22,6 +23,7 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type AbDetailProps = {
   index: number;
@@ -36,6 +38,7 @@ type AbDetailProps = {
   ) => void;
   addressBookCurrentAddress?: string;
   //setSecurityOption: (s: SecurityType) => Promise<void>;
+  navigation: DrawerScreenProps<AppDrawerParamList, RouteEnum.AddressBook>['navigation'];
 };
 const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   index,
@@ -45,6 +48,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   doAction,
   addressBookCurrentAddress,
   //setSecurityOption,
+  navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, addressBook, language } = context;
@@ -187,6 +191,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         setError={setErrorAddress}
         disabled={action === AddressBookActionEnum.Delete || item.own}
         showLabel={true}
+        navigation={navigation}
       />
       {(!!error || !!errorAddress) && (
         <View

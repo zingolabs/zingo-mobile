@@ -373,6 +373,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               action={action}
               doAction={doAction}
               addressBookCurrentAddress={addressBookCurrentAddress}
+              navigation={navigation}
             />
           )}
           {currentItem !== null && currentItem > -1 && action !== null && (
@@ -383,6 +384,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               cancel={cancel}
               action={action}
               doAction={doAction}
+              navigation={navigation}
             />
           )}
           {!addressBookCurrentAddress && addressBookSliced.length === 0 && currentItem !== -1 && !loading && (

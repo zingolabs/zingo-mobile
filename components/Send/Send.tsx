@@ -663,123 +663,133 @@ const Send: React.FunctionComponent<SendProps> = ({
     setSpendableBalanceLastError('');
   };
 
+  const buildSendState = () => {
+    return {
+      toaddr: {
+        to: addressText,
+        amount: amountText,
+        amountCurrency: amountCurrencyText,
+        memo: memoText,
+        includeUAMemo: includeUAMemoBoolean,
+      },
+    } as SendPageStateClass;
+  };
+
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
 
-    // not use await here.
     setComputingModalShow();
 
-    // call the sendTransaction method in a timeout, allowing the modals to show properly
-    setTimeout(async () => {
-      let error = '';
-      let customError: string | undefined;
-      try {
-        const txid = await sendTransaction(sendPageStatePar);
+    let error = '';
+    let customError: string | undefined;
+    try {
+      const txid = await sendTransaction(sendPageStatePar);
 
-        // Clear the fields
-        clearState();
+      // Clear the fields
+      clearState();
 
-        navigationHome?.navigate(RouteEnum.Home, {
-          screen: translate('loadedapp.history-menu') as string,
-        });
+      // scroll to top in history, just in case.
+      setScrollToTop(true);
+      setScrollToBottom(true);
 
-        // scroll to top in history, just in case.
-        setScrollToTop(true);
-        setScrollToBottom(true);
+      createAlert(
+        setBackgroundError,
+        addLastSnackbar,
+        [screenName, ScreenEnum.History],
+        translate('send.confirm-title') as string,
+        `${translate('send.Broadcast')} ${txid}`,
+        true,
+        translate,
+      );
+      // the app send successfully on the first attemp.
 
-        createAlert(
-          setBackgroundError,
-          addLastSnackbar,
-          [screenName, ScreenEnum.History],
-          translate('send.confirm-title') as string,
-          `${translate('send.Broadcast')} ${txid}`,
-          true,
-          translate,
-        );
-        // the app send successfully on the first attemp.
+      navigationHome?.navigate(RouteEnum.Home, {
+        screen: translate('loadedapp.history-menu') as string,
+      });
+      return;
+    } catch (err1) {
+      error = err1 as string;
 
-        return;
-      } catch (err1) {
-        error = err1 as string;
+      customError = interceptCustomError(error);
 
-        customError = interceptCustomError(error);
+      // in this point the App is failing, there is two possibilities:
+      // 1. Server Error
+      // 2. Another type of Error
+      // here is worth it to try again with the best working server...
+      // if the user selected a `custom` server, then we cannot change it.
+      if (!customError && selectServer !== SelectServerEnum.custom) {
+        // try send again with a working server
+        const serverChecked = await selectingServer(serverUris(translate).filter((s: ServerUrisType) => !s.obsolete));
+        let fasterServer: ServerType = {} as ServerType;
+        if (serverChecked && serverChecked.latency) {
+          fasterServer = { uri: serverChecked.uri, chainName: serverChecked.chainName };
+        } else {
+          fasterServer = server;
+          // likely here there is a internet conection problem
+          // all of the servers return an error because they are unreachable probably.
+          // the 30 seconds timout was fired.
+        }
+        console.log(serverChecked);
+        console.log(fasterServer);
+        if (fasterServer.uri !== server.uri) {
+          setServerOption(fasterServer, selectServer, false, true);
+        }
 
-        // in this point the App is failing, there is two possibilities:
-        // 1. Server Error
-        // 2. Another type of Error
-        // here is worth it to try again with the best working server...
-        // if the user selected a `custom` server, then we cannot change it.
-        if (!customError && selectServer !== SelectServerEnum.custom) {
-          // try send again with a working server
-          const serverChecked = await selectingServer(serverUris(translate).filter((s: ServerUrisType) => !s.obsolete));
-          let fasterServer: ServerType = {} as ServerType;
-          if (serverChecked && serverChecked.latency) {
-            fasterServer = { uri: serverChecked.uri, chainName: serverChecked.chainName };
-          } else {
-            fasterServer = server;
-            // likely here there is a internet conection problem
-            // all of the servers return an error because they are unreachable probably.
-            // the 30 seconds timout was fired.
-          }
-          console.log(serverChecked);
-          console.log(fasterServer);
-          if (fasterServer.uri !== server.uri) {
-            setServerOption(fasterServer, selectServer, false, true);
-          }
+        try {
+          const txid = await sendTransaction(sendPageStatePar);
 
-          try {
-            const txid = await sendTransaction(sendPageStatePar);
+          // Clear the fields
+          clearState();
 
-            // Clear the fields
-            clearState();
+          // scroll to top in history, just in case.
+          setScrollToTop(true);
+          setScrollToBottom(true);
 
-            navigationHome?.navigate(RouteEnum.Home, {
-              screen: translate('loadedapp.history-menu') as string,
-            });
+          createAlert(
+            setBackgroundError,
+            addLastSnackbar,
+            [screenName, ScreenEnum.History],
+            translate('send.confirm-title') as string,
+            `${translate('send.Broadcast')} ${txid}`,
+            true,
+            translate,
+          );
+          // the app send successfully on the second attemp.
 
-            // scroll to top in history, just in case.
-            setScrollToTop(true);
-            setScrollToBottom(true);
+          navigationHome?.navigate(RouteEnum.Home, {
+            screen: translate('loadedapp.history-menu') as string,
+          });
+          return;
+        } catch (err2) {
+          error = err2 as string;
 
-            createAlert(
-              setBackgroundError,
-              addLastSnackbar,
-              [screenName, ScreenEnum.History],
-              translate('send.confirm-title') as string,
-              `${translate('send.Broadcast')} ${txid}`,
-              true,
-              translate,
-            );
-            // the app send successfully on the second attemp.
-
-            return;
-          } catch (err2) {
-            error = err2 as string;
-
-            customError = interceptCustomError(error);
-          }
+          customError = interceptCustomError(error);
         }
       }
+    }
 
-      setTimeout(() => {
-        //console.log('sendtx error', error);
-        // if the App is in background I need to store the error
-        // and when the App come back to foreground shows it to the user.
-        createAlert(
-          setBackgroundError,
-          addLastSnackbar,
-          [screenName],
-          translate('send.sending-error') as string,
-          `${customError ? customError : error}`,
-          false,
-          translate,
-          sendEmail,
-          zingolibVersion,
-        );
-      }, 1 * 1000);
+    setTimeout(() => {
+      //console.log('sendtx error', error);
+      // if the App is in background I need to store the error
+      // and when the App come back to foreground shows it to the user.
+      createAlert(
+        setBackgroundError,
+        addLastSnackbar,
+        [screenName],
+        translate('send.sending-error') as string,
+        `${customError ? customError : error}`,
+        false,
+        translate,
+        sendEmail,
+        zingolibVersion,
+      );
+    }, 1 * 1000);
+
+    navigationHome?.navigate(RouteEnum.Home, {
+      screen: translate('loadedapp.history-menu') as string,
     });
   };
 
@@ -807,7 +817,8 @@ const Send: React.FunctionComponent<SendProps> = ({
 
   const setQrcodeModalShow = () => {
     navigationHome?.navigate(RouteEnum.ScannerAddress, { 
-      setAddress: (a: string) => updateToField(a, null, null, null, null) 
+      setAddress: (a: string) => updateToField(a, null, null, null, null),
+      active: true,
     })
   };
 
@@ -820,7 +831,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const setConfirmModalShow = async (parseAddressInfoJSON: RPCParseAddressType) => {
-    await updateToField(addressText, amountText, amountCurrencyText, memoText, includeUAMemoBoolean);
     navigationHome?.navigate(RouteEnum.Confirm, {
       calculatedFee: fee,
       parseAddressInfoJSON: parseAddressInfoJSON,
@@ -834,6 +844,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         Utils.parseStringLocaleToNumberFloat(amountText) ===
           Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
       calculateFeeWithPropose: calculateFeeWithPropose,
+      sendPageState: buildSendState(),
     });
   };
 
@@ -974,7 +985,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               },
                             }}
                             pickerProps={{
-                              mode: 'dropdown',
+                              mode: 'dialog',
                               itemStyle: {
                                 color: colors.background,
                               },

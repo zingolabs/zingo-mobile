@@ -23,6 +23,7 @@ type TextInputAddressProps = {
   setError: (e: string) => void;
   disabled: boolean;
   showLabel: boolean;
+  navigation: any;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
@@ -30,9 +31,10 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   setError,
   disabled,
   showLabel,
+  navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, language, navigationHome } = context;
+  const { translate, server, language } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
@@ -56,8 +58,9 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   }, [address, server.chainName, setError, translate]);
 
   const setQrcodeModalShow = () => {
-    navigationHome?.navigate(RouteEnum.ScannerAddress, { 
-      setAddress: (a: string) => setAddress(a) 
+    navigation.navigate(RouteEnum.ScannerAddress, { 
+      setAddress: (a: string) => setAddress(a),
+      active: true,
     })
   };
 

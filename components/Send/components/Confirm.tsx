@@ -44,6 +44,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   navigation,
   route,
 }) => {
+  const confirmSend = !!route.params && route.params.confirmSend !== undefined ? route.params.confirmSend : async () => {};
+  const calculateFeeWithPropose = !!route.params && route.params.calculateFeeWithPropose !== undefined ? route.params.calculateFeeWithPropose : async () => {};
   const context = useContext(ContextAppLoaded);
   const {
     info,
@@ -59,7 +61,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     language,
     snackbars,
     removeFirstSnackbar,
-    sendPageState,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { top, bottom, right, left } = useSafeAreaInsets();
@@ -70,12 +71,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
   const [sendingTotal, setSendingTotal] = useState<number>(0);
 
-  const [calculatedFee, setCalculatedFee] = useState<number>(route && route.params ? route.params.calculatedFee : 0); 
-  const [parseAddressInfoJSON, setParseAddressInfoJSON] = useState<RPCParseAddressType>(route && route.params ? route.params.parseAddressInfoJSON : {} as RPCParseAddressType);
-  const [donationAmount, setDonationAmount] = useState<number>(route && route.params ? route.params.donationAmount : 0);
-  const [confirmSend, setConfirmSend] = useState<(s: SendPageStateClass) => void>(route && route.params ? route.params.confirmSend : () => {});
-  const [sendAllAmount, setSendAllAmount] = useState<boolean>(route && route.params ? route.params.sendAllAmount : false);
-  const [calculateFeeWithPropose, setCalculateFeeWithPropose] = useState<(am: string, ad: string, m: string, i: boolean ) => {}>(route && route.params ? route.params.calculateFeeWithPropose : async () => {});
+  const [calculatedFee, setCalculatedFee] = useState<number>(!!route.params && route.params.calculatedFee !== undefined ? route.params.calculatedFee : 0); 
+  const [parseAddressInfoJSON, setParseAddressInfoJSON] = useState<RPCParseAddressType>(!!route.params && route.params.parseAddressInfoJSON !== undefined ? route.params.parseAddressInfoJSON : {} as RPCParseAddressType);
+  const [donationAmount, setDonationAmount] = useState<number>(!!route.params && route.params.donationAmount !== undefined ? route.params.donationAmount : 0);
+  const [sendAllAmount, setSendAllAmount] = useState<boolean>(!!route.params && route.params.sendAllAmount !== undefined ? route.params.sendAllAmount : false);
+  const [sendPageState, setSendPageState] = useState<SendPageStateClass>(!!route.params && route.params.sendPageState !== undefined ? route.params.sendPageState : {} as SendPageStateClass);
 
   const [memoTotal, setMemoTotal] = useState<string>(Utils.buildMemo(
     sendPageState.toaddr.memo,
@@ -84,12 +84,11 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   ));
 
   useEffect(() => {
-    const _calculatedFee = route && route.params ? route.params.calculatedFee : 0;
-    const _parseAddressInfoJSON = route && route.params ? route.params.parseAddressInfoJSON : {} as RPCParseAddressType;
-    const _donationAmount = route && route.params ? route.params.donationAmount : 0;
-    const _confirmSend = route && route.params ? route.params.confirmSend : () => {};
-    const _sendAllAmount = route && route.params ? route.params.sendAllAmount : false;
-    const _calculateFeeWithPropose = route && route.params ? route.params.calculateFeeWithPropose : async () => {};
+    const _calculatedFee = !!route.params && route.params?.calculatedFee !== undefined ? route.params.calculatedFee : 0;
+    const _parseAddressInfoJSON = !!route.params && route.params.parseAddressInfoJSON !== undefined ? route.params.parseAddressInfoJSON : {} as RPCParseAddressType;
+    const _donationAmount = !!route.params && route.params.donationAmount !== undefined ? route.params.donationAmount : 0;
+    const _sendAllAmount = !!route.params && route.params.sendAllAmount !== undefined ? route.params.sendAllAmount : false;
+    const _sendPageState = !!route.params && route.params.sendPageState !== undefined ? route.params.sendPageState : {} as SendPageStateClass;
     const _memoTotal = Utils.buildMemo(
       sendPageState.toaddr.memo,
       sendPageState.toaddr.includeUAMemo,
@@ -98,9 +97,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     setCalculatedFee(_calculatedFee);
     setParseAddressInfoJSON(_parseAddressInfoJSON);
     setDonationAmount(_donationAmount);
-    setConfirmSend(_confirmSend);
     setSendAllAmount(_sendAllAmount);
-    setCalculateFeeWithPropose(_calculateFeeWithPropose);
+    setSendPageState(_sendPageState);
     setMemoTotal(_memoTotal);
   }, [
     route, 
@@ -108,9 +106,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     route.params?.calculatedFee,
     route.params?.parseAddressInfoJSON,
     route.params?.donationAmount,
-    route.params?.confirmSend,
     route.params?.sendAllAmount,
-    route.params?.calculateFeeWithPropose,
     sendPageState,
     sendPageState.toaddr.memo,
     sendPageState.toaddr.includeUAMemo,
@@ -257,7 +253,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       // snack with Error
       addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
     } else {
-      confirmSend(sendPageState);
+      await confirmSend(sendPageState);
     }
   };
 
@@ -451,7 +447,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             <Button
               type={ButtonTypeEnum.Primary}
               title={sendAllAmount ? (translate('send.confirm-button-all') as string) : (translate('confirm') as string)}
-              onPress={() => confirmSendBiometrics()}
+              onPress={async () => await confirmSendBiometrics()}
             />
           </View>
         </View>

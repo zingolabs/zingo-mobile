@@ -36,6 +36,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
   navigation,
   route,
 }) => {
+  const setIndex = !!route.params && route.params.setIndex !== undefined ? route.params.setIndex : () => {};
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -59,19 +60,20 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [addressKind, setAddressKind] = useState<AddressKindEnum>(route && route.params ? route.params.addressKind : AddressKindEnum.u);
-  const [setIndex, setSetIndex] = useState<(n: number) => void>(route && route.params ? route.params.setIndex : () => {});
+  const [addressKind, setAddressKind] = useState<AddressKindEnum>(!!route.params && route.params.addressKind !== undefined ? route.params.addressKind : AddressKindEnum.u);
 
   const scrollViewRef = useRef<ScrollView>(null);
 
   useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
 
   useEffect(() => {
-    const _addressKind = route && route.params ? route.params.addressKind : AddressKindEnum.u;
-    const _setIndex = route && route.params ? route.params.setIndex : () => {};
+    const _addressKind = !!route.params && route.params.addressKind !== undefined ? route.params.addressKind : AddressKindEnum.u;
     setAddressKind(_addressKind);
-    setSetIndex(_setIndex);
-  }, [route, route.params, route.params?.addressKind, route.params?.setIndex]);
+  }, [
+    route, 
+    route.params, 
+    route.params?.addressKind
+  ]);
   
   const fetchAddressBookFiltered = useMemo(async () => {
     if (!addresses) {

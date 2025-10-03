@@ -61,7 +61,8 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     language, 
     snackbars, 
     removeFirstSnackbar, 
-    addLastSnackbar 
+    addLastSnackbar,
+    navigationHome,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -262,6 +263,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   hasTransparent={tAddr && tAddr.length > 0}
                   showMoreOptions={showMoreOptions}
                   setShowMoreOptions={setShowMoreOptions}
+                  navigation={navigationHome}
                 />
               </>
             )}
@@ -295,6 +297,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   VAShow={VAShow}
                   EAShow={EAShow}
                   changeIndex={setIndex}
+                  navigation={navigationHome}
                 />
               </>
             )}
