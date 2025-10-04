@@ -26,9 +26,9 @@ import {
   GlobalConst,
   RouteEnum,
   ScreenEnum,
-  SelectServerEnum,
-  SendPageStateClass,
-  ServerType,
+  //SelectServerEnum,
+  //SendPageStateClass,
+  //ServerType,
   ValueTransferType,
 } from '../../app/AppState';
 import { ThemeType } from '../../app/types';
@@ -37,7 +37,7 @@ import Button from '../Components/Button';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
-import Utils from '../../app/utils';
+//import Utils from '../../app/utils';
 import { DataProvider, RecyclerListView, LayoutProvider, RecyclerListViewProps } from 'recyclerlistview';
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
 import { isEqual } from 'lodash';
@@ -62,15 +62,15 @@ type HistoryProps = {
   setScrollToTop: (value: boolean) => void;
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
-  scrollToBottom: boolean;
+  //scrollToBottom: boolean;
   // for messages
-  sendTransaction: (s: SendPageStateClass) => Promise<String>;
-  setServerOption: (
-    value: ServerType,
-    selectServer: SelectServerEnum,
-    toast: boolean,
-    sameServerChainName: boolean,
-  ) => Promise<void>;
+  //sendTransaction: (s: SendPageStateClass) => Promise<String>;
+  //setServerOption: (
+  //  value: ServerType,
+  //  selectServer: SelectServerEnum,
+  //  toast: boolean,
+  //  sameServerChainName: boolean,
+  //) => Promise<void>;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
@@ -79,9 +79,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
   setScrollToTop,
   scrollToTop,
   setScrollToBottom,
-  scrollToBottom,
-  sendTransaction,
-  setServerOption,
+  //scrollToBottom,
+  //sendTransaction,
+  //setServerOption,
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
@@ -289,6 +289,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     });
   };
 
+  /*
   const setMessagesAddressModalShow = (vt: ValueTransferType) => {
     navigationHome?.navigate(RouteEnum.MessagesAddress, {
       setScrollToBottom: setScrollToBottom,
@@ -298,6 +299,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
       setServerOption: setServerOption,
     });
   };
+  */
 
   const rowRenderer = (type: string | number, data: ValueTransferType, index: number) => {
     let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
@@ -311,7 +313,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
         nextLineWithSameTxid={
           index >= valueTransfersSliced.length - 1 ? false : valueTransfersSliced[index + 1].txid === data.txid
         }
-        setMessagesAddressModalShow={setMessagesAddressModalShow}
         addressProtected={data.address === zenniesDonationAddress}
         screenName={screenName}
       />

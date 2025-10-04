@@ -136,11 +136,4 @@ export default interface AppContextLoaded {
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
-
-  // modals
-  setComputingModalShow: () => void;
-  setUfvkViewModalShow: () => void;
-  setSyncReportModalShow: () => void;
-  setPoolsModalShow: () => void;
-   
 }

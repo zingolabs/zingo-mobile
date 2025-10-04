@@ -41,9 +41,6 @@ describe('Component History - test', () => {
           setScrollToTop={onFunction}
           scrollToTop={false}
           setScrollToBottom={onFunction}
-          scrollToBottom={false}
-          sendTransaction={onFunction}
-          setServerOption={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
@@ -65,9 +62,6 @@ describe('Component History - test', () => {
           setScrollToTop={onFunction}
           scrollToTop={false}
           setScrollToBottom={onFunction}
-          scrollToBottom={false}
-          sendTransaction={onFunction}
-          setServerOption={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

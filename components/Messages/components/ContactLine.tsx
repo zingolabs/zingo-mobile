@@ -208,7 +208,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                     sendPageState.toaddr.to = c.address ? c.address : '';
                     setSendPageState(sendPageState);
-                    navigationHome?.navigate(RouteEnum.Home, {
+                    navigationHome?.navigate(RouteEnum.HomeStack, {
                       screen: translate('loadedapp.send-menu'),
                     });
                     swipeable.reset();

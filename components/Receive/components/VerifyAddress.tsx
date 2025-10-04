@@ -127,6 +127,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet
         disabled={false}
         showLabel={false}
         navigation={navigationHome}
+        screenName={screenName}
       />
       {!!errorAddress && (
         <View

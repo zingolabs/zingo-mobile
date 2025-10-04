@@ -262,6 +262,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
           noPrivacy={true}
           noUfvkIcon={true}
           closeScreen={() => {
+            setCurrentItem(null);
+            setAction(null);
+            setCurrentAddress('');
             clear();
             if (navigation.canGoBack()) {
               navigation.goBack();
@@ -385,6 +388,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               doAction={doAction}
               currentAddress={currentAddress}
               navigation={navigation}
+              screenName={screenName}
             />
           )}
           {currentItem !== null && currentItem > -1 && action !== null && (
@@ -396,6 +400,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               action={action}
               doAction={doAction}
               navigation={navigation}
+              screenName={screenName}
             />
           )}
           {!currentAddress && addressBookSliced.length === 0 && currentItem !== -1 && !loading && (

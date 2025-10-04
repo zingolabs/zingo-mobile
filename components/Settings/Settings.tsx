@@ -606,7 +606,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setMemos(walletSettings.downloadMemos);
       setFilter(walletSettings.transactionFilterThreshold);
     }
-    navigation.navigate(RouteEnum.Home);
+    navigation.navigate(RouteEnum.HomeStack);
   };
 
   const optionsRadio = (

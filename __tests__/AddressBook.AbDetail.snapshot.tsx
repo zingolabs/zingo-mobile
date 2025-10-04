@@ -8,7 +8,7 @@ import React from 'react';
 import { render, RenderResult } from '@testing-library/react-native';
 import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/context';
 import AbDetail from '../components/AddressBook/components/AbDetail';
-import { AddressBookActionEnum, AddressBookFileClass } from '../app/AppState';
+import { AddressBookActionEnum, AddressBookFileClass, ScreenEnum } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -31,6 +31,7 @@ describe('Component Address Book Details - test', () => {
           action={AddressBookActionEnum.Add}
           doAction={onAction}
           navigation={mockNavigation}
+          screenName={ScreenEnum.AddressBook}
         />
       </ContextAppLoadedProvider>,
     );
@@ -46,6 +47,7 @@ describe('Component Address Book Details - test', () => {
           action={AddressBookActionEnum.Modify}
           doAction={onAction}
           navigation={mockNavigation}
+          screenName={ScreenEnum.AddressBook}
         />
       </ContextAppLoadedProvider>,
     );
@@ -61,6 +63,7 @@ describe('Component Address Book Details - test', () => {
           action={AddressBookActionEnum.Delete}
           doAction={onAction}
           navigation={mockNavigation}
+          screenName={ScreenEnum.AddressBook}
         />
       </ContextAppLoadedProvider>,
     );

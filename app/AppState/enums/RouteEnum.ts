@@ -4,7 +4,8 @@ export enum RouteEnum {
   LoadedApp = 'LoadedApp',
 
   // Drawer no params
-  Home = 'Home',
+  HomeStack = 'HomeStack',
+  AddressBookStack = 'AddressBookStack',
   Settings = 'Settings',
   About = 'About',
   Rescan = 'Rescan',

@@ -45,7 +45,7 @@ type ValueTransferLineProps = {
   vt: ValueTransferType;
   setValueTransferDetailModalShow: (i: number, vt: ValueTransferType) => void;
   nextLineWithSameTxid: boolean;
-  setMessagesAddressModalShow: (vt: ValueTransferType) => void;
+  //setMessagesAddressModalShow: (vt: ValueTransferType) => void;
   addressProtected?: boolean;
   screenName: ScreenEnum;
 };
@@ -216,7 +216,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                     sendPageState.toaddr.to = vt.address ? vt.address : '';
                     setSendPageState(sendPageState);
-                    navigationHome?.navigate(RouteEnum.Home, {
+                    navigationHome?.navigate(RouteEnum.HomeStack, {
                       screen: translate('loadedapp.send-menu'),
                     });
                     swipeable.reset();

@@ -40,7 +40,8 @@ export type LoadedAppNavigationState = {
  */
 export type AppDrawerParamList = {
   // Drawer no params
-  [RouteEnum.Home]: undefined;
+  [RouteEnum.HomeStack]: undefined;
+  [RouteEnum.AddressBookStack]: undefined;
   [RouteEnum.Settings]: undefined;
   [RouteEnum.About]: undefined;
   [RouteEnum.Rescan]: undefined;

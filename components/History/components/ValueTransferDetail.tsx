@@ -73,7 +73,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     setBackgroundError,
     netInfo,
     selectServer,
-    setComputingModalShow,
     navigationHome,
     readOnly,
     setPrivacyOption,
@@ -201,7 +200,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     }
 
     // not use await here.
-    setComputingModalShow();
+    navigationHome?.navigate(RouteEnum.Computing);
 
     let actionStr: string;
     if (action === TransactionActionEnum.resend) {
@@ -234,12 +233,11 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
           translate,
         );
       }
-
-      // change to the history screen, just in case.
-      navigationHome?.navigate(RouteEnum.Home, {
-        screen: translate('loadedapp.history-menu') as string,
-      });
     }
+    // change to the history screen, just in case.
+    navigationHome?.navigate(RouteEnum.HomeStack, {
+      screen: translate('loadedapp.history-menu') as string,
+    });
   };
 
   const actionOnPress = (action: TransactionActionEnum) => {

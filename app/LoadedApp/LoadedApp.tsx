@@ -19,7 +19,7 @@ import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
-import { LoadingAppNavigationState } from '../types';
+import { LoadingAppNavigationState, AppDrawerParamList } from '../types';
 import NetInfo, { NetInfoSubscription, NetInfoState } from '@react-native-community/netinfo/src/index';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 
@@ -105,6 +105,7 @@ import Memo from '../../components/Memo';
 import Confirm from '../../components/Send/components/Confirm';
 import { AppStackParamList } from '../types';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -123,6 +124,7 @@ const ru = require('../translations/ru.json');
 const tr = require('../translations/tr.json');
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator<AppDrawerParamList>();
 
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -567,10 +569,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       doRefresh: this.doRefresh,
       setZecPrice: this.setZecPrice,
       zenniesDonationAddress: props.zenniesDonationAddress,
-      setComputingModalShow: this.setComputingModalShow,
-      setUfvkViewModalShow: this.setUfvkViewModalShow,
-      setSyncReportModalShow: this.setSyncReportModalShow,
-      setPoolsModalShow: this.setPoolsModalShow,
       zingolibVersion: '',
       setPrivacyOption: this.setPrivacyOption,
 
@@ -755,7 +753,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (initialUrl !== null) {
       this.readUrl(initialUrl);
 
-      this.state.navigationHome?.navigate(RouteEnum.Home, {
+      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
         screen: this.state.translate('loadedapp.send-menu'),
         params: undefined,
       });
@@ -767,7 +765,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.readUrl(url);
       }
 
-      this.state.navigationHome?.navigate(RouteEnum.Home, {
+      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
         screen: this.state.translate('loadedapp.send-menu'),
       });
     });
@@ -875,18 +873,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setSeedViewModalShow = async () => {
-    this.state.navigationHome?.navigate(RouteEnum.Seed, { 
-      action: SeedActionEnum.view 
-    });
-  };
-
-  setUfvkViewModalShow = async () => {
-    this.state.navigationHome?.navigate(RouteEnum.Ufvk, { 
-      action: UfvkActionEnum.view 
-    });
-  };
-
   setShieldingAmount = (value: number) => {
     //const start = Date.now();
     this.setState({ shieldingAmount: value });
@@ -934,7 +920,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           // I need to check this out in the seed screen.
           if (!this.state.isSeedViewModalOpen) {
             this.setIsSeedViewModalOpen(true);
-            await this.setSeedViewModalShow();
+            this.state.navigationHome?.navigate(RouteEnum.Seed, { 
+              action: SeedActionEnum.view 
+            });
           }
         }
       }
@@ -1145,10 +1133,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setComputingModalShow = () => {
-    this.state.navigationHome?.navigate(RouteEnum.Computing);
-  };
-
   setInfo = (newInfo: InfoType) => {
     if (!isEqual(this.state.info, newInfo)) {
       // if currencyName is empty,
@@ -1239,19 +1223,23 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.state.navigationHome?.navigate(RouteEnum.Info);
       return;
     } else if (item === MenuItemEnum.SyncReport) {
-      this.setSyncReportModalShow();
+      this.state.navigationHome?.navigate(RouteEnum.SyncReport);
       return;
     } else if (item === MenuItemEnum.FundPools) {
-      this.setPoolsModalShow();
+      this.state.navigationHome?.navigate(RouteEnum.Pools);
       return;
     } else if (item === MenuItemEnum.Insight) {
       this.state.navigationHome?.navigate(RouteEnum.Insight);
       return;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
-        await this.setUfvkViewModalShow();
+        this.state.navigationHome?.navigate(RouteEnum.Ufvk, { 
+          action: UfvkActionEnum.view 
+        });
       } else {
-        await this.setSeedViewModalShow();
+        this.state.navigationHome?.navigate(RouteEnum.Seed, { 
+          action: SeedActionEnum.view 
+        });
       }
       return;
     } else if (item === MenuItemEnum.ChangeWallet) {
@@ -1343,7 +1331,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
         this.setSendPageState(newSendPageState);
       }
-      this.state.navigationHome?.navigate(RouteEnum.Home, {
+      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
         screen: this.state.translate('loadedapp.send-menu'),
       });
     } else if (item === MenuItemEnum.Support) {
@@ -1745,14 +1733,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setSyncReportModalShow = async () => {
-    this.state.navigationHome?.navigate(RouteEnum.SyncReport);
-  };
-
-  setPoolsModalShow = async () => {
-    this.state.navigationHome?.navigate(RouteEnum.Pools);
-  };
-
   setBackgroundError = (title: string, error: string) => {
     this.setState({ backgroundError: { title, error } });
   };
@@ -1780,8 +1760,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   // close modal make sense because this is called
   // in a component which can live in differents screens
   launchAddressBook = (address: string) => {
-    this.state.navigationHome?.navigate(RouteEnum.AddressBook, {
-      currentAddress: address,
+    this.state.navigationHome?.navigate(RouteEnum.AddressBookStack, {
+      screen: RouteEnum.AddressBook,
+      params: {
+        currentAddress: address,
+      }
     });
   };
 
@@ -1859,10 +1842,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       doRefresh: this.state.doRefresh,
       setZecPrice: this.state.setZecPrice,
       zenniesDonationAddress: this.state.zenniesDonationAddress,
-      setComputingModalShow: this.setComputingModalShow,
-      setUfvkViewModalShow: this.setUfvkViewModalShow,
-      setSyncReportModalShow: this.setSyncReportModalShow,
-      setPoolsModalShow: this.setPoolsModalShow,
       zingolibVersion: this.state.zingolibVersion,
       setPrivacyOption: this.setPrivacyOption,
 
@@ -1931,8 +1910,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
         <ContextAppLoadedProvider value={context}>
           <GestureHandlerRootView>
-            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnum.Home} screenName={this.screenName}>
-              <Drawer.Screen name={RouteEnum.Home}>
+            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnum.HomeStack} screenName={this.screenName}>
+              <Drawer.Screen name={RouteEnum.HomeStack}>
                 {props => {
                   useEffect(() => {
                     this.setNavigationHome(props.navigation);
@@ -1978,9 +1957,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                               setScrollToTop={this.setScrollToTop /* header & history */}
                               scrollToTop={scrollToTop /* history */}
                               setScrollToBottom={this.setScrollToBottom /* header & messages */}
-                              scrollToBottom={scrollToBottom /* messages */}
-                              sendTransaction={this.sendTransaction /* messages */}
-                              setServerOption={this.setServerOption /* messages */}
                             />
                           )}
                         </Tab.Screen>
@@ -2176,8 +2152,23 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Drawer.Screen name={RouteEnum.Pools}>
                 {props => <Pools {...props} /> }
               </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.AddressBook}>
-                {props => <AddressBook {...props} setAddressBook={this.setAddressBook} />}
+              <Drawer.Screen name={RouteEnum.AddressBookStack}>
+                {() => {
+                  return (
+                    <Stack.Navigator initialRouteName={RouteEnum.AddressBook} screenOptions={{ headerShown: false }}>
+                      <Stack.Screen name={RouteEnum.AddressBook} >
+                        {props => (
+                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
+                        )}
+                      </Stack.Screen>
+                      <Stack.Screen name={RouteEnum.ScannerAddress} >
+                        {props => (
+                            <ScannerAddress {...props} />
+                        )}
+                      </Stack.Screen>
+                    </Stack.Navigator>
+                  );
+                }}
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.AddressList}>
                 {props => <AddressList {...props} />}

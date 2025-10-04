@@ -29,6 +29,7 @@ import {
   SelectServerEnum,
   RouteEnum,
   ScreenEnum,
+  UfvkActionEnum,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
@@ -128,10 +129,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     navigationHome,
     selectServer,
     setZecPrice,
-    setComputingModalShow,
-    setUfvkViewModalShow,
-    setSyncReportModalShow,
-    setPoolsModalShow,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum, privacy: boolean;
@@ -303,7 +300,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     let pools: PoolToShieldEnum = PoolToShieldEnum.transparentPoolToShield;
 
     // not use await here.
-    setComputingModalShow();
+    navigationHome?.navigate(RouteEnum.Computing);
     // because I don't what the user is doing, I need to the re-run the shield
     // command right before the confirmation
     await RPCModule.shieldProcess();
@@ -357,10 +354,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           );
         }
       }
-      // change to the history screen, just in case.
-      navigationHome?.navigate(RouteEnum.Home, {
-        screen: translate('loadedapp.history-menu') as string,
-      });
       // scroll to top in history, just in case.
       if (setScrollToTop) {
         setScrollToTop(true);
@@ -371,6 +364,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       }
       setShieldingFee(0);
       setShieldingAmount && setShieldingAmount(0);
+
+      // change to the history screen, just in case.
+      navigationHome?.navigate(RouteEnum.HomeStack, {
+        screen: translate('loadedapp.history-menu') as string,
+      });
     }
   };
 
@@ -450,7 +448,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
       }
     } else {
-      await setUfvkViewModalShow();
+      navigationHome?.navigate(RouteEnum.Ufvk, { 
+        action: UfvkActionEnum.view 
+      });
     }
   };
 
@@ -596,7 +596,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                               )}
                             </View>
                           ) : (
-                            <TouchableOpacity testID="header.playicon" onPress={() => setSyncReportModalShow()}>
+                            <TouchableOpacity testID="header.playicon" onPress={() => {
+                                navigationHome?.navigate(RouteEnum.SyncReport);
+                              }}
+                            >
                               <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                 <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={19} />
                                 {viewSyncStatus && (
@@ -634,7 +637,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           minWidth: 25,
                           minHeight: 25,
                         }}>
-                        <TouchableOpacity onPress={() => setSyncReportModalShow()}>
+                        <TouchableOpacity onPress={() => {
+                            navigationHome?.navigate(RouteEnum.SyncReport);
+                          }}
+                        >
                           <View
                             testID="header.wifiicon"
                             style={{
@@ -675,7 +681,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         size={20}
                       />
                     ) : (
-                      <TouchableOpacity onPress={() => setSyncReportModalShow()}>
+                      <TouchableOpacity onPress={() => {
+                          navigationHome?.navigate(RouteEnum.SyncReport);
+                        }}
+                      >
                         <FontAwesomeIcon
                           icon={faCloudDownload}
                           color={!netInfo.isConnected ? 'red' : 'yellow'}
@@ -751,7 +760,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 (totalBalance.totalOrchardBalance !== totalBalance.confirmedOrchardBalance ||
                   totalBalance.totalSaplingBalance > 0 ||
                   totalBalance.totalTransparentBalance > 0) && (
-                  <TouchableOpacity onPress={() => setPoolsModalShow()}>
+                  <TouchableOpacity onPress={() => {
+                      navigationHome?.navigate(RouteEnum.Pools);
+                    }}
+                  >
                     <View
                       style={{
                         display: 'flex',

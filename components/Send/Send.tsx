@@ -129,8 +129,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     selectServer,
     setZecPrice,
     zenniesDonationAddress,
-    setComputingModalShow,
-    setPoolsModalShow,
     //security,
     currency,
     zingolibVersion,
@@ -681,7 +679,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       return;
     }
 
-    setComputingModalShow();
+    navigationHome?.navigate(RouteEnum.Computing);
 
     let error = '';
     let customError: string | undefined;
@@ -706,7 +704,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
       // the app send successfully on the first attemp.
 
-      navigationHome?.navigate(RouteEnum.Home, {
+      navigationHome?.navigate(RouteEnum.HomeStack, {
         screen: translate('loadedapp.history-menu') as string,
       });
       return;
@@ -759,7 +757,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           );
           // the app send successfully on the second attemp.
 
-          navigationHome?.navigate(RouteEnum.Home, {
+          navigationHome?.navigate(RouteEnum.HomeStack, {
             screen: translate('loadedapp.history-menu') as string,
           });
           return;
@@ -788,7 +786,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
     }, 1 * 1000);
 
-    navigationHome?.navigate(RouteEnum.Home, {
+    navigationHome?.navigate(RouteEnum.HomeStack, {
       screen: translate('loadedapp.history-menu') as string,
     });
   };
@@ -1325,7 +1323,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                       </View>
                     )}
                     {stillConfirming && (
-                      <TouchableOpacity onPress={() => setPoolsModalShow()}>
+                      <TouchableOpacity onPress={() => {
+                          navigationHome?.navigate(RouteEnum.Pools);
+                        }}
+                      >
                         <View
                           style={{
                             display: 'flex',
@@ -1346,7 +1347,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                       </TouchableOpacity>
                     )}
                     {showShieldInfo && mode === ModeEnum.advanced && (
-                      <TouchableOpacity onPress={() => setPoolsModalShow()}>
+                      <TouchableOpacity onPress={() => {
+                          navigationHome?.navigate(RouteEnum.Pools);
+                        }}
+                      >
                         <View
                           style={{
                             display: 'flex',

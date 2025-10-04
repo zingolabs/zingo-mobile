@@ -9,6 +9,7 @@ import {
   ButtonTypeEnum,
   GlobalConst,
   RouteEnum,
+  ScreenEnum,
   //SecurityType,
 } from '../../../app/AppState';
 import { AppDrawerParamList, ThemeType } from '../../../app/types';
@@ -39,6 +40,7 @@ type AbDetailProps = {
   currentAddress?: string;
   //setSecurityOption: (s: SecurityType) => Promise<void>;
   navigation: DrawerScreenProps<AppDrawerParamList, RouteEnum.AddressBook>['navigation'];
+  screenName: ScreenEnum;
 };
 const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   index,
@@ -49,6 +51,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   currentAddress,
   //setSecurityOption,
   navigation,
+  screenName,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, addressBook, language } = context;
@@ -192,6 +195,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         disabled={action === AddressBookActionEnum.Delete || item.own}
         showLabel={true}
         navigation={navigation}
+        screenName={screenName}
       />
       {(!!error || !!errorAddress) && (
         <View

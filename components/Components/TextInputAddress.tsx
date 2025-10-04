@@ -15,7 +15,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 import Utils from '../../app/utils';
-import { RouteEnum } from '../../app/AppState';
+import { RouteEnum, ScreenEnum } from '../../app/AppState';
 
 type TextInputAddressProps = {
   address: string;
@@ -24,6 +24,7 @@ type TextInputAddressProps = {
   disabled: boolean;
   showLabel: boolean;
   navigation: any;
+  screenName: ScreenEnum;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
@@ -32,6 +33,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   disabled,
   showLabel,
   navigation,
+  screenName,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, language } = context;
@@ -58,10 +60,20 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   }, [address, server.chainName, setError, translate]);
 
   const setQrcodeModalShow = () => {
-    navigation.navigate(RouteEnum.ScannerAddress, { 
-      setAddress: (a: string) => setAddress(a),
-      active: true,
-    })
+    if (screenName === ScreenEnum.AddressBook) {
+      navigation.navigate(RouteEnum.AddressBookStack, {
+        screen: RouteEnum.ScannerAddress,
+        params: { 
+          setAddress: (a: string) => setAddress(a),
+          active: true,
+        }
+      });
+    } else if (screenName === ScreenEnum.Receive) {
+      navigation.navigate(RouteEnum.ScannerAddress, {
+        setAddress: (a: string) => setAddress(a),
+        active: true,
+      });
+    }
   };
 
   //console.log('render input text address');
