@@ -52,7 +52,7 @@ import {
 import { parseZcashURI, serverUris } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
 import Utils from '../../app/utils';
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
@@ -73,8 +73,9 @@ import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type SendProps = {
+type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   // side menu
   toggleMenuDrawer: () => void;
   // privacy
@@ -95,6 +96,7 @@ type SendProps = {
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
+  navigation,
   sendTransaction,
   clearToAddr,
   toggleMenuDrawer,
@@ -110,7 +112,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     info,
     totalBalance,
     sendPageState,
-    navigationHome,
     zecPrice,
     sendAll,
     netInfo,
@@ -135,6 +136,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     snackbars,
     removeFirstSnackbar,
     setPrivacyOption,
+    navigationHome,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -679,7 +681,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       return;
     }
 
-    navigationHome?.navigate(RouteEnum.Computing);
+    navigation.navigate(RouteEnum.Computing);
 
     let error = '';
     let customError: string | undefined;
@@ -705,7 +707,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       // the app send successfully on the first attemp.
 
       navigationHome?.navigate(RouteEnum.HomeStack, {
-        screen: translate('loadedapp.history-menu') as string,
+        screen: RouteEnum.History,
       });
       return;
     } catch (err1) {
@@ -758,7 +760,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           // the app send successfully on the second attemp.
 
           navigationHome?.navigate(RouteEnum.HomeStack, {
-            screen: translate('loadedapp.history-menu') as string,
+            screen: RouteEnum.History,
           });
           return;
         } catch (err2) {
@@ -787,7 +789,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     }, 1 * 1000);
 
     navigationHome?.navigate(RouteEnum.HomeStack, {
-      screen: translate('loadedapp.history-menu') as string,
+      screen: RouteEnum.History,
     });
   };
 
@@ -814,14 +816,14 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const setQrcodeModalShow = () => {
-    navigationHome?.navigate(RouteEnum.ScannerAddress, { 
+    navigation.navigate(RouteEnum.ScannerAddress, { 
       setAddress: (a: string) => updateToField(a, null, null, null, null),
       active: true,
     })
   };
 
   const setMemoModalShow = () => {
-    navigationHome?.navigate(RouteEnum.Memo, { 
+    navigation.navigate(RouteEnum.Memo, { 
       message: memoText,
       includeUAMessage: includeUAMemoBoolean,
       setMessage: setMemoText,
@@ -829,7 +831,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const setConfirmModalShow = async (parseAddressInfoJSON: RPCParseAddressType) => {
-    navigationHome?.navigate(RouteEnum.Confirm, {
+    navigation.navigate(RouteEnum.Confirm, {
       calculatedFee: fee,
       parseAddressInfoJSON: parseAddressInfoJSON,
       donationAmount:
@@ -1324,7 +1326,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     )}
                     {stillConfirming && (
                       <TouchableOpacity onPress={() => {
-                          navigationHome?.navigate(RouteEnum.Pools);
+                          navigation.navigate(RouteEnum.Pools);
                         }}
                       >
                         <View
@@ -1348,7 +1350,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     )}
                     {showShieldInfo && mode === ModeEnum.advanced && (
                       <TouchableOpacity onPress={() => {
-                          navigationHome?.navigate(RouteEnum.Pools);
+                          navigation.navigate(RouteEnum.Pools);
                         }}
                       >
                         <View

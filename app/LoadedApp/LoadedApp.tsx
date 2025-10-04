@@ -123,7 +123,7 @@ const pt = require('../translations/pt.json');
 const ru = require('../translations/ru.json');
 const tr = require('../translations/tr.json');
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<AppDrawerParamList>();
 const Stack = createNativeStackNavigator<AppDrawerParamList>();
 
 // for testing
@@ -754,8 +754,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.readUrl(initialUrl);
 
       this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
-        screen: this.state.translate('loadedapp.send-menu'),
-        params: undefined,
+        screen: RouteEnum.Send,
       });
     }
 
@@ -766,7 +765,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
 
       this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
-        screen: this.state.translate('loadedapp.send-menu'),
+        screen: RouteEnum.Send,
       });
     });
 
@@ -1332,7 +1331,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.setSendPageState(newSendPageState);
       }
       this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
-        screen: this.state.translate('loadedapp.send-menu'),
+        screen: RouteEnum.Send,
       });
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
@@ -1863,9 +1862,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     const fnTabBarIcon = (route: { name: string; key: string }, focused: boolean) => {
       var iconName;
 
-      if (route.name === translate('loadedapp.history-menu')) {
+      if (route.name === RouteEnum.History) {
         iconName = faClockRotateLeft;
-      } else if (route.name === translate('loadedapp.send-menu')) {
+      } else if (route.name === RouteEnum.Send) {
         if (
           mode === ModeEnum.basic &&
           !!totalBalance &&
@@ -1880,9 +1879,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         } else {
           iconName = faPaperPlane;
         }
-      } else if (route.name === translate('loadedapp.receive-menu')) {
+      } else if (route.name === RouteEnum.Receive) {
         iconName = faDownload;
-      } else if (route.name === translate('loadedapp.messages-menu')) {
+      } else if (route.name === RouteEnum.Messages) {
         iconName = faComments;
       } else {
         iconName = faCog;
@@ -1923,13 +1922,22 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     (!readOnly && !!totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0) ? (
                       <Tab.Navigator
                         detachInactiveScreens={true}
-                        initialRouteName={translate('loadedapp.history-menu') as string}
+                        initialRouteName={RouteEnum.History}
                         screenOptions={({ route }: { route: { name: string; key: string } }) => ({
                           tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
                           tabBarIconStyle: {
                             alignSelf: 'center',
                             marginBottom: 2,
                           },
+                          tabBarLabel: route.name === RouteEnum.History
+                            ? (translate('loadedapp.history-menu') as string)
+                            : route.name === RouteEnum.Send
+                              ? (translate('loadedapp.send-menu') as string)
+                              : route.name === RouteEnum.Receive
+                                ? (translate('loadedapp.receive-menu') as string)
+                                : route.name === RouteEnum.Messages
+                                  ? (translate('loadedapp.messages-menu') as string)
+                                  : '',
                           tabBarLabelPosition: 'below-icon',
                           tabBarLabelStyle: {
                             alignSelf: 'center',
@@ -1949,9 +1957,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                           headerShown: false,
                           tabBarButton: renderTabPressable(colors),
                         })}>
-                        <Tab.Screen name={translate('loadedapp.history-menu') as string}>
-                          {() => (
-                            <History
+                        <Tab.Screen name={RouteEnum.History}>
+                          {propsTab => (
+                            <History {...propsTab}
                               toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                               setShieldingAmount={this.setShieldingAmount /* header */}
                               setScrollToTop={this.setScrollToTop /* header & history */}
@@ -1970,9 +1978,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                                 (totalBalance.totalSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === 0)
                               ) &&
                               somePending)) && (
-                            <Tab.Screen name={translate('loadedapp.send-menu') as string}>
-                              {() => (
-                                <Send
+                            <Tab.Screen name={RouteEnum.Send}>
+                              {propsTab => (
+                                <Send {...propsTab}
                                   toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                                   setShieldingAmount={this.setShieldingAmount /* header */}
                                   setScrollToTop={this.setScrollToTop /* header & send */}
@@ -1985,9 +1993,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                               )}
                             </Tab.Screen>
                           )}
-                        <Tab.Screen name={translate('loadedapp.receive-menu') as string}>
-                          {() => (
-                            <Receive
+                        <Tab.Screen name={RouteEnum.Receive}>
+                          {propsTab => (
+                            <Receive {...propsTab}
                               toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                               alone={false /* receive */}
                               setSecurityOption={this.setSecurityOption}
@@ -1995,9 +2003,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                             />
                           )}
                         </Tab.Screen>
-                        <Tab.Screen name={translate('loadedapp.messages-menu') as string}>
-                          {() => (
-                            <MessageList
+                        <Tab.Screen name={RouteEnum.Messages}>
+                          {propsTab => (
+                            <MessageList {...propsTab}
                               toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                               setScrollToBottom={this.setScrollToBottom /* header & messages */}
                               scrollToBottom={scrollToBottom /* messages */}
@@ -2013,16 +2021,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                           <Loading backgroundColor={colors.background} spinColor={colors.primary} />
                         ) : (
                           <Tab.Navigator
-                            initialRouteName={translate('loadedapp.history-menu') as string}
+                            initialRouteName={RouteEnum.Receive}
                             screenOptions={{
                               tabBarStyle: {
                                 display: 'none',
                               },
                               headerShown: false,
                             }}>
-                            <Tab.Screen name={translate('loadedapp.history-menu') as string}>
-                              {() => (
-                                <Receive
+                            <Tab.Screen name={RouteEnum.Receive}>
+                              {propsTab => (
+                                <Receive {...propsTab}
                                   toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                                   alone={true /* receive */}
                                   setSecurityOption={this.setSecurityOption}

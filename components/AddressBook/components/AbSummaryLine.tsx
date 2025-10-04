@@ -160,7 +160,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
                   navigationHome?.navigate(RouteEnum.HomeStack, {
-                    screen: translate('loadedapp.send-menu'),
+                    screen: RouteEnum.Send,
                   });
                 }}>
                 <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />

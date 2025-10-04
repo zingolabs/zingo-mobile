@@ -39,7 +39,6 @@ type AddressBookProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.AddressB
   setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
 
-
 const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   navigation,
   route,

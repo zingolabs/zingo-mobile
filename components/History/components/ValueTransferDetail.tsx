@@ -236,7 +236,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     }
     // change to the history screen, just in case.
     navigationHome?.navigate(RouteEnum.HomeStack, {
-      screen: translate('loadedapp.history-menu') as string,
+      screen: RouteEnum.History,
     });
   };
 

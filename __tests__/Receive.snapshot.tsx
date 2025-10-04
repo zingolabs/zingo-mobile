@@ -12,7 +12,21 @@ import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { AppDrawerParamList } from '../app/types';
+import { RouteEnum } from '../app/AppState';
+import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
+function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> {
+  return {
+    navigation: mockNavigation,
+    route: {
+      key: 'Key-1',
+      name: RouteEnum.Receive,
+      params: undefined,
+    },
+  };
+}
 // test suite
 describe('Component Receive - test', () => {
   //snapshot test
@@ -23,9 +37,15 @@ describe('Component Receive - test', () => {
     state.info = mockInfo;
     state.totalBalance = mockTotalBalance;
     const onFunction = jest.fn();
+    const props = makeDrawerProps();
     const receive = render(
       <ContextAppLoadedProvider value={state}>
-        <Receive toggleMenuDrawer={onFunction} alone={false} setSecurityOption={onFunction} setAddressBook={onFunction} />
+        <Receive {...props}
+          toggleMenuDrawer={onFunction} 
+          alone={false} 
+          setSecurityOption={onFunction} 
+          setAddressBook={onFunction}
+        />
       </ContextAppLoadedProvider>,
     );
     expect(receive.toJSON()).toMatchSnapshot();

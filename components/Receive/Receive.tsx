@@ -6,7 +6,7 @@ import { useTheme } from '@react-navigation/native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import SingleAddress from '../Components/SingleAddress';
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import moment from 'moment';
@@ -24,6 +24,7 @@ import {
   AddressBookFileClass,
   ScreenEnum,
   SnackbarDurationEnum,
+  RouteEnum,
 } from '../../app/AppState';
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
@@ -34,8 +35,9 @@ import Snackbars from '../Components/Snackbars';
 import NewAddressTag from './components/NewAddressTag';
 import TransparentWarning from './components/TransparentWarning';
 import ExpandedAddress from './components/ExpandedAddress';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type ReceiveProps = {
+type ReceiveProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> & {
   toggleMenuDrawer: () => void;
   alone: boolean;
   setSecurityOption: (s: SecurityType) => Promise<void>;
@@ -43,6 +45,7 @@ type ReceiveProps = {
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
+  navigation,
   // side menu
   toggleMenuDrawer,
   // balance
@@ -62,7 +65,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     snackbars, 
     removeFirstSnackbar, 
     addLastSnackbar,
-    navigationHome,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -263,7 +265,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   hasTransparent={tAddr && tAddr.length > 0}
                   showMoreOptions={showMoreOptions}
                   setShowMoreOptions={setShowMoreOptions}
-                  navigation={navigationHome}
+                  navigation={navigation}
                 />
               </>
             )}
@@ -297,7 +299,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   VAShow={VAShow}
                   EAShow={EAShow}
                   changeIndex={setIndex}
-                  navigation={navigationHome}
+                  navigation={navigation}
                 />
               </>
             )}

@@ -54,7 +54,6 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const { 
-    translate, 
     language, 
     navigationHome, 
     showSwipeableIcons, 
@@ -209,7 +208,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                     sendPageState.toaddr.to = c.address ? c.address : '';
                     setSendPageState(sendPageState);
                     navigationHome?.navigate(RouteEnum.HomeStack, {
-                      screen: translate('loadedapp.send-menu'),
+                      screen: RouteEnum.Send,
                     });
                     swipeable.reset();
                   }}>

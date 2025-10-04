@@ -5,6 +5,10 @@ export enum RouteEnum {
 
   // Drawer no params
   HomeStack = 'HomeStack',
+  History = 'History',
+  Send = 'Send',
+  Receive = 'Receive',
+  Messages = 'Messages',
   AddressBookStack = 'AddressBookStack',
   Settings = 'Settings',
   About = 'About',

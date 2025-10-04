@@ -47,7 +47,7 @@ import {
   ToAddrClass,
   ValueTransferType,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import FadeText from '../../Components/FadeText';
 import Button from '../../Components/Button';
 import MessageLine from './MessageLine';
@@ -61,8 +61,9 @@ import { serverUris } from '../../../app/uris';
 import Utils from '../../../app/utils';
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../../Components/Snackbars';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type MessageListProps = {
+type MessageListProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Messages> & {
   toggleMenuDrawer: () => void;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
@@ -78,6 +79,7 @@ type MessageListProps = {
 };
 
 const MessageList: React.FunctionComponent<MessageListProps> = ({
+  navigation,
   toggleMenuDrawer,
   setScrollToBottom,
   scrollToBottom,
@@ -104,7 +106,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     snackbars,
     removeFirstSnackbar,
     setPrivacyOption,
-    navigationHome,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -492,7 +493,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   ]);
 
   const setMemoModalShow = () => {
-    navigationHome?.navigate(RouteEnum.Memo, { 
+    navigation.navigate(RouteEnum.Memo, { 
       message: memo,
       includeUAMessage: true,
       setMessage: setMemo,
@@ -500,7 +501,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   };
 
   const setValueTransferDetailModalShow = async (index: number, vt: ValueTransferType) => {
-    navigationHome?.navigate(RouteEnum.ValueTransferDetail, {
+    navigation.navigate(RouteEnum.ValueTransferDetail, {
       index: index,
       vt: vt,
       valueTransfersSliced: messagesSliced,

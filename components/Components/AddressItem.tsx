@@ -199,7 +199,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                   sendPageState.toaddr.to = address;
                   setSendPageState(sendPageState);
                   navigationHome?.navigate(RouteEnum.HomeStack, {
-                    screen: translate('loadedapp.send-menu'),
+                    screen: RouteEnum.Send,
                   });
                 }}>
                 <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faPaperPlane} color={colors.primary} />

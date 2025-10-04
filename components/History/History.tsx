@@ -31,7 +31,7 @@ import {
   //ServerType,
   ValueTransferType,
 } from '../../app/AppState';
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import ValueTransferLine from './components/ValueTransferLine';
@@ -44,6 +44,7 @@ import { isEqual } from 'lodash';
 import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -52,7 +53,7 @@ const ViewTypes = {
   WITHOUT_MONTH_REFRESH: 3,
 };
 
-type HistoryProps = {
+type HistoryProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.History> &  {
   // side menu
   toggleMenuDrawer: () => void;
   // privacy
@@ -74,6 +75,7 @@ type HistoryProps = {
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
+  navigation,
   toggleMenuDrawer,
   setShieldingAmount,
   setScrollToTop,
@@ -96,7 +98,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     snackbars,
     removeFirstSnackbar,
     setPrivacyOption,
-    navigationHome,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -281,7 +282,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   );
 
   const setValueTransferDetailModalShow = (index: number, vt: ValueTransferType) => {
-    navigationHome?.navigate(RouteEnum.ValueTransferDetail, { 
+    navigation.navigate(RouteEnum.ValueTransferDetail, { 
       index: index, 
       vt: vt,
       valueTransfersSliced: valueTransfersSliced,
@@ -291,7 +292,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
 
   /*
   const setMessagesAddressModalShow = (vt: ValueTransferType) => {
-    navigationHome?.navigate(RouteEnum.MessagesAddress, {
+    navigation.navigate(RouteEnum.MessagesAddress, {
       setScrollToBottom: setScrollToBottom,
       scrollToBottom: scrollToBottom,
       address: Utils.messagesAddress(vt),
