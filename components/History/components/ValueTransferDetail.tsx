@@ -10,7 +10,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 
 import {
   AddressBookFileClass,
@@ -53,9 +53,9 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 type ValueTransferDetailProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.ValueTransferDetail>;
 
 const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = ({
-  navigation,
   route,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
     info,
@@ -73,7 +73,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     setBackgroundError,
     netInfo,
     selectServer,
-    navigationHome,
     readOnly,
     setPrivacyOption,
   } = context;
@@ -200,7 +199,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     }
 
     // not use await here.
-    navigationHome?.navigate(RouteEnum.Computing);
+    navigation.navigate(RouteEnum.Computing);
 
     let actionStr: string;
     if (action === TransactionActionEnum.resend) {
@@ -235,7 +234,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       }
     }
     // change to the history screen, just in case.
-    navigationHome?.navigate(RouteEnum.HomeStack, {
+    navigation.navigate(RouteEnum.HomeStack, {
       screen: RouteEnum.History,
     });
   };

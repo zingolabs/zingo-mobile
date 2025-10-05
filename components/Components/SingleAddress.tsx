@@ -2,7 +2,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { View, ScrollView, TouchableOpacity, Text, Pressable } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
@@ -52,7 +52,6 @@ type SingleAddressProps = {
   hasTransparent?: boolean;
   showMoreOptions?: boolean;
   setShowMoreOptions?: React.Dispatch<React.SetStateAction<boolean>>;
-  navigation: any;
 };
 
 const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
@@ -71,8 +70,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   hasTransparent,
   showMoreOptions,
   setShowMoreOptions,
-  navigation,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const { translate, privacy, addLastSnackbar, language, mode, addressBook } = context;
   const { colors } = useTheme() as ThemeType;

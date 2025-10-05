@@ -23,7 +23,7 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
 import RNPickerSelect from 'react-native-picker-select';
 
@@ -96,7 +96,6 @@ type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
 };
 
 const Send: React.FunctionComponent<SendProps> = ({
-  navigation,
   sendTransaction,
   clearToAddr,
   toggleMenuDrawer,
@@ -106,6 +105,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   setServerOption,
   //setSecurityOption,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -136,7 +136,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     snackbars,
     removeFirstSnackbar,
     setPrivacyOption,
-    navigationHome,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -706,7 +705,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
       // the app send successfully on the first attemp.
 
-      navigationHome?.navigate(RouteEnum.HomeStack, {
+      navigation.navigate(RouteEnum.HomeStack, {
         screen: RouteEnum.History,
       });
       return;
@@ -759,7 +758,7 @@ const Send: React.FunctionComponent<SendProps> = ({
           );
           // the app send successfully on the second attemp.
 
-          navigationHome?.navigate(RouteEnum.HomeStack, {
+          navigation.navigate(RouteEnum.HomeStack, {
             screen: RouteEnum.History,
           });
           return;
@@ -788,7 +787,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       );
     }, 1 * 1000);
 
-    navigationHome?.navigate(RouteEnum.HomeStack, {
+    navigation.navigate(RouteEnum.HomeStack, {
       screen: RouteEnum.History,
     });
   };
@@ -831,20 +830,23 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const setConfirmModalShow = async (parseAddressInfoJSON: RPCParseAddressType) => {
-    navigation.navigate(RouteEnum.Confirm, {
-      calculatedFee: fee,
-      parseAddressInfoJSON: parseAddressInfoJSON,
-      donationAmount:
-        donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
-          ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
-          : 0,
-      confirmSend: confirmSend,
-      sendAllAmount:
-        mode !== ModeEnum.basic &&
-        Utils.parseStringLocaleToNumberFloat(amountText) ===
-          Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
-      calculateFeeWithPropose: calculateFeeWithPropose,
-      sendPageState: buildSendState(),
+    navigation.navigate(RouteEnum.ConfirmStack, {
+      screen: RouteEnum.Confirm,
+      params: {
+        calculatedFee: fee,
+        parseAddressInfoJSON: parseAddressInfoJSON,
+        donationAmount:
+          donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+            ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
+            : 0,
+        confirmSend: confirmSend,
+        sendAllAmount:
+          mode !== ModeEnum.basic &&
+          Utils.parseStringLocaleToNumberFloat(amountText) ===
+            Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
+        calculateFeeWithPropose: calculateFeeWithPropose,
+        sendPageState: buildSendState(),
+      }
     });
   };
 

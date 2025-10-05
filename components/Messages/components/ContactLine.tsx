@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, View, TouchableOpacity, Text, ActivityIndicator, Platform } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faCircleCheck as faCircleCheckSolid,
@@ -52,10 +52,10 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
   addressProtected,
   screenName,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const { 
     language, 
-    navigationHome, 
     showSwipeableIcons, 
     readOnly, 
     selectServer, 
@@ -207,7 +207,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
                     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                     sendPageState.toaddr.to = c.address ? c.address : '';
                     setSendPageState(sendPageState);
-                    navigationHome?.navigate(RouteEnum.HomeStack, {
+                    navigation.navigate(RouteEnum.HomeStack, {
                       screen: RouteEnum.Send,
                     });
                     swipeable.reset();

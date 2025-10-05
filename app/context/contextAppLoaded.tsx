@@ -25,7 +25,6 @@ import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
-  navigationHome: null,
   netInfo: {} as NetInfoType,
   syncingStatus: {} as RPCSyncStatusType,
   totalBalance: null,

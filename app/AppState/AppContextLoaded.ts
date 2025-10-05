@@ -21,14 +21,12 @@ import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { LoadedAppNavigationState } from '../types';
 import ValueTransferType from './types/ValueTransferType';
-import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
 import { ScreenEnum } from './enums/ScreenEnum';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 
 export default interface AppContextLoaded {
-  navigationHome: DrawerContentComponentProps['navigation'] | null;
   netInfo: NetInfoType;
 
   // The total confirmed and pending balance in this wallet
@@ -100,7 +98,7 @@ export default interface AppContextLoaded {
   addressBook: AddressBookFileClass[];
 
   // helpers to open the address book modal from different places in the App
-  launchAddressBook: (add: string) => void;
+  launchAddressBook: (add: string, s: ScreenEnum) => void;
 
   // is calculated in the header & needed in the send screen
   shieldingAmount: number;

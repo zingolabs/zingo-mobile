@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, TouchableOpacity, TextInput } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck, faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -23,8 +23,8 @@ type TextInputAddressProps = {
   setError: (e: string) => void;
   disabled: boolean;
   showLabel: boolean;
-  navigation: any;
   screenName: ScreenEnum;
+  routeStack?: RouteEnum;
 };
 const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   address,
@@ -32,9 +32,10 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   setError,
   disabled,
   showLabel,
-  navigation,
   screenName,
+  routeStack,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const { translate, server, language } = context;
   const { colors } = useTheme()  as ThemeType;
@@ -61,7 +62,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
 
   const setQrcodeModalShow = () => {
     if (screenName === ScreenEnum.AddressBook) {
-      navigation.navigate(RouteEnum.AddressBookStack, {
+      navigation.navigate(routeStack, {
         screen: RouteEnum.ScannerAddress,
         params: { 
           setAddress: (a: string) => setAddress(a),

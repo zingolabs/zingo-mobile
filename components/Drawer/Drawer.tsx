@@ -31,7 +31,7 @@ const SideBar = createDrawerNavigator<AppDrawerParamList>();
  * }
  */
 function Drawer({ onMenuItemSelected, screenName, initialRouteName, children }: DrawerProps) {
-  const menu = (props: DrawerContentComponentProps) => <Menu onItemSelected={onMenuItemSelected} screenName={screenName} {...props} />;
+  const menu = (props: DrawerContentComponentProps) => <Menu onItemSelected={onMenuItemSelected} screenName={screenName} toggleMenuDrawer={() => props.navigation.toggleDrawer()} />;
 
   return (
     <SideBar.Navigator

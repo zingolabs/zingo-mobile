@@ -45,7 +45,6 @@ type ReceiveProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> & {
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
-  navigation,
   // side menu
   toggleMenuDrawer,
   // balance
@@ -265,7 +264,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   hasTransparent={tAddr && tAddr.length > 0}
                   showMoreOptions={showMoreOptions}
                   setShowMoreOptions={setShowMoreOptions}
-                  navigation={navigation}
                 />
               </>
             )}
@@ -299,7 +297,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   VAShow={VAShow}
                   EAShow={EAShow}
                   changeIndex={setIndex}
-                  navigation={navigation}
                 />
               </>
             )}

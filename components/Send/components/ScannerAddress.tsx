@@ -69,6 +69,14 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
     validateAddress(scandata);
   };
 
+  const onCloseScreen = () => {
+    clear();
+    setActive(false);
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
+  };
+
   return (
     <ToastProvider>
       <Snackbars
@@ -94,24 +102,12 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
           noDrawMenu={true}
           noPrivacy={true}
           noUfvkIcon={true}
-          closeScreen={() => {
-            clear();
-            setActive(false);
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            }
-          }}
+          closeScreen={() => onCloseScreen()}
         />
         <Scanner 
           active={active}
           onRead={onRead} 
-          onClose={() => {
-            clear();
-            setActive(false);
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            }
-          }}
+          onClose={() => onCloseScreen()}
         />
       </View>
     </ToastProvider>

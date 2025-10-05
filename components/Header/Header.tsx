@@ -14,7 +14,7 @@ import {
   faGear,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Image, TouchableOpacity, View } from 'react-native';
 import {
@@ -113,6 +113,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   closeScreen,
   noUfvkIcon,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
     totalBalance,
@@ -126,7 +127,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     security,
     language,
     shieldingAmount,
-    navigationHome,
     selectServer,
     setZecPrice,
   } = context;
@@ -300,7 +300,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     let pools: PoolToShieldEnum = PoolToShieldEnum.transparentPoolToShield;
 
     // not use await here.
-    navigationHome?.navigate(RouteEnum.Computing);
+    navigation.navigate(RouteEnum.Computing);
     // because I don't what the user is doing, I need to the re-run the shield
     // command right before the confirmation
     await RPCModule.shieldProcess();
@@ -366,7 +366,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       setShieldingAmount && setShieldingAmount(0);
 
       // change to the history screen, just in case.
-      navigationHome?.navigate(RouteEnum.HomeStack, {
+      navigation.navigate(RouteEnum.HomeStack, {
         screen: RouteEnum.History,
       });
     }
@@ -448,7 +448,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
       }
     } else {
-      navigationHome?.navigate(RouteEnum.Ufvk, { 
+      navigation.navigate(RouteEnum.Ufvk, { 
         action: UfvkActionEnum.view 
       });
     }
@@ -597,7 +597,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                             </View>
                           ) : (
                             <TouchableOpacity testID="header.playicon" onPress={() => {
-                                navigationHome?.navigate(RouteEnum.SyncReport);
+                                navigation.navigate(RouteEnum.SyncReport);
                               }}
                             >
                               <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -638,7 +638,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           minHeight: 25,
                         }}>
                         <TouchableOpacity onPress={() => {
-                            navigationHome?.navigate(RouteEnum.SyncReport);
+                            navigation.navigate(RouteEnum.SyncReport);
                           }}
                         >
                           <View
@@ -682,7 +682,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                       />
                     ) : (
                       <TouchableOpacity onPress={() => {
-                          navigationHome?.navigate(RouteEnum.SyncReport);
+                          navigation.navigate(RouteEnum.SyncReport);
                         }}
                       >
                         <FontAwesomeIcon
@@ -761,7 +761,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   totalBalance.totalSaplingBalance > 0 ||
                   totalBalance.totalTransparentBalance > 0) && (
                   <TouchableOpacity onPress={() => {
-                      navigationHome?.navigate(RouteEnum.Pools);
+                      navigation.navigate(RouteEnum.Pools);
                     }}
                   >
                     <View
@@ -903,7 +903,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
                   }
                 } else {
-                  navigationHome?.navigate(RouteEnum.Settings);
+                  navigation.navigate(RouteEnum.Settings);
                 }
               }}>
               <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />

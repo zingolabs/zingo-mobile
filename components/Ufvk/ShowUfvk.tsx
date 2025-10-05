@@ -209,7 +209,6 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
                 setIndex={() => {}}
                 total={1}
                 EAShow={EAShow}
-                navigation={navigation}
               />
             )}
             {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}

@@ -28,9 +28,12 @@ type VerifyAddressProps = {
   closeSheet: () => void;
   screenName: ScreenEnum;
 };
-const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet, screenName }) => {
+const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ 
+  closeSheet, 
+  screenName 
+}) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, addLastSnackbar, server, navigationHome } = context;
+  const { translate, language, addLastSnackbar, server } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
   const { clear } = useToast();
@@ -126,7 +129,6 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet
         setError={setErrorAddress}
         disabled={false}
         showLabel={false}
-        navigation={navigationHome}
         screenName={screenName}
       />
       {!!errorAddress && (

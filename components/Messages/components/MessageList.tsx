@@ -24,7 +24,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faCircleUser,
@@ -79,7 +79,6 @@ type MessageListProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Messages
 };
 
 const MessageList: React.FunctionComponent<MessageListProps> = ({
-  navigation,
   toggleMenuDrawer,
   setScrollToBottom,
   scrollToBottom,
@@ -87,6 +86,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   sendTransaction,
   setServerOption,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -501,11 +501,14 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   };
 
   const setValueTransferDetailModalShow = async (index: number, vt: ValueTransferType) => {
-    navigation.navigate(RouteEnum.ValueTransferDetail, {
-      index: index,
-      vt: vt,
-      valueTransfersSliced: messagesSliced,
-      totalLength: messagesFiltered ? messagesFiltered.length : 0,
+    navigation.navigate(RouteEnum.ValueTransferDetailStack, {
+      screen: RouteEnum.ValueTransferDetail,
+      params: {
+        index: index,
+        vt: vt,
+        valueTransfersSliced: messagesSliced,
+        totalLength: messagesFiltered ? messagesFiltered.length : 0,
+      }
     });
   };
 

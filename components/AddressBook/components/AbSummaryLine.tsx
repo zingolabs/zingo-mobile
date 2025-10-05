@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { View, TouchableOpacity, Alert } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAddressCard, faQrcode, faTrashCan, faPencil, faPaperPlane, faWallet } from '@fortawesome/free-solid-svg-icons';
 
@@ -47,8 +47,9 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
   doAction,
   addressProtected,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
-  const { translate, navigationHome, readOnly, mode, totalBalance, language, selectServer, setSendPageState } = context;
+  const { translate, readOnly, mode, totalBalance, language, selectServer, setSendPageState } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
 
@@ -159,7 +160,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                   const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                   sendPageState.toaddr.to = item.address;
                   setSendPageState(sendPageState);
-                  navigationHome?.navigate(RouteEnum.HomeStack, {
+                  navigation.navigate(RouteEnum.HomeStack, {
                     screen: RouteEnum.Send,
                   });
                 }}>

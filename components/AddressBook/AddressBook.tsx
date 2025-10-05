@@ -73,6 +73,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
   const [currentAddress, setCurrentAddress] = useState<string>(!!route.params && route.params.currentAddress !== undefined ? route.params.currentAddress : '');
+  const [routeStack, setRouteStack] = useState<RouteEnum>(!!route.params && route.params.routeStack !== undefined ? route.params.routeStack : RouteEnum.AddressBookStack);
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -99,7 +100,9 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
 
   useEffect(() => {
     const _currentAddress = !!route.params && route.params.currentAddress !== undefined ? route.params.currentAddress : '';
+    const _routeStack = !!route.params && route.params.routeStack !== undefined ? route.params.routeStack : RouteEnum.AddressBookStack;
     setCurrentAddress(_currentAddress);
+    setRouteStack(_routeStack);
   }, [
     route, 
     route.params,
@@ -386,8 +389,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               action={action}
               doAction={doAction}
               currentAddress={currentAddress}
-              navigation={navigation}
               screenName={screenName}
+              routeStack={routeStack}
             />
           )}
           {currentItem !== null && currentItem > -1 && action !== null && (
@@ -398,8 +401,8 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
               cancel={cancel}
               action={action}
               doAction={doAction}
-              navigation={navigation}
               screenName={screenName}
+              routeStack={routeStack}
             />
           )}
           {!currentAddress && addressBookSliced.length === 0 && currentItem !== -1 && !loading && (

@@ -14,15 +14,15 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 import { MenuItemEnum, ModeEnum, ScreenEnum, SelectServerEnum } from '../../../app/AppState';
-import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
+import { DrawerContentScrollView } from '@react-navigation/drawer';
 
 type MenuProps = {
   onItemSelected: (item: MenuItemEnum) => void;
   screenName: ScreenEnum;
-  navigation: DrawerContentComponentProps['navigation'];
+  toggleMenuDrawer: () => void;
 };
 
-const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, navigation }) => {
+const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, toggleMenuDrawer }) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -51,7 +51,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
   };
 
   const onItemSelectedWrapper = async (value: MenuItemEnum) => {
-    navigation.toggleDrawer();
+    toggleMenuDrawer();
     if (
       (value === MenuItemEnum.WalletSeedUfvk && security.seedUfvkScreen) ||
       (value === MenuItemEnum.Rescan && security.rescanScreen) ||

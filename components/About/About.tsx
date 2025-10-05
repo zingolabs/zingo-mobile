@@ -22,7 +22,9 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type AboutProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.About>;
 
-const About: React.FunctionComponent<AboutProps> = ({ navigation }) => {
+const About: React.FunctionComponent<AboutProps> = ({
+  navigation,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { zingolibVersion, translate, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;

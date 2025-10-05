@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useRef } from 'react';
 import { Animated, Platform, View, TouchableOpacity } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faArrowDown,
@@ -59,13 +59,13 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   addressProtected,
   screenName,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
     translate,
     language,
     privacy,
     info,
-    navigationHome,
     showSwipeableIcons,
     readOnly,
     selectServer,
@@ -216,7 +216,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                     sendPageState.toaddr.to = vt.address ? vt.address : '';
                     setSendPageState(sendPageState);
-                    navigationHome?.navigate(RouteEnum.HomeStack, {
+                    navigation.navigate(RouteEnum.HomeStack, {
                       screen: RouteEnum.Send,
                     });
                     swipeable.reset();

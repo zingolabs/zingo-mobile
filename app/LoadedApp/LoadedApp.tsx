@@ -530,7 +530,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     this.state = {
       //context
-      navigationHome: null,
       netInfo: {} as NetInfoType,
       totalBalance: null,
       addresses: null,
@@ -587,6 +586,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       performanceLevel: props.performanceLevel,
 
       // state
+      navigationHome: null,
       appStateStatus: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
       newServer: {} as ServerType,
       newSelectServer: null,
@@ -1228,7 +1228,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.state.navigationHome?.navigate(RouteEnum.Pools);
       return;
     } else if (item === MenuItemEnum.Insight) {
-      this.state.navigationHome?.navigate(RouteEnum.Insight);
+      this.state.navigationHome?.navigate(RouteEnum.InsightStack, {
+        screen: RouteEnum.Insight,
+      });
       return;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
@@ -1296,7 +1298,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         { cancelable: false },
       );
     } else if (item === MenuItemEnum.AddressBook) {
-      this.launchAddressBook('');
+      this.launchAddressBook('', this.screenName);
       return;
     } else if (item === MenuItemEnum.VoteForNym) {
       let update = false;
@@ -1758,13 +1760,40 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
   // close modal make sense because this is called
   // in a component which can live in differents screens
-  launchAddressBook = (address: string) => {
-    this.state.navigationHome?.navigate(RouteEnum.AddressBookStack, {
-      screen: RouteEnum.AddressBook,
-      params: {
-        currentAddress: address,
-      }
-    });
+  launchAddressBook = (address: string, screenName: ScreenEnum) => {
+    if (screenName === ScreenEnum.LoadedApp || screenName === ScreenEnum.Send) {
+      this.state.navigationHome?.navigate(RouteEnum.AddressBookStack, {
+        screen: RouteEnum.AddressBook,
+        params: {
+          currentAddress: address,
+          routeStack: RouteEnum.AddressBookStack,
+        }
+      });
+    } else if (screenName === ScreenEnum.ValueTransferDetail) {
+      this.state.navigationHome?.navigate(RouteEnum.ValueTransferDetailStack, {
+        screen: RouteEnum.AddressBook,
+        params: {
+          currentAddress: address,
+          routeStack: RouteEnum.ValueTransferDetailStack,
+        }
+      });
+    } else if (screenName === ScreenEnum.Confirm) {
+      this.state.navigationHome?.navigate(RouteEnum.ConfirmStack, {
+        screen: RouteEnum.AddressBook,
+        params: {
+          currentAddress: address,
+          routeStack: RouteEnum.ConfirmStack,
+        }
+      });
+    } else if (screenName === ScreenEnum.Insight) {
+      this.state.navigationHome?.navigate(RouteEnum.InsightStack, {
+        screen: RouteEnum.AddressBook,
+        params: {
+          currentAddress: address,
+          routeStack: RouteEnum.InsightStack,
+        }
+      });
+    }
   };
 
   setScrollToTop = (value: boolean) => {
@@ -1805,7 +1834,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     const context = {
       //context
-      navigationHome: this.state.navigationHome,
       netInfo: this.state.netInfo,
       wallet: this.state.wallet,
       totalBalance: this.state.totalBalance,
@@ -2064,17 +2092,25 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   />
                 }
               </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.About}>
-                {props => <About {...props} />}
-              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.About} component={About} />
               <Drawer.Screen name={RouteEnum.Rescan}>
                 {props => <Rescan {...props} doRescan={this.doRescan} />}
               </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Info}>
-                {props => <Info {...props} />}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Insight}>
-                {props => <Insight {...props} />}
+              <Drawer.Screen name={RouteEnum.Info} component={Info} />
+              <Drawer.Screen name={RouteEnum.InsightStack}>
+                {() => {
+                  return (
+                    <Stack.Navigator initialRouteName={RouteEnum.Insight} screenOptions={{ headerShown: false }}>
+                      <Stack.Screen name={RouteEnum.Insight} component={Insight} />
+                      <Stack.Screen name={RouteEnum.AddressBook} >
+                        {props => (
+                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
+                        )}
+                      </Stack.Screen>
+                      <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
+                    </Stack.Navigator>
+                  );
+                }}
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.Ufvk}>
                 {props => {
@@ -2154,12 +2190,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   }
                 }}
               </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.SyncReport}>
-                {props => <SyncReport {...props} />}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Pools}>
-                {props => <Pools {...props} /> }
-              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.SyncReport} component={SyncReport} />
+              <Drawer.Screen name={RouteEnum.Pools} component={Pools} />
               <Drawer.Screen name={RouteEnum.AddressBookStack}>
                 {() => {
                   return (
@@ -2169,39 +2201,47 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                             <AddressBook {...props} setAddressBook={this.setAddressBook} />
                         )}
                       </Stack.Screen>
-                      <Stack.Screen name={RouteEnum.ScannerAddress} >
-                        {props => (
-                            <ScannerAddress {...props} />
-                        )}
-                      </Stack.Screen>
+                      <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
                     </Stack.Navigator>
                   );
                 }}
               </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.AddressList}>
-                {props => <AddressList {...props} />}
+              <Drawer.Screen name={RouteEnum.ValueTransferDetailStack}>
+                {() => {
+                  return (
+                    <Stack.Navigator initialRouteName={RouteEnum.ValueTransferDetail} screenOptions={{ headerShown: false }}>
+                      <Stack.Screen name={RouteEnum.ValueTransferDetail} component={ValueTransferDetail} />
+                      <Stack.Screen name={RouteEnum.AddressBook} >
+                        {props => (
+                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
+                        )}
+                      </Stack.Screen>
+                      <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
+                    </Stack.Navigator>
+                  );
+                }}
               </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.ScannerAddress}>
-                {props => <ScannerAddress {...props} />}
+              <Drawer.Screen name={RouteEnum.AddressList} component={AddressList} />
+              <Drawer.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
+              <Drawer.Screen name={RouteEnum.MessagesAddress} component={MessagesAddress} />
+              <Drawer.Screen name={RouteEnum.MessagesAll} component={MessagesAll} />
+              <Drawer.Screen name={RouteEnum.Memo} component={Memo} />
+              <Drawer.Screen name={RouteEnum.ConfirmStack}>
+                {() => {
+                  return (
+                    <Stack.Navigator initialRouteName={RouteEnum.Confirm} screenOptions={{ headerShown: false }}>
+                      <Stack.Screen name={RouteEnum.Confirm} component={Confirm} />
+                      <Stack.Screen name={RouteEnum.AddressBook} >
+                        {props => (
+                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
+                        )}
+                      </Stack.Screen>
+                      <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
+                    </Stack.Navigator>
+                  );
+                }}
               </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.ValueTransferDetail}>
-                {props => <ValueTransferDetail {...props} />}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.MessagesAddress}>
-                {props => <MessagesAddress {...props} />}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.MessagesAll}>
-                {props => <MessagesAll {...props} />}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Memo}>
-                {props => <Memo {...props} />}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Confirm}>
-                {props => <Confirm {...props} />}
-              </Drawer.Screen>
-              <Drawer.Screen name={RouteEnum.Computing}>
-                {props => <ComputingTxContent {...props} />}
-              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.Computing} component={ComputingTxContent} />
             </Drawer>
           </GestureHandlerRootView>
         </ContextAppLoadedProvider>

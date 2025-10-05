@@ -16,7 +16,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
@@ -75,7 +75,6 @@ type HistoryProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.History> &  
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
-  navigation,
   toggleMenuDrawer,
   setShieldingAmount,
   setScrollToTop,
@@ -85,6 +84,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
   //sendTransaction,
   //setServerOption,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -282,11 +282,14 @@ const History: React.FunctionComponent<HistoryProps> = ({
   );
 
   const setValueTransferDetailModalShow = (index: number, vt: ValueTransferType) => {
-    navigation.navigate(RouteEnum.ValueTransferDetail, { 
-      index: index, 
-      vt: vt,
-      valueTransfersSliced: valueTransfersSliced,
-      totalLength: valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0
+    navigation.navigate(RouteEnum.ValueTransferDetailStack, {
+      screen: RouteEnum.ValueTransferDetail,
+      params: { 
+        index: index, 
+        vt: vt,
+        valueTransfersSliced: valueTransfersSliced,
+        totalLength: valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0
+      }
     });
   };
 
