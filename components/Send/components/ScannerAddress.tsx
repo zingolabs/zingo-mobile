@@ -12,7 +12,6 @@ import { GlobalConst, RouteEnum, ScreenEnum } from '../../../app/AppState';
 import Header from '../../Header';
 import { useTheme } from '@react-navigation/native';
 import { AppDrawerParamList, ThemeType } from '../../../app/types';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { View } from 'react-native';
 import Snackbars from '../../Components/Snackbars';
@@ -29,7 +28,6 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.ScannerAddress;
@@ -87,10 +85,6 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
 
       <View
         style={{
-          marginTop: top,
-          marginBottom: bottom,
-          marginRight: right,
-          marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
         }}>

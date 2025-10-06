@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, ScrollView, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, ScrollView } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -17,7 +16,7 @@ import 'moment/locale/ru';
 import 'moment/locale/tr';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
-import { GlobalConst, RouteEnum, ScreenEnum } from '../../app/AppState';
+import { RouteEnum, ScreenEnum } from '../../app/AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type AboutProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.About>;
@@ -28,7 +27,6 @@ const About: React.FunctionComponent<AboutProps> = ({
   const context = useContext(ContextAppLoaded);
   const { zingolibVersion, translate, language, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.About;
@@ -38,8 +36,6 @@ const About: React.FunctionComponent<AboutProps> = ({
   if (typeof arrayTxtObject === 'object') {
     arrayTxt = arrayTxtObject as string[];
   }
-
-  console.log('Render About', top, bottom, right, left);
 
   return (
     <ToastProvider>
@@ -51,14 +47,8 @@ const About: React.FunctionComponent<AboutProps> = ({
 
       <View
         style={{
-          marginTop: Platform.OS === GlobalConst.platformOSandroid ? top : undefined,
-          marginBottom: Platform.OS === GlobalConst.platformOSandroid ? bottom : undefined,
-          marginRight: Platform.OS === GlobalConst.platformOSandroid ? right : undefined,
-          marginLeft: Platform.OS === GlobalConst.platformOSandroid ? left : undefined,
           flex: 1,
           backgroundColor: colors.background,
-          borderWidth: 1,
-          borderColor: 'red',
         }}>
         <Header
           title={translate('zingo') + ' ' + translate('version')}

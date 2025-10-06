@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext } from 'react';
 import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -58,7 +57,6 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
   const { colors } = useTheme()  as ThemeType;
   // when this screen is open from LoadingApp (new wallet)
   // is using the standard modal from react-native
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Seed;
@@ -120,10 +118,6 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
 
       <View
         style={{
-          marginTop: top,
-          marginBottom: bottom,
-          marginRight: right,
-          marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
         }}>

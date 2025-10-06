@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, Linking, Text, Alert } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import moment from 'moment';
@@ -77,7 +76,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     setPrivacyOption,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.ValueTransferDetail;
@@ -268,10 +266,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
 
       <View
         style={{
-          marginTop: top,
-          marginBottom: bottom,
-          marginRight: right,
-          marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
         }}>

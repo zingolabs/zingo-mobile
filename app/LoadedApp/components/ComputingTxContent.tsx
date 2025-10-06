@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 
 import RegText from '../../../components/Components/RegText';
@@ -22,17 +21,12 @@ const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({}
   const context = useContext(ContextAppLoaded);
   const { translate, language } = context;
   const { colors } = useTheme() as ThemeType;
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const screenName = ScreenEnum.ComputingTxContext;
 
   return (
     <View
       style={{
-        marginTop: top,
-        marginBottom: bottom,
-        marginRight: right,
-        marginLeft: left,
         flex: 1,
         backgroundColor: colors.background,
       }}>

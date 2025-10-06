@@ -12,7 +12,6 @@ import {
   TextInputEndEditingEventData,
   NativeSyntheticEvent,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import Button from '../Components/Button';
@@ -43,7 +42,6 @@ const Memo: React.FunctionComponent<MemoProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, language, defaultUnifiedAddress, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme() as ThemeType;
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Memo;
@@ -89,10 +87,6 @@ const Memo: React.FunctionComponent<MemoProps> = ({
         behavior={Platform.OS === GlobalConst.platformOSios ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === GlobalConst.platformOSios ? 10 : 0}
         style={{
-          marginTop: top,
-          marginBottom: bottom,
-          marginRight: right,
-          marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
         }}>
