@@ -17,10 +17,6 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
       {
         "backgroundColor": "#011401",
         "flex": 1,
-        "marginBottom": 0,
-        "marginLeft": 0,
-        "marginRight": 0,
-        "marginTop": 0,
       }
     }
   >
@@ -750,10 +746,6 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
       {
         "backgroundColor": "#011401",
         "flex": 1,
-        "marginBottom": 0,
-        "marginLeft": 0,
-        "marginRight": 0,
-        "marginTop": 0,
       }
     }
   >
@@ -1483,10 +1475,6 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
       {
         "backgroundColor": "#011401",
         "flex": 1,
-        "marginBottom": 0,
-        "marginLeft": 0,
-        "marginRight": 0,
-        "marginTop": 0,
       }
     }
   >
@@ -2216,10 +2204,6 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
       {
         "backgroundColor": "#011401",
         "flex": 1,
-        "marginBottom": 0,
-        "marginLeft": 0,
-        "marginRight": 0,
-        "marginTop": 0,
       }
     }
   >

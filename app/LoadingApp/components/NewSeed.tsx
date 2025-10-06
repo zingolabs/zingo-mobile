@@ -25,6 +25,7 @@ import 'moment/locale/ru';
 import 'moment/locale/tr';
 import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type TextsType = {
   new: string[];
@@ -55,8 +56,7 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
     setPrivacyOption,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  // when this screen is open from LoadingApp (new wallet)
-  // is using the standard modal from react-native
+  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Seed;
@@ -118,6 +118,10 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
 
       <View
         style={{
+          marginTop: top,
+          marginBottom: bottom,
+          marginRight: right,
+          marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
         }}>
