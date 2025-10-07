@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.9 (277)",
+  "version": "zingo-2.0.9 (278)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -146,7 +146,7 @@
     "restorebackupwallet": "Restaurar Último Backup da Carteira",
     "fundpools": "Fundos na Pool",
     "insight": "Visão Financeira",
-    "loadwalletfromseed-basic": "Restaurar Carteira",
+    "loadwalletfromseed-basic": "Restaurar outra Carteira",
     "addressbook": "Agenda de Endereços",
     "tipzingolabs-basic": "Apoiar a ZingoLabs",
     "votefornym": "Vote em Nym",

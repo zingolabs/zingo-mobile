@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, ScrollView, TouchableOpacity, Text, Alert } from 'react-native';
 
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import RegText from '../Components/RegText';
@@ -48,13 +48,13 @@ type SeedProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
   setIsSeedViewModalOpen?: (v: boolean) => void;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({
-  navigation,
   route,
   onClickOK,
   onClickCancel,
   keepAwake,
   setIsSeedViewModalOpen,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
     wallet,
@@ -188,11 +188,16 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     // the user just see the seed for the first time.
     if (mode === ModeEnum.basic && !basicFirstViewSeed) {
       await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
+      setBasicFirstViewSeed(true);
       keepAwake && keepAwake(false);
-    }
-    clear();
-    if (navigation.canGoBack()) {
-      navigation.goBack();
+      // redirect to history screen
+      navigation.navigate(RouteEnum.HomeStack, {
+        screen: RouteEnum.History,
+      });
+    } else {
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      }
     }
   };
 
