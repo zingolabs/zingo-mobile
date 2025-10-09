@@ -847,7 +847,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                     }}
                     editable={!disableSend && spendable > 0}
                     onContentSizeChange={(e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
-                      console.log(e.nativeEvent.contentSize.height);
+                      //console.log(e.nativeEvent.contentSize.height);
                       if (e.nativeEvent.contentSize.height < 48) {
                         setMemoFieldHeight(48 + 30);
                       } else if (e.nativeEvent.contentSize.height < 90) {

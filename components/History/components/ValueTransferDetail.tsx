@@ -206,7 +206,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       actionStr = await RPCModule.removeTransactionProcess(valueTransfer.txid);
     }
 
-    console.log(actionStr);
+    //console.log(actionStr);
 
     if (actionStr) {
       if (actionStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -249,7 +249,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     );
   };
 
-  console.log('render History Detail', valueTransferIndex, valueTransfer);
+  //console.log('render History Detail', valueTransferIndex, valueTransfer);
 
   //if (valueTransfer.status === RPCValueTransfersStatusEnum.calculated || valueTransfer.status === RPCValueTransfersStatusEnum.transmitted) {
   //  console.log('server', info.latestBlock, 'VT', valueTransfer.blockheight, 'expire', GlobalConst.expireBlocks);

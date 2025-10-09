@@ -47,7 +47,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   const verifyAddress = async () => {
     try {
       const verifyAddressStr = await RPCModule.checkMyAddressInfo(address);
-      console.log(verifyAddressStr);
+      //console.log(verifyAddressStr);
       if (verifyAddressStr) {
         if (verifyAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error new address ${verifyAddressStr}`);
@@ -105,7 +105,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
     <View
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
-        console.log('LAYOUTTT', height);
+        //console.log('LAYOUTTT', height);
         setHeightLayout(height + 70);
       }}
       style={{

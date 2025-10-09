@@ -30,7 +30,7 @@ const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
     <View 
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
-        console.log('LAYOUTTT', height);
+        //console.log('LAYOUTTT', height);
         setHeightLayout(height + 70);
       }}
       style={{ 

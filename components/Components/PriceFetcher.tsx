@@ -60,7 +60,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
     let error: string;
     // first attempt
     ({price, error} = await RPC.rpcGetZecPrice(withTor));
-    console.log('first price fetching', price, error);
+    //console.log('first price fetching', price, error);
     // values:
     // 0   - initial/default value
     // -1  - error in Gemini/zingolib.
@@ -69,7 +69,7 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
     if (price <= 0) {
       // second attempt
       ({price, error} = await RPC.rpcGetZecPrice(withTor));
-      console.log('second price fetching', price, error);
+      //console.log('second price fetching', price, error);
     }
 
     if (price === -1) {

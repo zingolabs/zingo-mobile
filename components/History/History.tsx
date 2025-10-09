@@ -45,6 +45,7 @@ import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/Re
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { Swipeable } from 'react-native-gesture-handler';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -114,6 +115,21 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const scrollViewRef = useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(null);
+
+  const swipeablesRef = new Map<number, Swipeable>();
+
+  const registerSwipeable = (key: number) => (ref: Swipeable) => {
+    swipeablesRef.set(key, ref);
+  };
+
+  const closeAllSwipeables = (exceptKey?: number) => {
+    swipeablesRef.forEach((ref, k) => {
+      if (k !== exceptKey) {
+        // soporta ambas APIs según versión
+        ref.close();
+      }
+    });
+  };
 
   const layoutProvider = useMemo(
     () =>
@@ -319,6 +335,9 @@ const History: React.FunctionComponent<HistoryProps> = ({
         }
         addressProtected={data.address === zenniesDonationAddress}
         screenName={screenName}
+        registerSwipeable={registerSwipeable(index)}
+        closeAllSwipeables={() => closeAllSwipeables()}
+        closeOtherSwipeables={() => closeAllSwipeables(index)}
       />
     );
   };

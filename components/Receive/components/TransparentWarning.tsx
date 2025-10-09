@@ -25,7 +25,7 @@ const TransparentWarning = ({ onSuccess, closeSheet, setHeightLayout }: Transpar
     <View 
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
-        console.log('LAYOUTTT', height);
+        //console.log('LAYOUTTT', height);
         setHeightLayout(height + 70);
       }}
       style={{ 

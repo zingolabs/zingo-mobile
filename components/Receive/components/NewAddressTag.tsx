@@ -47,10 +47,10 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
       if (!label) {
         return;
       }
-      console.log(label, address);
+      //console.log(label, address);
       const randomColors = Utils.generateColorList(1);
       const ab = await AddressBookFileImpl.writeAddressBookItem(label, address, randomColors[0], true);
-      console.log(ab);
+      //console.log(ab);
       setAddressBook(ab);
     } catch (error) {
       console.log(`Critical Error new address ${error}`);
@@ -68,7 +68,7 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({
     <View 
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
-        console.log('LAYOUTTT', height);
+        //console.log('LAYOUTTT', height);
         setHeightLayout(height + 70);
       }}
       style={{ 

@@ -97,10 +97,10 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
           const newTransparentAddressJSON: RPCTransparentAddressType = await JSON.parse(newAddressStr);
           newAddress = newTransparentAddressJSON.encoded_address;
         }
-        console.log(label, newAddress);
+        //console.log(label, newAddress);
         const randomColors = Utils.generateColorList(1);
         const ab = await AddressBookFileImpl.writeAddressBookItem(label, newAddress, randomColors[0], true);
-        console.log(ab);
+        //console.log(ab);
         setAddressBook(ab);
       }
 
@@ -122,7 +122,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
     <View
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
-        console.log('LAYOUTTT', height);
+        //console.log('LAYOUTTT', height);
         setHeightLayout(height + 80);
       }}
       style={{ 

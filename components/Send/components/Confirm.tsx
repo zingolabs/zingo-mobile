@@ -135,8 +135,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       ),
     );
 
-    console.log('total', totalAmount);
-    console.log('header spendable', totalBalance?.totalSpendableBalance);
+    //console.log('total', totalAmount);
+    //console.log('header spendable', totalBalance?.totalSpendableBalance);
 
     // amount + fee
     if (totalAmount <= (totalBalance ? totalBalance.confirmedOrchardBalance : 0)) {
@@ -147,7 +147,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       from = PrivacyLevelFromEnum.saplingPrivacyLevel;
     }
 
-    console.log(from);
+    //console.log(from);
 
     if (from === PrivacyLevelFromEnum.nonePrivacyLevel) {
       return '-';
