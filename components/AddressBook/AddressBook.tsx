@@ -529,7 +529,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
             />
           </Pressable>
         )}
-        {currentItem === null && (
+        {currentItem === null && !loading && (
           <View
             style={{
               flexGrow: 1,

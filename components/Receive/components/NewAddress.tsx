@@ -123,7 +123,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
       onLayout={e => {
         const { height } = e.nativeEvent.layout;
         console.log('LAYOUTTT', height);
-        setHeightLayout(height + 70);
+        setHeightLayout(height + 80);
       }}
       style={{ 
         backgroundColor: colors.background 
