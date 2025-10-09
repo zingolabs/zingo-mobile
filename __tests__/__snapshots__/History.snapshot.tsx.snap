@@ -1212,7 +1212,7 @@ exports[`Component History - test History no currency, privacy normal & mode bas
                   }
                   testID="undefined.big-part"
                 >
-                   0.6234
+                   1.1234
                 </Text>
                 <Text
                   style={

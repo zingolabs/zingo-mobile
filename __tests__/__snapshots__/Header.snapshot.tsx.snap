@@ -261,7 +261,7 @@ exports[`Component Header - test Header Complex - snapshot 1`] = `
                 }
                 testID="undefined.big-part"
               >
-                 0.6234
+                 1.1234
               </Text>
               <Text
                 style={
