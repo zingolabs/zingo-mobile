@@ -2100,7 +2100,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Drawer.Screen name={RouteEnum.InsightStack}>
                 {() => {
                   return (
-                    <Stack.Navigator initialRouteName={RouteEnum.Insight} screenOptions={{ headerShown: false }}>
+                    <Stack.Navigator initialRouteName={RouteEnum.Insight} screenOptions={{ headerShown: false, animation: 'none' }}>
                       <Stack.Screen name={RouteEnum.Insight} component={Insight} />
                       <Stack.Screen name={RouteEnum.AddressBook} >
                         {props => (
@@ -2195,7 +2195,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Drawer.Screen name={RouteEnum.AddressBookStack}>
                 {() => {
                   return (
-                    <Stack.Navigator initialRouteName={RouteEnum.AddressBook} screenOptions={{ headerShown: false }}>
+                    <Stack.Navigator initialRouteName={RouteEnum.AddressBook} screenOptions={{ headerShown: false, animation: 'none' }}>
                       <Stack.Screen name={RouteEnum.AddressBook} >
                         {props => (
                             <AddressBook {...props} setAddressBook={this.setAddressBook} />
@@ -2209,7 +2209,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Drawer.Screen name={RouteEnum.ValueTransferDetailStack}>
                 {() => {
                   return (
-                    <Stack.Navigator initialRouteName={RouteEnum.ValueTransferDetail} screenOptions={{ headerShown: false }}>
+                    <Stack.Navigator initialRouteName={RouteEnum.ValueTransferDetail} screenOptions={{ headerShown: false, animation: 'none' }}>
                       <Stack.Screen name={RouteEnum.ValueTransferDetail} component={ValueTransferDetail} />
                       <Stack.Screen name={RouteEnum.AddressBook} >
                         {props => (
@@ -2229,7 +2229,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Drawer.Screen name={RouteEnum.ConfirmStack}>
                 {() => {
                   return (
-                    <Stack.Navigator initialRouteName={RouteEnum.Confirm} screenOptions={{ headerShown: false }}>
+                    <Stack.Navigator initialRouteName={RouteEnum.Confirm} screenOptions={{ headerShown: false, animation: 'none' }}>
                       <Stack.Screen name={RouteEnum.Confirm} component={Confirm} />
                       <Stack.Screen name={RouteEnum.AddressBook} >
                         {props => (

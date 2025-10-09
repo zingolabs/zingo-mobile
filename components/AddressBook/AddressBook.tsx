@@ -470,7 +470,7 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
                 })}
             </>
           )}
-          {loadMoreButton ? (
+          {loadMoreButton && !currentAddress ? (
             <View
               style={{
                 height: 150,

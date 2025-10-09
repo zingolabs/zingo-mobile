@@ -8,19 +8,29 @@ import { ContextAppLoaded } from '../../../app/context';
 import { TriangleAlert } from '../../Components/Icons/TriangleAlert';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import RegText from '../../Components/RegText';
 
 
 type TransparentWarningProps = {
   onSuccess: () => void;
   closeSheet: () => void;
+  setHeightLayout: (h: number) => void;
 };
 
-const TransparentWarning = ({ onSuccess, closeSheet }: TransparentWarningProps) => {
+const TransparentWarning = ({ onSuccess, closeSheet, setHeightLayout }: TransparentWarningProps) => {
   const { colors } = useTheme() as ThemeType;
   const { translate } = useContext(ContextAppLoaded);
 
   return (
-    <View style={{ backgroundColor: colors.background  }}>
+    <View 
+      onLayout={e => {
+        const { height } = e.nativeEvent.layout;
+        console.log('LAYOUTTT', height);
+        setHeightLayout(height + 70);
+      }}
+      style={{ 
+        backgroundColor: colors.background,
+      }}>
       <TouchableOpacity
         onPress={() => {
           closeSheet();
@@ -32,19 +42,18 @@ const TransparentWarning = ({ onSuccess, closeSheet }: TransparentWarningProps) 
             style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
         />
       </TouchableOpacity>
+      <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>
+        {translate('receive.modal-transparent.title') as string}
+      </RegText>
       <View
         style={{
           width: '90%',
           padding: 16,
           borderRadius: 8,
-          backgroundColor: colors.modal,
+          backgroundColor: colors.background,
           alignSelf: 'center',
-          marginTop: 15,
         }}>
         <View>
-          <Text style={{ color: colors.money, fontSize: 25, fontWeight: 'bold', marginBottom: 12 }}>
-            {translate('receive.modal-transparent.title') as string}
-          </Text>
           <Text style={{ color: colors.money, fontSize: 16, marginBottom: 12 }}>
             {translate('receive.modal-transparent.message') as string}
           </Text>

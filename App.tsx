@@ -150,10 +150,10 @@ const App: React.FunctionComponent = () => {
           <Stack.Navigator
             initialRouteName={RouteEnum.LoadingApp}
             screenOptions={{ headerShown: false, animation: 'none' }}>
-            <Stack.Screen name={RouteEnum.LoadingApp} options={{ animation: 'none' }}>
+            <Stack.Screen name={RouteEnum.LoadingApp}>
               {props => <LoadingApp {...props} toggleTheme={toggleTheme} />}
             </Stack.Screen>
-            <Stack.Screen name={RouteEnum.LoadedApp} options={{ animation: 'none' }}>
+            <Stack.Screen name={RouteEnum.LoadedApp}>
               {props => <LoadedApp {...props} toggleTheme={toggleTheme} />}
             </Stack.Screen>
           </Stack.Navigator>

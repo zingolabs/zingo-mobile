@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.9 (278)",
+  "version": "zingo-2.0.9 (279)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
@@ -515,7 +515,7 @@
     "confirm-title": "Confirmar Transação",
     "sending-title": "Processando",
     "confirm-amount": "Quantia",
-    "fee": "Taxa transação",
+    "fee": "Taxa",
     "confirm-button-all": "Confirmar Enviar Tudo",
     "amount": "Quantia",
     "to": "Para",

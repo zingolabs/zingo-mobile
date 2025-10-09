@@ -748,9 +748,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 color={colors.text}
                 size={36}
                 amtZec={totalBalance
-                  ? totalBalance.confirmedOrchardBalance +
-                    totalBalance.confirmedSaplingBalance +
-                    totalBalance.confirmedTransparentBalance
+                  ? totalBalance.totalOrchardBalance +
+                    totalBalance.totalSaplingBalance +
+                    totalBalance.totalTransparentBalance
                   : 0}
                 privacy={privacy}
                 smallPrefix={true}
@@ -813,9 +813,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   style={{ marginTop: 0, marginBottom: 0 }}
                   price={zecPrice.zecPrice}
                   amtZec={totalBalance
-                    ? totalBalance.confirmedOrchardBalance +
-                      totalBalance.confirmedSaplingBalance +
-                      totalBalance.confirmedTransparentBalance
+                    ? totalBalance.totalOrchardBalance +
+                      totalBalance.totalSaplingBalance +
+                      totalBalance.totalTransparentBalance
                     : 0}
                   currency={currency}
                   privacy={privacy}

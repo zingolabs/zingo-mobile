@@ -37,8 +37,15 @@ type NewAddressProps = {
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
   screenName: ScreenEnum;
+  setHeightLayout: (h: number) => void;
 };
-const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, closeSheet, setAddressBook, screenName }) => {
+const NewAddress: React.FunctionComponent<NewAddressProps> = ({ 
+  addressKind, 
+  closeSheet, 
+  setAddressBook, 
+  screenName,
+  setHeightLayout,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, addLastSnackbar } = context;
   const { colors } = useTheme() as ThemeType;
@@ -112,7 +119,15 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({ addressKind, clo
   };
 
   return (
-    <View style={{ backgroundColor: colors.background }}>
+    <View
+      onLayout={e => {
+        const { height } = e.nativeEvent.layout;
+        console.log('LAYOUTTT', height);
+        setHeightLayout(height + 70);
+      }}
+      style={{ 
+        backgroundColor: colors.background 
+      }}>
       <TouchableOpacity
         onPress={() => {
           setLabel('');

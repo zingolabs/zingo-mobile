@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.9 (278)",
+  "version": "zingo-2.0.9 (279)",
   "loading": "Yükleniyor...",
   "connectingserver": "Sunucuya bağlanılıyor...",
   "wait": "Lütfen bekleyin...",
@@ -515,7 +515,7 @@
     "confirm-title": "İşlemi onayla",
     "sending-title": "İşleniyor",
     "confirm-amount": "Miktar",
-    "fee": "İşlem ücreti",
+    "fee": "Ücret",
     "confirm-button-all": "Tümünü Göndermeyi Onayla",
     "amount": "Tutar",
     "to": "Kime",

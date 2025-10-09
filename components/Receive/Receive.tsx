@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, ReactNode, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Keyboard, View } from 'react-native';
+import { Dimensions, Keyboard, View } from 'react-native';
 import { TabView, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
 import { useTheme } from '@react-navigation/native';
 
@@ -81,93 +81,33 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [indexBottomSheet, setIndexBottomSheet] = useState<number>(-1);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
+  const [heightLayout, setHeightLayout] = useState<number>(10);
 
-  const NASnapPoints = useMemo(() =>
-    [
-      index === 0 ? '55%' : '40%',
-      '65%',
-      index === 0 ? '95%' : '80%',
-    ], [index]);
+  const snapPoints = useMemo(() => {
+    const snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
+    let snap2: number = 80;
+    if (snap1 < 80) {
+      snap2 = snap1 + 20;
+    }
+    return [
+      `${snap1}%`,
+      `${snap2}%`,
+    ]
+  }, [heightLayout]);
 
-  const VASnapPoints = useMemo(() =>
-    [
-      '40%',
-      '65%',
-    ], []);
-
-  const TWSnapPoints = useMemo(() =>
-    [
-      '40%',
-    ], []);
-
-  const NAShow = useCallback(() => {
-    setSheetType('NA');
+  const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {
+    setSheetType(_sheetType);
     bottomSheetRef.current?.snapToIndex(0);
     setIndexBottomSheet(0);
   }, []);
 
-  const NAHide = useCallback(() => {
+  const hide = useCallback(() => {
     setSheetType(null);
     Keyboard.dismiss();
     bottomSheetRef.current?.snapToIndex(-1);
     bottomSheetRef.current?.close();
     setIndexBottomSheet(-1);
-  }, []);
-
-  const NATShow = useCallback(() => {
-    setSheetType('NAT');
-    bottomSheetRef.current?.snapToIndex(0);
-    setIndexBottomSheet(0);
-  }, []);
-
-  const NATHide = useCallback(() => {
-    setSheetType(null);
-    Keyboard.dismiss();
-    bottomSheetRef.current?.snapToIndex(-1);
-    bottomSheetRef.current?.close();
-    setIndexBottomSheet(-1);
-  }, []);
-
-  const VAShow = useCallback(() => {
-    setSheetType('VA');
-    bottomSheetRef.current?.snapToIndex(0);
-    setIndexBottomSheet(0);
-  }, []);
-
-  const VAHide = useCallback(() => {
-    setSheetType(null);
-    Keyboard.dismiss();
-    bottomSheetRef.current?.snapToIndex(-1);
-    bottomSheetRef.current?.close();
-    setIndexBottomSheet(-1);
-  }, []);
-
-  const TWShow = useCallback(() => {
-    setSheetType('TW');
-    bottomSheetRef.current?.snapToIndex(0);
-    setIndexBottomSheet(0);
-  }, []);
-
-  const TWHide = useCallback(() => {
-    setSheetType(null);
-    Keyboard.dismiss();
-    bottomSheetRef.current?.snapToIndex(-1);
-    bottomSheetRef.current?.close();
-    setIndexBottomSheet(-1);
-  }, []);
-
-  const EAShow = useCallback(() => {
-    setSheetType('EA');
-    bottomSheetRef.current?.snapToIndex(0);
-    setIndexBottomSheet(0);
-  }, []);
-
-  const EAHide = useCallback(() => {
-    setSheetType(null);
-    Keyboard.dismiss();
-    bottomSheetRef.current?.snapToIndex(-1);
-    bottomSheetRef.current?.close();
-    setIndexBottomSheet(-1);
+    setHeightLayout(10);
   }, []);
 
   const handleSheetChanges = useCallback((ind: number) => {
@@ -255,11 +195,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   index={uAddrIndex ? uAddrIndex : 0}
                   setIndex={setUAddrIndex}
                   total={uAddr.length}
-                  NAShow={NAShow}
-                  NATShow={NATShow}
-                  VAShow={VAShow}
-                  TWShow={TWShow}
-                  EAShow={EAShow}
+                  show={show}
                   changeIndex={setIndex}
                   hasTransparent={tAddr && tAddr.length > 0}
                   showMoreOptions={showMoreOptions}
@@ -292,10 +228,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   index={tAddrIndex ? tAddrIndex : 0}
                   setIndex={setTAddrIndex}
                   total={tAddr.length}
-                  NAShow={NAShow}
-                  NATShow={NATShow}
-                  VAShow={VAShow}
-                  EAShow={EAShow}
+                  show={show}
                   changeIndex={setIndex}
                 />
               </>
@@ -373,20 +306,22 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
-        snapPoints={sheetType === 'TW' ? TWSnapPoints : sheetType === 'NA' ? NASnapPoints : VASnapPoints}
+        snapPoints={snapPoints}
         enableDynamicSizing={false}
         onChange={handleSheetChanges}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
         handleStyle={{ display: 'none' }}
+        backgroundStyle={{ backgroundColor: colors.background }}
         backdropComponent={renderBackdrop}>
         <BottomSheetView style={{ backgroundColor: colors.background, height: '100%' }}>
           {sheetType === 'NA' && (
             <NewAddress
               addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
-              closeSheet={NAHide}
+              closeSheet={hide}
               setAddressBook={setAddressBook}
               screenName={screenName}
+              setHeightLayout={setHeightLayout}
             />
           )}
           {sheetType === 'NAT' && (
@@ -396,38 +331,44 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 : index === 1 && tAddrIndex !== null
                 ? tAddr[tAddrIndex].address
                 : ''}
-              closeSheet={NATHide}
+              closeSheet={hide}
               setAddressBook={setAddressBook}
+              setHeightLayout={setHeightLayout}
             />
           )}
           {sheetType === 'VA' && (
             <VerifyAddress
-              closeSheet={VAHide}
+              closeSheet={hide}
               screenName={screenName}
+              setHeightLayout={setHeightLayout}
             />
           )}
           {sheetType === 'TW' && (
             <TransparentWarning
-              closeSheet={TWHide}
+              closeSheet={hide}
               onSuccess={
                 () => {
                   setShowMoreOptions(false);
                   setIndex(1);
                 }
               }
+              setHeightLayout={setHeightLayout}
             />
           )}
           {sheetType === 'EA' && (
             <ExpandedAddress
                 onCopy={doCopy}
-                closeSheet={EAHide}
+                closeSheet={hide}
                 title={translate('receive.title-address') as string}
                 button={translate('receive.copy-address-button') as string}
-                address={index === 0 && uAddrIndex !== null
-                  ? uAddr[uAddrIndex].address
-                  : index === 1 && tAddrIndex !== null
-                  ? tAddr[tAddrIndex].address
-                  : ''}
+                address={
+                  index === 0 && uAddrIndex !== null
+                    ? uAddr[uAddrIndex].address
+                    : index === 1 && tAddrIndex !== null
+                      ? tAddr[tAddrIndex].address
+                      : ''
+                }
+                setHeightLayout={setHeightLayout}
               />
           )}
         </BottomSheetView>

@@ -2,9 +2,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../../app/types/ThemeType';
+import { ThemeType } from '../../../app/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import RegText from '../../Components/RegText';
 
 type ExpandedAddressProps = {
   address: string;
@@ -12,6 +13,7 @@ type ExpandedAddressProps = {
   onCopy?: () => void;
   title?: string;
   button?: string;
+  setHeightLayout: (h: number) => void;
 };
 
 const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
@@ -20,11 +22,20 @@ const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
   onCopy,
   title,
   button,
+  setHeightLayout,
 }) => {
-  const { colors } = useTheme() as unknown as ThemeType;
+  const { colors } = useTheme() as ThemeType;
 
   return (
-    <View style={{ backgroundColor: colors.background  }}>
+    <View 
+      onLayout={e => {
+        const { height } = e.nativeEvent.layout;
+        console.log('LAYOUTTT', height);
+        setHeightLayout(height + 70);
+      }}
+      style={{ 
+        backgroundColor: colors.background  
+      }}>
       <TouchableOpacity
         onPress={() => {
           closeSheet();
@@ -36,28 +47,20 @@ const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
             style={{ marginTop: 10, marginRight: 20, alignSelf: 'flex-end' }}
         />
       </TouchableOpacity>
+      <RegText style={{ marginTop: 0, paddingHorizontal: 10, alignSelf: 'center' }}>
+        {title ? title : ''}
+      </RegText>
       <View
         style={{
           width: '90%',
           padding: 16,
           borderRadius: 8,
-          backgroundColor: '#1e293b',
+          backgroundColor: colors.background,
           alignSelf: 'center',
-          marginTop: 15,
         }}>
-        <View
-          style={{
-            height: 2,
-            width: '100%',
-            marginBottom: 6,
-          }}
-        />
 
         <View style={{ alignItems: 'flex-start' }}>
-          <Text style={{ color: 'white', fontSize: 22, fontWeight: 'bold', marginBottom: 12 }}>
-            {title}
-          </Text>
-          <Text style={{ color: '#cbd5e1', fontSize: 16, marginBottom: 12 }}>{address}</Text>
+          <Text style={{ color: '#cbd5e1', fontSize: 16, marginBottom: 20 }}>{address}</Text>
           <TouchableOpacity
             onPress={() => {
               onCopy && onCopy();
@@ -70,6 +73,7 @@ const ExpandedAddress: React.FunctionComponent<ExpandedAddressProps> = ({
               paddingVertical: 4,
               borderRadius: 5,
               borderWidth: 1,
+              alignSelf: 'center',
             }}>
             <Text style={{ color: '#ccc', fontSize: 16 }}>{button}</Text>
           </TouchableOpacity>

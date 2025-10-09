@@ -43,11 +43,7 @@ type SingleAddressProps = {
   index: number;
   setIndex: (i: number) => void;
   total: number;
-  NAShow?: () => void;
-  NATShow?: () => void;
-  VAShow?: () => void;
-  TWShow?: () => void;
-  EAShow?: () => void;
+  show: (s: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => void;
   changeIndex?: (index: number) => void;
   hasTransparent?: boolean;
   showMoreOptions?: boolean;
@@ -58,11 +54,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
   address,
   ufvk,
   screenName,
-  NAShow,
-  NATShow,
-  VAShow,
-  TWShow,
-  EAShow,
+  show,
   total,
   index,
   setIndex,
@@ -395,9 +387,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 {address && !isBasic && (
                   <>
                     <TouchableOpacity
-                      onPress={() => {
-                        VAShow && VAShow();
-                      }}>
+                      onPress={() => show('VA')}>
                       <View
                         style={{
                           borderRadius: 30,
@@ -436,7 +426,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
               <Address
                   address={ufvk}
                   style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
-                  onPress={EAShow}
+                  onPress={() => show('EA')}
                 />
             )}
             {address && (
@@ -457,9 +447,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                     {contactFromAddress()}
                   </Text>
                 ) : (
-                  <TouchableOpacity onPress={() => {
-                      NATShow && NATShow();
-                    }}>
+                  <TouchableOpacity onPress={() => show('NAT')}>
                     <Text
                       style={{
                         color: colors.zingo,
@@ -473,7 +461,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 <Address
                   address={address.address}
                   style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
-                  onPress={EAShow}
+                  onPress={() => show('EA')}
                 />
               </View>
             )}
@@ -489,17 +477,13 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                 <>
                   {isUnified ? (
                     <Button
-                      onPress={() => {
-                        NAShow && NAShow();
-                      }}
+                      onPress={() => show('NA')}
                       title={translate('receive.newu-option') as string}
                       type={ButtonTypeEnum.Primary}
                     />
                   ) : (
                     <Button
-                      onPress={() => {
-                        NAShow && NAShow();
-                      }}
+                      onPress={() => show('NA')}
                       title={translate('receive.transparent.newt-option') as string}
                       type={ButtonTypeEnum.Tertiary}
                     />
@@ -567,7 +551,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                               width: '80%',
                             }}
                             onPress={() => {
-                              TWShow && TWShow();
+                              show('TW');
                               setShowMoreOptions && setShowMoreOptions(false);
                               animatedHeight.value = 0;
                             }}>
