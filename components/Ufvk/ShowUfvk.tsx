@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { View, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { View, ScrollView, Alert, ActivityIndicator, Dimensions } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -63,20 +63,28 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   const [texts, setTexts] = useState<TextsType>({} as TextsType);
   const [sheetType, setSheetType] = useState<'EA' | null>(null);
   const [action, setAction] = useState<UfvkActionEnum>(!!route.params && route.params.action !== undefined ? route.params.action : UfvkActionEnum.view);
+  const [heightLayout, setHeightLayout] = useState<number>(10);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const EASnapPoints = useMemo(() =>
-    [
-      '40%',
-    ], []);
+  const snapPoints = useMemo(() => {
+    const snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
+    let snap2: number = 80;
+    if (snap1 < 80) {
+      snap2 = snap1 + 20;
+    }
+    return [
+      `${snap1}%`,
+      `${snap2}%`,
+    ]
+  }, [heightLayout]);
 
-  const EAShow = useCallback(() => {
-    setSheetType('EA');
+  const show = useCallback((_sheetType: 'EA') => {
+    setSheetType(_sheetType);
     bottomSheetRef.current?.snapToIndex(0);
   }, []);
-
-  const EAHide = useCallback(() => {
+  
+  const hide = useCallback(() => {
     setSheetType(null);
     bottomSheetRef.current?.snapToIndex(-1);
     bottomSheetRef.current?.close();
@@ -202,7 +210,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
                 index={0}
                 setIndex={() => {}}
                 total={1}
-                EAShow={EAShow}
+                show={() => show('EA')}
               />
             )}
             {!wallet.ufvk && <ActivityIndicator size="large" color={colors.primary} />}
@@ -246,7 +254,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
-        snapPoints={EASnapPoints}
+        snapPoints={snapPoints}
         enableDynamicSizing={false}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
@@ -255,12 +263,13 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
         <BottomSheetView style={{ backgroundColor: colors.background, height: '100%' }}>
           {sheetType === 'EA' && (
             <ExpandedAddress
-                onCopy={doCopy}
-                closeSheet={EAHide}
-                title={translate('receive.title-address') as string}
-                button={translate('receive.copy-address-button') as string}
-                address={wallet.ufvk ? wallet.ufvk : ''}
-              />
+              onCopy={doCopy}
+              closeSheet={hide}
+              title={translate('receive.title-address') as string}
+              button={translate('receive.copy-address-button') as string}
+              address={wallet.ufvk ? wallet.ufvk : ''}
+              setHeightLayout={setHeightLayout}
+            />
           )}
         </BottomSheetView>
       </BottomSheet>
