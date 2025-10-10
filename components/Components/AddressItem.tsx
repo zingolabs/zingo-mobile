@@ -11,11 +11,11 @@ import {
   ToAddrClass,
   ModeEnum,
   SnackbarDurationEnum,
-  RouteEnums,
+  RouteEnum,
   SelectServerEnum,
   ScreenEnum,
 } from '../../app/AppState';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { ThemeType } from '../../app/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserPlus, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
@@ -46,6 +46,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
   addressProtected,
   ufvk,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -53,14 +54,12 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     addressBook,
     launchAddressBook,
     privacy,
-    navigationHome,
     readOnly,
     mode,
     totalBalance,
     language,
     selectServer,
     setSendPageState,
-    closeAllModals,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -163,7 +162,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             )}
           </View>
           {withIcon && !contact && oneLine && (
-            <TouchableOpacity onPress={() => launchAddressBook(address)}>
+            <TouchableOpacity onPress={() => launchAddressBook(address, screenName)}>
               <View
                 style={{
                   flexDirection: 'row',
@@ -177,7 +176,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             </TouchableOpacity>
           )}
           {withIcon && !contact && !oneLine && (
-            <TouchableOpacity onPress={() => launchAddressBook(address)}>
+            <TouchableOpacity onPress={() => launchAddressBook(address, screenName)}>
               <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faUserPlus} color={colors.primary} />
             </TouchableOpacity>
           )}
@@ -199,10 +198,8 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
                   const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                   sendPageState.toaddr.to = address;
                   setSendPageState(sendPageState);
-                  closeAllModals();
-                  navigationHome?.navigate(RouteEnums.Home, {
-                    screen: translate('loadedapp.send-menu'),
-                    initial: false,
+                  navigation.navigate(RouteEnum.HomeStack, {
+                    screen: RouteEnum.Send,
                   });
                 }}>
                 <FontAwesomeIcon style={{ marginTop: 3 }} size={30} icon={faPaperPlane} color={colors.primary} />

@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   Pressable,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import moment from 'moment';
 import 'moment/locale/es';
@@ -16,8 +15,8 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
-import { AddressKindEnum, ButtonTypeEnum, ScreenEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
-import { ThemeType } from '../../app/types';
+import { AddressKindEnum, ButtonTypeEnum, RouteEnum, ScreenEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
 import AlSummaryLine from './components/AlSummaryLine';
@@ -25,20 +24,18 @@ import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
-import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type AddressListProps = {
-  addressKind: AddressKindEnum;
-  setIndex: (i: number) => void;
-};
+type AddressListProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.AddressList>;
 
 const AddressList: React.FunctionComponent<AddressListProps> = ({
-  addressKind,
-  setIndex,
+  navigation,
+  route,
 }) => {
+  const setIndex = !!route.params && route.params.setIndex !== undefined ? route.params.setIndex : () => {};
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -48,8 +45,6 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
     removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.AddressList;
@@ -63,10 +58,21 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const [addressKind, setAddressKind] = useState<AddressKindEnum>(!!route.params && route.params.addressKind !== undefined ? route.params.addressKind : AddressKindEnum.u);
+
   const scrollViewRef = useRef<ScrollView>(null);
 
   useScrollToTop(scrollViewRef as unknown as React.RefObject<ScrollView>);
 
+  useEffect(() => {
+    const _addressKind = !!route.params && route.params.addressKind !== undefined ? route.params.addressKind : AddressKindEnum.u;
+    setAddressKind(_addressKind);
+  }, [
+    route, 
+    route.params, 
+    route.params?.addressKind
+  ]);
+  
   const fetchAddressBookFiltered = useMemo(async () => {
     if (!addresses) {
       return [];
@@ -146,10 +152,6 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
 
       <View
         style={{
-          marginTop: top,
-          marginBottom: bottom,
-          marginRight: right,
-          marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
         }}>
@@ -165,7 +167,9 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
           noUfvkIcon={true}
           closeScreen={() => {
             clear();
-            hide();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
           }}
         />
         <ScrollView
@@ -206,7 +210,9 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                       item={alItem}
                       closeScreen={() => {
                         clear();
-                        hide();
+                        if (navigation.canGoBack()) {
+                          navigation.goBack();
+                        }
                       }}
                       screenName={screenName}
                     />

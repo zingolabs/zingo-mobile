@@ -27,8 +27,13 @@ import { VerifyXIcon } from '../../Components/Icons/VerifyXIcon';
 type VerifyAddressProps = {
   closeSheet: () => void;
   screenName: ScreenEnum;
+  setHeightLayout: (h: number) => void;
 };
-const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet, screenName }) => {
+const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ 
+  closeSheet, 
+  screenName,
+  setHeightLayout,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language, addLastSnackbar, server } = context;
   const { colors } = useTheme() as ThemeType;
@@ -42,7 +47,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet
   const verifyAddress = async () => {
     try {
       const verifyAddressStr = await RPCModule.checkMyAddressInfo(address);
-      console.log(verifyAddressStr);
+      //console.log(verifyAddressStr);
       if (verifyAddressStr) {
         if (verifyAddressStr.toLowerCase().startsWith(GlobalConst.error)) {
           console.log(`Error new address ${verifyAddressStr}`);
@@ -98,6 +103,11 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet
 
   return (
     <View
+      onLayout={e => {
+        const { height } = e.nativeEvent.layout;
+        //console.log('LAYOUTTT', height);
+        setHeightLayout(height + 70);
+      }}
       style={{
         backgroundColor: colors.background,
       }}>
@@ -126,6 +136,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({ closeSheet
         setError={setErrorAddress}
         disabled={false}
         showLabel={false}
+        screenName={screenName}
       />
       {!!errorAddress && (
         <View

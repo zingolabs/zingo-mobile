@@ -2,8 +2,10 @@ import ServerType from './types/ServerType';
 
 import { AppStateStatus } from 'react-native';
 import { SelectServerEnum } from './enums/SelectServerEnum';
+import { DrawerContentComponentProps } from '@react-navigation/drawer';
 
 export default interface AppStateLoaded {
+  navigationHome: DrawerContentComponentProps['navigation'] | null;
   appStateStatus: AppStateStatus;
 
   // change server helper
@@ -19,5 +21,5 @@ export default interface AppStateLoaded {
   // to know if the modal is open or not
   isSeedViewModalOpen: boolean;
 
-  // eslint-disable-next-line semi
+   
 }

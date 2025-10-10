@@ -77,14 +77,16 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
 
         if (exists) {
             uniffi.zingo.initLogging()
+            // load the wallet file
+            loadWalletFile()
 
             // check the Server because the task can run without the App.
             val balance = uniffi.zingo.getBalance()
             Log.i("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
-            if (balance.lowercase().startsWith(ErrorPrefix.value)) {
+            //if (balance.lowercase().startsWith(ErrorPrefix.value)) {
                 // this means this task is running with the App closed
-                loadWalletFile()
-            } 
+                //loadWalletFile()
+            //} 
 
             // the task is running here blocking this execution until this process finished:
             // 1. finished the syncing.

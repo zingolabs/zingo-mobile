@@ -11,7 +11,21 @@ import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/contex
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { AppDrawerParamList } from '../app/types';
+import { RouteEnum } from '../app/AppState';
+import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
+function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.About> {
+  return {
+    navigation: mockNavigation,
+    route: {
+      key: 'Key-1',
+      name: RouteEnum.About,
+      params: undefined,
+    },
+  };
+}
 // test suite
 describe('Component About - test', () => {
   //snapshot test
@@ -20,9 +34,10 @@ describe('Component About - test', () => {
     state.translate = mockTranslate;
     state.info = mockInfo;
     state.totalBalance = mockTotalBalance;
+    const props = makeDrawerProps();
     const about = render(
       <ContextAppLoadedProvider value={state}>
-        <About />
+        <About {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(about.toJSON()).toMatchSnapshot();

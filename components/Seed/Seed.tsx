@@ -1,30 +1,24 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useContext } from 'react';
 import { View, ScrollView, TouchableOpacity, Text, Alert } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import RegText from '../Components/RegText';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
-import { ThemeType } from '../../app/types';
-import { ContextAppLoaded, ContextAppLoading } from '../../app/context';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
+import { ContextAppLoaded } from '../../app/context';
 import {
-  LanguageEnum,
-  NetInfoType,
-  ServerType,
-  TranslateType,
-  WalletType,
   ModeEnum,
   ChainNameEnum,
   SnackbarDurationEnum,
   SeedActionEnum,
   SettingsNameEnum,
-  SnackbarType,
   ButtonTypeEnum,
   ScreenEnum,
+  RouteEnum,
 } from '../../app/AppState';
 import Header from '../Header';
 import Utils from '../../app/utils';
@@ -34,9 +28,9 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type TextsType = {
   new: string[];
@@ -47,63 +41,37 @@ type TextsType = {
   backup: string[];
 };
 
-type SeedProps = {
+type SeedProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Seed> & {
   onClickOK: (seedPhrase: string, birthdayNumber: number) => void;
   onClickCancel: () => void;
-  action: SeedActionEnum;
-  setPrivacyOption: (value: boolean) => Promise<void>;
   keepAwake?: (v: boolean) => void;
   setIsSeedViewModalOpen?: (v: boolean) => void;
 };
 const Seed: React.FunctionComponent<SeedProps> = ({
+  route,
   onClickOK,
   onClickCancel,
-  action,
-  setPrivacyOption,
   keepAwake,
   setIsSeedViewModalOpen,
 }) => {
-  const contextLoaded = useContext(ContextAppLoaded);
-  const contextLoading = useContext(ContextAppLoading);
-  let wallet: WalletType,
-    translate: (key: string) => TranslateType,
-    server: ServerType,
-    netInfo: NetInfoType,
-    privacy: boolean,
-    mode: ModeEnum.basic | ModeEnum.advanced,
-    addLastSnackbar: (snackbar: SnackbarType) => void,
-    snackbars: SnackbarType[],
-    removeFirstSnackbar: (s: ScreenEnum) => void,
-    language: LanguageEnum;
-  if (action === SeedActionEnum.new) {
-    wallet = contextLoading.wallet;
-    translate = contextLoading.translate;
-    server = contextLoading.server;
-    netInfo = contextLoading.netInfo;
-    privacy = contextLoading.privacy;
-    mode = contextLoading.mode;
-    addLastSnackbar = contextLoading.addLastSnackbar;
-    snackbars = contextLoading.snackbars;
-    removeFirstSnackbar = contextLoading.removeFirstSnackbar;
-    language = contextLoading.language;
-  } else {
-    wallet = contextLoaded.wallet;
-    translate = contextLoaded.translate;
-    server = contextLoaded.server;
-    netInfo = contextLoaded.netInfo;
-    privacy = contextLoaded.privacy;
-    mode = contextLoaded.mode;
-    addLastSnackbar = contextLoaded.addLastSnackbar;
-    snackbars = contextLoaded.snackbars;
-    removeFirstSnackbar = contextLoaded.removeFirstSnackbar;
-    language = contextLoaded.language;
-  }
-
+  const navigation: any = useNavigation();
+  const context = useContext(ContextAppLoaded);
+  const {
+    wallet,
+    translate,
+    server,
+    netInfo,
+    privacy,
+    mode,
+    addLastSnackbar,
+    snackbars,
+    removeFirstSnackbar,
+    language,
+    setPrivacyOption,
+  } = context;
   const { colors } = useTheme()  as ThemeType;
   // when this screen is open from LoadingApp (new wallet)
   // is using the standard modal from react-native
-  const { hide } = useMagicModal();
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Seed;
@@ -113,9 +81,19 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const [expandSeed, setExpandSeed] = useState<boolean>(true);
   const [expandBirthday, setExpandBithday] = useState<boolean>(true);
   const [basicFirstViewSeed, setBasicFirstViewSeed] = useState<boolean>(true);
+  const [action, setAction] = useState<SeedActionEnum>(!!route.params && route.params.action !== undefined ? route.params.action : SeedActionEnum.view);
 
   const seedPhrase = wallet.seed || '';
   const birthdayNumber = (wallet.birthday && wallet.birthday.toString()) || '';
+
+  useEffect(() => {
+    const _action = !!route.params && route.params.action !== undefined ? route.params.action : SeedActionEnum.view;
+    setAction(_action);
+  }, [
+    route, 
+    route.params, 
+    route.params?.action
+  ]);
 
   useEffect(() => {
     if (keepAwake) {
@@ -206,14 +184,20 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const hiding = async () => {
     // when this screen is open from LoadingApp (new wallet)
     // is using the standard modal from react-native
-    if (action !== SeedActionEnum.new) {
-      setIsSeedViewModalOpen && setIsSeedViewModalOpen(false);
-      // the user just see the seed for the first time.
-      if (mode === ModeEnum.basic && !basicFirstViewSeed) {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
-        keepAwake && keepAwake(false);
+    setIsSeedViewModalOpen && setIsSeedViewModalOpen(false);
+    // the user just see the seed for the first time.
+    if (mode === ModeEnum.basic && !basicFirstViewSeed) {
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.basicFirstViewSeed, true);
+      setBasicFirstViewSeed(true);
+      keepAwake && keepAwake(false);
+      // redirect to history screen
+      navigation.navigate(RouteEnum.HomeStack, {
+        screen: RouteEnum.History,
+      });
+    } else {
+      if (navigation.canGoBack()) {
+        navigation.goBack();
       }
-      hide();
     }
   };
 
@@ -231,10 +215,6 @@ const Seed: React.FunctionComponent<SeedProps> = ({
 
       <View
         style={{
-          marginTop: top,
-          marginBottom: bottom,
-          marginRight: right,
-          marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
         }}>

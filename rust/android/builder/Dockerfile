@@ -1,6 +1,6 @@
 FROM ubuntu:latest
-ARG android_ndk_ver=r27d
-# 27.3.13750724 CLANG/LLVM 18
+ARG android_ndk_ver=r28c
+# 28.2.13676358
 
 # Install dependencies
 RUN apt update \

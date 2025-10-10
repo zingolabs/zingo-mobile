@@ -12,23 +12,23 @@ env:
   REPO-OWNER: ${{ github.repository_owner }}
 
 jobs:
-  ios-integration-test:
-    name: IOS Integration test
-    runs-on: macos-13
-    strategy:
-      fail-fast: false
-      matrix:
-        test: [
-          "offline_testsuite",
-          "execute_sync_from_seed",
-          "execute_send_from_orchard",
-          "execute_currentprice_and_value_transfers_from_seed",
-          "execute_sapling_balance_from_seed",
-          "execute_parse_addresses"
-        ]
-    env:
-      RUSTFLAGS: -D warnings
+  build-for-testing:
+    runs-on: macos-15
     steps:
+      - name: Xcode 16.4
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4'
+
+      - name: First launch
+        run: |
+          xcodebuild -runFirstLaunch || true
+
+      - name: Info 1
+        run: |
+          xcrun simctl list runtimes
+          xcrun simctl list devices
+
       - name: Set envs for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
         run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
@@ -49,14 +49,138 @@ jobs:
         working-directory: rust/lib/Generated
         run: cp ./*.* ../../../ios
 
-      - name: Install protoc
-        run: brew install protobuf
+      - name: Install nvm with node 20.9.0
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+          nvm install 20.9.0
+          nvm use 20.9.0
+
+      - name: Yarn
+        run: yarn
+
+      - name: Pod Install
+        working-directory: ios
+        run: pod install
+
+      - name: Info 2
+        run: |
+          xcrun simctl list runtimes
+          xcrun simctl list devices
+
+      - name: Build for testing
+        working-directory: ios
+        run: |
+          set -euxo pipefail
+          mkdir -p build/reports build/DerivedData
+          xcodebuild build-for-testing \
+            -workspace ZingoMobile.xcworkspace \
+            -scheme ZingoMobile \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -derivedDataPath "build/DerivedData" \
+            -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult" \
+            -quiet
+
+      - name: Upload Build Result
+        uses: actions/upload-artifact@v4
+        with:
+          name: xctestrun-and-products
+          path: ios/build/DerivedData/Build/Products
+
+      - name: Upload IOS build reports (.xcresult)
+        if: ${{ always() && !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-ios-integration-build-reports.xcresult
+          path: ios/build/reports/ZingoMobile-BuildForTesting.xcresult
+
+      - name: Upload IOS build DerivedData logs (optional)
+        if: ${{ always() && !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-ios-integration-build-derived-logs
+          path: |
+            ios/build/DerivedData/Logs/Test
+            ios/build/DerivedData/Logs/CrashReporter
+          if-no-files-found: ignore
+
+      - name: Cleaning up build
+        run: |
+          rm -rf build/reports build/DerivedData || true
+
+  ios-integration-test:
+    name: IOS Integration test
+    needs: build-for-testing
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [
+          "offline_testsuite",
+          "execute_sync_from_seed",
+          "execute_send_from_orchard",
+          "execute_currentprice_and_value_transfers_from_seed",
+          "execute_sapling_balance_from_seed",
+          "execute_parse_addresses"
+        ]
+    env:
+      RUSTFLAGS: -D warnings
+    steps:
+      - name: Xcode 16.4
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4'
+
+      - name: First launch
+        run: |
+          xcodebuild -runFirstLaunch || true
+
+      - name: Info 1
+        run: |
+          xcrun simctl list runtimes
+          xcrun simctl list devices
+
+      - name: Set envs for zingolib CI
+        if: ${{ contains(github.repository, 'zingolib') }}
+        run: echo "REPO-OWNER=zingolabs" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ env.REPO-OWNER }}/zingo-mobile
 
       - name: Install docker
         run: |
-          brew install --head colima
-          brew install --formula docker
-          colima start
+          set -euxo pipefail
+
+          brew install qemu
+          brew install docker
+
+          brew developer on
+
+          brew tap-new local/old-lima || true
+          brew extract --version=0.22.0 lima local/old-lima || true
+          brew install --build-from-source local/old-lima/lima@0.22.0
+          brew pin lima@0.22.0
+
+          # Replace limactl with the no-HVF build (if you really need this patch)
+          LIMACTL_PATH="$(brew --prefix lima@0.22.0)/bin/limactl"
+          sudo curl -L -o "${LIMACTL_PATH}" https://github.com/mikekazakov/lima-nohvf/raw/master/limactl
+          sudo chmod +x "${LIMACTL_PATH}"
+
+          sudo curl -L -o /usr/local/bin/colima https://github.com/abiosoft/colima/releases/download/v0.7.3/colima-Darwin-arm64
+          sudo chmod +x /usr/local/bin/colima
+
+          /usr/local/bin/colima version || true
+          limactl version || true
+
+          brew developer off
+
+          colima start --network-address --arch arm64 --vm-type=qemu
 
       - name: Grant permissions
         run: |
@@ -93,21 +217,16 @@ jobs:
         working-directory: ios
         run: pod install
 
-      - name: Run Build
-        working-directory: ios
-        run: |
-          set -euxo pipefail
-          rm -rf build/reports build/DerivedData
-          mkdir -p build/reports build/DerivedData
+      - name: Download Build Result
+        uses: actions/download-artifact@v4
+        with:
+          name: xctestrun-and-products
+          path: ios/build/DerivedData/Build/Products
 
-          xcodebuild build-for-testing \
-            -workspace ZingoMobile.xcworkspace \
-            -scheme ZingoMobile \
-            -sdk iphonesimulator \
-            -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.2' \
-            -derivedDataPath "build/DerivedData" \
-            -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult"
+      - name: Info 2
+        run: |
+          xcrun simctl list runtimes
+          xcrun simctl list devices
 
       - name: Run IOS integration tests
         working-directory: ./rust
@@ -117,15 +236,19 @@ jobs:
         if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-ios-integration-reports-${{ matrix.test }}.xcresult
+          name: test-ios-integration-test-reports-${{ matrix.test }}.xcresult
           path: ios/build/reports/ZingoMobile-Test.xcresult
 
       - name: Upload IOS DerivedData logs (optional)
         if: ${{ always() && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-ios-integration-derived-logs-${{ matrix.test }}
+          name: test-ios-integration-test-derived-logs-${{ matrix.test }}
           path: |
             ios/build/DerivedData/Logs/Test
             ios/build/DerivedData/Logs/CrashReporter
           if-no-files-found: ignore
+
+      - name: Cleaning up test
+        run: |
+          rm -rf build/reports build/DerivedData || true

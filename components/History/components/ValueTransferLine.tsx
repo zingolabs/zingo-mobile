@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useRef } from 'react';
+import React, { useContext } from 'react';
 import { Animated, Platform, View, TouchableOpacity } from 'react-native';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faArrowDown,
@@ -23,7 +23,7 @@ import {
   GlobalConst,
   SendPageStateClass,
   ToAddrClass,
-  RouteEnums,
+  RouteEnum,
   SelectServerEnum,
   ScreenEnum,
 } from '../../../app/AppState';
@@ -37,18 +37,20 @@ import 'moment/locale/tr';
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
-import { HideReturn } from 'react-native-magic-modal';
 //import Utils from '../../../app/utils';
 
 type ValueTransferLineProps = {
   index: number;
   month: string;
   vt: ValueTransferType;
-  setValueTransferDetailModalShow: (i: number, v: ValueTransferType) => Promise<HideReturn<unknown>>;
+  setValueTransferDetailModalShow: (i: number, vt: ValueTransferType) => void;
   nextLineWithSameTxid: boolean;
-  setMessagesAddressModalShow: (vt: ValueTransferType) => Promise<HideReturn<unknown>>;
+  //setMessagesAddressModalShow: (vt: ValueTransferType) => void;
   addressProtected?: boolean;
   screenName: ScreenEnum;
+  registerSwipeable: (r: Swipeable) => void; 
+  closeAllSwipeables: () => void;
+  closeOtherSwipeables: () => void;
 };
 const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   index,
@@ -59,19 +61,21 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   //setMessagesAddressModalShow,
   addressProtected,
   screenName,
+  registerSwipeable,
+  closeAllSwipeables,
+  closeOtherSwipeables,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
     translate,
     language,
     privacy,
     info,
-    navigationHome,
     showSwipeableIcons,
     readOnly,
     selectServer,
     setSendPageState,
-    closeAllModals,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
@@ -83,7 +87,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   //  height: Dimensions.get('window').height,
   //};
   //const maxWidthHit = useRef<boolean>(false);
-  const swipeableRef = useRef<Swipeable | null>(null);
 
   const amountColor =
     vt.confirmations >= 0 &&
@@ -175,7 +178,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
   const handleRenderLeftActions = (
     progress: Animated.AnimatedInterpolation<number>,
     _dragX: Animated.AnimatedInterpolation<number>,
-    swipeable: Swipeable,
+    _swipeable: Swipeable,
   ) => {
     const trans = progress.interpolate({
       inputRange: [0, 1],
@@ -199,7 +202,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 style={{ zIndex: 999, padding: 20 }}
                 onPress={() => {
                   setValueTransferDetailModalShow(index, vt);
-                  swipeable.reset();
+                  closeAllSwipeables();
                 }}>
                 <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faFileLines} color={colors.money} />
               </TouchableOpacity>
@@ -218,12 +221,10 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                     const sendPageState = new SendPageStateClass(new ToAddrClass(0));
                     sendPageState.toaddr.to = vt.address ? vt.address : '';
                     setSendPageState(sendPageState);
-                    closeAllModals();
-                    navigationHome?.navigate(RouteEnums.Home, {
-                      screen: translate('loadedapp.send-menu'),
-                      initial: false,
+                    navigation.navigate(RouteEnum.HomeStack, {
+                      screen: RouteEnum.Send,
                     });
-                    swipeable.reset();
+                    closeAllSwipeables();
                   }}>
                   <FontAwesomeIcon size={30} icon={faPaperPlane} color={colors.primary} />
                 </TouchableOpacity>
@@ -281,12 +282,14 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       )}
       <TouchableOpacity
         style={{ zIndex: 999 }}
-        onPress={() => {
+        onPress={async () => {
+          closeAllSwipeables();
+          await new Promise((r) => requestAnimationFrame(r));
           setValueTransferDetailModalShow(index, vt);
-          swipeableRef?.current?.reset();
         }}>
         <Swipeable
-          ref={swipeableRef}
+          ref={registerSwipeable}
+          onSwipeableWillOpen={closeOtherSwipeables}
           overshootLeft={false}
           overshootRight={false}
           overshootFriction={1}

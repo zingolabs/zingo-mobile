@@ -2,19 +2,19 @@ export default class TotalBalanceClass {
   // Total transparent, confirmed and unconfirmed
   totalTransparentBalance: number;
 
-  // Total private, confirmed + pending
+  // Total private, confirmed and unconfirmed
   totalSaplingBalance: number;
 
-  // Total orchard, confirmed + pending
+  // Total orchard, confirmed and unconfirmed
   totalOrchardBalance: number;
 
-  // Total transparent, only confirmed
+  // Total transparent, only confirmed funds
   confirmedTransparentBalance: number;
 
-  // Total private, confirmed funds
+  // Total private, only confirmed funds
   confirmedSaplingBalance: number;
 
-  // Total orchard, confirmed funds
+  // Total orchard, only confirmed funds
   confirmedOrchardBalance: number;
 
   // Total spendable

@@ -3,5 +3,5 @@ export default interface WalletType {
   ufvk?: string;
   birthday: number;
 
-  // eslint-disable-next-line semi
+   
 }

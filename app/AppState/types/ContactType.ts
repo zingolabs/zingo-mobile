@@ -17,5 +17,5 @@ export default interface ContactType {
   status?: RPCValueTransfersStatusEnum;
   kind?: ValueTransferKindEnum;
 
-  // eslint-disable-next-line semi
+   
 }

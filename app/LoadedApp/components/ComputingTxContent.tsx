@@ -1,11 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 
 import RegText from '../../../components/Components/RegText';
-import { ThemeType } from '../../types';
+import { AppDrawerParamList, ThemeType } from '../../types';
 import { ContextAppLoaded } from '../../context';
 import Header from '../../../components/Header';
 import moment from 'moment';
@@ -13,23 +12,21 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { ScreenEnum } from '../../AppState';
+import { RouteEnum, ScreenEnum } from '../../AppState';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-const ComputingTxContent: React.FunctionComponent = () => {
+type ComputingTxContentProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Computing>;
+
+const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({}) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language } = context;
   const { colors } = useTheme() as ThemeType;
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const screenName = ScreenEnum.ComputingTxContext;
 
   return (
     <View
       style={{
-        marginTop: top,
-        marginBottom: bottom,
-        marginRight: right,
-        marginLeft: left,
         flex: 1,
         backgroundColor: colors.background,
       }}>

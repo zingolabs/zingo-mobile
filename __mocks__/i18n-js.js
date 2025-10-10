@@ -1,11 +1,12 @@
 // i18n-js.js
 
-import { LanguageEnum } from '../app/AppState';
+const I18nCtor = jest.fn().mockImplementation((_file) => ({
+  t: jest.fn((k) => k),
+  locale: 'en',
+}));
 
-export default () => ({
+module.exports = {
   __esModule: true,
-  I18n: jest.fn().mockImplementation(() => ({
-    t: jest.fn(),
-    locale: LanguageEnum.en,
-  })),
-});
+  I18n: I18nCtor,   // soporte import nombrado
+  default: I18nCtor // soporte import por defecto
+};

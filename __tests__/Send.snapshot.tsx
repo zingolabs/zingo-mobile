@@ -8,7 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import Send from '../components/Send';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
-import { ModeEnum, CurrencyEnum } from '../app/AppState';
+import { ModeEnum, CurrencyEnum, RouteEnum } from '../app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
@@ -16,7 +16,20 @@ import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockZecPrice } from '../__mocks__/dataMocks/mockZecPrice';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import mockSendPageState from '../__mocks__/dataMocks/mockSendPageState';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { AppDrawerParamList } from '../app/types';
+import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
+function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> {
+  return {
+    navigation: mockNavigation,
+    route: {
+      key: 'Key-1',
+      name: RouteEnum.Send,
+      params: undefined,
+    },
+  };
+}
 // test suite
 describe('Component Send - test', () => {
   //snapshot test
@@ -37,13 +50,13 @@ describe('Component Send - test', () => {
     state.privacy = false;
     // mode basic
     state.mode = ModeEnum.basic;
+    const props = makeDrawerProps();
     const send = render(
       <ContextAppLoadedProvider value={state}>
-        <Send
+        <Send {...props}
           sendTransaction={onFunction}
           clearToAddr={onFunction}
           toggleMenuDrawer={onFunction}
-          setPrivacyOption={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           setScrollToBottom={onFunction}
@@ -62,13 +75,13 @@ describe('Component Send - test', () => {
     state.privacy = true;
     // mode basic
     state.mode = ModeEnum.advanced;
+    const props = makeDrawerProps();
     const send = render(
       <ContextAppLoadedProvider value={state}>
-        <Send
+        <Send {...props}
           sendTransaction={onFunction}
           clearToAddr={onFunction}
           toggleMenuDrawer={onFunction}
-          setPrivacyOption={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           setScrollToBottom={onFunction}

@@ -11,7 +11,21 @@ import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/contex
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { AppDrawerParamList } from '../app/types';
+import { RouteEnum } from '../app/AppState';
+import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
+function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.Pools> {
+  return {
+    navigation: mockNavigation,
+    route: {
+      key: 'Key-1',
+      name: RouteEnum.Pools,
+      params: undefined,
+    },
+  };
+}
 // test suite
 describe('Component Pools - test', () => {
   //snapshot test
@@ -19,11 +33,11 @@ describe('Component Pools - test', () => {
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
-  const onSet = jest.fn();
+  const props = makeDrawerProps();
   test('Pools - snapshot', () => {
     const pools = render(
       <ContextAppLoadedProvider value={state}>
-        <Pools setPrivacyOption={onSet} />
+        <Pools {...props} />
       </ContextAppLoadedProvider>,
     );
     expect(pools.toJSON()).toMatchSnapshot();

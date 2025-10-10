@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.8 (273)",
+  "version": "zingo-2.0.9 (280)",
   "loading": "загрузка...",
   "connectingserver": "Подключение к серверу...",
   "wait": "Пожалуйста, подождите...",
@@ -146,7 +146,7 @@
     "restorebackupwallet": "Восстановить последнюю резервную копию кошелька",
     "fundpools": "Ваши активы в пулах",
     "insight": "Аналитика",
-    "loadwalletfromseed-basic": "Восстановить кошелек",
+    "loadwalletfromseed-basic": "восстановить другой кошелек",
     "addressbook": "Адресная книга",
     "tipzingolabs-basic": "Поддержать ZingoLabs",
     "votefornym": "Проголосовать за Nym",
