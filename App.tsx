@@ -1,15 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { createNavigationContainerRef, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { LoadedApp } from './app/LoadedApp';
 import { LoadingApp } from './app/LoadingApp';
-import { ThemeType, RootStackParamList } from './app/types';
-import { ModeEnum, RouteEnums } from './app/AppState';
+import { ThemeType, AppStackParamList } from './app/types';
+import { ModeEnum, RouteEnum } from './app/AppState';
 
-import { LogBox, StatusBar } from 'react-native';
+import { BackHandler, LogBox, StatusBar } from 'react-native';
 
 LogBox.ignoreLogs(['[Reanimated] Reduced motion setting is enabled on this device.']);
 
@@ -113,10 +113,25 @@ const basicTheme: ThemeType = {
   },
 };
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createStackNavigator<AppStackParamList>();
+
+export const navigationRef = createNavigationContainerRef();
 
 const App: React.FunctionComponent = () => {
   const [theme, setTheme] = useState<ThemeType>(advancedTheme);
+
+  // avoid to close the App when the user tap on
+  // the back button of the device.
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (navigationRef.isReady() && navigationRef.canGoBack()) {
+        navigationRef.goBack();
+        return true;
+      }
+      return true;
+    });
+    return () => sub.remove();
+  }, []);
 
   const toggleTheme = (mode: ModeEnum) => {
     setTheme(mode === ModeEnum.advanced ? advancedTheme : basicTheme);
@@ -126,19 +141,19 @@ const App: React.FunctionComponent = () => {
   return (
     <SafeAreaProvider>
       <StatusBar backgroundColor={theme.colors.background} />
-      <NavigationContainer theme={theme}>
+      <NavigationContainer ref={navigationRef} theme={theme}>
         <SafeAreaView
           style={{
             flex: 1,
             backgroundColor: theme.colors.background,
           }}>
           <Stack.Navigator
-            initialRouteName={RouteEnums.LoadingApp}
+            initialRouteName={RouteEnum.LoadingApp}
             screenOptions={{ headerShown: false, animation: 'none' }}>
-            <Stack.Screen name={RouteEnums.LoadingApp} options={{ animation: 'none' }}>
+            <Stack.Screen name={RouteEnum.LoadingApp}>
               {props => <LoadingApp {...props} toggleTheme={toggleTheme} />}
             </Stack.Screen>
-            <Stack.Screen name={RouteEnums.LoadedApp} options={{ animation: 'none' }}>
+            <Stack.Screen name={RouteEnum.LoadedApp}>
               {props => <LoadedApp {...props} toggleTheme={toggleTheme} />}
             </Stack.Screen>
           </Stack.Navigator>

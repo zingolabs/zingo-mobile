@@ -1,21 +1,21 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { ContextAppLoading } from '../../../app/context';
-import Scanner from '../../Scanner';
+import { ContextAppLoading } from '../../context';
+import Scanner from '../../../components/Scanner';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import Header from '../../Header';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Header from '../../../components/Header';
 
 import { useTheme } from '@react-navigation/native';
-import { ThemeType } from '../../../app/types';
+import { ThemeType } from '../../types';
 import { View } from 'react-native';
-import Snackbars from '../../Components/Snackbars';
+import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
-import { ScreenEnum } from '../../../app/AppState';
+import { ScreenEnum } from '../../AppState';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type ScannerUfvkProps = {
   setUfvkText: (k: string) => void;
@@ -63,7 +63,7 @@ const ScannerUfvk: React.FunctionComponent<ScannerUfvkProps> = ({ setUfvkText, c
           noUfvkIcon={true}
           closeScreen={closeModal}
         />
-        <Scanner onRead={onRead} onClose={() => closeModal()} />
+        <Scanner onRead={onRead} onClose={() => closeModal()} active={true} />
       </View>
     </ToastProvider>
   );

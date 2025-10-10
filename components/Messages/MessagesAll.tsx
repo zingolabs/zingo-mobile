@@ -1,5 +1,6 @@
 
 import React, { useContext } from 'react';
+import { RouteEnum } from '../../app/AppState';
 //import MessageList from './components/MessageList';
 
 import { ContextAppLoaded } from '../../app/context';
@@ -8,23 +9,21 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-//import { useMagicModal } from 'react-native-magic-modal';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { AppDrawerParamList } from '../../app/types';
+
 //import { useToast } from 'react-native-toastier';
 
-type MessagesAllProps = {
-  setPrivacyOption: (value: boolean) => Promise<void>;
-  setScrollToBottom: (value: boolean) => void;
-  scrollToBottom: boolean;
-};
+type MessagesAllProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.MessagesAll>;
 
 const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
-  //setPrivacyOption,
-  //setScrollToBottom,
-  //scrollToBottom,
+  //navigation,
+  //route,
 }) => {
+  //const setScrollToBottom = route.params.setScrollToBottom;
+  //const scrollToBottom = route.params.scrollToBottom;
   const context = useContext(ContextAppLoaded);
   const { language } = context;
-  //const { hide } = useMagicModal();
   moment.locale(language);
   //const { clear } = useToast();
 
@@ -38,7 +37,9 @@ const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
       scrollToBottom={scrollToBottom}
       closeModal={() => {
         clear();
-        hide();
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        }
       }}
     />
   );

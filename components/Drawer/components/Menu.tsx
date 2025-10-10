@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, Text, Dimensions, Platform } from 'react-native';
+import { View, Text, Dimensions } from 'react-native';
 
 import RegText from '../../../components/Components/RegText';
 
@@ -13,17 +13,16 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { GlobalConst, MenuItemEnum, ModeEnum, ScreenEnum, SelectServerEnum } from '../../../app/AppState';
-import { HideReturn } from 'react-native-magic-modal';
-import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
+import { MenuItemEnum, ModeEnum, ScreenEnum, SelectServerEnum } from '../../../app/AppState';
+import { DrawerContentScrollView } from '@react-navigation/drawer';
 
 type MenuProps = {
-  onItemSelected: (item: MenuItemEnum) => Promise<HideReturn<unknown> | undefined>;
+  onItemSelected: (item: MenuItemEnum) => void;
   screenName: ScreenEnum;
-  navigation: DrawerContentComponentProps['navigation'];
+  toggleMenuDrawer: () => void;
 };
 
-const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, navigation }) => {
+const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, toggleMenuDrawer }) => {
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -52,7 +51,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
   };
 
   const onItemSelectedWrapper = async (value: MenuItemEnum) => {
-    navigation.toggleDrawer();
+    toggleMenuDrawer();
     if (
       (value === MenuItemEnum.WalletSeedUfvk && security.seedUfvkScreen) ||
       (value === MenuItemEnum.Rescan && security.rescanScreen) ||
@@ -69,14 +68,14 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
         // snack with Error & closing the menu.
         addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
       } else {
+        // the App/Drawer needs a bit of time to close
+        // properly
         onItemSelected(value);
       }
     } else {
       // the App/Drawer needs a bit of time to close
       // properly
-      setTimeout(() => {
-        onItemSelected(value);
-      }, Platform.OS === GlobalConst.platformOSandroid ? 500 : 0);
+      onItemSelected(value);
     }
   };
 

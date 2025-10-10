@@ -1,11 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, Text, ActivityIndicator } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import DetailLine from '../Components/DetailLine';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
@@ -19,25 +18,34 @@ import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 import RegText from '../Components/RegText';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCloudDownload } from '@fortawesome/free-solid-svg-icons';
-import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { isEqual } from 'lodash';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 import { RPCSyncScanRangeStatusType } from '../../app/rpc/types/RPCSyncScanRangeStatusType';
 import { RPCSyncScanRangePriorityStatusEnum } from '../../app/rpc/enums/RPCSyncScanRangePriorityStatusEnum';
-import { ScreenEnum } from '../../app/AppState';
+import { RouteEnum, ScreenEnum } from '../../app/AppState';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 //import { ModeEnum } from '../../app/AppState';
 
-type SyncReportProps = {
-};
+type SyncReportProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.SyncReport>;
 
-const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
+const SyncReport: React.FunctionComponent<SyncReportProps> = ({
+  navigation,
+}) => {
   const context = useContext(ContextAppLoaded);
-  const { syncingStatus, wallet, translate, background, language, netInfo, snackbars, removeFirstSnackbar, info } = context; //mode
+  const { 
+    syncingStatus, 
+    wallet, 
+    translate, 
+    background, 
+    language, 
+    netInfo, 
+    snackbars, 
+    removeFirstSnackbar, 
+    info
+  } = context; //mode
   const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.SyncReport;
@@ -171,10 +179,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
 
       <View
         style={{
-          marginTop: top,
-          marginBottom: bottom,
-          marginRight: right,
-          marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
         }}>
@@ -188,7 +192,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = () => {
           noUfvkIcon={true}
           closeScreen={() => {
             clear();
-            hide();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
           }}
         />
         <ScrollView

@@ -25,7 +25,7 @@ const parseZcashURI = async (
 
   // The first address is special, it can be the "host" part of the URI
   const address = parsedUri.pathname;
-  console.log(address);
+  //console.log(address);
 
   // Has to have at least 1 element
   const t = new ZcashURITargetClass();

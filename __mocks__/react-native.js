@@ -47,6 +47,7 @@ jest.mock('react-native', () => {
     sendProcess: jest.fn(() => '{}'),
     shieldProcess: jest.fn(() => '{}'),
     confirmProcess: jest.fn(() => '{}'),
+    getZenniesDonationAddress: jest.fn(() => '{}'),
   };
   RN.View = jest.fn();
 

@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 import { PieChart, pieDataItem } from 'react-native-gifted-charts';
@@ -12,22 +11,22 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import RegText from '../Components/RegText';
 import ZecAmount from '../Components/ZecAmount';
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Utils from '../../app/utils';
 import FadeText from '../Components/FadeText';
 import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
-import { ScreenEnum, SnackbarDurationEnum } from '../../app/AppState';
+import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '../../app/AppState';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
 type DataType = {
   svg: {
@@ -43,16 +42,23 @@ const getPercent = (percent: number) => {
   return (percent < 1 ? '<1' : percent < 100 && percent >= 99 ? '99' : percent.toFixed(0)) + '%';
 };
 
-type InsightProps = {
-  setPrivacyOption: (value: boolean) => Promise<void>;
-};
+type InsightProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Insight>;
 
-const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) => {
+const Insight: React.FunctionComponent<InsightProps> = ({
+  navigation,
+}) => {
   const context = useContext(ContextAppLoaded);
-  const { info, translate, privacy, addLastSnackbar, language, snackbars, removeFirstSnackbar } = context;
+  const { 
+    info, 
+    translate, 
+    privacy, 
+    addLastSnackbar, 
+    language, 
+    snackbars, 
+    removeFirstSnackbar, 
+    setPrivacyOption,
+  } = context;
   const { colors } = useTheme() as ThemeType;
-  const { hide } = useMagicModal();
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Insight;
@@ -247,10 +253,6 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
 
       <View
         style={{
-          marginTop: top,
-          marginBottom: bottom,
-          marginRight: right,
-          marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
         }}>
@@ -265,7 +267,9 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
           addLastSnackbar={addLastSnackbar}
           closeScreen={() => {
             clear();
-            hide();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
           }}
         />
 
@@ -353,25 +357,27 @@ const Insight: React.FunctionComponent<InsightProps> = ({ setPrivacyOption }) =>
               <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 100 }} />
             ) : (
               <View style={{ width: '100%', alignItems: 'center', paddingVertical: 10 }}>
-                <PieChart
-                  showExternalLabels
-                  labelLineConfig={{
-                    thickness: 1,
-                    avoidOverlappingOfLabels: true,
-                  }}
-                  strokeWidth={4}
-                  donut
-                  innerCircleColor={colors.background}
-                  innerCircleBorderWidth={0}
-                  innerCircleBorderColor={colors.background}
-                  strokeColor={colors.background}
-                  showValuesAsTooltipText={true}
-                  showText
-                  externalLabelComponent={renderExternalLabel}
-                  textBackgroundColor={colors.background}
-                  data={pieAmounts}
-                  innerRadius={dimensions.width * 0.09}
-                />
+                {!!pieAmounts && !!pieAmounts.length && (
+                  <PieChart
+                    showExternalLabels={true}
+                    labelLineConfig={{
+                      thickness: 1,
+                      avoidOverlappingOfLabels: true,
+                    }}
+                    strokeWidth={4}
+                    donut={true}
+                    innerCircleColor={colors.background}
+                    innerCircleBorderWidth={0}
+                    innerCircleBorderColor={colors.background}
+                    strokeColor={colors.background}
+                    showValuesAsTooltipText={true}
+                    showText
+                    externalLabelComponent={renderExternalLabel}
+                    textBackgroundColor={colors.background}
+                    data={pieAmounts}
+                    innerRadius={dimensions.width * 0.09}
+                  />
+                )}
               </View>
             )}
           </View>

@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Component App - test App - snapshot 1`] = `
 <MockedNavigator
@@ -12,19 +12,9 @@ exports[`Component App - test App - snapshot 1`] = `
 >
   <MockedScreen
     name="LoadingApp"
-    options={
-      {
-        "animation": "none",
-      }
-    }
   />
   <MockedScreen
     name="LoadedApp"
-    options={
-      {
-        "animation": "none",
-      }
-    }
   />
 </MockedNavigator>
 `;

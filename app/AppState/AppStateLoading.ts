@@ -19,5 +19,5 @@ export default interface AppStateLoading {
   firstLaunchingMessage: LaunchingModeEnum;
   hasRecoveryWalletInfoSaved: boolean;
 
-  // eslint-disable-next-line semi
+   
 }

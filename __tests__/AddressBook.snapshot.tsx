@@ -10,7 +10,21 @@ import { ContextAppLoadedProvider, defaultAppContextLoaded } from '../app/contex
 import { AddressBook } from '../components/AddressBook';
 import { mockAddressBook } from '../__mocks__/dataMocks/mockAddressBook';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { AppDrawerParamList } from '../app/types';
+import { RouteEnum } from '../app/AppState';
+import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
+function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.AddressBook> {
+  return {
+    navigation: mockNavigation,
+    route: {
+      key: 'Key-1',
+      name: RouteEnum.AddressBook,
+      params: undefined,
+    },
+  };
+}
 // test suite
 describe('Component Address Book - test', () => {
   //snapshot test
@@ -19,9 +33,10 @@ describe('Component Address Book - test', () => {
     state.addressBook = mockAddressBook;
     state.translate = mockTranslate;
     const onSet = jest.fn();
+    const props = makeDrawerProps();
     const ab: RenderResult = render(
       <ContextAppLoadedProvider value={state}>
-        <AddressBook setAddressBook={onSet} />
+        <AddressBook {...props} setAddressBook={onSet} />
       </ContextAppLoadedProvider>,
     );
     expect(ab.toJSON()).toMatchSnapshot();

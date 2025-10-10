@@ -34,7 +34,11 @@ struct SyncStatus: Decodable {
 }
 
 @UIApplicationMain
-class AppDelegate: RCTAppDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
+  var window: UIWindow?
+  var reactNativeDelegate: ReactNativeDelegate?
+  var reactNativeFactory: RCTReactNativeFactory?
+
   private let bcgTaskId = "Zingo_Processing_Task_ID"
   private let bcgSchedulerTaskId = "Zingo_Processing_Scheduler_Task_ID"
   private var monitor: NWPathMonitor?
@@ -44,30 +48,46 @@ class AppDelegate: RCTAppDelegate {
   private var timeStampStrStart: String? = nil
   private var syncWorkItem: DispatchWorkItem?
   
-  override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-    self.moduleName = "Zingo"
-    self.dependencyProvider = RCTAppDependencyProvider()
-    
-    // You can add your custom initial props in the dictionary below.
-    // They will be passed down to the ViewController used by React Native.
-    self.initialProps = [:]
+  func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+  ) -> Bool {
+    let delegate = ReactNativeDelegate()
+    let factory = RCTReactNativeFactory(delegate: delegate)
+    delegate.dependencyProvider = RCTAppDependencyProvider()
+ 
+    reactNativeDelegate = delegate
+    reactNativeFactory = factory
+ 
+    window = UIWindow(frame: UIScreen.main.bounds)
+ 
+    factory.startReactNative(
+      withModuleName: "Zingo",
+      in: window,
+      launchOptions: launchOptions
+    )
 
     if #available(iOS 13.0, *) {
       NSLog("BGTask registerTasks")
       self.handleBackgroundTask()
     }
-
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+ 
+    return true
   }
 
-  override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-    return RCTLinkingManager.application(app, open: url, options: options)
+  func application(
+    _ application: UIApplication, 
+    open url: URL, 
+    options: [UIApplication.OpenURLOptionsKey : Any] = [:]
+  ) -> Bool {
+    return RCTLinkingManager.application(application, open: url, options: options)
   }
 
-  override func application(
+  func application(
     _ application: UIApplication,
     continue userActivity: NSUserActivity,
-    restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+    restorationHandler: @escaping ([UIUserActivityRestoring]?
+  ) -> Void) -> Bool {
         return RCTLinkingManager.application(
             application,
             continue: userActivity,
@@ -75,19 +95,7 @@ class AppDelegate: RCTAppDelegate {
     )
   }
 
-  override func sourceURL(for bridge: RCTBridge) -> URL? {
-    self.bundleURL()
-  }
-
-  override func bundleURL() -> URL? {
-#if DEBUG
-    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
-#else
-    Bundle.main.url(forResource: "main", withExtension: "jsbundle")
-#endif
-  }
-
-  override func applicationWillEnterForeground(_ application: UIApplication) {
+  func applicationWillEnterForeground(_ application: UIApplication) {
     if #available(iOS 13.0, *) {
         // cancel existing sync process (if any).
         NSLog("BGTask foreground")
@@ -101,7 +109,7 @@ class AppDelegate: RCTAppDelegate {
     }
   }
 
-  override func applicationDidEnterBackground(_ application: UIApplication) {
+  func applicationDidEnterBackground(_ application: UIApplication) {
     if #available(iOS 13.0, *) {
         // Cancel existing sync process (if any).
         NSLog("BGTask background")
@@ -118,6 +126,20 @@ class AppDelegate: RCTAppDelegate {
         NSLog("BGTask background - scheduleSchedulerBackgroundTask")
         self.scheduleSchedulerBackgroundTask()
     }
+  }
+}
+
+class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
+  override func sourceURL(for bridge: RCTBridge) -> URL? {
+    self.bundleURL()
+  }
+
+  override func bundleURL() -> URL? {
+#if DEBUG
+    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+#else
+    Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+#endif
   }
 }
 
@@ -316,15 +338,18 @@ extension AppDelegate {
         }
       
         if exists == "true" {
+            // load the wallet file
+            self.loadWalletFile()
+          
             // chaeck the server
             let balance = getBalance()
             let balanceStr = String(balance)
             NSLog("BGTask syncingProcessBackgroundTask - testing if server is active \(balanceStr)")
-            if balanceStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
+            //if balanceStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
                 // this task is running with the App closed.
                 // probably is an impossible case...
-                self.loadWalletFile()
-            }
+                //self.loadWalletFile()
+            //}
 
             // run the sync process.
             let syncing = runSync()

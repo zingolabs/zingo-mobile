@@ -1,24 +1,24 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
 <View
   style={
-    [
-      {
-        "flex": 1,
-      },
-      undefined,
-    ]
+    {
+      "alignItems": "center",
+      "backgroundColor": "#011401",
+      "flex": 1,
+      "justifyContent": "center",
+    }
   }
 >
-  <View />
   <View
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "#011401",
         "flex": 1,
+        "flexDirection": "column",
         "justifyContent": "center",
+        "width": "95%",
       }
     }
   >
@@ -26,110 +26,98 @@ exports[`Component LoadingApp - test LoadingApp - snapshot 1`] = `
       style={
         {
           "alignItems": "center",
-          "flex": 1,
           "flexDirection": "column",
-          "justifyContent": "center",
-          "width": "95%",
+          "height": "40%",
+          "justifyContent": "flex-end",
+          "marginTop": 20,
+          "padding": 10,
+          "width": "80%",
         }
       }
     >
-      <View
+      <Text
         style={
           {
-            "alignItems": "center",
-            "flexDirection": "column",
-            "height": "40%",
-            "justifyContent": "flex-end",
-            "marginTop": 20,
-            "padding": 10,
-            "width": "80%",
+            "color": "#888888",
+            "fontSize": 40,
+            "fontWeight": "bold",
           }
         }
       >
-        <Text
-          style={
-            {
-              "color": "#888888",
-              "fontSize": 40,
-              "fontWeight": "bold",
-            }
-          }
-        >
-          text translated
-        </Text>
-        <Text
-          style={
-            {
-              "color": "#888888",
-              "fontSize": 15,
-            }
-          }
-        >
-          text translated
-        </Text>
-      </View>
-      <View
+        zingo
+      </Text>
+      <Text
         style={
           {
-            "alignItems": "center",
-            "flexDirection": "column",
-            "height": "60%",
-            "justifyContent": "flex-start",
-            "marginTop": 20,
-            "padding": 10,
-            "width": "80%",
+            "color": "#888888",
+            "fontSize": 15,
           }
         }
       >
-        <ActivityIndicator
-          color="transparent"
-          size="large"
-        />
-        <Text
-          selectable={true}
-          style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 20,
-              "fontWeight": "bold",
-              "marginTop": 10,
-              "opacity": 0,
-              "textAlign": "center",
-            }
+        version
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "column",
+          "height": "60%",
+          "justifyContent": "flex-start",
+          "marginTop": 20,
+          "padding": 10,
+          "width": "80%",
+        }
+      }
+    >
+      <ActivityIndicator
+        color="transparent"
+        size="large"
+      />
+      <Text
+        selectable={true}
+        style={
+          {
+            "color": "#c3c3c3",
+            "fontSize": 20,
+            "fontWeight": "bold",
+            "marginTop": 10,
+            "opacity": 0,
+            "textAlign": "center",
           }
-        >
-          text translated
-        </Text>
-        <Text
-          selectable={true}
-          style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 15,
-              "marginTop": 10,
-              "opacity": 0,
-              "textAlign": "center",
-            }
+        }
+      >
+        updating.firstlaunchingmessage-title
+      </Text>
+      <Text
+        selectable={true}
+        style={
+          {
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "marginTop": 10,
+            "opacity": 0,
+            "textAlign": "center",
           }
-        >
-          text translated
-        </Text>
-        <Text
-          selectable={true}
-          style={
-            {
-              "color": "#c3c3c3",
-              "fontSize": 15,
-              "marginBottom": 10,
-              "marginTop": 10,
-              "opacity": 0,
-              "textAlign": "center",
-            }
+        }
+      >
+        updating.firstlaunchingmessage-body
+      </Text>
+      <Text
+        selectable={true}
+        style={
+          {
+            "color": "#c3c3c3",
+            "fontSize": 15,
+            "marginBottom": 10,
+            "marginTop": 10,
+            "opacity": 0,
+            "textAlign": "center",
           }
-        >
-          text translated
-        </Text>
-      </View>
+        }
+      >
+        updating.firstlaunchingmessage-footer
+      </Text>
     </View>
   </View>
 </View>

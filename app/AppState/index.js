@@ -41,7 +41,7 @@ import { PoolToShieldEnum } from './enums/PoolToShieldEnum';
 import { SeedActionEnum } from './enums/SeedActionEnum';
 import { UfvkActionEnum } from './enums/UfvkActionEnum';
 import { SettingsNameEnum } from './enums/SettingsNameEnum';
-import { RouteEnums } from './enums/RouteEnums';
+import { RouteEnum } from './enums/RouteEnum';
 import { WalletOptionEnum } from './enums/WalletOptionEnum';
 import { AppStateStatusEnum } from './enums/AppStateStatusEnum';
 import { CurrencyNameEnum } from './enums/CurrencyNameEnum';
@@ -112,7 +112,7 @@ export {
   SeedActionEnum,
   UfvkActionEnum,
   SettingsNameEnum,
-  RouteEnums,
+  RouteEnum,
   WalletOptionEnum,
   AppStateStatusEnum,
   CurrencyNameEnum,

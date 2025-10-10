@@ -25,7 +25,6 @@ import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 
 export const defaultAppContextLoaded: AppContextLoaded = {
-  navigationHome: null,
   netInfo: {} as NetInfoType,
   syncingStatus: {} as RPCSyncStatusType,
   totalBalance: null,
@@ -70,8 +69,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   restartApp: () => {},
   somePending: false,
   addressBook: [] as AddressBookFileClass[],
-  launchAddressBook: () => new Promise(resolve => resolve),
-  addressBookCurrentAddress: '',
+  launchAddressBook: () => {},
   security: {} as SecurityType,
   selectServer: SelectServerEnum.auto,
   rescanMenu: false,
@@ -81,13 +79,9 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   doRefresh: () => {},
   setZecPrice: () => {},
   zenniesDonationAddress: '',
-  setComputingModalShow: () => new Promise(resolve => resolve),
-  closeAllModals: () => {},
-  setUfvkViewModalShow: () => new Promise(resolve => resolve),
-  setSyncReportModalShow: () => new Promise(resolve => resolve),
-  setPoolsModalShow: () => new Promise(resolve => resolve),
   zingolibVersion: '',
   performanceLevel: RPCPerformanceLevelEnum.Medium,
+  setPrivacyOption: async () => {},
 };
 
 export const ContextAppLoaded = React.createContext(defaultAppContextLoaded);

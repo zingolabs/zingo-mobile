@@ -16,7 +16,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
@@ -24,28 +24,28 @@ import {
   ButtonTypeEnum,
   FilterEnum,
   GlobalConst,
+  RouteEnum,
   ScreenEnum,
-  SelectServerEnum,
-  SendPageStateClass,
-  ServerType,
+  //SelectServerEnum,
+  //SendPageStateClass,
+  //ServerType,
   ValueTransferType,
 } from '../../app/AppState';
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import FadeText from '../Components/FadeText';
 import Button from '../Components/Button';
-import ValueTransferDetail from './components/ValueTransferDetail';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
-import { MessagesAddress } from '../Messages';
-import Utils from '../../app/utils';
-import { magicModal } from 'react-native-magic-modal';
+//import Utils from '../../app/utils';
 import { DataProvider, RecyclerListView, LayoutProvider, RecyclerListViewProps } from 'recyclerlistview';
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
 import { isEqual } from 'lodash';
 import { RecyclerListViewState } from 'recyclerlistview/dist/reactnative/core/RecyclerListView';
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { Swipeable } from 'react-native-gesture-handler';
 
 const ViewTypes = {
   WITH_MONTH: 0,
@@ -54,39 +54,38 @@ const ViewTypes = {
   WITHOUT_MONTH_REFRESH: 3,
 };
 
-type HistoryProps = {
+type HistoryProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.History> &  {
   // side menu
   toggleMenuDrawer: () => void;
   // privacy
-  setPrivacyOption: (value: boolean) => Promise<void>;
   // addLastSnackbar from context
   // shielding / sending
   setShieldingAmount: (value: number) => void;
   setScrollToTop: (value: boolean) => void;
   scrollToTop: boolean;
   setScrollToBottom: (value: boolean) => void;
-  scrollToBottom: boolean;
+  //scrollToBottom: boolean;
   // for messages
-  sendTransaction: (s: SendPageStateClass) => Promise<String>;
-  setServerOption: (
-    value: ServerType,
-    selectServer: SelectServerEnum,
-    toast: boolean,
-    sameServerChainName: boolean,
-  ) => Promise<void>;
+  //sendTransaction: (s: SendPageStateClass) => Promise<String>;
+  //setServerOption: (
+  //  value: ServerType,
+  //  selectServer: SelectServerEnum,
+  //  toast: boolean,
+  //  sameServerChainName: boolean,
+  //) => Promise<void>;
 };
 
 const History: React.FunctionComponent<HistoryProps> = ({
   toggleMenuDrawer,
-  setPrivacyOption,
   setShieldingAmount,
   setScrollToTop,
   scrollToTop,
   setScrollToBottom,
-  scrollToBottom,
-  sendTransaction,
-  setServerOption,
+  //scrollToBottom,
+  //sendTransaction,
+  //setServerOption,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -99,6 +98,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     zenniesDonationAddress,
     snackbars,
     removeFirstSnackbar,
+    setPrivacyOption,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -115,6 +115,21 @@ const History: React.FunctionComponent<HistoryProps> = ({
   const [filter, setFilter] = useState<FilterEnum>(FilterEnum.all);
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const scrollViewRef = useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(null);
+
+  const swipeablesRef = new Map<number, Swipeable>();
+
+  const registerSwipeable = (key: number) => (ref: Swipeable) => {
+    swipeablesRef.set(key, ref);
+  };
+
+  const closeAllSwipeables = (exceptKey?: number) => {
+    swipeablesRef.forEach((ref, k) => {
+      if (k !== exceptKey) {
+        // soporta ambas APIs según versión
+        ref.close();
+      }
+    });
+  };
 
   const layoutProvider = useMemo(
     () =>
@@ -283,43 +298,28 @@ const History: React.FunctionComponent<HistoryProps> = ({
   );
 
   const setValueTransferDetailModalShow = (index: number, vt: ValueTransferType) => {
-    return magicModal.show(
-      () => (
-        <ValueTransferDetail
-          index={index}
-          vt={vt}
-          valueTransfersSliced={valueTransfersSliced}
-          totalLength={valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0}
-          setPrivacyOption={setPrivacyOption}
-        />
-      ),
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      {
-        swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined,
-        style: { flex: 1, backgroundColor: colors.background },
-      },
-    ).promise;
+    navigation.navigate(RouteEnum.ValueTransferDetailStack, {
+      screen: RouteEnum.ValueTransferDetail,
+      params: { 
+        index: index, 
+        vt: vt,
+        valueTransfersSliced: valueTransfersSliced,
+        totalLength: valueTransfersFiltered !== null ? valueTransfersFiltered.length : 0
+      }
+    });
   };
 
+  /*
   const setMessagesAddressModalShow = (vt: ValueTransferType) => {
-    return magicModal.show(
-      () => (
-        <MessagesAddress
-          setPrivacyOption={setPrivacyOption}
-          setScrollToBottom={setScrollToBottom}
-          scrollToBottom={scrollToBottom}
-          address={Utils.messagesAddress(vt)}
-          sendTransaction={sendTransaction}
-          setServerOption={setServerOption}
-        />
-      ),
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      {
-        swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined,
-        style: { flex: 1, backgroundColor: colors.background },
-      },
-    ).promise;
+    navigation.navigate(RouteEnum.MessagesAddress, {
+      setScrollToBottom: setScrollToBottom,
+      scrollToBottom: scrollToBottom,
+      address: Utils.messagesAddress(vt),
+      sendTransaction: sendTransaction,
+      setServerOption: setServerOption,
+    });
   };
+  */
 
   const rowRenderer = (type: string | number, data: ValueTransferType, index: number) => {
     let txmonth = data && data.time ? moment(data.time * 1000).format('MMM YYYY') : '--- ----';
@@ -333,9 +333,11 @@ const History: React.FunctionComponent<HistoryProps> = ({
         nextLineWithSameTxid={
           index >= valueTransfersSliced.length - 1 ? false : valueTransfersSliced[index + 1].txid === data.txid
         }
-        setMessagesAddressModalShow={setMessagesAddressModalShow}
         addressProtected={data.address === zenniesDonationAddress}
         screenName={screenName}
+        registerSwipeable={registerSwipeable(index)}
+        closeAllSwipeables={() => closeAllSwipeables()}
+        closeOtherSwipeables={() => closeAllSwipeables(index)}
       />
     );
   };

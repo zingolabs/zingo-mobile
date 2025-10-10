@@ -1,13 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { View, ScrollView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 
 import RegText from '../Components/RegText';
 import Button from '../Components/Button';
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import moment from 'moment';
@@ -15,21 +14,31 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { ButtonTypeEnum, ScreenEnum, SelectServerEnum, SnackbarDurationEnum } from '../../app/AppState';
-import { useMagicModal } from 'react-native-magic-modal';
+import { ButtonTypeEnum, RouteEnum, ScreenEnum, SelectServerEnum, SnackbarDurationEnum } from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type RescanProps = {
+type RescanProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Rescan> & {
   doRescan: () => Promise<void>;
 };
 
-const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
+const Rescan: React.FunctionComponent<RescanProps> = ({ 
+  navigation,
+  doRescan 
+}) => {
   const context = useContext(ContextAppLoaded);
-  const { wallet, translate, netInfo, addLastSnackbar, language, selectServer, snackbars, removeFirstSnackbar } = context;
+  const { 
+    wallet, 
+    translate, 
+    netInfo, 
+    addLastSnackbar, 
+    language, 
+    selectServer, 
+    snackbars, 
+    removeFirstSnackbar,
+  } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Rescan;
@@ -42,7 +51,10 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
     // was removed the `await` here because launching the rescan can
     // take a lot of time and it's better the App responsive.
     doRescan();
-    hide();
+    clear();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
     setTimeout(() => {
       // because this message is between screens.
       addLastSnackbar({
@@ -63,10 +75,6 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
 
       <View
         style={{
-          marginTop: top,
-          marginBottom: bottom,
-          marginRight: right,
-          marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
         }}>
@@ -80,7 +88,9 @@ const Rescan: React.FunctionComponent<RescanProps> = ({ doRescan }) => {
           noUfvkIcon={true}
           closeScreen={() => {
             clear();
-            hide();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
           }}
         />
         <ScrollView

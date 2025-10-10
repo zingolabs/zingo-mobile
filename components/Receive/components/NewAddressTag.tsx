@@ -26,8 +26,14 @@ type NewAddressTagProps = {
   address: string;
   closeSheet: () => void;
   setAddressBook: (ab: AddressBookFileClass[]) => void;
+  setHeightLayout: (h: number) => void;
 };
-const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({ address, closeSheet, setAddressBook }) => {
+const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({ 
+  address, 
+  closeSheet, 
+  setAddressBook,
+  setHeightLayout,
+}) => {
   const context = useContext(ContextAppLoaded);
   const { translate, language } = context;
   const { colors } = useTheme() as ThemeType;
@@ -41,10 +47,10 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({ address, c
       if (!label) {
         return;
       }
-      console.log(label, address);
+      //console.log(label, address);
       const randomColors = Utils.generateColorList(1);
       const ab = await AddressBookFileImpl.writeAddressBookItem(label, address, randomColors[0], true);
-      console.log(ab);
+      //console.log(ab);
       setAddressBook(ab);
     } catch (error) {
       console.log(`Critical Error new address ${error}`);
@@ -59,7 +65,15 @@ const NewAddressTag: React.FunctionComponent<NewAddressTagProps> = ({ address, c
   };
 
   return (
-    <View style={{ backgroundColor: colors.background }}>
+    <View 
+      onLayout={e => {
+        const { height } = e.nativeEvent.layout;
+        //console.log('LAYOUTTT', height);
+        setHeightLayout(height + 70);
+      }}
+      style={{ 
+        backgroundColor: colors.background 
+      }}>
       <TouchableOpacity
         onPress={() => {
           setLabel('');
