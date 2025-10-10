@@ -6,5 +6,5 @@ export default interface SnackbarType {
   screenName: ScreenEnum[];
   duration?: SnackbarDurationEnum;
 
-  // eslint-disable-next-line semi
+   
 }

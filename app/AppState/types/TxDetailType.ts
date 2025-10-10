@@ -14,5 +14,5 @@ export default interface TxDetailType {
   amount: number;
   memos?: string[];
   poolType?: PoolEnum;
-  // eslint-disable-next-line semi
+   
 }

@@ -24,7 +24,7 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faCircleUser,
@@ -38,6 +38,7 @@ import {
   AddressBookFileClass,
   ButtonTypeEnum,
   GlobalConst,
+  RouteEnum,
   ScreenEnum,
   SelectServerEnum,
   SendPageStateClass,
@@ -46,27 +47,24 @@ import {
   ToAddrClass,
   ValueTransferType,
 } from '../../../app/AppState';
-import { ThemeType } from '../../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import FadeText from '../../Components/FadeText';
 import Button from '../../Components/Button';
-import ValueTransferDetail from '../../History/components/ValueTransferDetail';
 import MessageLine from './MessageLine';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import AddressItem from '../../Components/AddressItem';
-import Memo from '../../Memo';
 import { sendEmail } from '../../../app/sendEmail';
 import { createAlert } from '../../../app/createAlert';
 import selectingServer from '../../../app/selectingServer';
 import { serverUris } from '../../../app/uris';
 import Utils from '../../../app/utils';
-import { magicModal } from 'react-native-magic-modal';
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../../Components/Snackbars';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type MessageListProps = {
+type MessageListProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Messages> & {
   toggleMenuDrawer: () => void;
-  setPrivacyOption: (value: boolean) => Promise<void>;
   setScrollToBottom: (value: boolean) => void;
   scrollToBottom: boolean;
   address?: string;
@@ -82,13 +80,13 @@ type MessageListProps = {
 
 const MessageList: React.FunctionComponent<MessageListProps> = ({
   toggleMenuDrawer,
-  setPrivacyOption,
   setScrollToBottom,
   scrollToBottom,
   address,
   sendTransaction,
   setServerOption,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
     translate,
@@ -107,6 +105,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     zingolibVersion,
     snackbars,
     removeFirstSnackbar,
+    setPrivacyOption,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -494,33 +493,23 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
   ]);
 
   const setMemoModalShow = () => {
-    return magicModal.show(
-      () => <Memo message={memo} includeUAMessage={true} setMessage={setMemo} />,
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      {
-        swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined,
-        style: { flex: 1, backgroundColor: colors.background },
-      },
-    ).promise;
+    navigation.navigate(RouteEnum.Memo, { 
+      message: memo,
+      includeUAMessage: true,
+      setMessage: setMemo,
+    });
   };
 
   const setValueTransferDetailModalShow = async (index: number, vt: ValueTransferType) => {
-    return magicModal.show(
-      () => (
-        <ValueTransferDetail
-          index={index}
-          vt={vt}
-          valueTransfersSliced={messagesSliced}
-          totalLength={messagesFiltered ? messagesFiltered.length : 0}
-          setPrivacyOption={setPrivacyOption}
-        />
-      ),
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      {
-        swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined,
-        style: { flex: 1, backgroundColor: colors.background },
-      },
-    ).promise;
+    navigation.navigate(RouteEnum.ValueTransferDetailStack, {
+      screen: RouteEnum.ValueTransferDetail,
+      params: {
+        index: index,
+        vt: vt,
+        valueTransfersSliced: messagesSliced,
+        totalLength: messagesFiltered ? messagesFiltered.length : 0,
+      }
+    });
   };
 
   //if (address) {
@@ -858,7 +847,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
                     }}
                     editable={!disableSend && spendable > 0}
                     onContentSizeChange={(e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => {
-                      console.log(e.nativeEvent.contentSize.height);
+                      //console.log(e.nativeEvent.contentSize.height);
                       if (e.nativeEvent.contentSize.height < 48) {
                         setMemoFieldHeight(48 + 30);
                       } else if (e.nativeEvent.contentSize.height < 90) {

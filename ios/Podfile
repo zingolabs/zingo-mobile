@@ -30,6 +30,14 @@ target 'ZingoMobile' do
   end
 
   post_install do |installer|
+    min = min_ios_version_supported.to_s
+    installer.pods_project.targets.each do |t|
+      t.build_configurations.each do |cfg|
+        cfg.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = min
+        cfg.build_settings['IPHONEOS_DEPLOYMENT_TARGET[sdk=iphonesimulator*]'] = min
+      end
+    end
+
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
       installer,

@@ -1,14 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
 import { View, ScrollView, ActivityIndicator } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@react-navigation/native';
 
 import ZecAmount from '../Components/ZecAmount';
 import BoldText from '../Components/BoldText';
 import DetailLine from '../Components/DetailLine';
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -19,21 +18,34 @@ import 'moment/locale/es';
 import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
-import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
-import { ScreenEnum } from '../../app/AppState';
+import { RouteEnum, ScreenEnum } from '../../app/AppState';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type PoolsProps = {
-  setPrivacyOption: (value: boolean) => Promise<void>;
-};
+type PoolsProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Pools>;
 
-const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
+const Pools: React.FunctionComponent<PoolsProps> = ({
+  navigation,
+ }) => {
   const context = useContext(ContextAppLoaded);
-  const { totalBalance, info, translate, privacy, addLastSnackbar, somePending, language, shieldingAmount, snackbars, removeFirstSnackbar, orchardPool, saplingPool, transparentPool } = context;
+  const { 
+    totalBalance, 
+    info, 
+    translate, 
+    privacy, 
+    addLastSnackbar, 
+    somePending, 
+    language, 
+    shieldingAmount, 
+    snackbars, 
+    removeFirstSnackbar, 
+    orchardPool, 
+    saplingPool, 
+    transparentPool,
+    setPrivacyOption,
+  } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Pools;
@@ -50,10 +62,6 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
 
       <View
         style={{
-          marginTop: top,
-          marginBottom: bottom,
-          marginRight: right,
-          marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
         }}>
@@ -68,7 +76,9 @@ const Pools: React.FunctionComponent<PoolsProps> = ({ setPrivacyOption }) => {
           addLastSnackbar={addLastSnackbar}
           closeScreen={() => {
             clear();
-            hide();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
           }}
         />
         <ScrollView

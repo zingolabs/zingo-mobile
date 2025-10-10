@@ -11,7 +11,6 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { MagicModalPortal, magicModal } from 'react-native-magic-modal';
 import { BottomTabBarButtonProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faDownload, faCog, faRefresh, faPaperPlane, faClockRotateLeft, faComments } from '@fortawesome/free-solid-svg-icons';
@@ -20,7 +19,7 @@ import { I18n } from 'i18n-js';
 import * as RNLocalize from 'react-native-localize';
 import { isEqual } from 'lodash';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList, LoadingAppNavigationState } from '../types';
+import { LoadingAppNavigationState, AppDrawerParamList } from '../types';
 import NetInfo, { NetInfoSubscription, NetInfoState } from '@react-native-community/netinfo/src/index';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 
@@ -48,7 +47,7 @@ import {
   SeedActionEnum,
   UfvkActionEnum,
   SettingsNameEnum,
-  RouteEnums,
+  RouteEnum,
   SnackbarType,
   AppStateStatusEnum,
   GlobalConst,
@@ -83,7 +82,7 @@ import { AddressBook } from '../../components/AddressBook';
 import { AddressBookFileImpl } from '../../components/AddressBook';
 import simpleBiometrics from '../simpleBiometrics';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
-import { createUpdateRecoveryWalletInfo, removeRecoveryWalletInfo } from '../recoveryWalletInfo';
+import { createUpdateRecoveryWalletInfo, removeRecoveryWalletInfo } from '../recoveryWalletInfov10';
 
 import History from '../../components/History';
 import Send from '../../components/Send';
@@ -92,13 +91,21 @@ import Settings from '../../components/Settings';
 import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
-import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import MessageList from '../../components/Messages/components/MessageList';
 import { ToastProvider } from 'react-native-toastier';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCCheckAddressType } from '../rpc/types/RPCCheckAddressType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
+import { AddressList } from '../../components/AddressList';
+import ScannerAddress from '../../components/Send/components/ScannerAddress';
+import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
+import { MessagesAddress, MessagesAll } from '../../components/Messages';
+import Memo from '../../components/Memo';
+import Confirm from '../../components/Send/components/Confirm';
+import { AppStackParamList } from '../types';
+import { DrawerContentComponentProps } from '@react-navigation/drawer';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const About = React.lazy(() => import('../../components/About'));
 const Seed = React.lazy(() => import('../../components/Seed'));
@@ -116,14 +123,15 @@ const pt = require('../translations/pt.json');
 const ru = require('../translations/ru.json');
 const tr = require('../translations/tr.json');
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<AppDrawerParamList>();
+const Stack = createNativeStackNavigator<AppDrawerParamList>();
 
 // for testing
 //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 type LoadedAppProps = {
-  navigation: StackScreenProps<RootStackParamList, RouteEnums.LoadedApp>['navigation'];
-  route: StackScreenProps<RootStackParamList, RouteEnums.LoadedApp>['route'];
+  navigation: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['navigation'];
+  route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
 };
 
@@ -172,12 +180,12 @@ export default function LoadedApp(props: LoadedAppProps) {
   const i18n = useMemo(() => new I18n(file), [file]);
 
   const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
-  const readOnly = props.route.params ? props.route.params.readOnly : false;
-  const orchardPool = props.route.params ? props.route.params.orchardPool : false;
-  const saplingPool = props.route.params ? props.route.params.saplingPool : false;
-  const transparentPool = props.route.params ? props.route.params.transparentPool : false;
-  const newWallet = props.route.params ? props.route.params.newWallet : false;
-  const firstLaunchingMessage = props.route.params ? props.route.params.firstLaunchingMessage : LaunchingModeEnum.opening;
+  const readOnly = !!props.route.params && props.route.params.readOnly !== undefined ? props.route.params.readOnly : false;
+  const orchardPool = !!props.route.params && props.route.params.orchardPool !== undefined ? props.route.params.orchardPool : false;
+  const saplingPool = !!props.route.params && props.route.params.saplingPool !== undefined ? props.route.params.saplingPool : false;
+  const transparentPool = !!props.route.params && props.route.params.transparentPool !== undefined ? props.route.params.transparentPool : false;
+  const newWallet = !!props.route.params && props.route.params.newWallet !== undefined ? props.route.params.newWallet : false;
+  const firstLaunchingMessage = !!props.route.params && props.route.params.firstLaunchingMessage !== undefined ? props.route.params.firstLaunchingMessage : LaunchingModeEnum.opening;
 
   useEffect(() => {
     (async () => {
@@ -199,7 +207,7 @@ export default function LoadedApp(props: LoadedAppProps) {
 
       //I have to check what language is in the settings
       const settings = await SettingsFileImpl.readSettings();
-      console.log('LoadedApp', settings);
+      //console.log('LoadedApp', settings);
 
       // for testing
       //await delay(5000);
@@ -334,7 +342,7 @@ export default function LoadedApp(props: LoadedAppProps) {
           if (!a.hasOwnProperty('own')) {
             // verify this address as own or not
             const checkStr = await RPCModule.checkMyAddressInfo(a.address);
-            console.log(checkStr);
+            //console.log(checkStr);
             if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
               const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
               own = checkJSON.is_wallet_address;
@@ -410,7 +418,7 @@ export default function LoadedApp(props: LoadedAppProps) {
       setAddressBook(abSorted);
       await AddressBookFileImpl.writeAddressBook(abSorted);
       setLoading(false);
-      console.log('LoadedApp functional component - finished');
+      //console.log('LoadedApp functional component - finished');
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -474,8 +482,8 @@ const Loading: React.FC<LoadingProps> = ({ backgroundColor, spinColor }) => {
 };
 
 type LoadedAppClassProps = {
-  navigationApp: StackScreenProps<RootStackParamList, RouteEnums.LoadedApp>['navigation'];
-  route: StackScreenProps<RootStackParamList, RouteEnums.LoadedApp>['route'];
+  navigationApp: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['navigation'];
+  route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
   toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
   theme: ThemeType;
@@ -522,7 +530,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     this.state = {
       //context
-      navigationHome: null,
       netInfo: {} as NetInfoType,
       totalBalance: null,
       addresses: null,
@@ -556,18 +563,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       somePending: false,
       addressBook: props.addressBook,
       launchAddressBook: this.launchAddressBook,
-      addressBookCurrentAddress: '',
       shieldingAmount: 0,
       showSwipeableIcons: true,
       doRefresh: this.doRefresh,
       setZecPrice: this.setZecPrice,
       zenniesDonationAddress: props.zenniesDonationAddress,
-      setComputingModalShow: this.setComputingModalShow,
-      closeAllModals: this.closeAllModals,
-      setUfvkViewModalShow: this.setUfvkViewModalShow,
-      setSyncReportModalShow: this.setSyncReportModalShow,
-      setPoolsModalShow: this.setPoolsModalShow,
       zingolibVersion: '',
+      setPrivacyOption: this.setPrivacyOption,
 
       // context settings
       server: props.server,
@@ -584,6 +586,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       performanceLevel: props.performanceLevel,
 
       // state
+      navigationHome: null,
       appStateStatus: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
       newServer: {} as ServerType,
       newSelectServer: null,
@@ -746,14 +749,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
 
     const initialUrl = await Linking.getInitialURL();
+    console.log('INITIAL URI', initialUrl);
     if (initialUrl !== null) {
-      console.log('INITIAL URI', initialUrl);
       this.readUrl(initialUrl);
 
-      this.closeAllModals();
-      this.state.navigationHome?.navigate(RouteEnums.Home, {
-        screen: this.state.translate('loadedapp.send-menu'),
-        initial: false,
+      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
+        screen: RouteEnum.Send,
       });
     }
 
@@ -763,10 +764,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.readUrl(url);
       }
 
-      this.closeAllModals();
-      this.state.navigationHome?.navigate(RouteEnums.Home, {
-        screen: this.state.translate('loadedapp.send-menu'),
-        initial: false,
+      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
+        screen: RouteEnum.Send,
       });
     });
 
@@ -865,50 +864,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  closeAllModals = () => {
-    magicModal.hideAll();
-  };
-
   fetchBackgroundSyncing = async () => {
     const backgroundJson: BackgroundType = await BackgroundFileImpl.readBackground();
     if (!isEqual(this.state.background, backgroundJson)) {
       //console.log('fetch background sync info');
       this.setState({ background: backgroundJson });
     }
-  };
-
-  setSeedViewModalShow = async () => {
-    const { colors } = this.props.theme;
-    return magicModal.show(
-      () => (
-        <Seed
-          onClickOK={() => {}}
-          onClickCancel={() => {}}
-          action={SeedActionEnum.view}
-          setPrivacyOption={this.setPrivacyOption}
-          keepAwake={this.keepAwake}
-          setIsSeedViewModalOpen={this.setIsSeedViewModalOpen}
-        />
-      ),
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-    ).promise;
-  };
-
-  setUfvkViewModalShow = async () => {
-    const { colors } = this.props.theme;
-    return magicModal.show(
-      () => (
-        <ShowUfvk
-          onClickOK={() => {}}
-          onClickCancel={() => {}}
-          action={UfvkActionEnum.view}
-          setPrivacyOption={this.setPrivacyOption}
-        />
-      ),
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-    ).promise;
   };
 
   setShieldingAmount = (value: number) => {
@@ -958,7 +919,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           // I need to check this out in the seed screen.
           if (!this.state.isSeedViewModalOpen) {
             this.setIsSeedViewModalOpen(true);
-            await this.setSeedViewModalShow();
+            this.state.navigationHome?.navigate(RouteEnum.Seed, { 
+              action: SeedActionEnum.view 
+            });
           }
         }
       }
@@ -1169,12 +1132,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setComputingModalShow = () => {
-    const { colors } = this.props.theme;
-    // no swipping right in this modal.
-    return magicModal.show(() => <ComputingTxContent />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
-  };
-
   setInfo = (newInfo: InfoType) => {
     if (!isEqual(this.state.info, newInfo)) {
       // if currencyName is empty,
@@ -1254,87 +1211,60 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   onMenuItemSelected = async (item: MenuItemEnum) => {
-    const { colors } = this.props.theme;
-    // Depending on the menu item, open the appropriate modal
+    // Depending on the menu item, open the appropriate screen
     if (item === MenuItemEnum.About) {
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      return magicModal.show(() => <About />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
+      this.state.navigationHome?.navigate(RouteEnum.About);
+      return;
     } else if (item === MenuItemEnum.Rescan) {
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      return magicModal.show(() => <Rescan doRescan={this.doRescan} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
+      this.state.navigationHome?.navigate(RouteEnum.Rescan);
+      return;
     } else if (item === MenuItemEnum.Info) {
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      return magicModal.show(() => <Info />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
+      this.state.navigationHome?.navigate(RouteEnum.Info);
+      return;
     } else if (item === MenuItemEnum.SyncReport) {
-      return this.setSyncReportModalShow();
+      this.state.navigationHome?.navigate(RouteEnum.SyncReport);
+      return;
     } else if (item === MenuItemEnum.FundPools) {
-      return this.setPoolsModalShow();
+      this.state.navigationHome?.navigate(RouteEnum.Pools);
+      return;
     } else if (item === MenuItemEnum.Insight) {
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      return magicModal.show(() => <Insight setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } })
-        .promise;
+      this.state.navigationHome?.navigate(RouteEnum.InsightStack, {
+        screen: RouteEnum.Insight,
+      });
+      return;
     } else if (item === MenuItemEnum.WalletSeedUfvk) {
       if (this.state.readOnly) {
-        await this.setUfvkViewModalShow();
+        this.state.navigationHome?.navigate(RouteEnum.Ufvk, { 
+          action: UfvkActionEnum.view 
+        });
       } else {
-        await this.setSeedViewModalShow();
+        this.state.navigationHome?.navigate(RouteEnum.Seed, { 
+          action: SeedActionEnum.view 
+        });
       }
+      return;
     } else if (item === MenuItemEnum.ChangeWallet) {
       if (this.state.readOnly) {
-        return magicModal.show(
-          () => (
-            <ShowUfvk
-              onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
-              onClickCancel={() => {}}
-              action={UfvkActionEnum.change}
-              setPrivacyOption={this.setPrivacyOption}
-            />
-          ),
-          // possible problem if scrolling vertically, if so change to `undefined`.
-          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-        ).promise;
+        this.state.navigationHome?.navigate(RouteEnum.Ufvk, { 
+          action: UfvkActionEnum.change 
+        });
       } else {
-        return magicModal.show(
-          () => (
-            <Seed
-              onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
-              onClickCancel={() => {}}
-              action={SeedActionEnum.change}
-              setPrivacyOption={this.setPrivacyOption}
-            />
-          ),
-          // possible problem if scrolling vertically, if so change to `undefined`.
-          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-        ).promise;
+        this.state.navigationHome?.navigate(RouteEnum.Seed, { 
+          action: SeedActionEnum.change 
+        });
       }
+      return;
     } else if (item === MenuItemEnum.RestoreWalletBackup) {
       if (this.state.readOnly) {
-        return magicModal.show(
-          () => (
-            <ShowUfvk
-              onClickOK={async () => await this.onClickOKRestoreBackup()}
-              onClickCancel={() => {}}
-              action={UfvkActionEnum.backup}
-              setPrivacyOption={this.setPrivacyOption}
-            />
-          ),
-          // possible problem if scrolling vertically, if so change to `undefined`.
-          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-        ).promise;
+        this.state.navigationHome?.navigate(RouteEnum.Ufvk, { 
+          action: UfvkActionEnum.backup 
+        });
       } else {
-        return magicModal.show(
-          () => (
-            <Seed
-              onClickOK={async () => await this.onClickOKRestoreBackup()}
-              onClickCancel={() => {}}
-              action={SeedActionEnum.backup}
-              setPrivacyOption={this.setPrivacyOption}
-            />
-          ),
-          // possible problem if scrolling vertically, if so change to `undefined`.
-          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-        ).promise;
+        this.state.navigationHome?.navigate(RouteEnum.Seed, { 
+          action: SeedActionEnum.backup 
+        });
       }
+      return;
     } else if (item === MenuItemEnum.LoadWalletFromSeed) {
       const { translate } = this.state;
       Alert.alert(
@@ -1368,12 +1298,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         { cancelable: false },
       );
     } else if (item === MenuItemEnum.AddressBook) {
-      this.setState({
-        addressBookCurrentAddress: '',
-      });
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } })
-        .promise;
+      this.launchAddressBook('', this.screenName);
+      return;
     } else if (item === MenuItemEnum.VoteForNym) {
       let update = false;
       if (
@@ -1406,10 +1332,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
         this.setSendPageState(newSendPageState);
       }
-      this.closeAllModals();
-      this.state.navigationHome?.navigate(RouteEnums.Home, {
-        screen: this.state.translate('loadedapp.send-menu'),
-        initial: false,
+      this.state.navigationHome?.navigate(RouteEnum.HomeStack, {
+        screen: RouteEnum.Send,
       });
     } else if (item === MenuItemEnum.Support) {
       this.setShowSwipeableIcons(false);
@@ -1431,7 +1355,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     toast: boolean,
     sameServerChainName: boolean,
   ): Promise<void> => {
-    const { colors } = this.props.theme;
     // here I know the server was changed, clean all the tasks before anything.
     await this.rpc.clearTimers();
     this.setSyncingStatus({} as RPCSyncStatusType);
@@ -1497,39 +1420,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (error) {
       // I need to open the modal ASAP, and keep going with the toast.
       if (this.state.readOnly) {
-        magicModal.show(
-          () => (
-            <ShowUfvk
-              onClickOK={async () => await this.onClickOKServerWallet()}
-              onClickCancel={async () => {
-                // restart all the tasks again, nothing happen.
-                await this.rpc.clearTimers();
-                await this.rpc.configure();
-              }}
-              action={UfvkActionEnum.server}
-              setPrivacyOption={this.setPrivacyOption}
-            />
-          ),
-          // possible problem if scrolling vertically, if so change to `undefined`.
-          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-        );
+        this.state.navigationHome?.navigate(RouteEnum.Ufvk, { 
+          action: UfvkActionEnum.server 
+        });
       } else {
-        magicModal.show(
-          () => (
-            <Seed
-              onClickOK={async () => await this.onClickOKServerWallet()}
-              onClickCancel={async () => {
-                // restart all the tasks again, nothing happen.
-                await this.rpc.clearTimers();
-                await this.rpc.configure();
-              }}
-              action={SeedActionEnum.server}
-              setPrivacyOption={this.setPrivacyOption}
-            />
-          ),
-          // possible problem if scrolling vertically, if so change to `undefined`.
-          { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-        );
+        this.state.navigationHome?.navigate(RouteEnum.Seed, { 
+          action: SeedActionEnum.server 
+        });
       }
       //console.log(`Error Reading Wallet ${value} - ${error}`);
       if (toast) {
@@ -1562,11 +1459,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (value === CurrencyEnum.USDTORCurrency || value === CurrencyEnum.USDCurrency) {
       // when the user select USD
       // the App have to create a Tor Client
-      console.log('before CREATE ------------------- TOR CLIENT');
+      //console.log('before CREATE ------------------- TOR CLIENT');
       const result = await RPCModule.createTorClientProcess();
       console.log('after CREATE ------------------- TOR CLIENT', result);
     } else {
-      console.log('before REMOVE ------------------- TOR CLIENT');
+      //console.log('before REMOVE ------------------- TOR CLIENT');
       const result = await RPCModule.removeTorClientProcess();
       console.log('after REMOVE ------------------- TOR CLIENT', result);
     }
@@ -1703,7 +1600,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       index: 0,
       routes: [
         {
-          name: RouteEnums.LoadingApp,
+          name: RouteEnum.LoadingApp,
           params: state,
         },
       ],
@@ -1837,19 +1734,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setSyncReportModalShow = async () => {
-    const { colors } = this.props.theme;
-    // possible problem if scrolling vertically, if so change to `undefined`.
-    return magicModal.show(() => <SyncReport />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } }).promise;
-  };
-
-  setPoolsModalShow = async () => {
-    const { colors } = this.props.theme;
-    // possible problem if scrolling vertically, if so change to `undefined`.
-    return magicModal.show(() => <Pools setPrivacyOption={this.setPrivacyOption} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } })
-      .promise;
-  };
-
   setBackgroundError = (title: string, error: string) => {
     this.setState({ backgroundError: { title, error } });
   };
@@ -1876,14 +1760,40 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
   // close modal make sense because this is called
   // in a component which can live in differents screens
-  launchAddressBook = (address: string) => {
-    const { colors } = this.props.theme;
-    this.setState({
-      addressBookCurrentAddress: address,
-    });
-    // possible problem if scrolling vertically, if so change to `undefined`.
-    return magicModal.show(() => <AddressBook setAddressBook={this.setAddressBook} />, { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } })
-      .promise;
+  launchAddressBook = (address: string, screenName: ScreenEnum) => {
+    if (screenName === ScreenEnum.LoadedApp || screenName === ScreenEnum.Send) {
+      this.state.navigationHome?.navigate(RouteEnum.AddressBookStack, {
+        screen: RouteEnum.AddressBook,
+        params: {
+          currentAddress: address,
+          routeStack: RouteEnum.AddressBookStack,
+        }
+      });
+    } else if (screenName === ScreenEnum.ValueTransferDetail) {
+      this.state.navigationHome?.navigate(RouteEnum.ValueTransferDetailStack, {
+        screen: RouteEnum.AddressBook,
+        params: {
+          currentAddress: address,
+          routeStack: RouteEnum.ValueTransferDetailStack,
+        }
+      });
+    } else if (screenName === ScreenEnum.Confirm) {
+      this.state.navigationHome?.navigate(RouteEnum.ConfirmStack, {
+        screen: RouteEnum.AddressBook,
+        params: {
+          currentAddress: address,
+          routeStack: RouteEnum.ConfirmStack,
+        }
+      });
+    } else if (screenName === ScreenEnum.Insight) {
+      this.state.navigationHome?.navigate(RouteEnum.InsightStack, {
+        screen: RouteEnum.AddressBook,
+        params: {
+          currentAddress: address,
+          routeStack: RouteEnum.InsightStack,
+        }
+      });
+    }
   };
 
   setScrollToTop = (value: boolean) => {
@@ -1898,7 +1808,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
   };
 
-  setNavigation = (navigationHome: DrawerContentComponentProps['navigation']) => {
+  setNavigationHome = (navigationHome: DrawerContentComponentProps['navigation']) => {
     if (!this.state.navigationHome) {
       this.setState({
         navigationHome,
@@ -1924,7 +1834,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
     const context = {
       //context
-      navigationHome: this.state.navigationHome,
       netInfo: this.state.netInfo,
       wallet: this.state.wallet,
       totalBalance: this.state.totalBalance,
@@ -1953,7 +1862,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       removeFirstSnackbar: this.state.removeFirstSnackbar,
       addressBook: this.state.addressBook,
       launchAddressBook: this.state.launchAddressBook,
-      addressBookCurrentAddress: this.state.addressBookCurrentAddress,
       shieldingAmount: this.state.shieldingAmount,
       restartApp: this.state.restartApp,
       somePending: this.state.somePending,
@@ -1961,12 +1869,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       doRefresh: this.state.doRefresh,
       setZecPrice: this.state.setZecPrice,
       zenniesDonationAddress: this.state.zenniesDonationAddress,
-      setComputingModalShow: this.setComputingModalShow,
-      closeAllModals: this.closeAllModals,
-      setUfvkViewModalShow: this.setUfvkViewModalShow,
-      setSyncReportModalShow: this.setSyncReportModalShow,
-      setPoolsModalShow: this.setPoolsModalShow,
       zingolibVersion: this.state.zingolibVersion,
+      setPrivacyOption: this.setPrivacyOption,
 
       // context settings
       server: this.state.server,
@@ -1986,9 +1890,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     const fnTabBarIcon = (route: { name: string; key: string }, focused: boolean) => {
       var iconName;
 
-      if (route.name === translate('loadedapp.history-menu')) {
+      if (route.name === RouteEnum.History) {
         iconName = faClockRotateLeft;
-      } else if (route.name === translate('loadedapp.send-menu')) {
+      } else if (route.name === RouteEnum.Send) {
         if (
           mode === ModeEnum.basic &&
           !!totalBalance &&
@@ -2003,9 +1907,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         } else {
           iconName = faPaperPlane;
         }
-      } else if (route.name === translate('loadedapp.receive-menu')) {
+      } else if (route.name === RouteEnum.Receive) {
         iconName = faDownload;
-      } else if (route.name === translate('loadedapp.messages-menu')) {
+      } else if (route.name === RouteEnum.Messages) {
         iconName = faComments;
       } else {
         iconName = faCog;
@@ -2033,11 +1937,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
         <ContextAppLoadedProvider value={context}>
           <GestureHandlerRootView>
-            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnums.Home} screenName={this.screenName}>
-              <Drawer.Screen name={RouteEnums.Home}>
-                {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {
+            <Drawer onMenuItemSelected={this.onMenuItemSelected} initialRouteName={RouteEnum.HomeStack} screenName={this.screenName}>
+              <Drawer.Screen name={RouteEnum.HomeStack}>
+                {props => {
                   useEffect(() => {
-                    this.setNavigation(navigation);
+                    this.setNavigationHome(props.navigation);
                   });
                   return (
                   <>
@@ -2046,13 +1950,22 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                     (!readOnly && !!totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0) ? (
                       <Tab.Navigator
                         detachInactiveScreens={true}
-                        initialRouteName={translate('loadedapp.history-menu') as string}
+                        initialRouteName={RouteEnum.History}
                         screenOptions={({ route }: { route: { name: string; key: string } }) => ({
                           tabBarIcon: ({ focused }) => fnTabBarIcon(route, focused),
                           tabBarIconStyle: {
                             alignSelf: 'center',
                             marginBottom: 2,
                           },
+                          tabBarLabel: route.name === RouteEnum.History
+                            ? (translate('loadedapp.history-menu') as string)
+                            : route.name === RouteEnum.Send
+                              ? (translate('loadedapp.send-menu') as string)
+                              : route.name === RouteEnum.Receive
+                                ? (translate('loadedapp.receive-menu') as string)
+                                : route.name === RouteEnum.Messages
+                                  ? (translate('loadedapp.messages-menu') as string)
+                                  : '',
                           tabBarLabelPosition: 'below-icon',
                           tabBarLabelStyle: {
                             alignSelf: 'center',
@@ -2072,18 +1985,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                           headerShown: false,
                           tabBarButton: renderTabPressable(colors),
                         })}>
-                        <Tab.Screen name={translate('loadedapp.history-menu') as string}>
-                          {() => (
-                            <History
-                              toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
-                              setPrivacyOption={this.setPrivacyOption /* header */}
+                        <Tab.Screen name={RouteEnum.History}>
+                          {propsTab => (
+                            <History {...propsTab}
+                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                               setShieldingAmount={this.setShieldingAmount /* header */}
                               setScrollToTop={this.setScrollToTop /* header & history */}
                               scrollToTop={scrollToTop /* history */}
                               setScrollToBottom={this.setScrollToBottom /* header & messages */}
-                              scrollToBottom={scrollToBottom /* messages */}
-                              sendTransaction={this.sendTransaction /* messages */}
-                              setServerOption={this.setServerOption /* messages */}
                             />
                           )}
                         </Tab.Screen>
@@ -2097,11 +2006,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                                 (totalBalance.totalSaplingBalance > 0 && totalBalance.confirmedSaplingBalance === 0)
                               ) &&
                               somePending)) && (
-                            <Tab.Screen name={translate('loadedapp.send-menu') as string}>
-                              {() => (
-                                <Send
-                                  toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
-                                  setPrivacyOption={this.setPrivacyOption /* header */}
+                            <Tab.Screen name={RouteEnum.Send}>
+                              {propsTab => (
+                                <Send {...propsTab}
+                                  toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                                   setShieldingAmount={this.setShieldingAmount /* header */}
                                   setScrollToTop={this.setScrollToTop /* header & send */}
                                   setScrollToBottom={this.setScrollToBottom /* header & send */}
@@ -2113,21 +2021,20 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                               )}
                             </Tab.Screen>
                           )}
-                        <Tab.Screen name={translate('loadedapp.receive-menu') as string}>
-                          {() => (
-                            <Receive
-                              toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                        <Tab.Screen name={RouteEnum.Receive}>
+                          {propsTab => (
+                            <Receive {...propsTab}
+                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                               alone={false /* receive */}
                               setSecurityOption={this.setSecurityOption}
                               setAddressBook={this.setAddressBook}
                             />
                           )}
                         </Tab.Screen>
-                        <Tab.Screen name={translate('loadedapp.messages-menu') as string}>
-                          {() => (
-                            <MessageList
-                              toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
-                              setPrivacyOption={this.setPrivacyOption /* header */}
+                        <Tab.Screen name={RouteEnum.Messages}>
+                          {propsTab => (
+                            <MessageList {...propsTab}
+                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                               setScrollToBottom={this.setScrollToBottom /* header & messages */}
                               scrollToBottom={scrollToBottom /* messages */}
                               sendTransaction={this.sendTransaction /* messages */}
@@ -2142,17 +2049,17 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                           <Loading backgroundColor={colors.background} spinColor={colors.primary} />
                         ) : (
                           <Tab.Navigator
-                            initialRouteName={translate('loadedapp.history-menu') as string}
+                            initialRouteName={RouteEnum.Receive}
                             screenOptions={{
                               tabBarStyle: {
                                 display: 'none',
                               },
                               headerShown: false,
                             }}>
-                            <Tab.Screen name={translate('loadedapp.history-menu') as string}>
-                              {() => (
-                                <Receive
-                                  toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
+                            <Tab.Screen name={RouteEnum.Receive}>
+                              {propsTab => (
+                                <Receive {...propsTab}
+                                  toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                                   alone={true /* receive */}
                                   setSecurityOption={this.setSecurityOption}
                                   setAddressBook={this.setAddressBook}
@@ -2166,34 +2073,176 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   </>
                 );}}
               </Drawer.Screen>
-              <Drawer.Screen name={RouteEnums.Settings}>
-                {({ navigation }: { navigation: DrawerContentComponentProps['navigation'] }) => {
-                  useEffect(() => {
-                    this.setNavigation(navigation);
-                  });
-                  return (
-                  <>
-                    <Settings
-                      setWalletOption={this.setWalletOption}
-                      setServerOption={this.setServerOption}
-                      setCurrencyOption={this.setCurrencyOption}
-                      setLanguageOption={this.setLanguageOption}
-                      setSendAllOption={this.setSendAllOption}
-                      setDonationOption={this.setDonationOption}
-                      setPrivacyOption={this.setPrivacyOption}
-                      setModeOption={this.setModeOption}
-                      setSecurityOption={this.setSecurityOption}
-                      setSelectServerOption={this.setSelectServerOption}
-                      setRescanMenuOption={this.setRescanMenuOption}
-                      setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
-                      setPerformanceLevelOption={this.setPerformanceLevelOption}
-                      toggleMenuDrawer={() => navigation.toggleDrawer() /* header */}
-                    />
-                  </>
-                );}}
+              <Drawer.Screen name={RouteEnum.Settings}>
+                {props => 
+                  <Settings {...props}
+                    setWalletOption={this.setWalletOption}
+                    setServerOption={this.setServerOption}
+                    setCurrencyOption={this.setCurrencyOption}
+                    setLanguageOption={this.setLanguageOption}
+                    setSendAllOption={this.setSendAllOption}
+                    setDonationOption={this.setDonationOption}
+                    setModeOption={this.setModeOption}
+                    setSecurityOption={this.setSecurityOption}
+                    setSelectServerOption={this.setSelectServerOption}
+                    setRescanMenuOption={this.setRescanMenuOption}
+                    setRecoveryWalletInfoOnDeviceOption={this.setRecoveryWalletInfoOnDeviceOption}
+                    setPerformanceLevelOption={this.setPerformanceLevelOption}
+                    toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
+                  />
+                }
               </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.About} component={About} />
+              <Drawer.Screen name={RouteEnum.Rescan}>
+                {props => <Rescan {...props} doRescan={this.doRescan} />}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.Info} component={Info} />
+              <Drawer.Screen name={RouteEnum.InsightStack}>
+                {() => {
+                  return (
+                    <Stack.Navigator initialRouteName={RouteEnum.Insight} screenOptions={{ headerShown: false, animation: 'none' }}>
+                      <Stack.Screen name={RouteEnum.Insight} component={Insight} />
+                      <Stack.Screen name={RouteEnum.AddressBook} >
+                        {props => (
+                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
+                        )}
+                      </Stack.Screen>
+                      <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
+                    </Stack.Navigator>
+                  );
+                }}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.Ufvk}>
+                {props => {
+                  const action = !!props.route.params && props.route.params.action !== undefined ? props.route.params.action : UfvkActionEnum.view;
+                  if (action === UfvkActionEnum.view ) {
+                    return (
+                      <ShowUfvk {...props}
+                        onClickOK={() => {}}
+                        onClickCancel={() => {}}
+                      />
+                    );
+                  } else if (action === UfvkActionEnum.change) {
+                    return (
+                      <ShowUfvk {...props}
+                        onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
+                        onClickCancel={() => {}}
+                      />
+                    );
+                  } else if (action === UfvkActionEnum.backup) {
+                    return (
+                      <ShowUfvk {...props}
+                        onClickOK={async () => await this.onClickOKRestoreBackup()}
+                        onClickCancel={() => {}}
+                      />
+                    );
+                  } else if (action === UfvkActionEnum.server) {
+                    return (
+                      <ShowUfvk {...props}
+                        onClickOK={async () => await this.onClickOKServerWallet()}
+                        onClickCancel={async () => {
+                          // restart all the tasks again, nothing happen.
+                          await this.rpc.clearTimers();
+                          await this.rpc.configure();
+                        }}
+                      />
+                    );
+                  }
+                }}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.Seed}>
+                {props => {
+                  const action = !!props.route.params && props.route.params.action !== undefined ? props.route.params.action : SeedActionEnum.view;
+                  if (action === SeedActionEnum.view ) {
+                    return (
+                      <Seed {...props}
+                        onClickOK={() => {}}
+                        onClickCancel={() => {}}
+                        keepAwake={this.keepAwake}
+                        setIsSeedViewModalOpen={this.setIsSeedViewModalOpen}
+                      />
+                    );
+                  } else if (action === SeedActionEnum.change) {
+                    return (
+                      <Seed {...props}
+                        onClickOK={async () => await this.onClickOKChangeWallet({ startingApp: false })}
+                        onClickCancel={() => {}}
+                      />
+                    );
+                  } else if (action === SeedActionEnum.backup) {
+                    return (
+                      <Seed {...props}
+                        onClickOK={async () => await this.onClickOKRestoreBackup()}
+                        onClickCancel={() => {}}
+                      />
+                    );
+                  } else if (action === SeedActionEnum.server) {
+                    return (
+                      <Seed {...props}
+                        onClickOK={async () => await this.onClickOKServerWallet()}
+                        onClickCancel={async () => {
+                          // restart all the tasks again, nothing happen.
+                          await this.rpc.clearTimers();
+                          await this.rpc.configure();
+                        }}
+                      />
+                    );
+                  }
+                }}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.SyncReport} component={SyncReport} />
+              <Drawer.Screen name={RouteEnum.Pools} component={Pools} />
+              <Drawer.Screen name={RouteEnum.AddressBookStack}>
+                {() => {
+                  return (
+                    <Stack.Navigator initialRouteName={RouteEnum.AddressBook} screenOptions={{ headerShown: false, animation: 'none' }}>
+                      <Stack.Screen name={RouteEnum.AddressBook} >
+                        {props => (
+                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
+                        )}
+                      </Stack.Screen>
+                      <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
+                    </Stack.Navigator>
+                  );
+                }}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.ValueTransferDetailStack}>
+                {() => {
+                  return (
+                    <Stack.Navigator initialRouteName={RouteEnum.ValueTransferDetail} screenOptions={{ headerShown: false, animation: 'none' }}>
+                      <Stack.Screen name={RouteEnum.ValueTransferDetail} component={ValueTransferDetail} />
+                      <Stack.Screen name={RouteEnum.AddressBook} >
+                        {props => (
+                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
+                        )}
+                      </Stack.Screen>
+                      <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
+                    </Stack.Navigator>
+                  );
+                }}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.AddressList} component={AddressList} />
+              <Drawer.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
+              <Drawer.Screen name={RouteEnum.MessagesAddress} component={MessagesAddress} />
+              <Drawer.Screen name={RouteEnum.MessagesAll} component={MessagesAll} />
+              <Drawer.Screen name={RouteEnum.Memo} component={Memo} />
+              <Drawer.Screen name={RouteEnum.ConfirmStack}>
+                {() => {
+                  return (
+                    <Stack.Navigator initialRouteName={RouteEnum.Confirm} screenOptions={{ headerShown: false, animation: 'none' }}>
+                      <Stack.Screen name={RouteEnum.Confirm} component={Confirm} />
+                      <Stack.Screen name={RouteEnum.AddressBook} >
+                        {props => (
+                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
+                        )}
+                      </Stack.Screen>
+                      <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
+                    </Stack.Navigator>
+                  );
+                }}
+              </Drawer.Screen>
+              <Drawer.Screen name={RouteEnum.Computing} component={ComputingTxContent} />
             </Drawer>
-            <MagicModalPortal />
           </GestureHandlerRootView>
         </ContextAppLoadedProvider>
       </ToastProvider>

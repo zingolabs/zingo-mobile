@@ -1,10 +1,10 @@
 import { RouteProp } from '@react-navigation/native';
-import { RootStackParamList } from '../../app/types';
-import { RouteEnums } from '../../app/AppState';
+import { AppStackParamList } from '../../app/types';
+import { RouteEnum } from '../../app/AppState';
 
-export const mockLoadingAppRoute: RouteProp<RootStackParamList, RouteEnums.LoadingApp> = {
+export const mockLoadingAppRoute: RouteProp<AppStackParamList, RouteEnum.LoadingApp> = {
   key: 'LoadingApp-test',
-  name: RouteEnums.LoadingApp,
+  name: RouteEnum.LoadingApp,
   params: {
     screen: 0,
     startingApp: true,

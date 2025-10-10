@@ -14,7 +14,7 @@ import {
   faGear,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Image, TouchableOpacity, View } from 'react-native';
 import {
@@ -27,8 +27,9 @@ import {
   ButtonTypeEnum,
   GlobalConst,
   SelectServerEnum,
-  RouteEnums,
+  RouteEnum,
   ScreenEnum,
+  UfvkActionEnum,
 } from '../../app/AppState';
 import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
@@ -112,6 +113,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   closeScreen,
   noUfvkIcon,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
     totalBalance,
@@ -125,14 +127,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     security,
     language,
     shieldingAmount,
-    navigationHome,
     selectServer,
     setZecPrice,
-    setComputingModalShow,
-    closeAllModals,
-    setUfvkViewModalShow,
-    setSyncReportModalShow,
-    setPoolsModalShow,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum, privacy: boolean;
@@ -304,7 +300,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     let pools: PoolToShieldEnum = PoolToShieldEnum.transparentPoolToShield;
 
     // not use await here.
-    setComputingModalShow();
+    navigation.navigate(RouteEnum.Computing);
     // because I don't what the user is doing, I need to the re-run the shield
     // command right before the confirmation
     await RPCModule.shieldProcess();
@@ -358,11 +354,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
           );
         }
       }
-      // change to the history screen, just in case.
-      navigationHome?.navigate(RouteEnums.Home, {
-        screen: translate('loadedapp.history-menu') as string,
-        initial: false,
-      });
       // scroll to top in history, just in case.
       if (setScrollToTop) {
         setScrollToTop(true);
@@ -371,9 +362,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       if (setScrollToBottom) {
         setScrollToBottom(true);
       }
-      closeAllModals();
       setShieldingFee(0);
       setShieldingAmount && setShieldingAmount(0);
+
+      // change to the history screen, just in case.
+      navigation.navigate(RouteEnum.HomeStack, {
+        screen: RouteEnum.History,
+      });
     }
   };
 
@@ -453,7 +448,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
       }
     } else {
-      await setUfvkViewModalShow();
+      navigation.navigate(RouteEnum.Ufvk, { 
+        action: UfvkActionEnum.view 
+      });
     }
   };
 
@@ -502,7 +499,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     </TouchableOpacity>
   );
 
-  //console.log('render header &&&&&&&&&&&&&&&&&&&&&', info.currencyName);
+  //console.log('Render header &&&&&&&&&&&&&&&&&&&&&');
 
   return (
     <>
@@ -599,7 +596,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                               )}
                             </View>
                           ) : (
-                            <TouchableOpacity testID="header.playicon" onPress={() => setSyncReportModalShow()}>
+                            <TouchableOpacity testID="header.playicon" onPress={() => {
+                                navigation.navigate(RouteEnum.SyncReport);
+                              }}
+                            >
                               <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                 <FontAwesomeIcon icon={faPlay} color={colors.syncing} size={19} />
                                 {viewSyncStatus && (
@@ -637,7 +637,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                           minWidth: 25,
                           minHeight: 25,
                         }}>
-                        <TouchableOpacity onPress={() => setSyncReportModalShow()}>
+                        <TouchableOpacity onPress={() => {
+                            navigation.navigate(RouteEnum.SyncReport);
+                          }}
+                        >
                           <View
                             testID="header.wifiicon"
                             style={{
@@ -678,7 +681,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                         size={20}
                       />
                     ) : (
-                      <TouchableOpacity onPress={() => setSyncReportModalShow()}>
+                      <TouchableOpacity onPress={() => {
+                          navigation.navigate(RouteEnum.SyncReport);
+                        }}
+                      >
                         <FontAwesomeIcon
                           icon={faCloudDownload}
                           color={!netInfo.isConnected ? 'red' : 'yellow'}
@@ -742,9 +748,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 color={colors.text}
                 size={36}
                 amtZec={totalBalance
-                  ? totalBalance.confirmedOrchardBalance +
-                    totalBalance.confirmedSaplingBalance +
-                    totalBalance.confirmedTransparentBalance
+                  ? totalBalance.totalOrchardBalance +
+                    totalBalance.totalSaplingBalance +
+                    totalBalance.totalTransparentBalance
                   : 0}
                 privacy={privacy}
                 smallPrefix={true}
@@ -754,7 +760,10 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 (totalBalance.totalOrchardBalance !== totalBalance.confirmedOrchardBalance ||
                   totalBalance.totalSaplingBalance > 0 ||
                   totalBalance.totalTransparentBalance > 0) && (
-                  <TouchableOpacity onPress={() => setPoolsModalShow()}>
+                  <TouchableOpacity onPress={() => {
+                      navigation.navigate(RouteEnum.Pools);
+                    }}
+                  >
                     <View
                       style={{
                         display: 'flex',
@@ -804,9 +813,9 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   style={{ marginTop: 0, marginBottom: 0 }}
                   price={zecPrice.zecPrice}
                   amtZec={totalBalance
-                    ? totalBalance.confirmedOrchardBalance +
-                      totalBalance.confirmedSaplingBalance +
-                      totalBalance.confirmedTransparentBalance
+                    ? totalBalance.totalOrchardBalance +
+                      totalBalance.totalSaplingBalance +
+                      totalBalance.totalTransparentBalance
                     : 0}
                   currency={currency}
                   privacy={privacy}
@@ -894,7 +903,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                     addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
                   }
                 } else {
-                  navigationHome?.navigate(RouteEnums.Settings);
+                  navigation.navigate(RouteEnum.Settings);
                 }
               }}>
               <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />

@@ -8,13 +8,26 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import History from '../components/History';
 import { defaultAppContextLoaded, ContextAppLoadedProvider } from '../app/context';
-import { CurrencyEnum, ModeEnum } from '../app/AppState';
+import { CurrencyEnum, ModeEnum, RouteEnum } from '../app/AppState';
 import { mockValueTransfers } from '../__mocks__/dataMocks/mockValueTransfers';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockAddresses } from '../__mocks__/dataMocks/mockAddresses';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { AppDrawerParamList } from '../app/types';
+import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
 
+function makeDrawerProps(): DrawerScreenProps<AppDrawerParamList, RouteEnum.History> {
+  return {
+    navigation: mockNavigation,
+    route: {
+      key: 'Key-1',
+      name: RouteEnum.History,
+      params: undefined,
+    },
+  };
+}
 // test suite
 describe('Component History - test', () => {
   //snapshot test
@@ -33,18 +46,15 @@ describe('Component History - test', () => {
     state.privacy = false;
     // mode basic
     state.mode = ModeEnum.basic;
+    const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>
-        <History
+        <History {...props}
           toggleMenuDrawer={onFunction}
-          setPrivacyOption={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           scrollToTop={false}
           setScrollToBottom={onFunction}
-          scrollToBottom={false}
-          sendTransaction={onFunction}
-          setServerOption={onFunction}
         />
       </ContextAppLoadedProvider>,
     );
@@ -58,18 +68,15 @@ describe('Component History - test', () => {
     state.privacy = true;
     // mode basic
     state.mode = ModeEnum.advanced;
+    const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>
-        <History
+        <History {...props}
           toggleMenuDrawer={onFunction}
-          setPrivacyOption={onFunction}
           setShieldingAmount={onFunction}
           setScrollToTop={onFunction}
           scrollToTop={false}
           setScrollToBottom={onFunction}
-          scrollToBottom={false}
-          sendTransaction={onFunction}
-          setServerOption={onFunction}
         />
       </ContextAppLoadedProvider>,
     );

@@ -8,6 +8,8 @@ import {
   AddressBookFileClass,
   ButtonTypeEnum,
   GlobalConst,
+  RouteEnum,
+  ScreenEnum,
   //SecurityType,
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
@@ -34,8 +36,10 @@ type AbDetailProps = {
     address: string,
     color: string,
   ) => void;
-  addressBookCurrentAddress?: string;
+  currentAddress?: string;
   //setSecurityOption: (s: SecurityType) => Promise<void>;
+  screenName: ScreenEnum;
+  routeStack: RouteEnum;
 };
 const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   index,
@@ -43,8 +47,10 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   cancel,
   action: actionProp,
   doAction,
-  addressBookCurrentAddress,
+  currentAddress,
   //setSecurityOption,
+  screenName,
+  routeStack,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { translate, server, addressBook, language } = context;
@@ -58,8 +64,8 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   const [errorAddress, setErrorAddress] = useState<string>('');
 
   useEffect(() => {
-    if (addressBookCurrentAddress) {
-      setAddress(addressBookCurrentAddress);
+    if (currentAddress) {
+      setAddress(currentAddress);
     }
     if (item.label !== label && item.address !== address) {
       setAction(AddressBookActionEnum.Add);
@@ -100,7 +106,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
     actionProp,
     address,
     addressBook,
-    addressBookCurrentAddress,
+    currentAddress,
     error,
     item.address,
     item.label,
@@ -187,6 +193,8 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
         setError={setErrorAddress}
         disabled={action === AddressBookActionEnum.Delete || item.own}
         showLabel={true}
+        screenName={screenName}
+        routeStack={routeStack}
       />
       {(!!error || !!errorAddress) && (
         <View

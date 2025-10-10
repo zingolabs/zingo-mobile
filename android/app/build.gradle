@@ -115,8 +115,8 @@ android {
         applicationId 'org.ZingoLabs.Zingo' // Real
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 273 // Real
-        versionName "zingo-2.0.8" // Real
+        versionCode 280 // Real
+        versionName "zingo-2.0.9" // Real
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         externalNativeBuild {
@@ -196,7 +196,9 @@ android {
     }
 
     packagingOptions {
-        jniLibs.useLegacyPackaging = true  // Ensures stable binary layout
+        jniLibs {
+            useLegacyPackaging = true  // Ensures stable binary layout
+        }
     }
 
     testOptions {
@@ -329,7 +331,7 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit-ktx:1.2.1"
 
     // uniffi needs this
-    implementation "net.java.dev.jna:jna:5.9.0@aar"
+    implementation "net.java.dev.jna:jna:5.18.1@aar"
 
     // back navigation implementation
     implementation 'androidx.activity:activity:1.10.1'

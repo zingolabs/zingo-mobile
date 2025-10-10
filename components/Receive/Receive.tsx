@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState, ReactNode, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Keyboard, View } from 'react-native';
+import { Dimensions, Keyboard, View } from 'react-native';
 import { TabView, SceneRendererProps, Route, NavigationState } from 'react-native-tab-view';
 import { useTheme } from '@react-navigation/native';
 
+import Clipboard from '@react-native-clipboard/clipboard';
 import SingleAddress from '../Components/SingleAddress';
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import moment from 'moment';
@@ -22,6 +23,8 @@ import {
   TransparentAddressClass,
   AddressBookFileClass,
   ScreenEnum,
+  SnackbarDurationEnum,
+  RouteEnum,
 } from '../../app/AppState';
 import { RPCAddressScopeEnum } from '../../app/rpc/enums/RPCAddressScopeEnum';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
@@ -30,8 +33,11 @@ import VerifyAddress from './components/VerifyAddress';
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import NewAddressTag from './components/NewAddressTag';
+import TransparentWarning from './components/TransparentWarning';
+import ExpandedAddress from './components/ExpandedAddress';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type ReceiveProps = {
+type ReceiveProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> & {
   toggleMenuDrawer: () => void;
   alone: boolean;
   setSecurityOption: (s: SecurityType) => Promise<void>;
@@ -49,14 +55,23 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addresses, defaultUnifiedAddress, mode, language, snackbars, removeFirstSnackbar } = context;
+  const { 
+    translate, 
+    addresses, 
+    defaultUnifiedAddress, 
+    mode, 
+    language, 
+    snackbars, 
+    removeFirstSnackbar, 
+    addLastSnackbar,
+  } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
   const screenName = ScreenEnum.Receive;
 
   const [index, setIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
-  const [sheetType, setSheetType] = useState<'NA' | 'VA' | 'NAT' | null>(null);
+  const [sheetType, setSheetType] = useState<'NA' | 'VA' | 'NAT' | 'TW' | 'EA' | null>(null);
 
   const [uAddr, setUAddr] = useState<UnifiedAddressClass[]>([]);
   const [tAddr, setTAddr] = useState<TransparentAddressClass[]>([]);
@@ -65,60 +80,34 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [indexBottomSheet, setIndexBottomSheet] = useState<number>(-1);
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
+  const [heightLayout, setHeightLayout] = useState<number>(10);
 
-  const NASnapPoints = useMemo(() =>
-    [
-      index === 0 ? '55%' : '40%',
-      '65%',
-      index === 0 ? '95%' : '80%',
-    ], [index]);
+  const snapPoints = useMemo(() => {
+    const snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
+    let snap2: number = 80;
+    if (snap1 < 80) {
+      snap2 = snap1 + 20;
+    }
+    return [
+      `${snap1}%`,
+      `${snap2}%`,
+    ]
+  }, [heightLayout]);
 
-  const VASnapPoints = useMemo(() =>
-    [
-      '40%',
-      '65%',
-    ], []);
-
-  const NAShow = useCallback(() => {
-    setSheetType('NA');
+  const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {
+    setSheetType(_sheetType);
     bottomSheetRef.current?.snapToIndex(0);
     setIndexBottomSheet(0);
   }, []);
 
-  const NAHide = useCallback(() => {
+  const hide = useCallback(() => {
     setSheetType(null);
     Keyboard.dismiss();
     bottomSheetRef.current?.snapToIndex(-1);
     bottomSheetRef.current?.close();
     setIndexBottomSheet(-1);
-  }, []);
-
-  const NATShow = useCallback(() => {
-    setSheetType('NAT');
-    bottomSheetRef.current?.snapToIndex(0);
-    setIndexBottomSheet(0);
-  }, []);
-
-  const NATHide = useCallback(() => {
-    setSheetType(null);
-    Keyboard.dismiss();
-    bottomSheetRef.current?.snapToIndex(-1);
-    bottomSheetRef.current?.close();
-    setIndexBottomSheet(-1);
-  }, []);
-
-  const VAShow = useCallback(() => {
-    setSheetType('VA');
-    bottomSheetRef.current?.snapToIndex(0);
-    setIndexBottomSheet(0);
-  }, []);
-
-  const VAHide = useCallback(() => {
-    setSheetType(null);
-    Keyboard.dismiss();
-    bottomSheetRef.current?.snapToIndex(-1);
-    bottomSheetRef.current?.close();
-    setIndexBottomSheet(-1);
+    setHeightLayout(10);
   }, []);
 
   const handleSheetChanges = useCallback((ind: number) => {
@@ -206,11 +195,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   index={uAddrIndex ? uAddrIndex : 0}
                   setIndex={setUAddrIndex}
                   total={uAddr.length}
-                  NAShow={NAShow}
-                  NATShow={NATShow}
-                  VAShow={VAShow}
+                  show={show}
                   changeIndex={setIndex}
                   hasTransparent={tAddr && tAddr.length > 0}
+                  showMoreOptions={showMoreOptions}
+                  setShowMoreOptions={setShowMoreOptions}
                 />
               </>
             )}
@@ -239,9 +228,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                   index={tAddrIndex ? tAddrIndex : 0}
                   setIndex={setTAddrIndex}
                   total={tAddr.length}
-                  NAShow={NAShow}
-                  NATShow={NATShow}
-                  VAShow={VAShow}
+                  show={show}
                   changeIndex={setIndex}
                 />
               </>
@@ -287,6 +274,20 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} pressBehavior="close" />
   );
 
+  const doCopy = () => {
+    Clipboard.setString(index === 0 && uAddrIndex !== null
+      ? uAddr[uAddrIndex].address
+      : index === 1 && tAddrIndex !== null
+      ? tAddr[tAddrIndex].address
+      : '');
+    addLastSnackbar({
+      message: (translate('history.addresscopied') as string),
+      duration: SnackbarDurationEnum.short,
+      screenName: [screenName],
+    });
+  };
+
+
   const returnPage = (
     <ToastProvider>
       <Snackbars
@@ -305,20 +306,22 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
-        snapPoints={sheetType === 'NA' ? NASnapPoints : VASnapPoints}
+        snapPoints={snapPoints}
         enableDynamicSizing={false}
         onChange={handleSheetChanges}
         enablePanDownToClose
         keyboardBehavior={'interactive'}
         handleStyle={{ display: 'none' }}
+        backgroundStyle={{ backgroundColor: colors.background }}
         backdropComponent={renderBackdrop}>
         <BottomSheetView style={{ backgroundColor: colors.background, height: '100%' }}>
           {sheetType === 'NA' && (
             <NewAddress
               addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
-              closeSheet={NAHide}
+              closeSheet={hide}
               setAddressBook={setAddressBook}
               screenName={screenName}
+              setHeightLayout={setHeightLayout}
             />
           )}
           {sheetType === 'NAT' && (
@@ -328,15 +331,45 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
                 : index === 1 && tAddrIndex !== null
                 ? tAddr[tAddrIndex].address
                 : ''}
-              closeSheet={NATHide}
+              closeSheet={hide}
               setAddressBook={setAddressBook}
+              setHeightLayout={setHeightLayout}
             />
           )}
           {sheetType === 'VA' && (
             <VerifyAddress
-              closeSheet={VAHide}
+              closeSheet={hide}
               screenName={screenName}
+              setHeightLayout={setHeightLayout}
             />
+          )}
+          {sheetType === 'TW' && (
+            <TransparentWarning
+              closeSheet={hide}
+              onSuccess={
+                () => {
+                  setShowMoreOptions(false);
+                  setIndex(1);
+                }
+              }
+              setHeightLayout={setHeightLayout}
+            />
+          )}
+          {sheetType === 'EA' && (
+            <ExpandedAddress
+                onCopy={doCopy}
+                closeSheet={hide}
+                title={translate('receive.title-address') as string}
+                button={translate('receive.copy-address-button') as string}
+                address={
+                  index === 0 && uAddrIndex !== null
+                    ? uAddr[uAddrIndex].address
+                    : index === 1 && tAddrIndex !== null
+                      ? tAddr[tAddrIndex].address
+                      : ''
+                }
+                setHeightLayout={setHeightLayout}
+              />
           )}
         </BottomSheetView>
       </BottomSheet>

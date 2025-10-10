@@ -23,7 +23,7 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
 import RNPickerSelect from 'react-native-picker-select';
 
@@ -45,22 +45,19 @@ import {
   ServerUrisType,
   ServerType,
   SelectServerEnum,
-  RouteEnums,
+  RouteEnum,
   SecurityType,
   ScreenEnum,
 } from '../../app/AppState';
 import { parseZcashURI, serverUris } from '../../app/uris';
 import RPCModule from '../../app/RPCModule';
 import Utils from '../../app/utils';
-import ScannerAddress from './components/ScannerAddress';
-import Confirm from './components/Confirm';
-import { ThemeType } from '../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
 import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
-import Memo from '../Memo';
 import moment from 'moment';
 import 'moment/locale/es';
 import 'moment/locale/pt';
@@ -70,20 +67,18 @@ import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
 import { sendEmail } from '../../app/sendEmail';
 import selectingServer from '../../app/selectingServer';
-import { magicModal } from 'react-native-magic-modal';
 // @ts-ignore
 //import BarcodeZxingScan from 'react-native-barcode-zxing-scan';
 import { RPCParseAddressType } from '../../app/rpc/types/RPCParseAddressType';
 import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalanceType';
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type SendProps = {
+type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   // side menu
   toggleMenuDrawer: () => void;
   // privacy
-  setPrivacyOption: (value: boolean) => Promise<void>;
-  // addLastSnackbar from context
   // shielding
   setShieldingAmount: (value: number) => void;
   setScrollToTop: (value: boolean) => void;
@@ -104,20 +99,19 @@ const Send: React.FunctionComponent<SendProps> = ({
   sendTransaction,
   clearToAddr,
   toggleMenuDrawer,
-  setPrivacyOption,
   setShieldingAmount,
   setScrollToTop,
   setScrollToBottom,
   setServerOption,
   //setSecurityOption,
 }) => {
+  const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
   const {
     translate,
     info,
     totalBalance,
     sendPageState,
-    navigationHome,
     zecPrice,
     sendAll,
     netInfo,
@@ -136,14 +130,12 @@ const Send: React.FunctionComponent<SendProps> = ({
     selectServer,
     setZecPrice,
     zenniesDonationAddress,
-    setComputingModalShow,
-    closeAllModals,
-    setPoolsModalShow,
     //security,
     currency,
     zingolibVersion,
     snackbars,
     removeFirstSnackbar,
+    setPrivacyOption,
   } = context;
   const { colors } = useTheme() as ThemeType;
   moment.locale(language);
@@ -659,6 +651,17 @@ const Send: React.FunctionComponent<SendProps> = ({
     }
   };
 
+  const clearState = () => {
+    setAddressText('');
+    setAmountText('');
+    setAmountCurrencyText('');
+    setMemoText('');
+    setIncludeUAMemoBoolean(false);
+    clearToAddr();
+    setSpendable(0);
+    setSpendableBalanceLastError('');
+  };
+
   const buildSendState = () => {
     return {
       toaddr: {
@@ -671,139 +674,121 @@ const Send: React.FunctionComponent<SendProps> = ({
     } as SendPageStateClass;
   };
 
-  const clearState = () => {
-    setAddressText('');
-    setAmountText('');
-    setAmountCurrencyText('');
-    setMemoText('');
-    setIncludeUAMemoBoolean(false);
-    clearToAddr();
-    setSpendable(0);
-    setSpendableBalanceLastError('');
-  };
-
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
     if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
 
-    // not use await here.
-    setComputingModalShow();
+    navigation.navigate(RouteEnum.Computing);
 
-    // call the sendTransaction method in a timeout, allowing the modals to show properly
-    setTimeout(async () => {
-      let error = '';
-      let customError: string | undefined;
-      try {
-        const txid = await sendTransaction(sendPageStatePar);
+    let error = '';
+    let customError: string | undefined;
+    try {
+      const txid = await sendTransaction(sendPageStatePar);
 
-        // Clear the fields
-        clearState();
+      // Clear the fields
+      clearState();
 
-        navigationHome?.navigate(RouteEnums.Home, {
-          screen: translate('loadedapp.history-menu') as string,
-          initial: false,
-        });
+      // scroll to top in history, just in case.
+      setScrollToTop(true);
+      setScrollToBottom(true);
 
-        // scroll to top in history, just in case.
-        setScrollToTop(true);
-        setScrollToBottom(true);
+      createAlert(
+        setBackgroundError,
+        addLastSnackbar,
+        [screenName, ScreenEnum.History],
+        translate('send.confirm-title') as string,
+        `${translate('send.Broadcast')} ${txid}`,
+        true,
+        translate,
+      );
+      // the app send successfully on the first attemp.
 
-        createAlert(
-          setBackgroundError,
-          addLastSnackbar,
-          [screenName, ScreenEnum.History],
-          translate('send.confirm-title') as string,
-          `${translate('send.Broadcast')} ${txid}`,
-          true,
-          translate,
-        );
-        closeAllModals();
-        // the app send successfully on the first attemp.
+      navigation.navigate(RouteEnum.HomeStack, {
+        screen: RouteEnum.History,
+      });
+      return;
+    } catch (err1) {
+      error = err1 as string;
 
-        return;
-      } catch (err1) {
-        error = err1 as string;
+      customError = interceptCustomError(error);
 
-        customError = interceptCustomError(error);
+      // in this point the App is failing, there is two possibilities:
+      // 1. Server Error
+      // 2. Another type of Error
+      // here is worth it to try again with the best working server...
+      // if the user selected a `custom` server, then we cannot change it.
+      if (!customError && selectServer !== SelectServerEnum.custom) {
+        // try send again with a working server
+        const serverChecked = await selectingServer(serverUris(translate).filter((s: ServerUrisType) => !s.obsolete));
+        let fasterServer: ServerType = {} as ServerType;
+        if (serverChecked && serverChecked.latency) {
+          fasterServer = { uri: serverChecked.uri, chainName: serverChecked.chainName };
+        } else {
+          fasterServer = server;
+          // likely here there is a internet conection problem
+          // all of the servers return an error because they are unreachable probably.
+          // the 30 seconds timout was fired.
+        }
+        console.log(serverChecked);
+        console.log(fasterServer);
+        if (fasterServer.uri !== server.uri) {
+          setServerOption(fasterServer, selectServer, false, true);
+        }
 
-        // in this point the App is failing, there is two possibilities:
-        // 1. Server Error
-        // 2. Another type of Error
-        // here is worth it to try again with the best working server...
-        // if the user selected a `custom` server, then we cannot change it.
-        if (!customError && selectServer !== SelectServerEnum.custom) {
-          // try send again with a working server
-          const serverChecked = await selectingServer(serverUris(translate).filter((s: ServerUrisType) => !s.obsolete));
-          let fasterServer: ServerType = {} as ServerType;
-          if (serverChecked && serverChecked.latency) {
-            fasterServer = { uri: serverChecked.uri, chainName: serverChecked.chainName };
-          } else {
-            fasterServer = server;
-            // likely here there is a internet conection problem
-            // all of the servers return an error because they are unreachable probably.
-            // the 30 seconds timout was fired.
-          }
-          console.log(serverChecked);
-          console.log(fasterServer);
-          if (fasterServer.uri !== server.uri) {
-            setServerOption(fasterServer, selectServer, false, true);
-          }
+        try {
+          const txid = await sendTransaction(sendPageStatePar);
 
-          try {
-            const txid = await sendTransaction(sendPageStatePar);
+          // Clear the fields
+          clearState();
 
-            // Clear the fields
-            clearState();
+          // scroll to top in history, just in case.
+          setScrollToTop(true);
+          setScrollToBottom(true);
 
-            navigationHome?.navigate(RouteEnums.Home, {
-              screen: translate('loadedapp.history-menu') as string,
-              initial: false,
-            });
+          createAlert(
+            setBackgroundError,
+            addLastSnackbar,
+            [screenName, ScreenEnum.History],
+            translate('send.confirm-title') as string,
+            `${translate('send.Broadcast')} ${txid}`,
+            true,
+            translate,
+          );
+          // the app send successfully on the second attemp.
 
-            // scroll to top in history, just in case.
-            setScrollToTop(true);
-            setScrollToBottom(true);
+          navigation.navigate(RouteEnum.HomeStack, {
+            screen: RouteEnum.History,
+          });
+          return;
+        } catch (err2) {
+          error = err2 as string;
 
-            createAlert(
-              setBackgroundError,
-              addLastSnackbar,
-              [screenName, ScreenEnum.History],
-              translate('send.confirm-title') as string,
-              `${translate('send.Broadcast')} ${txid}`,
-              true,
-              translate,
-            );
-            closeAllModals();
-            // the app send successfully on the second attemp.
-
-            return;
-          } catch (err2) {
-            error = err2 as string;
-
-            customError = interceptCustomError(error);
-          }
+          customError = interceptCustomError(error);
         }
       }
+    }
 
-      setTimeout(() => {
-        //console.log('sendtx error', error);
-        // if the App is in background I need to store the error
-        // and when the App come back to foreground shows it to the user.
-        createAlert(
-          setBackgroundError,
-          addLastSnackbar,
-          [screenName],
-          translate('send.sending-error') as string,
-          `${customError ? customError : error}`,
-          false,
-          translate,
-          sendEmail,
-          zingolibVersion,
-        );
-      }, 1 * 1000);
-      closeAllModals();
+    setTimeout(() => {
+      //console.log('sendtx error', error);
+      // if the App is in background I need to store the error
+      // and when the App come back to foreground shows it to the user.
+      createAlert(
+        setBackgroundError,
+        addLastSnackbar,
+        [screenName],
+        translate('send.sending-error') as string,
+        `${customError ? customError : error}`,
+        false,
+        translate,
+        sendEmail,
+        zingolibVersion,
+      );
+    }, 1 * 1000);
+
+    navigation.navigate(RouteEnum.HomeStack, {
+      screen: RouteEnum.History,
     });
   };
 
@@ -830,90 +815,39 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const setQrcodeModalShow = () => {
-    //if (Platform.OS === GlobalConst.platformOSandroid) {
-    //  let changed: boolean = false;
-    //  if (security.foregroundApp) {
-    //    // deactivate temporarily this
-    //    changed = true;
-    //    const newSecurity = {
-    //      startApp: security.startApp,
-    //      foregroundApp: false,
-    //      sendConfirm: security.sendConfirm,
-    //      seedUfvkScreen: security.seedUfvkScreen,
-    //      rescanScreen: security.rescanScreen,
-    //      settingsScreen: security.settingsScreen,
-    //      changeWalletScreen: security.changeWalletScreen,
-    //      restoreWalletBackupScreen: security.restoreWalletBackupScreen,
-    //    } as SecurityType;
-    //    setSecurityOption(newSecurity);
-    //  }
-    //  BarcodeZxingScan.showQrReader(async (a: string) => {
-    //    updateToField(a, null, null, null, null);
-    //  });
-    //  if (changed) {
-    //    // activate again in 5 seconds
-    //    setTimeout(() => {
-    //      const newSecurity = {
-    //        startApp: security.startApp,
-    //        foregroundApp: true,
-    //        sendConfirm: security.sendConfirm,
-    //        seedUfvkScreen: security.seedUfvkScreen,
-    //        rescanScreen: security.rescanScreen,
-    //        settingsScreen: security.settingsScreen,
-    //        changeWalletScreen: security.changeWalletScreen,
-    //        restoreWalletBackupScreen: security.restoreWalletBackupScreen,
-    //      } as SecurityType;
-    //      setSecurityOption(newSecurity);
-    //    }, 5 * 1000);
-    //  }
-    //  return;
-    //} else {
-    return magicModal.show(
-      () => (
-        <ScannerAddress
-          setAddress={(a: string) => {
-            updateToField(a, null, null, null, null);
-          }}
-        />
-      ),
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-    ).promise;
-    //}
+    navigation.navigate(RouteEnum.ScannerAddress, { 
+      setAddress: (a: string) => updateToField(a, null, null, null, null),
+      active: true,
+    })
   };
 
   const setMemoModalShow = () => {
-    return magicModal.show(
-      () => <Memo message={memoText} includeUAMessage={includeUAMemoBoolean} setMessage={setMemoText} />,
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-    ).promise;
+    navigation.navigate(RouteEnum.Memo, { 
+      message: memoText,
+      includeUAMessage: includeUAMemoBoolean,
+      setMessage: setMemoText,
+    });
   };
 
-  const setConfirmModalShow = (parseAddressInfoJSON: RPCParseAddressType) => {
-    return magicModal.show(
-      () => (
-        <Confirm
-          calculatedFee={fee}
-          parseAddressInfoJSON={parseAddressInfoJSON}
-          donationAmount={
-            donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
-              ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
-              : 0
-          }
-          confirmSend={confirmSend}
-          sendAllAmount={
-            mode !== ModeEnum.basic &&
-            Utils.parseStringLocaleToNumberFloat(amountText) ===
-              Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8))
-          }
-          calculateFeeWithPropose={calculateFeeWithPropose}
-          sendPageState={buildSendState()}
-        />
-      ),
-      // possible problem if scrolling vertically, if so change to `undefined`.
-      { swipeDirection: Platform.OS === GlobalConst.platformOSios ? 'right' : undefined, style: { flex: 1, backgroundColor: colors.background } },
-    ).promise;
+  const setConfirmModalShow = async (parseAddressInfoJSON: RPCParseAddressType) => {
+    navigation.navigate(RouteEnum.ConfirmStack, {
+      screen: RouteEnum.Confirm,
+      params: {
+        calculatedFee: fee,
+        parseAddressInfoJSON: parseAddressInfoJSON,
+        donationAmount:
+          donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+            ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
+            : 0,
+        confirmSend: confirmSend,
+        sendAllAmount:
+          mode !== ModeEnum.basic &&
+          Utils.parseStringLocaleToNumberFloat(amountText) ===
+            Utils.parseStringLocaleToNumberFloat(maxAmount.toFixed(8)),
+        calculateFeeWithPropose: calculateFeeWithPropose,
+        sendPageState: buildSendState(),
+      }
+    });
   };
 
   //console.log(
@@ -1053,6 +987,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                               },
                             }}
                             pickerProps={{
+                              mode: 'dialog',
                               itemStyle: {
                                 color: colors.background,
                               },
@@ -1060,13 +995,13 @@ const Send: React.FunctionComponent<SendProps> = ({
                             fixAndroidTouchableBug={true}
                             value={
                               pickerTempSelectedAddress && Platform.OS === GlobalConst.platformOSios
-                                ? pickerTempSelectedAddress
-                                : addressText
+                                ? (pickerTempSelectedAddress ?? ' ')
+                                : (addressText ?? ' ')
                             }
                             items={itemsPicker}
                             placeholder={{
                               label: translate('addressbook.select-placeholder') as string,
-                              value: addressText,
+                              value: null,
                               color: colors.primary,
                             }}
                             useNativeAndroidPickerStyle={false}
@@ -1392,7 +1327,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                       </View>
                     )}
                     {stillConfirming && (
-                      <TouchableOpacity onPress={() => setPoolsModalShow()}>
+                      <TouchableOpacity onPress={() => {
+                          navigation.navigate(RouteEnum.Pools);
+                        }}
+                      >
                         <View
                           style={{
                             display: 'flex',
@@ -1413,7 +1351,10 @@ const Send: React.FunctionComponent<SendProps> = ({
                       </TouchableOpacity>
                     )}
                     {showShieldInfo && mode === ModeEnum.advanced && (
-                      <TouchableOpacity onPress={() => setPoolsModalShow()}>
+                      <TouchableOpacity onPress={() => {
+                          navigation.navigate(RouteEnum.Pools);
+                        }}
+                      >
                         <View
                           style={{
                             display: 'flex',

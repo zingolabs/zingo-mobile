@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, ScrollView, ActivityIndicator, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import FadeText from '../../Components/FadeText';
 import BoldText from '../../Components/BoldText';
@@ -12,7 +11,6 @@ import Button from '../../Components/Button';
 import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
-import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
 import AddressItem from '../../Components/AddressItem';
 import simpleBiometrics from '../../../app/simpleBiometrics';
 import moment from 'moment';
@@ -21,45 +19,32 @@ import 'moment/locale/pt';
 import 'moment/locale/ru';
 import 'moment/locale/tr';
 
-import { ThemeType } from '../../../app/types';
+import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import Utils from '../../../app/utils';
 import {
   ButtonTypeEnum,
   PrivacyLevelFromEnum,
   GlobalConst,
-  SendPageStateClass,
   ScreenEnum,
+  RouteEnum,
+  SendPageStateClass,
 } from '../../../app/AppState';
 import { RPCAddressKindEnum } from '../../../app/rpc/enums/RPCAddressKindEnum';
 import { RPCReceiversEnum } from '../../../app/rpc/enums/RPCReceiversEnum';
 import { RPCParseAddressStatusEnum } from '../../../app/rpc/enums/RPCParseAddressStatusEnum';
-import { useMagicModal } from 'react-native-magic-modal';
 import Snackbars from '../../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { RPCParseAddressType } from '../../../app/rpc/types/RPCParseAddressType';
 
-type ConfirmProps = {
-  calculatedFee: number;
-  parseAddressInfoJSON: RPCParseAddressType;
-  donationAmount: number;
-  confirmSend: (s: SendPageStateClass) => void;
-  sendAllAmount: boolean;
-  calculateFeeWithPropose: (
-    amount: string,
-    address: string,
-    memo: string,
-    includeUAMemo: boolean,
-  ) => Promise<void>;
-  sendPageState: SendPageStateClass;
-};
+type ConfirmProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Confirm>;
+
 const Confirm: React.FunctionComponent<ConfirmProps> = ({
-  confirmSend,
-  calculatedFee,
-  parseAddressInfoJSON,
-  donationAmount,
-  sendAllAmount,
-  calculateFeeWithPropose,
-  sendPageState,
+  navigation,
+  route,
 }) => {
+  const confirmSend = !!route.params && route.params.confirmSend !== undefined ? route.params.confirmSend : async () => {};
+  const calculateFeeWithPropose = !!route.params && route.params.calculateFeeWithPropose !== undefined ? route.params.calculateFeeWithPropose : async () => {};
   const context = useContext(ContextAppLoaded);
   const {
     info,
@@ -77,8 +62,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { hide } = useMagicModal();
-  const { top, bottom, right, left } = useSafeAreaInsets();
   moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Confirm;
@@ -86,11 +69,47 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
   const [privacyLevel, setPrivacyLevel] = useState<string | null>(null);
   const [sendingTotal, setSendingTotal] = useState<number>(0);
 
-  const memoTotal: string = Utils.buildMemo(
+  const [calculatedFee, setCalculatedFee] = useState<number>(!!route.params && route.params.calculatedFee !== undefined ? route.params.calculatedFee : 0); 
+  const [parseAddressInfoJSON, setParseAddressInfoJSON] = useState<RPCParseAddressType>(!!route.params && route.params.parseAddressInfoJSON !== undefined ? route.params.parseAddressInfoJSON : {} as RPCParseAddressType);
+  const [donationAmount, setDonationAmount] = useState<number>(!!route.params && route.params.donationAmount !== undefined ? route.params.donationAmount : 0);
+  const [sendAllAmount, setSendAllAmount] = useState<boolean>(!!route.params && route.params.sendAllAmount !== undefined ? route.params.sendAllAmount : false);
+  const [sendPageState, setSendPageState] = useState<SendPageStateClass>(!!route.params && route.params.sendPageState !== undefined ? route.params.sendPageState : {} as SendPageStateClass);
+
+  const [memoTotal, setMemoTotal] = useState<string>(Utils.buildMemo(
     sendPageState.toaddr.memo,
     sendPageState.toaddr.includeUAMemo,
     defaultUnifiedAddress,
-  );
+  ));
+
+  useEffect(() => {
+    const _calculatedFee = !!route.params && route.params?.calculatedFee !== undefined ? route.params.calculatedFee : 0;
+    const _parseAddressInfoJSON = !!route.params && route.params.parseAddressInfoJSON !== undefined ? route.params.parseAddressInfoJSON : {} as RPCParseAddressType;
+    const _donationAmount = !!route.params && route.params.donationAmount !== undefined ? route.params.donationAmount : 0;
+    const _sendAllAmount = !!route.params && route.params.sendAllAmount !== undefined ? route.params.sendAllAmount : false;
+    const _sendPageState = !!route.params && route.params.sendPageState !== undefined ? route.params.sendPageState : {} as SendPageStateClass;
+    const _memoTotal = Utils.buildMemo(
+      sendPageState.toaddr.memo,
+      sendPageState.toaddr.includeUAMemo,
+      defaultUnifiedAddress,
+    );
+    setCalculatedFee(_calculatedFee);
+    setParseAddressInfoJSON(_parseAddressInfoJSON);
+    setDonationAmount(_donationAmount);
+    setSendAllAmount(_sendAllAmount);
+    setSendPageState(_sendPageState);
+    setMemoTotal(_memoTotal);
+  }, [
+    route, 
+    route.params, 
+    route.params?.calculatedFee,
+    route.params?.parseAddressInfoJSON,
+    route.params?.donationAmount,
+    route.params?.sendAllAmount,
+    sendPageState,
+    sendPageState.toaddr.memo,
+    sendPageState.toaddr.includeUAMemo,
+    defaultUnifiedAddress,
+  ]);
 
   /**
    * Returns the privacy level for the transaction.
@@ -102,7 +121,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     let from: PrivacyLevelFromEnum = PrivacyLevelFromEnum.nonePrivacyLevel;
     const totalAmount: number = Utils.parseStringLocaleToNumberFloat(
       Utils.parseNumberFloatToStringLocale(
-        Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee,
+        Utils.parseStringLocaleToNumberFloat(
+          sendPageState.toaddr.amount
+        ) + (calculatedFee),
         8,
       ),
     );
@@ -114,8 +135,8 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       ),
     );
 
-    console.log('total', totalAmount);
-    console.log('header spendable', totalBalance?.totalSpendableBalance);
+    //console.log('total', totalAmount);
+    //console.log('header spendable', totalBalance?.totalSpendableBalance);
 
     // amount + fee
     if (totalAmount <= (totalBalance ? totalBalance.confirmedOrchardBalance : 0)) {
@@ -126,7 +147,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       from = PrivacyLevelFromEnum.saplingPrivacyLevel;
     }
 
-    console.log(from);
+    //console.log(from);
 
     if (from === PrivacyLevelFromEnum.nonePrivacyLevel) {
       return '-';
@@ -230,13 +251,15 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
       // snack with Error
       addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
     } else {
-      confirmSend(sendPageState);
+      await confirmSend(sendPageState);
     }
   };
 
   useEffect(() => {
     const sendingTot =
-      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + calculatedFee + donationAmount;
+      Utils.parseStringLocaleToNumberFloat(sendPageState.toaddr.amount) + 
+      (calculatedFee) + 
+      (donationAmount);
     setSendingTotal(sendingTot);
   }, [calculatedFee, donationAmount, sendPageState.toaddr.amount]);
 
@@ -266,10 +289,6 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
       <View
         style={{
-          marginTop: top,
-          marginBottom: bottom,
-          marginRight: right,
-          marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
         }}>
@@ -283,7 +302,9 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
           noUfvkIcon={true}
           closeScreen={() => {
             clear();
-            hide();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
           }}
         />
         <ScrollView
@@ -420,7 +441,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
             <Button
               type={ButtonTypeEnum.Primary}
               title={sendAllAmount ? (translate('send.confirm-button-all') as string) : (translate('confirm') as string)}
-              onPress={() => confirmSendBiometrics()}
+              onPress={async () => await confirmSendBiometrics()}
             />
           </View>
         </View>

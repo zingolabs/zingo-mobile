@@ -8,15 +8,15 @@ import { ThemeType } from '../../app/types';
 import { View } from 'react-native';
 
 type ScannerProps = {
-  onRead: (value: string) => Promise<void>;
+  active: boolean;
+  onRead: (value: string) => void;
   onClose: () => void;
 };
 
-const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead, onClose }) => {
+const Scanner: React.FunctionComponent<ScannerProps> = ({ active, onRead, onClose }) => {
   const { colors } = useTheme()  as ThemeType;
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
-  const [active, setActive] = React.useState(true);
 
   if (!hasPermission) {
     requestPermission();
@@ -25,14 +25,14 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead, onClose }) => 
   const codeScanner = useCodeScanner({
     codeTypes: ['qr', 'ean-13'],
     onCodeScanned: (codes: Code[]) => {
-      setActive(false);
-      //console.log(codes[0].value);
+
       onRead(codes && codes[0] && codes[0].value ? codes[0].value.trim() : '');
       onClose();
     },
   });
 
-  //console.log('permission', hasPermission);
+  console.log('active', active);
+  console.log('permission', hasPermission);
   //console.log('device', device);
 
   return (
@@ -45,7 +45,12 @@ const Scanner: React.FunctionComponent<ScannerProps> = ({ onRead, onClose }) => 
           <Text>No permission</Text>
         </View>
       ) : (
-        <Camera style={{ width: '100%', height: '100%' }} device={device} isActive={active} codeScanner={codeScanner} />
+        <Camera 
+          style={{ width: '100%', height: '100%' }} 
+          device={device} 
+          isActive={active} 
+          codeScanner={codeScanner} 
+        />
       )}
     </View>
   );

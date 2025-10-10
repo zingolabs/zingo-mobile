@@ -2,16 +2,16 @@ import { createDrawerNavigator, DrawerContentComponentProps } from '@react-navig
 import React from 'react';
 import Menu from './components/Menu';
 import { MenuItemEnum, ScreenEnum } from '../../app/AppState';
-import { HideReturn } from 'react-native-magic-modal';
+import { AppDrawerParamList } from '../../app/types';
 
 type DrawerProps = {
-  onMenuItemSelected: (i: MenuItemEnum) => Promise<HideReturn<unknown> | undefined>;
+  onMenuItemSelected: (i: MenuItemEnum) => void;
   screenName: ScreenEnum;
   initialRouteName: string;
   children: React.ReactNode;
 };
 
-const SideBar = createDrawerNavigator();
+const SideBar = createDrawerNavigator<AppDrawerParamList>();
 
 /**
  * A drawer component.
@@ -31,12 +31,12 @@ const SideBar = createDrawerNavigator();
  * }
  */
 function Drawer({ onMenuItemSelected, screenName, initialRouteName, children }: DrawerProps) {
-  const menu = (props: DrawerContentComponentProps) => <Menu onItemSelected={onMenuItemSelected} screenName={screenName} {...props} />;
+  const menu = (props: DrawerContentComponentProps) => <Menu onItemSelected={onMenuItemSelected} screenName={screenName} toggleMenuDrawer={() => props.navigation.toggleDrawer()} />;
 
   return (
     <SideBar.Navigator
       drawerContent={menu}
-      initialRouteName={initialRouteName}
+      initialRouteName={initialRouteName as keyof AppDrawerParamList}
       screenOptions={{
         headerShown: false,
         drawerType: 'slide',

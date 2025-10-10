@@ -148,7 +148,7 @@ export default class RPC {
       //const start = Date.now();
       const resultStr: string = await RPCModule.zecPriceInfo(withTOR ? GlobalConst.true : GlobalConst.false);
       //console.log('=========================================== > get ZEC price - ', Date.now() - start);
-      console.log(resultStr);
+      //console.log(resultStr);
 
       if (resultStr) {
         if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -768,7 +768,7 @@ export default class RPC {
       if (Date.now() - start > 4000) {
         console.log('=========================================== > spendable balance - ', Date.now() - start);
       }
-      console.log(spendableStr);
+      //console.log(spendableStr);
       let spendableJSON: RPCSpendablebalanceType = {} as RPCSpendablebalanceType;
       if (spendableStr) {
         if (spendableStr.toLowerCase().startsWith(GlobalConst.error)) {
@@ -810,7 +810,7 @@ export default class RPC {
         totalSpendableBalance: (spendableJSON.spendable_balance || 0) / 10 ** 8,
         //totalSpendableBalance: ((balanceJSON.confirmed_orchard_balance + balanceJSON.confirmed_sapling_balance) || 0) / 10 ** 8,
       };
-      console.log(balance);
+      //console.log(balance);
       this.fnSetTotalBalance(balance);
       this.fetchTotalBalanceLock = false;
     } catch (error) {
@@ -1033,7 +1033,7 @@ export default class RPC {
   async fetchTandZandOValueTransfers() {
     try {
       if (this.fetchTandZandOValueTransfersLock) {
-        console.log('VT LOCKKKKKKKKKKKKKKKKKKKKKKK');
+        //console.log('VT LOCKKKKKKKKKKKKKKKKKKKKKKK');
         return;
       }
       // first to get the last server block.
@@ -1164,7 +1164,7 @@ export default class RPC {
   async fetchTandZandOMessages() {
     try {
       if (this.fetchTandZandOMessagesLock) {
-        console.log('MESSAGES LOCKKKKKKKKKKKKKKKKKKKKKKK');
+        //console.log('MESSAGES LOCKKKKKKKKKKKKKKKKKKKKKKK');
         return;
       }
       this.fetchTandZandOMessagesLock = true;
