@@ -140,6 +140,9 @@ export default class RPC {
 
   static async rpcGetZecPrice(withTOR: boolean): Promise<{price: number, error: string}> {
     try {
+      // create the tor client if needed
+      await RPCModule.createTorClientProcess();
+
       // values:
       // 0   - initial/default value
       // -1  - error in zingolib.
