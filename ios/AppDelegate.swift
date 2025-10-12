@@ -97,34 +97,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func applicationWillEnterForeground(_ application: UIApplication) {
     if #available(iOS 13.0, *) {
-        // cancel existing sync process (if any).
-        NSLog("BGTask foreground")
-
-        // cancel bg task
-        if let task = self.bgTask {
-            NSLog("BGTask foreground - sync task CANCEL")
-            task.setTaskCompleted(success: false)
-        }
-        self.bgTask = nil
+      NSLog("BGTask foreground")
     }
   }
 
   func applicationDidEnterBackground(_ application: UIApplication) {
     if #available(iOS 13.0, *) {
-        // Cancel existing sync process (if any).
-        NSLog("BGTask background")
+      NSLog("BGTask background")
 
-        // Cancel bg task
-        if let task = self.bgTask {
-            NSLog("BGTask background - sync task CANCEL")
-            task.setTaskCompleted(success: false)
-        }
-        self.bgTask = nil
-
-        NSLog("BGTask background - scheduleBackgroundTask")
-        self.scheduleBackgroundTask()
-        NSLog("BGTask background - scheduleSchedulerBackgroundTask")
-        self.scheduleSchedulerBackgroundTask()
+      NSLog("BGTask background - scheduleBackgroundTask")
+      self.scheduleBackgroundTask()
+      NSLog("BGTask background - scheduleSchedulerBackgroundTask")
+      self.scheduleSchedulerBackgroundTask()
     }
   }
 }
