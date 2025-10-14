@@ -325,16 +325,6 @@ extension AppDelegate {
             // load the wallet file
             self.loadWalletFile()
           
-            // chaeck the server
-            let balance = getBalance()
-            let balanceStr = String(balance)
-            NSLog("BGTask syncingProcessBackgroundTask - testing if server is active \(balanceStr)")
-            //if balanceStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-                // this task is running with the App closed.
-                // probably is an impossible case...
-                //self.loadWalletFile()
-            //}
-
             // run the sync process.
             let syncing = runSync()
             let syncingStr = String(syncing)
@@ -358,7 +348,7 @@ extension AppDelegate {
 
                     let percent = syncStatus?.percentage_total_outputs_scanned ?? 0
 
-                    if percent == 100.0 {
+                    if percent >= 100.0 {
                         NSLog("BGTask syncingProcessBackgroundTask - sync COMPLETED %: \(percent)")
                         break
                     } else {

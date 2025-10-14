@@ -159,7 +159,7 @@ private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
             return
         }
         if let status: SyncStatus = try? decodeJSON(statusJson),
-           status.percentage_total_outputs_scanned == 100.0 {
+           status.percentage_total_outputs_scanned >= 100.0 {
             return
         }
         Thread.sleep(forTimeInterval: 1.0)

@@ -655,7 +655,8 @@ export default class RPC {
       return;
     }
 
-    if (sp.sync_complete && sp.sync_complete.percentage_total_outputs_scanned === 100) {
+    if (sp.sync_complete && sp.sync_complete.percentage_total_outputs_scanned &&
+        sp.sync_complete.percentage_total_outputs_scanned >= 100) {
       this.keepAwake(false);
     } else {
       this.keepAwake(true);

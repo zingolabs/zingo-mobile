@@ -116,7 +116,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
 
                     val percent = syncStatus.percentage_total_outputs_scanned
 
-                    if (percent == 100.0) {
+                    if (percent >= 100.0) {
                         Log.i("SCHEDULED_TASK_RUN", "sync COMPLETED %: $percent")
                         break
                     } else {
