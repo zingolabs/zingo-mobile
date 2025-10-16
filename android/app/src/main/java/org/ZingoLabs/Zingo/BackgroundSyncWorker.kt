@@ -80,19 +80,20 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             // load the wallet file
             loadWalletFile()
 
-            // check the Server because the task can run without the App.
-            val balance = uniffi.zingo.getBalance()
-            Log.i("SCHEDULED_TASK_RUN", "Testing if server is active: $balance")
-            //if (balance.lowercase().startsWith(ErrorPrefix.value)) {
-                // this means this task is running with the App closed
-                //loadWalletFile()
-            //} 
-
-            // the task is running here blocking this execution until this process finished:
-            // 1. finished the syncing.
-
-            val syncing = uniffi.zingo.runSync()
-            Log.i("SCHEDULED_TASK_RUN", "sync LAUNCH: $syncing")
+            try {
+                val syncing = uniffi.zingo.runSync()
+                Log.i("SCHEDULED_TASK_RUN", "sync LAUNCH: $syncing")
+            } catch (t: Throwable) {
+                Log.i("SCHEDULED_TASK_RUN", "Run Sync unknown error: $t")
+                // save the background JSON file
+                val timeStampError = Date().time / 1000
+                val timeStampStrError = timeStampError.toString()
+                val error = (t.message ?: "Error: Unknown")
+                val jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Run sync process KO. $error\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"$timeStampStrError\"}"
+                rpcModule.saveBackgroundFile(jsonBackgroundError)
+                Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
+                return Result.failure()
+            }
 
             val startTime = System.currentTimeMillis()
             val maxDurationMillis = 60 * 60 * 1000
@@ -138,7 +139,6 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
             rpcModule.saveBackgroundFile(jsonBackgroundError)
             Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
             return Result.failure()
-
         }
 
         // save the wallet file with the new data from the sync process

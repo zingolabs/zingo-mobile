@@ -326,9 +326,30 @@ extension AppDelegate {
             self.loadWalletFile()
           
             // run the sync process.
-            let syncing = runSync()
-            let syncingStr = String(syncing)
-            NSLog("BGTask syncingProcessBackgroundTask - sync LAUNCH \(syncingStr)")
+            do {
+              let syncing = runSync()
+              let syncingStr = String(syncing)
+              NSLog("BGTask syncingProcessBackgroundTask - sync LAUNCH \(syncingStr)")
+            } catch let error as ZingolibError {
+              NSLog("BGTask runSync unknown error: \(error)")
+
+              // save the background file
+              let timeStampError = Date().timeIntervalSince1970
+              let timeStampStrError = String(format: "%.0f", timeStampError)
+              let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Run sync process KO. \(error)\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\"}"
+              do {
+                try rpcmodule.saveBackgroundFile(jsonBackgroundError)
+                NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
+              } catch {
+                NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError) error: \(error.localizedDescription)")
+              }
+              
+              if let task = self.bgTask {
+                task.setTaskCompleted(success: false)
+              }
+              bgTask = nil
+              return
+            }
 
             var syncStatus: SyncStatus?
             while true {
