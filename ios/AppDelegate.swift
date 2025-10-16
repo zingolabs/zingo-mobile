@@ -327,16 +327,16 @@ extension AppDelegate {
           
             // run the sync process.
             do {
-              let syncing = runSync()
+              let syncing = try runSync()
               let syncingStr = String(syncing)
               NSLog("BGTask syncingProcessBackgroundTask - sync LAUNCH \(syncingStr)")
-            } catch let error as ZingolibError {
-              NSLog("BGTask runSync unknown error: \(error)")
+            } catch {
+              NSLog("BGTask runSync unknown error: \(error.localizedDescription)")
 
               // save the background file
               let timeStampError = Date().timeIntervalSince1970
               let timeStampStrError = String(format: "%.0f", timeStampError)
-              let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Run sync process KO. \(error)\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\"}"
+              let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Run sync process KO. \(error.localizedDescription)\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\"}"
               do {
                 try rpcmodule.saveBackgroundFile(jsonBackgroundError)
                 NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -357,10 +357,32 @@ extension AppDelegate {
                     NSLog("BGTask syncingProcessBackgroundTask - sync cancelled by expiration handler")
                     return
                 }
-                let syncStatusJson = statusSync()
-                if syncStatusJson.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-                    NSLog("BGTask syncingProcessBackgroundTask - sync STATUS ERROR: \(syncStatusJson)")
-                    break
+                var syncStatusJson: String = ""
+                do {
+                  syncStatusJson = try statusSync()
+                  if syncStatusJson.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
+                      NSLog("BGTask syncingProcessBackgroundTask - sync STATUS ERROR: \(syncStatusJson)")
+                      break
+                  }
+                } catch {
+                  NSLog("BGTask statusSync unknown error: \(error.localizedDescription)")
+
+                  // save the background file
+                  let timeStampError = Date().timeIntervalSince1970
+                  let timeStampStrError = String(format: "%.0f", timeStampError)
+                  let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Status sync process KO. \(error.localizedDescription)\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\"}"
+                  do {
+                    try rpcmodule.saveBackgroundFile(jsonBackgroundError)
+                    NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
+                  } catch {
+                    NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError) error: \(error.localizedDescription)")
+                  }
+                  
+                  if let task = self.bgTask {
+                    task.setTaskCompleted(success: false)
+                  }
+                  bgTask = nil
+                  return
                 }
 
                 do {

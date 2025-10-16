@@ -649,8 +649,10 @@ class RPCModule: NSObject {
 
   func fnRunSyncProcess(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = runSync()
-          let respStr = String(resp)
+        var respStr: String = ""
+        do {
+          let resp = try runSync()
+          respStr = String(resp)
           if !respStr.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
             // Also save the wallet after sync
             do {
@@ -660,9 +662,13 @@ class RPCModule: NSObject {
               NSLog(err)
             }
           }
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
+        } catch {
+          let err = "Error: [Native] Executing command. Run Sync. \(error.localizedDescription)"
+          NSLog(err)
+        }
+        DispatchQueue.main.async {
+          resolve(respStr)
+        }
       } else {
           let err = "Error: [Native] Sync run process. Command arguments problem."
           NSLog(err)
@@ -714,11 +720,17 @@ class RPCModule: NSObject {
 
   func fnStatusSyncInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = statusSync()
-          let respStr = String(resp)
-          DispatchQueue.main.async {
-            resolve(respStr)
-          }
+        var respStr: String = ""
+        do {
+          let resp = try statusSync()
+          respStr = String(resp)
+        } catch {
+          let err = "Error: [Native] Executing command. Sync Status. \(error.localizedDescription)"
+          NSLog(err)
+        }
+        DispatchQueue.main.async {
+          resolve(respStr)
+        }
       } else {
           let err = "Error: [Native] Sync poll info. Command arguments problem."
           NSLog(err)
