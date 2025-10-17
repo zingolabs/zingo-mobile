@@ -609,7 +609,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         setItemsPicker(items);
       }
     })();
-  }, [addressBook, zenniesDonationAddress]);
+  }, [addressBook, itemsPicker, zenniesDonationAddress]);
 
   useEffect(() => {
     if (addressText) {
