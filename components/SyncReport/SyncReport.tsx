@@ -1,8 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, ScrollView, Text, ActivityIndicator } from 'react-native';
 
-import { useTheme } from '@react-navigation/native';
+import { useFocusEffect, useTheme } from '@react-navigation/native';
 
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import DetailLine from '../Components/DetailLine';
@@ -106,9 +106,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   }, [info.latestBlock]);
 
   // because this screen is fired from more places than the menu.
-  useEffect(() => {
-    setTimeout(() => setShowBackgroundLegend(false), 10 * 1000); // 10 seconds only
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      if (showBackgroundLegend) {
+        setTimeout(() => setShowBackgroundLegend(false), 10 * 1000); // 10 seconds only
+      }
+    }, [showBackgroundLegend])
+  );
 
   useEffect(() => {
     if (!syncingStatus || isEqual(syncingStatus, {} as RPCSyncStatusType) || (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) || syncingStatus.percentage_total_outputs_scanned === 0) {
@@ -191,6 +195,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           noPrivacy={true}
           noUfvkIcon={true}
           closeScreen={() => {
+            setShowBackgroundLegend(true);
             clear();
             if (navigation.canGoBack()) {
               navigation.goBack();
@@ -248,7 +253,12 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                     //translate('report.batches-date') +
                     moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a') +
                     (Number(background.dateEnd) > 0 && Number(background.date) !== Number(background.dateEnd)
-                      ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
+                      ? (
+                        moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D') ===
+                        moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D')
+                          ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('h:mm:ss a')
+                          : ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
+                        )
                       : '')
                   }
                   screenName={screenName}
