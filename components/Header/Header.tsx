@@ -175,10 +175,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       setPercentageOutputsScanned(0);
       setSyncInProgress(true);
     } else {
+      // avoiding 0.00 or 100%, minimum 0.01, maximun 99.99
       setPercentageOutputsScanned(
         syncingStatus.percentage_total_outputs_scanned && syncingStatus.percentage_total_outputs_scanned < 0.01
           ? 0.01
-          : Number(syncingStatus.percentage_total_outputs_scanned?.toFixed(2).replace(/\.?0+$/, '')),
+          : syncingStatus.percentage_total_outputs_scanned && syncingStatus.percentage_total_outputs_scanned > 99.99
+            ? 99.99
+            : Number(syncingStatus.percentage_total_outputs_scanned?.toFixed(2).replace(/\.?0+$/, '')),
       );
       setSyncInProgress(
         !!syncingStatus.scan_ranges &&

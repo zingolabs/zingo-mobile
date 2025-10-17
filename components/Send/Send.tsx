@@ -74,6 +74,7 @@ import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalance
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { isEqual } from 'lodash';
 
 type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   // side menu
@@ -604,7 +605,9 @@ const Send: React.FunctionComponent<SendProps> = ({
           label: item.label,
           value: item.address,
         }));
-      setItemsPicker(items);
+      if (!isEqual(items, itemsPicker)) {
+        setItemsPicker(items);
+      }
     })();
   }, [addressBook, zenniesDonationAddress]);
 
