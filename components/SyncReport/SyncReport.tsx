@@ -171,7 +171,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     wallet.birthday,
   ]);
 
-  //console.log('render sync report. ServerWallet:', serverWallet);
+  console.log('render sync report. background:', background);
 
   return (
     <ToastProvider>
@@ -237,35 +237,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               />
             </View>
           )}
-          {(Number(background.date) > 0 || Number(background.dateEnd) > 0 || !!background.message) &&
-            showBackgroundLegend && (
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  marginHorizontal: 20,
-                }}>
-                <DetailLine
-                  label={translate('report.lastbackgroundsync') as string}
-                  value={
-                    //background.batches.toString() +
-                    //translate('report.batches-date') +
-                    moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a') +
-                    (Number(background.dateEnd) > 0 && Number(background.date) !== Number(background.dateEnd)
-                      ? (
-                        moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D') ===
-                        moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D')
-                          ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('h:mm:ss a')
-                          : ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
-                        )
-                      : '')
-                  }
-                  screenName={screenName}
-                />
-                {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
-              </View>
-            )}
           {!!maxBlocks && netInfo.isConnected ? (
             <>
               <View style={{ display: 'flex', marginHorizontal: 20, marginBottom: 30 }}>
@@ -610,6 +581,36 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               <ActivityIndicator size="large" color={colors.primary} />
             </View>
           )}
+          {(Number(background.date) > 0 || Number(background.dateEnd) > 0 || !!background.message) &&
+            showBackgroundLegend && (
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  marginHorizontal: 20,
+                }}>
+                <DetailLine
+                  label={translate('report.lastbackgroundsync') as string}
+                  value={
+                    //background.batches.toString() +
+                    //translate('report.batches-date') +
+                    moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a') +
+                    (Number(background.dateEnd) > 0 && Number(background.date) !== Number(background.dateEnd)
+                      ? (
+                        moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D') ===
+                        moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D')
+                          ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('h:mm:ss a')
+                          : ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
+                        )
+                      : '')
+                  }
+                  screenName={screenName}
+                />
+                {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
+              </View>
+            )}
+
           {/*!!syncingStatus.lastError && mode === ModeEnum.advanced && (
             <>
               <View

@@ -88,8 +88,9 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 // save the background JSON file
                 val timeStampError = Date().time / 1000
                 val timeStampStrError = timeStampError.toString()
-                val error = (t.message ?: "Error: Unknown")
-                val jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Run sync process KO. $error\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"$timeStampStrError\"}"
+                val e = (t.message ?: "Error: Unknown")
+                val clean = e.replace("\"", "")
+                val jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Run sync process KO. $clean\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"$timeStampStrError\"}"
                 rpcModule.saveBackgroundFile(jsonBackgroundError)
                 Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
                 return Result.failure()
