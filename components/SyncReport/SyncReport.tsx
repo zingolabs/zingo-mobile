@@ -114,8 +114,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   // because this screen is fired from more places than the menu.
   useFocusEffect(
     useCallback(() => {
-      if (showBackgroundLegend) {
-        setTimeout(() => setShowBackgroundLegend(false), background.error ? 60 * 1000 : 10 * 1000); // 60 seconds if BS error.
+      if (showBackgroundLegend && !background.error) {
+        setTimeout(() => setShowBackgroundLegend(false), 10 * 1000); // 10 seconds.
       }
     }, [showBackgroundLegend, background.error])
   );
@@ -627,26 +627,17 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                   }
                   screenName={screenName}
                 />
-                <View 
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                  }}>
-                  {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
-                  {!!background.error && (
-                    <Button
-                      type={ButtonTypeEnum.Primary}
-                      title={translate('view-error') as string}
-                      onPress={() => {
-                        reportError(background.error ? background.error : '');
-                      }}
-                      twoButtons={true}
-                    />
-                  )}
-                </View>
+                {!!background.message && <RegText style={{ marginBottom: 20}} color={colors.text}>{background.message}</RegText>}
+                {!!background.error && (
+                  <Button
+                    type={ButtonTypeEnum.Primary}
+                    title={translate('view-error') as string}
+                    onPress={() => {
+                      reportError(background.error ? background.error : '');
+                    }}
+                    twoButtons={true}
+                  />
+                )}
               </View>
             )}
 

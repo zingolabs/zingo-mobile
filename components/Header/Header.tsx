@@ -55,6 +55,7 @@ import { RPCShieldProposeType } from '../../app/rpc/types/RPCShieldProposeType';
 import RPCModule from '../../app/RPCModule';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 import { isEqual } from 'lodash';
+import { TriangleAlert } from '../Components/Icons/TriangleAlert';
 
 type HeaderProps = {
   // general
@@ -129,6 +130,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     shieldingAmount,
     selectServer,
     setZecPrice,
+    background,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum, privacy: boolean;
@@ -735,6 +737,25 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               addLastSnackbar &&
               noBalance &&
               privacyComponent()}
+            {!noSyncingStatus && !!background.error && mode === ModeEnum.advanced && (
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: 0,
+                  marginHorizontal: 5,
+                  padding: 0,
+                  minWidth: 25,
+                  minHeight: 25,
+                }}>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate(RouteEnum.SyncReport);
+                  }}
+                >
+                  <TriangleAlert color={colors.warning.primary} size={24} />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
 
           {!noBalance && (
