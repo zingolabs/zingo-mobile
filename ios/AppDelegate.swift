@@ -248,19 +248,18 @@ extension AppDelegate {
             NSLog("BGTask scheduleBackgroundTask failed to schedule time")
             return
         }
-        
-        //let earlyMorningComponent = DateComponents(hour: 3, minute: Int.random(in: 0...60))
-        //let earlyMorning = Calendar.current.date(byAdding: earlyMorningComponent, to: tomorrow)
       
-        let oneMinuteLater = Date().addingTimeInterval(60)
-        request.earliestBeginDate = oneMinuteLater
+        //let oneMinuteLater = Date().addingTimeInterval(60)
+        //request.earliestBeginDate = oneMinuteLater
 
-        //request.earliestBeginDate = earlyMorning
+        let earlyMorningComponent = DateComponents(hour: 3, minute: Int.random(in: 0...60))
+        let earlyMorning = Calendar.current.date(byAdding: earlyMorningComponent, to: tomorrow)
+        request.earliestBeginDate = earlyMorning
         request.requiresExternalPower = true
         request.requiresNetworkConnectivity = true
       
-        //NSLog("BGTask scheduleBackgroundTask date calculated: \(String(describing: earlyMorning))")
-        NSLog("BGTask scheduleBackgroundTask date test calculated: \(String(describing: oneMinuteLater))")
+        NSLog("BGTask scheduleBackgroundTask date calculated: \(String(describing: earlyMorning))")
+        //NSLog("BGTask scheduleBackgroundTask date test calculated: \(String(describing: oneMinuteLater))")
         
         do {
             try BGTaskScheduler.shared.submit(request)
@@ -338,7 +337,7 @@ extension AppDelegate {
               let timeStampStrError = String(format: "%.0f", timeStampError)
               let e = error.localizedDescription
               let clean = e.replacingOccurrences(of: "\"", with: "")
-              let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Run sync process KO. \(clean)\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\"}"
+              let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Run sync process KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"\(clean)\"}"
               do {
                 try rpcmodule.saveBackgroundFile(jsonBackgroundError)
                 NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
