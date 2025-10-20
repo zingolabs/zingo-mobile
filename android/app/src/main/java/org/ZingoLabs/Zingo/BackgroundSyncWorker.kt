@@ -88,9 +88,15 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 // save the background JSON file
                 val timeStampError = Date().time / 1000
                 val timeStampStrError = timeStampError.toString()
-                val e = (t.message ?: "Error: Unknown")
-                val clean = e.replace("\"", "")
-                val jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Run sync process KO. $clean\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"$timeStampStrError\"}"
+                val msg = (t.message ?: "Error: Unknown")
+                val payload = JSONObject().apply {
+                    put("batches", "0")
+                    put("message", "Run sync process KO.")
+                    put("date", "$timeStampStrStart")
+                    put("dateEnd", "$timeStampStrError")
+                    put("error", "$msg")
+                }
+                val jsonBackgroundError = payload.toString()
                 rpcModule.saveBackgroundFile(jsonBackgroundError)
                 Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
                 return Result.failure()
@@ -196,6 +202,9 @@ class BSCompanion {
             // PRODUCTION - next day between 3:00 and 4:00 am.
             val targetTimeDiff = calculateTargetTimeDifference()
 
+            // TEST - 1 minutes later
+            //val targetTimeDiff = calculateInFiveMinutes()
+
             Log.i("SCHEDULING_TASK", "calculated target time DIFF $targetTimeDiff")
 
             val workRequest = PeriodicWorkRequest.Builder(BackgroundSyncWorker::class.java, SYNC_PERIOD.toJavaDuration())
@@ -214,6 +223,8 @@ class BSCompanion {
             Log.i("SCHEDULING_TASK", "Task info ${WorkManager.getInstance(context).getWorkInfosForUniqueWork(
                 TASKID).get()}")
         }
+
+        //private fun calculateInFiveMinutes(): Duration = 1.minutes
 
         private fun calculateTargetTimeDifference(): Duration {
             val currentTimeZone: TimeZone = TimeZone.currentSystemDefault()

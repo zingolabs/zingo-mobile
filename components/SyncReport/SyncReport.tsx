@@ -24,8 +24,11 @@ import { isEqual } from 'lodash';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 import { RPCSyncScanRangeStatusType } from '../../app/rpc/types/RPCSyncScanRangeStatusType';
 import { RPCSyncScanRangePriorityStatusEnum } from '../../app/rpc/enums/RPCSyncScanRangePriorityStatusEnum';
-import { RouteEnum, ScreenEnum } from '../../app/AppState';
+import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import Button from '../Components/Button';
+import { createAlert } from '../../app/createAlert';
+import { sendEmail } from '../../app/sendEmail';
 //import { ModeEnum } from '../../app/AppState';
 
 type SyncReportProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.SyncReport>;
@@ -43,7 +46,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     netInfo, 
     snackbars, 
     removeFirstSnackbar, 
-    info
+    info,
+    zingolibVersion,
+    setBackgroundError,
+    addLastSnackbar,
   } = context; //mode
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
@@ -109,9 +115,9 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   useFocusEffect(
     useCallback(() => {
       if (showBackgroundLegend) {
-        setTimeout(() => setShowBackgroundLegend(false), 10 * 1000); // 10 seconds only
+        setTimeout(() => setShowBackgroundLegend(false), background.error ? 60 * 1000 : 10 * 1000); // 60 seconds if BS error.
       }
-    }, [showBackgroundLegend])
+    }, [showBackgroundLegend, background.error])
   );
 
   useEffect(() => {
@@ -170,6 +176,20 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     info.latestBlock,
     wallet.birthday,
   ]);
+
+  const reportError = (error: string) => {
+    createAlert(
+      setBackgroundError,
+      addLastSnackbar,
+      [screenName],
+      'Background Sync Error',
+      error,
+      false,
+      translate,
+      sendEmail,
+      zingolibVersion,
+    );
+  };
 
   console.log('render sync report. background:', background);
 
@@ -607,7 +627,26 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                   }
                   screenName={screenName}
                 />
-                {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
+                <View 
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                  }}>
+                  {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
+                  {!!background.error && (
+                    <Button
+                      type={ButtonTypeEnum.Primary}
+                      title={translate('view-error') as string}
+                      onPress={() => {
+                        reportError(background.error ? background.error : '');
+                      }}
+                      twoButtons={true}
+                    />
+                  )}
+                </View>
               </View>
             )}
 
