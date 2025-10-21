@@ -152,14 +152,19 @@ private func setCryptoProvider() {
 private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
     let t0 = Date()
     while Date().timeIntervalSince(t0) < timeoutSeconds {
-        let statusJson = statusSync()
-        print("\nSync Status:\n\(statusJson)")
-        if isError(statusJson) {
-            XCTFail("Sync Error: \(statusJson)")
-            return
-        }
-        if let status: SyncStatus = try? decodeJSON(statusJson),
-           status.percentage_total_outputs_scanned >= 100.0 {
+        do {
+            let statusJson = statusSync()
+            print("\nSync Status:\n\(statusJson)")
+            if isError(statusJson) {
+                XCTFail("\nSync status error:\n\(statusJson)")
+                return
+            }
+            if let status: SyncStatus = try? decodeJSON(statusJson),
+            status.percentage_total_outputs_scanned >= 100.0 {
+                return
+            }
+        } catch {
+            XCTFail("\nSync status error:\n\(error.localizedDescription)")
             return
         }
         Thread.sleep(forTimeInterval: 1.0)
@@ -271,8 +276,12 @@ final class ExecuteSyncFromSeed: XCTestCase {
         let hPre: Height = try decodeJSON(hPreJson)
         XCTAssertEqual(hPre.height, 0)
 
-        let syncJson = runSync()
-        print("\nSync:\n\(syncJson)")
+        do {
+            let syncJson = runSync()
+            print("\nSync:\n\(syncJson)")
+        } catch {
+            print("\nSync error:\n\(error.localizedDescription)")
+        }
 
         waitForSyncOrFail()
 
@@ -299,8 +308,12 @@ final class ExecuteSendFromOrchard: XCTestCase {
         XCTAssertEqual(initRes.birthday, 1)
 
 
-        let syncJson = runSync()
-        print("\nSync:\n\(syncJson)")
+        do {
+            let syncJson = runSync()
+            print("\nSync:\n\(syncJson)")
+        } catch {
+            print("\nSync error:\n\(error.localizedDescription)")
+        }
 
         waitForSyncOrFail()
 
@@ -327,8 +340,12 @@ final class ExecuteSendFromOrchard: XCTestCase {
         let confirmJson = confirm()
         print("\nConfirm Txid:\n\(confirmJson)")
 
-        let syncJson2 = runSync()
-        print("\nSync:\n\(syncJson2)")
+        do {
+            let syncJson2 = runSync()
+            print("\nSync:\n\(syncJson2)")
+        } catch {
+            print("\nSync error:\n\(error.localizedDescription)")
+        }
 
         waitForSyncOrFail()
 
@@ -360,8 +377,12 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
         let price = zecPrice(tor: tor)
         print("\nPrice:\n\(price)")
 
-        let syncJson = runSync()
-        print("\nSync:\n\(syncJson)")
+        do {
+            let syncJson = runSync()
+            print("\nSync:\n\(syncJson)")
+        } catch {
+            print("\nSync error:\n\(error.localizedDescription)")
+        }
 
         waitForSyncOrFail()
 
@@ -405,8 +426,12 @@ final class ExecuteSaplingBalanceFromSeed: XCTestCase {
         XCTAssertEqual(initRes.seed_phrase, seed)
         XCTAssertEqual(initRes.birthday, 1)
 
-        let syncJson = runSync()
-        print("\nSync:\n\(syncJson)")
+        do {
+            let syncJson = runSync()
+            print("\nSync:\n\(syncJson)")
+        } catch {
+            print("\nSync error:\n\(error.localizedDescription)")
+        }
 
         waitForSyncOrFail()
 

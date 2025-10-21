@@ -113,10 +113,42 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                     break
                 }
 
-                val syncStatusJson: String = uniffi.zingo.statusSync()
-                if (syncStatusJson.lowercase().startsWith(ErrorPrefix.value)) {
-                    Log.i("SCHEDULED_TASK_RUN", "sync STATUS ERROR: $syncStatusJson")
-                    break
+                try {
+                    val syncStatusJson: String = uniffi.zingo.statusSync()
+                    if (syncStatusJson.lowercase().startsWith(ErrorPrefix.value)) {
+                        Log.i("SCHEDULED_TASK_RUN", "sync STATUS ERROR: $syncStatusJson")
+                        // save the background JSON file
+                        val timeStampError = Date().time / 1000
+                        val timeStampStrError = timeStampError.toString()
+                        val payload = JSONObject().apply {
+                            put("batches", "0")
+                            put("message", "Run sync status KO.")
+                            put("date", "$timeStampStrStart")
+                            put("dateEnd", "$timeStampStrError")
+                            put("error", "$syncStatusJson")
+                        }
+                        val jsonBackgroundError = payload.toString()
+                        rpcModule.saveBackgroundFile(jsonBackgroundError)
+                        Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
+                        return Result.failure()
+                    }
+                } catch (t: Throwable) {
+                    Log.i("SCHEDULED_TASK_RUN", "Sync STATUS unknown error: $t")
+                    // save the background JSON file
+                    val timeStampError = Date().time / 1000
+                    val timeStampStrError = timeStampError.toString()
+                    val msg = (t.message ?: "Error: Unknown")
+                    val payload = JSONObject().apply {
+                        put("batches", "0")
+                        put("message", "Run sync status KO.")
+                        put("date", "$timeStampStrStart")
+                        put("dateEnd", "$timeStampStrError")
+                        put("error", "$msg")
+                    }
+                    val jsonBackgroundError = payload.toString()
+                    rpcModule.saveBackgroundFile(jsonBackgroundError)
+                    Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
+                    return Result.failure()
                 }
 
                 try {
@@ -132,6 +164,20 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                     }
                 } catch (e: Exception) {
                     Log.e("SCHEDULED_TASK_RUN", "sync STATUS - parsing ERROR ${e.localizedMessage}")
+                    // save the background JSON file
+                    val timeStampError = Date().time / 1000
+                    val timeStampStrError = timeStampError.toString()
+                    val payload = JSONObject().apply {
+                        put("batches", "0")
+                        put("message", "Run sync status parsing KO.")
+                        put("date", "$timeStampStrStart")
+                        put("dateEnd", "$timeStampStrError")
+                        put("error", "${e.localizedMessage}")
+                    }
+                    val jsonBackgroundError = payload.toString()
+                    rpcModule.saveBackgroundFile(jsonBackgroundError)
+                    Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
+                    return Result.failure()
                 }
 
                 Thread.sleep(5000)
