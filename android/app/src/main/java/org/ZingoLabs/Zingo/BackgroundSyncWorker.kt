@@ -132,6 +132,34 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
                         return Result.failure()
                     }
+                    try {
+                        syncStatus = mapper.readValue(syncStatusJson)
+
+                        val percent = syncStatus.percentage_total_outputs_scanned
+
+                        if (percent >= 100.0) {
+                            Log.i("SCHEDULED_TASK_RUN", "sync COMPLETED %: $percent")
+                            break
+                        } else {
+                            Log.i("SCHEDULED_TASK_RUN", "sync STATUS %: $percent")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("SCHEDULED_TASK_RUN", "sync STATUS - parsing ERROR ${e.localizedMessage}")
+                        // save the background JSON file
+                        val timeStampError = Date().time / 1000
+                        val timeStampStrError = timeStampError.toString()
+                        val payload = JSONObject().apply {
+                            put("batches", "0")
+                            put("message", "Run sync status parsing KO.")
+                            put("date", "$timeStampStrStart")
+                            put("dateEnd", "$timeStampStrError")
+                            put("error", "${e.localizedMessage}")
+                        }
+                        val jsonBackgroundError = payload.toString()
+                        rpcModule.saveBackgroundFile(jsonBackgroundError)
+                        Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
+                        return Result.failure()
+                    }
                 } catch (t: Throwable) {
                     Log.i("SCHEDULED_TASK_RUN", "Sync STATUS unknown error: $t")
                     // save the background JSON file
@@ -144,35 +172,6 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                         put("date", "$timeStampStrStart")
                         put("dateEnd", "$timeStampStrError")
                         put("error", "$msg")
-                    }
-                    val jsonBackgroundError = payload.toString()
-                    rpcModule.saveBackgroundFile(jsonBackgroundError)
-                    Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
-                    return Result.failure()
-                }
-
-                try {
-                    syncStatus = mapper.readValue(syncStatusJson)
-
-                    val percent = syncStatus.percentage_total_outputs_scanned
-
-                    if (percent >= 100.0) {
-                        Log.i("SCHEDULED_TASK_RUN", "sync COMPLETED %: $percent")
-                        break
-                    } else {
-                        Log.i("SCHEDULED_TASK_RUN", "sync STATUS %: $percent")
-                    }
-                } catch (e: Exception) {
-                    Log.e("SCHEDULED_TASK_RUN", "sync STATUS - parsing ERROR ${e.localizedMessage}")
-                    // save the background JSON file
-                    val timeStampError = Date().time / 1000
-                    val timeStampStrError = timeStampError.toString()
-                    val payload = JSONObject().apply {
-                        put("batches", "0")
-                        put("message", "Run sync status parsing KO.")
-                        put("date", "$timeStampStrStart")
-                        put("dateEnd", "$timeStampStrError")
-                        put("error", "${e.localizedMessage}")
                     }
                     val jsonBackgroundError = payload.toString()
                     rpcModule.saveBackgroundFile(jsonBackgroundError)
