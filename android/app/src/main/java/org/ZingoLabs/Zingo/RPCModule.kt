@@ -65,9 +65,9 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     fun saveWalletFile(): Boolean {
-        uniffi.zingo.initLogging()
-
         try {
+            uniffi.zingo.initLogging()
+
             // Get the encoded wallet file
             val b64encoded: String = uniffi.zingo.saveToB64()
             if (b64encoded.lowercase().startsWith(ErrorPrefix.value)) {
@@ -129,52 +129,64 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
 
     @ReactMethod
     fun createNewWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
-        // Log.i("MAIN", "Creating new wallet")
+        try {
+            uniffi.zingo.initLogging()
 
-        uniffi.zingo.initLogging()
+            // Create a seed
+            val resp = uniffi.zingo.initNew(serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            // Log.i("MAIN-Seed", resp)
 
-        // Create a seed
-        val resp = uniffi.zingo.initNew(serveruri, chainhint, performancelevel, minconfirmations.toUInt())
-        // Log.i("MAIN-Seed", resp)
+            if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
+                saveWalletFile()
+            }
 
-        if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
-            saveWalletFile()
+            promise.resolve(resp)
+        } catch (e: Exception) {
+            val errorMessage = "Error: [Native] create new wallet: ${e.localizedMessage}"
+            Log.e("MAIN", errorMessage, e)
+            promise.resolve(errorMessage)
         }
-
-        promise.resolve(resp)
     }
 
     @ReactMethod
     fun restoreWalletFromSeed(seed: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
-        // Log.i("MAIN", "Restoring wallet with seed $seed")
+        try {
+            uniffi.zingo.initLogging()
 
-        uniffi.zingo.initLogging()
+            val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            // Log.i("MAIN", resp)
 
-        val resp = uniffi.zingo.initFromSeed(seed, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
-        // Log.i("MAIN", resp)
+            if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
+                saveWalletFile()
+            }
 
-        if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
-            saveWalletFile()
+            promise.resolve(resp)
+        } catch (e: Exception) {
+            val errorMessage = "Error: [Native] restore wallet from seed: ${e.localizedMessage}"
+            Log.e("MAIN", errorMessage, e)
+            promise.resolve(errorMessage)
         }
-
-        promise.resolve(resp)
     }
 
     @ReactMethod
     fun restoreWalletFromUfvk(ufvk: String, birthday: String, serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
-        // Log.i("MAIN", "Restoring wallet with ufvk $ufvk")
+        try {
+            uniffi.zingo.initLogging()
 
-        uniffi.zingo.initLogging()
+            val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+            // Log.i("MAIN", resp)
 
-        val resp = uniffi.zingo.initFromUfvk(ufvk, birthday.toUInt(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
-        // Log.i("MAIN", resp)
+            if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
+                saveWalletFile()
+            }
 
-        if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
-            saveWalletFile()
+            promise.resolve(resp)
+        } catch (e: Exception) {
+            val errorMessage = "Error: [Native] restore wallet from ufvk: ${e.localizedMessage}"
+            Log.e("MAIN", errorMessage, e)
+            promise.resolve(errorMessage)
         }
-
-        promise.resolve(resp)
-    }
+}
 
     @ReactMethod
     fun loadExistingWallet(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String, promise: Promise) {
@@ -182,44 +194,27 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
     }
 
     fun loadExistingWalletNative(serveruri: String, chainhint: String, performancelevel: String, minconfirmations: String): String {
-        // Read the file
-        val fileBytes = readFile(WalletFileName.value)
+        try {
+            // Read the file
+            val fileBytes = readFile(WalletFileName.value)
 
-        val middle0w = 0
-        val middle1w = 6000000 // 6_000_000 - 8 pieces
-        val middle2w = 12000000
-        val middle3w = 18000000
-        val middle4w = 24000000
-        val middle5w = 30000000
-        val middle6w = 36000000
-        val middle7w = 42000000
-        val middle8w: Int = fileBytes.size
+            val middle0w = 0
+            val middle1w = 6000000 // 6_000_000 - 8 pieces
+            val middle2w = 12000000
+            val middle3w = 18000000
+            val middle4w = 24000000
+            val middle5w = 30000000
+            val middle6w = 36000000
+            val middle7w = 42000000
+            val middle8w: Int = fileBytes.size
 
-        var fileb64 = StringBuilder("")
-        if (middle8w <= middle1w) {
-            fileb64 = fileb64.append(
-                Base64.encodeToString(
-                    fileBytes,
-                    middle0w,
-                    middle8w - middle0w,
-                    Base64.NO_WRAP
-                )
-            )
-        } else {
-            fileb64 = fileb64.append(
-                Base64.encodeToString(
-                    fileBytes,
-                    middle0w,
-                    middle1w - middle0w,
-                    Base64.NO_WRAP
-                )
-            )
-            if (middle8w <= middle2w) {
+            var fileb64 = StringBuilder("")
+            if (middle8w <= middle1w) {
                 fileb64 = fileb64.append(
                     Base64.encodeToString(
                         fileBytes,
-                        middle1w,
-                        middle8w - middle1w,
+                        middle0w,
+                        middle8w - middle0w,
                         Base64.NO_WRAP
                     )
                 )
@@ -227,17 +222,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 fileb64 = fileb64.append(
                     Base64.encodeToString(
                         fileBytes,
-                        middle1w,
-                        middle2w - middle1w,
+                        middle0w,
+                        middle1w - middle0w,
                         Base64.NO_WRAP
                     )
                 )
-                if (middle8w <= middle3w) {
+                if (middle8w <= middle2w) {
                     fileb64 = fileb64.append(
                         Base64.encodeToString(
                             fileBytes,
-                            middle2w,
-                            middle8w - middle2w,
+                            middle1w,
+                            middle8w - middle1w,
                             Base64.NO_WRAP
                         )
                     )
@@ -245,17 +240,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     fileb64 = fileb64.append(
                         Base64.encodeToString(
                             fileBytes,
-                            middle2w,
-                            middle3w - middle2w,
+                            middle1w,
+                            middle2w - middle1w,
                             Base64.NO_WRAP
                         )
                     )
-                    if (middle8w <= middle4w) {
+                    if (middle8w <= middle3w) {
                         fileb64 = fileb64.append(
                             Base64.encodeToString(
                                 fileBytes,
-                                middle3w,
-                                middle8w - middle3w,
+                                middle2w,
+                                middle8w - middle2w,
                                 Base64.NO_WRAP
                             )
                         )
@@ -263,17 +258,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                         fileb64 = fileb64.append(
                             Base64.encodeToString(
                                 fileBytes,
-                                middle3w,
-                                middle4w - middle3w,
+                                middle2w,
+                                middle3w - middle2w,
                                 Base64.NO_WRAP
                             )
                         )
-                        if (middle8w <= middle5w) {
+                        if (middle8w <= middle4w) {
                             fileb64 = fileb64.append(
                                 Base64.encodeToString(
                                     fileBytes,
-                                    middle4w,
-                                    middle8w - middle4w,
+                                    middle3w,
+                                    middle8w - middle3w,
                                     Base64.NO_WRAP
                                 )
                             )
@@ -281,17 +276,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                             fileb64 = fileb64.append(
                                 Base64.encodeToString(
                                     fileBytes,
-                                    middle4w,
-                                    middle5w - middle4w,
+                                    middle3w,
+                                    middle4w - middle3w,
                                     Base64.NO_WRAP
                                 )
                             )
-                            if (middle8w <= middle6w) {
+                            if (middle8w <= middle5w) {
                                 fileb64 = fileb64.append(
                                     Base64.encodeToString(
                                         fileBytes,
-                                        middle5w,
-                                        middle8w - middle5w,
+                                        middle4w,
+                                        middle8w - middle4w,
                                         Base64.NO_WRAP
                                     )
                                 )
@@ -299,17 +294,17 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                                 fileb64 = fileb64.append(
                                     Base64.encodeToString(
                                         fileBytes,
-                                        middle5w,
-                                        middle6w - middle5w,
+                                        middle4w,
+                                        middle5w - middle4w,
                                         Base64.NO_WRAP
                                     )
                                 )
-                                if (middle8w <= middle7w) {
+                                if (middle8w <= middle6w) {
                                     fileb64 = fileb64.append(
                                         Base64.encodeToString(
                                             fileBytes,
-                                            middle6w,
-                                            middle8w - middle6w,
+                                            middle5w,
+                                            middle8w - middle5w,
                                             Base64.NO_WRAP
                                         )
                                     )
@@ -317,32 +312,57 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                                     fileb64 = fileb64.append(
                                         Base64.encodeToString(
                                             fileBytes,
-                                            middle6w,
-                                            middle7w - middle6w,
+                                            middle5w,
+                                            middle6w - middle5w,
                                             Base64.NO_WRAP
                                         )
                                     )
-                                    fileb64 = fileb64.append(
-                                        Base64.encodeToString(
-                                            fileBytes,
-                                            middle7w,
-                                            middle8w - middle7w,
-                                            Base64.NO_WRAP
+                                    if (middle8w <= middle7w) {
+                                        fileb64 = fileb64.append(
+                                            Base64.encodeToString(
+                                                fileBytes,
+                                                middle6w,
+                                                middle8w - middle6w,
+                                                Base64.NO_WRAP
+                                            )
                                         )
-                                    )
+                                    } else {
+                                        fileb64 = fileb64.append(
+                                            Base64.encodeToString(
+                                                fileBytes,
+                                                middle6w,
+                                                middle7w - middle6w,
+                                                Base64.NO_WRAP
+                                            )
+                                        )
+                                        fileb64 = fileb64.append(
+                                            Base64.encodeToString(
+                                                fileBytes,
+                                                middle7w,
+                                                middle8w - middle7w,
+                                                Base64.NO_WRAP
+                                            )
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+
+            uniffi.zingo.initLogging()
+
+            Log.i("MAIN", "file size: $middle8w")
+
+            val resp = uniffi.zingo.initFromB64(fileb64.toString(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
+
+            return resp
+        } catch (e: Exception) {
+            val errorMessage = "Error: [Native] load existing wallet: ${e.localizedMessage}"
+            Log.e("MAIN", errorMessage, e)
+            return errorMessage
         }
-
-        uniffi.zingo.initLogging()
-
-        Log.i("MAIN", "file size: $middle8w")
-
-        return uniffi.zingo.initFromB64(fileb64.toString(), serveruri, chainhint, performancelevel, minconfirmations.toUInt())
     }
 
     @ReactMethod

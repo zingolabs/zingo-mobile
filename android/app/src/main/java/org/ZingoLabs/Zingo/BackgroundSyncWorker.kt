@@ -65,10 +65,6 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
 
         val mapper = jacksonObjectMapper()
 
-        // if the App is close, it need this at first step.
-        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
-        Log.i("SCHEDULED_TASK_RUN", "crypto provider default: $setCrytoProvider")
-
         // save the background JSON file
         val timeStampStart = Date().time / 1000
         val timeStampStrStart = timeStampStart.toString()
@@ -76,15 +72,38 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         rpcModule.saveBackgroundFile(jsonBackgroundStart)
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundStart")
 
+        try {
+            // if the App is close, it need this at first step.
+            val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+            Log.i("SCHEDULED_TASK_RUN", "crypto provider default: $setCrytoProvider")
+        } catch (t: Throwable) {
+            Log.i("SCHEDULED_TASK_RUN", "crypto provider default error: $t")
+            // save the background JSON file
+            val timeStampError = Date().time / 1000
+            val timeStampStrError = timeStampError.toString()
+            val msg = (t.message ?: "Error: Unknown")
+            val payload = JSONObject().apply {
+                put("batches", "0")
+                put("message", "Crypto Provider Default KO.")
+                put("date", "$timeStampStrStart")
+                put("dateEnd", "$timeStampStrError")
+                put("error", "$msg")
+            }
+            val jsonBackgroundError = payload.toString()
+            rpcModule.saveBackgroundFile(jsonBackgroundError)
+            Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
+            return Result.failure()
+        }
+
         // checking if the wallet file exists
         val exists: Boolean = rpcModule.fileExists(WalletFileName.value)
 
         if (exists) {
-            uniffi.zingo.initLogging()
-            // load the wallet file
-            loadWalletFile()
-
             try {
+                uniffi.zingo.initLogging()
+                // load the wallet file
+                loadWalletFile()
+
                 val syncing = uniffi.zingo.runSync()
                 Log.i("SCHEDULED_TASK_RUN", "sync LAUNCH: $syncing")
             } catch (t: Throwable) {
