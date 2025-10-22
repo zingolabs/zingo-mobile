@@ -303,6 +303,9 @@ extension AppDelegate {
 
         NSLog("BGTask syncingProcessBackgroundTask")
 
+        let setCrytoProvider = setCryptoDefaultProviderToRing()
+        NSLog("BGTask syncingProcessBackgroundTask - Crypto provider default \(setCrytoProvider)")
+
         // save the background file
         let timeStampStart = Date().timeIntervalSince1970
         self.timeStampStrStart = String(format: "%.0f", timeStampStart)

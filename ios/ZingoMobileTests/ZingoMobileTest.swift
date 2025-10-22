@@ -145,7 +145,6 @@ private func isError(_ s: String) -> Bool {
 }
 
 private func setCryptoProvider() {
-    // Ajusta el espacio de nombres si tu UniFFI genera otro wrapper.
     _ = setCryptoDefaultProviderToRing()
 }
 
