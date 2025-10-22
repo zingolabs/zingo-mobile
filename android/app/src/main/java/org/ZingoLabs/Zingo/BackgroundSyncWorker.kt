@@ -65,6 +65,10 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
 
         val mapper = jacksonObjectMapper()
 
+        // if the App is close, it need this at first step.
+        val setCrytoProvider = uniffi.zingo.setCryptoDefaultProviderToRing()
+        Log.i("SCHEDULED_TASK_RUN", "crypto provider default: $setCrytoProvider")
+
         // save the background JSON file
         val timeStampStart = Date().time / 1000
         val timeStampStrStart = timeStampStart.toString()
