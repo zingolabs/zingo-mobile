@@ -195,7 +195,8 @@ final class OfflineTestSuite: XCTestCase {
             XCTAssertEqual(addrs[0].has_sapling, false)
             XCTAssertEqual(addrs[0].has_transparent, false)
         } catch {
-            print("\nAddresses error:\n\(error.localizedDescription)")
+          XCTFail("\nAddresses error:\n\(error.localizedDescription)")
+          return
         }
 
         do {
@@ -205,7 +206,8 @@ final class OfflineTestSuite: XCTestCase {
             XCTAssertEqual(tAddrs[0].encoded_address, "t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
             XCTAssertEqual(tAddrs[0].scope, "external")
         } catch {
-            print("\nT Addresses error:\n\(error.localizedDescription)")
+          XCTFail("\nT Addresses error:\n\(error.localizedDescription)")
+          return
         }
     }
 
@@ -237,7 +239,8 @@ final class OfflineTestSuite: XCTestCase {
             XCTAssertEqual(addrs[0].has_sapling, false)
             XCTAssertEqual(addrs[0].has_transparent, false)
         } catch {
-            print("\nAddresses error:\n\(error.localizedDescription)")
+          XCTFail("\nAddresses error:\n\(error.localizedDescription)")
+          return
         }
 
         do {
@@ -247,7 +250,8 @@ final class OfflineTestSuite: XCTestCase {
             XCTAssertEqual(tAddrs[0].encoded_address, "t1dUDJ62ANtmebE8drFg7g2MWYwXHQ6Xu3F")
             XCTAssertEqual(tAddrs[0].scope, "external")
         } catch {
-            print("\nT Addresses error:\n\(error.localizedDescription)")
+          XCTFail("\nT Addresses error:\n\(error.localizedDescription)")
+          return
         }
 
     }
@@ -265,11 +269,12 @@ final class OfflineTestSuite: XCTestCase {
         XCTAssertEqual(initRes.birthday, 1)
 
         do {
-            let version = getVersion()
+            let version = try getVersion()
             print("\nVersion:\n\(version)")
             XCTAssertFalse(version.isEmpty)
         } catch {
-            print("\nVersion error:\n\(error.localizedDescription)")
+          XCTFail("\nVersion error:\n\(error.localizedDescription)")
+          return
         }
     }
 }
@@ -287,13 +292,16 @@ final class ExecuteSyncFromSeed: XCTestCase {
         XCTAssertEqual(initRes.seed_phrase, seed)
         XCTAssertEqual(initRes.birthday, 1)
 
+        var height: UInt64? = nil
         do {
-            let infoJson = infoServer()
+            let infoJson = try infoServer()
             print("\nInfo:\n\(infoJson)")
             let info: Info = try decodeJSON(infoJson)
-            XCTAssertGreaterThan(info.latest_block_height, 0)
+            let height = info.latest_block_height
+            XCTAssertGreaterThan(height, UInt64.zero)
         } catch {
-            print("\nInfo error:\n\(error.localizedDescription)")
+          XCTFail("\nInfo error:\n\(error.localizedDescription)")
+          return
         }
 
         do {
@@ -302,25 +310,27 @@ final class ExecuteSyncFromSeed: XCTestCase {
             let hPre: Height = try decodeJSON(hPreJson)
             XCTAssertEqual(hPre.height, 0)
         } catch {
-            print("\nHeight pre-sync error:\n\(error.localizedDescription)")
+          XCTFail("\nHeight pre-sync error:\n\(error.localizedDescription)")
+          return
         }
 
         do {
             let syncJson = try runSync()
             print("\nSync:\n\(syncJson)")
         } catch {
-            print("\nSync error:\n\(error.localizedDescription)")
+          print("\nSync error:\n\(error.localizedDescription)")
         }
 
         waitForSyncOrFail()
 
         do {
-            let hPostJson = getLatestBlockWallet()
+            let hPostJson = try getLatestBlockWallet()
             print("\nHeight post-sync:\n\(hPostJson)")
             let hPost: Height = try decodeJSON(hPostJson)
-            XCTAssertEqual(hPost.height, info.latest_block_height)
+            XCTAssertEqual(hPost.height, height)
         } catch {
-            print("\nHeight post-sync error:\n\(error.localizedDescription)")
+          XCTFail("\nHeight post-sync error:\n\(error.localizedDescription)")
+          return
         }
     }
 }
@@ -357,22 +367,29 @@ final class ExecuteSendFromOrchard: XCTestCase {
             XCTAssertEqual(bal.confirmed_orchard_balance, 1_000_000)
             XCTAssertEqual(bal.confirmed_transparent_balance, 0)
         } catch {
-            print("\nBalance pre-send error:\n\(error.localizedDescription)")
+          XCTFail("\nBalance pre-send error:\n\(error.localizedDescription)")
+          return
         }
 
+        var taddr: String? = nil
         do {
             let tAddrsJson = try getTransparentAddresses()
             print("\nT Addresses:\n\(tAddrsJson)")
             let tAddrs: [TransparentAddress] = try decodeJSON(tAddrsJson)
-            guard let taddr = tAddrs.first?.encoded_address else {
+            guard let addr = tAddrs.first?.encoded_address else {
                 XCTFail("No transparent address")
                 return
             }
+            taddr = addr
         } catch {
-            print("\nT Addresses error:\n\(error.localizedDescription)")
+          XCTFail("\nT Addresses error:\n\(error.localizedDescription)")
+          return
         }
 
-        let sendJson = SendResult(address: taddr, amount: 100_000, memo: nil)
+        let ta = try XCTUnwrap(taddr, "T address is nil")
+        XCTAssertFalse(ta.isEmpty, "T address is empty")
+      
+        let sendJson = SendResult(address: ta, amount: 100_000, memo: nil)
         let sendBodyData = try JSONEncoder().encode([sendJson])
         let sendBody = String(data: sendBodyData, encoding: .utf8)!
         let proposeJson = send(sendJson: sendBody)
@@ -391,14 +408,15 @@ final class ExecuteSendFromOrchard: XCTestCase {
         waitForSyncOrFail()
 
         do {
-            balJson = getBalance()
+            var balJson = try getBalance()
             print("\nBalance post-send:\n\(balJson)")
-            bal = try decodeJSON(balJson)
+            var bal: Balance = try decodeJSON(balJson)
             XCTAssertEqual(bal.total_orchard_balance, 885_000)
             XCTAssertEqual(bal.confirmed_transparent_balance, 0)
             XCTAssertEqual(bal.unconfirmed_transparent_balance, 100_000)
         } catch {
-            print("\nBalance post-send error:\n\(error.localizedDescription)")
+          XCTFail("\nBalance post-send error:\n\(error.localizedDescription)")
+          return
         }
     }
 }
@@ -456,7 +474,8 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
             XCTAssertEqual(vts.value_transfers[2].status, "confirmed")
             XCTAssertEqual(vts.value_transfers[2].value, 1_000_000)
         } catch {
-            print("\nValue Transfers error:\n\(error.localizedDescription)")
+          XCTFail("\nValue Transfers error:\n\(error.localizedDescription)")
+          return
         }
     }
 }
@@ -488,35 +507,31 @@ final class ExecuteSaplingBalanceFromSeed: XCTestCase {
             let vtJson = try getValueTransfers()
             print("\nValue Transfers:\n\(vtJson)")
         } catch {
-            print("\nValue Transfers error:\n\(error.localizedDescription)")
+          XCTFail("\nValue Transfers error:\n\(error.localizedDescription)")
+          return
         }
 
         do {
-            let balJson = getBalance()
-            print("\nBalance:\n\(balJson)")
-            let bal: Balance = try decodeJSON(balJson)
-        catch {
-            print("\nBalance error:\n\(error.localizedDescription)")
+          let balJson = try getBalance()
+          print("\nBalance:\n\(balJson)")
+          let bal: Balance = try decodeJSON(balJson)
+          XCTAssertEqual(bal.total_orchard_balance, 710_000)
+          XCTAssertEqual(bal.confirmed_orchard_balance, 710_000)
+          XCTAssertEqual(bal.total_sapling_balance, 125_000)
+          XCTAssertEqual(bal.confirmed_sapling_balance, 125_000)
+          XCTAssertEqual(bal.confirmed_transparent_balance, 0)
+        } catch {
+          XCTFail("\nBalance error:\n\(error.localizedDescription)")
+          return
         }
 
-        // Valores esperados exactamente como en Kotlin
-        XCTAssertEqual(bal.total_orchard_balance, 710_000)
-        XCTAssertEqual(bal.confirmed_orchard_balance, 710_000)
-        XCTAssertEqual(bal.total_sapling_balance, 125_000)
-        XCTAssertEqual(bal.confirmed_sapling_balance, 125_000)
-        XCTAssertEqual(bal.confirmed_transparent_balance, 0)
-
-        // Guardar wallet vía RPCModule
         let rpc = RPCModule()
         try rpc.saveWalletInternal()
 
-        // Cambiar a Offline
         let changeJson = changeServer(serveruri: "")
         print("\nChange Serveruri:\n\(changeJson)")
         XCTAssertFalse(isError(changeJson))
 
-        // Cargar wallet sin server (Offline)
-        // Ajusta la firma si tu método se llama diferente (por ej. fnLoadExistingWalletNative)
         let loadJson = try rpc.fnLoadExistingWallet(serveruri: "", chainhint: "main", performancelevel: "Medium", minconfirmations: "1")
         print("\nLoad Wallet:\n\(loadJson)")
     }

@@ -1223,7 +1223,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 </View>
 
                 {showDeveloperOptions && (
-                  <>
+                  <View style={{ width: '100%', marginBottom: 20 }}>
                     <View style={{ display: 'flex', margin: 10 }}>
                       <BoldText>{translate('settings.performancelevel-title') as string}</BoldText>
                     </View>
@@ -1255,7 +1255,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         </View>
                       </>
                     )}
-                  </>
+                  </View>
                 )}
               </>
             )}

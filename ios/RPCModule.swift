@@ -199,7 +199,7 @@ class RPCModule: NSObject {
         NSLog("file size \(size)")
         try self.saveWalletFile(walletEncodedString)
       } else {
-        throw FileError.saveFileError("Couldn't save the wallet. \(walletEncodedString)")
+        NSLog("Couldn't save the wallet. \(walletEncodedString)")
       }
     } catch {
       throw FileError.saveFileError("Couldn't save the wallet. Read/Write issue.")
@@ -610,11 +610,19 @@ class RPCModule: NSObject {
 
   func fnPollSyncInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
-          let resp = pollSync()
+        do {
+          let resp = try pollSync()
           let respStr = String(resp)
           DispatchQueue.main.async {
             resolve(respStr)
           }
+        } catch {
+          let err = "Error: [Native] Sync poll info. \(error.localizedDescription)"
+          NSLog(err)
+          DispatchQueue.main.async {
+            resolve(err)
+          }
+        }
       } else {
           let err = "Error: [Native] Sync poll info. Command arguments problem."
           NSLog(err)
@@ -670,7 +678,7 @@ class RPCModule: NSObject {
   func fnPauseSyncProcess(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           do {
-            let resp = pauseSync()
+            let resp = try pauseSync()
             let respStr = String(resp)
             DispatchQueue.main.async {
               resolve(respStr)
@@ -733,7 +741,7 @@ class RPCModule: NSObject {
   func fnRunRescanProcess(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           do {
-            let resp = runRescan()
+            let resp = try runRescan()
             let respStr = String(resp)
             DispatchQueue.main.async {
               resolve(respStr)
@@ -764,7 +772,7 @@ class RPCModule: NSObject {
   func fnInfoServerInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           do {
-            let resp = infoServer()
+            let resp = try infoServer()
             let respStr = String(resp)
             DispatchQueue.main.async {
               resolve(respStr)
@@ -951,7 +959,7 @@ class RPCModule: NSObject {
   func fnGetVersionInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           do {
-            let resp = getVersion()
+            let resp = try getVersion()
             let respStr = String(resp)
             DispatchQueue.main.async {
               resolve(respStr)
@@ -1236,7 +1244,7 @@ func fnGetBalanceInfo(_ dict: [AnyHashable: Any]) {
   func fnGetSpendableBalanceTotalInfo(_ dict: [AnyHashable: Any]) {
       if let resolve = dict["resolve"] as? RCTPromiseResolveBlock {
           do {
-            let resp = getSpendableBalanceTotal()
+            let resp = try getSpendableBalanceTotal()
             let respStr = String(resp)
             DispatchQueue.main.async {
               resolve(respStr)

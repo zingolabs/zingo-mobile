@@ -609,6 +609,8 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
                   flexDirection: 'column',
                   alignItems: 'flex-start',
                   marginHorizontal: 20,
+                  width: '100%',
+                  marginBottom: 20,
                 }}>
                 <DetailLine
                   label={translate('report.lastbackgroundsync') as string}

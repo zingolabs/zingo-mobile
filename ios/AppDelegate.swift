@@ -367,7 +367,7 @@ extension AppDelegate {
                     // save the background file
                     let timeStampError = Date().timeIntervalSince1970
                     let timeStampStrError = String(format: "%.0f", timeStampError)
-                    let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Status sync process KO. \(error.localizedDescription)\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"\(syncStatusJson)\"}"
+                    let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Status sync process KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"\(syncStatusJson)\"}"
                     do {
                       try rpcmodule.saveBackgroundFile(jsonBackgroundError)
                       NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -389,7 +389,7 @@ extension AppDelegate {
                   let timeStampStrError = String(format: "%.0f", timeStampError)
                   let e = error.localizedDescription
                   let clean = e.replacingOccurrences(of: "\"", with: "")
-                  let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Status sync process KO. \(error.localizedDescription)\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"\(clean)\"}"
+                  let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Status sync process KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"\(clean)\"}"
                   do {
                     try rpcmodule.saveBackgroundFile(jsonBackgroundError)
                     NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
@@ -423,7 +423,7 @@ extension AppDelegate {
                   let timeStampStrError = String(format: "%.0f", timeStampError)
                   let e = error.localizedDescription
                   let clean = e.replacingOccurrences(of: "\"", with: "")
-                  let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Status sync parsing process KO. \(error.localizedDescription)\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"\(clean)\"}"
+                  let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Status sync parsing process KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"\(clean)\"}"
                   do {
                     try rpcmodule.saveBackgroundFile(jsonBackgroundError)
                     NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
