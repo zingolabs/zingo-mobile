@@ -191,7 +191,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     );
   };
 
-  console.log('render sync report. background:', background);
+  //console.log('render sync report. background:', background);
 
   return (
     <ToastProvider>
