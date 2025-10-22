@@ -153,7 +153,7 @@ private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
     let t0 = Date()
     while Date().timeIntervalSince(t0) < timeoutSeconds {
         do {
-            let statusJson = statusSync()
+            let statusJson = try statusSync()
             print("\nSync Status:\n\(statusJson)")
             if isError(statusJson) {
                 XCTFail("\nSync status error:\n\(statusJson)")
@@ -306,7 +306,7 @@ final class ExecuteSyncFromSeed: XCTestCase {
         }
 
         do {
-            let syncJson = runSync()
+            let syncJson = try runSync()
             print("\nSync:\n\(syncJson)")
         } catch {
             print("\nSync error:\n\(error.localizedDescription)")
@@ -342,7 +342,7 @@ final class ExecuteSendFromOrchard: XCTestCase {
 
 
         do {
-            let syncJson = runSync()
+            let syncJson = try runSync()
             print("\nSync:\n\(syncJson)")
         } catch {
             print("\nSync error:\n\(error.localizedDescription)")
@@ -382,7 +382,7 @@ final class ExecuteSendFromOrchard: XCTestCase {
         print("\nConfirm Txid:\n\(confirmJson)")
 
         do {
-            let syncJson2 = runSync()
+            let syncJson2 = try runSync()
             print("\nSync:\n\(syncJson2)")
         } catch {
             print("\nSync error:\n\(error.localizedDescription)")
@@ -423,7 +423,7 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
         print("\nPrice:\n\(price)")
 
         do {
-            let syncJson = runSync()
+            let syncJson = try runSync()
             print("\nSync:\n\(syncJson)")
         } catch {
             print("\nSync error:\n\(error.localizedDescription)")
@@ -476,7 +476,7 @@ final class ExecuteSaplingBalanceFromSeed: XCTestCase {
         XCTAssertEqual(initRes.birthday, 1)
 
         do {
-            let syncJson = runSync()
+            let syncJson = try runSync()
             print("\nSync:\n\(syncJson)")
         } catch {
             print("\nSync error:\n\(error.localizedDescription)")
