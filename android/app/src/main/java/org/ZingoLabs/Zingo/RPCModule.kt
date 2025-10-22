@@ -96,10 +96,10 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             // Intentar leer el archivo
             fileBytes = readFile(WalletFileName.value)
         } catch (e: FileNotFoundException) {
-            Log.e("MAIN", "Error: Wallet file not found", e)
+            Log.e("MAIN", "Error: [Native] Wallet file not found", e)
             return false
         } catch (e: IOException) {
-            Log.e("MAIN", "Error: Couldn't read the wallet file", e)
+            Log.e("MAIN", "Error: [Native] Couldn't read the wallet file", e)
             return false
         }
 
@@ -354,11 +354,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         try {
             fileBytesBackup = readFile(WalletBackupFileName.value)
         } catch (e: FileNotFoundException) {
-            Log.e("MAIN", "Error: Backup file not found", e)
+            Log.e("MAIN", "Error: [Native] Backup file not found", e)
             promise.resolve(false)
             return
         } catch (e: IOException) {
-            Log.e("MAIN", "Error reading the backup file", e)
+            Log.e("MAIN", "Error [Native] reading the backup file", e)
             promise.resolve(false)
             return
         }
@@ -367,7 +367,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         try {
             fileBytesWallet = readFile(WalletFileName.value)
         } catch (e: FileNotFoundException) {
-            Log.e("MAIN", "Error: Wallet file not found", e)
+            Log.e("MAIN", "Error: [Native] Wallet file not found", e)
             promise.resolve(false)
             return
         } catch (e: IOException) {
@@ -428,7 +428,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: saving wallet: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] saving wallet: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -449,7 +449,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: saving wallet backup: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] saving wallet backup: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -470,7 +470,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: getting latest block serveruri: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] get latest block serveruri: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -491,7 +491,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: getting latest block wallet: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] get latest block wallet: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -512,7 +512,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: getting donation address: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] get donation address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -533,7 +533,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: getting Zennies donation address: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] get Zennies donation address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -554,7 +554,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: getting value transfers list: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] get value transfers list: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -575,7 +575,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: setting crypto default provider: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] setting crypto default provider: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -596,7 +596,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: sync poll info: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] sync poll info: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -621,7 +621,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: sync run process: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] sync run process: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -642,7 +642,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: sync pause process: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] sync pause process: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -663,7 +663,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: sync status info: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] sync status info: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -684,7 +684,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: rescan run process: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] rescan run process: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -705,7 +705,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: server info: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] server info: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -726,7 +726,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: seed: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] seed: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -747,7 +747,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: ufvk: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] ufvk: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -768,7 +768,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: change serveruri: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] change serveruri: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -789,7 +789,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: wallet kind: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] wallet kind: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -810,7 +810,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: parse address: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] parse address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -831,7 +831,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: parse ufvk: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] parse ufvk: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -852,7 +852,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: version: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] version: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -873,7 +873,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: messages: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] messages: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -894,7 +894,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: balance: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] balance: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -915,7 +915,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: memobyes to address: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] memobyes to address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -936,7 +936,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: value to address: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] value to address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -957,7 +957,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: spends to address: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] spends to address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -978,7 +978,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: zec price: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] zec price: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -999,7 +999,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: resend transaction: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] resend transaction: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1020,7 +1020,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: remove transaction: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] remove transaction: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1041,7 +1041,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: spendable balance with address: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] spendable balance with address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1062,7 +1062,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: spendable balance total: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] spendable balance total: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1083,7 +1083,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: get option wallet: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] get option wallet: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1104,7 +1104,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: set option wallet: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] set option wallet: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1125,7 +1125,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: create tor client: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] create tor client: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1146,7 +1146,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: remove tor client: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] remove tor client: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1167,7 +1167,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: unified addresses: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] unified addresses: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1188,7 +1188,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: transparent addresses: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] transparent addresses: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1209,7 +1209,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: create new unified address: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] create new unified address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1230,7 +1230,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: create new transparent address: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] create new transparent address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1251,7 +1251,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: create new unified address: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] create new unified address: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1272,7 +1272,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: get wallet save required: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] get wallet save required: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1293,7 +1293,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: set wallet config prod: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] set wallet config prod: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1314,7 +1314,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: get wallet config performance level: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] get wallet config performance level: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1335,7 +1335,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: get wallet version: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] get wallet version: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1356,7 +1356,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: send: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] send: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1377,7 +1377,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: shield: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] shield: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {
@@ -1398,7 +1398,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                     promise.resolve(resp)
                 }
             } catch (e: Exception) {
-                val errorMessage = "Error: confirm: ${e.localizedMessage}"
+                val errorMessage = "Error: [Native] confirm: ${e.localizedMessage}"
                 Log.e("MAIN", errorMessage, e)
 
                 withContext(Dispatchers.Main) {

@@ -78,6 +78,9 @@ export default interface AppContextLoaded {
   // this wallet is watch-only (Readonly)
   readOnly: boolean;
 
+  // Last fetching error
+  lastError: string;
+
   // pools available
   orchardPool: boolean;
   saplingPool: boolean;

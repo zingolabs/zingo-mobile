@@ -553,6 +553,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       backgroundError: {} as BackgroundErrorType,
       setBackgroundError: this.setBackgroundError,
       readOnly: props.readOnly,
+      lastError: '',
       orchardPool: props.orchardPool,
       saplingPool: props.saplingPool,
       transparentPool: props.transparentPool,
@@ -607,6 +608,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.keepAwake,
       this.setZingolibVersion,
       this.setWallet,
+      this.setLastError,
       props.readOnly,
       props.server,
       props.performanceLevel,
@@ -1752,6 +1754,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({ snackbars: newSnackbars });
   };
 
+  setLastError = (error: string) => {
+    this.setState({ lastError: error });
+  };
+
   removeFirstSnackbar = (screenName: ScreenEnum) => {
     const newSnackbars = this.state.snackbars.filter((s: SnackbarType) => s.screenName.includes(screenName));
     newSnackbars.shift();
@@ -1854,6 +1860,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       backgroundError: this.state.backgroundError,
       setBackgroundError: this.state.setBackgroundError,
       readOnly: this.state.readOnly,
+      lastError: this.state.lastError,
       orchardPool: this.state.orchardPool,
       saplingPool: this.state.saplingPool,
       transparentPool: this.state.transparentPool,

@@ -53,6 +53,8 @@ import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { createAlert } from '../../app/createAlert';
+import { sendEmail } from '../../app/sendEmail';
 
 type SettingsProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Settings> & {
   setWalletOption: (walletOption: string, value: string) => Promise<void>;
@@ -118,6 +120,9 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     snackbars,
     removeFirstSnackbar,
     setPrivacyOption,
+    setBackgroundError,
+    zingolibVersion,
+    lastError,
   } = context;
 
   const memosArray = translate('settings.memos');
@@ -682,6 +687,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     );
   };
 
+  const reportError = (error: string) => {
+    createAlert(
+      setBackgroundError,
+      addLastSnackbar,
+      [screenName],
+      'Last Error',
+      error,
+      false,
+      translate,
+      sendEmail,
+      zingolibVersion,
+    );
+  };
+  
   return (
     <ToastProvider>
       <Snackbars
@@ -1218,6 +1237,24 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         'performancelevel',
                       )}
                     </View>
+                    {!!lastError && (
+                      <>
+                        <View style={{ display: 'flex', margin: 10 }}>
+                          <BoldText>{'LAST ERROR'}</BoldText>
+                        </View>
+
+                        <View style={{ display: 'flex', marginLeft: 25 }}>
+                          <Button
+                            type={ButtonTypeEnum.Primary}
+                            title={translate('view-error') as string}
+                            onPress={() => {
+                              reportError(lastError);
+                            }}
+                            twoButtons={true}
+                          />
+                        </View>
+                      </>
+                    )}
                   </>
                 )}
               </>

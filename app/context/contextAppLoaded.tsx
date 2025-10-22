@@ -59,6 +59,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   setBackgroundError: () => {},
   privacy: false,
   readOnly: false,
+  lastError: '',
   orchardPool: true,
   saplingPool: true,
   transparentPool: true,
