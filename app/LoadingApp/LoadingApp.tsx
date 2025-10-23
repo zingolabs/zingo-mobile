@@ -31,11 +31,9 @@ import {
   ModeEnum,
   SelectServerEnum,
   ChainNameEnum,
-  DownloadMemosEnum,
   SnackbarDurationEnum,
   SettingsNameEnum,
   RouteEnum,
-  WalletOptionEnum,
   SnackbarType,
   AppStateStatusEnum,
   GlobalConst,
@@ -1102,8 +1100,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         return;
       }
       const wallet: WalletType = { seed: seedJSON.seed_phrase || '', birthday: seedJSON.birthday || 0 };
-      // default values for wallet options
-      this.setWalletOption(WalletOptionEnum.downloadMemos, DownloadMemosEnum.walletMemos);
       // storing the seed & birthday in KeyChain/KeyStore
       if (this.state.recoveryWalletInfoOnDevice) {
         await createUpdateRecoveryWalletInfo(wallet);
@@ -1310,10 +1306,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     if (error) {
       this.walletErrorHandle(errorText, this.state.translate('loadingapp.readingwallet-label') as string, 3, false);
     }
-  };
-
-  setWalletOption = async (walletOption: string, value: string) => {
-    await RPC.rpcSetWalletSettingOption(walletOption, value);
   };
 
   setPrivacyOption = async (value: boolean): Promise<void> => {

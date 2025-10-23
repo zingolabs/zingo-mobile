@@ -31,7 +31,6 @@ import {
   SendPageStateClass,
   InfoType,
   ToAddrClass,
-  WalletSettingsClass,
   ZecPriceType,
   BackgroundType,
   TranslateType,
@@ -540,7 +539,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       sendPageState: new SendPageStateClass(new ToAddrClass(0)),
       setSendPageState: this.setSendPageState,
       info: {} as InfoType,
-      walletSettings: {} as WalletSettingsClass,
       syncingStatus: {} as RPCSyncStatusType,
       wallet: {} as WalletType,
       defaultUnifiedAddress: '',
@@ -601,7 +599,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setValueTransfersList,
       this.setMessagesList,
       this.setAllAddresses,
-      //this.setWalletSettings,
       this.setInfo,
       this.setSyncingStatus,
       props.translate,
@@ -1091,20 +1088,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  /*
-  setWalletSettings = (walletSettings: WalletSettingsClass) => {
-    if (!isEqual(this.state.walletSettings, walletSettings)) {
-      //console.log('fetch wallet settings');
-      //const start = Date.now();
-      this.setState({ walletSettings });
-      //console.log(
-      //  '=========================================== > WALLET SETTINGS STORED SETSTATE - ',
-      //  Date.now() - start,
-      //);
-    }
-  };
-  */
-
   setSendPageState = (sendPageState: SendPageStateClass) => {
     //console.log('fetch send page state');
     //const start = Date.now();
@@ -1344,13 +1327,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setWalletOption = async (walletOption: string, value: string): Promise<void> => {
-    await RPC.rpcSetWalletSettingOption(walletOption, value);
-
-    // Refetch the settings updated
-    //this.rpc.fetchWalletSettings();
-  };
-
   setServerOption = async (
     value: ServerType,
     selectServer: SelectServerEnum,
@@ -1478,9 +1454,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         this.setLastError(`Remove tor client error: ${result}`);
       }
     }
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setLanguageOption = async (value: string, reset: boolean): Promise<void> => {
@@ -1488,9 +1461,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       language: value as LanguageEnum,
     });
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
     if (reset) {
       this.navigateToLoadingApp({ startingApp: false });
     }
@@ -1501,9 +1471,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       sendAll: value as boolean,
     });
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setDonationOption = async (value: boolean): Promise<void> => {
@@ -1511,9 +1478,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       donation: value as boolean,
     });
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setPrivacyOption = async (value: boolean): Promise<void> => {
@@ -1521,9 +1485,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       privacy: value as boolean,
     });
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setModeOption = async (value: string): Promise<void> => {
@@ -1533,9 +1494,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
     // this function change the Theme in the App component.
     this.props.toggleTheme(value as ModeEnum);
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setSecurityOption = async (value: SecurityType): Promise<void> => {
@@ -1543,9 +1501,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       security: value as SecurityType,
     });
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setSelectServerOption = async (value: string): Promise<void> => {
@@ -1553,9 +1508,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       selectServer: value as SelectServerEnum,
     });
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setRescanMenuOption = async (value: boolean): Promise<void> => {
@@ -1563,9 +1515,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       rescanMenu: value as boolean,
     });
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setRecoveryWalletInfoOnDeviceOption = async (value: boolean): Promise<void> => {
@@ -1580,9 +1529,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       const wallet: WalletType = await RPC.rpcFetchWallet(this.state.readOnly);
       await createUpdateRecoveryWalletInfo(wallet);
     }
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setPerformanceLevelOption = async (value: RPCPerformanceLevelEnum): Promise<void> => {
@@ -1600,9 +1546,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     if (setConfigWallet && setConfigWallet.toLowerCase().startsWith(GlobalConst.error)) {
       this.setLastError(`Set performance level error: ${setConfigWallet}`);
     }
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
@@ -1860,7 +1803,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       valueTransfersTotal: this.state.valueTransfersTotal,
       messages: this.state.messages,
       messagesTotal: this.state.messagesTotal,
-      walletSettings: this.state.walletSettings,
       syncingStatus: this.state.syncingStatus,
       info: this.state.info,
       zecPrice: this.state.zecPrice,
@@ -2095,7 +2037,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Drawer.Screen name={RouteEnum.Settings}>
                 {props => 
                   <Settings {...props}
-                    setWalletOption={this.setWalletOption}
                     setServerOption={this.setServerOption}
                     setCurrencyOption={this.setCurrencyOption}
                     setLanguageOption={this.setLanguageOption}

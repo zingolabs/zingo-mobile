@@ -1,7 +1,6 @@
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import UnifiedAddressClass from './classes/UnifiedAddressClass';
 import SendPageStateClass from './classes/SendPageStateClass';
-import WalletSettingsClass from './classes/WalletSettingsClass';
 import AddressBookFileClass from './classes/AddressBookFileClass';
 
 import InfoType from './types/InfoType';
@@ -49,9 +48,6 @@ export default interface AppContextLoaded {
 
   // getinfo and getblockchaininfo result
   info: InfoType;
-
-  // internal wallet settings from blockchain
-  walletSettings: WalletSettingsClass;
 
   // syncing Info about the status of the process
   syncingStatus: RPCSyncStatusType;

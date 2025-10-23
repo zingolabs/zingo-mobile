@@ -3,10 +3,8 @@ import {
   InfoType,
   SendJsonToTypeType,
   WalletType,
-  //WalletSettingsClass,
   TranslateType,
   ChainNameEnum,
-  //WalletOptionEnum,
   CurrencyNameEnum,
   AddressKindEnum,
   GlobalConst,
@@ -23,7 +21,6 @@ import { RPCInfoType } from './types/RPCInfoType';
 import { RPCWalletHeight } from './types/RPCWalletHeightType';
 import { RPCSeedType } from './types/RPCSeedType';
 import { RPCSyncStatusType } from './types/RPCSyncStatusType';
-//import { RPCGetOptionType } from './types/RPCGetOptionType';
 import { RPCSendType } from './types/RPCSendType';
 import { RPCValueTransfersType } from './types/RPCValueTransfersType';
 import { RPCValueTransfersKindEnum } from './enums/RPCValueTransfersKindEnum';
@@ -46,7 +43,6 @@ export default class RPC {
   fnSetMessagesList: (mList: ValueTransferType[], total: number) => void;
   fnSetAllAddresses: (allAddresses: (UnifiedAddressClass | TransparentAddressClass)[]) => void;
   fnSetSyncingStatus: (syncingStatus: RPCSyncStatusType) => void;
-  //fnSetWalletSettings: (settings: WalletSettingsClass) => void;
   translate: (key: string) => TranslateType;
   keepAwake: (keep: boolean) => void;
   fnSetZingolib: (zingolib: string) => void;
@@ -65,7 +61,6 @@ export default class RPC {
   fetchTandZandOValueTransfersLock: boolean;
   fetchTandZandOMessagesLock: boolean;
   fetchTotalBalanceLock: boolean;
-  //fetchWalletSettingsLock: boolean;
   fetchAddressesLock: boolean;
   refreshSyncLock: boolean;
   fetchSyncStatusLock: boolean;
@@ -87,7 +82,6 @@ export default class RPC {
     fnSetValueTransfersList: (vtlist: ValueTransferType[], total: number) => void,
     fnSetMessagesList: (mlist: ValueTransferType[], total: number) => void,
     fnSetAllAddresses: (addresses: (UnifiedAddressClass | TransparentAddressClass)[]) => void,
-    //fnSetWalletSettings: (settings: WalletSettingsClass) => void,
     fnSetInfo: (info: InfoType) => void,
     fnSetSyncingStatus: (syncingStatus: RPCSyncStatusType) => void,
     translate: (key: string) => TranslateType,
@@ -103,7 +97,6 @@ export default class RPC {
     this.fnSetValueTransfersList = fnSetValueTransfersList;
     this.fnSetMessagesList = fnSetMessagesList;
     this.fnSetAllAddresses = fnSetAllAddresses;
-    //this.fnSetWalletSettings = fnSetWalletSettings;
     this.fnSetInfo = fnSetInfo;
     this.fnSetSyncingStatus = fnSetSyncingStatus;
     this.translate = translate;
@@ -122,7 +115,6 @@ export default class RPC {
     this.fetchTandZandOValueTransfersLock = false;
     this.fetchTandZandOMessagesLock = false;
     this.fetchTotalBalanceLock = false;
-    //this.fetchWalletSettingsLock = false;
     this.fetchAddressesLock = false;
     this.refreshSyncLock = false;
     this.fetchSyncStatusLock = false;
@@ -185,32 +177,6 @@ export default class RPC {
     } catch (error) {
       console.log(`Critical Error fetching price ${error}`);
       return {price: -2, error: `Critical Error fetching price ${error}`};
-    }
-  }
-
-  static async rpcSetWalletSettingOption(name: string, value: string): Promise<string> {
-    try {
-      console.log(`${name}=${value}`);
-      //const start = Date.now();
-      const resultStr: string = await RPCModule.setOptionWalletProcess(); //`${name}=${value}`);
-      //console.log('=========================================== > set wallet setting - ', Date.now() - start);
-
-      if (resultStr) {
-        if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
-          console.log(`Error setting option ${resultStr}`);
-          return resultStr;
-        }
-        //const start2 = Date.now();
-        await RPCModule.doSave();
-        //console.log('=========================================== > save wallet - ', Date.now() - start2);
-        return resultStr;
-      } else {
-        console.log('Internal Error setting option');
-        return '';
-      }
-    } catch (error) {
-      console.log(`Critical Error setting option ${error}`);
-      return '';
     }
   }
 
@@ -450,9 +416,6 @@ export default class RPC {
     await this.fetchTandZandOMessages();
     await this.fetchWalletHeight();
     await this.fetchWalletBirthdaySeedUfvk();
-
-
-    //await this.fetchWalletSettings();
 
     // every 5 seconds the App update part of the data
     if (!this.updateTimerID) {

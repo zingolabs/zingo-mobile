@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react';
 
 import {
-  WalletSettingsClass,
   InfoType,
   WalletType,
   ZecPriceType,
@@ -36,7 +35,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   sendPageState: new SendPageStateClass(new ToAddrClass(0)),
   setSendPageState: () => {},
   info: {} as InfoType,
-  walletSettings: new WalletSettingsClass(),
   wallet: {} as WalletType,
   defaultUnifiedAddress: '',
   server: {} as ServerType,
