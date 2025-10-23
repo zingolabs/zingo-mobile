@@ -1004,7 +1004,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     } else {
       const uri: string = parseServerURI(this.state.customServerUri, this.state.translate);
       const chainName = this.state.customServerChainName;
-      if (uri.toLowerCase().startsWith(GlobalConst.error)) {
+      if (uri && uri.toLowerCase().startsWith(GlobalConst.error)) {
         this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, screenName: [this.screenName] });
         this.setState({ actionButtonsDisabled: false });
         return;

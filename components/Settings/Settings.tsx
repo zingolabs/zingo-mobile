@@ -445,7 +445,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
     if (serverContext.uri !== serverUriParsed && selectServer !== SelectServerEnum.offline) {
       const resultUri = parseServerURI(serverUriParsed, translate);
-      if (resultUri.toLowerCase().startsWith(GlobalConst.error)) {
+      if (resultUri && resultUri.toLowerCase().startsWith(GlobalConst.error)) {
         addLastSnackbar({ message: translate('settings.isuri') as string, screenName: [screenName] });
         return;
       } else {

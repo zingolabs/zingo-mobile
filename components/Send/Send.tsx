@@ -264,7 +264,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         JSON.stringify(sendJson),
       );
       //Alert.alert('Calculating the FEE ' + command, runProposeStr);
-      if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+      if (runProposeStr && runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
         console.log(runProposeStr);
         setProposeSendLastError(runProposeStr);
@@ -336,7 +336,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         console.log('=========================================== > spendable balance with address - ', Date.now() - start);
       }
       console.log(runSpendableBalanceStr);
-      if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
+      if (runSpendableBalanceStr && runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
         console.log(runSpendableBalanceStr);
         setSpendableBalanceLastError(runSpendableBalanceStr);

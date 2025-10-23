@@ -131,6 +131,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     selectServer,
     setZecPrice,
     background,
+    lastError,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum, privacy: boolean;
@@ -235,7 +236,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         let proposeFee = 0;
         let proposeAmount = 0;
         const runProposeStr = await runShieldPropose();
-        if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+        if (runProposeStr && runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
           // snack with error
           console.log('Error shield proposing', runProposeStr);
           //Alert.alert('Calculating the FEE', runProposeStr);
@@ -910,28 +911,31 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             position: 'absolute',
             right: 0,
           }}>
-          {!noDrawMenu ? (
-            <TouchableOpacity
-              style={{ marginRight: 5 }}
-              testID="header.drawmenu"
-              onPress={async () => {
-                const resultBio = security.settingsScreen ? await simpleBiometrics({ translate: translate }) : true;
-                // can be:
-                // - true      -> the user do pass the authentication
-                // - false     -> the user do NOT pass the authentication
-                // - undefined -> no biometric authentication available -> Passcode.
-                //console.log('BIOMETRIC --------> ', resultBio);
-                if (resultBio === false) {
-                  // snack with Error & closing the menu.
-                  if (addLastSnackbar) {
-                    addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
+          {!noDrawMenu && screenName !== ScreenEnum.Settings ? (
+            <>
+              <TouchableOpacity
+                style={{ marginRight: 5 }}
+                testID="header.drawmenu"
+                onPress={async () => {
+                  const resultBio = security.settingsScreen ? await simpleBiometrics({ translate: translate }) : true;
+                  // can be:
+                  // - true      -> the user do pass the authentication
+                  // - false     -> the user do NOT pass the authentication
+                  // - undefined -> no biometric authentication available -> Passcode.
+                  //console.log('BIOMETRIC --------> ', resultBio);
+                  if (resultBio === false) {
+                    // snack with Error & closing the menu.
+                    if (addLastSnackbar) {
+                      addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
+                    }
+                  } else {
+                    navigation.navigate(RouteEnum.Settings);
                   }
-                } else {
-                  navigation.navigate(RouteEnum.Settings);
-                }
-              }}>
-              <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
-            </TouchableOpacity>
+                }}>
+                <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
+                {!!lastError && <FontAwesomeIcon icon={faGear} size={5} color={colors.warning} />}
+              </TouchableOpacity>
+            </>
           ) : (
             <Image
               source={require('../../assets/img/logobig-zingo.png')}

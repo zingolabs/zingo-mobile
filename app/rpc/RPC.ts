@@ -468,7 +468,7 @@ export default class RPC {
 
   async pauseSyncProcess(): Promise<void> {
     let returnPause: string = await RPCModule.pauseSyncProcess();
-    if (!returnPause || returnPause.toLowerCase().startsWith(GlobalConst.error)) {
+    if (returnPause && returnPause.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC PAUSE ERROR', returnPause);
       this.fnSetLastError(`Error sync pause: ${returnPause}`);
       return;
@@ -550,7 +550,7 @@ export default class RPC {
         console.log('=========================================== > rescan run command - ', Date.now() - s);
       }
       //console.log('rescan RUN', rescanStr);
-      if (rescanStr || rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
+      if (rescanStr && rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
         console.log(`Error rescan: ${rescanStr}`);
         this.fnSetLastError(`Error rescan: ${rescanStr}`);
       }
@@ -562,7 +562,7 @@ export default class RPC {
         console.log('=========================================== > sync run command - ', Date.now() - s);
       }
       //console.log('sync RUN', syncStr);
-      if (syncStr || syncStr.toLowerCase().startsWith(GlobalConst.error)) {
+      if (syncStr && syncStr.toLowerCase().startsWith(GlobalConst.error)) {
         console.log(`Error sync: ${syncStr}`);
         this.fnSetLastError(`Error sync: ${syncStr}`);
       }
@@ -582,7 +582,7 @@ export default class RPC {
     if (Date.now() - s > 4000) {
       console.log('=========================================== > sync status command - ', Date.now() - s);
     }
-    if (!returnStatus || returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
+    if (returnStatus && returnStatus.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC STATUS ERROR', returnStatus);
       this.fnSetLastError(`Error sync status: ${returnStatus}`);
       this.fetchSyncStatusLock = false;
@@ -632,7 +632,7 @@ export default class RPC {
     if (Date.now() - s > 4000) {
       console.log('=========================================== > sync poll command - ', Date.now() - s);
     }
-    if (!returnPoll || returnPoll.toLowerCase().startsWith(GlobalConst.error)) {
+    if (returnPoll && returnPoll.toLowerCase().startsWith(GlobalConst.error)) {
       console.log('SYNC POLL ERROR', returnPoll);
       this.fnSetLastError(`Error sync poll: ${returnPoll}`);
       this.fetchSyncPollLock = false;

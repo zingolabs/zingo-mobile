@@ -1636,7 +1636,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
 
     //console.log("jc change", resultStr);
-    if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
+    if (resultStr && resultStr.toLowerCase().startsWith(GlobalConst.error)) {
       //console.log(`Error change wallet. ${resultStr}`);
       createAlert(
         this.setBackgroundError,
@@ -1660,7 +1660,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     const resultStr = (await this.rpc.restoreBackup()) as string;
 
     //console.log("jc restore", resultStr);
-    if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
+    if (resultStr && resultStr.toLowerCase().startsWith(GlobalConst.error)) {
       //console.log(`Error restore backup wallet. ${resultStr}`);
       createAlert(
         this.setBackgroundError,
@@ -1694,7 +1694,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       const resultStrServer: string = await Promise.race([resultStrServerPromise, timeoutServerPromise]);
       //console.log(resultStrServer);
 
-      if (!resultStrServer || resultStrServer.toLowerCase().startsWith(GlobalConst.error)) {
+      if (resultStrServer && resultStrServer.toLowerCase().startsWith(GlobalConst.error)) {
         //console.log(`Error change server ${value} - ${resultStr}`);
         this.addLastSnackbar({
           message: `${this.state.translate('loadedapp.changeservernew-error')} ${resultStrServer}`,
@@ -1727,7 +1727,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
 
       //console.log("jc change", resultStr);
-      if (resultStr2.toLowerCase().startsWith(GlobalConst.error)) {
+      if (resultStr2 && resultStr2.toLowerCase().startsWith(GlobalConst.error)) {
         //console.log(`Error change wallet. ${resultStr}`);
         createAlert(
           this.setBackgroundError,
