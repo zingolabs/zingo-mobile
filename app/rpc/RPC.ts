@@ -156,7 +156,7 @@ export default class RPC {
         } else {
           const resultJSON: RPCZecPriceType = await JSON.parse(resultStr);
           if (resultJSON.error) {
-            console.log(resultJSON.error);
+            console.log(`Error fetching price ${resultJSON.error}`);
             return {price: -1, error: resultJSON.error};
           }
           if (!resultJSON.current_price) {
@@ -1051,7 +1051,7 @@ export default class RPC {
         console.log('Internal Error server height');
       }
 
-      console.log('SERVER HEIGHT', this.lastServerBlockHeight);
+      //console.log('SERVER HEIGHT', this.lastServerBlockHeight);
 
       this.fetchTandZandOValueTransfersLock = true;
       const start2 = Date.now();

@@ -664,7 +664,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           this.setState({ appStateStatus: nextAppState });
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
-          console.log('&&&&& background yes in storage &&&&&');
+          //console.log('&&&&& background yes in storage &&&&&');
           await this.rpc.clearTimers();
           //console.log('clear timers IOS');
           this.setSyncingStatus({} as RPCSyncStatusType);
@@ -707,7 +707,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           await this.fetchBackgroundSyncing();
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-          console.log('&&&&& background no in storage &&&&&');
+          //console.log('&&&&& background no in storage &&&&&');
           // needs this because when the App go from back to fore
           // it have to re-launch all the tasks.
           await this.rpc.clearTimers();
@@ -725,7 +725,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         console.log('App LOADED is gone to the background!');
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
-        console.log('&&&&& background yes in storage &&&&&');
+        //console.log('&&&&& background yes in storage &&&&&');
         await this.rpc.clearTimers();
         //console.log('clear timers');
         this.setSyncingStatus({} as RPCSyncStatusType);
@@ -1442,14 +1442,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       // the App have to create a Tor Client
       //console.log('before CREATE ------------------- TOR CLIENT');
       const result = await RPCModule.createTorClientProcess();
-      console.log('after CREATE ------------------- TOR CLIENT', result);
+      //console.log('after CREATE ------------------- TOR CLIENT', result);
       if (result && result.toLowerCase().startsWith(GlobalConst.error)) {
         this.setLastError(`Create tor client error: ${result}`);
       }
     } else {
       //console.log('before REMOVE ------------------- TOR CLIENT');
       const result = await RPCModule.removeTorClientProcess();
-      console.log('after REMOVE ------------------- TOR CLIENT', result);
+      //console.log('after REMOVE ------------------- TOR CLIENT', result);
       if (result && result.toLowerCase().startsWith(GlobalConst.error)) {
         this.setLastError(`Remove tor client error: ${result}`);
       }
