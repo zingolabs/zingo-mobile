@@ -80,8 +80,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
             Log.i("MAIN", "file size: ${fileBytes.size} bytes")
 
-            // Save file to disk
-            writeFile(WalletFileName.value, fileBytes)
+            if (fileBytes.size > 0) {
+                writeFile(WalletFileName.value, fileBytes)
+            } else {
+                Log.e("MAIN", "No need to save the wallet.")
+            }
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Couldn't save the wallet. Read/Write issue.")
             return false

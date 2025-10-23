@@ -196,8 +196,12 @@ class RPCModule: NSObject {
       let walletEncodedString = try saveToB64()
       if !walletEncodedString.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
         let size = (walletEncodedString.count * 3) / 4
-        NSLog("file size \(size)")
-        try self.saveWalletFile(walletEncodedString)
+        NSLog("file size: \(size) bytes")
+        if size > 0 {
+          try self.saveWalletFile(walletEncodedString)
+        } else {
+          NSLog("No need to save the wallet.")
+        }
       } else {
         NSLog("Couldn't save the wallet. \(walletEncodedString)")
       }
