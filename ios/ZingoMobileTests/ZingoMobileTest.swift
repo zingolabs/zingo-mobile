@@ -145,7 +145,12 @@ private func isError(_ s: String) -> Bool {
 }
 
 private func setCryptoProvider() {
-    _ = setCryptoDefaultProviderToRing()
+  do {
+    _ = try setCryptoDefaultProviderToRing()
+  } catch {
+    XCTFail("\nCrypto provider default error:\n\(error.localizedDescription)")
+    return
+  }
 }
 
 private func waitForSyncOrFail(timeoutSeconds: TimeInterval = 120) {
@@ -179,11 +184,16 @@ final class OfflineTestSuite: XCTestCase {
         let chainhint = "main"
         let seed = Seeds.ABANDON
 
-        let initJson = initFromSeed(seed: seed, birthday:UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-        print("\nInit from seed:\n\(initJson)")
-        let initRes: InitFromSeed = try decodeJSON(initJson)
-        XCTAssertEqual(initRes.seed_phrase, seed)
-        XCTAssertEqual(initRes.birthday, 1)
+        do {
+            let initJson = try initFromSeed(seed: seed, birthday:UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
+            print("\nInit from seed:\n\(initJson)")
+            let initRes: InitFromSeed = try decodeJSON(initJson)
+            XCTAssertEqual(initRes.seed_phrase, seed)
+            XCTAssertEqual(initRes.birthday, 1)
+        } catch {
+          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          return
+        }
 
         do {
             let addrsJson = try getUnifiedAddresses()
@@ -217,17 +227,27 @@ final class OfflineTestSuite: XCTestCase {
         let chainhint = "main"
         let ufvk = UfvkConst.ABANDON
 
-        let initJson = initFromUfvk(ufvk: ufvk, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-        print("\nInit From UFVK:\n\(initJson)")
-        let initRes: InitFromUfvk = try decodeJSON(initJson)
-        XCTAssertEqual(initRes.ufvk, ufvk)
-        XCTAssertEqual(initRes.birthday, 1)
+        do {
+          let initJson = try initFromUfvk(ufvk: ufvk, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
+          print("\nInit From UFVK:\n\(initJson)")
+          let initRes: InitFromUfvk = try decodeJSON(initJson)
+          XCTAssertEqual(initRes.ufvk, ufvk)
+          XCTAssertEqual(initRes.birthday, 1)
+        } catch {
+          XCTFail("\nInit from UFVK error:\n\(error.localizedDescription)")
+          return
+        }
 
-        let exportJson = getUfvk()
-        print("\nExport Ufvk:\n\(exportJson)")
-        let exportRes: ExportUfvk = try decodeJSON(exportJson)
-        XCTAssertEqual(exportRes.ufvk, ufvk)
-        XCTAssertEqual(exportRes.birthday, 1)
+        do {
+          let exportJson = try getUfvk()
+          print("\nExport Ufvk:\n\(exportJson)")
+          let exportRes: ExportUfvk = try decodeJSON(exportJson)
+          XCTAssertEqual(exportRes.ufvk, ufvk)
+          XCTAssertEqual(exportRes.birthday, 1)
+        } catch {
+          XCTFail("\nInit from UFVK error:\n\(error.localizedDescription)")
+          return
+        }
 
         do {
             let addrsJson = try getUnifiedAddresses()
@@ -261,12 +281,17 @@ final class OfflineTestSuite: XCTestCase {
         let chainhint = "main"
         let seed = Seeds.ABANDON
 
-        let initJson = initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-        print("\nInit from seed:\n\(initJson)")
-        let initRes: InitFromSeed = try decodeJSON(initJson)
-        XCTAssertEqual(initRes.seed_phrase, seed)
-        XCTAssertEqual(initRes.birthday, 1)
-
+        do {
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
+          print("\nInit from seed:\n\(initJson)")
+          let initRes: InitFromSeed = try decodeJSON(initJson)
+          XCTAssertEqual(initRes.seed_phrase, seed)
+          XCTAssertEqual(initRes.birthday, 1)
+        } catch {
+          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          return
+        }
+        
         do {
             let version = try getVersion()
             print("\nVersion:\n\(version)")
@@ -285,12 +310,17 @@ final class ExecuteSyncFromSeed: XCTestCase {
         let chainhint = "regtest"
         let seed = Seeds.ABANDON
 
-        let initJson = initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-        print("\nInit from seed:\n\(initJson)")
-        let initRes: InitFromSeed = try decodeJSON(initJson)
-        XCTAssertEqual(initRes.seed_phrase, seed)
-        XCTAssertEqual(initRes.birthday, 1)
-
+        do {
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
+          print("\nInit from seed:\n\(initJson)")
+          let initRes: InitFromSeed = try decodeJSON(initJson)
+          XCTAssertEqual(initRes.seed_phrase, seed)
+          XCTAssertEqual(initRes.birthday, 1)
+        } catch {
+          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          return
+        }
+        
         var height: UInt64? = nil
         do {
             let infoJson = try infoServer()
@@ -343,12 +373,16 @@ final class ExecuteSendFromOrchard: XCTestCase {
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
 
-        let initJson = initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-        print("\nInit from seed:\n\(initJson)")
-        let initRes: InitFromSeed = try decodeJSON(initJson)
-        XCTAssertEqual(initRes.seed_phrase, seed)
-        XCTAssertEqual(initRes.birthday, 1)
-
+        do {
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
+          print("\nInit from seed:\n\(initJson)")
+          let initRes: InitFromSeed = try decodeJSON(initJson)
+          XCTAssertEqual(initRes.seed_phrase, seed)
+          XCTAssertEqual(initRes.birthday, 1)
+        } catch {
+          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          return
+        }
 
         do {
             let syncJson = try runSync()
@@ -388,15 +422,25 @@ final class ExecuteSendFromOrchard: XCTestCase {
         let ta = try XCTUnwrap(taddr, "T address is nil")
         XCTAssertFalse(ta.isEmpty, "T address is empty")
       
+      do {
         let sendJson = SendResult(address: ta, amount: 100_000, memo: nil)
         let sendBodyData = try JSONEncoder().encode([sendJson])
         let sendBody = String(data: sendBodyData, encoding: .utf8)!
-        let proposeJson = send(sendJson: sendBody)
+        let proposeJson = try send(sendJson: sendBody)
         print("\nPropose:\n\(proposeJson)")
-
-        let confirmJson = confirm()
-        print("\nConfirm Txid:\n\(confirmJson)")
-
+      } catch {
+        XCTFail("\nPropose error:\n\(error.localizedDescription)")
+        return
+      }
+        
+        do {
+          let confirmJson = try confirm()
+          print("\nConfirm Txid:\n\(confirmJson)")
+        } catch {
+          XCTFail("\nConfirm error:\n\(error.localizedDescription)")
+          return
+        }
+        
         do {
             let syncJson2 = try runSync()
             print("\nSync:\n\(syncJson2)")
@@ -429,16 +473,25 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
         let seed = Seeds.HOSPITAL
         let tor = "false"
 
-        let initJson = initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-        print("\nInit from seed:\n\(initJson)")
-        let initRes: InitFromSeed = try decodeJSON(initJson)
-        XCTAssertEqual(initRes.seed_phrase, seed)
-        XCTAssertEqual(initRes.birthday, 1)
+        do {
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
+          print("\nInit from seed:\n\(initJson)")
+          let initRes: InitFromSeed = try decodeJSON(initJson)
+          XCTAssertEqual(initRes.seed_phrase, seed)
+          XCTAssertEqual(initRes.birthday, 1)
+        } catch {
+          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          return
+        }
 
-
-        let price = zecPrice(tor: tor)
-        print("\nPrice:\n\(price)")
-
+        do {
+          let price = try zecPrice(tor: tor)
+          print("\nPrice:\n\(price)")
+        } catch {
+          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          return
+        }
+        
         do {
             let syncJson = try runSync()
             print("\nSync:\n\(syncJson)")
@@ -487,12 +540,17 @@ final class ExecuteSaplingBalanceFromSeed: XCTestCase {
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
 
-        let initJson = initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-        print("\nInit from seed:\n\(initJson)")
-        let initRes: InitFromSeed = try decodeJSON(initJson)
-        XCTAssertEqual(initRes.seed_phrase, seed)
-        XCTAssertEqual(initRes.birthday, 1)
-
+        do {
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
+          print("\nInit from seed:\n\(initJson)")
+          let initRes: InitFromSeed = try decodeJSON(initJson)
+          XCTAssertEqual(initRes.seed_phrase, seed)
+          XCTAssertEqual(initRes.birthday, 1)
+        } catch {
+          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          return
+        }
+        
         do {
             let syncJson = try runSync()
             print("\nSync:\n\(syncJson)")
@@ -527,10 +585,15 @@ final class ExecuteSaplingBalanceFromSeed: XCTestCase {
         let rpc = RPCModule()
         try rpc.saveWalletInternal()
 
-        let changeJson = changeServer(serveruri: "")
-        print("\nChange Serveruri:\n\(changeJson)")
-        XCTAssertFalse(isError(changeJson))
-
+        do {
+          let changeJson = try changeServer(serveruri: "")
+          print("\nChange Serveruri:\n\(changeJson)")
+          XCTAssertFalse(isError(changeJson))
+        } catch {
+          XCTFail("\nChange Serveruri error:\n\(error.localizedDescription)")
+          return
+        }
+        
         let loadJson = try rpc.fnLoadExistingWallet(serveruri: "", chainhint: "main", performancelevel: "Medium", minconfirmations: "1")
         print("\nLoad Wallet:\n\(loadJson)")
     }
@@ -544,18 +607,28 @@ final class ExecuteParseAddresses: XCTestCase {
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
 
-        let initJson = initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-        print("\nInit from seed:\n\(initJson)")
-        let initRes: InitFromSeed = try decodeJSON(initJson)
-        XCTAssertEqual(initRes.seed_phrase, seed)
-        XCTAssertEqual(initRes.birthday, 1)
+        do {
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
+          print("\nInit from seed:\n\(initJson)")
+          let initRes: InitFromSeed = try decodeJSON(initJson)
+          XCTAssertEqual(initRes.seed_phrase, seed)
+          XCTAssertEqual(initRes.birthday, 1)
+        } catch {
+          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          return
+        }
+        
+        do {
+          let resJson = try parseAddress(address: "texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
+          print("\nParsed address:\n\(resJson)")
+          let res: ParseResult = try decodeJSON(resJson)
 
-        let resJson = parseAddress(address: "texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
-        print("\nParsed Address:\n\(resJson)")
-        let res: ParseResult = try decodeJSON(resJson)
-
-        let expected = ParseResult(status: "success", chain_name: "regtest", address_kind: "tex")
-        XCTAssertEqual(res, expected)
+          let expected = ParseResult(status: "success", chain_name: "regtest", address_kind: "tex")
+          XCTAssertEqual(res, expected)
+        } catch {
+          XCTFail("\nParse address error:\n\(error.localizedDescription)")
+          return
+        }
     }
 
     func testExecuteParseAddressInvalid() throws {
@@ -565,17 +638,27 @@ final class ExecuteParseAddresses: XCTestCase {
         let chainhint = "regtest"
         let seed = Seeds.HOSPITAL
 
-        let initJson = initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
-        print("\nInit from seed:\n\(initJson)")
-        let initRes: InitFromSeed = try decodeJSON(initJson)
-        XCTAssertEqual(initRes.seed_phrase, seed)
-        XCTAssertEqual(initRes.birthday, 1)
+        do {
+          let initJson = try initFromSeed(seed: seed, birthday: UInt32(1), serveruri: serveruri, chainhint: chainhint, performancelevel: "Medium", minconfirmations: UInt32(1))
+          print("\nInit from seed:\n\(initJson)")
+          let initRes: InitFromSeed = try decodeJSON(initJson)
+          XCTAssertEqual(initRes.seed_phrase, seed)
+          XCTAssertEqual(initRes.birthday, 1)
+        } catch {
+          XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          return
+        }
+        
+        do {
+          let wrongJson = try parseAddress(address: "thiswontwork")
+          print("\nWrong address:\n\(wrongJson)")
+          let wrong: ParseResult = try decodeJSON(wrongJson)
 
-        let wrongJson = parseAddress(address: "thiswontwork")
-        print("\nWrong Address:\n\(wrongJson)")
-        let wrong: ParseResult = try decodeJSON(wrongJson)
-
-        let expectedWrong = ParseResult(status: "Invalid address", chain_name: nil, address_kind: nil)
-        XCTAssertEqual(wrong, expectedWrong)
+          let expectedWrong = ParseResult(status: "Invalid address", chain_name: nil, address_kind: nil)
+          XCTAssertEqual(wrong, expectedWrong)
+        } catch {
+          XCTFail("\nWrong address error:\n\(error.localizedDescription)")
+          return
+        }
     }
 }
