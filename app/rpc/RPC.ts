@@ -142,7 +142,10 @@ export default class RPC {
   static async rpcGetZecPrice(withTOR: boolean): Promise<{price: number, error: string}> {
     try {
       // create the tor client if needed
-      await RPCModule.createTorClientProcess();
+      const result: string = await RPCModule.createTorClientProcess();
+      if (result && result.toLowerCase().startsWith(GlobalConst.error)) {
+        console.log(`Create Tor client error: ${result}`);
+      }
 
       // values:
       // 0   - initial/default value
@@ -311,6 +314,9 @@ export default class RPC {
       if (performance !== this.performanceLevel) {
         const setConfigWallet = await RPCModule.setConfigWalletToProdProcess(this.performanceLevel, GlobalConst.minConfirmations.toString());
         console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET', setConfigWallet);
+        if (setConfigWallet && setConfigWallet.toLowerCase().startsWith(GlobalConst.error)) {
+          this.fnSetLastError(`Set wallet to prod error: ${setConfigWallet}`);
+        }
         // I need to be sure in this point that the performance level is the selected setting
         await RPCModule.doSave();
         const performanceChanged = await this.getConfigWalletPerformance();
@@ -544,7 +550,7 @@ export default class RPC {
         console.log('=========================================== > rescan run command - ', Date.now() - s);
       }
       //console.log('rescan RUN', rescanStr);
-      if (!rescanStr || rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
+      if (rescanStr || rescanStr.toLowerCase().startsWith(GlobalConst.error)) {
         console.log(`Error rescan: ${rescanStr}`);
         this.fnSetLastError(`Error rescan: ${rescanStr}`);
       }
@@ -556,7 +562,7 @@ export default class RPC {
         console.log('=========================================== > sync run command - ', Date.now() - s);
       }
       //console.log('sync RUN', syncStr);
-      if (!syncStr || syncStr.toLowerCase().startsWith(GlobalConst.error)) {
+      if (syncStr || syncStr.toLowerCase().startsWith(GlobalConst.error)) {
         console.log(`Error sync: ${syncStr}`);
         this.fnSetLastError(`Error sync: ${syncStr}`);
       }

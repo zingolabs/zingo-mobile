@@ -1404,7 +1404,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             // creating tor cliente if needed
             // we have two buttons to fetch -> we need tor client Just in case.
             if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
-              await RPCModule.createTorClientProcess();
+              const resp: string = await RPCModule.createTorClientProcess();
+              if (resp && resp.toLowerCase().startsWith(GlobalConst.error)) {
+                this.setLastError(`Create tor client error: ${resp}`);
+              }
             }
             return;
           } else {
@@ -1464,10 +1467,16 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       //console.log('before CREATE ------------------- TOR CLIENT');
       const result = await RPCModule.createTorClientProcess();
       console.log('after CREATE ------------------- TOR CLIENT', result);
+      if (result && result.toLowerCase().startsWith(GlobalConst.error)) {
+        this.setLastError(`Create tor client error: ${result}`);
+      }
     } else {
       //console.log('before REMOVE ------------------- TOR CLIENT');
       const result = await RPCModule.removeTorClientProcess();
       console.log('after REMOVE ------------------- TOR CLIENT', result);
+      if (result && result.toLowerCase().startsWith(GlobalConst.error)) {
+        this.setLastError(`Remove tor client error: ${result}`);
+      }
     }
 
     // Refetch the settings to update
@@ -1588,6 +1597,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       GlobalConst.minConfirmations.toString()
     );
     console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET', setConfigWallet);
+    if (setConfigWallet && setConfigWallet.toLowerCase().startsWith(GlobalConst.error)) {
+      this.setLastError(`Set performance level error: ${setConfigWallet}`);
+    }
 
     // Refetch the settings to update
     //this.rpc.fetchWalletSettings();
