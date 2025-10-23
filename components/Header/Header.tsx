@@ -933,8 +933,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                   }
                 }}>
                 <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
-                {!!lastError && <FontAwesomeIcon icon={faGear} size={5} color={colors.warning} />}
               </TouchableOpacity>
+              {!!lastError && <FontAwesomeIcon style={{ alignSelf: 'flex-end' }} icon={faGear} size={5} color={colors.warning.primary} />}
             </>
           ) : (
             <Image
