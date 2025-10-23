@@ -303,9 +303,32 @@ extension AppDelegate {
 
         NSLog("BGTask syncingProcessBackgroundTask")
 
-        let setCrytoProvider = setCryptoDefaultProviderToRing()
-        NSLog("BGTask syncingProcessBackgroundTask - Crypto provider default \(setCrytoProvider)")
+        do {
+          let setCrytoProvider = try setCryptoDefaultProviderToRing()
+          NSLog("BGTask syncingProcessBackgroundTask - Crypto provider default \(setCrytoProvider)")
+        } catch {
+          NSLog("BGTask syncingProcessBackgroundTask - Crypto provider default error: \(error.localizedDescription)")
 
+          // save the background file
+          let timeStampError = Date().timeIntervalSince1970
+          let timeStampStrError = String(format: "%.0f", timeStampError)
+          let e = error.localizedDescription
+          let clean = e.replacingOccurrences(of: "\"", with: "")
+          let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"Crypto provider default KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\", \"error\": \"\(clean)\"}"
+          do {
+            try rpcmodule.saveBackgroundFile(jsonBackgroundError)
+            NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
+          } catch {
+            NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError) error: \(error.localizedDescription)")
+          }
+          
+          if let task = self.bgTask {
+            task.setTaskCompleted(success: false)
+          }
+          bgTask = nil
+          return
+        }
+        
         // save the background file
         let timeStampStart = Date().timeIntervalSince1970
         self.timeStampStrStart = String(format: "%.0f", timeStampStart)
@@ -334,7 +357,7 @@ extension AppDelegate {
               let syncingStr = String(syncing)
               NSLog("BGTask syncingProcessBackgroundTask - sync LAUNCH \(syncingStr)")
             } catch {
-              NSLog("BGTask runSync unknown error: \(error.localizedDescription)")
+              NSLog("BGTask syncingProcessBackgroundTask - run Sync error: \(error.localizedDescription)")
 
               // save the background file
               let timeStampError = Date().timeIntervalSince1970
@@ -366,7 +389,8 @@ extension AppDelegate {
                 do {
                   syncStatusJson = try statusSync()
                   if syncStatusJson.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
-                      NSLog("BGTask syncingProcessBackgroundTask - sync STATUS ERROR: \(syncStatusJson)")
+                    NSLog("BGTask syncingProcessBackgroundTask - sync STATUS error: \(syncStatusJson)")
+                    
                     // save the background file
                     let timeStampError = Date().timeIntervalSince1970
                     let timeStampStrError = String(format: "%.0f", timeStampError)
@@ -385,7 +409,7 @@ extension AppDelegate {
                     return
                   }
                 } catch {
-                  NSLog("BGTask statusSync unknown error: \(error.localizedDescription)")
+                  NSLog("BGTask syncingProcessBackgroundTask - sync STATUS error: \(error.localizedDescription)")
 
                   // save the background file
                   let timeStampError = Date().timeIntervalSince1970
@@ -420,7 +444,7 @@ extension AppDelegate {
                       NSLog("BGTask syncingProcessBackgroundTask - sync STATUS %: \(percent)")
                   }
                 } catch {
-                  NSLog("BGTask syncingProcessBackgroundTask - sync STATUS - parsing ERROR \(error)")
+                  NSLog("BGTask syncingProcessBackgroundTask - sync STATUS parsing error: \(error)")
                   // save the background file
                   let timeStampError = Date().timeIntervalSince1970
                   let timeStampStrError = String(format: "%.0f", timeStampError)
