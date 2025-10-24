@@ -199,7 +199,7 @@ class RPCModule: NSObject {
         NSLog("file size: \(size) bytes")
         if size > 0 {
           // check if the content is correct. Stored Encoded.
-          let correct = checkB64(walletEncodedString)
+          let correct = checkB64(datab64: walletEncodedString)
           if correct == "true" {
             try self.saveWalletFile(walletEncodedString)
           } else {
@@ -380,10 +380,10 @@ class RPCModule: NSObject {
       let backupEncodedData = try self.readWalletBackup()
       let walletEncodedData = try self.readWalletUtf8String()
       // check if the content is correct. Stored Encoded.
-      let correct = checkB64(walletEncodedString)
+      let correct = checkB64(datab64: backupEncodedData)
       if correct == "true" {
         try self.saveWalletFile(backupEncodedData)
-        try self.saveWalletBackupFile(walletData)
+        try self.saveWalletBackupFile(walletEncodedData)
         DispatchQueue.main.async {
           resolve("true")
         }
