@@ -198,15 +198,21 @@ class RPCModule: NSObject {
         let size = (walletEncodedString.count * 3) / 4
         NSLog("file size: \(size) bytes")
         if size > 0 {
-          try self.saveWalletFile(walletEncodedString)
+          // check if the content is correct. Stored Encoded.
+          let correct = checkB64(walletEncodedString)
+          if correct == "true" {
+            try self.saveWalletFile(walletEncodedString)
+          } else {
+            throw FileError.saveFileError("Error: Couldn't save the wallet. The Encoded content is incorrect: \(walletEncodedString)")
+          }
         } else {
           NSLog("No need to save the wallet.")
         }
       } else {
-        NSLog("Couldn't save the wallet. \(walletEncodedString)")
+        NSLog("Error: Couldn't save the wallet. \(walletEncodedString)")
       }
     } catch {
-      throw FileError.saveFileError("Couldn't save the wallet. Read/Write issue.")
+      throw FileError.saveFileError("Error: Couldn't save the wallet. \(error.localizedDescription)")
     }
   }
 
@@ -371,12 +377,21 @@ class RPCModule: NSObject {
   @objc(restoreExistingWalletBackup:reject:)
   func restoreExistingWalletBackup(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     do {
-      let backupData = try self.readWalletBackup()
-      let walletData = try self.readWalletUtf8String()
-      try self.saveWalletFile(backupData)
-      try self.saveWalletBackupFile(walletData)
-      DispatchQueue.main.async {
-        resolve("true")
+      let backupEncodedData = try self.readWalletBackup()
+      let walletEncodedData = try self.readWalletUtf8String()
+      // check if the content is correct. Stored Encoded.
+      let correct = checkB64(walletEncodedString)
+      if correct == "true" {
+        try self.saveWalletFile(backupEncodedData)
+        try self.saveWalletBackupFile(walletData)
+        DispatchQueue.main.async {
+          resolve("true")
+        }
+      } else {
+        NSLog("Couldn't save the wallet. The Encoded content is incorrect: \(backupEncodedData)")
+        DispatchQueue.main.async {
+          resolve("false")
+        }
       }
     } catch {
       NSLog("Restoring existing wallet backup error: \(error.localizedDescription)")

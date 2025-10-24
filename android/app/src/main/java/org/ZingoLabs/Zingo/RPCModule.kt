@@ -72,24 +72,26 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             val b64encoded: String = uniffi.zingo.saveToB64()
             if (b64encoded.lowercase().startsWith(ErrorPrefix.value)) {
                 // with error don't save the file. Obviously.
-                Log.e("MAIN", "Couldn't save the wallet. $b64encoded")
+                Log.e("MAIN", "Error: Couldn't save the wallet. $b64encoded")
                 return false
             }
             // Log.i("MAIN", b64encoded)
 
+            // check if the content is correct. Stored Decoded.
             val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
             Log.i("MAIN", "file size: ${fileBytes.size} bytes")
 
             if (fileBytes.size > 0) {
                 writeFile(WalletFileName.value, fileBytes)
+                return true
             } else {
                 Log.e("MAIN", "No need to save the wallet.")
+                return false
             }
         } catch (e: IllegalArgumentException) {
-            Log.e("MAIN", "Couldn't save the wallet. Read/Write issue.")
+            Log.e("MAIN", "Error: Couldn't save the wallet", e)
             return false
         }
-        return true
     }
 
     private fun saveWalletBackupFile(): Boolean {
