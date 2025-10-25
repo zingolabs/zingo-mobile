@@ -92,7 +92,7 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 return true
             } else {
                 Log.e("MAIN", "No need to save the wallet.")
-                return false
+                return true
             }
         } catch (e: IllegalArgumentException) {
             Log.e("MAIN", "Error: Couldn't save the wallet", e)
@@ -645,7 +645,15 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
                 val resp = uniffi.zingo.runSync()
 
                 if (!resp.lowercase().startsWith(ErrorPrefix.value)) {
-                    saveWalletFile()
+                    val save = saveWalletFile()
+                    if (!save) {
+                        val errorMessage = "Error: [Native] sync run process: Couldn't save the wallet."
+                        Log.e("MAIN", errorMessage)
+
+                        withContext(Dispatchers.Main) {
+                            promise.resolve(errorMessage)
+                        }
+                    }
                 }
 
                 withContext(Dispatchers.Main) {
