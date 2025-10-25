@@ -203,6 +203,7 @@ class RPCModule: NSObject {
           if correct == "true" {
             try self.saveWalletFile(walletEncodedString)
           } else {
+            NSLog("Error: Couldn't save the wallet. The Encoded content is incorrect: \(walletEncodedString)")
             throw FileError.saveFileError("Error: Couldn't save the wallet. The Encoded content is incorrect: \(walletEncodedString)")
           }
         } else {
@@ -210,8 +211,10 @@ class RPCModule: NSObject {
         }
       } else {
         NSLog("Error: Couldn't save the wallet. \(walletEncodedString)")
+        throw FileError.saveFileError("Error: Couldn't save the wallet. \(walletEncodedString)")
       }
     } catch {
+      NSLog("Error: Couldn't save the wallet. \(error.localizedDescription)")
       throw FileError.saveFileError("Error: Couldn't save the wallet. \(error.localizedDescription)")
     }
   }
