@@ -77,6 +77,12 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             }
             // Log.i("MAIN", b64encoded)
 
+            val correct = uniffi.zingo.checkB64(b64encoded)
+            if (correct == "false") {
+                Log.e("MAIN", "Error: Couldn't save the wallet. The Encoded content is incorrect: $b64encoded")
+                return false
+            }
+
             // check if the content is correct. Stored Decoded.
             val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
             Log.i("MAIN", "file size: ${fileBytes.size} bytes")
