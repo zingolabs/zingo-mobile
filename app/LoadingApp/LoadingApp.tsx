@@ -31,11 +31,9 @@ import {
   ModeEnum,
   SelectServerEnum,
   ChainNameEnum,
-  DownloadMemosEnum,
   SnackbarDurationEnum,
   SettingsNameEnum,
   RouteEnum,
-  WalletOptionEnum,
   SnackbarType,
   AppStateStatusEnum,
   GlobalConst,
@@ -523,7 +521,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
 
     // Second, check if a wallet exists. Do it async so the basic screen has time to render
     await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-    console.log('&&&&& background no in storage &&&&&');
+    //console.log('&&&&& background no in storage &&&&&');
     const exists = await RPCModule.walletExists();
     //console.log('Wallet Exists result', this.state.screen, exists);
 
@@ -690,7 +688,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         this.fetchBackgroundSyncing();
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-        console.log('&&&&& background no in storage &&&&&');
+        //console.log('&&&&& background no in storage &&&&&');
         if (this.state.backgroundError && (this.state.backgroundError.title || this.state.backgroundError.error)) {
           Alert.alert(this.state.backgroundError.title, this.state.backgroundError.error);
           this.setBackgroundError('', '');
@@ -703,7 +701,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         console.log('App LOADING is gone to the background!');
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
-        console.log('&&&&& background yes in storage &&&&&');
+        //console.log('&&&&& background yes in storage &&&&&');
       }
     });
 
@@ -1004,7 +1002,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     } else {
       const uri: string = parseServerURI(this.state.customServerUri, this.state.translate);
       const chainName = this.state.customServerChainName;
-      if (uri.toLowerCase().startsWith(GlobalConst.error)) {
+      if (uri && uri.toLowerCase().startsWith(GlobalConst.error)) {
         this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, screenName: [this.screenName] });
         this.setState({ actionButtonsDisabled: false });
         return;
@@ -1102,8 +1100,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         return;
       }
       const wallet: WalletType = { seed: seedJSON.seed_phrase || '', birthday: seedJSON.birthday || 0 };
-      // default values for wallet options
-      this.setWalletOption(WalletOptionEnum.downloadMemos, DownloadMemosEnum.walletMemos);
       // storing the seed & birthday in KeyChain/KeyStore
       if (this.state.recoveryWalletInfoOnDevice) {
         await createUpdateRecoveryWalletInfo(wallet);
@@ -1310,10 +1306,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     if (error) {
       this.walletErrorHandle(errorText, this.state.translate('loadingapp.readingwallet-label') as string, 3, false);
     }
-  };
-
-  setWalletOption = async (walletOption: string, value: string) => {
-    await RPC.rpcSetWalletSettingOption(walletOption, value);
   };
 
   setPrivacyOption = async (value: boolean): Promise<void> => {

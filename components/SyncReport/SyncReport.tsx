@@ -1,8 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, ScrollView, Text, ActivityIndicator } from 'react-native';
 
-import { useTheme } from '@react-navigation/native';
+import { useFocusEffect, useTheme } from '@react-navigation/native';
 
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import DetailLine from '../Components/DetailLine';
@@ -24,8 +24,11 @@ import { isEqual } from 'lodash';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 import { RPCSyncScanRangeStatusType } from '../../app/rpc/types/RPCSyncScanRangeStatusType';
 import { RPCSyncScanRangePriorityStatusEnum } from '../../app/rpc/enums/RPCSyncScanRangePriorityStatusEnum';
-import { RouteEnum, ScreenEnum } from '../../app/AppState';
+import { ButtonTypeEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import Button from '../Components/Button';
+import { createAlert } from '../../app/createAlert';
+import { sendEmail } from '../../app/sendEmail';
 //import { ModeEnum } from '../../app/AppState';
 
 type SyncReportProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.SyncReport>;
@@ -43,7 +46,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     netInfo, 
     snackbars, 
     removeFirstSnackbar, 
-    info
+    info,
+    zingolibVersion,
+    setBackgroundError,
+    addLastSnackbar,
   } = context; //mode
   const { colors } = useTheme()  as ThemeType;
   moment.locale(language);
@@ -106,9 +112,13 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   }, [info.latestBlock]);
 
   // because this screen is fired from more places than the menu.
-  useEffect(() => {
-    setTimeout(() => setShowBackgroundLegend(false), 10 * 1000); // 10 seconds only
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      if (showBackgroundLegend && !background.error) {
+        setTimeout(() => setShowBackgroundLegend(false), 10 * 1000); // 10 seconds.
+      }
+    }, [showBackgroundLegend, background.error])
+  );
 
   useEffect(() => {
     if (!syncingStatus || isEqual(syncingStatus, {} as RPCSyncStatusType) || (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) || syncingStatus.percentage_total_outputs_scanned === 0) {
@@ -167,7 +177,21 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     wallet.birthday,
   ]);
 
-  //console.log('render sync report. ServerWallet:', serverWallet);
+  const reportError = (error: string) => {
+    createAlert(
+      setBackgroundError,
+      addLastSnackbar,
+      [screenName],
+      'Background Sync Error',
+      error,
+      false,
+      translate,
+      sendEmail,
+      zingolibVersion,
+    );
+  };
+
+  //console.log('render sync report. background:', background);
 
   return (
     <ToastProvider>
@@ -191,6 +215,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           noPrivacy={true}
           noUfvkIcon={true}
           closeScreen={() => {
+            setShowBackgroundLegend(true);
             clear();
             if (navigation.canGoBack()) {
               navigation.goBack();
@@ -232,30 +257,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               />
             </View>
           )}
-          {(Number(background.date) > 0 || Number(background.dateEnd) > 0 || !!background.message) &&
-            showBackgroundLegend && (
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  marginHorizontal: 20,
-                }}>
-                <DetailLine
-                  label={translate('report.lastbackgroundsync') as string}
-                  value={
-                    //background.batches.toString() +
-                    //translate('report.batches-date') +
-                    moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a') +
-                    (Number(background.dateEnd) > 0 && Number(background.date) !== Number(background.dateEnd)
-                      ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
-                      : '')
-                  }
-                  screenName={screenName}
-                />
-                {!!background.message && <RegText color={colors.text}>{background.message}</RegText>}
-              </View>
-            )}
           {!!maxBlocks && netInfo.isConnected ? (
             <>
               <View style={{ display: 'flex', marginHorizontal: 20, marginBottom: 30 }}>
@@ -600,26 +601,47 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               <ActivityIndicator size="large" color={colors.primary} />
             </View>
           )}
-          {/*!!syncingStatus.lastError && mode === ModeEnum.advanced && (
-            <>
-              <View
-                style={{ height: 1, width: '100%', backgroundColor: 'white' }}
-              />
+          {(Number(background.date) > 0 || Number(background.dateEnd) > 0 || !!background.message || !!background.error) &&
+            showBackgroundLegend && (
               <View
                 style={{
                   display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'flex-end',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
                   marginHorizontal: 20,
+                  width: '100%',
+                  marginBottom: 20,
                 }}>
-                <DetailLine label={'Last Sync Error'}>
-                  <View style={{ display: 'flex', flexDirection: 'column' }}>
-                    <RegText> {syncingStatus.lastError} </RegText>
-                  </View>
-                </DetailLine>
+                <DetailLine
+                  label={translate('report.lastbackgroundsync') as string}
+                  value={
+                    //background.batches.toString() +
+                    //translate('report.batches-date') +
+                    moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a') +
+                    (Number(background.dateEnd) > 0 && Number(background.date) !== Number(background.dateEnd)
+                      ? (
+                        moment(Number(Number(background.date).toFixed(0)) * 1000).format('YYYY MMM D') ===
+                        moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D')
+                          ? ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('h:mm:ss a')
+                          : ' - ' + moment(Number(Number(background.dateEnd).toFixed(0)) * 1000).format('YYYY MMM D h:mm:ss a')
+                        )
+                      : '')
+                  }
+                  screenName={screenName}
+                />
+                {!!background.message && <RegText style={{ marginBottom: 20}} color={colors.text}>{background.message}</RegText>}
+                {!!background.error && (
+                  <Button
+                    type={ButtonTypeEnum.Primary}
+                    title={translate('view-error') as string}
+                    onPress={() => {
+                      reportError(background.error ? background.error : '');
+                    }}
+                    twoButtons={true}
+                  />
+                )}
               </View>
-            </>
-          )*/}
+            )}
         </ScrollView>
       </View>
     </ToastProvider>

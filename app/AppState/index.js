@@ -5,7 +5,6 @@ import SendPageStateClass from './classes/SendPageStateClass';
 import SettingsFileClass from './classes/SettingsFileClass';
 import ToAddrClass from './classes/ToAddrClass';
 import TotalBalanceClass from './classes/TotalBalanceClass';
-import WalletSettingsClass from './classes/WalletSettingsClass';
 import AddressBookFileClassObsolete from './classes/AddressBookFileClassObsolete';
 
 import InfoType from './types/InfoType';
@@ -32,7 +31,6 @@ import { ModeEnum } from './enums/ModeEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
 import { ChainNameEnum } from './enums/ChainNameEnum';
-import { DownloadMemosEnum } from './enums/DownloadMemosEnum';
 import { SnackbarDurationEnum } from './enums/SnackbarDurationEnum';
 import { TransactionTypeEnum } from './enums/TransactionTypeEnum';
 import { PoolEnum } from './enums/PoolEnum';
@@ -42,7 +40,6 @@ import { SeedActionEnum } from './enums/SeedActionEnum';
 import { UfvkActionEnum } from './enums/UfvkActionEnum';
 import { SettingsNameEnum } from './enums/SettingsNameEnum';
 import { RouteEnum } from './enums/RouteEnum';
-import { WalletOptionEnum } from './enums/WalletOptionEnum';
 import { AppStateStatusEnum } from './enums/AppStateStatusEnum';
 import { CurrencyNameEnum } from './enums/CurrencyNameEnum';
 import { ButtonTypeEnum } from './enums/ButtonTypeEnum';
@@ -78,7 +75,6 @@ export {
   SettingsFileClass,
   ToAddrClass,
   TotalBalanceClass,
-  WalletSettingsClass,
   AddressBookFileClassObsolete,
   WalletType,
   SendJsonToTypeType,
@@ -103,7 +99,6 @@ export {
   CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
-  DownloadMemosEnum,
   SnackbarDurationEnum,
   TransactionTypeEnum,
   PoolEnum,
@@ -113,7 +108,6 @@ export {
   UfvkActionEnum,
   SettingsNameEnum,
   RouteEnum,
-  WalletOptionEnum,
   AppStateStatusEnum,
   CurrencyNameEnum,
   ButtonTypeEnum,

@@ -3,5 +3,5 @@ export default interface BackgroundType {
   message: string;
   date: number;
   dateEnd: number;
-   
+  error?: string;
 }
