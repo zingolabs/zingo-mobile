@@ -27,7 +27,7 @@ class RPCModule: NSObject {
   func getDocumentsDirectory() throws -> String {
     let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
     guard let pathsFirst = paths.first else {
-      throw FileError.documentsDirectoryNotFoundError("Documents directory could not be located.")
+      throw FileError.documentsDirectoryNotFoundError("Error: [Native] Documents directory could not be located.")
     }
     return pathsFirst
   }
@@ -35,17 +35,16 @@ class RPCModule: NSObject {
   func getFileName(_ file: String) throws -> String {
     let documentsDirectory = try getDocumentsDirectory()
     let fileName = "\(documentsDirectory)/\(file)"
-    //NSLog("get file name \(fileName)")
     return fileName
   }
   
   func fileExists(_ fileName: String) throws -> String {
     let fileExists = try FileManager.default.fileExists(atPath: getFileName(fileName))
     if fileExists {
-      NSLog("File exists \(fileName)")
+      NSLog("[Native] File exists \(fileName)")
       return "true"
     } else {
-      NSLog("File DOES not exists \(fileName)")
+      NSLog("[Native] File DOES not exists \(fileName)")
       return "false"
     }
   }
@@ -70,7 +69,7 @@ class RPCModule: NSObject {
         resolve(result)
       }
     } catch {
-      NSLog("wallet exists error: \(error.localizedDescription)")
+      NSLog("Error: [Native] wallet exists error: \(error.localizedDescription)")
       DispatchQueue.main.async {
         resolve("false")
       }
@@ -85,7 +84,7 @@ class RPCModule: NSObject {
         resolve(result)
       }
     } catch {
-      NSLog("wallet backup exists error: \(error.localizedDescription)")
+      NSLog("Error: [Native] wallet backup exists error: \(error.localizedDescription)")
       DispatchQueue.main.async {
         resolve("false")
       }
@@ -96,7 +95,7 @@ class RPCModule: NSObject {
     do {
       try writeFile(Constants.WalletFileName.rawValue, fileBase64EncodedString: base64EncodedString)
     } catch {
-      throw FileError.writeFileError("Error writting wallet file error: \(error.localizedDescription)")
+      throw FileError.writeFileError("Error: [Native] writting wallet file error: \(error.localizedDescription)")
     }
   }
   
@@ -104,7 +103,7 @@ class RPCModule: NSObject {
     do {
       try writeFile(Constants.WalletBackupFileName.rawValue, fileBase64EncodedString: base64EncodedString)
     } catch {
-      throw FileError.writeFileError("Error writting wallet backup file error: \(error.localizedDescription)")
+      throw FileError.writeFileError("Error: [Native] writting wallet backup file error: \(error.localizedDescription)")
     }
   }
 
@@ -113,7 +112,7 @@ class RPCModule: NSObject {
       // the content of this JSON can be represented safely in utf8.
       try jsonString.write(toFile: getFileName(Constants.BackgroundFileName.rawValue), atomically: true, encoding: .utf8)
     } catch {
-      throw FileError.writeFileError("Error writting background file error: \(error.localizedDescription)")
+      throw FileError.writeFileError("Error: [Native] writting background file error: \(error.localizedDescription)")
     }
   }
 
@@ -121,7 +120,7 @@ class RPCModule: NSObject {
     do {
       return try readFile(Constants.WalletFileName.rawValue)
     } catch {
-      throw FileError.readWalletError("Error reading wallet format error: \(error.localizedDescription)")
+      throw FileError.readWalletError("Error: [Native] reading wallet format error: \(error.localizedDescription)")
     }
   }
 
@@ -129,7 +128,7 @@ class RPCModule: NSObject {
     do {
       return try readFile(Constants.WalletBackupFileName.rawValue)
     } catch {
-      throw FileError.readWalletError("Error reading wallet backup format error: \(error.localizedDescription)")
+      throw FileError.readWalletError("Error: [Native] reading wallet backup format error: \(error.localizedDescription)")
     }
   }
 
@@ -137,7 +136,7 @@ class RPCModule: NSObject {
     do {
       try deleteFile(Constants.WalletFileName.rawValue)
     } catch {
-      throw FileError.deleteFileError("Error deleting wallet error: \(error.localizedDescription)")
+      throw FileError.deleteFileError("Error: [Native] deleting wallet error: \(error.localizedDescription)")
     }
   }
 
@@ -155,7 +154,7 @@ class RPCModule: NSObject {
         }
       }
     } catch {
-      NSLog("\(error.localizedDescription)")
+      NSLog("Error: [Native] deleting wallet \(error.localizedDescription)")
       DispatchQueue.main.async {
         resolve("false")
       }
@@ -166,7 +165,7 @@ class RPCModule: NSObject {
     do {
       try deleteFile(Constants.WalletBackupFileName.rawValue)
     } catch {
-      throw FileError.deleteFileError("Error deleting wallet backup error: \(error.localizedDescription)")
+      throw FileError.deleteFileError("Error: [Native] deleting wallet backup error: \(error.localizedDescription)")
     }
   }
 
@@ -184,7 +183,7 @@ class RPCModule: NSObject {
         }
       }
     } catch {
-      NSLog("\(error.localizedDescription)")
+      NSLog("Error: [Native] deleting wallet backup\(error.localizedDescription)")
       DispatchQueue.main.async {
         resolve("false")
       }
@@ -196,26 +195,29 @@ class RPCModule: NSObject {
       let walletEncodedString = try saveToB64()
       if !walletEncodedString.lowercased().hasPrefix(Constants.ErrorPrefix.rawValue) {
         let size = (walletEncodedString.count * 3) / 4
-        NSLog("file size: \(size) bytes")
+        NSLog("[Native] file size: \(size) bytes")
         if size > 0 {
           // check if the content is correct. Stored Encoded.
           let correct = checkB64(datab64: walletEncodedString)
           if correct == "true" {
             try self.saveWalletFile(walletEncodedString)
           } else {
-            NSLog("Error: Couldn't save the wallet. The Encoded content is incorrect: \(walletEncodedString)")
-            throw FileError.saveFileError("Error: Couldn't save the wallet. The Encoded content is incorrect: \(walletEncodedString)")
+            let err = "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect: \(walletEncodedString)"
+            NSLog(err)
+            throw FileError.saveFileError(err)
           }
         } else {
-          NSLog("No need to save the wallet.")
+          NSLog("[Native] No need to save the wallet.")
         }
       } else {
-        NSLog("Error: Couldn't save the wallet. \(walletEncodedString)")
-        throw FileError.saveFileError("Error: Couldn't save the wallet. \(walletEncodedString)")
+        let err = "Error: [Native] Couldn't save the wallet. \(walletEncodedString)"
+        NSLog(err)
+        throw FileError.saveFileError(err)
       }
     } catch {
-      NSLog("Error: Couldn't save the wallet. \(error.localizedDescription)")
-      throw FileError.saveFileError("Error: Couldn't save the wallet. \(error.localizedDescription)")
+      let err = "Error: [Native] Couldn't save the wallet. \(error.localizedDescription)"
+      NSLog(err)
+      throw FileError.saveFileError(err)
     }
   }
 
@@ -391,13 +393,13 @@ class RPCModule: NSObject {
           resolve("true")
         }
       } else {
-        NSLog("Couldn't save the wallet. The Encoded content is incorrect: \(backupEncodedData)")
+        NSLog("Error: [Native] Couldn't save the wallet backup. The Encoded content is incorrect: \(backupEncodedData)")
         DispatchQueue.main.async {
           resolve("false")
         }
       }
     } catch {
-      NSLog("Restoring existing wallet backup error: \(error.localizedDescription)")
+      NSLog("Error: [Native] Restoring existing wallet backup error: \(error.localizedDescription)")
       DispatchQueue.main.async {
         resolve("false")
       }
@@ -412,7 +414,7 @@ class RPCModule: NSObject {
           resolve("true")
         }
       } catch {
-        NSLog("Saving wallet error: \(error.localizedDescription)")
+        NSLog("Error: [Native] Saving wallet error: \(error.localizedDescription)")
         DispatchQueue.main.async {
           resolve("false")
         }
@@ -441,7 +443,7 @@ class RPCModule: NSObject {
           resolve("true")
         }
       } catch {
-        NSLog("Saving wallet backup error: \(error.localizedDescription)")
+        NSLog("Error: [Native] Saving wallet backup error: \(error.localizedDescription)")
         DispatchQueue.main.async {
           resolve("false")
         }

@@ -72,30 +72,30 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             val b64encoded: String = uniffi.zingo.saveToB64()
             if (b64encoded.lowercase().startsWith(ErrorPrefix.value)) {
                 // with error don't save the file. Obviously.
-                Log.e("MAIN", "Error: Couldn't save the wallet. $b64encoded")
+                Log.e("MAIN", "Error: [Native] Couldn't save the wallet. $b64encoded")
                 return false
             }
             // Log.i("MAIN", b64encoded)
 
             val correct = uniffi.zingo.checkB64(b64encoded)
             if (correct == "false") {
-                Log.e("MAIN", "Error: Couldn't save the wallet. The Encoded content is incorrect: $b64encoded")
+                Log.e("MAIN", "Error: [Native] Couldn't save the wallet. The Encoded content is incorrect: $b64encoded")
                 return false
             }
 
             // check if the content is correct. Stored Decoded.
             val fileBytes = Base64.decode(b64encoded, Base64.NO_WRAP)
-            Log.i("MAIN", "file size: ${fileBytes.size} bytes")
+            Log.i("MAIN", "[Native] file size: ${fileBytes.size} bytes")
 
             if (fileBytes.size > 0) {
                 writeFile(WalletFileName.value, fileBytes)
                 return true
             } else {
-                Log.e("MAIN", "No need to save the wallet.")
+                Log.e("MAIN", "[Native] No need to save the wallet.")
                 return true
             }
-        } catch (e: IllegalArgumentException) {
-            Log.e("MAIN", "Error: Couldn't save the wallet", e)
+        } catch (e: Exception) {
+            Log.e("MAIN", "Error: [Native] Unexpected error. Couldn't save the wallet. $e")
             return false
         }
     }
@@ -112,29 +112,30 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         } catch (e: IOException) {
             Log.e("MAIN", "Error: [Native] Couldn't read the wallet file", e)
             return false
+        } catch (e: Exception) {
+            Log.e("MAIN", "Error: [Native] Unexpected error. Couldn't read the wallet file", e)
+            return false
         }
 
         try {
             // Save file to disk
             writeFile(WalletBackupFileName.value, fileBytes)
-        } catch (e: IllegalArgumentException) {
-            Log.e("MAIN", "Couldn't save the wallet backup")
+        } catch (e: Exception) {
+            Log.e("MAIN", "Error: [Native] Unexpected error. Couldn't save the wallet backup")
             return false
         }
         return true
     }
 
     fun saveBackgroundFile(json: String) {
-        // Log.i("MAIN", b64encoded)
-
         try {
             val fileBytes = json.toByteArray()
             Log.i("MAIN", "file background size: ${fileBytes.size} bytes")
 
             // Save file to disk
             writeFile(BackgroundFileName.value, fileBytes)
-        } catch (e: IllegalArgumentException) {
-            Log.e("MAIN", "Couldn't save the background file")
+        } catch (e: Exception) {
+            Log.e("MAIN", "Error: [Native] Unexpected error. Couldn't save the background file")
         }
     }
 
@@ -389,7 +390,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             promise.resolve(false)
             return
         } catch (e: IOException) {
-            Log.e("MAIN", "Error [Native] reading the backup file", e)
+            Log.e("MAIN", "Error: [Native] reading the backup file", e)
+            promise.resolve(false)
+            return
+        } catch (e: Exception) {
+            Log.e("MAIN", "Error: [Native] Unexpected error, reading the backup file", e)
             promise.resolve(false)
             return
         }
@@ -402,7 +407,11 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
             promise.resolve(false)
             return
         } catch (e: IOException) {
-            Log.e("MAIN", "Error reading the wallet file", e)
+            Log.e("MAIN", "Error: [Native] reading the wallet file", e)
+            promise.resolve(false)
+            return
+        } catch (e: Exception) {
+            Log.e("MAIN", "Error: [Native] Unexpected error, reading the wallet file", e)
             promise.resolve(false)
             return
         }
@@ -410,8 +419,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         try {
             // Save file to disk wallet (with the backup)
             writeFile(WalletFileName.value, fileBytesBackup)
-        } catch (e: IllegalArgumentException) {
-            Log.e("MAIN", "Couldn't save the wallet with the backup")
+        } catch (e: Exception) {
+            Log.e("MAIN", "Error: [Native] Unexpected error, Couldn't save the wallet with the backup")
             promise.resolve(false)
             return
         }
@@ -419,8 +428,8 @@ class RPCModule internal constructor(private val reactContext: ReactApplicationC
         try {
             // Save file to disk backup (with the wallet)
             writeFile(WalletBackupFileName.value, fileBytesWallet)
-        } catch (e: IllegalArgumentException) {
-            Log.e("MAIN", "Couldn't save the backup with the wallet")
+        } catch (e: Exception) {
+            Log.e("MAIN", "Error: [Native] Unexpected error, Couldn't save the backup with the wallet")
             promise.resolve(false)
             return
         }
