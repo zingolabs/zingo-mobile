@@ -38,7 +38,6 @@ import {
   CurrencyEnum,
   SelectServerEnum,
   ChainNameEnum,
-  WalletOptionEnum,
   ButtonTypeEnum,
   GlobalConst,
   RouteEnum,
@@ -53,9 +52,10 @@ import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { createAlert } from '../../app/createAlert';
+import { sendEmail } from '../../app/sendEmail';
 
 type SettingsProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Settings> & {
-  setWalletOption: (walletOption: string, value: string) => Promise<void>;
   setServerOption: (
     value: ServerType,
     selectServer: SelectServerEnum,
@@ -82,7 +82,6 @@ type Options = {
 
 const Settings: React.FunctionComponent<SettingsProps> = ({
   navigation,
-  setWalletOption,
   setServerOption,
   setCurrencyOption,
   setLanguageOption,
@@ -98,7 +97,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 }) => {
   const context = useContext(ContextAppLoaded);
   const {
-    walletSettings,
     translate,
     server: serverContext,
     currency: currencyContext,
@@ -118,14 +116,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     snackbars,
     removeFirstSnackbar,
     setPrivacyOption,
+    setBackgroundError,
+    zingolibVersion,
+    lastError,
   } = context;
-
-  const memosArray = translate('settings.memos');
-  //console.log(memosArray, typeof memosArray);
-  let MEMOS: Options[] = [];
-  if (typeof memosArray === 'object') {
-    MEMOS = memosArray as Options[];
-  }
 
   const currenciesArray = translate('settings.currencies');
   let CURRENCIES: Options[] = [];
@@ -185,8 +179,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   moment.locale(languageContext);
   const screenName = ScreenEnum.Settings;
 
-  const [memos, setMemos] = useState<string>(walletSettings.downloadMemos);
-  const [filter, setFilter] = useState<string>(walletSettings.transactionFilterThreshold);
   const [autoServerUri, setAutoServerUri] = useState<string>('');
   const [autoServerChainName, setAutoServerChainName] = useState<string>('');
   const [listServerUri, setListServerUri] = useState<string>('');
@@ -325,8 +317,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       chainNameParsed = ChainNameEnum.mainChainName;
     }
     if (
-      walletSettings.downloadMemos === memos &&
-      walletSettings.transactionFilterThreshold === filter &&
       serverContext.uri === serverUriParsed &&
       serverContext.chainName === chainNameParsed &&
       currencyContext === currency &&
@@ -355,12 +345,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     customServerUri,
     donation,
     donationContext,
-    filter,
     language,
     languageContext,
     listServerChainName,
     listServerUri,
-    memos,
     mode,
     modeContext,
     privacy,
@@ -378,8 +366,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     sendAllContext,
     serverContext.chainName,
     serverContext.uri,
-    walletSettings.downloadMemos,
-    walletSettings.transactionFilterThreshold,
     securityObject,
   ]);
 
@@ -402,8 +388,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     let sameServerChainName = true;
     const chainName = serverContext.chainName;
     if (
-      walletSettings.downloadMemos === memos &&
-      walletSettings.transactionFilterThreshold === filter &&
       serverContext.uri === serverUriParsed &&
       serverContext.chainName === chainNameParsed &&
       currencyContext === currency &&
@@ -421,14 +405,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       addLastSnackbar({ message: translate('settings.nochanges') as string, screenName: [screenName] });
       return;
     }
-    //if (!memos) {
-    //  addLastSnackbar({ message: translate('settings.ismemo') as string, screenName: [screenName] });
-    //  return;
-    //}
-    //if (!filter) {
-    //  addLastSnackbar({ message: translate('settings.isthreshold') as string, screenName: [screenName] });
-    //  return;
-    //}
     if ((!serverUriParsed || !chainNameParsed) && selectServer !== SelectServerEnum.offline) {
       addLastSnackbar({ message: translate('settings.isserver') as string, screenName: [screenName] });
       return;
@@ -440,7 +416,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
     if (serverContext.uri !== serverUriParsed && selectServer !== SelectServerEnum.offline) {
       const resultUri = parseServerURI(serverUriParsed, translate);
-      if (resultUri.toLowerCase().startsWith(GlobalConst.error)) {
+      if (resultUri && resultUri.toLowerCase().startsWith(GlobalConst.error)) {
         addLastSnackbar({ message: translate('settings.isuri') as string, screenName: [screenName] });
         return;
       } else {
@@ -509,22 +485,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       }
     }
 
-    if (walletSettings.downloadMemos !== memos) {
-      if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
-        setDisabled(false);
-        return;
-      }
-      await setWalletOption(WalletOptionEnum.downloadMemos, memos);
-    }
-    if (walletSettings.transactionFilterThreshold !== filter) {
-      if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
-        addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
-        setDisabled(false);
-        return;
-      }
-      await setWalletOption(WalletOptionEnum.transactionFilterThreshold, filter);
-    }
     if (currencyContext !== currency) {
       await setCurrencyOption(currency);
     }
@@ -603,8 +563,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setRestoreWalletBackupScreen(securityContext.restoreWalletBackupScreen);
       setRecoveryWalletInfoOnDevice(recoveryWalletInfoOnDeviceContext);
       setPerformanceLevel(performanceLevelContext);
-      setMemos(walletSettings.downloadMemos);
-      setFilter(walletSettings.transactionFilterThreshold);
     }
     navigation.navigate(RouteEnum.HomeStack);
   };
@@ -682,6 +640,20 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     );
   };
 
+  const reportError = (error: string) => {
+    createAlert(
+      setBackgroundError,
+      addLastSnackbar,
+      [screenName],
+      'Last Error',
+      error,
+      false,
+      translate,
+      sendEmail,
+      zingolibVersion,
+    );
+  };
+  
   return (
     <ToastProvider>
       <Snackbars
@@ -1107,63 +1079,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                   translate('settings.security-restorewalletbackupscreen') as string,
                 )}
 
-                {false && (
-                  <>
-                    <View style={{ display: 'flex', margin: 10 }}>
-                      <BoldText>{translate('settings.threshold-title') as string}</BoldText>
-                    </View>
-
-                    <View style={{ display: 'flex', marginLeft: 25 }}>
-                      <View
-                        accessible={true}
-                        accessibilityLabel={translate('settings.threshold-acc') as string}
-                        style={{
-                          borderColor: colors.border,
-                          borderWidth: 1,
-                          marginLeft: 5,
-                          width: 'auto',
-                          maxWidth: '60%',
-                          maxHeight: 48,
-                          minWidth: '30%',
-                          minHeight: 48,
-                        }}>
-                        <TextInput
-                          placeholder={translate('settings.number') as string}
-                          placeholderTextColor={colors.placeholder}
-                          keyboardType="numeric"
-                          style={{
-                            color: colors.text,
-                            fontWeight: '600',
-                            fontSize: 18,
-                            minWidth: '30%',
-                            minHeight: 48,
-                            marginLeft: 5,
-                            backgroundColor: 'transparent',
-                          }}
-                          value={filter}
-                          onChangeText={(text: string) => setFilter(text)}
-                          editable={!disabled}
-                          maxLength={6}
-                        />
-                      </View>
-                    </View>
-
-                    <View style={{ display: 'flex', margin: 10 }}>
-                      <BoldText>{translate('settings.memo-title') as string}</BoldText>
-                    </View>
-
-                    <View style={{ display: 'flex', marginLeft: 25 }}>
-                      {optionsRadio(
-                        MEMOS,
-                        setMemos as React.Dispatch<React.SetStateAction<string | boolean>>,
-                        String,
-                        memos,
-                        'memo',
-                      )}
-                    </View>
-                  </>
-                )}
-
                 <View style={{ display: 'flex', margin: 10 }}>
                   <BoldText>{translate('settings.recoverywalletinfoondevice-title') as string}</BoldText>
                 </View>
@@ -1204,7 +1119,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                 </View>
 
                 {showDeveloperOptions && (
-                  <>
+                  <View style={{ width: '100%', marginBottom: 20 }}>
                     <View style={{ display: 'flex', margin: 10 }}>
                       <BoldText>{translate('settings.performancelevel-title') as string}</BoldText>
                     </View>
@@ -1218,7 +1133,25 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
                         'performancelevel',
                       )}
                     </View>
-                  </>
+                    {!!lastError && (
+                      <>
+                        <View style={{ display: 'flex', margin: 10 }}>
+                          <BoldText>{'LAST ERROR'}</BoldText>
+                        </View>
+
+                        <View style={{ display: 'flex', marginLeft: 25 }}>
+                          <Button
+                            type={ButtonTypeEnum.Primary}
+                            title={translate('view-error') as string}
+                            onPress={() => {
+                              reportError(lastError);
+                            }}
+                            twoButtons={true}
+                          />
+                        </View>
+                      </>
+                    )}
+                  </View>
                 )}
               </>
             )}

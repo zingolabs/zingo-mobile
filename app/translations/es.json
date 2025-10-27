@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.9 (280)",
+  "version": "zingo-2.0.10 (289)",
   "loading": "cargando...",
   "connectingserver": "Conectando con el servidor...",
   "wait": "Por favor espere...",
@@ -31,6 +31,7 @@
   "share": "Compartir",
   "confirm": "Confirmar",
   "support": "Enviar Email",
+  "view-error": "Ver/Informar Error",
   "menudrawer-acc": "Abrir Menú Lateral",
   "menu-acc": "Abrir Menú",
   "donation": "¡Donación a Zingo!\n¡Gracias por apoyar a ZingoLabs!",

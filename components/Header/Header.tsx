@@ -55,6 +55,7 @@ import { RPCShieldProposeType } from '../../app/rpc/types/RPCShieldProposeType';
 import RPCModule from '../../app/RPCModule';
 import { RPCSyncStatusType } from '../../app/rpc/types/RPCSyncStatusType';
 import { isEqual } from 'lodash';
+import { TriangleAlert } from '../Components/Icons/TriangleAlert';
 
 type HeaderProps = {
   // general
@@ -129,6 +130,8 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     shieldingAmount,
     selectServer,
     setZecPrice,
+    background,
+    lastError,
   } = context;
 
   let translate: (key: string) => TranslateType, netInfo: NetInfoType, mode: ModeEnum, privacy: boolean;
@@ -175,10 +178,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       setPercentageOutputsScanned(0);
       setSyncInProgress(true);
     } else {
+      // avoiding 0.00 or 100%, minimum 0.01, maximun 99.99
       setPercentageOutputsScanned(
         syncingStatus.percentage_total_outputs_scanned && syncingStatus.percentage_total_outputs_scanned < 0.01
           ? 0.01
-          : Number(syncingStatus.percentage_total_outputs_scanned?.toFixed(2).replace(/\.?0+$/, '')),
+          : syncingStatus.percentage_total_outputs_scanned && syncingStatus.percentage_total_outputs_scanned > 99.99
+            ? 99.99
+            : Number(syncingStatus.percentage_total_outputs_scanned?.toFixed(2).replace(/\.?0+$/, '')),
       );
       setSyncInProgress(
         !!syncingStatus.scan_ranges &&
@@ -230,7 +236,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         let proposeFee = 0;
         let proposeAmount = 0;
         const runProposeStr = await runShieldPropose();
-        if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+        if (runProposeStr && runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
           // snack with error
           console.log('Error shield proposing', runProposeStr);
           //Alert.alert('Calculating the FEE', runProposeStr);
@@ -732,6 +738,25 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               addLastSnackbar &&
               noBalance &&
               privacyComponent()}
+            {!noSyncingStatus && !!background.error && mode === ModeEnum.advanced && (
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: 0,
+                  marginHorizontal: 5,
+                  padding: 0,
+                  minWidth: 25,
+                  minHeight: 25,
+                }}>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate(RouteEnum.SyncReport);
+                  }}
+                >
+                  <TriangleAlert color={colors.warning.primary} size={24} />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
 
           {!noBalance && (
@@ -886,28 +911,31 @@ const Header: React.FunctionComponent<HeaderProps> = ({
             position: 'absolute',
             right: 0,
           }}>
-          {!noDrawMenu ? (
-            <TouchableOpacity
-              style={{ marginRight: 5 }}
-              testID="header.drawmenu"
-              onPress={async () => {
-                const resultBio = security.settingsScreen ? await simpleBiometrics({ translate: translate }) : true;
-                // can be:
-                // - true      -> the user do pass the authentication
-                // - false     -> the user do NOT pass the authentication
-                // - undefined -> no biometric authentication available -> Passcode.
-                //console.log('BIOMETRIC --------> ', resultBio);
-                if (resultBio === false) {
-                  // snack with Error & closing the menu.
-                  if (addLastSnackbar) {
-                    addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
+          {!noDrawMenu && screenName !== ScreenEnum.Settings ? (
+            <>
+              <TouchableOpacity
+                style={{ marginRight: 5 }}
+                testID="header.drawmenu"
+                onPress={async () => {
+                  const resultBio = security.settingsScreen ? await simpleBiometrics({ translate: translate }) : true;
+                  // can be:
+                  // - true      -> the user do pass the authentication
+                  // - false     -> the user do NOT pass the authentication
+                  // - undefined -> no biometric authentication available -> Passcode.
+                  //console.log('BIOMETRIC --------> ', resultBio);
+                  if (resultBio === false) {
+                    // snack with Error & closing the menu.
+                    if (addLastSnackbar) {
+                      addLastSnackbar({ message: translate('biometrics-error') as string, screenName: [screenName] });
+                    }
+                  } else {
+                    navigation.navigate(RouteEnum.Settings);
                   }
-                } else {
-                  navigation.navigate(RouteEnum.Settings);
-                }
-              }}>
-              <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
-            </TouchableOpacity>
+                }}>
+                <FontAwesomeIcon icon={faGear} size={35} color={colors.border} />
+              </TouchableOpacity>
+              {!!lastError && <FontAwesomeIcon style={{ alignSelf: 'flex-end' }} icon={faGear} size={5} color={colors.warning.primary} />}
+            </>
           ) : (
             <Image
               source={require('../../assets/img/logobig-zingo.png')}

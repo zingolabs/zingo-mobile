@@ -31,7 +31,6 @@ import {
   SendPageStateClass,
   InfoType,
   ToAddrClass,
-  WalletSettingsClass,
   ZecPriceType,
   BackgroundType,
   TranslateType,
@@ -540,7 +539,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       sendPageState: new SendPageStateClass(new ToAddrClass(0)),
       setSendPageState: this.setSendPageState,
       info: {} as InfoType,
-      walletSettings: {} as WalletSettingsClass,
       syncingStatus: {} as RPCSyncStatusType,
       wallet: {} as WalletType,
       defaultUnifiedAddress: '',
@@ -553,6 +551,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       backgroundError: {} as BackgroundErrorType,
       setBackgroundError: this.setBackgroundError,
       readOnly: props.readOnly,
+      lastError: '',
       orchardPool: props.orchardPool,
       saplingPool: props.saplingPool,
       transparentPool: props.transparentPool,
@@ -600,13 +599,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setValueTransfersList,
       this.setMessagesList,
       this.setAllAddresses,
-      //this.setWalletSettings,
       this.setInfo,
       this.setSyncingStatus,
       props.translate,
       this.keepAwake,
       this.setZingolibVersion,
       this.setWallet,
+      this.setLastError,
       props.readOnly,
       props.server,
       props.performanceLevel,
@@ -665,7 +664,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           this.setState({ appStateStatus: nextAppState });
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
-          console.log('&&&&& background yes in storage &&&&&');
+          //console.log('&&&&& background yes in storage &&&&&');
           await this.rpc.clearTimers();
           //console.log('clear timers IOS');
           this.setSyncingStatus({} as RPCSyncStatusType);
@@ -708,7 +707,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           await this.fetchBackgroundSyncing();
           // setting value for background task Android
           await AsyncStorage.setItem(GlobalConst.background, GlobalConst.no);
-          console.log('&&&&& background no in storage &&&&&');
+          //console.log('&&&&& background no in storage &&&&&');
           // needs this because when the App go from back to fore
           // it have to re-launch all the tasks.
           await this.rpc.clearTimers();
@@ -726,7 +725,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         console.log('App LOADED is gone to the background!');
         // setting value for background task Android
         await AsyncStorage.setItem(GlobalConst.background, GlobalConst.yes);
-        console.log('&&&&& background yes in storage &&&&&');
+        //console.log('&&&&& background yes in storage &&&&&');
         await this.rpc.clearTimers();
         //console.log('clear timers');
         this.setSyncingStatus({} as RPCSyncStatusType);
@@ -1089,20 +1088,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  /*
-  setWalletSettings = (walletSettings: WalletSettingsClass) => {
-    if (!isEqual(this.state.walletSettings, walletSettings)) {
-      //console.log('fetch wallet settings');
-      //const start = Date.now();
-      this.setState({ walletSettings });
-      //console.log(
-      //  '=========================================== > WALLET SETTINGS STORED SETSTATE - ',
-      //  Date.now() - start,
-      //);
-    }
-  };
-  */
-
   setSendPageState = (sendPageState: SendPageStateClass) => {
     //console.log('fetch send page state');
     //const start = Date.now();
@@ -1342,13 +1327,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
   };
 
-  setWalletOption = async (walletOption: string, value: string): Promise<void> => {
-    await RPC.rpcSetWalletSettingOption(walletOption, value);
-
-    // Refetch the settings updated
-    //this.rpc.fetchWalletSettings();
-  };
-
   setServerOption = async (
     value: ServerType,
     selectServer: SelectServerEnum,
@@ -1402,7 +1380,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             // creating tor cliente if needed
             // we have two buttons to fetch -> we need tor client Just in case.
             if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
-              await RPCModule.createTorClientProcess();
+              const resp: string = await RPCModule.createTorClientProcess();
+              if (resp && resp.toLowerCase().startsWith(GlobalConst.error)) {
+                this.setLastError(`Create tor client error: ${resp}`);
+              }
             }
             return;
           } else {
@@ -1461,15 +1442,18 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       // the App have to create a Tor Client
       //console.log('before CREATE ------------------- TOR CLIENT');
       const result = await RPCModule.createTorClientProcess();
-      console.log('after CREATE ------------------- TOR CLIENT', result);
+      //console.log('after CREATE ------------------- TOR CLIENT', result);
+      if (result && result.toLowerCase().startsWith(GlobalConst.error)) {
+        this.setLastError(`Create tor client error: ${result}`);
+      }
     } else {
       //console.log('before REMOVE ------------------- TOR CLIENT');
       const result = await RPCModule.removeTorClientProcess();
-      console.log('after REMOVE ------------------- TOR CLIENT', result);
+      //console.log('after REMOVE ------------------- TOR CLIENT', result);
+      if (result && result.toLowerCase().startsWith(GlobalConst.error)) {
+        this.setLastError(`Remove tor client error: ${result}`);
+      }
     }
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setLanguageOption = async (value: string, reset: boolean): Promise<void> => {
@@ -1477,9 +1461,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       language: value as LanguageEnum,
     });
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
     if (reset) {
       this.navigateToLoadingApp({ startingApp: false });
     }
@@ -1490,9 +1471,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       sendAll: value as boolean,
     });
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setDonationOption = async (value: boolean): Promise<void> => {
@@ -1500,9 +1478,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       donation: value as boolean,
     });
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setPrivacyOption = async (value: boolean): Promise<void> => {
@@ -1510,9 +1485,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       privacy: value as boolean,
     });
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setModeOption = async (value: string): Promise<void> => {
@@ -1522,9 +1494,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     });
     // this function change the Theme in the App component.
     this.props.toggleTheme(value as ModeEnum);
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setSecurityOption = async (value: SecurityType): Promise<void> => {
@@ -1532,9 +1501,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       security: value as SecurityType,
     });
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setSelectServerOption = async (value: string): Promise<void> => {
@@ -1542,9 +1508,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       selectServer: value as SelectServerEnum,
     });
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setRescanMenuOption = async (value: boolean): Promise<void> => {
@@ -1552,9 +1515,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({
       rescanMenu: value as boolean,
     });
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setRecoveryWalletInfoOnDeviceOption = async (value: boolean): Promise<void> => {
@@ -1569,9 +1529,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       const wallet: WalletType = await RPC.rpcFetchWallet(this.state.readOnly);
       await createUpdateRecoveryWalletInfo(wallet);
     }
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
   };
 
   setPerformanceLevelOption = async (value: RPCPerformanceLevelEnum): Promise<void> => {
@@ -1586,9 +1543,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       GlobalConst.minConfirmations.toString()
     );
     console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET CONFIG WALLET', setConfigWallet);
-
-    // Refetch the settings to update
-    //this.rpc.fetchWalletSettings();
+    if (setConfigWallet && setConfigWallet.toLowerCase().startsWith(GlobalConst.error)) {
+      this.setLastError(`Set performance level error: ${setConfigWallet}`);
+    }
   };
 
   navigateToLoadingApp = async (state: LoadingAppNavigationState) => {
@@ -1622,7 +1579,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
 
     //console.log("jc change", resultStr);
-    if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
+    if (resultStr && resultStr.toLowerCase().startsWith(GlobalConst.error)) {
       //console.log(`Error change wallet. ${resultStr}`);
       createAlert(
         this.setBackgroundError,
@@ -1646,7 +1603,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     const resultStr = (await this.rpc.restoreBackup()) as string;
 
     //console.log("jc restore", resultStr);
-    if (resultStr.toLowerCase().startsWith(GlobalConst.error)) {
+    if (resultStr && resultStr.toLowerCase().startsWith(GlobalConst.error)) {
       //console.log(`Error restore backup wallet. ${resultStr}`);
       createAlert(
         this.setBackgroundError,
@@ -1680,7 +1637,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       const resultStrServer: string = await Promise.race([resultStrServerPromise, timeoutServerPromise]);
       //console.log(resultStrServer);
 
-      if (!resultStrServer || resultStrServer.toLowerCase().startsWith(GlobalConst.error)) {
+      if (resultStrServer && resultStrServer.toLowerCase().startsWith(GlobalConst.error)) {
         //console.log(`Error change server ${value} - ${resultStr}`);
         this.addLastSnackbar({
           message: `${this.state.translate('loadedapp.changeservernew-error')} ${resultStrServer}`,
@@ -1713,7 +1670,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       }
 
       //console.log("jc change", resultStr);
-      if (resultStr2.toLowerCase().startsWith(GlobalConst.error)) {
+      if (resultStr2 && resultStr2.toLowerCase().startsWith(GlobalConst.error)) {
         //console.log(`Error change wallet. ${resultStr}`);
         createAlert(
           this.setBackgroundError,
@@ -1750,6 +1707,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
     newSnackbars.push(snackbar);
     this.setState({ snackbars: newSnackbars });
+  };
+
+  setLastError = (error: string) => {
+    this.setState({ lastError: error });
   };
 
   removeFirstSnackbar = (screenName: ScreenEnum) => {
@@ -1842,7 +1803,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       valueTransfersTotal: this.state.valueTransfersTotal,
       messages: this.state.messages,
       messagesTotal: this.state.messagesTotal,
-      walletSettings: this.state.walletSettings,
       syncingStatus: this.state.syncingStatus,
       info: this.state.info,
       zecPrice: this.state.zecPrice,
@@ -1854,6 +1814,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       backgroundError: this.state.backgroundError,
       setBackgroundError: this.state.setBackgroundError,
       readOnly: this.state.readOnly,
+      lastError: this.state.lastError,
       orchardPool: this.state.orchardPool,
       saplingPool: this.state.saplingPool,
       transparentPool: this.state.transparentPool,
@@ -2076,7 +2037,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               <Drawer.Screen name={RouteEnum.Settings}>
                 {props => 
                   <Settings {...props}
-                    setWalletOption={this.setWalletOption}
                     setServerOption={this.setServerOption}
                     setCurrencyOption={this.setCurrencyOption}
                     setLanguageOption={this.setLanguageOption}

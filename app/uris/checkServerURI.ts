@@ -22,7 +22,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
     const resultStrServer: string = await Promise.race([resultStrServerPromise, timeoutServerPromise]);
     //console.log(resultStrServer);
 
-    if (!resultStrServer || resultStrServer.toLowerCase().startsWith(GlobalConst.error)) {
+    if (resultStrServer && resultStrServer.toLowerCase().startsWith(GlobalConst.error)) {
       // I have to restore the old server again. Just in case.
       //console.log('changeserver', resultStrServer);
       await RPCModule.changeServerProcess(oldUri);
@@ -42,7 +42,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
         const infoStr: string = await Promise.race([infoStrPromise, timeoutInfoPromise]);
         //console.log(infoStr);
 
-        if (!infoStr || infoStr.toLowerCase().startsWith(GlobalConst.error)) {
+        if (infoStr && infoStr.toLowerCase().startsWith(GlobalConst.error)) {
           //console.log('info', infoStr);
           // I have to restore the old server again.
           await RPCModule.changeServerProcess(oldUri);
@@ -72,7 +72,7 @@ const checkServerURI = async (uri: string, oldUri: string): Promise<checkServerU
         const balanceStr: string = await Promise.race([balanceStrPromise, timeoutInfoPromise]);
         //console.log(balanceStr);
 
-        if (!balanceStr || balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
+        if (balanceStr && balanceStr.toLowerCase().startsWith(GlobalConst.error)) {
           //console.log('info', infoStr);
           // I have to restore the old server again.
           await RPCModule.changeServerProcess(oldUri);
