@@ -74,6 +74,7 @@ import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalance
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import { isEqual } from 'lodash';
 
 type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   // side menu
@@ -263,7 +264,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         JSON.stringify(sendJson),
       );
       //Alert.alert('Calculating the FEE ' + command, runProposeStr);
-      if (runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
+      if (runProposeStr && runProposeStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
         console.log(runProposeStr);
         setProposeSendLastError(runProposeStr);
@@ -335,7 +336,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         console.log('=========================================== > spendable balance with address - ', Date.now() - start);
       }
       console.log(runSpendableBalanceStr);
-      if (runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
+      if (runSpendableBalanceStr && runSpendableBalanceStr.toLowerCase().startsWith(GlobalConst.error)) {
         // snack with error
         console.log(runSpendableBalanceStr);
         setSpendableBalanceLastError(runSpendableBalanceStr);
@@ -604,9 +605,11 @@ const Send: React.FunctionComponent<SendProps> = ({
           label: item.label,
           value: item.address,
         }));
-      setItemsPicker(items);
+      if (!isEqual(items, itemsPicker)) {
+        setItemsPicker(items);
+      }
     })();
-  }, [addressBook, zenniesDonationAddress]);
+  }, [addressBook, itemsPicker, zenniesDonationAddress]);
 
   useEffect(() => {
     if (addressText) {

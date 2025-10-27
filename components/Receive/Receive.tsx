@@ -84,7 +84,10 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   const [heightLayout, setHeightLayout] = useState<number>(10);
 
   const snapPoints = useMemo(() => {
-    const snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
+    let snap1: number = (heightLayout * 100) / Dimensions.get('window').height;
+    if (snap1 < 1) {
+      snap1 = 1;
+    }
     let snap2: number = 80;
     if (snap1 < 80) {
       snap2 = snap1 + 20;

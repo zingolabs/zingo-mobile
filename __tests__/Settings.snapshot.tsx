@@ -13,7 +13,6 @@ import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
 import { mockServer } from '../__mocks__/dataMocks/mockServer';
-import { mockWalletSettings } from '../__mocks__/dataMocks/mockWalletSettings';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -42,7 +41,6 @@ describe('Component Settings - test', () => {
   state.rescanMenu = false;
   state.recoveryWalletInfoOnDevice = true;
   state.donation = false;
-  state.walletSettings = mockWalletSettings;
   const onSetOption = jest.fn();
   const toggle = jest.fn();
   const props = makeDrawerProps();
@@ -50,7 +48,6 @@ describe('Component Settings - test', () => {
     const settings = render(
       <ContextAppLoadedProvider value={state}>
         <Settings {...props}
-          setWalletOption={onSetOption}
           setServerOption={onSetOption}
           setCurrencyOption={onSetOption}
           setLanguageOption={onSetOption}

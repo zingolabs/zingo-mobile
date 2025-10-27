@@ -1,4 +1,4 @@
-import { CurrencyEnum, DownloadMemosEnum, LanguageEnum } from '../../app/AppState';
+import { CurrencyEnum, LanguageEnum } from '../../app/AppState';
 import { RPCPerformanceLevelEnum } from '../../app/rpc/enums/RPCPerformanceLevelEnum';
 
 export const mockTranslate = (p: string) => {
@@ -19,21 +19,6 @@ export const mockTranslate = (p: string) => {
         "restore": ["restore"],
         "backup": ["backup"]
       }`;
-  } else if (p === 'settings.memos') {
-    return [
-      {
-        value: DownloadMemosEnum.noneMemos,
-        text: 'text none',
-      },
-      {
-        value: DownloadMemosEnum.walletMemos,
-        text: 'text wallet',
-      },
-      {
-        value: DownloadMemosEnum.allMemos,
-        text: 'text all',
-      },
-    ];
   } else if (p === 'settings.currencies') {
     return [
       {

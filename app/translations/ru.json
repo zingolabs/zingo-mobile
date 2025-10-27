@@ -1,6 +1,6 @@
 {
   "zingo": "Zingo",
-  "version": "zingo-2.0.9 (280)",
+  "version": "zingo-2.0.10 (289)",
   "loading": "загрузка...",
   "connectingserver": "Подключение к серверу...",
   "wait": "Пожалуйста, подождите...",
@@ -31,6 +31,7 @@
   "share": "Поделиться",
   "confirm": "Подтвердить",
   "support": "Отправить Email",
+  "view-error": "Просмотреть/Сообщить об ошибке",
   "menudrawer-acc": "Открыть панель меню",
   "menu-acc": "Открыть меню",
   "donation": "Спасибо за поддержку ZingoLabs!",
