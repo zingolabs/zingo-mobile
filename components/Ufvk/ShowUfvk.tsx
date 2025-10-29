@@ -10,11 +10,6 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import SingleAddress from '../Components/SingleAddress';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import RegText from '../Components/RegText';
 import { ButtonTypeEnum, ChainNameEnum, ModeEnum, RouteEnum, ScreenEnum, SnackbarDurationEnum, UfvkActionEnum } from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
@@ -49,13 +44,11 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
     server, 
     mode, 
     addLastSnackbar, 
-    language, 
     snackbars, 
     removeFirstSnackbar, 
     setPrivacyOption,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.ShowUfvk;
 

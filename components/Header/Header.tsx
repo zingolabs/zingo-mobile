@@ -45,11 +45,6 @@ import { createAlert } from '../../app/createAlert';
 import { Animated } from 'react-native';
 import FadeText from '../Components/FadeText';
 import simpleBiometrics from '../../app/simpleBiometrics';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import Utils from '../../app/utils';
 import { RPCShieldProposeType } from '../../app/rpc/types/RPCShieldProposeType';
 import RPCModule from '../../app/RPCModule';
@@ -126,7 +121,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     valueTransfersTotal,
     somePending,
     security,
-    language,
     shieldingAmount,
     selectServer,
     setZecPrice,
@@ -157,7 +151,6 @@ const Header: React.FunctionComponent<HeaderProps> = ({
   }
 
   const { colors } = useTheme() as ThemeType;
-  moment.locale(language);
 
   const opacityValue = useRef(new Animated.Value(1)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);

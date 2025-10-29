@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -22,10 +22,6 @@ import {
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
@@ -52,7 +48,6 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
   const context = useContext(ContextAppLoaded);
   const { translate, language, privacy, info, addressBook, addresses, addLastSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
 
   const { memo, memoUA } = Utils.splitMemo(vt.memos);
 
@@ -80,6 +75,10 @@ const MessageLine: React.FunctionComponent<MessageLineProps> = ({
     const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses ? addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.address === add) : [];
     return address.length >= 1;
   };
+
+  useEffect(() => {
+    Utils.setMomentLocale(language);
+  }, [language]);
 
   //console.log('render ValueTransferLine - 5', index, nextLineWithSameTxid);
 

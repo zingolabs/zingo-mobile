@@ -6,11 +6,6 @@ import { useNavigation, useTheme } from '@react-navigation/native';
 
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import {
   AddressKindEnum,
   ButtonTypeEnum,
@@ -65,9 +60,8 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
-  const { translate, privacy, addLastSnackbar, language, mode, addressBook } = context;
+  const { translate, privacy, addLastSnackbar, mode, addressBook } = context;
   const { colors } = useTheme() as ThemeType;
-  moment.locale(language);
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
   const contentHeight = useRef(0);

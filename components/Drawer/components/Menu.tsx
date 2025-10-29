@@ -8,11 +8,6 @@ import { useTheme } from '@react-navigation/native';
 import { ContextAppLoaded } from '../../../app/context';
 import { ThemeType } from '../../../app/types';
 import simpleBiometrics from '../../../app/simpleBiometrics';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import { MenuItemEnum, ModeEnum, ScreenEnum, SelectServerEnum } from '../../../app/AppState';
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 
@@ -31,13 +26,11 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
     valueTransfersTotal,
     addLastSnackbar,
     security,
-    language,
     rescanMenu,
     selectServer,
     netInfo,
   } = context;
   const { colors } = useTheme() as ThemeType;
-  moment.locale(language);
 
   const dimensions = {
     width: Dimensions.get('window').width,

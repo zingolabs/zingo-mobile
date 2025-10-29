@@ -14,10 +14,6 @@ import {
 } from 'react-native';
 
 import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 
 import { useScrollToTop, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -90,7 +86,6 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
     removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
   const screenName = ScreenEnum.ContactList;
 
   const [contacts, setContacts] = useState<ContactType[]>([]);
@@ -249,6 +244,10 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
 
     return cont;
   };
+
+  useEffect(() => {
+    Utils.setMomentLocale(language);
+  }, [language]);
 
   useEffect(() => {
     if (valueTransfers !== null) {

@@ -9,11 +9,6 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
 import DetailLine from '../Components/DetailLine';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { RouteEnum, ScreenEnum } from '../../app/AppState';
@@ -25,9 +20,8 @@ const About: React.FunctionComponent<AboutProps> = ({
   navigation,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { zingolibVersion, translate, language, snackbars, removeFirstSnackbar } = context;
+  const { zingolibVersion, translate, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.About;
 

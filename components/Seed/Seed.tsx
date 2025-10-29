@@ -23,11 +23,6 @@ import {
 import Header from '../Header';
 import Utils from '../../app/utils';
 import SettingsFileImpl from '../Settings/SettingsFileImpl';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -66,13 +61,11 @@ const Seed: React.FunctionComponent<SeedProps> = ({
     addLastSnackbar,
     snackbars,
     removeFirstSnackbar,
-    language,
     setPrivacyOption,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   // when this screen is open from LoadingApp (new wallet)
   // is using the standard modal from react-native
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Seed;
 

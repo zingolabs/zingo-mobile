@@ -19,10 +19,6 @@ import {
   Pressable,
 } from 'react-native';
 import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -108,7 +104,6 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     setPrivacyOption,
   } = context;
   const { colors } = useTheme() as ThemeType;
-  moment.locale(language);
   const screenName = ScreenEnum.MessagesList;
 
   const [numVt, setNumVt] = useState<number>(50);
@@ -207,6 +202,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
       return messages;
     }
   }, [messages, address, anonymous, addressFilter, anonymousFilter]);
+
+  useEffect(() => {
+    Utils.setMomentLocale(language);
+  }, [language]);
 
   useEffect(() => {
     if (messages !== null) {

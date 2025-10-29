@@ -58,11 +58,6 @@ import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
 import { createAlert } from '../../app/createAlert';
 import AddressItem from '../Components/AddressItem';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import { RPCSendProposeType } from '../../app/rpc/types/RPCSendProposeType';
 import ShowAddressAlertAsync from './components/ShowAddressAlertAsync';
 import { sendEmail } from '../../app/sendEmail';
@@ -123,7 +118,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     mode,
     somePending,
     addressBook,
-    language,
     donation,
     addresses,
     defaultUnifiedAddress,
@@ -139,7 +133,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     setPrivacyOption,
   } = context;
   const { colors } = useTheme() as ThemeType;
-  moment.locale(language);
   const screenName = ScreenEnum.Send;
 
   const [memoEnabled, setMemoEnabled] = useState<boolean>(false);

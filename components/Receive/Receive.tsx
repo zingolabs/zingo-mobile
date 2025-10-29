@@ -9,11 +9,6 @@ import SingleAddress from '../Components/SingleAddress';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 
 import {
   AddressKindEnum,
@@ -60,13 +55,11 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     addresses, 
     defaultUnifiedAddress, 
     mode, 
-    language, 
     snackbars, 
     removeFirstSnackbar, 
     addLastSnackbar,
   } = context;
   const { colors } = useTheme() as ThemeType;
-  moment.locale(language);
   const screenName = ScreenEnum.Receive;
 
   const [index, setIndex] = useState<number>(0);

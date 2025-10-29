@@ -11,11 +11,6 @@ import {
   Pressable,
 } from 'react-native';
 import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
-
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
@@ -37,7 +32,7 @@ import Button from '../Components/Button';
 import ValueTransferLine from './components/ValueTransferLine';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
-//import Utils from '../../app/utils';
+import Utils from '../../app/utils';
 import { DataProvider, RecyclerListView, LayoutProvider, RecyclerListViewProps } from 'recyclerlistview';
 import { ScrollEvent } from 'recyclerlistview/dist/reactnative/core/scrollcomponent/BaseScrollView';
 import { isEqual } from 'lodash';
@@ -101,7 +96,6 @@ const History: React.FunctionComponent<HistoryProps> = ({
     setPrivacyOption,
   } = context;
   const { colors } = useTheme() as ThemeType;
-  moment.locale(language);
   const screenName = ScreenEnum.History;
 
   const [numVt, setNumVt] = useState<number>(50);
@@ -200,6 +194,10 @@ const History: React.FunctionComponent<HistoryProps> = ({
     // strictly show VT's with some amount on funds.
     return valueTransfers.filter((vt: ValueTransferType) => (filter === FilterEnum.withFunds ? vt.amount > 0 : true));
   }, [valueTransfers, filter]);
+
+  useEffect(() => {
+    Utils.setMomentLocale(language)
+  }, [language]);
 
   useEffect(() => {
     if (valueTransfers !== null) {

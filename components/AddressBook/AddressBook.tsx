@@ -10,11 +10,6 @@ import {
   Pressable,
 } from 'react-native';
 
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import { AddressBookActionEnum, AddressBookFileClass, ButtonTypeEnum, FilterEnum, GlobalConst, RouteEnum, ScreenEnum } from '../../app/AppState';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
@@ -46,14 +41,12 @@ const AddressBook: React.FunctionComponent<AddressBookProps> = ({
   const context = useContext(ContextAppLoaded);
   const {
     translate,
-    language,
     addressBook,
     zenniesDonationAddress,
     snackbars,
     removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.AddressBook;
 

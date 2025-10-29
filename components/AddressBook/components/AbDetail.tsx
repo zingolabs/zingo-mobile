@@ -19,11 +19,6 @@ import TextInputAddress from '../../Components/TextInputAddress';
 import { parseZcashURI } from '../../../app/uris';
 import Button from '../../Components/Button';
 import FadeText from '../../Components/FadeText';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 
 type AbDetailProps = {
   index: number;
@@ -53,9 +48,8 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   routeStack,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, addressBook, language } = context;
+  const { translate, server, addressBook } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
 
   const [label, setLabel] = useState<string>(item.label);
   const [address, setAddress] = useState<string>(item.address);
