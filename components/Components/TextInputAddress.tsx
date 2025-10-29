@@ -9,11 +9,6 @@ import { ContextAppLoaded } from '../../app/context';
 import { ThemeType } from '../../app/types';
 import ErrorText from './ErrorText';
 import RegText from './RegText';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import Utils from '../../app/utils';
 import { RouteEnum, ScreenEnum } from '../../app/AppState';
 
@@ -37,9 +32,8 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
-  const { translate, server, language } = context;
+  const { translate, server } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
 
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
 

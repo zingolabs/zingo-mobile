@@ -1,9 +1,16 @@
 import { getNumberFormatSettings } from 'react-native-localize';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/pt';
+import 'moment/locale/ru';
+import 'moment/locale/tr';
+
 import { ZecAmountSplitType } from './types/ZecAmountSplitType';
 import {
   ChainNameEnum,
   ContactType,
   GlobalConst,
+  LanguageEnum,
   SendJsonToTypeType,
   SendPageStateClass,
   ServerType,
@@ -423,5 +430,9 @@ export default class Utils {
     const memoTotal = Utils.buildMemo(memo, includeUAMemo, uAddress);
     const len = Buffer.byteLength(memoTotal, GlobalConst.utf8 as BufferEncoding);
     return len;
+  };
+
+  static setMomentLocale = async (language: LanguageEnum) => {
+    moment.locale(language);
   };
 }

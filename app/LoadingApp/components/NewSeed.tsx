@@ -18,11 +18,6 @@ import {
 } from '../../AppState';
 import Header from '../../../components/Header';
 import Utils from '../../utils';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -52,12 +47,10 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
     addLastSnackbar, 
     snackbars, 
     removeFirstSnackbar,
-    language,
     setPrivacyOption,
   } = context;
   const { colors } = useTheme()  as ThemeType;
   const { top, bottom, right, left } = useSafeAreaInsets();
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Seed;
 

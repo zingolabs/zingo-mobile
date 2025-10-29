@@ -22,11 +22,6 @@ import { checkServerURI, parseServerURI, serverUris } from '../../app/uris';
 import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 
 import Header from '../Header';
 import {
@@ -176,7 +171,6 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }
 
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(languageContext);
   const screenName = ScreenEnum.Settings;
 
   const [autoServerUri, setAutoServerUri] = useState<string>('');

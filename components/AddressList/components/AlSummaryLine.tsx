@@ -17,11 +17,6 @@ import {
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 
 type AlSummaryLineProps = {
   index: number;
@@ -38,9 +33,8 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
   screenName,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, addressBook, addLastSnackbar } = context;
+  const { translate, addressBook, addLastSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
 
   const displayAddress: string = item.address ? Utils.trimToSmall(item.address, 7) : (translate('info.unknown') as string);
   const found: AddressBookFileClass[] = addressBook.filter((ab: AddressBookFileClass) => ab.address === item.address);

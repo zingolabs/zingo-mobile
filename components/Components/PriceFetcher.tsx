@@ -7,14 +7,11 @@ import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import FadeText from './FadeText';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import RPC from '../../app/rpc';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
 import { CurrencyEnum, ModeEnum, ScreenEnum } from '../../app/AppState';
+import Utils from '../../app/utils';
 
 type PriceFetcherProps = {
   setZecPrice: (p: number, d: number) => void;
@@ -26,10 +23,13 @@ const PriceFetcher: React.FunctionComponent<PriceFetcherProps> = ({ setZecPrice,
   const context = useContext(ContextAppLoaded);
   const { translate, zecPrice, addLastSnackbar, mode, language, currency } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
 
   const [refreshMinutes, setRefreshMinutes] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    Utils.setMomentLocale(language);
+  }, [language]);
 
   useEffect(() => {
     const fn = () => {

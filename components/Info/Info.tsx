@@ -11,11 +11,6 @@ import PriceFetcher from '../Components/PriceFetcher';
 import Header from '../Header';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import RegText from '../Components/RegText';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import { ChainNameEnum, CurrencyEnum, RouteEnum, ScreenEnum } from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -33,13 +28,11 @@ const Info: React.FunctionComponent<InfoProps> = ({
     currency, 
     zecPrice, 
     privacy, 
-    language, 
     setZecPrice, 
     snackbars, 
     removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Info;
 

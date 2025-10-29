@@ -4,10 +4,6 @@ import { View, ScrollView, TouchableOpacity, Linking, Text, Alert } from 'react-
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 
 import { useNavigation, useTheme } from '@react-navigation/native';
 
@@ -76,7 +72,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     setPrivacyOption,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.ValueTransferDetail;
 
@@ -91,6 +86,10 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
   const isTheFirstMount = useRef(true);
 
   const { memo, memoUA } = Utils.splitMemo(valueTransfer.memos);
+
+  useEffect(() => {
+    Utils.setMomentLocale(language);
+  }, [language]);
 
   useEffect(() => {
     const _index = !!route.params && route.params.index !== undefined ? route.params.index : 0;

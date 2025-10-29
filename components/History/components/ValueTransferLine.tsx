@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Animated, Platform, View, TouchableOpacity } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -29,14 +29,11 @@ import {
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
 import { RPCValueTransfersStatusEnum } from '../../../app/rpc/enums/RPCValueTransfersStatusEnum';
+import Utils from '../../../app/utils';
 //import Utils from '../../../app/utils';
 
 type ValueTransferLineProps = {
@@ -78,7 +75,6 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     setSendPageState,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
 
   //const [messagesAddress, setMessagesAddress] = useState<boolean>(false);
 
@@ -105,6 +101,10 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
       : faArrowUp;
 
   const haveMemo = vt.memos && vt.memos.length > 0 && !!vt.memos.join('');
+
+  useEffect(() => {
+    Utils.setMomentLocale(language);
+  }, [language]);
 
   //useEffect(() => {
   //  setMessagesAddress(Utils.isMessagesAddress(vt));

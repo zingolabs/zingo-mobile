@@ -16,11 +16,6 @@ import { ThemeType } from '../../../app/types';
 import RegText from '../../Components/RegText';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import { useToast } from 'react-native-toastier';
 import { AddressUnifiedTypeEnum } from '../../../app/AppState';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -47,9 +42,8 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
   setHeightLayout,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, addLastSnackbar } = context;
+  const { translate, addLastSnackbar } = context;
   const { colors } = useTheme() as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
 
   const [label, setLabel] = useState<string>('');

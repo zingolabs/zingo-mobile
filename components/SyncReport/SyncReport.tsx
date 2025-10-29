@@ -8,10 +8,6 @@ import { AppDrawerParamList, ThemeType } from '../../app/types';
 import DetailLine from '../Components/DetailLine';
 import { ContextAppLoaded } from '../../app/context';
 import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 
 import Header from '../Header';
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
@@ -29,6 +25,7 @@ import { DrawerScreenProps } from '@react-navigation/drawer';
 import Button from '../Components/Button';
 import { createAlert } from '../../app/createAlert';
 import { sendEmail } from '../../app/sendEmail';
+import Utils from '../../app/utils';
 //import { ModeEnum } from '../../app/AppState';
 
 type SyncReportProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.SyncReport>;
@@ -52,7 +49,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
     addLastSnackbar,
   } = context; //mode
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.SyncReport;
 
@@ -68,6 +64,10 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
 
   const [percentageOutputsScanned, setPercentageOutputsScanned] = useState<number>(0);
   const [syncInProgress, setSyncInProgress] = useState<boolean>(true);
+
+  useEffect(() => {
+    Utils.setMomentLocale(language);
+  }, [language]);
 
   useEffect(() => {
     if (info.latestBlock) {
