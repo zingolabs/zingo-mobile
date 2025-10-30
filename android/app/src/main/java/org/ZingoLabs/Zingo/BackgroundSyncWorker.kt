@@ -87,7 +87,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 put("message", "Crypto Provider Default KO.")
                 put("date", "$timeStampStrStart")
                 put("dateEnd", "$timeStampStrError")
-                put("error", "$msg")
+                put("error", "Crypto Provider Default KO. $msg")
             }
             val jsonBackgroundError = payload.toString()
             rpcModule.saveBackgroundFile(jsonBackgroundError)
@@ -117,7 +117,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                     put("message", "Run sync process KO.")
                     put("date", "$timeStampStrStart")
                     put("dateEnd", "$timeStampStrError")
-                    put("error", "$msg")
+                    put("error", "Run sync process KO. $msg")
                 }
                 val jsonBackgroundError = payload.toString()
                 rpcModule.saveBackgroundFile(jsonBackgroundError)
@@ -149,7 +149,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                             put("message", "Status sync process KO.")
                             put("date", "$timeStampStrStart")
                             put("dateEnd", "$timeStampStrError")
-                            put("error", "$syncStatusJson")
+                            put("error", "Status sync process KO. $syncStatusJson")
                         }
                         val jsonBackgroundError = payload.toString()
                         rpcModule.saveBackgroundFile(jsonBackgroundError)
@@ -167,7 +167,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                         put("message", "Status sync process KO.")
                         put("date", "$timeStampStrStart")
                         put("dateEnd", "$timeStampStrError")
-                        put("error", "$msg")
+                        put("error", "Status sync process KO. $msg")
                     }
                     val jsonBackgroundError = payload.toString()
                     rpcModule.saveBackgroundFile(jsonBackgroundError)
@@ -196,7 +196,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                         put("message", "Status sync parsing process KO.")
                         put("date", "$timeStampStrStart")
                         put("dateEnd", "$timeStampStrError")
-                        put("error", "${e.localizedMessage}")
+                        put("error", "Status sync parsing process KO. ${e.localizedMessage}")
                     }
                     val jsonBackgroundError = payload.toString()
                     rpcModule.saveBackgroundFile(jsonBackgroundError)

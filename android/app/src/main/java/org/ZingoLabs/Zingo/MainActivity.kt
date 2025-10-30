@@ -13,8 +13,6 @@ class MainActivity : ReactActivity() {
      * rendering of the component.
      */
 
-    private var isStarting = true
-
     override fun getMainComponentName(): String = "Zingo"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +28,7 @@ class MainActivity : ReactActivity() {
             fabricEnabled
         )
     }
+
     override fun onPause() {
         Log.i("ON_PAUSE", "Pausing main activity - Background")
         // oreo 8.0 (SDK 26)
@@ -48,15 +47,10 @@ class MainActivity : ReactActivity() {
 
     override fun onResume() {
         Log.i("ON_RESUME", "Resuming main activity - Foreground")
-        // cancel the task if it is in execution now
-        if (isStarting) {
-            // this is the time the App is launching.
-            isStarting = false
-        } else {
-            // oreo 8.0 (SDK 26)
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                BSCompanion.cancelExecutingTask()
-            }
+        // cancel the task always
+        // oreo 8.0 (SDK 26)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            BSCompanion.cancelExecutingTask()
         }
         super.onResume()
     }
