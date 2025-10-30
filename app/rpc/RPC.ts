@@ -296,29 +296,11 @@ export default class RPC {
       }
     }
 
-    if (
-      this.getWalletSaveRequiredLock ||
-      this.fetchWalletHeightLock ||
-      this.fetchWalletBirthdaySeedUfvkLock ||
-      this.fetchInfoAndServerHeightLock ||
-      this.fetchAddressesLock ||
-      this.fetchTotalBalanceLock ||
-      this.fetchTandZandOValueTransfersLock ||
-      this.fetchTandZandOMessagesLock ||
-      this.fetchSyncStatusLock ||
-      this.fetchSyncPollLock ||
-      this.fetchZingolibVersionLock ||
-      this.refreshSyncLock
-    ) {
-      console.log('************ LONG TASKS: No fetching data ************');
-      return;
-    }
-
     const taskPromises: Promise<void>[] = [];
 
     // if the wallet needs to save, means the App needs to fetch all the new data
     if (!(await this.getWalletSaveRequired())) {
-      console.log('NOT SAVE REQUIRED: No fetching data');
+      console.log('***************** NOT SAVE REQUIRED: No fetching data');
       // do need this because of the sync process
       taskPromises.push(
         new Promise<void>(async resolve => {
@@ -342,7 +324,15 @@ export default class RPC {
         this.fetchZingolibVersionLock ||
         this.refreshSyncLock
       ) {
-        console.log('LONG TASKS: No fetching data');
+        console.log('***************** LONG TASKS: No fetching data');
+        // do need this because of the sync process
+        taskPromises.push(
+          new Promise<void>(async resolve => {
+            await this.fetchSyncPoll();
+            //console.log('INTERVAL poll sync');
+            resolve();
+          }),
+        );
       } else {
         // do need this because of the sync process
         taskPromises.push(
@@ -614,7 +604,7 @@ export default class RPC {
   // do not use it for now...
   async fetchSyncPoll(): Promise<void> {
     if (this.fetchSyncPollLock) {
-      //console.log('sync poll locked');
+      console.log('***************** SYNC POLL - locked');
       return;
     }
     this.fetchSyncPollLock = true;
