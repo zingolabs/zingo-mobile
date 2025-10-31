@@ -99,6 +99,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     if #available(iOS 13.0, *) {
       NSLog("BGTask foreground")
       self.cancelExecutingTask()
+
+      NSLog("BGTask background - scheduleBackgroundTask")
+      self.scheduleBackgroundTask()
+      NSLog("BGTask background - scheduleSchedulerBackgroundTask")
+      self.scheduleSchedulerBackgroundTask()
     }
   }
 

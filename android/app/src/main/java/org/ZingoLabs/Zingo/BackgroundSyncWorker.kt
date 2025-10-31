@@ -262,7 +262,6 @@ class BSCompanion {
         @RequiresApi(Build.VERSION_CODES.O)
         fun scheduleBackgroundTask() {
             val context = MainApplication.getAppContext() as Context
-            // zancas requeriment, not plug-in, reverted.
             val constraints = Constraints.Builder()
                 .setRequiresStorageNotLow(false) // less restricted
                 .setRequiredNetworkType(NetworkType.UNMETERED)

@@ -51,6 +51,7 @@ class MainActivity : ReactActivity() {
         // oreo 8.0 (SDK 26)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             BSCompanion.cancelExecutingTask()
+            BSCompanion.scheduleBackgroundTask()
         }
         super.onResume()
     }
