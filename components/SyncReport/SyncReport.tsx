@@ -55,7 +55,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
   const [maxBlocks, setMaxBlocks] = useState<number>(0);
   const [points, setPoints] = useState<number[]>([]);
   const [labels, setLabels] = useState<string[]>([]);
-  const [showBackgroundLegend, setShowBackgroundLegend] = useState<boolean>(true);
   const [serverServer, setServerServer] = useState<number>(0);
   const [serverWallet, setServerWallet] = useState<number>(0);
   const [server1Percent, setServer1Percent] = useState<number>(0);
@@ -110,15 +109,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
       })();
     }
   }, [info.latestBlock]);
-
-  // because this screen is fired from more places than the menu.
-  useFocusEffect(
-    useCallback(() => {
-      if (showBackgroundLegend && !background.error) {
-        setTimeout(() => setShowBackgroundLegend(false), 10 * 1000); // 10 seconds.
-      }
-    }, [showBackgroundLegend, background.error])
-  );
 
   useEffect(() => {
     if (!syncingStatus || isEqual(syncingStatus, {} as RPCSyncStatusType) || (!!syncingStatus.scan_ranges && syncingStatus.scan_ranges.length === 0) || syncingStatus.percentage_total_outputs_scanned === 0) {
@@ -215,7 +205,6 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
           noPrivacy={true}
           noUfvkIcon={true}
           closeScreen={() => {
-            setShowBackgroundLegend(true);
             clear();
             if (navigation.canGoBack()) {
               navigation.goBack();
@@ -601,8 +590,7 @@ const SyncReport: React.FunctionComponent<SyncReportProps> = ({
               <ActivityIndicator size="large" color={colors.primary} />
             </View>
           )}
-          {(Number(background.date) > 0 || Number(background.dateEnd) > 0 || !!background.message || !!background.error) &&
-            showBackgroundLegend && (
+          {(Number(background.date) > 0 || Number(background.dateEnd) > 0 || !!background.message || !!background.error) && (
               <View
                 style={{
                   display: 'flex',

@@ -100,9 +100,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       NSLog("BGTask foreground")
       self.cancelExecutingTask()
 
-      NSLog("BGTask background - scheduleBackgroundTask")
+      NSLog("BGTask foreground - scheduleBackgroundTask")
       self.scheduleBackgroundTask()
-      NSLog("BGTask background - scheduleSchedulerBackgroundTask")
+      NSLog("BGTask foreground - scheduleSchedulerBackgroundTask")
       self.scheduleSchedulerBackgroundTask()
     }
   }
@@ -255,17 +255,19 @@ extension AppDelegate {
             return
         }
       
+        // TESTING
         //let oneMinuteLater = Date().addingTimeInterval(60)
         //request.earliestBeginDate = oneMinuteLater
+        //NSLog("BGTask scheduleBackgroundTask date test calculated: \(String(describing: oneMinuteLater))")
 
+        // PRODUCTION
         let earlyMorningComponent = DateComponents(hour: 3, minute: Int.random(in: 0...60))
         let earlyMorning = Calendar.current.date(byAdding: earlyMorningComponent, to: tomorrow)
         request.earliestBeginDate = earlyMorning
+        NSLog("BGTask scheduleBackgroundTask date calculated: \(String(describing: earlyMorning))")
+        
         request.requiresExternalPower = true
         request.requiresNetworkConnectivity = true
-      
-        NSLog("BGTask scheduleBackgroundTask date calculated: \(String(describing: earlyMorning))")
-        //NSLog("BGTask scheduleBackgroundTask date test calculated: \(String(describing: oneMinuteLater))")
         
         do {
             try BGTaskScheduler.shared.submit(request)
@@ -303,11 +305,51 @@ extension AppDelegate {
             NSLog("BGTask scheduleSchedulerBackgroundTask failed to submit, error: \(error)")
         }
     }
+  
+    func isAppInForeground() -> Bool {
+        var result = false
+        DispatchQueue.main.sync {
+            result = UIApplication.shared.applicationState == .active
+        }
+        return result
+    }
 
     func syncingProcessBackgroundTask() {
         let rpcmodule = RPCModule()
 
         NSLog("BGTask syncingProcessBackgroundTask")
+      
+        // save the background file
+        let timeStampStart = Date().timeIntervalSince1970
+        self.timeStampStrStart = String(format: "%.0f", timeStampStart)
+        let jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"0\"}"
+        do {
+          try rpcmodule.saveBackgroundFile(jsonBackgroundStart)
+          NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundStart)")
+        } catch {
+          NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundStart) error: \(error.localizedDescription)")
+        }
+      
+        if isAppInForeground() {
+          NSLog("BGTask syncingProcessBackgroundTask - App in Foreground - cancel background task")
+
+          // save the background file
+          let timeStampError = Date().timeIntervalSince1970
+          let timeStampStrError = String(format: "%.0f", timeStampError)
+          let jsonBackgroundError = "{\"batches\": \"0\", \"message\": \"App in Foreground, Background task KO.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"\(timeStampStrError)\"}"
+          do {
+            try rpcmodule.saveBackgroundFile(jsonBackgroundError)
+            NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError)")
+          } catch {
+            NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundError) error: \(error.localizedDescription)")
+          }
+          
+          if let task = self.bgTask {
+            task.setTaskCompleted(success: false)
+          }
+          bgTask = nil
+          return
+        }
 
         do {
           let setCrytoProvider = try setCryptoDefaultProviderToRing()
@@ -333,17 +375,6 @@ extension AppDelegate {
           }
           bgTask = nil
           return
-        }
-        
-        // save the background file
-        let timeStampStart = Date().timeIntervalSince1970
-        self.timeStampStrStart = String(format: "%.0f", timeStampStart)
-        let jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"\(self.timeStampStrStart ?? "0")\", \"dateEnd\": \"0\"}"
-        do {
-          try rpcmodule.saveBackgroundFile(jsonBackgroundStart)
-          NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundStart)")
-        } catch {
-          NSLog("BGTask syncingProcessBackgroundTask - Save background JSON \(jsonBackgroundStart) error: \(error.localizedDescription)")
         }
 
         var exists: String = "false"
