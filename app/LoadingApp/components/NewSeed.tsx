@@ -20,7 +20,6 @@ import Header from '../../../components/Header';
 import Utils from '../../utils';
 import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type TextsType = {
   new: string[];
@@ -50,7 +49,6 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
     setPrivacyOption,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { top, bottom, right, left } = useSafeAreaInsets();
   const { clear } = useToast();
   const screenName = ScreenEnum.Seed;
 
@@ -111,10 +109,6 @@ const NewSeed: React.FunctionComponent<NewSeedProps> = ({
 
       <View
         style={{
-          marginTop: top,
-          marginBottom: bottom,
-          marginRight: right,
-          marginLeft: left,
           flex: 1,
           backgroundColor: colors.background,
         }}>

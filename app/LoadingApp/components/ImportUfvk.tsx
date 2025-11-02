@@ -25,7 +25,6 @@ import RPCModule from '../../RPCModule';
 import { ButtonTypeEnum, GlobalConst, ScreenEnum, SelectServerEnum } from '../../AppState';
 import Snackbars from '../../../components/Components/Snackbars';
 import { ToastProvider } from 'react-native-toastier';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type ImportUfvkProps = {
   onClickCancel: () => void;
@@ -35,7 +34,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   const context = useContext(ContextAppLoading);
   const { translate, netInfo, server, mode, addLastSnackbar, selectServer, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
-  const { top, bottom, right, left } = useSafeAreaInsets();
   const screenName = ScreenEnum.ImportUfvk;
 
   const [seedufvkText, setSeedufvkText] = useState<string>('');
@@ -133,10 +131,6 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
       >
         <View
           style={{
-            marginTop: top,
-            marginBottom: bottom,
-            marginRight: right,
-            marginLeft: left,
             flex: 1,
             backgroundColor: colors.background,
           }}>
