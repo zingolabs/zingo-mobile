@@ -13,11 +13,6 @@ import Header from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import FadeText from '../Components/FadeText';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { RouteEnum, ScreenEnum } from '../../app/AppState';
@@ -36,7 +31,6 @@ const Pools: React.FunctionComponent<PoolsProps> = ({
     privacy, 
     addLastSnackbar, 
     somePending, 
-    language, 
     shieldingAmount, 
     snackbars, 
     removeFirstSnackbar, 
@@ -46,7 +40,6 @@ const Pools: React.FunctionComponent<PoolsProps> = ({
     setPrivacyOption,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Pools;
 

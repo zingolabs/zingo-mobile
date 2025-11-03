@@ -891,6 +891,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setSyncingStatus = (syncingStatus: RPCSyncStatusType) => {
+    // here is a good place to fetch the background task info
+    this.fetchBackgroundSyncing();
     if (!isEqual(this.state.syncingStatus, syncingStatus)) {
       //console.log('fetch syncing status report');
       //const start = Date.now();

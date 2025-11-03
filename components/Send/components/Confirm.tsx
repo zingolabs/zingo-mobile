@@ -13,11 +13,6 @@ import { ContextAppLoaded } from '../../../app/context';
 import Header from '../../Header';
 import AddressItem from '../../Components/AddressItem';
 import simpleBiometrics from '../../../app/simpleBiometrics';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 
 import { AppDrawerParamList, ThemeType } from '../../../app/types';
 import Utils from '../../../app/utils';
@@ -57,12 +52,10 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     addLastSnackbar,
     server,
     security,
-    language,
     snackbars,
     removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Confirm;
 

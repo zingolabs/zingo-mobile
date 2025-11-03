@@ -18,11 +18,6 @@ import {
 import Utils from '../../../app/utils';
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 
 type AbSummaryLineProps = {
   index: number;
@@ -49,9 +44,8 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly, mode, totalBalance, language, selectServer, setSendPageState } = context;
+  const { translate, readOnly, mode, totalBalance, selectServer, setSendPageState } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
 
   const displayAddress: string = item.address ? Utils.trimToSmall(item.address, 7) : (translate('info.unknown') as string);
   const displayContact: string = item.label

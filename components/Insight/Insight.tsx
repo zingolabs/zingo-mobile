@@ -19,11 +19,6 @@ import Header from '../Header';
 import RPCModule from '../../app/RPCModule';
 import AddressItem from '../Components/AddressItem';
 import { RouteEnum, ScreenEnum, SnackbarDurationEnum } from '../../app/AppState';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -53,13 +48,11 @@ const Insight: React.FunctionComponent<InsightProps> = ({
     translate, 
     privacy, 
     addLastSnackbar, 
-    language, 
     snackbars, 
     removeFirstSnackbar, 
     setPrivacyOption,
   } = context;
   const { colors } = useTheme() as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Insight;
 

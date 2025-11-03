@@ -9,11 +9,6 @@ import {
   Pressable,
 } from 'react-native';
 
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import { useTheme, useScrollToTop } from '@react-navigation/native';
 import { AddressKindEnum, ButtonTypeEnum, RouteEnum, ScreenEnum, TransparentAddressClass, UnifiedAddressClass } from '../../app/AppState';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
@@ -39,13 +34,11 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
   const context = useContext(ContextAppLoaded);
   const {
     translate,
-    language,
     addresses,
     snackbars,
     removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.AddressList;
 

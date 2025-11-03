@@ -25,10 +25,6 @@ import {
 } from '../../../app/AppState';
 import { ThemeType } from '../../../app/types';
 import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 
 import { ContextAppLoaded } from '../../../app/context';
 import AddressItem from '../../Components/AddressItem';
@@ -62,7 +58,6 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
     setSendPageState, 
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
 
   const [messagesAddress, setMessagesAddress] = useState<boolean>(false);
 
@@ -107,6 +102,10 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
     const { memo } = Utils.splitMemo(_c.memos);
     return memo;
   };
+
+  useEffect(() => {
+    Utils.setMomentLocale(language);
+  }, [language]);
 
   useEffect(() => {
     setMessagesAddress(Utils.isMessagesAddress(c));

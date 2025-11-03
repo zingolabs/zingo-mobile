@@ -18,11 +18,6 @@ import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { ButtonTypeEnum, GlobalConst, RouteEnum, ScreenEnum } from '../../app/AppState';
@@ -40,9 +35,8 @@ const Memo: React.FunctionComponent<MemoProps> = ({
 }) => {
   const setMessage = !!route.params && route.params.setMessage !== undefined ? route.params.setMessage : () => {};
   const context = useContext(ContextAppLoaded);
-  const { translate, language, defaultUnifiedAddress, snackbars, removeFirstSnackbar } = context;
+  const { translate, defaultUnifiedAddress, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme() as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Memo;
 

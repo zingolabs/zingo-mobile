@@ -8,11 +8,6 @@ import FadeText from './FadeText';
 import RegText from './RegText';
 import { ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import { ScreenEnum, SnackbarDurationEnum } from '../../app/AppState';
 
 type DetailLineProps = {
@@ -26,8 +21,7 @@ type DetailLineProps = {
 const DetailLine: React.FunctionComponent<DetailLineProps> = ({ label, value, children, testID, screenName }) => {
   const { colors } = useTheme()  as ThemeType;
   const context = useContext(ContextAppLoaded);
-  const { addLastSnackbar, translate, language } = context;
-  moment.locale(language);
+  const { addLastSnackbar, translate } = context;
 
   return (
     <View style={{ display: 'flex', marginTop: 20 }}>

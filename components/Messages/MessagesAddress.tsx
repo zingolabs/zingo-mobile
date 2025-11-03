@@ -1,15 +1,9 @@
 
-import React, { useContext } from 'react';
+import React from 'react';
 //import { SelectServerEnum, SendPageStateClass, ServerType } from '../../app/AppState';
 import { RouteEnum } from '../../app/AppState';
 //import MessageList from './components/MessageList';
 
-import { ContextAppLoaded } from '../../app/context';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../../app/types';
 //import { useToast } from 'react-native-toastier';
@@ -25,9 +19,6 @@ const MessagesAddress: React.FunctionComponent<MessagesAddressProps> = ({
   //const address = route.params.address;
   //const sendTransaction = route.params.sendTransaction;
   //const setServerOption = route.params.setServerOption;
-  const context = useContext(ContextAppLoaded);
-  const { language } = context;
-  moment.locale(language);
   //const { clear } = useToast();
 
   return null;

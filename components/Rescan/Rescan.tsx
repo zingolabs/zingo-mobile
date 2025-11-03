@@ -9,11 +9,6 @@ import Button from '../Components/Button';
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import { ContextAppLoaded } from '../../app/context';
 import Header from '../Header';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import { ButtonTypeEnum, RouteEnum, ScreenEnum, SelectServerEnum, SnackbarDurationEnum } from '../../app/AppState';
 import Snackbars from '../Components/Snackbars';
 import { ToastProvider, useToast } from 'react-native-toastier';
@@ -33,13 +28,11 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
     translate, 
     netInfo, 
     addLastSnackbar, 
-    language, 
     selectServer, 
     snackbars, 
     removeFirstSnackbar,
   } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.Rescan;
 

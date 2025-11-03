@@ -1,14 +1,8 @@
 
-import React, { useContext } from 'react';
+import React from 'react';
 import { RouteEnum } from '../../app/AppState';
 //import MessageList from './components/MessageList';
 
-import { ContextAppLoaded } from '../../app/context';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../../app/types';
 
@@ -22,9 +16,6 @@ const MessagesAll: React.FunctionComponent<MessagesAllProps> = ({
 }) => {
   //const setScrollToBottom = route.params.setScrollToBottom;
   //const scrollToBottom = route.params.scrollToBottom;
-  const context = useContext(ContextAppLoaded);
-  const { language } = context;
-  moment.locale(language);
   //const { clear } = useToast();
 
   return null;

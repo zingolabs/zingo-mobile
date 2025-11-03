@@ -7,11 +7,6 @@ import { ButtonTypeEnum, GlobalConst, ScreenEnum, SnackbarDurationEnum } from '.
 import { ThemeType } from '../../../app/types';
 import { ContextAppLoaded } from '../../../app/context';
 import Button from '../../Components/Button';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import { useToast } from 'react-native-toastier';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -35,9 +30,8 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   setHeightLayout,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language, addLastSnackbar, server } = context;
+  const { translate, addLastSnackbar, server } = context;
   const { colors } = useTheme() as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
 
   const [address, setAddress] = useState<string>('');

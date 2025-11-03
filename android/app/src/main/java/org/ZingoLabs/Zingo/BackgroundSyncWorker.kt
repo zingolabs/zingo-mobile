@@ -1,6 +1,7 @@
 package org.ZingoLabs.Zingo
 
 import android.content.Context
+import android.app.ActivityManager
 import android.os.Build
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -58,6 +59,21 @@ data class SyncStatus (
 class BackgroundSyncWorker(private val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     private val rpcModule = RPCModule(MainApplication.getAppReactContext())
 
+    fun isAppInForeground(context: Context): Boolean {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val appProcesses = activityManager.runningAppProcesses ?: return false
+
+        val packageName = context.packageName
+        for (appProcess in appProcesses) {
+            if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&
+                appProcess.processName == packageName
+            ) {
+                return true
+            }
+        }
+        return false
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun doWork(): Result {
 
@@ -71,6 +87,23 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
         val jsonBackgroundStart = "{\"batches\": \"0\", \"message\": \"Starting OK.\", \"date\": \"$timeStampStrStart\", \"dateEnd\": \"0\"}"
         rpcModule.saveBackgroundFile(jsonBackgroundStart)
         Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundStart")
+
+        if (isAppInForeground(context)) {
+            Log.i("SCHEDULED_TASK_RUN", "App in Foreground, cancel background task")
+            // save the background JSON file
+            val timeStampError = Date().time / 1000
+            val timeStampStrError = timeStampError.toString()
+            val payload = JSONObject().apply {
+                put("batches", "0")
+                put("message", "App in Foreground, Background task KO.")
+                put("date", "$timeStampStrStart")
+                put("dateEnd", "$timeStampStrError")
+            }
+            val jsonBackgroundError = payload.toString()
+            rpcModule.saveBackgroundFile(jsonBackgroundError)
+            Log.i("SCHEDULED_TASK_RUN", "background json file SAVED $jsonBackgroundError")
+            return Result.failure()
+        }
 
         try {
             // if the App is close, it need this at first step.
@@ -87,7 +120,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                 put("message", "Crypto Provider Default KO.")
                 put("date", "$timeStampStrStart")
                 put("dateEnd", "$timeStampStrError")
-                put("error", "$msg")
+                put("error", "Crypto Provider Default KO. $msg")
             }
             val jsonBackgroundError = payload.toString()
             rpcModule.saveBackgroundFile(jsonBackgroundError)
@@ -117,7 +150,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                     put("message", "Run sync process KO.")
                     put("date", "$timeStampStrStart")
                     put("dateEnd", "$timeStampStrError")
-                    put("error", "$msg")
+                    put("error", "Run sync process KO. $msg")
                 }
                 val jsonBackgroundError = payload.toString()
                 rpcModule.saveBackgroundFile(jsonBackgroundError)
@@ -149,7 +182,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                             put("message", "Status sync process KO.")
                             put("date", "$timeStampStrStart")
                             put("dateEnd", "$timeStampStrError")
-                            put("error", "$syncStatusJson")
+                            put("error", "Status sync process KO. $syncStatusJson")
                         }
                         val jsonBackgroundError = payload.toString()
                         rpcModule.saveBackgroundFile(jsonBackgroundError)
@@ -167,7 +200,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                         put("message", "Status sync process KO.")
                         put("date", "$timeStampStrStart")
                         put("dateEnd", "$timeStampStrError")
-                        put("error", "$msg")
+                        put("error", "Status sync process KO. $msg")
                     }
                     val jsonBackgroundError = payload.toString()
                     rpcModule.saveBackgroundFile(jsonBackgroundError)
@@ -196,7 +229,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
                         put("message", "Status sync parsing process KO.")
                         put("date", "$timeStampStrStart")
                         put("dateEnd", "$timeStampStrError")
-                        put("error", "${e.localizedMessage}")
+                        put("error", "Status sync parsing process KO. ${e.localizedMessage}")
                     }
                     val jsonBackgroundError = payload.toString()
                     rpcModule.saveBackgroundFile(jsonBackgroundError)
@@ -262,7 +295,6 @@ class BSCompanion {
         @RequiresApi(Build.VERSION_CODES.O)
         fun scheduleBackgroundTask() {
             val context = MainApplication.getAppContext() as Context
-            // zancas requeriment, not plug-in, reverted.
             val constraints = Constraints.Builder()
                 .setRequiresStorageNotLow(false) // less restricted
                 .setRequiredNetworkType(NetworkType.UNMETERED)

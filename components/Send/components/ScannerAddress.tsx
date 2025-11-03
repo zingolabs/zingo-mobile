@@ -3,11 +3,6 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import { ContextAppLoaded } from '../../../app/context';
 import Scanner from '../../Scanner';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import { GlobalConst, RouteEnum, ScreenEnum } from '../../../app/AppState';
 import Header from '../../Header';
 import { useTheme } from '@react-navigation/native';
@@ -26,9 +21,8 @@ const ScannerAddress: React.FunctionComponent<ScannerAddressProps> = ({
  }) => {
   const setAddress = !!route.params && route.params.setAddress !== undefined ? route.params.setAddress : () => {};
   const context = useContext(ContextAppLoaded);
-  const { translate, language, snackbars, removeFirstSnackbar } = context;
+  const { translate, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
-  moment.locale(language);
   const { clear } = useToast();
   const screenName = ScreenEnum.ScannerAddress;
 

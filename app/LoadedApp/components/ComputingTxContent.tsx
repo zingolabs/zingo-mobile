@@ -7,11 +7,6 @@ import RegText from '../../../components/Components/RegText';
 import { AppDrawerParamList, ThemeType } from '../../types';
 import { ContextAppLoaded } from '../../context';
 import Header from '../../../components/Header';
-import moment from 'moment';
-import 'moment/locale/es';
-import 'moment/locale/pt';
-import 'moment/locale/ru';
-import 'moment/locale/tr';
 import { RouteEnum, ScreenEnum } from '../../AppState';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 
@@ -19,9 +14,8 @@ type ComputingTxContentProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.C
 
 const ComputingTxContent: React.FunctionComponent<ComputingTxContentProps> = ({}) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, language } = context;
+  const { translate } = context;
   const { colors } = useTheme() as ThemeType;
-  moment.locale(language);
   const screenName = ScreenEnum.ComputingTxContext;
 
   return (
