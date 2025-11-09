@@ -206,7 +206,7 @@ where
             g
         }
     };
-    f(&mut *guard)
+    f(&mut guard)
 }
 
 fn reset_lightclient() {
