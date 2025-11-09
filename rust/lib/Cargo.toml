@@ -5,32 +5,48 @@ authors = ["Zingolabs <zingo@zingolabs.com>"]
 edition = "2024"
 
 [dependencies]
-zingolib = { workspace = true }
-pepper-sync = { workspace = true }
+zingolib = { git = "https://github.com/zingolabs/zingolib", default-features = true, tag = "2.0.7", features = [
+    "testutils",
+] }
+pepper-sync = { git = "https://github.com/zingolabs/zingolib", tag = "2.0.7" }
 
-http = { workspace = true }
-json = { workspace = true }
-lazy_static = { workspace = true }
-base64 = { workspace = true }
-hex = { workspace = true }
-android_logger = { workspace = true }
-log = { workspace = true }
-uniffi = { workspace = true, features = ["cli"] }
-tokio = { workspace = true }
-rustls = { workspace = true }
-serde_json = { workspace = true }
-bip0039 = { workspace = true }
-thiserror = { workspace = true }
-once_cell = { workspace = true }
+http = "1.1.0"
+json = "0.12.4"
+lazy_static = "1.4.0"
+hex = "0.4"
+android_logger = "0.11"
+base64 = "0.22"
+log = "0.4"
+uniffi = "0.29"
+tokio = { version = "1", features = ["full"] }
+rustls = { version = "0.23", features = ["ring"] }
+serde_json = "1"
+bip0039 = { version = "0.12", features = ["rand"] }
+thiserror = "1"
+once_cell = "1"
 
-zcash_primitives = { workspace = true }
-zcash_keys = { workspace = true }
-zcash_address = { workspace = true }
-zcash_protocol = { workspace = true }
-zcash_client_backend = { workspace = true }
+zcash_primitives = { git = "https://github.com/zcash/librustzcash", rev = "d387aed7e04e881dbe30c6ff8b26a96c834c094b" }
+zcash_keys = { git = "https://github.com/zcash/librustzcash", rev = "d387aed7e04e881dbe30c6ff8b26a96c834c094b", features = [
+    "transparent-inputs",
+    "sapling",
+    "orchard",
+] }
+zcash_address = { git = "https://github.com/zcash/librustzcash", rev = "d387aed7e04e881dbe30c6ff8b26a96c834c094b" }
+zcash_protocol = { git = "https://github.com/zcash/librustzcash", rev = "d387aed7e04e881dbe30c6ff8b26a96c834c094b", features = [
+    "local-consensus",
+] }
+zcash_client_backend = { git = "https://github.com/zcash/librustzcash", rev = "d387aed7e04e881dbe30c6ff8b26a96c834c094b", features = [
+    "lightwalletd-tonic",
+    "orchard",
+    "transparent-inputs",
+    "tor",
+] }
+
+[patch.crates-io]
+zcash_script = { git = "https://github.com/juanky201271/zcash_script", branch = "fixing_cross_compiling_32_bits_v_0.3.2" }
 
 [build-dependencies]
-uniffi_build = { workspace = true, features = ["builtin-bindgen"] }
+uniffi_build = { version = "0.29", features = ["builtin-bindgen"] }
 
 [lib]
 crate-type = ["cdylib", "staticlib"]
@@ -39,3 +55,4 @@ name = "zingo"
 [[bin]]
 name = "uniffi-bindgen"
 path = "uniffi-bindgen.rs"
+required-features = ["uniffi/cli"]
