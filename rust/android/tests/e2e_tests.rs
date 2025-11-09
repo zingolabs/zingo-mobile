@@ -11,8 +11,7 @@ const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
 
 async fn tex_send_address(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
         match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
@@ -41,8 +40,7 @@ async fn tex_send_address(abi: &str) {
 
 async fn shielding(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_transparent_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_transparent_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
         match regchest_utils::launch(UNIX_SOCKET, Some("funded_transparent_mobileclient")).await {
@@ -70,8 +68,7 @@ async fn shielding(abi: &str) {
 
 async fn parse_invalid_address(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
         match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
@@ -101,8 +98,7 @@ async fn parse_invalid_address(abi: &str) {
 
 async fn reload_while_tx_pending(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
         match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
@@ -147,8 +143,7 @@ async fn change_custom_server(abi: &str) {
 
 async fn change_custom_regtest_server(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
         match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
@@ -234,8 +229,7 @@ async fn screen_awake(abi: &str) {
 
 async fn send(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
         match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
@@ -357,7 +351,6 @@ mod e2e {
         async fn transaction_history() {
             crate::transaction_history(ABI).await;
         }
-
     }
 
     mod x86_64 {
@@ -427,7 +420,6 @@ mod e2e {
         async fn transaction_history() {
             crate::transaction_history(ABI).await;
         }
-
     }
 
     mod arm32 {
@@ -497,7 +489,6 @@ mod e2e {
         async fn transaction_history() {
             crate::transaction_history(ABI).await;
         }
-
     }
 
     mod arm64 {
@@ -567,6 +558,5 @@ mod e2e {
         async fn transaction_history() {
             crate::transaction_history(ABI).await;
         }
-
     }
 }
