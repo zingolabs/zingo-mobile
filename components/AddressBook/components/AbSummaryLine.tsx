@@ -44,7 +44,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
-  const { translate, readOnly, mode, totalBalance, selectServer, setSendPageState } = context;
+  const { translate, readOnly, mode, totalBalance, selectLightWalletServer, setSendPageState } = context;
   const { colors } = useTheme()  as ThemeType;
 
   const displayAddress: string = item.address ? Utils.trimToSmall(item.address, 7) : (translate('info.unknown') as string);
@@ -138,7 +138,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           </View>
         )}
         {!readOnly &&
-          selectServer !== SelectServerEnum.offline &&
+          selectLightWalletServer !== SelectServerEnum.offline &&
           !addressProtected &&
           !(
             mode === ModeEnum.basic &&

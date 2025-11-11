@@ -12,7 +12,7 @@ import { LanguageEnum, CurrencyEnum, RouteEnum } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import { mockServer } from '../__mocks__/dataMocks/mockServer';
+import { mockLightWalletServer } from '../__mocks__/dataMocks/mockServer';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';
@@ -34,7 +34,7 @@ describe('Component Settings - test', () => {
   state.translate = mockTranslate;
   state.info = mockInfo;
   state.totalBalance = mockTotalBalance;
-  state.server = mockServer;
+  state.lightWalletserver = mockLightWalletServer;
   state.currency = CurrencyEnum.USDCurrency;
   state.language = LanguageEnum.en;
   state.sendAll = false;

@@ -52,7 +52,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
     readOnly,
     mode,
     totalBalance,
-    selectServer,
+    selectLightWalletServer,
     setSendPageState,
   } = context;
   const { colors } = useTheme() as ThemeType;
@@ -177,7 +177,7 @@ const AddressItem: React.FunctionComponent<AddressItemProps> = ({
             !addressProtected &&
             contact &&
             !readOnly &&
-            selectServer !== SelectServerEnum.offline &&
+            selectLightWalletServer !== SelectServerEnum.offline &&
             !(
               mode === ModeEnum.basic &&
               totalBalance &&

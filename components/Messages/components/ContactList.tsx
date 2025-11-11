@@ -77,7 +77,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
     translate, 
     valueTransfers, 
     language, 
-    server, 
+    lightWalletserver, 
     addressBook, 
     addresses, 
     doRefresh, 
@@ -258,7 +258,7 @@ const ContactList: React.FunctionComponent<ContactListProps> = ({
       }, 500);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addressBook, server.chainName, valueTransfers, searchMode, loading, filter]);
+  }, [addressBook, lightWalletserver.chainName, valueTransfers, searchMode, loading, filter]);
 
   useEffect(() => {
     if (scrollToTop) {

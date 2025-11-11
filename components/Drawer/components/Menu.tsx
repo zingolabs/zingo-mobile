@@ -27,7 +27,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
     addLastSnackbar,
     security,
     rescanMenu,
-    selectServer,
+    selectLightWalletServer,
     netInfo,
   } = context;
   const { colors } = useTheme() as ThemeType;
@@ -94,7 +94,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
             {translate('loadedapp.about') as string}
           </RegText>
 
-          {mode !== ModeEnum.basic && selectServer !== SelectServerEnum.offline && (
+          {mode !== ModeEnum.basic && selectLightWalletServer !== SelectServerEnum.offline && (
             <RegText testID="menu.info" onPress={() => onItemSelectedWrapper(MenuItemEnum.Info)} style={item}>
               {translate('loadedapp.info') as string}
             </RegText>
@@ -122,13 +122,13 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
             </RegText>
           )}
 
-          {mode !== ModeEnum.basic && rescanMenu && selectServer !== SelectServerEnum.offline && (
+          {mode !== ModeEnum.basic && rescanMenu && selectLightWalletServer !== SelectServerEnum.offline && (
             <RegText testID="menu.rescan" onPress={() => onItemSelectedWrapper(MenuItemEnum.Rescan)} style={item}>
               {translate('loadedapp.rescanwallet') as string}
             </RegText>
           )}
 
-          {mode !== ModeEnum.basic && selectServer !== SelectServerEnum.offline && (
+          {mode !== ModeEnum.basic && selectLightWalletServer !== SelectServerEnum.offline && (
             <RegText
               testID="menu.syncreport"
               onPress={() => onItemSelectedWrapper(MenuItemEnum.SyncReport)}
@@ -152,7 +152,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
             </RegText>
           )}
 
-          {mode !== ModeEnum.basic && netInfo.isConnected && selectServer !== SelectServerEnum.offline && (
+          {mode !== ModeEnum.basic && netInfo.isConnected && selectLightWalletServer !== SelectServerEnum.offline && (
             <RegText
               testID="menu.changewallet"
               onPress={() => onItemSelectedWrapper(MenuItemEnum.ChangeWallet)}
@@ -173,7 +173,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
             valueTransfersTotal !== null &&
             valueTransfersTotal === 0 &&
             netInfo.isConnected &&
-            selectServer !== SelectServerEnum.offline && (
+            selectLightWalletServer !== SelectServerEnum.offline && (
               <RegText
                 testID="menu.loadwalletfromseed"
                 onPress={() => onItemSelectedWrapper(MenuItemEnum.LoadWalletFromSeed)}
@@ -181,7 +181,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
                 {translate('loadedapp.loadwalletfromseed-basic') as string}
               </RegText>
             )}
-          {mode === ModeEnum.basic && !readOnly && selectServer !== SelectServerEnum.offline && (
+          {mode === ModeEnum.basic && !readOnly && selectLightWalletServer !== SelectServerEnum.offline && (
             <RegText
               testID="menu.tipzingolabs"
               onPress={() => onItemSelectedWrapper(MenuItemEnum.TipZingoLabs)}
@@ -189,7 +189,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
               {translate('loadedapp.tipzingolabs-basic') as string}
             </RegText>
           )}
-          {mode !== ModeEnum.basic && !readOnly && selectServer !== SelectServerEnum.offline && (
+          {mode !== ModeEnum.basic && !readOnly && selectLightWalletServer !== SelectServerEnum.offline && (
             <RegText
               testID="menu.votefornym"
               onPress={() => onItemSelectedWrapper(MenuItemEnum.VoteForNym)}

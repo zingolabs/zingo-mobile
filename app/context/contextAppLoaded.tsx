@@ -37,7 +37,9 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   info: {} as InfoType,
   wallet: {} as WalletType,
   defaultUnifiedAddress: '',
-  server: {} as ServerType,
+  lightWalletserver: {} as ServerType,
+  selectLightWalletServer: SelectServerEnum.custom,
+  validatorServer: {} as ServerType,
   currency: CurrencyEnum.USDCurrency,
   language: LanguageEnum.en,
   zecPrice: {
@@ -70,7 +72,6 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   addressBook: [] as AddressBookFileClass[],
   launchAddressBook: () => {},
   security: {} as SecurityType,
-  selectServer: SelectServerEnum.auto,
   rescanMenu: false,
   recoveryWalletInfoOnDevice: false,
   shieldingAmount: 0,

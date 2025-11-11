@@ -54,7 +54,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
     language, 
     showSwipeableIcons, 
     readOnly, 
-    selectServer, 
+    selectLightWalletServer, 
     setSendPageState, 
   } = context;
   const { colors } = useTheme()  as ThemeType;
@@ -192,7 +192,7 @@ const ContactLine: React.FunctionComponent<ContactLineProps> = ({
               transform: [{ translateX: trans }],
               backgroundColor: colors.sideMenuBackground,
             }}>
-            {!!c.address && !readOnly && selectServer !== SelectServerEnum.offline && !addressProtected && (
+            {!!c.address && !readOnly && selectLightWalletServer !== SelectServerEnum.offline && !addressProtected && (
               <View
                 style={{
                   width: 67,

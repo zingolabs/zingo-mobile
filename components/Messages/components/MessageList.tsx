@@ -91,10 +91,10 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
     addLastSnackbar,
     addressBook,
     defaultUnifiedAddress,
-    selectServer,
+    selectLightWalletServer,
     netInfo,
     setBackgroundError,
-    server,
+    lightWalletserver,
     totalBalance,
     doRefresh,
     somePending,
@@ -414,22 +414,22 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
         // 2. Another type of Error
         // here is worth it to try again with the best working server...
         // if the user selected a `custom` server, then we cannot change it.
-        if (!customError && selectServer !== SelectServerEnum.custom) {
+        if (!customError && selectLightWalletServer !== SelectServerEnum.custom) {
           // try send again with a working server
           const serverChecked = await selectingServer(serverUris(translate).filter((s: ServerUrisType) => !s.obsolete));
           let fasterServer: ServerType = {} as ServerType;
           if (serverChecked && serverChecked.latency) {
             fasterServer = { uri: serverChecked.uri, chainName: serverChecked.chainName };
           } else {
-            fasterServer = server;
+            fasterServer = lightWalletserver;
             // likely here there is a internet conection problem
             // all of the servers return an error because they are unreachable probably.
             // the 30 seconds timout was fired.
           }
           console.log(serverChecked);
           console.log(fasterServer);
-          if (fasterServer.uri !== server.uri) {
-            setServerOption(fasterServer, selectServer, false, true);
+          if (fasterServer.uri !== lightWalletserver.uri) {
+            setServerOption(fasterServer, selectLightWalletServer, false, true);
           }
 
           try {
@@ -783,7 +783,7 @@ const MessageList: React.FunctionComponent<MessageListProps> = ({
               </Pressable>
             )}
           </View>
-          {!loading && firstScrollToBottomDone && address && selectServer !== SelectServerEnum.offline && (
+          {!loading && firstScrollToBottomDone && address && selectLightWalletServer !== SelectServerEnum.offline && (
             <View
               style={{
                 height: `${

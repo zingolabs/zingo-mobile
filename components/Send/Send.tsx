@@ -112,7 +112,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendAll,
     netInfo,
     privacy,
-    server,
+    lightWalletserver,
     setBackgroundError,
     addLastSnackbar,
     mode,
@@ -122,7 +122,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     addresses,
     defaultUnifiedAddress,
     shieldingAmount,
-    selectServer,
+    selectLightWalletServer,
     setZecPrice,
     zenniesDonationAddress,
     //security,
@@ -197,7 +197,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     setSpendable(totalBalance ? totalBalance.totalSpendableBalance : 0);
     const max =
       (totalBalance ? totalBalance.totalSpendableBalance : 0) -
-      (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+      (donation && lightWalletserver.chainName === ChainNameEnum.mainChainName && !donationAddress
         ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
         : 0);
     if (max > 0) {
@@ -214,7 +214,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [
     donation,
     donationAddress,
-    server.chainName,
+    lightWalletserver.chainName,
     totalBalance,
     totalBalance?.totalSpendableBalance,
   ]);
@@ -248,7 +248,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemoPar;
       sendPageStateCalculateFee.toaddr.amount = amountPar;
 
-      sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, defaultUnifiedAddress, server, donation);
+      sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, defaultUnifiedAddress, lightWalletserver, donation);
       console.log('SEND', sendJson);
 
       // fee
@@ -280,7 +280,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             if (runProposeJson.amount !== undefined) {
               const newAmount =
                 runProposeJson.amount / 10 ** 8 -
-                (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+                (donation && lightWalletserver.chainName === ChainNameEnum.mainChainName && !donationAddress
                   ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
                   : 0);
               console.log('AMOUNT', newAmount);
@@ -298,7 +298,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setFee(proposeFee);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [donation, server, defaultUnifiedAddress, validAddress, validAmount, validMemo, donationAddress,
+    [donation, lightWalletserver, defaultUnifiedAddress, validAddress, validAmount, validMemo, donationAddress,
     /* added */ spendable, maxAmount, somePending, stillConfirming, info.latestBlock],
     // The App have to re-calculate de fee if some of these data changed:
     // - spendable
@@ -387,7 +387,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       //setAddressText(addressPar);
       // Attempt to parse as URI if it starts with zcash
       if (addressPar.toLowerCase().startsWith(GlobalConst.zcash) || addressPar.toLowerCase().includes(':')) {
-        const { error, target } = await parseZcashURI(addressPar, translate, server);
+        const { error, target } = await parseZcashURI(addressPar, translate, lightWalletserver);
 
         if (target) {
           // redo the to addresses
@@ -493,7 +493,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     };
 
     if (addressText) {
-      getMemoEnabled(addressText, server.chainName).then(r => {
+      getMemoEnabled(addressText, lightWalletserver.chainName).then(r => {
         setMemoEnabled(r);
         if (!r) {
           setMemoText('');
@@ -503,7 +503,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setMemoEnabled(false);
       setMemoText('');
     }
-  }, [server.chainName, addressText]);
+  }, [lightWalletserver.chainName, addressText]);
 
   useEffect(() => {
     const parseAddress = async (
@@ -514,7 +514,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     };
 
     if (addressText) {
-      parseAddress(addressText, server.chainName).then(r => {
+      parseAddress(addressText, lightWalletserver.chainName).then(r => {
         setValidAddress(r.isValid ? 1 : -1);
         if (!r.isValid) {
           setSpendableBalanceLastError('');
@@ -565,7 +565,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     donation,
     donationAddress,
     decimalSeparator,
-    server.chainName,
+    lightWalletserver.chainName,
     addressText,
     amountCurrencyText,
     amountText,
@@ -608,15 +608,15 @@ const Send: React.FunctionComponent<SendProps> = ({
     if (addressText) {
       (async () => {
         const donationA =
-          addressText === (await Utils.getDonationAddress(server.chainName)) ||
+          addressText === (await Utils.getDonationAddress(lightWalletserver.chainName)) ||
           addressText === zenniesDonationAddress ||
-          addressText === (await Utils.getNymDonationAddress(server.chainName));
+          addressText === (await Utils.getNymDonationAddress(lightWalletserver.chainName));
         setDonationAddress(donationA);
       })();
     } else {
       setDonationAddress(false);
     }
-  }, [addresses, addressText, server.chainName, zenniesDonationAddress]);
+  }, [addresses, addressText, lightWalletserver.chainName, zenniesDonationAddress]);
 
   useEffect(() => {
     setAddressText(sendPageState.toaddr.to);
@@ -671,7 +671,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
-    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+    if (!netInfo.isConnected || selectLightWalletServer === SelectServerEnum.offline) {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
@@ -715,22 +715,22 @@ const Send: React.FunctionComponent<SendProps> = ({
       // 2. Another type of Error
       // here is worth it to try again with the best working server...
       // if the user selected a `custom` server, then we cannot change it.
-      if (!customError && selectServer !== SelectServerEnum.custom) {
+      if (!customError && selectLightWalletServer !== SelectServerEnum.custom) {
         // try send again with a working server
         const serverChecked = await selectingServer(serverUris(translate).filter((s: ServerUrisType) => !s.obsolete));
         let fasterServer: ServerType = {} as ServerType;
         if (serverChecked && serverChecked.latency) {
           fasterServer = { uri: serverChecked.uri, chainName: serverChecked.chainName };
         } else {
-          fasterServer = server;
+          fasterServer = lightWalletserver;
           // likely here there is a internet conection problem
           // all of the servers return an error because they are unreachable probably.
           // the 30 seconds timout was fired.
         }
         console.log(serverChecked);
         console.log(fasterServer);
-        if (fasterServer.uri !== server.uri) {
-          setServerOption(fasterServer, selectServer, false, true);
+        if (fasterServer.uri !== lightWalletserver.uri) {
+          setServerOption(fasterServer, selectLightWalletServer, false, true);
         }
 
         try {
@@ -832,7 +832,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         calculatedFee: fee,
         parseAddressInfoJSON: parseAddressInfoJSON,
         donationAmount:
-          donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+          donation && lightWalletserver.chainName === ChainNameEnum.mainChainName && !donationAddress
             ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
             : 0,
         confirmSend: confirmSend,
@@ -1245,7 +1245,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         />
                       </View>
                     </TouchableOpacity>
-                    {donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress && (
+                    {donation && lightWalletserver.chainName === ChainNameEnum.mainChainName && !donationAddress && (
                       <View
                         style={{
                           display: 'flex',
@@ -1644,7 +1644,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     updateToField(null, null, null, memoText, null);
                     // donation - a Zenny is the minimum
                     if (
-                      server.chainName === ChainNameEnum.mainChainName &&
+                      lightWalletserver.chainName === ChainNameEnum.mainChainName &&
                       donationAddress &&
                       Utils.parseStringLocaleToNumberFloat(amountText) <
                         Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
@@ -1653,7 +1653,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       updateToField(null, Utils.getZenniesDonationAmount(), null, null, false);
                       return;
                     }
-                    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+                    if (!netInfo.isConnected || selectLightWalletServer === SelectServerEnum.offline) {
                       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
                       return;
                     }
@@ -1708,7 +1708,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                   twoButtons={true}
                 />
               </View>
-              {server.chainName === ChainNameEnum.mainChainName && Platform.OS === GlobalConst.platformOSandroid && (
+              {lightWalletserver.chainName === ChainNameEnum.mainChainName && Platform.OS === GlobalConst.platformOSandroid && (
                 <>
                   {donation ? (
                     <View
@@ -1728,7 +1728,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     <TouchableOpacity
                       onPress={async () => {
                         let update = false;
-                        if (addressText && addressText !== (await Utils.getDonationAddress(server.chainName))) {
+                        if (addressText && addressText !== (await Utils.getDonationAddress(lightWalletserver.chainName))) {
                           await ShowAddressAlertAsync(translate)
                             .then(async () => {
                               // fill the fields in the screen with the donation data
@@ -1741,7 +1741,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         }
                         if (update) {
                           updateToField(
-                            await Utils.getDonationAddress(server.chainName),
+                            await Utils.getDonationAddress(lightWalletserver.chainName),
                             Utils.getDonationAmount(),
                             null,
                             Utils.getDonationMemo(translate),

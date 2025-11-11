@@ -48,7 +48,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
   routeStack,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, server, addressBook } = context;
+  const { translate, lightWalletserver, addressBook } = context;
   const { colors } = useTheme()  as ThemeType;
 
   const [label, setLabel] = useState<string>(item.label);
@@ -115,7 +115,7 @@ const AbDetail: React.FunctionComponent<AbDetailProps> = ({
     }
     // Attempt to parse as URI if it starts with zcash
     if (addr.toLowerCase().startsWith(GlobalConst.zcash) || addr.toLowerCase().includes(':')) {
-      const {error: errorTarget, target } = await parseZcashURI(addr, translate, server);
+      const {error: errorTarget, target } = await parseZcashURI(addr, translate, lightWalletserver);
       //console.log(targets);
 
       if (target) {

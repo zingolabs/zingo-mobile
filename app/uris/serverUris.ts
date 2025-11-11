@@ -2,7 +2,7 @@ import { ServerUrisType, TranslateType, ChainNameEnum } from '../AppState';
 
 const serverUris = (translate: (key: string) => TranslateType | void): ServerUrisType[] => {
   return [
-    // default servers (2)
+    // default servers (3)
     {
       uri: 'https://zec.rocks:443', // this will be the default server.
       region: translate('settings.usa') as string,
@@ -15,6 +15,14 @@ const serverUris = (translate: (key: string) => TranslateType | void): ServerUri
       uri: 'https://lwd1.zcash-infra.com:9067',
       region: translate('settings.usa') as string,
       chainName: ChainNameEnum.mainChainName,
+      default: true,
+      latency: null,
+      obsolete: false,
+    },
+    {
+      uri: 'https://testnet.zec.rocks:443', // this will be the default server in Testnet.
+      region: 'USA' as string,
+      chainName: ChainNameEnum.testChainName,
       default: true,
       latency: null,
       obsolete: false,
