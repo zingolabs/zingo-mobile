@@ -11,7 +11,7 @@ regchest = []
 [dev-dependencies]
 zingolib = { workspace = true }
 pepper-sync = { workspace = true }
-zingomobile_utils = { workspace = true }
+zingodelegator_utils = { workspace = true }
 regchest_utils = { workspace = true }
 json = { workspace = true }
 env_logger = { workspace = true }

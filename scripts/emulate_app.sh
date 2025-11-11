@@ -175,7 +175,7 @@ fi
 # Setup working directory
 if [ ! -d "./android/app" ]; then
     echo "Error: Incorrect working directory" >&2
-    echo "Try './scripts/$(basename $0)' from zingo-mobile root directory." >&2
+    echo "Try './scripts/$(basename $0)' from crosslink-mobile-client root directory." >&2
     exit 1
 fi
 cd android
@@ -286,7 +286,7 @@ else
     nohup yarn react-native start &> "${test_report_dir}/react_native.out" &
         
     echo -e "\nLaunching App..."
-    adb shell am start -n "org.ZingoLabs.Zingo/org.ZingoLabs.Zingo.MainActivity" -a android.intent.action.MAIN \
+    adb shell am start -n "org.ZingoLabs.ZingoDelegator/org.ZingoLabs.ZingoDelegator.MainActivity" -a android.intent.action.MAIN \
         -c android.intent.category.LAUNCHER &> "${test_report_dir}/launch_app.out"
 
     echo -e "\nTest reports saved: android/${test_report_dir}"        

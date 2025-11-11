@@ -1,4 +1,4 @@
-package org.ZingoLabs.Zingo
+package org.ZingoLabs.ZingoDelegator
 
 import org.junit.runner.RunWith
 import org.junit.experimental.categories.Categories

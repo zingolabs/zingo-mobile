@@ -5,14 +5,14 @@
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.transistorsoft.fetch</string>
-		<string>Zingo_Refresh_Task_ID</string>
-		<string>Zingo_Processing_Task_ID</string>
-		<string>Zingo_Processing_Scheduler_Task_ID</string>
+		<string>Zingo_Delegator_Refresh_Task_ID</string>
+		<string>Zingo_Delegator_Processing_Task_ID</string>
+		<string>Zingo_Delegator_Processing_Scheduler_Task_ID</string>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Zingo</string>
+	<string>ZingoDelegator</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -56,13 +56,13 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Zingo needs access to the camera to scan address QRCodes</string>
+	<string>Zingo Delegator needs access to the camera to scan address QRCodes</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Allow Zingo to use FaceID to improve the security and privacy?</string>
+	<string>Allow Zingo Delegator to use FaceID to improve the security and privacy?</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Zingo does not use any Location Features</string>
+	<string>Zingo Delegator does not use any Location Features</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Zingo export/share address QRCodes as images</string>
+	<string>Zingo Delegator export/share address QRCodes as images</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIBackgroundModes</key>

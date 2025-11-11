@@ -1,12 +1,12 @@
 {
-  "zingo": "Zingo",
-  "version": "zingo-2.0.12 (292)",
+  "zingodelegator": "Zingo Delegator",
+  "version": "zingodelegator-0.0.1 (1)",
   "loading": "Yükleniyor...",
   "connectingserver": "Sunucuya bağlanılıyor...",
   "wait": "Lütfen bekleyin...",
   "workingonit": "Bu özellik üzerinde çalışıyoruz.",
   "updating" : {
-    "firstlaunchingmessage-title": "Zingo optimize ediliyor",
+    "firstlaunchingmessage-title": "Zingo Delegator optimize ediliyor",
     "firstlaunchingmessage-body": "Bu işlem, işlem geçmişine bağlı olarak biraz zaman alabilir. Lütfen işlem tamamlanana kadar uygulamayı açık tutun.",
     "firstlaunchingmessage-footer": "Teşekkürler."
   },
@@ -34,14 +34,14 @@
   "view-error": "Hatayı Görüntüle/Bildir",
   "menudrawer-acc": "Menü çekmecesini aç",
   "menu-acc": "Menüyü aç",
-  "donation": "Zingo'ya Bağış!\nZingoLabs'i desteklediğiniz için teşekkürler!",
+  "donation": "Zingo Delegator'ya Bağış!\nZingoLabs'i desteklediğiniz için teşekkürler!",
   "zenny-tips-ab": "Zenny Tavsiyeleri",
   "nym-donation": "Nym ağı güvenliğine ihtiyacım var!",
   "restarting": "Sunucuya bağlanırken hata oluştu, uygulama birkaç saniye içinde yeniden başlayacak.",
   "change-privacy": "Yeni gizlilik politikası ",
   "warning-binance": "UYARI: Binance, kullanıcı fonlarını zamanında iade etmeden topluyor ve tutuyor. Bu cüzdandan Binance’e para yatırmayın.",
   "email": "zingo@zingolabs.org",
-  "subject": "Zingo Destek...",
+  "subject": "Zingo Delegator Destek...",
   "body": "… ile ilgili yardıma ihtiyacım var",
   "connecting": "Bağlanıyor",
   "syncing": "Senkronize ediliyor",
@@ -133,7 +133,7 @@
     "noservers": "Listedeki sunucuların hiçbiri kullanılabilir değil, muhtemelen bir bağlantı hatası var."
   },
   "loadedapp": {
-    "about": "Zingo hakkında",
+    "about": "Zingo Delegator hakkında",
     "info": "Sunucu bilgisi",
     "options": "Seçenekler",
     "settings": "Ayarlar",
@@ -151,7 +151,7 @@
     "addressbook": "Adres Defteri",
     "tipzingolabs-basic": "ZingoLabs’i Destekle",
     "votefornym": "Nym için oy ver",
-    "support": "Zingo destek mail",
+    "support": "Zingo Delegator destek mail",
     "restoremainnet-error": "Bu seçenek yalnızca 'Ana Ağ' sunucuları için kullanılabilir.",
     "changeservernew-error": "Sunucuyu yenisiyle değiştirmeye çalışırken bir hata oluştu ",
     "readingwallet-error": "Yeni sunucuyla cüzdanı okuma girişiminde hata oluştu:",
@@ -283,7 +283,7 @@
     "modes": [
       {
         "value": "basic",
-        "text": "Temel Mod: Zingo'yu kullanmanın en basit yolu."
+        "text": "Temel Mod: Zingo Delegator'yu kullanmanın en basit yolu."
       },
       {
         "value": "advanced",
@@ -655,8 +655,8 @@
     "details": "İşlem Detayları",
     "pool": "Havuz",
     "contactcopied": "Kişi panoya kopyalandı",
-    "address-http": "Zingo, bu adresin size kim tarafından gönderildiğini bilmiyor! Gönderenin kimliğini doğrulamak tamamen size kalmış.",
-    "address-https": "Zingo Doğrulanmış Adres",
+    "address-http": "Zingo Delegator, bu adresin size kim tarafından gönderildiğini bilmiyor! Gönderenin kimliğini doğrulamak tamamen size kalmış.",
+    "address-https": "Zingo Delegator Doğrulanmış Adres",
     "type": "Tür",
     "not-confirmed": "İşlem henüz onaylanmadı",
     "calculated": "Hesaplanmış",
@@ -725,7 +725,7 @@
     "copyright": [
       "Copyright (c) 2025, ZingoLabs.",
       "Built with React Native.",
-      "The MIT License (MIT) Copyright (c) 2025 Zingo",
+      "The MIT License (MIT) Copyright (c) 2025 Zingo Delegator",
       "İşbu belgeyle, bu yazılımın ve ilgili dokümantasyon dosyalarının (bundan böyle “Yazılım” olarak anılacaktır) bir kopyasını edinen herkese, hiçbir kısıtlama olmaksızın Yazılım üzerinde işlem yapma izni ücretsiz olarak verilir. Bu izin; kullanma, kopyalama, değiştirme, birleştirme, yayımlama, dağıtma, alt lisans verme ve/veya Yazılımın kopyalarını satma haklarını kapsar ve Yazılımın sağlandığı kişilere de aynı hakları verme iznini içerir.",
       "Yukarıdaki telif hakkı bildirimi ve bu izin bildirimi, Yazılımın tüm kopyalarına veya önemli bölümlerine dahil edilmelidir",
       "YAZILIM, HERHANGİ BİR TÜRDE AÇIK VEYA ZIMNİ BİR GARANTİ OLMAKSIZIN, “OLDUĞU GİBİ” SAĞLANMAKTADIR. BU GARANTİLER, SINIRLI OLMAMAK KAYDIYLA, TİCARİ ELVERİŞLİLİK, BELİRLİ BİR AMACA UYGUNLUK VE İHLAL ETMEME GİBİ GARANTİLERİ DE KAPSAR. HİÇBİR DURUMDA, YAZARLAR VEYA TELİF HAKKI SAHİPLERİ, SÖZLEŞME, HAKSIZ FİİL VEYA BAŞKA BİR SEBEPLE, YAZILIMIN KULLANIMINDAN YA DA YAZILIMLA BAĞLANTILI DİĞER HUSUSLARDAN KAYNAKLANAN HİÇBİR TALEP, ZARAR VEYA BAŞKA BİR YÜKÜMLÜLÜKTEN SORUMLU TUTULAMAZ."

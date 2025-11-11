@@ -29,7 +29,7 @@ Also, make sure your JAVA_HOME is set, for example: <br />
 
 ## Building
 1. Clone the repository.
-2. Go to the cloned repo `cd zingo-mobile`.
+2. Go to the cloned repo `cd crosslink-mobile-client`.
 3. In the `rust` directory, run: <br />
    `./build.sh` <br />
    This step may take a long time.

@@ -158,7 +158,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
           }}>
           <View style={{ marginBottom: 30, display: 'flex', alignItems: 'center' }}>
             <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>
-              {translate('zingo') as string}
+              {translate('zingodelegator') as string}
             </Text>
             <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version') as string}</Text>
             <Image

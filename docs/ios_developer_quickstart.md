@@ -9,7 +9,7 @@
 
 ## Building for physical device
 1. Clone the repository.
-2. Go to the cloned repo `cd zingo-mobile`.
+2. Go to the cloned repo `cd crosslink-mobile-client`.
 3. In the `rust/ios` directory, run: <br />
    `./build.sh` <br />
    This step may take a long time.
@@ -20,7 +20,7 @@
 
 ## Building for simulator
 1. Clone the repository.
-2. Go to the cloned repo `cd zingo-mobile`.
+2. Go to the cloned repo `cd crosslink-mobile-client`.
 3. In the `rust/ios` directory, run: <br />
    `./buildsimulator.sh` <br />
    This step may take a long time.

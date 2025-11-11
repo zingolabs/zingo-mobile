@@ -1,4 +1,4 @@
-package org.ZingoLabs.Zingo
+package org.ZingoLabs.ZingoDelegator
 
 enum class Constants(val value: String) {
     // wallet files

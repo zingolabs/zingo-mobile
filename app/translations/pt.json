@@ -1,12 +1,12 @@
 {
-  "zingo": "Zingo",
-  "version": "zingo-2.0.12 (292)",
+  "zingodelegator": "Zingo Delegator",
+  "version": "zingodelegator-0.0.1 (1)",
   "loading": "carregando...",
   "connectingserver": "Conectando-se ao servidor...",
   "wait": "Aguarde um momento...",
   "workingonit": "Estamos trabalhando neste recurso.",
   "updating" : {
-    "firstlaunchingmessage-title": "Otimizando a Zingo",
+    "firstlaunchingmessage-title": "Otimizando a Zingo Delegator",
     "firstlaunchingmessage-body": "Isso pode demorar um pouco, dependendo do histórico de transações. Por favor, mantenha o aplicativo aberto até que o processo termine",
     "firstlaunchingmessage-footer": "Obrigado."
   },
@@ -34,14 +34,14 @@
   "view-error": "Ver/Relatar Erro",
   "menudrawer-acc": "Abrir Menu Lateral",
   "menu-acc": "Abrir Menu",
-  "donation": "Doação para o Zingo!\nObrigado por apoiar o ZingoLabs!",
+  "donation": "Doação para o Zingo Delegator\nObrigado por apoiar o ZingoLabs!",
   "zenny-tips-ab": "Zenny Gorjetas",
   "nym-donation": "Eu preciso de segurança de rede Nym!",
   "restarting": "Erro ao conectar ao servidor, o aplicativo será reiniciado em alguns segundos.",
   "change-privacy": "Nova política de privacidade: ",
   "warning-binance": "AVISO: A Binance está coletando e mantendo fundos dos usuários sem recurso oportuno. NÃO deposite na Binance a partir desta Carteira.",
   "email": "zingo@zingolabs.org",
-  "subject": "Suporte Zingo...",
+  "subject": "Suporte Zingo Delegator...",
   "body": "Preciso de ajuda com...",
   "connecting": "Conectando",
   "syncing": "Sincronizando",
@@ -133,7 +133,7 @@
     "noservers": "Nenhum dos servidores da lista está disponível, provavelmente é um erro de conexão."
   },
   "loadedapp": {
-    "about": "Sobre a Zingo",
+    "about": "Sobre a Zingo Delegator",
     "info": "Informações do Servidor",
     "options": "Opções",
     "settings": "Configurações",
@@ -151,7 +151,7 @@
     "addressbook": "Agenda de Endereços",
     "tipzingolabs-basic": "Apoiar a ZingoLabs",
     "votefornym": "Vote em Nym",
-    "support": "E-mail de suporte do Zingo",
+    "support": "E-mail de suporte do Zingo Delegator",
     "restoremainnet-error": "Esta opção está disponível apenas para servidores da 'Mainnet'.",
     "changeservernew-error": "Erro ao tentar alterar para um novo servidor: ",
     "readingwallet-error": "Erro ao tentar ler a carteira com o novo servidor:",
@@ -283,7 +283,7 @@
     "modes": [
       {
         "value": "basic",
-        "text": "Modo Básico, a maneira mais simples de usar a Zingo."
+        "text": "Modo Básico, a maneira mais simples de usar a Zingo Delegator."
       },
       {
         "value": "advanced",
@@ -655,8 +655,8 @@
     "details": "Detalhes da Transação",
     "pool": "Pool",
     "contactcopied": "Contato copiado para a Área de Transparência",
-    "address-http": "Zingo não tem ideia de quem lhe enviou este Endereço! Você deve autenticar o Remetente.",
-    "address-https": "Endereço Zingo-Authenticated",
+    "address-http": "Zingo Delegator não tem ideia de quem lhe enviou este Endereço! Você deve autenticar o Remetente.",
+    "address-https": "Endereço Zingo Delegator-Authenticated",
     "type": "Tipo",
     "not-confirmed": "Transação ainda não confirmada",
     "calculated": "Calculada",
@@ -725,7 +725,7 @@
     "copyright": [
       "Copyright (c) 2025, ZingoLabs.",
       "Construído com React Native.",
-      "A licença do MIT (MIT) Copyright (c) 2025 Zingo",
+      "A licença do MIT (MIT) Copyright (c) 2025 Zingo Delegator",
       "A permissão é concedida gratuitamente a qualquer pessoa que obtenha uma cópia deste software e dos arquivos de documentação associados, para negociá-lo sem restrições, incluindo, sem limitações, direitos de usar, copiar, modificar, mesclar, publicar, distribuir, sublicenciar e/ou vender cópias do Software e permitir que as pessoas a quem o mesmo seja fornecido o façam, sujeito às seguintes condições:",
       "O aviso de direitos autorais acima e este aviso de permissão serão incluídos em todas as cópias ou partes substanciais do Software.",
       "O SOFTWARE É FORNECIDO 'COMO ESTÁ', SEM GARANTIA ALGUMA, SEJA EXPRESSA OU IMPLÍCITA, MAS NÃO SE LIMITANDO ÀS GARANTIAS DE COMERCIALIZAÇÃO, ADEQUAÇÃO A UM DETERMINADO FIM E SEM VIOLAÇÕES. EM HIPÓTESE ALGUMA OS AUTORES OU DETENTORES DE DIREITOS AUTORAIS SERÃO RESPONSÁVEIS POR QUALQUER RECLAMAÇÃO, DANOS OU OUTRAS RESPONSABILIDADES, SEJA EM UMA AÇÃO DE CONTRATO, ATO ILÍCITO OU DE OUTRA FORMA, DECORRENTE A ALGO RELACIONADO A CONEXÃO, A USABILIDADE OU OUTRAS NEGOCIAÇÕES NO SOFTWARE."

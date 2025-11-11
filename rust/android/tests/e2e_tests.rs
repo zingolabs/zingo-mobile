@@ -21,10 +21,10 @@ async fn tex_send_address(abi: &str) {
         };
 
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "tex_send_address");
+    let (exit_code, output, error) = zingodelegator_utils::android_e2e_test(abi, "tex_send_address");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test_ci(abi, "tex_send_address");
+        zingodelegator_utils::android_e2e_test_ci(abi, "tex_send_address");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -51,9 +51,9 @@ async fn shielding(abi: &str) {
         };
 
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "shielding");
+    let (exit_code, output, error) = zingodelegator_utils::android_e2e_test(abi, "shielding");
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) = zingomobile_utils::android_e2e_test_ci(abi, "shielding");
+    let (exit_code, output, error) = zingodelegator_utils::android_e2e_test_ci(abi, "shielding");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -81,10 +81,10 @@ async fn parse_invalid_address(abi: &str) {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "parse_invalid_address");
+        zingodelegator_utils::android_e2e_test(abi, "parse_invalid_address");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test_ci(abi, "parse_invalid_address");
+        zingodelegator_utils::android_e2e_test_ci(abi, "parse_invalid_address");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -112,10 +112,10 @@ async fn reload_while_tx_pending(abi: &str) {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "reload_while_tx_pending");
+        zingodelegator_utils::android_e2e_test(abi, "reload_while_tx_pending");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test_ci(abi, "reload_while_tx_pending");
+        zingodelegator_utils::android_e2e_test_ci(abi, "reload_while_tx_pending");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -133,10 +133,10 @@ async fn reload_while_tx_pending(abi: &str) {
 async fn change_custom_server(abi: &str) {
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "change_custom_server");
+        zingodelegator_utils::android_e2e_test(abi, "change_custom_server");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test_ci(abi, "change_custom_server");
+        zingodelegator_utils::android_e2e_test_ci(abi, "change_custom_server");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -158,10 +158,10 @@ async fn change_custom_regtest_server(abi: &str) {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "change_custom_regtest_server");
+        zingodelegator_utils::android_e2e_test(abi, "change_custom_regtest_server");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test_ci(abi, "change_custom_regtest_server");
+        zingodelegator_utils::android_e2e_test_ci(abi, "change_custom_regtest_server");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -179,10 +179,10 @@ async fn change_custom_regtest_server(abi: &str) {
 async fn change_custom_testnet_server(abi: &str) {
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "change_custom_testnet_server");
+        zingodelegator_utils::android_e2e_test(abi, "change_custom_testnet_server");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test_ci(abi, "change_custom_testnet_server");
+        zingodelegator_utils::android_e2e_test_ci(abi, "change_custom_testnet_server");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -194,10 +194,10 @@ async fn change_custom_testnet_server(abi: &str) {
 async fn change_server_from_list(abi: &str) {
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "change_server_from_list");
+        zingodelegator_utils::android_e2e_test(abi, "change_server_from_list");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test_ci(abi, "change_server_from_list");
+        zingodelegator_utils::android_e2e_test_ci(abi, "change_server_from_list");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -208,9 +208,9 @@ async fn change_server_from_list(abi: &str) {
 
 async fn new_wallet(abi: &str) {
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "new_wallet");
+    let (exit_code, output, error) = zingodelegator_utils::android_e2e_test(abi, "new_wallet");
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) = zingomobile_utils::android_e2e_test_ci(abi, "new_wallet");
+    let (exit_code, output, error) = zingodelegator_utils::android_e2e_test_ci(abi, "new_wallet");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -221,9 +221,9 @@ async fn new_wallet(abi: &str) {
 
 async fn screen_awake(abi: &str) {
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "screen_awake");
+    let (exit_code, output, error) = zingodelegator_utils::android_e2e_test(abi, "screen_awake");
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) = zingomobile_utils::android_e2e_test_ci(abi, "screen_awake");
+    let (exit_code, output, error) = zingodelegator_utils::android_e2e_test_ci(abi, "screen_awake");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -244,9 +244,9 @@ async fn send(abi: &str) {
         };
 
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "send");
+    let (exit_code, output, error) = zingodelegator_utils::android_e2e_test(abi, "send");
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) = zingomobile_utils::android_e2e_test_ci(abi, "send");
+    let (exit_code, output, error) = zingodelegator_utils::android_e2e_test_ci(abi, "send");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -263,9 +263,9 @@ async fn send(abi: &str) {
 
 async fn sync_report(abi: &str) {
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) = zingomobile_utils::android_e2e_test(abi, "sync_report");
+    let (exit_code, output, error) = zingodelegator_utils::android_e2e_test(abi, "sync_report");
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) = zingomobile_utils::android_e2e_test_ci(abi, "sync_report");
+    let (exit_code, output, error) = zingodelegator_utils::android_e2e_test_ci(abi, "sync_report");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -277,10 +277,10 @@ async fn sync_report(abi: &str) {
 async fn transaction_history(abi: &str) {
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test(abi, "transaction_history");
+        zingodelegator_utils::android_e2e_test(abi, "transaction_history");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_e2e_test_ci(abi, "transaction_history");
+        zingodelegator_utils::android_e2e_test_ci(abi, "transaction_history");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
