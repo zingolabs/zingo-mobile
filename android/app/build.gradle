@@ -95,7 +95,7 @@ android {
 
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'org.ZingoLabs.Zingo'
+    namespace 'org.ZingoLabs.ZingoDelegator'
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -112,11 +112,11 @@ android {
     }
 
     defaultConfig {
-        applicationId 'org.ZingoLabs.Zingo' // Real
+        applicationId 'org.ZingoLabs.ZingoDelegator' // Real
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 292 // Real
-        versionName "zingo-2.0.12" // Real
+        versionCode 1 // Real
+        versionName "zingodelegator-0.0.1" // Real
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         externalNativeBuild {

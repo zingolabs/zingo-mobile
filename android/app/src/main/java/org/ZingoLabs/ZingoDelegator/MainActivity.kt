@@ -1,4 +1,4 @@
-package org.ZingoLabs.Zingo
+package org.ZingoLabs.ZingoDelegator
 
 import android.os.Bundle
 import android.util.Log
@@ -13,7 +13,7 @@ class MainActivity : ReactActivity() {
      * rendering of the component.
      */
 
-    override fun getMainComponentName(): String = "Zingo"
+    override fun getMainComponentName(): String = "ZingoDelegator"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("ON_CREATE", "Starting main activity")

@@ -1,4 +1,4 @@
-package org.ZingoLabs.Zingo
+package org.ZingoLabs.ZingoDelegator
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test

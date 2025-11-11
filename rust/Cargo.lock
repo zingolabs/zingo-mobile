@@ -5080,8 +5080,8 @@ dependencies = [
  "regchest_utils",
  "rustls 0.23.34",
  "tokio",
+ "zingodelegator_utils",
  "zingolib",
- "zingomobile_utils",
 ]
 
 [[package]]
@@ -5136,8 +5136,8 @@ dependencies = [
  "regchest_utils",
  "rustls 0.23.34",
  "tokio",
+ "zingodelegator_utils",
  "zingolib",
- "zingomobile_utils",
 ]
 
 [[package]]
@@ -9310,6 +9310,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "zingodelegator_utils"
+version = "0.1.0"
+
+[[package]]
 name = "zingolib"
 version = "0.0.1"
 source = "git+https://github.com/zingolabs/zingolib?tag=2.0.7#fd632c4fcbbe612434166692907ff63ce2556261"
@@ -9374,10 +9378,6 @@ dependencies = [
  "zingo-testvectors",
  "zip32",
 ]
-
-[[package]]
-name = "zingomobile_utils"
-version = "0.1.0"
 
 [[package]]
 name = "zip32"

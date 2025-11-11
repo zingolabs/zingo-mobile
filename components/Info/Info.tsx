@@ -74,7 +74,7 @@ const Info: React.FunctionComponent<InfoProps> = ({
           <View style={{ display: 'flex', margin: 20, marginBottom: 30 }}>
             <DetailLine
               label={translate('info.version') as string}
-              value={translate('zingo') + ' ' + translate('version')}
+              value={translate('zingodelegator') + ' ' + translate('version')}
               screenName={screenName}
             />
             <DetailLine label={translate('info.serverversion') as string} value={info.version ? info.version : '-' } screenName={screenName} />

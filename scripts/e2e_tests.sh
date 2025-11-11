@@ -157,8 +157,8 @@ adb -s emulator-5554 shell cat /proc/cpuinfo &> "${test_report_dir}/cpuinfo.txt"
 nohup adb -s emulator-5554 shell logcat -v threadtime -b main &> "${test_report_dir}/logcat.txt" &
 
 # Create additional test output directory
-adb -s emulator-5554 shell rm -rf "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output"
-adb -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output"
+adb -s emulator-5554 shell rm -rf "/sdcard/Android/media/org.ZingoLabs.ZingoDelegator/additional_test_output"
+adb -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.ZingoDelegator/additional_test_output"
 
 echo -e "\nRunning end-to-end tests..."
 nohup yarn start &> "${test_report_dir}/metro.txt" &
@@ -167,8 +167,8 @@ yarn detox test -c android.att.debug ${test_name}.test.js
 success_status=$?
 
 # Store additional test outputs
-if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output 2>/dev/null)" ]; then
-    adb -s emulator-5554 shell cat /sdcard/Android/media/org.ZingoLabs.Zingo/additional_test_output/* \
+if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.ZingoDelegator/additional_test_output 2>/dev/null)" ]; then
+    adb -s emulator-5554 shell cat /sdcard/Android/media/org.ZingoLabs.ZingoDelegator/additional_test_output/* \
         &> "${test_report_dir}/additional_test_output.txt"
 fi
 

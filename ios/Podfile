@@ -14,8 +14,8 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'ZingoMobile' do
-  # Pods for ZingoMobile
+target 'ZingoDelegator' do
+  # Pods for ZingoDelegator
   config = use_native_modules!
 
   use_react_native!(
@@ -24,7 +24,7 @@ target 'ZingoMobile' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  target 'ZingoMobileTests' do
+  target 'ZingoDelegatorTests' do
     inherit! :complete
     # Pods for testing
   end

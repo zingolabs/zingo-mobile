@@ -36,7 +36,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+          repository: ${{ env.REPO-OWNER }}/crosslink-mobile-client
 
       - name: Native rust cache
         uses: actions/cache/restore@v4
@@ -76,13 +76,13 @@ jobs:
           set -euxo pipefail
           mkdir -p build/reports build/DerivedData
           xcodebuild build-for-testing \
-            -workspace ZingoMobile.xcworkspace \
-            -scheme ZingoMobile \
+            -workspace ZingoDelegator.xcworkspace \
+            -scheme ZingoDelegator \
             -sdk iphonesimulator \
             -configuration Debug \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
             -derivedDataPath "build/DerivedData" \
-            -resultBundlePath "build/reports/ZingoMobile-BuildForTesting.xcresult" \
+            -resultBundlePath "build/reports/ZingoDelegator-BuildForTesting.xcresult" \
             -quiet
 
       - name: Upload Build Result
@@ -96,7 +96,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-ios-integration-build-reports.xcresult
-          path: ios/build/reports/ZingoMobile-BuildForTesting.xcresult
+          path: ios/build/reports/ZingoDelegator-BuildForTesting.xcresult
 
       - name: Upload IOS build DerivedData logs (optional)
         if: ${{ always() && !cancelled() }}
@@ -151,7 +151,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+          repository: ${{ env.REPO-OWNER }}/crosslink-mobile-client
 
       - name: Install docker
         run: |
@@ -237,7 +237,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-ios-integration-test-reports-${{ matrix.test }}.xcresult
-          path: ios/build/reports/ZingoMobile-Test.xcresult
+          path: ios/build/reports/ZingoDelegator-Test.xcresult
 
       - name: Upload IOS DerivedData logs (optional)
         if: ${{ always() && !cancelled() }}

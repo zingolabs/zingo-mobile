@@ -1,4 +1,4 @@
-package org.ZingoLabs.Zingo
+package org.ZingoLabs.ZingoDelegator
 
 import android.content.Context
 import android.util.Log

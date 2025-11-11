@@ -19,7 +19,7 @@ COPY ios/ /opt/zingo/rust/ios/
 COPY lib/ /opt/zingo/rust/lib/
 COPY Cargo.lock /opt/zingo/rust/Cargo.lock
 COPY Cargo.toml /opt/zingo/rust/Cargo.toml
-COPY zingomobile_utils/ /opt/zingo/rust/zingomobile_utils/
+COPY zingodelegator_utils/ /opt/zingo/rust/zingodelegator_utils/
 
 RUN rustup default nightly
 

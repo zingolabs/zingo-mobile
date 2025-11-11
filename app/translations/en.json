@@ -1,12 +1,12 @@
 {
-  "zingo": "Zingo",
-  "version": "zingo-2.0.12 (292)",
+  "zingodelegator": "Zingo Delegator",
+  "version": "zingodelegator-0.0.1 (1)",
   "loading": "loading...",
   "connectingserver": "Connecting to the server...",
   "wait": "Please wait...",
   "workingonit": "We are working on this feature.",
   "updating" : {
-    "firstlaunchingmessage-title": "Optimizing Zingo",
+    "firstlaunchingmessage-title": "Optimizing Zingo Delegator",
     "firstlaunchingmessage-body": "This may take a while, depending on the transaction history. Please keep the app open until the process finishes.",
     "firstlaunchingmessage-footer": "Thanks."
   },
@@ -34,14 +34,14 @@
   "view-error": "View/Report Error",
   "menudrawer-acc": "Open Menu Drawer",
   "menu-acc": "Open Menu",
-  "donation": "Donation to Zingo!\nThanks for supporting ZingoLabs!",
+  "donation": "Donation to Zingo Delegator\nThanks for supporting ZingoLabs!",
   "zenny-tips-ab": "Zenny Tips",
   "nym-donation": "I need Nym network security!",
   "restarting": "Error connecting to the Server, the App will restart in a few seconds.",
   "change-privacy": "New privacy policy: ",
   "warning-binance": "WARNING: Binance is collecting and holding user funds without timely recourse. Do NOT deposit into Binance from this Wallet.",
   "email": "zingo@zingolabs.org",
-  "subject": "Zingo Support...",
+  "subject": "Zingo Delegator Support...",
   "body": "I need help with...",
   "connecting": "Connecting",
   "syncing": "Syncing",
@@ -133,7 +133,7 @@
     "noservers": "None of the servers on the list are available, it is probably a connection error."
   },
   "loadedapp": {
-    "about": "About Zingo",
+    "about": "About Zingo Delegator",
     "info": "Server Info",
     "options": "Options",
     "settings": "Settings",
@@ -151,7 +151,7 @@
     "addressbook": "Address Book",
     "tipzingolabs-basic": "Tip ZingoLabs",
     "votefornym": "Vote for Nym",
-    "support": "Zingo support email",
+    "support": "Zingo Delegator support email",
     "restoremainnet-error": "This option is only available for 'Mainnet' servers.",
     "changeservernew-error": "Error trying to change the server to the new one: ",
     "readingwallet-error": "Error trying to read the wallet with the new server:",
@@ -283,7 +283,7 @@
     "modes": [
       {
         "value": "basic",
-        "text": "Basic Mode, the most simple way to use Zingo."
+        "text": "Basic Mode, the most simple way to use Zingo Delegator."
       },
       {
         "value": "advanced",
@@ -655,8 +655,8 @@
     "details": "Transaction Details",
     "pool": "Pool",
     "contactcopied": "Copied Contact to Clipboard",
-    "address-http": "Zingo has no idea who sent you this Address! It's entirely up to you to authenticate the Sender.",
-    "address-https": "Zingo-Authenticated Address",
+    "address-http": "Zingo Delegator has no idea who sent you this Address! It's entirely up to you to authenticate the Sender.",
+    "address-https": "Zingo Delegator-Authenticated Address",
     "type": "Type",
     "not-confirmed": "Transaction not yet confirmed",
     "calculated": "Calculated",
@@ -725,7 +725,7 @@
     "copyright": [
       "Copyright (c) 2025, ZingoLabs.",
       "Built with React Native.",
-      "The MIT License (MIT) Copyright (c) 2025 Zingo",
+      "The MIT License (MIT) Copyright (c) 2025 Zingo Delegator",
       "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:",
       "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
       "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
