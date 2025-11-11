@@ -10,7 +10,7 @@ import com.facebook.react.bridge.Promise
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
-import org.ZingoLabs.Zingo.Constants.*
+import org.ZingoLabs.ZingoDelegator.Constants.*
 import kotlinx.coroutines.*
 
 class RPCModule internal constructor(private val reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext) {
