@@ -1,5 +1,5 @@
 import { ChainNameEnum, CurrencyNameEnum, InfoType } from '../../app/AppState';
-import { mockLightWalletServer } from './mockServer';
+import { mockLightWalletServer } from './mockServers';
 
 export const mockInfo: InfoType = {
   chainName: ChainNameEnum.mainChainName,

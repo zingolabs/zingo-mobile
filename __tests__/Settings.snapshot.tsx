@@ -12,7 +12,7 @@ import { LanguageEnum, CurrencyEnum, RouteEnum } from '../app/AppState';
 import { mockTranslate } from '../__mocks__/dataMocks/mockTranslate';
 import { mockInfo } from '../__mocks__/dataMocks/mockInfo';
 import { mockTotalBalance } from '../__mocks__/dataMocks/mockTotalBalance';
-import { mockLightWalletServer } from '../__mocks__/dataMocks/mockServer';
+import { mockLightWalletServer } from '../__mocks__/dataMocks/mockServers';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../app/types';
 import mockNavigation from '../__mocks__/dataMocks/mockNavigation';

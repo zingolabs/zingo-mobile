@@ -7,6 +7,4 @@ export default interface ServerUrisType {
   default: boolean;
   latency: number | null;
   obsolete: boolean;
-
-   
 }
