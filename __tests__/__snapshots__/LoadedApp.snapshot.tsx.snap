@@ -44,7 +44,7 @@ exports[`Component LoadedApp - test LoadedApp - snapshot 1`] = `
           }
         }
       >
-        zingo
+        zingodelegator
       </Text>
       <Text
         style={

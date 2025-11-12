@@ -1,1 +1,1 @@
-Zingo! is a private wallet and messenger for Zcash.
+Zingo Delegator is a private wallet and messenger for Zcash.

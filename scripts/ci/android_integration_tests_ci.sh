@@ -60,7 +60,7 @@ fi
 # Setup working directory
 if [ ! -d "./android/app" ]; then
     echo "Error: Incorrect working directory" >&2
-    echo "Try './scripts/$(basename $0)' from zingo-mobile root directory." >&2
+    echo "Try './scripts/$(basename $0)' from crosslink-mobile-client root directory." >&2
     exit 1
 fi
 
@@ -114,19 +114,19 @@ adb -s emulator-5554 shell cat /proc/cpuinfo &> "${test_report_dir}/cpuinfo.txt"
 nohup adb -s emulator-5554 shell logcat -v threadtime -b main &> "${test_report_dir}/logcat.txt" &
 
 # Create additional test output directory
-adb -s emulator-5554 shell rm -rf "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output"
-adb -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output"
+adb -s emulator-5554 shell rm -rf "/sdcard/Android/media/org.ZingoLabs.ZingoDelegator/additional_integration_test_output"
+adb -s emulator-5554 shell mkdir -p "/sdcard/Android/media/org.ZingoLabs.ZingoDelegator/additional_integration_test_output"
 
 echo -e "\nRunning integration tests..."
 nohup yarn start &> "${test_report_dir}/metro.txt" &
-adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.Zingo.$test_name \
-    -e additionalTestOutputDir /sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output \
-    -e testTimeoutSeconds 31536000 org.ZingoLabs.Zingo.test/androidx.test.runner.AndroidJUnitRunner \
+adb -s emulator-5554 shell am instrument -w -r -e class org.ZingoLabs.ZingoDelegator.$test_name \
+    -e additionalTestOutputDir /sdcard/Android/media/org.ZingoLabs.ZingoDelegator/additional_integration_test_output \
+    -e testTimeoutSeconds 31536000 org.ZingoLabs.ZingoDelegator.test/androidx.test.runner.AndroidJUnitRunner \
     | tee "${test_report_dir}/test_results.txt"
 
 # Store additional test outputs
-if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output 2>/dev/null)" ]; then
-    adb -s emulator-5554 shell cat /sdcard/Android/media/org.ZingoLabs.Zingo/additional_integration_test_output/* \
+if [ -n "$(adb -s emulator-5554 shell ls -A /sdcard/Android/media/org.ZingoLabs.ZingoDelegator/additional_integration_test_output 2>/dev/null)" ]; then
+    adb -s emulator-5554 shell cat /sdcard/Android/media/org.ZingoLabs.ZingoDelegator/additional_integration_test_output/* \
         &> "${test_report_dir}/additional_integration_test_output.txt"
 fi
 

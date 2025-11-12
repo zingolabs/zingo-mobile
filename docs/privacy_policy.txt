@@ -1,4 +1,4 @@
-Zingo A Zcash Application
+Zingo Delegator A Zcash Application
 
 Use zero knowledge cryptography to transact, and to manage your transaction history, in a private and mindful way.
 
@@ -11,12 +11,12 @@ Only you have the power to share your information! Your perspective matters. You
 When you send Zcash you can write a memo containing anything you like. When you receive
 Zcash you also receive the memo that the Sender wrote. As with most cryptocurrencies, wallets
 routinely send transactions to themselves to recover "change" from the transaction.  In this case, where
-the application is both the Sender and the Receiver, Zingo uses the memo system to write
+the application is both the Sender and the Receiver, Zingo Delegator uses the memo system to write
 notes to itself about the transactions it builds for the User.
 
-Zingo extracts that data to provide insights exclusively to you.  In our initial release we
+Zingo Delegator extracts that data to provide insights exclusively to you.  In our initial release we
 already use this introspective mechanism to "remember" which full Unified Addresses you've previously sent Zcash.
-In other words, Zingo keeps track of who you've sent Zcash to, on the blockchain. This "Address Book"
+In other words, Zingo Delegator keeps track of who you've sent Zcash to, on the blockchain. This "Address Book"
 of people you've "Sent To" in the past is completely private and, as long as you properly protect your
 seed-phrase, will be fully recovered even if you lose your device. 
 
@@ -44,5 +44,5 @@ blockchain as part of the transaction that it builds. This means that the on-cha
 with a transaction does not contain all of the information the Sending-Client received as a "Unified Address"
 from the Recipient-Client, off-chain.  If the Sending-Client simply recorded the UA off-chain then, in the
 case of Re-Sprouting the Client from its SeedPhrase, there'd be no way to recover that relationship data.
-Zingo solves this issue by recording the original recipient provided UA in the memo field of change from the
+Zingo Delegator solves this issue by recording the original recipient provided UA in the memo field of change from the
 transaction.

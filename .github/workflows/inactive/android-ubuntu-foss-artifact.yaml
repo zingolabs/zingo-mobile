@@ -25,7 +25,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+          repository: ${{ env.REPO-OWNER }}/crosslink-mobile-client
 
       - name: Gradle setup
         uses: gradle/actions/setup-gradle@v4

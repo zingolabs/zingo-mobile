@@ -1,5 +1,5 @@
 [workspace]
-members = ["lib", "android", "ios", "zingomobile_utils"]
+members = ["lib", "android", "ios", "zingodelegator_utils"]
 resolver = "2"
 
 [workspace.lints.clippy]
@@ -12,7 +12,7 @@ zingolib = { git = "https://github.com/zingolabs/zingolib", default-features = t
 ] }
 pepper-sync = { git = "https://github.com/zingolabs/zingolib", tag = "2.0.7" }
 regchest_utils = { git = "https://github.com/zingolabs/zingo-regchest", branch = "dev" }
-zingomobile_utils = { path = "zingomobile_utils" }
+zingodelegator_utils = { path = "zingodelegator_utils" }
 
 zcash_primitives = { git = "https://github.com/zcash/librustzcash", rev = "d387aed7e04e881dbe30c6ff8b26a96c834c094b" }
 zcash_keys = { git = "https://github.com/zcash/librustzcash", rev = "d387aed7e04e881dbe30c6ff8b26a96c834c094b", features = [

@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  ZingoMobile
+//  ZingoDelegator
 //
 //  Created by Juan Carlos Carmona Calvo on 4/4/24.
 //
@@ -39,8 +39,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   var reactNativeDelegate: ReactNativeDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
 
-  private let bcgTaskId = "Zingo_Processing_Task_ID"
-  private let bcgSchedulerTaskId = "Zingo_Processing_Scheduler_Task_ID"
+  private let bcgTaskId = "Zingo_Delegator_Processing_Task_ID"
+  private let bcgSchedulerTaskId = "Zingo_Delegator_Processing_Scheduler_Task_ID"
   private var monitor: NWPathMonitor?
   private let workerQueue = DispatchQueue(label: "Monitor")
   private var isConnectedToWifi = false
@@ -62,7 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window = UIWindow(frame: UIScreen.main.bounds)
  
     factory.startReactNative(
-      withModuleName: "Zingo",
+      withModuleName: "ZingoDelegator",
       in: window,
       launchOptions: launchOptions
     )

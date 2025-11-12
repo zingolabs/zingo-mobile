@@ -1,12 +1,12 @@
-Zingo! Wallet lets you use Real Secure Money (RSM), based on Zcash, for unblockable, uncensorable, and undetectable transactions.
+Zingo Delegator Wallet lets you use Real Secure Money (RSM), based on Zcash, for unblockable, uncensorable, and undetectable transactions.
 
 Thanks to Zero-Knowledge Cryptography, you have complete control and privacy over your money and messages.
 
-What can you do with Zingo!?
+What can you do with Zingo Delegator?
 * Send ZEC and messages quickly, privately, and securely.
 * Add addresses to your address book and save them as contacts.
 * Shielded your transparent funds and ensure secure spending for added privacy.
 * Basic and advanced use for all users.
 * Automatic server management that keeps your wallet synchronized.
 
-Download Zingo! to experience financial freedom with RSM.
+Download Zingo Delegator to experience financial freedom with RSM.

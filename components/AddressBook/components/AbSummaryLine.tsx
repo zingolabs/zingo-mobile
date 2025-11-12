@@ -86,7 +86,7 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
           marginTop: 15,
           paddingBottom: 15,
           borderBottomWidth: addressProtected ? 3 : 1,
-          borderBottomColor: addressProtected ? colors.zingo : colors.border,
+          borderBottomColor: addressProtected ? colors.zingo: colors.border,
           opacity: addressProtected ? 0.5 : 1,
         }}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-start' }}>
@@ -103,13 +103,13 @@ const AbSummaryLine: React.FunctionComponent<AbSummaryLineProps> = ({
                 style={{ marginHorizontal: 10 }}
                 size={24}
                 icon={item.own ? faWallet : faAddressCard}
-                color={addressProtected || item.own ? colors.zingo : item.color ? item.color : colors.primarydisabled}
+                color={addressProtected || item.own ? colors.zingo: item.color ? item.color : colors.primarydisabled}
               />
               <FadeText
                 style={{
                   fontSize: 18,
                   marginHorizontal: 10,
-                  color: addressProtected ? colors.zingo : colors.primary,
+                  color: addressProtected ? colors.zingo: colors.primary,
                   opacity: 1,
                   fontWeight: 'bold',
                 }}>

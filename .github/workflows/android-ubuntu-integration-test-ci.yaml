@@ -40,7 +40,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+          repository: ${{ env.REPO-OWNER }}/crosslink-mobile-client
 
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}
@@ -139,7 +139,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+          repository: ${{ env.REPO-OWNER }}/crosslink-mobile-client
 
       - name: Set envs for x86_64
         if: ${{ env.ABI == 'x86_64' }}

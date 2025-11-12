@@ -1,4 +1,4 @@
-package org.ZingoLabs.Zingo
+package org.ZingoLabs.ZingoDelegator
 
 import android.content.Context
 import android.app.ActivityManager
@@ -30,7 +30,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
-import org.ZingoLabs.Zingo.Constants.*
+import org.ZingoLabs.ZingoDelegator.Constants.*
 import java.io.FileInputStream
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -287,7 +287,7 @@ class BackgroundSyncWorker(private val context: Context, workerParams: WorkerPar
 
 class BSCompanion {
     companion object {
-        private const val TASKID = "Zingo_Processing_Task_ID"
+        private const val TASKID = "Zingo_Delegator_Processing_Task_ID"
         private val SYNC_PERIOD = 24.hours
         private val SYNC_DAY_SHIFT = 1.days // Move to tomorrow
         private val SYNC_START_TIME_HOURS = 3.hours // Start around 3 a.m. at night

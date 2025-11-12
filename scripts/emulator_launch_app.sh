@@ -15,7 +15,7 @@ adb -s emulator-5554 shell logcat -v threadtime -b main &> "${output_dir}/logcat
 ./scripts/node_reboot.sh
 
 echo -e "\nLaunching App..."
-adb shell am start -n "org.ZingoLabs.Zingo/org.ZingoLabs.Zingo.MainActivity" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER &> "${output_dir}/launch_app.txt"
+adb shell am start -n "org.ZingoLabs.ZingoDelegator/org.ZingoLabs.ZingoDelegator.MainActivity" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER &> "${output_dir}/launch_app.txt"
 
 echo -e "\nOutputs saved: ${output_dir}"        
 

@@ -45,7 +45,7 @@ const About: React.FunctionComponent<AboutProps> = ({
           backgroundColor: colors.background,
         }}>
         <Header
-          title={translate('zingo') + ' ' + translate('version')}
+          title={translate('zingodelegator') + ' ' + translate('version')}
           screenName={screenName}
           noBalance={true}
           noSyncingStatus={true}

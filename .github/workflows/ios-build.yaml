@@ -25,7 +25,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+          repository: ${{ env.REPO-OWNER }}/crosslink-mobile-client
 
       - name: Check if native rust cache exists
         id: ios-check-build-cache
@@ -54,7 +54,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+          repository: ${{ env.REPO-OWNER }}/crosslink-mobile-client
 
       - name: Cargo update for zingolib CI
         if: ${{ contains(github.repository, 'zingolib') }}
@@ -132,7 +132,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          repository: ${{ env.REPO-OWNER }}/zingo-mobile
+          repository: ${{ env.REPO-OWNER }}/crosslink-mobile-client
 
       - name: Download native rust
         uses: actions/download-artifact@v4

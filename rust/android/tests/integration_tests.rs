@@ -12,10 +12,10 @@ const UNIX_SOCKET: Option<&str> = Some("/var/run/docker.sock");
 async fn offline_testsuite(abi: &str) {
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "OfflineTestSuite");
+        zingodelegator_utils::android_integration_test(abi, "OfflineTestSuite");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "OfflineTestSuite");
+        zingodelegator_utils::android_integration_test_ci(abi, "OfflineTestSuite");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -36,10 +36,10 @@ async fn execute_sync_from_seed(abi: &str) {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteSyncFromSeed");
+        zingodelegator_utils::android_integration_test(abi, "ExecuteSyncFromSeed");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ExecuteSyncFromSeed");
+        zingodelegator_utils::android_integration_test_ci(abi, "ExecuteSyncFromSeed");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -66,10 +66,10 @@ async fn execute_send_from_orchard(abi: &str) {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
+        zingodelegator_utils::android_integration_test(abi, "ExecuteSendFromOrchard");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ExecuteSendFromOrchard");
+        zingodelegator_utils::android_integration_test_ci(abi, "ExecuteSendFromOrchard");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -97,12 +97,12 @@ async fn execute_currentprice_and_value_transfers_from_seed(abi: &str) {
         };
 
     #[cfg(not(feature = "ci"))]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test(
+    let (exit_code, output, error) = zingodelegator_utils::android_integration_test(
         abi,
         "UpdateCurrentPriceAndValueTransfersFromSeed",
     );
     #[cfg(feature = "ci")]
-    let (exit_code, output, error) = zingomobile_utils::android_integration_test_ci(
+    let (exit_code, output, error) = zingodelegator_utils::android_integration_test_ci(
         abi,
         "UpdateCurrentPriceAndValueTransfersFromSeed",
     );
@@ -137,10 +137,10 @@ async fn execute_sapling_balance_from_seed(abi: &str) {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteSaplingBalanceFromSeed");
+        zingodelegator_utils::android_integration_test(abi, "ExecuteSaplingBalanceFromSeed");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ExecuteSaplingBalanceFromSeed");
+        zingodelegator_utils::android_integration_test_ci(abi, "ExecuteSaplingBalanceFromSeed");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -172,10 +172,10 @@ async fn execute_parse_addresses(abi: &str) {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test(abi, "ExecuteParseAddresses");
+        zingodelegator_utils::android_integration_test(abi, "ExecuteParseAddresses");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::android_integration_test_ci(abi, "ExecuteParseAddresses");
+        zingodelegator_utils::android_integration_test_ci(abi, "ExecuteParseAddresses");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
