@@ -24,7 +24,6 @@ export default class SettingsFileClass {
   // - null: means is a fresh install
   // - string: means it have a normal value
   security: SecurityType;
-  firstUpdateWithDonation: boolean;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
@@ -43,7 +42,6 @@ export default class SettingsFileClass {
     basicFirstViewSeed: boolean,
     version: string,
     security: SecurityType,
-    firstUpdateWithDonation: boolean,
     rescanMenu: boolean,
     recoveryWalletInfoOnDevice: boolean,
     performanceLevel: RPCPerformanceLevelEnum,
@@ -61,7 +59,6 @@ export default class SettingsFileClass {
     this.basicFirstViewSeed = basicFirstViewSeed;
     this.version = version;
     this.security = security;
-    this.firstUpdateWithDonation = firstUpdateWithDonation;
     this.rescanMenu = rescanMenu;
     this.recoveryWalletInfoOnDevice = recoveryWalletInfoOnDevice;
     this.performanceLevel = performanceLevel;

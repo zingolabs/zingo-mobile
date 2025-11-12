@@ -31,7 +31,6 @@ function makeDrawerProps(): StackScreenProps<AppStackParamList, RouteEnum.Loaded
         orchardPool: true,
         saplingPool: true,
         transparentPool: true,
-        newWallet: false,
         firstLaunchingMessage: LaunchingModeEnum.opening,
       },
     },

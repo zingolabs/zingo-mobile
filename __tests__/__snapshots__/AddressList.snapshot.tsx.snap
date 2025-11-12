@@ -216,7 +216,7 @@ exports[`Component Unified Address List - test Address Transparent List - snapsh
           "maxHeight": "80%",
         }
       }
-      testID="addressbook.scroll-view"
+      testID="address.scroll-view"
     >
       <View>
         <ActivityIndicator
@@ -451,7 +451,7 @@ exports[`Component Unified Address List - test Address Unified List - snapshot 1
           "maxHeight": "80%",
         }
       }
-      testID="addressbook.scroll-view"
+      testID="address.scroll-view"
     >
       <View>
         <ActivityIndicator

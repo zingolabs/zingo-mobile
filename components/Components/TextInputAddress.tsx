@@ -28,7 +28,6 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   disabled,
   showLabel,
   screenName,
-  routeStack,
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
@@ -55,15 +54,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   }, [address, lightWalletserver.chainName, setError, translate]);
 
   const setQrcodeModalShow = () => {
-    if (screenName === ScreenEnum.AddressBook) {
-      navigation.navigate(routeStack, {
-        screen: RouteEnum.ScannerAddress,
-        params: { 
-          setAddress: (a: string) => setAddress(a),
-          active: true,
-        }
-      });
-    } else if (screenName === ScreenEnum.Receive) {
+    if (screenName === ScreenEnum.Receive) {
       navigation.navigate(RouteEnum.ScannerAddress, {
         setAddress: (a: string) => setAddress(a),
         active: true,

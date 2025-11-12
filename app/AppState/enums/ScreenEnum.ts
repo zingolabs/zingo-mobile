@@ -9,7 +9,6 @@ export enum ScreenEnum {
   //
   LoadedApp = 'LoadedApp',
   ComputingTxContext = 'ComputingTxContext',
-  AddressBook = 'AddressBook',
   History = 'History',
   ValueTransferDetail = 'ValueTransferDetail',
   Send = 'Send',

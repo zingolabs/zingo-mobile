@@ -100,13 +100,6 @@ const Menu: React.FunctionComponent<MenuProps> = ({ onItemSelected, screenName, 
             </RegText>
           )}
 
-          <RegText
-            testID="menu.addressbook"
-            onPress={() => onItemSelectedWrapper(MenuItemEnum.AddressBook)}
-            style={item}>
-            {translate('loadedapp.addressbook') as string}
-          </RegText>
-
           {!(mode === ModeEnum.basic && valueTransfersTotal !== null && valueTransfersTotal === 0) && (
             <RegText
               testID="menu.walletseedufvk"

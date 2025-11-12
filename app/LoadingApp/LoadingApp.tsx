@@ -100,31 +100,32 @@ const SERVER_DEFAULT_0: ServerType = {
 
 export default function LoadingApp(props: LoadingAppProps) {
   const theme = useTheme() as ThemeType;
+  const [loading, setLoading] = useState<boolean>(true);
+
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.USDCurrency); // by default USD
+  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency); // by default none because of cTAZ
   const [lightWalletServer, setLightWalletServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [selectLightWalletServer, setSelectLightWalletserver] = useState<SelectServerEnum>(SelectServerEnum.custom);
   const [validatorServer, setValidatorServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
-  const [mode, setMode] = useState<ModeEnum.basic | ModeEnum.advanced>(ModeEnum.advanced); // by default advanced
+  const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
   const [firstLaunchingMessage, setFirstLaunchingMessage] = useState<LaunchingModeEnum>(LaunchingModeEnum.opening);
-  const [loading, setLoading] = useState<boolean>(true);
   const [security, setSecurity] = useState<SecurityType>({
-    startApp: true,
-    foregroundApp: true,
-    sendConfirm: true,
-    seedUfvkScreen: true,
-    rescanScreen: true,
-    settingsScreen: true,
-    changeWalletScreen: true,
-    restoreWalletBackupScreen: true,
+    startApp: true, // activate only this
+    foregroundApp: false,
+    sendConfirm: false,
+    seedUfvkScreen: false,
+    rescanScreen: false,
+    settingsScreen: false,
+    changeWalletScreen: false,
+    restoreWalletBackupScreen: false,
   });
-  const [donationAlert, setDonationAlert] = useState<boolean>(false);
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
-  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
+  // by default the App store the seed phrase & birthday on KeyChain/KeyStore (Device).
+  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(true);
   const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const file = useMemo(
     () => ({
@@ -162,35 +163,14 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else if (settings.version === '' || settings.version !== (translate('version') as string)) {
         // this is an update
         setFirstLaunchingMessage(LaunchingModeEnum.updating);
-        // The App needs to set the currency opt-in to USD by default
-        // only if the currency have `none`
-        if (settings.currency === CurrencyEnum.noCurrency) {
-          await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, CurrencyEnum.USDCurrency);
-        }
       }
 
-      // new donation feature.
-      if (settings.firstInstall || settings.firstUpdateWithDonation) {
-        setDonationAlert(true);
-      }
-
-      // first I need to know if this launch is a fresh install...
-      // if firstInstall is true -> 100% is the first time.
-      //console.log('first install', settings.firstInstall);
-      if (settings.firstInstall) {
-        // basic mode
-        setMode(ModeEnum.basic);
-        props.toggleTheme(ModeEnum.basic);
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, ModeEnum.basic);
+      if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
+        setMode(settings.mode);
+        props.toggleTheme(settings.mode);
       } else {
-        if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
-          setMode(settings.mode);
-          props.toggleTheme(settings.mode);
-        } else {
-          // if it is not a fresh install -> advanced
-          await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-          props.toggleTheme(mode);
-        }
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
+        props.toggleTheme(mode);
       }
 
       if (
@@ -232,6 +212,7 @@ export default function LoadingApp(props: LoadingAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, lightWalletServer);
       }
+      // using only custom & offline.
       if (
         settings.selectLightWalletServer === SelectServerEnum.auto ||
         settings.selectLightWalletServer === SelectServerEnum.custom ||
@@ -289,20 +270,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.performanceLevel, performanceLevel);
       }
 
-      // if server uri is empty, fix this.
-      // it is a weird edge case
-      if (settings.lightWalletserver && !settings.lightWalletserver.uri) {
-        if (
-          settings.selectLightWalletServer &&
-          settings.selectLightWalletServer === SelectServerEnum.auto ||
-          settings.selectLightWalletServer === SelectServerEnum.custom ||
-          settings.selectLightWalletServer === SelectServerEnum.list
-        ) {
-          setLightWalletServer(lightWalletServer);
-          await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, lightWalletServer);
-        }
-      }
-
       // for testing
       //await delay(5000);
 
@@ -338,7 +305,6 @@ export default function LoadingApp(props: LoadingAppProps) {
         background={background}
         firstLaunchingMessage={firstLaunchingMessage}
         security={security}
-        donationAlert={donationAlert}
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         performanceLevel={performanceLevel}
@@ -365,7 +331,6 @@ type LoadingAppClassProps = {
   background: BackgroundType;
   firstLaunchingMessage: LaunchingModeEnum;
   security: SecurityType;
-  donationAlert: boolean;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
@@ -430,7 +395,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       startingApp:
         !!props.route.params && props.route.params.startingApp !== undefined ? props.route.params.startingApp : true,
       serverErrorTries: 0,
-      donationAlert: props.donationAlert,
       firstLaunchingMessage: props.firstLaunchingMessage,
       hasRecoveryWalletInfoSaved: false,
     };
@@ -488,17 +452,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     // before anything...
     const r = await RPCModule.setCryptoDefaultProvider();
     console.log('crypto provider result', r);
-
-    // Here the App ask about the new donation feature if needed.
-    // only for Advance Users
-    if (this.state.donationAlert && this.state.mode === ModeEnum.advanced) {
-      await this.showDonationAlertAsync()
-        .then(() => {
-          this.setState({ donation: true });
-          SettingsFileImpl.writeSettings(SettingsNameEnum.donation, true);
-        })
-        .catch(() => {});
-    }
 
     // has the device the Wallet Keys stored?
     const has = await hasRecoveryWalletInfo();
@@ -619,8 +572,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             }
             // if the App is restoring another wallet backup...
             // needs to recalculate the Address Book.
-            const newWallet = !!this.props.route.params && this.props.route.params.newWallet !== undefined ? this.props.route.params.newWallet : false;
-            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, newWallet, this.state.firstLaunchingMessage);
+            this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, this.state.firstLaunchingMessage);
             //console.log('navigate to LoadedApp');
           } else {
             error = true;
@@ -670,7 +622,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           } else {
             await this.createNewWallet(false);
             this.setState({ actionButtonsDisabled: false });
-            this.navigateToLoadedApp(false, true, true, true, true, this.state.firstLaunchingMessage);
+            this.navigateToLoadedApp(false, true, true, true, this.state.firstLaunchingMessage);
             //console.log('navigate to LoadedApp');
           }
         }
@@ -773,27 +725,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.dim && typeof this.dim.remove === 'function' && this.dim.remove();
     this.appstate && typeof this.appstate.remove === 'function' && this.appstate.remove();
     this.unsubscribeNetInfo && typeof this.unsubscribeNetInfo === 'function' && this.unsubscribeNetInfo();
-  };
-
-  showDonationAlertAsync = (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      Alert.alert(
-        this.state.translate('loadingapp.alert-donation-title') as string,
-        this.state.translate('loadingapp.alert-donation-body') as string,
-        [
-          {
-            text: this.state.translate('confirm') as string,
-            onPress: () => resolve(),
-          },
-          {
-            text: this.state.translate('cancel') as string,
-            style: 'cancel',
-            onPress: () => reject(),
-          },
-        ],
-        { cancelable: false },
-      );
-    });
   };
 
   selectTheBestServer = async (aDifferentOne: boolean): Promise<boolean> => {
@@ -1051,13 +982,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.setState({ actionButtonsDisabled: false });
   };
 
-  navigateToLoadedApp = (readOnly: boolean, orchardPool: boolean, saplingPool: boolean, transparentPool: boolean, newWallet: boolean, firstLaunchingMessage: LaunchingModeEnum) => {
+  navigateToLoadedApp = (readOnly: boolean, orchardPool: boolean, saplingPool: boolean, transparentPool: boolean, firstLaunchingMessage: LaunchingModeEnum) => {
     this.props.navigationApp.reset({
       index: 0,
       routes: [
         {
           name: RouteEnum.LoadedApp,
-          params: { readOnly, orchardPool, saplingPool, transparentPool, newWallet, firstLaunchingMessage },
+          params: { readOnly, orchardPool, saplingPool, transparentPool, firstLaunchingMessage },
         },
       ],
     });
@@ -1301,7 +1232,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
             await RPCModule.createTorClientProcess();
           }
-          this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true, this.state.firstLaunchingMessage);
+          this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, this.state.firstLaunchingMessage);
         } else {
           error = true;
           errorText = resultJson.error;
@@ -1545,9 +1476,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               animationType="slide"
               transparent={true}
               visible={screen === 2}
-              onRequestClose={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true, firstLaunchingMessage)}>
+              onRequestClose={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, firstLaunchingMessage)}>
               <NewSeed
-                onClickOK={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, true, firstLaunchingMessage)}
+                onClickOK={() => this.navigateToLoadedApp(readOnly, orchardPool, saplingPool, transparentPool, firstLaunchingMessage)}
               />
             </Modal>
           )}

@@ -19,7 +19,6 @@ export type LoadingAppNavigationState = {
   screen?: number;
   startingApp?: boolean;
   biometricsFailed?: boolean;
-  newWallet?: boolean;
 };
 /**
  * Navigation state used for internal app navigation within LoadedApp
@@ -30,7 +29,6 @@ export type LoadedAppNavigationState = {
   orchardPool: boolean;
   saplingPool: boolean;
   transparentPool: boolean;
-  newWallet: boolean;
   firstLaunchingMessage: LaunchingModeEnum;
 };
 
@@ -45,7 +43,6 @@ export type AppDrawerParamList = {
   [RouteEnum.Send]: undefined;
   [RouteEnum.Receive]: undefined;
   [RouteEnum.Messages]: undefined;
-  [RouteEnum.AddressBookStack]: undefined;
   [RouteEnum.ValueTransferDetailStack]: undefined;
   [RouteEnum.ConfirmStack]: undefined;
   [RouteEnum.InsightStack]: undefined;
@@ -60,7 +57,6 @@ export type AppDrawerParamList = {
   [RouteEnum.ContactList]: undefined;
 
   // Drawer with params
-  [RouteEnum.AddressBook]: AddressBookNavigationState | undefined;
   [RouteEnum.AddressList]: AddressListNavigationState | undefined;
   [RouteEnum.ScannerAddress]: ScannerAddressNavigationState | undefined;
   [RouteEnum.ValueTransferDetail]: ValueTransferDetailNavigationState | undefined;
@@ -70,11 +66,6 @@ export type AppDrawerParamList = {
   [RouteEnum.Confirm]: ConfirmNavigationState | undefined;
   [RouteEnum.Ufvk]: UfvkNavigationState | undefined;
   [RouteEnum.Seed]: SeedNavigationState | undefined;
-};
-
-export type AddressBookNavigationState = {
-  currentAddress: string;
-  routeStack: RouteEnum;
 };
 
 export type AddressListNavigationState = {

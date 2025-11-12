@@ -17,7 +17,6 @@ import {
   faQrcode,
   faCheck,
   faInfoCircle,
-  faAddressCard,
   faMagnifyingGlassPlus,
   faMoneyCheckDollar,
   faXmark,
@@ -25,7 +24,6 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
-import RNPickerSelect from 'react-native-picker-select';
 
 import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
@@ -34,7 +32,6 @@ import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import Button from '../Components/Button';
 import {
-  AddressBookFileClass,
   SendPageStateClass,
   ToAddrClass,
   ModeEnum,
@@ -69,7 +66,6 @@ import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalance
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import { isEqual } from 'lodash';
 
 type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   // side menu
@@ -117,7 +113,6 @@ const Send: React.FunctionComponent<SendProps> = ({
     addLastSnackbar,
     mode,
     somePending,
-    addressBook,
     donation,
     addresses,
     defaultUnifiedAddress,
@@ -140,14 +135,12 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
-  const [itemsPicker, setItemsPicker] = useState<{ label: string; value: string }[]>([]);
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
   const [maxAmount, setMaxAmount] = useState<number>(0);
   const [spendable, setSpendable] = useState<number>(0);
   const [fee, setFee] = useState<number>(0);
   const [stillConfirming, setStillConfirming] = useState<boolean>(false);
   const [showShieldInfo, setShowShieldInfo] = useState<boolean>(false);
-  const [updatingToField, setUpdatingToField] = useState<boolean>(false);
   const [donationAddress, setDonationAddress] = useState<boolean>(false);
   const [negativeMaxAmount, setNegativeMaxAmount] = useState<boolean>(false);
   //const [sendAllClick, setSendAllClick] = useState<boolean>(false);
@@ -155,7 +148,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [spendableBalanceLastError, setSpendableBalanceLastError] = useState<string>('');
   const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
   const [contentHeight, setContentHeight] = useState<number>(0);
-  const [pickerTempSelectedAddress, setPickerTempSelectedAddress] = useState<string>('');
   const [addressText, setAddressText] = useState<string>(sendPageState.toaddr.to);
   const [memoText, setMemoText] = useState<string>(sendPageState.toaddr.memo);
   const [amountText, setAmountText] = useState<string>(sendPageState.toaddr.amount);
@@ -591,20 +583,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [memoEnabled, amountText, validAddress, validAmount, validMemo, fee, maxAmount]);
 
   useEffect(() => {
-    (async () => {
-      const items = addressBook
-        .filter((item: AddressBookFileClass) => item.address !== zenniesDonationAddress)
-        .map((item: AddressBookFileClass) => ({
-          label: item.label,
-          value: item.address,
-        }));
-      if (!isEqual(items, itemsPicker)) {
-        setItemsPicker(items);
-      }
-    })();
-  }, [addressBook, itemsPicker, zenniesDonationAddress]);
-
-  useEffect(() => {
     if (addressText) {
       (async () => {
         const donationA =
@@ -972,97 +950,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                           color={colors.primaryDisabled}
                         />
                       </TouchableOpacity>
-                    )}
-                    {itemsPicker.length > 0 && (
-                      <>
-                        {!updatingToField ? (
-                          <RNPickerSelect
-                            style={{
-                              modalViewBottom: {
-                                minHeight: 300,
-                              },
-                            }}
-                            pickerProps={{
-                              mode: 'dialog',
-                              itemStyle: {
-                                color: colors.background,
-                              },
-                            }}
-                            fixAndroidTouchableBug={true}
-                            value={
-                              pickerTempSelectedAddress && Platform.OS === GlobalConst.platformOSios
-                                ? (pickerTempSelectedAddress ?? ' ')
-                                : (addressText ?? ' ')
-                            }
-                            items={itemsPicker}
-                            placeholder={{
-                              label: translate('addressbook.select-placeholder') as string,
-                              value: null,
-                              color: colors.primary,
-                            }}
-                            useNativeAndroidPickerStyle={false}
-                            onDonePress={async () => {
-                              // only for IOS
-                              if (
-                                validAddress === 1 &&
-                                addressText &&
-                                pickerTempSelectedAddress &&
-                                addressText !== pickerTempSelectedAddress
-                              ) {
-                                setUpdatingToField(true);
-                                await ShowAddressAlertAsync(translate)
-                                  .then(() => {
-                                    updateToField(pickerTempSelectedAddress, null, null, null, null);
-                                  })
-                                  .catch(() => {
-                                    updateToField(addressText, null, null, null, null);
-                                  });
-                                setTimeout(() => {
-                                  setUpdatingToField(false);
-                                }, 500);
-                              } else if (addressText !== pickerTempSelectedAddress) {
-                                updateToField(pickerTempSelectedAddress, null, null, null, null);
-                              }
-                              setPickerTempSelectedAddress('');
-                            }}
-                            onValueChange={async (itemValue: string) => {
-                              // only for Android
-                              if (Platform.OS === GlobalConst.platformOSandroid) {
-                                if (validAddress === 1 && addressText && itemValue && addressText !== itemValue) {
-                                  setUpdatingToField(true);
-                                  await ShowAddressAlertAsync(translate)
-                                    .then(() => {
-                                      updateToField(itemValue, null, null, null, null);
-                                    })
-                                    .catch(() => {
-                                      updateToField(addressText, null, null, null, null);
-                                    });
-                                  setTimeout(() => {
-                                    setUpdatingToField(false);
-                                  }, 500);
-                                } else if (addressText !== itemValue) {
-                                  updateToField(itemValue, null, null, null, null);
-                                }
-                              } else {
-                                setPickerTempSelectedAddress(itemValue);
-                              }
-                            }}>
-                            <FontAwesomeIcon
-                              style={{ marginRight: 7 }}
-                              size={39}
-                              icon={faAddressCard}
-                              color={colors.primary}
-                            />
-                          </RNPickerSelect>
-                        ) : (
-                          <FontAwesomeIcon
-                            style={{ marginRight: 7 }}
-                            size={39}
-                            icon={faAddressCard}
-                            color={colors.primaryDisabled}
-                          />
-                        )}
-                      </>
                     )}
                     <TouchableOpacity
                       testID="send.scan-button"
@@ -1702,7 +1589,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                     defaultValueFee();
                     defaultValuesSpendableMaxAmount();
                     clearState();
-                    setPickerTempSelectedAddress('');
                     Keyboard.dismiss();
                   }}
                   twoButtons={true}

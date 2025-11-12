@@ -1,11 +1,9 @@
 import UnifiedAddressClass from './classes/UnifiedAddressClass';
 import TransparentAddressClass from './classes/TransparentAddressClass';
-import AddressBookFileClass from './classes/AddressBookFileClass';
 import SendPageStateClass from './classes/SendPageStateClass';
 import SettingsFileClass from './classes/SettingsFileClass';
 import ToAddrClass from './classes/ToAddrClass';
 import TotalBalanceClass from './classes/TotalBalanceClass';
-import AddressBookFileClassObsolete from './classes/AddressBookFileClassObsolete';
 
 import InfoType from './types/InfoType';
 import SendJsonToTypeType from './types/SendJsonToTypeType';
@@ -24,7 +22,6 @@ import ContactType from './types/ContactType';
 import TransactionType from './types/TransactionType';
 import TxDetailType from './types/TxDetailType';
 
-import { AddressBookActionEnum } from './enums/AddressBookActionEnum';
 import { MenuItemEnum } from './enums/MenuItemEnum';
 import { LanguageEnum } from './enums/LanguageEnum';
 import { ModeEnum } from './enums/ModeEnum';
@@ -70,12 +67,10 @@ export {
   AppContextLoaded,
   UnifiedAddressClass,
   TransparentAddressClass,
-  AddressBookFileClass,
   SendPageStateClass,
   SettingsFileClass,
   ToAddrClass,
   TotalBalanceClass,
-  AddressBookFileClassObsolete,
   WalletType,
   SendJsonToTypeType,
   InfoType,
@@ -92,7 +87,6 @@ export {
   ContactType,
   TransactionType,
   TxDetailType,
-  AddressBookActionEnum,
   MenuItemEnum,
   LanguageEnum,
   ModeEnum,

@@ -8,7 +8,6 @@ import moment from 'moment';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
 import {
-  AddressBookFileClass,
   ChainNameEnum,
   SnackbarDurationEnum,
   ValueTransferType,
@@ -60,7 +59,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     addLastSnackbar,
     lightWalletserver,
     currency,
-    addressBook,
     addresses,
     zenniesDonationAddress,
     snackbars,
@@ -155,16 +153,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalLength]);
-
-  const contactFound: (add: string) => boolean = (add: string) => {
-    if (!add) {
-      return false;
-    }
-    const contact: AddressBookFileClass[] = addressBook.filter(
-      (ab: AddressBookFileClass) => ab.address === add,
-    );
-    return contact.length >= 1;
-  };
 
   const thisWalletAddress: (add: string) => boolean = (add: string) => {
     const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses ? addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.address === add) : [];
@@ -617,18 +605,10 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                       <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
                     )}
                     <RegText style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}>{memoUA}</RegText>
-                    {contactFound(memoUA) && (
-                      <View style={{ flexDirection: 'row' }}>
-                        {!thisWalletAddress(memoUA) && (
-                          <RegText style={{ opacity: 0.6 }}>{translate('addressbook.likely') as string}</RegText>
-                        )}
-                        <AddressItem address={memoUA} screenName={screenName} onlyContact={true} />
-                      </View>
-                    )}
-                    {!contactFound(memoUA) && thisWalletAddress(memoUA) && (
+                    {thisWalletAddress(memoUA) && (
                       <View style={{ flexDirection: 'row' }}>
                         <RegText color={colors.primaryDisabled}>
-                          {translate('addressbook.thiswalletaddress') as string}
+                          {translate('history.thiswalletaddress') as string}
                         </RegText>
                       </View>
                     )}

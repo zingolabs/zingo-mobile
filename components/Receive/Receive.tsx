@@ -16,7 +16,6 @@ import {
   SecurityType,
   UnifiedAddressClass,
   TransparentAddressClass,
-  AddressBookFileClass,
   ScreenEnum,
   SnackbarDurationEnum,
   RouteEnum,
@@ -27,7 +26,6 @@ import NewAddress from './components/NewAddress';
 import VerifyAddress from './components/VerifyAddress';
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
-import NewAddressTag from './components/NewAddressTag';
 import TransparentWarning from './components/TransparentWarning';
 import ExpandedAddress from './components/ExpandedAddress';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -36,7 +34,6 @@ type ReceiveProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Receive> & {
   toggleMenuDrawer: () => void;
   alone: boolean;
   setSecurityOption: (s: SecurityType) => Promise<void>;
-  setAddressBook: (ab: AddressBookFileClass[]) => void;
 };
 
 const Receive: React.FunctionComponent<ReceiveProps> = ({
@@ -47,7 +44,6 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
   // shielding
   // for receive
   alone,
-  setAddressBook,
 }) => {
   const context = useContext(ContextAppLoaded);
   const { 
@@ -64,7 +60,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
 
   const [index, setIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<{ key: string; title: string }[]>([]);
-  const [sheetType, setSheetType] = useState<'NA' | 'VA' | 'NAT' | 'TW' | 'EA' | null>(null);
+  const [sheetType, setSheetType] = useState<'NA' | 'VA' | 'TW' | 'EA' | null>(null);
 
   const [uAddr, setUAddr] = useState<UnifiedAddressClass[]>([]);
   const [tAddr, setTAddr] = useState<TransparentAddressClass[]>([]);
@@ -91,7 +87,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
     ]
   }, [heightLayout]);
 
-  const show = useCallback((_sheetType: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => {
+  const show = useCallback((_sheetType: 'NA' | 'VA' | 'TW' | 'EA') => {
     setSheetType(_sheetType);
     bottomSheetRef.current?.snapToIndex(0);
     setIndexBottomSheet(0);
@@ -315,20 +311,7 @@ const Receive: React.FunctionComponent<ReceiveProps> = ({
             <NewAddress
               addressKind={index === 0 ? AddressKindEnum.u : AddressKindEnum.t}
               closeSheet={hide}
-              setAddressBook={setAddressBook}
               screenName={screenName}
-              setHeightLayout={setHeightLayout}
-            />
-          )}
-          {sheetType === 'NAT' && (
-            <NewAddressTag
-              address={index === 0 && uAddrIndex !== null
-                ? uAddr[uAddrIndex].address
-                : index === 1 && tAddrIndex !== null
-                ? tAddr[tAddrIndex].address
-                : ''}
-              closeSheet={hide}
-              setAddressBook={setAddressBook}
               setHeightLayout={setHeightLayout}
             />
           )}

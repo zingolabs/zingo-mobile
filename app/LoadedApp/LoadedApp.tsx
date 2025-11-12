@@ -35,7 +35,6 @@ import {
   BackgroundType,
   TranslateType,
   ServerType,
-  AddressBookFileClass,
   SecurityType,
   MenuItemEnum,
   LanguageEnum,
@@ -61,7 +60,6 @@ import {
   UnifiedAddressClass,
   TransparentAddressClass,
   AddressKindEnum,
-  AddressBookFileClassObsolete,
   ScreenEnum,
   LaunchingModeEnum,
 } from '../AppState';
@@ -77,8 +75,6 @@ import { sendEmail } from '../sendEmail';
 import Snackbars from '../../components/Components/Snackbars';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
-import { AddressBook } from '../../components/AddressBook';
-import { AddressBookFileImpl } from '../../components/AddressBook';
 import simpleBiometrics from '../simpleBiometrics';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
 import { createUpdateRecoveryWalletInfo, removeRecoveryWalletInfo } from '../recoveryWalletInfov10';
@@ -90,16 +86,13 @@ import Settings from '../../components/Settings';
 import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
-import MessageList from '../../components/Messages/components/MessageList';
 import { ToastProvider } from 'react-native-toastier';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
-import { RPCCheckAddressType } from '../rpc/types/RPCCheckAddressType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '../../components/AddressList';
 import ScannerAddress from '../../components/Send/components/ScannerAddress';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
-import { MessagesAddress, MessagesAll } from '../../components/Messages';
 import Memo from '../../components/Memo';
 import Confirm from '../../components/Send/components/Confirm';
 import { AppStackParamList } from '../types';
@@ -141,8 +134,10 @@ const SERVER_DEFAULT_0: ServerType = {
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as ThemeType;
+  const [loading, setLoading] = useState<boolean>(true);
+
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.USDCurrency);
+  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency);
   const [lightWalletServer, setLightWalletServer] = useState<ServerType>(SERVER_DEFAULT_0);
   const [selectLightWalletServer, setSelectLightWalletserver] = useState<SelectServerEnum>(SelectServerEnum.custom);
   const [validatorServer, setValidatorServer] = useState<ServerType>(SERVER_DEFAULT_0);
@@ -151,20 +146,19 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
-  const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [security, setSecurity] = useState<SecurityType>({
-    startApp: true,
-    foregroundApp: true,
-    sendConfirm: true,
-    seedUfvkScreen: true,
-    rescanScreen: true,
-    settingsScreen: true,
-    changeWalletScreen: true,
-    restoreWalletBackupScreen: true,
+    startApp: true, // activate only this
+    foregroundApp: false,
+    sendConfirm: false,
+    seedUfvkScreen: false,
+    rescanScreen: false,
+    settingsScreen: false,
+    changeWalletScreen: false,
+    restoreWalletBackupScreen: false,
   });
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
-  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
+  // by default the App store the seed phrase & birthday on KeyChain/KeyStore (Device).
+  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(true);
   const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const [zenniesDonationAddress, setZenniesDonationAddress] = useState<string>('');
   const file = useMemo(
@@ -180,11 +174,11 @@ export default function LoadedApp(props: LoadedAppProps) {
   const i18n = useMemo(() => new I18n(file), [file]);
 
   const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
+
   const readOnly = !!props.route.params && props.route.params.readOnly !== undefined ? props.route.params.readOnly : false;
   const orchardPool = !!props.route.params && props.route.params.orchardPool !== undefined ? props.route.params.orchardPool : false;
   const saplingPool = !!props.route.params && props.route.params.saplingPool !== undefined ? props.route.params.saplingPool : false;
   const transparentPool = !!props.route.params && props.route.params.transparentPool !== undefined ? props.route.params.transparentPool : false;
-  const newWallet = !!props.route.params && props.route.params.newWallet !== undefined ? props.route.params.newWallet : false;
   const firstLaunchingMessage = !!props.route.params && props.route.params.firstLaunchingMessage !== undefined ? props.route.params.firstLaunchingMessage : LaunchingModeEnum.opening;
 
   useEffect(() => {
@@ -198,9 +192,8 @@ export default function LoadedApp(props: LoadedAppProps) {
       I18nManager.forceRTL(isRTL);
 
       // If the App is mounting this component,
-      // I know I have to reset the firstInstall & firstUpdateWithDonation prop in settings.
+      // I know I have to reset the firstInstall prop in settings.
       await SettingsFileImpl.writeSettings(SettingsNameEnum.firstInstall, false);
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.firstUpdateWithDonation, false);
 
       // If the App is mounting this component, I know I have to update the version prop in settings.
       await SettingsFileImpl.writeSettings(SettingsNameEnum.version, translate('version') as string);
@@ -211,6 +204,14 @@ export default function LoadedApp(props: LoadedAppProps) {
 
       // for testing
       //await delay(5000);
+
+      if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
+        setMode(settings.mode);
+        props.toggleTheme(settings.mode);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
+        props.toggleTheme(mode);
+      }
 
       if (
         settings.language === LanguageEnum.en ||
@@ -280,13 +281,6 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
       }
-      if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
-        setMode(settings.mode);
-        props.toggleTheme(settings.mode);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-        props.toggleTheme(mode);
-      }
       if (settings.security) {
         setSecurity(settings.security);
       } else {
@@ -317,115 +311,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       const backgroundJson = await BackgroundFileImpl.readBackground();
       setBackground(backgroundJson);
 
-      let sort: boolean = false;
       const zenniesAddress = await Utils.getZenniesDonationAddress(lightWalletServer.chainName);
       setZenniesDonationAddress(zenniesAddress);
 
-      // adding `Zenny Tips` address always.
-      let ab = await AddressBookFileImpl.readAddressBook();
-      if (ab.filter((a: AddressBookFileClass) => a.address === zenniesAddress).length === 0) {
-        ab = await AddressBookFileImpl.writeAddressBookItem(
-          translate('zenny-tips-ab') as string,
-          zenniesAddress,
-          '',
-          false,
-        );
-        sort = true;
-      }
-
-      // now make no sense to have two UA's in the same contact
-      // if `uOrchardAddress` exists then it will be removed.
-      let toUpdate: AddressBookFileClassObsolete[] = ab.filter(
-        // if have orchard address or NOT have color or NOT have own flag...
-        (a: AddressBookFileClassObsolete) => a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('color') || !a.hasOwnProperty('own'),
-      );
-      console.log('Address Book -> TO UPDATE', toUpdate);
-      console.log('Address Book items', ab.length);
-      if (toUpdate.length > 0) {
-        const randomColors = Utils.generateColorList(toUpdate.length);
-        for (let i = 0; i < toUpdate.length; i++) {
-          const a = toUpdate[i];
-          let own: boolean;
-          if (!a.hasOwnProperty('own')) {
-            // verify this address as own or not
-            const checkStr = await RPCModule.checkMyAddressInfo(a.address);
-            //console.log(checkStr);
-            if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
-              const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
-              own = checkJSON.is_wallet_address;
-            } else {
-              // error
-              own = false;
-            }
-          } else {
-            // no value
-            own = a.own !== undefined ? a.own : false;
-          }
-          let color: string;
-          if (!a.hasOwnProperty('color')) {
-            color = randomColors[i];
-          } else {
-            // no value
-            color = a.color !== undefined ? a.color : randomColors[i];
-          }
-          if (a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('own') || !a.hasOwnProperty('color')) {
-            ab = await AddressBookFileImpl.updateColorAndOwnItem(
-              a.label,
-              a.address,
-              color,
-              own,
-            );
-          }
-        }
-        sort = true;
-        console.log('Address Book -> UPDATED', ab.length);
-      }
-      // if new wallet or restore from seed/ufvk
-      // the App needs to calculate if the Addresses
-      // in the Address Book belong to this new/restored wallet.
-      if (newWallet) {
-        toUpdate = ab.filter((a: AddressBookFileClass) => !!a.address);
-        // always have one -> Zennies.
-        if (toUpdate.length > 1) {
-          for (let i = 0; i < toUpdate.length; i++) {
-            const a = toUpdate[i];
-            let own: boolean;
-            // verify this address as own or not
-            const checkStr = await RPCModule.checkMyAddressInfo(a.address);
-            //console.log(checkStr);
-            if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
-              const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
-              own = checkJSON.is_wallet_address;
-            } else {
-              // error
-              own = false;
-            }
-            ab = await AddressBookFileImpl.updateColorAndOwnItem(
-              a.label,
-              a.address,
-              a.color ? a.color : '',
-              own,
-            );
-          }
-          sort = true;
-        }
-      }
-      let abSorted = [] as AddressBookFileClass[];
-      if (sort) {
-        // this is a good place to sort properly these data
-        // if anything changed.
-        abSorted = ab.sort((a, b) => {
-          const aLabel = a.label;
-          const bLabel = b.label;
-          return aLabel.localeCompare(bLabel);
-        });
-      } else {
-        abSorted = ab;
-      }
-      setAddressBook(abSorted);
-      await AddressBookFileImpl.writeAddressBook(abSorted);
       setLoading(false);
-      //console.log('LoadedApp functional component - finished');
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -457,7 +346,6 @@ export default function LoadedApp(props: LoadedAppProps) {
         orchardPool={orchardPool}
         saplingPool={saplingPool}
         transparentPool={transparentPool}
-        addressBook={addressBook}
         security={security}
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
@@ -509,7 +397,6 @@ type LoadedAppClassProps = {
   orchardPool: boolean;
   saplingPool: boolean;
   transparentPool: boolean;
-  addressBook: AddressBookFileClass[];
   security: SecurityType;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
@@ -568,10 +455,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       snackbars: [] as SnackbarType[],
       addLastSnackbar: this.addLastSnackbar,
       removeFirstSnackbar: this.removeFirstSnackbar,
-      restartApp: this.navigateToLoadingApp,
       somePending: false,
-      addressBook: props.addressBook,
-      launchAddressBook: this.launchAddressBook,
       shieldingAmount: 0,
       showSwipeableIcons: true,
       doRefresh: this.doRefresh,
@@ -1295,9 +1179,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         ],
         { cancelable: false },
       );
-    } else if (item === MenuItemEnum.AddressBook) {
-      this.launchAddressBook('', this.screenName);
-      return;
     } else if (item === MenuItemEnum.VoteForNym) {
       let update = false;
       if (
@@ -1633,7 +1514,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
 
     this.keepAwake(false);
-    this.navigateToLoadingApp({ startingApp: false, newWallet: true });
+    this.navigateToLoadingApp({ startingApp: false });
   };
 
   onClickOKServerWallet = async () => {
@@ -1708,10 +1589,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({ backgroundError: { title, error } });
   };
 
-  setAddressBook = (addressBook: AddressBookFileClass[]) => {
-    this.setState({ addressBook });
-  };
-
   addLastSnackbar = (snackbar: SnackbarType) => {
     const newSnackbars = this.state.snackbars;
     // if the last one is the same don't do anything.
@@ -1730,44 +1607,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     const newSnackbars = this.state.snackbars.filter((s: SnackbarType) => s.screenName.includes(screenName));
     newSnackbars.shift();
     this.setState({ snackbars: newSnackbars });
-  };
-
-  // close modal make sense because this is called
-  // in a component which can live in differents screens
-  launchAddressBook = (address: string, screenName: ScreenEnum) => {
-    if (screenName === ScreenEnum.LoadedApp || screenName === ScreenEnum.Send) {
-      this.state.navigationHome?.navigate(RouteEnum.AddressBookStack, {
-        screen: RouteEnum.AddressBook,
-        params: {
-          currentAddress: address,
-          routeStack: RouteEnum.AddressBookStack,
-        }
-      });
-    } else if (screenName === ScreenEnum.ValueTransferDetail) {
-      this.state.navigationHome?.navigate(RouteEnum.ValueTransferDetailStack, {
-        screen: RouteEnum.AddressBook,
-        params: {
-          currentAddress: address,
-          routeStack: RouteEnum.ValueTransferDetailStack,
-        }
-      });
-    } else if (screenName === ScreenEnum.Confirm) {
-      this.state.navigationHome?.navigate(RouteEnum.ConfirmStack, {
-        screen: RouteEnum.AddressBook,
-        params: {
-          currentAddress: address,
-          routeStack: RouteEnum.ConfirmStack,
-        }
-      });
-    } else if (screenName === ScreenEnum.Insight) {
-      this.state.navigationHome?.navigate(RouteEnum.InsightStack, {
-        screen: RouteEnum.AddressBook,
-        params: {
-          currentAddress: address,
-          routeStack: RouteEnum.InsightStack,
-        }
-      });
-    }
   };
 
   setScrollToTop = (value: boolean) => {
@@ -1799,7 +1638,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       totalBalance,
       translate,
       scrollToTop,
-      scrollToBottom,
       addresses,
       somePending,
       selectLightWalletServer,
@@ -1834,10 +1672,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       snackbars: this.state.snackbars,
       addLastSnackbar: this.state.addLastSnackbar,
       removeFirstSnackbar: this.state.removeFirstSnackbar,
-      addressBook: this.state.addressBook,
-      launchAddressBook: this.state.launchAddressBook,
       shieldingAmount: this.state.shieldingAmount,
-      restartApp: this.state.restartApp,
       somePending: this.state.somePending,
       showSwipeableIcons: this.state.showSwipeableIcons,
       doRefresh: this.state.doRefresh,
@@ -2002,18 +1837,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                               toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                               alone={false /* receive */}
                               setSecurityOption={this.setSecurityOption}
-                              setAddressBook={this.setAddressBook}
-                            />
-                          )}
-                        </Tab.Screen>
-                        <Tab.Screen name={RouteEnum.Messages}>
-                          {propsTab => (
-                            <MessageList {...propsTab}
-                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                              setScrollToBottom={this.setScrollToBottom /* header & messages */}
-                              scrollToBottom={scrollToBottom /* messages */}
-                              sendTransaction={this.sendTransaction /* messages */}
-                              setServerOption={this.setServerOption /* messages */}
                             />
                           )}
                         </Tab.Screen>
@@ -2037,7 +1860,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                                   toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                                   alone={true /* receive */}
                                   setSecurityOption={this.setSecurityOption}
-                                  setAddressBook={this.setAddressBook}
                                 />
                               )}
                             </Tab.Screen>
@@ -2076,11 +1898,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   return (
                     <Stack.Navigator initialRouteName={RouteEnum.Insight} screenOptions={{ headerShown: false, animation: 'none' }}>
                       <Stack.Screen name={RouteEnum.Insight} component={Insight} />
-                      <Stack.Screen name={RouteEnum.AddressBook} >
-                        {props => (
-                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
-                        )}
-                      </Stack.Screen>
                       <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
                     </Stack.Navigator>
                   );
@@ -2166,30 +1983,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.SyncReport} component={SyncReport} />
               <Drawer.Screen name={RouteEnum.Pools} component={Pools} />
-              <Drawer.Screen name={RouteEnum.AddressBookStack}>
-                {() => {
-                  return (
-                    <Stack.Navigator initialRouteName={RouteEnum.AddressBook} screenOptions={{ headerShown: false, animation: 'none' }}>
-                      <Stack.Screen name={RouteEnum.AddressBook} >
-                        {props => (
-                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
-                        )}
-                      </Stack.Screen>
-                      <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
-                    </Stack.Navigator>
-                  );
-                }}
-              </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.ValueTransferDetailStack}>
                 {() => {
                   return (
                     <Stack.Navigator initialRouteName={RouteEnum.ValueTransferDetail} screenOptions={{ headerShown: false, animation: 'none' }}>
                       <Stack.Screen name={RouteEnum.ValueTransferDetail} component={ValueTransferDetail} />
-                      <Stack.Screen name={RouteEnum.AddressBook} >
-                        {props => (
-                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
-                        )}
-                      </Stack.Screen>
                       <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
                     </Stack.Navigator>
                   );
@@ -2197,19 +1995,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.AddressList} component={AddressList} />
               <Drawer.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
-              <Drawer.Screen name={RouteEnum.MessagesAddress} component={MessagesAddress} />
-              <Drawer.Screen name={RouteEnum.MessagesAll} component={MessagesAll} />
               <Drawer.Screen name={RouteEnum.Memo} component={Memo} />
               <Drawer.Screen name={RouteEnum.ConfirmStack}>
                 {() => {
                   return (
                     <Stack.Navigator initialRouteName={RouteEnum.Confirm} screenOptions={{ headerShown: false, animation: 'none' }}>
                       <Stack.Screen name={RouteEnum.Confirm} component={Confirm} />
-                      <Stack.Screen name={RouteEnum.AddressBook} >
-                        {props => (
-                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
-                        )}
-                      </Stack.Screen>
                       <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
                     </Stack.Navigator>
                   );

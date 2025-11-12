@@ -66,7 +66,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
     route.params?.addressKind
   ]);
   
-  const fetchAddressBookFiltered = useMemo(async () => {
+  const fetchAddressFiltered = useMemo(async () => {
     if (!addresses) {
       return [];
     }
@@ -79,12 +79,12 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
 
   useEffect(() => {
     (async () => {
-      const abf = await fetchAddressBookFiltered;
+      const abf = await fetchAddressFiltered;
       setLoadMoreButton(numAl < abf.length);
       setAddressesSliced(abf.slice(0, numAl));
       setLoading(false);
     })();
-  }, [fetchAddressBookFiltered, numAl]);
+  }, [fetchAddressFiltered, numAl]);
 
   const loadMoreClicked = useCallback(() => {
     setNumAl(numAl + 50);
@@ -133,7 +133,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
     setIsAtTop(isTop);
   }, [isScrollingToTop]);
 
-  //console.log('render Address Book - 4', currentItem, action, addressBook);
+  //console.log('render Address Book - 4', currentItem, action);
 
   return (
     <ToastProvider>
@@ -169,7 +169,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
           ref={scrollViewRef}
           onScroll={handleScroll}
           scrollEventThrottle={100}
-          testID="addressbook.scroll-view"
+          testID="address.scroll-view"
           keyboardShouldPersistTaps="handled"
           style={{ height: '80%', maxHeight: '80%' }}
           contentContainerStyle={{
@@ -186,7 +186,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                 justifyContent: 'flex-start',
                 marginTop: 30,
               }}>
-              <FadeText style={{ color: colors.primary }}>{translate('addressbook.empty') as string}</FadeText>
+              <FadeText style={{ color: colors.primary }}>{translate('history.empty') as string}</FadeText>
             </View>
           )}
           {loading ? (
@@ -226,7 +226,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
               }}>
               <Button
                 type={ButtonTypeEnum.Secondary}
-                title={translate('addressbook.loadmore') as string}
+                title={translate('history.loadmore') as string}
                 onPress={loadMoreClicked}
               />
             </View>
@@ -242,7 +242,7 @@ const AddressList: React.FunctionComponent<AddressListProps> = ({
                     marginTop: 5,
                     marginBottom: 30,
                   }}>
-                  <FadeText style={{ color: colors.primary }}>{translate('addressbook.end') as string}</FadeText>
+                  <FadeText style={{ color: colors.primary }}>{translate('history.end') as string}</FadeText>
                 </View>
               )}
             </>

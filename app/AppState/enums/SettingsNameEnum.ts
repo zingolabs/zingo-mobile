@@ -18,5 +18,4 @@ export enum SettingsNameEnum {
   firstInstall = 'firstInstall',
   basicFirstViewSeed = 'basicFirstViewSeed',
   version = 'version',
-  firstUpdateWithDonation = 'firstUpdateWithDonation',
 }
