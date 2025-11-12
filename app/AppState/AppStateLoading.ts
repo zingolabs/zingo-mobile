@@ -15,9 +15,6 @@ export default interface AppStateLoading {
   biometricsFailed: boolean;
   startingApp: boolean;
   serverErrorTries: number;
-  donationAlert: boolean;
   firstLaunchingMessage: LaunchingModeEnum;
   hasRecoveryWalletInfoSaved: boolean;
-
-   
 }

@@ -1,7 +1,6 @@
 import TotalBalanceClass from './classes/TotalBalanceClass';
 import UnifiedAddressClass from './classes/UnifiedAddressClass';
 import SendPageStateClass from './classes/SendPageStateClass';
-import AddressBookFileClass from './classes/AddressBookFileClass';
 
 import InfoType from './types/InfoType';
 import WalletType from './types/WalletType';
@@ -18,7 +17,6 @@ import { LanguageEnum } from './enums/LanguageEnum';
 import { CurrencyEnum } from './enums/CurrencyEnum';
 import { ModeEnum } from './enums/ModeEnum';
 import { SelectServerEnum } from './enums/SelectServerEnum';
-import { LoadedAppNavigationState } from '../types';
 import ValueTransferType from './types/ValueTransferType';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import TransparentAddressClass from './classes/TransparentAddressClass';
@@ -87,17 +85,8 @@ export default interface AppContextLoaded {
   addLastSnackbar: (snackbar: SnackbarType) => void;
   removeFirstSnackbar: (s: ScreenEnum) => void;
 
-  // if the App is stalled - restart is fired
-  restartApp: (s: LoadedAppNavigationState) => void;
-
   // some ValueTransfer is pending?
   somePending: boolean;
-
-  // List of our contacts - Address book
-  addressBook: AddressBookFileClass[];
-
-  // helpers to open the address book modal from different places in the App
-  launchAddressBook: (add: string, s: ScreenEnum) => void;
 
   // is calculated in the header & needed in the send screen
   shieldingAmount: number;
@@ -121,7 +110,10 @@ export default interface AppContextLoaded {
   setPrivacyOption: (value: boolean) => Promise<void>;
 
   // settings
-  server: ServerType;
+  lightWalletserver: ServerType;
+  selectLightWalletServer: SelectServerEnum;
+  validatorServer: ServerType;
+  selectValidatorServer: SelectServerEnum;
   currency: CurrencyEnum;
   language: LanguageEnum;
   sendAll: boolean;
@@ -129,7 +121,6 @@ export default interface AppContextLoaded {
   privacy: boolean;
   mode: ModeEnum;
   security: SecurityType;
-  selectServer: SelectServerEnum;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;

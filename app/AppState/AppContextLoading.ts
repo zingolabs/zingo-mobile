@@ -35,7 +35,10 @@ export default interface AppContextLoading {
   setPrivacyOption: (value: boolean) => Promise<void>;
 
   // context settings
-  server: ServerType;
+  lightWalletserver: ServerType;
+  selectLightWalletServer: SelectServerEnum;
+  validatorServer: ServerType;
+  selectValidatorServer: SelectServerEnum;
   currency: CurrencyEnum;
   language: LanguageEnum;
   sendAll: boolean;
@@ -43,10 +46,7 @@ export default interface AppContextLoading {
   privacy: boolean;
   mode: ModeEnum;
   security: SecurityType;
-  selectServer: SelectServerEnum;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
-  performanceLevel: RPCPerformanceLevelEnum;
-
-   
+  performanceLevel: RPCPerformanceLevelEnum;   
 }

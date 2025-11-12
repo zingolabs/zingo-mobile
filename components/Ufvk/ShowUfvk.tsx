@@ -41,7 +41,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
   const { 
     translate, 
     wallet, 
-    server, 
+    lightWalletserver, 
     mode, 
     addLastSnackbar, 
     snackbars, 
@@ -117,7 +117,7 @@ const ShowUfvk: React.FunctionComponent<ShowUfvkProps> = ({
         : action === UfvkActionEnum.server
         ? (translate('ufvk.server-warning') as string)
         : '') +
-        (server.chainName !== ChainNameEnum.mainChainName &&
+        (lightWalletserver.chainName !== ChainNameEnum.mainChainName &&
         (action === UfvkActionEnum.change || action === UfvkActionEnum.server)
           ? '\n' + (translate('ufvk.mainnet-warning') as string)
           : ''),

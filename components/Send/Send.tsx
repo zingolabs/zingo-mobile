@@ -17,7 +17,6 @@ import {
   faQrcode,
   faCheck,
   faInfoCircle,
-  faAddressCard,
   faMagnifyingGlassPlus,
   faMoneyCheckDollar,
   faXmark,
@@ -25,7 +24,6 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { getNumberFormatSettings } from 'react-native-localize';
-import RNPickerSelect from 'react-native-picker-select';
 
 import FadeText from '../Components/FadeText';
 import ErrorText from '../Components/ErrorText';
@@ -34,7 +32,6 @@ import ZecAmount from '../Components/ZecAmount';
 import CurrencyAmount from '../Components/CurrencyAmount';
 import Button from '../Components/Button';
 import {
-  AddressBookFileClass,
   SendPageStateClass,
   ToAddrClass,
   ModeEnum,
@@ -69,7 +66,6 @@ import { RPCSpendablebalanceType } from '../../app/rpc/types/RPCSpendablebalance
 import { ToastProvider } from 'react-native-toastier';
 import Snackbars from '../Components/Snackbars';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import { isEqual } from 'lodash';
 
 type SendProps = DrawerScreenProps<AppDrawerParamList, RouteEnum.Send> & {
   // side menu
@@ -112,17 +108,16 @@ const Send: React.FunctionComponent<SendProps> = ({
     sendAll,
     netInfo,
     privacy,
-    server,
+    lightWalletserver,
     setBackgroundError,
     addLastSnackbar,
     mode,
     somePending,
-    addressBook,
     donation,
     addresses,
     defaultUnifiedAddress,
     shieldingAmount,
-    selectServer,
+    selectLightWalletServer,
     setZecPrice,
     zenniesDonationAddress,
     //security,
@@ -140,14 +135,12 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [validAmount, setValidAmount] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - Invalid number, -2 - Invalid Amount
   const [validMemo, setValidMemo] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
   const [sendButtonEnabled, setSendButtonEnabled] = useState<boolean>(false);
-  const [itemsPicker, setItemsPicker] = useState<{ label: string; value: string }[]>([]);
   const [memoIcon, setMemoIcon] = useState<boolean>(false);
   const [maxAmount, setMaxAmount] = useState<number>(0);
   const [spendable, setSpendable] = useState<number>(0);
   const [fee, setFee] = useState<number>(0);
   const [stillConfirming, setStillConfirming] = useState<boolean>(false);
   const [showShieldInfo, setShowShieldInfo] = useState<boolean>(false);
-  const [updatingToField, setUpdatingToField] = useState<boolean>(false);
   const [donationAddress, setDonationAddress] = useState<boolean>(false);
   const [negativeMaxAmount, setNegativeMaxAmount] = useState<boolean>(false);
   //const [sendAllClick, setSendAllClick] = useState<boolean>(false);
@@ -155,7 +148,6 @@ const Send: React.FunctionComponent<SendProps> = ({
   const [spendableBalanceLastError, setSpendableBalanceLastError] = useState<string>('');
   const [keyboardVisible, setKeyboardVisible] = useState<boolean>(false);
   const [contentHeight, setContentHeight] = useState<number>(0);
-  const [pickerTempSelectedAddress, setPickerTempSelectedAddress] = useState<string>('');
   const [addressText, setAddressText] = useState<string>(sendPageState.toaddr.to);
   const [memoText, setMemoText] = useState<string>(sendPageState.toaddr.memo);
   const [amountText, setAmountText] = useState<string>(sendPageState.toaddr.amount);
@@ -197,7 +189,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     setSpendable(totalBalance ? totalBalance.totalSpendableBalance : 0);
     const max =
       (totalBalance ? totalBalance.totalSpendableBalance : 0) -
-      (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+      (donation && lightWalletserver.chainName === ChainNameEnum.mainChainName && !donationAddress
         ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
         : 0);
     if (max > 0) {
@@ -214,7 +206,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [
     donation,
     donationAddress,
-    server.chainName,
+    lightWalletserver.chainName,
     totalBalance,
     totalBalance?.totalSpendableBalance,
   ]);
@@ -248,7 +240,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       sendPageStateCalculateFee.toaddr.includeUAMemo = includeUAMemoPar;
       sendPageStateCalculateFee.toaddr.amount = amountPar;
 
-      sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, defaultUnifiedAddress, server, donation);
+      sendJson = await Utils.getSendManyJSON(sendPageStateCalculateFee, defaultUnifiedAddress, lightWalletserver, donation);
       console.log('SEND', sendJson);
 
       // fee
@@ -280,7 +272,7 @@ const Send: React.FunctionComponent<SendProps> = ({
             if (runProposeJson.amount !== undefined) {
               const newAmount =
                 runProposeJson.amount / 10 ** 8 -
-                (donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+                (donation && lightWalletserver.chainName === ChainNameEnum.mainChainName && !donationAddress
                   ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
                   : 0);
               console.log('AMOUNT', newAmount);
@@ -298,7 +290,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setFee(proposeFee);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [donation, server, defaultUnifiedAddress, validAddress, validAmount, validMemo, donationAddress,
+    [donation, lightWalletserver, defaultUnifiedAddress, validAddress, validAmount, validMemo, donationAddress,
     /* added */ spendable, maxAmount, somePending, stillConfirming, info.latestBlock],
     // The App have to re-calculate de fee if some of these data changed:
     // - spendable
@@ -387,7 +379,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       //setAddressText(addressPar);
       // Attempt to parse as URI if it starts with zcash
       if (addressPar.toLowerCase().startsWith(GlobalConst.zcash) || addressPar.toLowerCase().includes(':')) {
-        const { error, target } = await parseZcashURI(addressPar, translate, server);
+        const { error, target } = await parseZcashURI(addressPar, translate, lightWalletserver);
 
         if (target) {
           // redo the to addresses
@@ -493,7 +485,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     };
 
     if (addressText) {
-      getMemoEnabled(addressText, server.chainName).then(r => {
+      getMemoEnabled(addressText, lightWalletserver.chainName).then(r => {
         setMemoEnabled(r);
         if (!r) {
           setMemoText('');
@@ -503,7 +495,7 @@ const Send: React.FunctionComponent<SendProps> = ({
       setMemoEnabled(false);
       setMemoText('');
     }
-  }, [server.chainName, addressText]);
+  }, [lightWalletserver.chainName, addressText]);
 
   useEffect(() => {
     const parseAddress = async (
@@ -514,7 +506,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     };
 
     if (addressText) {
-      parseAddress(addressText, server.chainName).then(r => {
+      parseAddress(addressText, lightWalletserver.chainName).then(r => {
         setValidAddress(r.isValid ? 1 : -1);
         if (!r.isValid) {
           setSpendableBalanceLastError('');
@@ -565,7 +557,7 @@ const Send: React.FunctionComponent<SendProps> = ({
     donation,
     donationAddress,
     decimalSeparator,
-    server.chainName,
+    lightWalletserver.chainName,
     addressText,
     amountCurrencyText,
     amountText,
@@ -591,32 +583,18 @@ const Send: React.FunctionComponent<SendProps> = ({
   }, [memoEnabled, amountText, validAddress, validAmount, validMemo, fee, maxAmount]);
 
   useEffect(() => {
-    (async () => {
-      const items = addressBook
-        .filter((item: AddressBookFileClass) => item.address !== zenniesDonationAddress)
-        .map((item: AddressBookFileClass) => ({
-          label: item.label,
-          value: item.address,
-        }));
-      if (!isEqual(items, itemsPicker)) {
-        setItemsPicker(items);
-      }
-    })();
-  }, [addressBook, itemsPicker, zenniesDonationAddress]);
-
-  useEffect(() => {
     if (addressText) {
       (async () => {
         const donationA =
-          addressText === (await Utils.getDonationAddress(server.chainName)) ||
+          addressText === (await Utils.getDonationAddress(lightWalletserver.chainName)) ||
           addressText === zenniesDonationAddress ||
-          addressText === (await Utils.getNymDonationAddress(server.chainName));
+          addressText === (await Utils.getNymDonationAddress(lightWalletserver.chainName));
         setDonationAddress(donationA);
       })();
     } else {
       setDonationAddress(false);
     }
-  }, [addresses, addressText, server.chainName, zenniesDonationAddress]);
+  }, [addresses, addressText, lightWalletserver.chainName, zenniesDonationAddress]);
 
   useEffect(() => {
     setAddressText(sendPageState.toaddr.to);
@@ -671,7 +649,7 @@ const Send: React.FunctionComponent<SendProps> = ({
   };
 
   const confirmSend = async (sendPageStatePar: SendPageStateClass) => {
-    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+    if (!netInfo.isConnected || selectLightWalletServer === SelectServerEnum.offline) {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
@@ -715,22 +693,22 @@ const Send: React.FunctionComponent<SendProps> = ({
       // 2. Another type of Error
       // here is worth it to try again with the best working server...
       // if the user selected a `custom` server, then we cannot change it.
-      if (!customError && selectServer !== SelectServerEnum.custom) {
+      if (!customError && selectLightWalletServer !== SelectServerEnum.custom) {
         // try send again with a working server
         const serverChecked = await selectingServer(serverUris(translate).filter((s: ServerUrisType) => !s.obsolete));
         let fasterServer: ServerType = {} as ServerType;
         if (serverChecked && serverChecked.latency) {
           fasterServer = { uri: serverChecked.uri, chainName: serverChecked.chainName };
         } else {
-          fasterServer = server;
+          fasterServer = lightWalletserver;
           // likely here there is a internet conection problem
           // all of the servers return an error because they are unreachable probably.
           // the 30 seconds timout was fired.
         }
         console.log(serverChecked);
         console.log(fasterServer);
-        if (fasterServer.uri !== server.uri) {
-          setServerOption(fasterServer, selectServer, false, true);
+        if (fasterServer.uri !== lightWalletserver.uri) {
+          setServerOption(fasterServer, selectLightWalletServer, false, true);
         }
 
         try {
@@ -832,7 +810,7 @@ const Send: React.FunctionComponent<SendProps> = ({
         calculatedFee: fee,
         parseAddressInfoJSON: parseAddressInfoJSON,
         donationAmount:
-          donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress
+          donation && lightWalletserver.chainName === ChainNameEnum.mainChainName && !donationAddress
             ? Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
             : 0,
         confirmSend: confirmSend,
@@ -972,97 +950,6 @@ const Send: React.FunctionComponent<SendProps> = ({
                           color={colors.primaryDisabled}
                         />
                       </TouchableOpacity>
-                    )}
-                    {itemsPicker.length > 0 && (
-                      <>
-                        {!updatingToField ? (
-                          <RNPickerSelect
-                            style={{
-                              modalViewBottom: {
-                                minHeight: 300,
-                              },
-                            }}
-                            pickerProps={{
-                              mode: 'dialog',
-                              itemStyle: {
-                                color: colors.background,
-                              },
-                            }}
-                            fixAndroidTouchableBug={true}
-                            value={
-                              pickerTempSelectedAddress && Platform.OS === GlobalConst.platformOSios
-                                ? (pickerTempSelectedAddress ?? ' ')
-                                : (addressText ?? ' ')
-                            }
-                            items={itemsPicker}
-                            placeholder={{
-                              label: translate('addressbook.select-placeholder') as string,
-                              value: null,
-                              color: colors.primary,
-                            }}
-                            useNativeAndroidPickerStyle={false}
-                            onDonePress={async () => {
-                              // only for IOS
-                              if (
-                                validAddress === 1 &&
-                                addressText &&
-                                pickerTempSelectedAddress &&
-                                addressText !== pickerTempSelectedAddress
-                              ) {
-                                setUpdatingToField(true);
-                                await ShowAddressAlertAsync(translate)
-                                  .then(() => {
-                                    updateToField(pickerTempSelectedAddress, null, null, null, null);
-                                  })
-                                  .catch(() => {
-                                    updateToField(addressText, null, null, null, null);
-                                  });
-                                setTimeout(() => {
-                                  setUpdatingToField(false);
-                                }, 500);
-                              } else if (addressText !== pickerTempSelectedAddress) {
-                                updateToField(pickerTempSelectedAddress, null, null, null, null);
-                              }
-                              setPickerTempSelectedAddress('');
-                            }}
-                            onValueChange={async (itemValue: string) => {
-                              // only for Android
-                              if (Platform.OS === GlobalConst.platformOSandroid) {
-                                if (validAddress === 1 && addressText && itemValue && addressText !== itemValue) {
-                                  setUpdatingToField(true);
-                                  await ShowAddressAlertAsync(translate)
-                                    .then(() => {
-                                      updateToField(itemValue, null, null, null, null);
-                                    })
-                                    .catch(() => {
-                                      updateToField(addressText, null, null, null, null);
-                                    });
-                                  setTimeout(() => {
-                                    setUpdatingToField(false);
-                                  }, 500);
-                                } else if (addressText !== itemValue) {
-                                  updateToField(itemValue, null, null, null, null);
-                                }
-                              } else {
-                                setPickerTempSelectedAddress(itemValue);
-                              }
-                            }}>
-                            <FontAwesomeIcon
-                              style={{ marginRight: 7 }}
-                              size={39}
-                              icon={faAddressCard}
-                              color={colors.primary}
-                            />
-                          </RNPickerSelect>
-                        ) : (
-                          <FontAwesomeIcon
-                            style={{ marginRight: 7 }}
-                            size={39}
-                            icon={faAddressCard}
-                            color={colors.primaryDisabled}
-                          />
-                        )}
-                      </>
                     )}
                     <TouchableOpacity
                       testID="send.scan-button"
@@ -1245,7 +1132,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         />
                       </View>
                     </TouchableOpacity>
-                    {donation && server.chainName === ChainNameEnum.mainChainName && !donationAddress && (
+                    {donation && lightWalletserver.chainName === ChainNameEnum.mainChainName && !donationAddress && (
                       <View
                         style={{
                           display: 'flex',
@@ -1644,7 +1531,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     updateToField(null, null, null, memoText, null);
                     // donation - a Zenny is the minimum
                     if (
-                      server.chainName === ChainNameEnum.mainChainName &&
+                      lightWalletserver.chainName === ChainNameEnum.mainChainName &&
                       donationAddress &&
                       Utils.parseStringLocaleToNumberFloat(amountText) <
                         Utils.parseStringLocaleToNumberFloat(Utils.getZenniesDonationAmount())
@@ -1653,7 +1540,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                       updateToField(null, Utils.getZenniesDonationAmount(), null, null, false);
                       return;
                     }
-                    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+                    if (!netInfo.isConnected || selectLightWalletServer === SelectServerEnum.offline) {
                       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
                       return;
                     }
@@ -1702,13 +1589,12 @@ const Send: React.FunctionComponent<SendProps> = ({
                     defaultValueFee();
                     defaultValuesSpendableMaxAmount();
                     clearState();
-                    setPickerTempSelectedAddress('');
                     Keyboard.dismiss();
                   }}
                   twoButtons={true}
                 />
               </View>
-              {server.chainName === ChainNameEnum.mainChainName && Platform.OS === GlobalConst.platformOSandroid && (
+              {lightWalletserver.chainName === ChainNameEnum.mainChainName && Platform.OS === GlobalConst.platformOSandroid && (
                 <>
                   {donation ? (
                     <View
@@ -1728,7 +1614,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                     <TouchableOpacity
                       onPress={async () => {
                         let update = false;
-                        if (addressText && addressText !== (await Utils.getDonationAddress(server.chainName))) {
+                        if (addressText && addressText !== (await Utils.getDonationAddress(lightWalletserver.chainName))) {
                           await ShowAddressAlertAsync(translate)
                             .then(async () => {
                               // fill the fields in the screen with the donation data
@@ -1741,7 +1627,7 @@ const Send: React.FunctionComponent<SendProps> = ({
                         }
                         if (update) {
                           updateToField(
-                            await Utils.getDonationAddress(server.chainName),
+                            await Utils.getDonationAddress(lightWalletserver.chainName),
                             Utils.getDonationAmount(),
                             null,
                             Utils.getDonationMemo(translate),

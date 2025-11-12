@@ -71,7 +71,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
     info,
     showSwipeableIcons,
     readOnly,
-    selectServer,
+    selectLightWalletServer,
     setSendPageState,
   } = context;
   const { colors } = useTheme()  as ThemeType;
@@ -207,7 +207,7 @@ const ValueTransferLine: React.FunctionComponent<ValueTransferLineProps> = ({
                 <FontAwesomeIcon style={{ opacity: 0.8 }} size={30} icon={faFileLines} color={colors.money} />
               </TouchableOpacity>
             </View>
-            {!!vt.address && !readOnly && selectServer !== SelectServerEnum.offline && !addressProtected && (
+            {!!vt.address && !readOnly && selectLightWalletServer !== SelectServerEnum.offline && !addressProtected && (
               <View
                 style={{
                   width: 67,

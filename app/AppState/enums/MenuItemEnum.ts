@@ -9,7 +9,6 @@ export enum MenuItemEnum {
   Insight = 'Insight',
   LoadWalletFromSeed = 'Load Wallet From Seed',
   TipZingoLabs = 'Tip ZingoLabs',
-  AddressBook = 'Address Book',
   About = 'About',
   Info = 'Info',
   VoteForNym = 'Vote For Nym',

@@ -9,7 +9,6 @@ export enum RouteEnum {
   Send = 'Send',
   Receive = 'Receive',
   Messages = 'Messages',
-  AddressBookStack = 'AddressBookStack',
   ValueTransferDetailStack = 'ValueTransferDetailStack',
   ConfirmStack = 'ConfirmStack',
   InsightStack = 'InsightStack',
@@ -24,7 +23,6 @@ export enum RouteEnum {
   ContactList = 'ContactList',
 
   // Drawer with params
-  AddressBook = 'AddressBook',
   AddressList = 'AddressList',
   ScannerAddress = 'ScannerAddress',
   ValueTransferDetail = 'ValueTransferDetail',

@@ -38,7 +38,7 @@ type SingleAddressProps = {
   index: number;
   setIndex: (i: number) => void;
   total: number;
-  show: (s: 'NA' | 'VA' | 'NAT' | 'TW' | 'EA') => void;
+  show: (s: 'NA' | 'VA' | 'TW' | 'EA') => void;
   changeIndex?: (index: number) => void;
   hasTransparent?: boolean;
   showMoreOptions?: boolean;
@@ -60,7 +60,7 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
-  const { translate, privacy, addLastSnackbar, mode, addressBook } = context;
+  const { translate, privacy, addLastSnackbar, mode } = context;
   const { colors } = useTheme() as ThemeType;
 
   const [expandQRAddress, setExpandQRAddress] = useState<boolean>(true);
@@ -125,11 +125,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
       animatedStyle.height = 0;
     };
   }, [animatedStyle, setShowMoreOptions]);
-
-  function contactFromAddress() {
-    const contact = addressBook.find(c => c.address === address?.address);
-    return contact ? contact.label : '';
-  }
 
   const doCopy = () => {
     Clipboard.setString(ufvk ? ufvk : address ? address.address : '');
@@ -422,42 +417,6 @@ const SingleAddress: React.FunctionComponent<SingleAddressProps> = ({
                   style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
                   onPress={() => show('EA')}
                 />
-            )}
-            {address && (
-              <View
-                style={{
-                  flexDirection: 'column',
-                  width: '100%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginBottom: 20,
-                }}>
-                {contactFromAddress() ? (
-                  <Text
-                    style={{
-                      color: colors.zingo,
-                      fontSize: 16,
-                    }}>
-                    {contactFromAddress()}
-                  </Text>
-                ) : (
-                  <TouchableOpacity onPress={() => show('NAT')}>
-                    <Text
-                      style={{
-                        color: colors.zingo,
-                        textDecorationLine: 'underline',
-                        fontSize: 16,
-                      }}>
-                      {translate('receive.add-tag') as string}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-                <Address
-                  address={address.address}
-                  style={{ color: colors.money, fontSize: 18, opacity: 0.8 }}
-                  onPress={() => show('EA')}
-                />
-              </View>
             )}
             <View
               style={{

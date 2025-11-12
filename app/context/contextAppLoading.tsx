@@ -20,7 +20,10 @@ import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,
   wallet: {} as WalletType,
-  server: {} as ServerType,
+  lightWalletserver: {} as ServerType,
+  selectLightWalletServer: SelectServerEnum.custom,
+  validatorServer: {} as ServerType,
+  selectValidatorServer: SelectServerEnum.custom,
   currency: CurrencyEnum.USDCurrency,
   language: LanguageEnum.en,
   zecPrice: {
@@ -48,7 +51,6 @@ export const defaultAppContextLoading: AppContextLoading = {
   addLastSnackbar: () => {},
   removeFirstSnackbar: () => {},
   security: {} as SecurityType,
-  selectServer: SelectServerEnum.auto,
   rescanMenu: false,
   recoveryWalletInfoOnDevice: false,
   zingolibVersion: '',

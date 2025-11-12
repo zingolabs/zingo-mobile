@@ -10,7 +10,6 @@ import FadeText from '../../Components/FadeText';
 import {
   UnifiedAddressClass,
   TransparentAddressClass,
-  AddressBookFileClass,
   SnackbarDurationEnum,
   ScreenEnum,
 } from '../../../app/AppState';
@@ -33,15 +32,10 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
   screenName,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addressBook, addLastSnackbar } = context;
+  const { translate, addLastSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
 
   const displayAddress: string = item.address ? Utils.trimToSmall(item.address, 7) : (translate('info.unknown') as string);
-  const found: AddressBookFileClass[] = addressBook.filter((ab: AddressBookFileClass) => ab.address === item.address);
-  const label: string = found.length > 0 ? found[0].label : '-';
-  const displayContact: string = label.length > 20
-      ? Utils.trimToSmall(label, 8)
-      : label;
 
   const doCopy = () => {
     Clipboard.setString(item.address);
@@ -82,16 +76,6 @@ const AlSummaryLine: React.FunctionComponent<AlSummaryLineProps> = ({
                 icon={faTags}
                 color={colors.text}
               />
-              <FadeText
-                style={{
-                  fontSize: 18,
-                  marginHorizontal: 10,
-                  color: colors.primary,
-                  opacity: 1,
-                  fontWeight: 'bold',
-                }}>
-                {displayContact}
-              </FadeText>
             </View>
             <View style={{ flexDirection: 'row' }}>
               <FontAwesomeIcon style={{ marginHorizontal: 10 }} size={24} icon={faWallet} color={colors.text} />

@@ -28,18 +28,17 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
   disabled,
   showLabel,
   screenName,
-  routeStack,
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
-  const { translate, server } = context;
+  const { translate, lightWalletserver } = context;
   const { colors } = useTheme()  as ThemeType;
 
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
 
   useEffect(() => {
     const parseAddress = async (addr: string): Promise<{ isValid: boolean; onlyOrchardUA: string }> => {
-      return await Utils.isValidAddress(addr, server.chainName);
+      return await Utils.isValidAddress(addr, lightWalletserver.chainName);
     };
 
     if (address) {
@@ -52,18 +51,10 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
       setValidAddress(0);
       setError('');
     }
-  }, [address, server.chainName, setError, translate]);
+  }, [address, lightWalletserver.chainName, setError, translate]);
 
   const setQrcodeModalShow = () => {
-    if (screenName === ScreenEnum.AddressBook) {
-      navigation.navigate(routeStack, {
-        screen: RouteEnum.ScannerAddress,
-        params: { 
-          setAddress: (a: string) => setAddress(a),
-          active: true,
-        }
-      });
-    } else if (screenName === ScreenEnum.Receive) {
+    if (screenName === ScreenEnum.Receive) {
       navigation.navigate(RouteEnum.ScannerAddress, {
         setAddress: (a: string) => setAddress(a),
         active: true,

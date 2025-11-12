@@ -7,7 +7,10 @@ import SecurityType from '../types/SecurityType';
 import ServerType from '../types/ServerType';
 
 export default class SettingsFileClass {
-  server: ServerType;
+  lightWalletserver: ServerType;
+  selectLightWalletServer: SelectServerEnum;
+  validatorServer: ServerType;
+  selectValidatorServer: SelectServerEnum;
   currency: CurrencyEnum;
   language: LanguageEnum;
   sendAll: boolean;
@@ -22,14 +25,15 @@ export default class SettingsFileClass {
   // - null: means is a fresh install
   // - string: means it have a normal value
   security: SecurityType;
-  selectServer: SelectServerEnum;
-  firstUpdateWithDonation: boolean;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   performanceLevel: RPCPerformanceLevelEnum;
 
   constructor(
-    server: ServerType,
+    lightWalletserver: ServerType,
+    selectLightWalletServer: SelectServerEnum,
+    validatorServer: ServerType,
+    selectValidatorServer: SelectServerEnum,
     currency: CurrencyEnum,
     language: LanguageEnum,
     sendAll: boolean,
@@ -40,13 +44,14 @@ export default class SettingsFileClass {
     basicFirstViewSeed: boolean,
     version: string,
     security: SecurityType,
-    selectServer: SelectServerEnum,
-    firstUpdateWithDonation: boolean,
     rescanMenu: boolean,
     recoveryWalletInfoOnDevice: boolean,
     performanceLevel: RPCPerformanceLevelEnum,
   ) {
-    this.server = server;
+    this.lightWalletserver = lightWalletserver;
+    this.selectLightWalletServer = selectLightWalletServer;
+    this.validatorServer = validatorServer;
+    this.selectValidatorServer = selectValidatorServer;
     this.currency = currency;
     this.language = language;
     this.sendAll = sendAll;
@@ -57,8 +62,6 @@ export default class SettingsFileClass {
     this.basicFirstViewSeed = basicFirstViewSeed;
     this.version = version;
     this.security = security;
-    this.selectServer = selectServer;
-    this.firstUpdateWithDonation = firstUpdateWithDonation;
     this.rescanMenu = rescanMenu;
     this.recoveryWalletInfoOnDevice = recoveryWalletInfoOnDevice;
     this.performanceLevel = performanceLevel;

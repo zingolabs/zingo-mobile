@@ -30,7 +30,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
   setHeightLayout,
 }) => {
   const context = useContext(ContextAppLoaded);
-  const { translate, addLastSnackbar, server } = context;
+  const { translate, addLastSnackbar, lightWalletserver } = context;
   const { colors } = useTheme() as ThemeType;
   const { clear } = useToast();
 
@@ -76,7 +76,7 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
     }
     // Attempt to parse as URI if it starts with zcash
     if (addr.toLowerCase().startsWith(GlobalConst.zcash) || addr.toLowerCase().includes(':')) {
-      const { error, target } = await parseZcashURI(addr, translate, server);
+      const { error, target } = await parseZcashURI(addr, translate, lightWalletserver);
       //console.log(targets);
 
       if (target) {

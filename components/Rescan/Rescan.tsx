@@ -28,7 +28,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
     translate, 
     netInfo, 
     addLastSnackbar, 
-    selectServer, 
+    selectLightWalletServer, 
     snackbars, 
     removeFirstSnackbar,
   } = context;
@@ -37,7 +37,7 @@ const Rescan: React.FunctionComponent<RescanProps> = ({
   const screenName = ScreenEnum.Rescan;
 
   const doRescanAndClose = async () => {
-    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+    if (!netInfo.isConnected || selectLightWalletServer === SelectServerEnum.offline) {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }

@@ -35,7 +35,6 @@ import {
   BackgroundType,
   TranslateType,
   ServerType,
-  AddressBookFileClass,
   SecurityType,
   MenuItemEnum,
   LanguageEnum,
@@ -61,7 +60,6 @@ import {
   UnifiedAddressClass,
   TransparentAddressClass,
   AddressKindEnum,
-  AddressBookFileClassObsolete,
   ScreenEnum,
   LaunchingModeEnum,
 } from '../AppState';
@@ -69,7 +67,7 @@ import Utils from '../utils';
 import { ThemeType } from '../types';
 import SettingsFileImpl from '../../components/Settings/SettingsFileImpl';
 import { ContextAppLoadedProvider } from '../context';
-import { parseZcashURI, serverUris } from '../uris';
+import { parseZcashURI } from '../uris';
 import BackgroundFileImpl from '../../components/Background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAlert } from '../createAlert';
@@ -77,8 +75,6 @@ import { sendEmail } from '../sendEmail';
 import Snackbars from '../../components/Components/Snackbars';
 import { RPCSeedType } from '../rpc/types/RPCSeedType';
 import { Launching } from '../LoadingApp';
-import { AddressBook } from '../../components/AddressBook';
-import { AddressBookFileImpl } from '../../components/AddressBook';
 import simpleBiometrics from '../simpleBiometrics';
 import ShowAddressAlertAsync from '../../components/Send/components/ShowAddressAlertAsync';
 import { createUpdateRecoveryWalletInfo, removeRecoveryWalletInfo } from '../recoveryWalletInfov10';
@@ -90,16 +86,13 @@ import Settings from '../../components/Settings';
 import { PlatformPressable } from '@react-navigation/elements';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '../../components/Drawer';
-import MessageList from '../../components/Messages/components/MessageList';
 import { ToastProvider } from 'react-native-toastier';
 import { RPCSyncStatusType } from '../rpc/types/RPCSyncStatusType';
 import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
-import { RPCCheckAddressType } from '../rpc/types/RPCCheckAddressType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import { AddressList } from '../../components/AddressList';
 import ScannerAddress from '../../components/Send/components/ScannerAddress';
 import ValueTransferDetail from '../../components/History/components/ValueTransferDetail';
-import { MessagesAddress, MessagesAll } from '../../components/Messages';
 import Memo from '../../components/Memo';
 import Confirm from '../../components/Send/components/Confirm';
 import { AppStackParamList } from '../types';
@@ -135,35 +128,38 @@ type LoadedAppProps = {
 };
 
 const SERVER_DEFAULT_0: ServerType = {
-  uri: serverUris(() => {})[0].uri,
-  chainName: serverUris(() => {})[0].chainName,
+  uri: '',
+  chainName: ChainNameEnum.testChainName,
 } as ServerType;
 
 export default function LoadedApp(props: LoadedAppProps) {
   const theme = useTheme() as ThemeType;
+  const [loading, setLoading] = useState<boolean>(true);
+
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
-  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.USDCurrency);
-  const [server, setServer] = useState<ServerType>(SERVER_DEFAULT_0);
+  const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency);
+  const [lightWalletServer, setLightWalletServer] = useState<ServerType>(SERVER_DEFAULT_0);
+  const [selectLightWalletServer, setSelectLightWalletServer] = useState<SelectServerEnum>(SelectServerEnum.custom);
+  const [validatorServer, setValidatorServer] = useState<ServerType>(SERVER_DEFAULT_0);
+  const [selectValidatorServer, setSelectValidatorServer] = useState<SelectServerEnum>(SelectServerEnum.custom);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [mode, setMode] = useState<ModeEnum>(ModeEnum.advanced); // by default advanced
   const [background, setBackground] = useState<BackgroundType>({ batches: 0, message: '', date: 0, dateEnd: 0 });
-  const [addressBook, setAddressBook] = useState<AddressBookFileClass[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [security, setSecurity] = useState<SecurityType>({
-    startApp: true,
-    foregroundApp: true,
-    sendConfirm: true,
-    seedUfvkScreen: true,
-    rescanScreen: true,
-    settingsScreen: true,
-    changeWalletScreen: true,
-    restoreWalletBackupScreen: true,
+    startApp: true, // activate only this
+    foregroundApp: false,
+    sendConfirm: false,
+    seedUfvkScreen: false,
+    rescanScreen: false,
+    settingsScreen: false,
+    changeWalletScreen: false,
+    restoreWalletBackupScreen: false,
   });
-  const [selectServer, setSelectServer] = useState<SelectServerEnum>(SelectServerEnum.auto);
   const [rescanMenu, setRescanMenu] = useState<boolean>(false);
-  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(false);
+  // by default the App store the seed phrase & birthday on KeyChain/KeyStore (Device).
+  const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(true);
   const [performanceLevel, setPerformanceLevel] = useState<RPCPerformanceLevelEnum>(RPCPerformanceLevelEnum.Medium);
   const [zenniesDonationAddress, setZenniesDonationAddress] = useState<string>('');
   const file = useMemo(
@@ -179,11 +175,11 @@ export default function LoadedApp(props: LoadedAppProps) {
   const i18n = useMemo(() => new I18n(file), [file]);
 
   const translate: (key: string) => TranslateType = (key: string) => i18n.t(key);
+
   const readOnly = !!props.route.params && props.route.params.readOnly !== undefined ? props.route.params.readOnly : false;
   const orchardPool = !!props.route.params && props.route.params.orchardPool !== undefined ? props.route.params.orchardPool : false;
   const saplingPool = !!props.route.params && props.route.params.saplingPool !== undefined ? props.route.params.saplingPool : false;
   const transparentPool = !!props.route.params && props.route.params.transparentPool !== undefined ? props.route.params.transparentPool : false;
-  const newWallet = !!props.route.params && props.route.params.newWallet !== undefined ? props.route.params.newWallet : false;
   const firstLaunchingMessage = !!props.route.params && props.route.params.firstLaunchingMessage !== undefined ? props.route.params.firstLaunchingMessage : LaunchingModeEnum.opening;
 
   useEffect(() => {
@@ -197,9 +193,8 @@ export default function LoadedApp(props: LoadedAppProps) {
       I18nManager.forceRTL(isRTL);
 
       // If the App is mounting this component,
-      // I know I have to reset the firstInstall & firstUpdateWithDonation prop in settings.
+      // I know I have to reset the firstInstall prop in settings.
       await SettingsFileImpl.writeSettings(SettingsNameEnum.firstInstall, false);
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.firstUpdateWithDonation, false);
 
       // If the App is mounting this component, I know I have to update the version prop in settings.
       await SettingsFileImpl.writeSettings(SettingsNameEnum.version, translate('version') as string);
@@ -210,6 +205,14 @@ export default function LoadedApp(props: LoadedAppProps) {
 
       // for testing
       //await delay(5000);
+
+      if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
+        setMode(settings.mode);
+        props.toggleTheme(settings.mode);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
+        props.toggleTheme(mode);
+      }
 
       if (
         settings.language === LanguageEnum.en ||
@@ -242,10 +245,37 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, currency);
       }
-      if (settings.server) {
-        setServer(settings.server);
+      // lightwallet server
+      if (settings.lightWalletserver) {
+        setLightWalletServer(settings.lightWalletserver);
       } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.server, server);
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, lightWalletServer);
+      }
+      if (
+        settings.selectLightWalletServer === SelectServerEnum.auto ||
+        settings.selectLightWalletServer === SelectServerEnum.custom ||
+        settings.selectLightWalletServer === SelectServerEnum.list ||
+        settings.selectLightWalletServer === SelectServerEnum.offline
+      ) {
+        setSelectLightWalletServer(settings.selectLightWalletServer);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, selectLightWalletServer);
+      }
+      // validator server
+      if (settings.validatorServer) {
+        setValidatorServer(settings.validatorServer);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.validatorServer, validatorServer);
+      }
+      if (
+        settings.selectValidatorServer === SelectServerEnum.auto ||
+        settings.selectValidatorServer === SelectServerEnum.custom ||
+        settings.selectValidatorServer === SelectServerEnum.list ||
+        settings.selectValidatorServer === SelectServerEnum.offline
+      ) {
+        setSelectValidatorServer(settings.selectValidatorServer);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectValidatorServer, selectValidatorServer);
       }
       if (settings.sendAll === true || settings.sendAll === false) {
         setSendAll(settings.sendAll);
@@ -262,27 +292,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.privacy, privacy);
       }
-      if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
-        setMode(settings.mode);
-        props.toggleTheme(settings.mode);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-        props.toggleTheme(mode);
-      }
       if (settings.security) {
         setSecurity(settings.security);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.security, security);
-      }
-      if (
-        settings.selectServer === SelectServerEnum.auto ||
-        settings.selectServer === SelectServerEnum.custom ||
-        settings.selectServer === SelectServerEnum.list ||
-        settings.selectServer === SelectServerEnum.offline
-      ) {
-        setSelectServer(settings.selectServer);
-      } else {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, selectServer);
       }
       if (settings.rescanMenu === true || settings.rescanMenu === false) {
         setRescanMenu(settings.rescanMenu);
@@ -309,115 +322,10 @@ export default function LoadedApp(props: LoadedAppProps) {
       const backgroundJson = await BackgroundFileImpl.readBackground();
       setBackground(backgroundJson);
 
-      let sort: boolean = false;
-      const zenniesAddress = await Utils.getZenniesDonationAddress(server.chainName);
+      const zenniesAddress = await Utils.getZenniesDonationAddress(lightWalletServer.chainName);
       setZenniesDonationAddress(zenniesAddress);
 
-      // adding `Zenny Tips` address always.
-      let ab = await AddressBookFileImpl.readAddressBook();
-      if (ab.filter((a: AddressBookFileClass) => a.address === zenniesAddress).length === 0) {
-        ab = await AddressBookFileImpl.writeAddressBookItem(
-          translate('zenny-tips-ab') as string,
-          zenniesAddress,
-          '',
-          false,
-        );
-        sort = true;
-      }
-
-      // now make no sense to have two UA's in the same contact
-      // if `uOrchardAddress` exists then it will be removed.
-      let toUpdate: AddressBookFileClassObsolete[] = ab.filter(
-        // if have orchard address or NOT have color or NOT have own flag...
-        (a: AddressBookFileClassObsolete) => a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('color') || !a.hasOwnProperty('own'),
-      );
-      console.log('Address Book -> TO UPDATE', toUpdate);
-      console.log('Address Book items', ab.length);
-      if (toUpdate.length > 0) {
-        const randomColors = Utils.generateColorList(toUpdate.length);
-        for (let i = 0; i < toUpdate.length; i++) {
-          const a = toUpdate[i];
-          let own: boolean;
-          if (!a.hasOwnProperty('own')) {
-            // verify this address as own or not
-            const checkStr = await RPCModule.checkMyAddressInfo(a.address);
-            //console.log(checkStr);
-            if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
-              const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
-              own = checkJSON.is_wallet_address;
-            } else {
-              // error
-              own = false;
-            }
-          } else {
-            // no value
-            own = a.own !== undefined ? a.own : false;
-          }
-          let color: string;
-          if (!a.hasOwnProperty('color')) {
-            color = randomColors[i];
-          } else {
-            // no value
-            color = a.color !== undefined ? a.color : randomColors[i];
-          }
-          if (a.hasOwnProperty('uOrchardAddress') || !a.hasOwnProperty('own') || !a.hasOwnProperty('color')) {
-            ab = await AddressBookFileImpl.updateColorAndOwnItem(
-              a.label,
-              a.address,
-              color,
-              own,
-            );
-          }
-        }
-        sort = true;
-        console.log('Address Book -> UPDATED', ab.length);
-      }
-      // if new wallet or restore from seed/ufvk
-      // the App needs to calculate if the Addresses
-      // in the Address Book belong to this new/restored wallet.
-      if (newWallet) {
-        toUpdate = ab.filter((a: AddressBookFileClass) => !!a.address);
-        // always have one -> Zennies.
-        if (toUpdate.length > 1) {
-          for (let i = 0; i < toUpdate.length; i++) {
-            const a = toUpdate[i];
-            let own: boolean;
-            // verify this address as own or not
-            const checkStr = await RPCModule.checkMyAddressInfo(a.address);
-            //console.log(checkStr);
-            if (checkStr && !checkStr.toLowerCase().startsWith(GlobalConst.error)) {
-              const checkJSON: RPCCheckAddressType = await JSON.parse(checkStr);
-              own = checkJSON.is_wallet_address;
-            } else {
-              // error
-              own = false;
-            }
-            ab = await AddressBookFileImpl.updateColorAndOwnItem(
-              a.label,
-              a.address,
-              a.color ? a.color : '',
-              own,
-            );
-          }
-          sort = true;
-        }
-      }
-      let abSorted = [] as AddressBookFileClass[];
-      if (sort) {
-        // this is a good place to sort properly these data
-        // if anything changed.
-        abSorted = ab.sort((a, b) => {
-          const aLabel = a.label;
-          const bLabel = b.label;
-          return aLabel.localeCompare(bLabel);
-        });
-      } else {
-        abSorted = ab;
-      }
-      setAddressBook(abSorted);
-      await AddressBookFileImpl.writeAddressBook(abSorted);
       setLoading(false);
-      //console.log('LoadedApp functional component - finished');
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -437,7 +345,10 @@ export default function LoadedApp(props: LoadedAppProps) {
         translate={translate}
         language={language}
         currency={currency}
-        server={server}
+        lightWalletserver={lightWalletServer}
+        selectLightWalletServer={selectLightWalletServer}
+        validatorServer={validatorServer}
+        selectValidatorServer={selectValidatorServer}
         sendAll={sendAll}
         donation={donation}
         privacy={privacy}
@@ -447,9 +358,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         orchardPool={orchardPool}
         saplingPool={saplingPool}
         transparentPool={transparentPool}
-        addressBook={addressBook}
         security={security}
-        selectServer={selectServer}
         rescanMenu={rescanMenu}
         recoveryWalletInfoOnDevice={recoveryWalletInfoOnDevice}
         zenniesDonationAddress={zenniesDonationAddress}
@@ -488,7 +397,10 @@ type LoadedAppClassProps = {
   theme: ThemeType;
   language: LanguageEnum;
   currency: CurrencyEnum;
-  server: ServerType;
+  lightWalletserver: ServerType;
+  selectLightWalletServer: SelectServerEnum;
+  validatorServer: ServerType;
+  selectValidatorServer: SelectServerEnum;
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
@@ -498,9 +410,7 @@ type LoadedAppClassProps = {
   orchardPool: boolean;
   saplingPool: boolean;
   transparentPool: boolean;
-  addressBook: AddressBookFileClass[];
   security: SecurityType;
-  selectServer: SelectServerEnum;
   rescanMenu: boolean;
   recoveryWalletInfoOnDevice: boolean;
   zenniesDonationAddress: string;
@@ -558,10 +468,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       snackbars: [] as SnackbarType[],
       addLastSnackbar: this.addLastSnackbar,
       removeFirstSnackbar: this.removeFirstSnackbar,
-      restartApp: this.navigateToLoadingApp,
       somePending: false,
-      addressBook: props.addressBook,
-      launchAddressBook: this.launchAddressBook,
       shieldingAmount: 0,
       showSwipeableIcons: true,
       doRefresh: this.doRefresh,
@@ -571,7 +478,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       setPrivacyOption: this.setPrivacyOption,
 
       // context settings
-      server: props.server,
+      lightWalletserver: props.lightWalletserver,
+      selectLightWalletServer: props.selectLightWalletServer,
+      validatorServer: props.validatorServer,
+      selectValidatorServer: props.selectValidatorServer,
       currency: props.currency,
       language: props.language,
       sendAll: props.sendAll,
@@ -579,7 +489,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       privacy: props.privacy,
       mode: props.mode,
       security: props.security,
-      selectServer: props.selectServer,
       rescanMenu: props.rescanMenu,
       recoveryWalletInfoOnDevice: props.recoveryWalletInfoOnDevice,
       performanceLevel: props.performanceLevel,
@@ -587,8 +496,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       // state
       navigationHome: null,
       appStateStatus: Platform.OS === GlobalConst.platformOSios ? AppStateStatusEnum.active : AppState.currentState,
-      newServer: {} as ServerType,
-      newSelectServer: null,
+      newLightWalletServer: {} as ServerType,
+      newSelectLightWalletServer: null,
       scrollToTop: false,
       scrollToBottom: false,
       isSeedViewModalOpen: false,
@@ -607,7 +516,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setWallet,
       this.setLastError,
       props.readOnly,
-      props.server,
+      props.lightWalletserver,
       props.performanceLevel,
     );
 
@@ -817,7 +726,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     // Attempt to parse as URI if it starts with zcash
     // only if it is a spendable wallet
     if (url && url.startsWith(GlobalConst.zcash) && !this.state.readOnly) {
-      const { error, target } = await parseZcashURI(url, this.state.translate, this.state.server);
+      const { error, target } = await parseZcashURI(url, this.state.translate, this.state.lightWalletserver);
       //console.log(targets);
 
       if (target) {
@@ -1129,14 +1038,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           newInfo.currencyName = this.state.info.currencyName;
         } else {
           newInfo.currencyName =
-            this.state.server.chainName === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.TAZ;
+            this.state.lightWalletserver.chainName === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.TAZ;
         }
       }
       if (!newInfo.chainName) {
-        newInfo.chainName = this.state.server.chainName;
+        newInfo.chainName = this.state.lightWalletserver.chainName;
       }
       if (!newInfo.serverUri) {
-        newInfo.serverUri = this.state.server.uri;
+        newInfo.serverUri = this.state.lightWalletserver.uri;
       }
       //const start = Date.now();
       this.setState({ info: newInfo });
@@ -1157,8 +1066,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   sendTransaction = async (sendPageState: SendPageStateClass): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
-      const { server, donation, defaultUnifiedAddress } = this.state;
-      const sendJson = await Utils.getSendManyJSON(sendPageState, defaultUnifiedAddress, server, donation);
+      const { lightWalletserver, donation, defaultUnifiedAddress } = this.state;
+      const sendJson = await Utils.getSendManyJSON(sendPageState, defaultUnifiedAddress, lightWalletserver, donation);
       //const start = Date.now();
       const txid = await this.rpc.sendTransaction(sendJson);
       //console.log('&&&&&&&&&&&&&& send tx', Date.now() - start);
@@ -1284,14 +1193,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         ],
         { cancelable: false },
       );
-    } else if (item === MenuItemEnum.AddressBook) {
-      this.launchAddressBook('', this.screenName);
-      return;
     } else if (item === MenuItemEnum.VoteForNym) {
       let update = false;
       if (
         this.state.sendPageState.toaddr.to &&
-        this.state.sendPageState.toaddr.to !== (await Utils.getNymDonationAddress(this.state.server.chainName))
+        this.state.sendPageState.toaddr.to !== (await Utils.getNymDonationAddress(this.state.lightWalletserver.chainName))
       ) {
         await ShowAddressAlertAsync(this.state.translate)
           .then(async () => {
@@ -1308,7 +1214,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         let uriToAddr: ToAddrClass = new ToAddrClass(0);
         const to = new ToAddrClass(0);
 
-        to.to = await Utils.getNymDonationAddress(this.state.server.chainName);
+        to.to = await Utils.getNymDonationAddress(this.state.lightWalletserver.chainName);
         to.amount = Utils.getNymDonationAmount();
         to.memo = Utils.getNymDonationMemo(this.state.translate);
         to.includeUAMemo = true;
@@ -1370,11 +1276,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                 screenName: [this.screenName],
               });
             }
-            await SettingsFileImpl.writeSettings(SettingsNameEnum.server, value);
-            await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, selectServer);
+            await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, value);
+            await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, selectServer);
             this.setState({
-              server: value,
-              selectServer: selectServer,
+              lightWalletserver: value,
+              selectLightWalletServer: selectServer,
             });
             // the server is changed, the App needs to restart the timeout tasks from the beginning
             await this.rpc.clearTimers();
@@ -1421,14 +1327,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
       // we need to restore the old server because the new one doesn't have the seed of the current wallet.
       const oldSettings = await SettingsFileImpl.readSettings();
-      await RPCModule.changeServerProcess(oldSettings.server.uri);
+      await RPCModule.changeServerProcess(oldSettings.lightWalletserver.uri);
 
       // go to the seed screen for changing the wallet for another in the new server or cancel this action.
       this.setState({
-        newServer: value as ServerType,
-        newSelectServer: selectServer,
-        server: oldSettings.server,
-        selectServer: oldSettings.selectServer,
+        newLightWalletServer: value as ServerType,
+        newSelectLightWalletServer: selectServer,
+        lightWalletserver: oldSettings.lightWalletserver,
+        selectLightWalletServer: oldSettings.selectLightWalletServer,
       });
     }
   };
@@ -1506,9 +1412,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   setSelectServerOption = async (value: string): Promise<void> => {
-    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, value);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, value);
     this.setState({
-      selectServer: value as SelectServerEnum,
+      selectLightWalletServer: value as SelectServerEnum,
     });
   };
 
@@ -1567,12 +1473,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   onClickOKChangeWallet = async (state: LoadingAppNavigationState) => {
-    const { server } = this.state;
+    const { lightWalletserver } = this.state;
 
     // if the App is working with a test server
     // no need to do backups of the wallets.
     let resultStr = '';
-    if (server.chainName === ChainNameEnum.mainChainName) {
+    if (lightWalletserver.chainName === ChainNameEnum.mainChainName) {
       // backup
       resultStr = (await this.rpc.changeWallet()) as string;
     } else {
@@ -1622,14 +1528,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     }
 
     this.keepAwake(false);
-    this.navigateToLoadingApp({ startingApp: false, newWallet: true });
+    this.navigateToLoadingApp({ startingApp: false });
   };
 
   onClickOKServerWallet = async () => {
-    if (this.state.newServer && this.state.newSelectServer) {
-      const beforeServer = this.state.server;
+    if (this.state.newLightWalletServer && this.state.newSelectLightWalletServer) {
+      const beforeServer = this.state.lightWalletserver;
 
-      const resultStrServerPromise = await RPCModule.changeServerProcess(this.state.newServer.uri);
+      const resultStrServerPromise = await RPCModule.changeServerProcess(this.state.newLightWalletServer.uri);
       const timeoutServerPromise = new Promise((_, reject) => {
         setTimeout(() => {
           reject(new Error('Promise changeserver Timeout 30 seconds'));
@@ -1650,13 +1556,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         //console.log(`change server ok ${value}`);
       }
 
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.server, this.state.newServer);
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.selectServer, this.state.newSelectServer);
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, this.state.newLightWalletServer);
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, this.state.newSelectLightWalletServer);
       this.setState({
-        server: this.state.newServer,
-        selectServer: this.state.newSelectServer,
-        newServer: {} as ServerType,
-        newSelectServer: null,
+        lightWalletserver: this.state.newLightWalletServer,
+        selectLightWalletServer: this.state.selectLightWalletServer,
+        newLightWalletServer: {} as ServerType,
+        newSelectLightWalletServer: null,
       });
 
       await this.rpc.fetchInfoAndServerHeight();
@@ -1697,10 +1603,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     this.setState({ backgroundError: { title, error } });
   };
 
-  setAddressBook = (addressBook: AddressBookFileClass[]) => {
-    this.setState({ addressBook });
-  };
-
   addLastSnackbar = (snackbar: SnackbarType) => {
     const newSnackbars = this.state.snackbars;
     // if the last one is the same don't do anything.
@@ -1719,44 +1621,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     const newSnackbars = this.state.snackbars.filter((s: SnackbarType) => s.screenName.includes(screenName));
     newSnackbars.shift();
     this.setState({ snackbars: newSnackbars });
-  };
-
-  // close modal make sense because this is called
-  // in a component which can live in differents screens
-  launchAddressBook = (address: string, screenName: ScreenEnum) => {
-    if (screenName === ScreenEnum.LoadedApp || screenName === ScreenEnum.Send) {
-      this.state.navigationHome?.navigate(RouteEnum.AddressBookStack, {
-        screen: RouteEnum.AddressBook,
-        params: {
-          currentAddress: address,
-          routeStack: RouteEnum.AddressBookStack,
-        }
-      });
-    } else if (screenName === ScreenEnum.ValueTransferDetail) {
-      this.state.navigationHome?.navigate(RouteEnum.ValueTransferDetailStack, {
-        screen: RouteEnum.AddressBook,
-        params: {
-          currentAddress: address,
-          routeStack: RouteEnum.ValueTransferDetailStack,
-        }
-      });
-    } else if (screenName === ScreenEnum.Confirm) {
-      this.state.navigationHome?.navigate(RouteEnum.ConfirmStack, {
-        screen: RouteEnum.AddressBook,
-        params: {
-          currentAddress: address,
-          routeStack: RouteEnum.ConfirmStack,
-        }
-      });
-    } else if (screenName === ScreenEnum.Insight) {
-      this.state.navigationHome?.navigate(RouteEnum.InsightStack, {
-        screen: RouteEnum.AddressBook,
-        params: {
-          currentAddress: address,
-          routeStack: RouteEnum.InsightStack,
-        }
-      });
-    }
   };
 
   setScrollToTop = (value: boolean) => {
@@ -1788,10 +1652,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       totalBalance,
       translate,
       scrollToTop,
-      scrollToBottom,
       addresses,
       somePending,
-      selectServer,
+      selectLightWalletServer,
     } = this.state;
     const { colors } = this.props.theme;
 
@@ -1823,10 +1686,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       snackbars: this.state.snackbars,
       addLastSnackbar: this.state.addLastSnackbar,
       removeFirstSnackbar: this.state.removeFirstSnackbar,
-      addressBook: this.state.addressBook,
-      launchAddressBook: this.state.launchAddressBook,
       shieldingAmount: this.state.shieldingAmount,
-      restartApp: this.state.restartApp,
       somePending: this.state.somePending,
       showSwipeableIcons: this.state.showSwipeableIcons,
       doRefresh: this.state.doRefresh,
@@ -1836,7 +1696,10 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       setPrivacyOption: this.setPrivacyOption,
 
       // context settings
-      server: this.state.server,
+      lightWalletserver: this.state.lightWalletserver,
+      selectLightWalletServer: this.state.selectLightWalletServer,
+      validatorServer: this.state.validatorServer,
+      selectValidatorServer: this.state.selectValidatorServer,
       currency: this.state.currency,
       language: this.state.language,
       sendAll: this.state.sendAll,
@@ -1844,7 +1707,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       privacy: this.state.privacy,
       mode: this.state.mode,
       security: this.state.security,
-      selectServer: this.state.selectServer,
       rescanMenu: this.state.rescanMenu,
       recoveryWalletInfoOnDevice: this.state.recoveryWalletInfoOnDevice,
       performanceLevel: this.state.performanceLevel,
@@ -1960,7 +1822,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                           )}
                         </Tab.Screen>
                         {!readOnly &&
-                          selectServer !== SelectServerEnum.offline &&
+                          selectLightWalletServer !== SelectServerEnum.offline &&
                           (mode === ModeEnum.advanced ||
                             (!!totalBalance && totalBalance.confirmedOrchardBalance + totalBalance.confirmedSaplingBalance > 0) ||
                             (!!totalBalance &&
@@ -1990,18 +1852,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                               toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                               alone={false /* receive */}
                               setSecurityOption={this.setSecurityOption}
-                              setAddressBook={this.setAddressBook}
-                            />
-                          )}
-                        </Tab.Screen>
-                        <Tab.Screen name={RouteEnum.Messages}>
-                          {propsTab => (
-                            <MessageList {...propsTab}
-                              toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
-                              setScrollToBottom={this.setScrollToBottom /* header & messages */}
-                              scrollToBottom={scrollToBottom /* messages */}
-                              sendTransaction={this.sendTransaction /* messages */}
-                              setServerOption={this.setServerOption /* messages */}
                             />
                           )}
                         </Tab.Screen>
@@ -2025,7 +1875,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                                   toggleMenuDrawer={() => props.navigation.toggleDrawer() /* header */}
                                   alone={true /* receive */}
                                   setSecurityOption={this.setSecurityOption}
-                                  setAddressBook={this.setAddressBook}
                                 />
                               )}
                             </Tab.Screen>
@@ -2064,11 +1913,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
                   return (
                     <Stack.Navigator initialRouteName={RouteEnum.Insight} screenOptions={{ headerShown: false, animation: 'none' }}>
                       <Stack.Screen name={RouteEnum.Insight} component={Insight} />
-                      <Stack.Screen name={RouteEnum.AddressBook} >
-                        {props => (
-                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
-                        )}
-                      </Stack.Screen>
                       <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
                     </Stack.Navigator>
                   );
@@ -2154,30 +1998,11 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.SyncReport} component={SyncReport} />
               <Drawer.Screen name={RouteEnum.Pools} component={Pools} />
-              <Drawer.Screen name={RouteEnum.AddressBookStack}>
-                {() => {
-                  return (
-                    <Stack.Navigator initialRouteName={RouteEnum.AddressBook} screenOptions={{ headerShown: false, animation: 'none' }}>
-                      <Stack.Screen name={RouteEnum.AddressBook} >
-                        {props => (
-                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
-                        )}
-                      </Stack.Screen>
-                      <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
-                    </Stack.Navigator>
-                  );
-                }}
-              </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.ValueTransferDetailStack}>
                 {() => {
                   return (
                     <Stack.Navigator initialRouteName={RouteEnum.ValueTransferDetail} screenOptions={{ headerShown: false, animation: 'none' }}>
                       <Stack.Screen name={RouteEnum.ValueTransferDetail} component={ValueTransferDetail} />
-                      <Stack.Screen name={RouteEnum.AddressBook} >
-                        {props => (
-                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
-                        )}
-                      </Stack.Screen>
                       <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
                     </Stack.Navigator>
                   );
@@ -2185,19 +2010,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
               </Drawer.Screen>
               <Drawer.Screen name={RouteEnum.AddressList} component={AddressList} />
               <Drawer.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
-              <Drawer.Screen name={RouteEnum.MessagesAddress} component={MessagesAddress} />
-              <Drawer.Screen name={RouteEnum.MessagesAll} component={MessagesAll} />
               <Drawer.Screen name={RouteEnum.Memo} component={Memo} />
               <Drawer.Screen name={RouteEnum.ConfirmStack}>
                 {() => {
                   return (
                     <Stack.Navigator initialRouteName={RouteEnum.Confirm} screenOptions={{ headerShown: false, animation: 'none' }}>
                       <Stack.Screen name={RouteEnum.Confirm} component={Confirm} />
-                      <Stack.Screen name={RouteEnum.AddressBook} >
-                        {props => (
-                            <AddressBook {...props} setAddressBook={this.setAddressBook} />
-                        )}
-                      </Stack.Screen>
                       <Stack.Screen name={RouteEnum.ScannerAddress} component={ScannerAddress} />
                     </Stack.Navigator>
                   );

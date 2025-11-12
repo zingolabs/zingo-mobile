@@ -10,7 +10,6 @@ export const mockLoadedAppRoute: RouteProp<AppStackParamList, RouteEnum.LoadedAp
     orchardPool: true,
     saplingPool: true,
     transparentPool: true,
-    newWallet: false,
     firstLaunchingMessage: LaunchingModeEnum.opening,
   },
 };

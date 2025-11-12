@@ -1,9 +1,9 @@
 import { ChainNameEnum, CurrencyNameEnum, InfoType } from '../../app/AppState';
-import { serverUris } from '../../app/uris';
+import { mockLightWalletServer } from './mockServers';
 
 export const mockInfo: InfoType = {
   chainName: ChainNameEnum.mainChainName,
-  serverUri: serverUris(() => {})[0].uri,
+  serverUri: mockLightWalletServer.uri,
   latestBlock: 2000000,
   version: 'server_version',
   currencyName: CurrencyNameEnum.ZEC,

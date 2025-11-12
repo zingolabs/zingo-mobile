@@ -4,7 +4,6 @@ import { View, TextInput, NativeSyntheticEvent, TouchableOpacity, Keyboard, Plat
 import { useTheme } from '@react-navigation/native';
 
 import {
-  AddressBookFileClass,
   AddressKindEnum,
   ButtonTypeEnum,
   GlobalConst,
@@ -22,22 +21,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons';
 import ContextMenu, { ContextMenuOnPressNativeEvent } from 'react-native-context-menu-view';
 import RPCModule from '../../../app/RPCModule';
-import { RPCUnifiedAddressType } from '../../../app/rpc/types/RPCUnifiedAddressType';
-import { RPCTransparentAddressType } from '../../../app/rpc/types/RPCTransparentAddressType';
-import Utils from '../../../app/utils';
-import { AddressBookFileImpl } from '../../AddressBook';
 
 type NewAddressProps = {
   addressKind: AddressKindEnum;
   closeSheet: () => void;
-  setAddressBook: (ab: AddressBookFileClass[]) => void;
   screenName: ScreenEnum;
   setHeightLayout: (h: number) => void;
 };
 const NewAddress: React.FunctionComponent<NewAddressProps> = ({ 
   addressKind, 
   closeSheet, 
-  setAddressBook, 
   screenName,
   setHeightLayout,
 }) => {
@@ -80,22 +73,6 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
         }
       } else {
         console.log('Internal Error new address ');
-      }
-
-      if (label) {
-        let newAddress: string;
-        if (receivers) {
-          const newUnifiedAddressJSON: RPCUnifiedAddressType = await JSON.parse(newAddressStr);
-          newAddress = newUnifiedAddressJSON.encoded_address;
-        } else {
-          const newTransparentAddressJSON: RPCTransparentAddressType = await JSON.parse(newAddressStr);
-          newAddress = newTransparentAddressJSON.encoded_address;
-        }
-        //console.log(label, newAddress);
-        const randomColors = Utils.generateColorList(1);
-        const ab = await AddressBookFileImpl.writeAddressBookItem(label, newAddress, randomColors[0], true);
-        //console.log(ab);
-        setAddressBook(ab);
       }
 
       //return newAddressStr;
@@ -175,7 +152,7 @@ const NewAddress: React.FunctionComponent<NewAddressProps> = ({
                 marginLeft: 5,
                 backgroundColor: 'transparent',
               }}
-              placeholder={translate('addressbook.label-placeholder') as string}
+              placeholder={translate('history.label-placeholder') as string}
               placeholderTextColor={colors.placeholder}
               value={label}
               onChangeText={(text: string) => setLabel(text)}

@@ -9,8 +9,8 @@ export default interface AppStateLoaded {
   appStateStatus: AppStateStatus;
 
   // change server helper
-  newServer: ServerType;
-  newSelectServer: SelectServerEnum | null;
+  newLightWalletServer: ServerType;
+  newSelectLightWalletServer: SelectServerEnum | null;
 
   // to do scroll to top in history
   scrollToTop: boolean;

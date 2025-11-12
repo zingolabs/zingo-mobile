@@ -1,6 +1,9 @@
 export enum SettingsNameEnum {
   // screen
-  server = 'server',
+  lightWalletServer = 'lightWalletServer',
+  selectLightWalletServer = 'selectLightWalletServer',
+  validatorServer = 'validatorServer',
+  selectValidatorServer = 'selectValidatorServer',
   currency = 'currency',
   language = 'language',
   sendAll = 'sendAll',
@@ -8,7 +11,6 @@ export enum SettingsNameEnum {
   privacy = 'privacy',
   mode = 'mode',
   security = 'security',
-  selectServer = 'selectServer',
   rescanMenu = 'rescanMenu',
   recoveryWalletInfoOnDevice = 'recoveryWalletInfoOnDevice',
   performanceLevel = 'performanceLevel',
@@ -17,5 +19,4 @@ export enum SettingsNameEnum {
   firstInstall = 'firstInstall',
   basicFirstViewSeed = 'basicFirstViewSeed',
   version = 'version',
-  firstUpdateWithDonation = 'firstUpdateWithDonation',
 }

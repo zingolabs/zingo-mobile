@@ -8,7 +8,6 @@ import moment from 'moment';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
 import {
-  AddressBookFileClass,
   ChainNameEnum,
   SnackbarDurationEnum,
   ValueTransferType,
@@ -58,16 +57,15 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     language,
     privacy,
     addLastSnackbar,
-    server,
+    lightWalletserver,
     currency,
-    addressBook,
     addresses,
     zenniesDonationAddress,
     snackbars,
     removeFirstSnackbar,
     setBackgroundError,
     netInfo,
-    selectServer,
+    selectLightWalletServer,
     readOnly,
     setPrivacyOption,
   } = context;
@@ -132,7 +130,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       return;
     }
 
-    const url = Utils.getBlockExplorerTxIDURL(txid, server.chainName);
+    const url = Utils.getBlockExplorerTxIDURL(txid, lightWalletserver.chainName);
     Linking.canOpenURL(url).then(supported => {
       if (supported) {
         Linking.openURL(url);
@@ -155,16 +153,6 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalLength]);
-
-  const contactFound: (add: string) => boolean = (add: string) => {
-    if (!add) {
-      return false;
-    }
-    const contact: AddressBookFileClass[] = addressBook.filter(
-      (ab: AddressBookFileClass) => ab.address === add,
-    );
-    return contact.length >= 1;
-  };
 
   const thisWalletAddress: (add: string) => boolean = (add: string) => {
     const address: (UnifiedAddressClass | TransparentAddressClass)[] = addresses ? addresses.filter((a: UnifiedAddressClass | TransparentAddressClass) => a.address === add) : [];
@@ -190,7 +178,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     if (!setBackgroundError || !addLastSnackbar) {
       return;
     }
-    if (!netInfo.isConnected || selectServer === SelectServerEnum.offline) {
+    if (!netInfo.isConnected || selectLightWalletServer === SelectServerEnum.offline) {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
@@ -528,7 +516,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                 {expandTxid && !!valueTransfer.txid && (
                   <>
                     <RegText>{valueTransfer.txid}</RegText>
-                    {server.chainName !== ChainNameEnum.regtestChainName && (
+                    {lightWalletserver.chainName !== ChainNameEnum.regtestChainName && (
                       <TouchableOpacity onPress={() => handleTxIDClick(valueTransfer.txid)}>
                         <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
                           {translate('history.viewexplorer') as string}
@@ -617,18 +605,10 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                       <FontAwesomeIcon icon={faTriangleExclamation} color={'red'} size={18} />
                     )}
                     <RegText style={{ opacity: thisWalletAddress(memoUA) ? 0.6 : 0.4 }}>{memoUA}</RegText>
-                    {contactFound(memoUA) && (
-                      <View style={{ flexDirection: 'row' }}>
-                        {!thisWalletAddress(memoUA) && (
-                          <RegText style={{ opacity: 0.6 }}>{translate('addressbook.likely') as string}</RegText>
-                        )}
-                        <AddressItem address={memoUA} screenName={screenName} onlyContact={true} />
-                      </View>
-                    )}
-                    {!contactFound(memoUA) && thisWalletAddress(memoUA) && (
+                    {thisWalletAddress(memoUA) && (
                       <View style={{ flexDirection: 'row' }}>
                         <RegText color={colors.primaryDisabled}>
-                          {translate('addressbook.thiswalletaddress') as string}
+                          {translate('history.thiswalletaddress') as string}
                         </RegText>
                       </View>
                     )}
