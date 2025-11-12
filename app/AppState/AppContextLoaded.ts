@@ -110,7 +110,7 @@ export default interface AppContextLoaded {
   setPrivacyOption: (value: boolean) => Promise<void>;
 
   // settings
-  lightWalletserver: ServerType;
+  lightWalletServer: ServerType;
   selectLightWalletServer: SelectServerEnum;
   validatorServer: ServerType;
   selectValidatorServer: SelectServerEnum;

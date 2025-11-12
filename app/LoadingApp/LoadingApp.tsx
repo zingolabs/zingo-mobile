@@ -77,6 +77,7 @@ import { RPCUfvkType } from '../rpc/types/RPCUfvkType';
 import { RPCPerformanceLevelEnum } from '../rpc/enums/RPCPerformanceLevelEnum';
 import NewSeed from './components/NewSeed';
 import { AppStackParamList } from '../types';
+import Servers from './components/Servers';
 
 const en = require('../translations/en.json');
 const es = require('../translations/es.json');
@@ -208,8 +209,8 @@ export default function LoadingApp(props: LoadingAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, currency);
       }
       // lightwallet server
-      if (settings.lightWalletserver) {
-        setLightWalletServer(settings.lightWalletserver);
+      if (settings.lightWalletServer) {
+        setLightWalletServer(settings.lightWalletServer);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, lightWalletServer);
       }
@@ -306,7 +307,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         translate={translate}
         language={language}
         currency={currency}
-        lightWalletserver={lightWalletServer}
+        lightWalletServer={lightWalletServer}
         selectLightWalletserver={selectLightWalletServer}
         validatorServer={validatorServer}
         selectLightWalletServer={selectLightWalletServer}
@@ -333,7 +334,7 @@ type LoadingAppClassProps = {
   theme: ThemeType;
   language: LanguageEnum;
   currency: CurrencyEnum;
-  lightWalletserver: ServerType;
+  lightWalletServer: ServerType;
   selectLightWalletserver: SelectServerEnum;
   validatorServer: ServerType;
   selectLightWalletServer: SelectServerEnum;
@@ -380,7 +381,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       setPrivacyOption: this.setPrivacyOption,
 
       // context settings
-      lightWalletserver: props.lightWalletserver,
+      lightWalletServer: props.lightWalletServer,
       selectLightWalletServer: props.selectLightWalletserver,
       validatorServer: props.validatorServer,
       selectValidatorServer: props.selectLightWalletServer,
@@ -471,30 +472,17 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     const has = await hasRecoveryWalletInfo();
     this.setState({ hasRecoveryWalletInfoSaved: has });
 
-    // First, if it's server automatic
-    // here I need to check the servers and select the best one
-    // likely only when the user install or update the new version with this feature or
-    // select automatic in settings.
-    if (this.state.selectLightWalletServer === SelectServerEnum.auto) {
-      if (netInfoState.isConnected) {
-        setTimeout(() => {
-          this.addLastSnackbar({
-            message: this.state.translate('loadedapp.selectingserver') as string,
-            duration: SnackbarDurationEnum.longer,
-            screenName: [this.screenName],
-          });
-        }, 10);
-        // not a different one, can be the same.
-        const someServerIsWorking = await this.selectTheBestServer(false);
-        console.log('some server is working?', someServerIsWorking);
-      } else {
-        // if NO internet then I have to chose a server (the first one)
-        const s: ServerType = SERVER_DEFAULT_0;
-        this.setState({
-          lightWalletserver: s,
-        });
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, s);
-      }
+    // First, check servers (lightwallet & validator)
+    // valid scenarios:
+    // 1. server with uri & select server custom
+    // 2. server with no uri & select server offline
+    if ((!this.state.lightWalletServer.uri && this.state.selectLightWalletServer === SelectServerEnum.custom) ||
+        (!this.state.validatorServer.uri && this.state.selectValidatorServer === SelectServerEnum.custom)) {
+      this.setState({
+        screen: 0.5,
+        actionButtonsDisabled: false,
+      })
+      return;
     }
 
     // Second, check if a wallet exists. Do it async so the basic screen has time to render
@@ -506,8 +494,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     if (exists && exists !== GlobalConst.false) {
       this.setState({ walletExists: true });
       let result: string = await RPCModule.loadExistingWallet(
-        this.state.lightWalletserver.uri,
-        this.state.lightWalletserver.chainName,
+        this.state.lightWalletServer.uri,
+        this.state.lightWalletServer.chainName,
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
       );
@@ -744,7 +732,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
   selectTheBestServer = async (aDifferentOne: boolean): Promise<boolean> => {
     // avoiding obsolete ones
     let someServerIsWorking: boolean = true;
-    const actualServer = this.state.lightWalletserver;
+    const actualServer = this.state.lightWalletServer;
     const server = await selectingServer(
       serverUris(this.state.translate).filter(
         (s: ServerUrisType) => !s.obsolete && s.uri !== (aDifferentOne ? actualServer.uri : ''),
@@ -763,7 +751,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     //console.log(server);
     console.log(fasterServer);
     this.setState({
-      lightWalletserver: fasterServer,
+      lightWalletServer: fasterServer,
       selectLightWalletServer: SelectServerEnum.list,
     });
     await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, fasterServer);
@@ -830,7 +818,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       );
       this.setState({ actionButtonsDisabled: false, serverErrorTries: 0, screen });
     } else {
-      const workingServer = await this.checkServer(this.state.lightWalletserver);
+      const workingServer = await this.checkServer(this.state.lightWalletServer);
       if (workingServer) {
         // the server is working -> this error is something not related with the server availability
         createAlert(
@@ -944,15 +932,15 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     if (this.state.customServerOffline) {
       await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, {
         uri: '',
-        chainName: this.state.lightWalletserver.chainName,
+        chainName: this.state.lightWalletServer.chainName,
       });
       await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, SelectServerEnum.offline);
       this.setState({
         selectLightWalletServer: SelectServerEnum.offline,
-        lightWalletserver: { uri: '', chainName: this.state.lightWalletserver.chainName },
+        lightWalletServer: { uri: '', chainName: this.state.lightWalletServer.chainName },
         customServerShow: false,
         customServerUri: '',
-        customServerChainName: this.state.lightWalletserver.chainName,
+        customServerChainName: this.state.lightWalletServer.chainName,
         customServerOffline: false,
       });
     } else {
@@ -980,10 +968,10 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, SelectServerEnum.custom);
         this.setState({
           selectLightWalletServer: SelectServerEnum.custom,
-          lightWalletserver: { uri, chainName },
+          lightWalletServer: { uri, chainName },
           customServerShow: false,
           customServerUri: '',
-          customServerChainName: this.state.lightWalletserver.chainName,
+          customServerChainName: this.state.lightWalletServer.chainName,
           customServerOffline: false,
         });
       } else {
@@ -1015,8 +1003,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     }
     this.setState({ actionButtonsDisabled: true });
     let seed: string = await RPCModule.createNewWallet(
-      this.state.lightWalletserver.uri,
-      this.state.lightWalletserver.chainName,
+      this.state.lightWalletServer.uri,
+      this.state.lightWalletServer.chainName,
       this.state.performanceLevel,
       GlobalConst.minConfirmations.toString(),
     );
@@ -1101,9 +1089,9 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     }
     if (
       (seedUfvk.toLowerCase().startsWith(GlobalConst.uview) &&
-        this.state.lightWalletserver.chainName !== ChainNameEnum.mainChainName) ||
+        this.state.lightWalletServer.chainName !== ChainNameEnum.mainChainName) ||
       (seedUfvk.toLowerCase().startsWith(GlobalConst.utestview) &&
-        this.state.lightWalletserver.chainName === ChainNameEnum.mainChainName)
+        this.state.lightWalletServer.chainName === ChainNameEnum.mainChainName)
     ) {
       createAlert(
         this.setBackgroundError,
@@ -1142,8 +1130,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       result = await RPCModule.restoreWalletFromSeed(
         seedUfvk.toLowerCase(),
         walletBirthday || '0',
-        this.state.lightWalletserver.uri,
-        this.state.lightWalletserver.chainName,
+        this.state.lightWalletServer.uri,
+        this.state.lightWalletServer.chainName,
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
       );
@@ -1151,8 +1139,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       result = await RPCModule.restoreWalletFromUfvk(
         seedUfvk.toLowerCase(),
         walletBirthday || '0',
-        this.state.lightWalletserver.uri,
-        this.state.lightWalletserver.chainName,
+        this.state.lightWalletServer.uri,
+        this.state.lightWalletServer.chainName,
         this.state.performanceLevel,
         GlobalConst.minConfirmations.toString(),
       );
@@ -1303,7 +1291,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.setState({ snackbars: newSnackbars });
   };
 
-  changeMode = async (mode: ModeEnum.basic | ModeEnum.advanced) => {
+  changeMode = async (mode: ModeEnum) => {
     this.setState({ mode, screen: 0 });
     await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
     this.props.toggleTheme(mode);
@@ -1429,7 +1417,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       setPrivacyOption: this.setPrivacyOption,
 
       // settings
-      lightWalletserver: this.state.lightWalletserver,
+      lightWalletServer: this.state.lightWalletServer,
       selectLightWalletServer: this.state.selectLightWalletServer,
       validatorServer: this.state.validatorServer,
       selectValidatorServer: this.state.selectValidatorServer,
@@ -1462,6 +1450,28 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               tryAgain={() => {
                 this.setState({ biometricsFailed: false }, () => this.componentDidMount());
               }}
+            />
+          )}
+          {screen === 0.5 && (
+            <Servers
+              actionButtonsDisabled={actionButtonsDisabled}
+              hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
+              recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
+              changeMode={this.changeMode}
+              customServer={this.customServer}
+              customServerShow={customServerShow}
+              customServerOffline={customServerOffline}
+              onPressServerOffline={this.onPressServerOffline}
+              customServerChainName={customServerChainName}
+              onPressServerChainName={this.onPressServerChainName}
+              customServerUri={customServerUri}
+              setCustomServerUri={this.setCustomServerUri}
+              usingCustomServer={this.usingCustomServer}
+              setCustomServerShow={this.setCustomServerShow}
+              walletExists={walletExists}
+              openCurrentWallet={this.openCurrentWallet}
+              createNewWallet={this.createNewWallet}
+              getwalletToRestore={this.getwalletToRestore}
             />
           )}
           {screen === 1 && (

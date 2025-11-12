@@ -32,7 +32,7 @@ type ImportUfvkProps = {
 };
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, onClickOK }) => {
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, lightWalletserver, mode, addLastSnackbar, selectLightWalletServer, snackbars, removeFirstSnackbar } = context;
+  const { translate, netInfo, lightWalletServer, mode, addLastSnackbar, selectLightWalletServer, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const screenName = ScreenEnum.ImportUfvk;
 
@@ -44,7 +44,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   useEffect(() => {
     if (!netInfo.isConnected || selectLightWalletServer !== SelectServerEnum.offline) {
       (async () => {
-        const resp: string = await RPCModule.getLatestBlockServerInfo(lightWalletserver.uri);
+        const resp: string = await RPCModule.getLatestBlockServerInfo(lightWalletServer.uri);
         //console.log(resp);
         if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
           setLatestBlock(Number(resp));
@@ -53,7 +53,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
         }
       })();
     }
-  }, [lightWalletserver, selectLightWalletServer, netInfo.isConnected]);
+  }, [lightWalletServer, selectLightWalletServer, netInfo.isConnected]);
 
   useEffect(() => {
     if (seedufvkText) {

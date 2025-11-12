@@ -60,7 +60,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   getwalletToRestore,
 }) => {
   const context = useContext(ContextAppLoading);
-  const { netInfo, mode, translate, lightWalletserver, selectLightWalletServer } = context;
+  const { netInfo, mode, translate, lightWalletServer, selectLightWalletServer } = context;
   const { colors } = useTheme()  as ThemeType;
 
   return (
@@ -171,10 +171,10 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             <>
               <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
                 {`${translate('loadingapp.actualserver') as string} [${
-                  translate(`settings.value-chainname-${lightWalletserver.chainName}`) as string
+                  translate(`settings.value-chainname-${lightWalletServer.chainName}`) as string
                 }]`}
               </BoldText>
-              <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{lightWalletserver.uri}</BoldText>
+              <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{lightWalletServer.uri}</BoldText>
             </>
           )}
           {selectLightWalletServer === SelectServerEnum.offline && (

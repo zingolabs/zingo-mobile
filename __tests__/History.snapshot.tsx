@@ -45,7 +45,7 @@ describe('Component History - test', () => {
     // privacy normal
     state.privacy = false;
     // mode basic
-    state.mode = ModeEnum.basic;
+    state.mode = ModeEnum.advanced;
     const props = makeDrawerProps();
     const history = render(
       <ContextAppLoadedProvider value={state}>

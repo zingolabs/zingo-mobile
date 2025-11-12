@@ -36,7 +36,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   info: {} as InfoType,
   wallet: {} as WalletType,
   defaultUnifiedAddress: '',
-  lightWalletserver: {} as ServerType,
+  lightWalletServer: {} as ServerType,
   selectLightWalletServer: SelectServerEnum.custom,
   validatorServer: {} as ServerType,
   selectValidatorServer: SelectServerEnum.custom,

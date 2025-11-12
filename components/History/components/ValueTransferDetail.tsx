@@ -57,7 +57,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     language,
     privacy,
     addLastSnackbar,
-    lightWalletserver,
+    lightWalletServer,
     currency,
     addresses,
     zenniesDonationAddress,
@@ -130,7 +130,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       return;
     }
 
-    const url = Utils.getBlockExplorerTxIDURL(txid, lightWalletserver.chainName);
+    const url = Utils.getBlockExplorerTxIDURL(txid, lightWalletServer.chainName);
     Linking.canOpenURL(url).then(supported => {
       if (supported) {
         Linking.openURL(url);
@@ -516,7 +516,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                 {expandTxid && !!valueTransfer.txid && (
                   <>
                     <RegText>{valueTransfer.txid}</RegText>
-                    {lightWalletserver.chainName !== ChainNameEnum.regtestChainName && (
+                    {lightWalletServer.chainName !== ChainNameEnum.regtestChainName && (
                       <TouchableOpacity onPress={() => handleTxIDClick(valueTransfer.txid)}>
                         <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
                           {translate('history.viewexplorer') as string}

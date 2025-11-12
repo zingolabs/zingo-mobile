@@ -7,7 +7,7 @@ import SecurityType from '../types/SecurityType';
 import ServerType from '../types/ServerType';
 
 export default class SettingsFileClass {
-  lightWalletserver: ServerType;
+  lightWalletServer: ServerType;
   selectLightWalletServer: SelectServerEnum;
   validatorServer: ServerType;
   selectValidatorServer: SelectServerEnum;
@@ -30,7 +30,7 @@ export default class SettingsFileClass {
   performanceLevel: RPCPerformanceLevelEnum;
 
   constructor(
-    lightWalletserver: ServerType,
+    lightWalletServer: ServerType,
     selectLightWalletServer: SelectServerEnum,
     validatorServer: ServerType,
     selectValidatorServer: SelectServerEnum,
@@ -48,7 +48,7 @@ export default class SettingsFileClass {
     recoveryWalletInfoOnDevice: boolean,
     performanceLevel: RPCPerformanceLevelEnum,
   ) {
-    this.lightWalletserver = lightWalletserver;
+    this.lightWalletServer = lightWalletServer;
     this.selectLightWalletServer = selectLightWalletServer;
     this.validatorServer = validatorServer;
     this.selectValidatorServer = selectValidatorServer;

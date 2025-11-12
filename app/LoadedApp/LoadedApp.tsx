@@ -246,8 +246,8 @@ export default function LoadedApp(props: LoadedAppProps) {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.currency, currency);
       }
       // lightwallet server
-      if (settings.lightWalletserver) {
-        setLightWalletServer(settings.lightWalletserver);
+      if (settings.lightWalletServer) {
+        setLightWalletServer(settings.lightWalletServer);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, lightWalletServer);
       }
@@ -345,7 +345,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         translate={translate}
         language={language}
         currency={currency}
-        lightWalletserver={lightWalletServer}
+        lightWalletServer={lightWalletServer}
         selectLightWalletServer={selectLightWalletServer}
         validatorServer={validatorServer}
         selectValidatorServer={selectValidatorServer}
@@ -397,7 +397,7 @@ type LoadedAppClassProps = {
   theme: ThemeType;
   language: LanguageEnum;
   currency: CurrencyEnum;
-  lightWalletserver: ServerType;
+  lightWalletServer: ServerType;
   selectLightWalletServer: SelectServerEnum;
   validatorServer: ServerType;
   selectValidatorServer: SelectServerEnum;
@@ -478,7 +478,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       setPrivacyOption: this.setPrivacyOption,
 
       // context settings
-      lightWalletserver: props.lightWalletserver,
+      lightWalletServer: props.lightWalletServer,
       selectLightWalletServer: props.selectLightWalletServer,
       validatorServer: props.validatorServer,
       selectValidatorServer: props.selectValidatorServer,
@@ -516,7 +516,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       this.setWallet,
       this.setLastError,
       props.readOnly,
-      props.lightWalletserver,
+      props.lightWalletServer,
       props.performanceLevel,
     );
 
@@ -726,7 +726,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
     // Attempt to parse as URI if it starts with zcash
     // only if it is a spendable wallet
     if (url && url.startsWith(GlobalConst.zcash) && !this.state.readOnly) {
-      const { error, target } = await parseZcashURI(url, this.state.translate, this.state.lightWalletserver);
+      const { error, target } = await parseZcashURI(url, this.state.translate, this.state.lightWalletServer);
       //console.log(targets);
 
       if (target) {
@@ -1038,14 +1038,14 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           newInfo.currencyName = this.state.info.currencyName;
         } else {
           newInfo.currencyName =
-            this.state.lightWalletserver.chainName === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.TAZ;
+            this.state.lightWalletServer.chainName === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.TAZ;
         }
       }
       if (!newInfo.chainName) {
-        newInfo.chainName = this.state.lightWalletserver.chainName;
+        newInfo.chainName = this.state.lightWalletServer.chainName;
       }
       if (!newInfo.serverUri) {
-        newInfo.serverUri = this.state.lightWalletserver.uri;
+        newInfo.serverUri = this.state.lightWalletServer.uri;
       }
       //const start = Date.now();
       this.setState({ info: newInfo });
@@ -1066,8 +1066,8 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   sendTransaction = async (sendPageState: SendPageStateClass): Promise<String> => {
     try {
       // Construct a sendJson from the sendPage state
-      const { lightWalletserver, donation, defaultUnifiedAddress } = this.state;
-      const sendJson = await Utils.getSendManyJSON(sendPageState, defaultUnifiedAddress, lightWalletserver, donation);
+      const { lightWalletServer, donation, defaultUnifiedAddress } = this.state;
+      const sendJson = await Utils.getSendManyJSON(sendPageState, defaultUnifiedAddress, lightWalletServer, donation);
       //const start = Date.now();
       const txid = await this.rpc.sendTransaction(sendJson);
       //console.log('&&&&&&&&&&&&&& send tx', Date.now() - start);
@@ -1197,7 +1197,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       let update = false;
       if (
         this.state.sendPageState.toaddr.to &&
-        this.state.sendPageState.toaddr.to !== (await Utils.getNymDonationAddress(this.state.lightWalletserver.chainName))
+        this.state.sendPageState.toaddr.to !== (await Utils.getNymDonationAddress(this.state.lightWalletServer.chainName))
       ) {
         await ShowAddressAlertAsync(this.state.translate)
           .then(async () => {
@@ -1214,7 +1214,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
         let uriToAddr: ToAddrClass = new ToAddrClass(0);
         const to = new ToAddrClass(0);
 
-        to.to = await Utils.getNymDonationAddress(this.state.lightWalletserver.chainName);
+        to.to = await Utils.getNymDonationAddress(this.state.lightWalletServer.chainName);
         to.amount = Utils.getNymDonationAmount();
         to.memo = Utils.getNymDonationMemo(this.state.translate);
         to.includeUAMemo = true;
@@ -1279,7 +1279,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
             await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, value);
             await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, selectServer);
             this.setState({
-              lightWalletserver: value,
+              lightWalletServer: value,
               selectLightWalletServer: selectServer,
             });
             // the server is changed, the App needs to restart the timeout tasks from the beginning
@@ -1327,13 +1327,13 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
       // we need to restore the old server because the new one doesn't have the seed of the current wallet.
       const oldSettings = await SettingsFileImpl.readSettings();
-      await RPCModule.changeServerProcess(oldSettings.lightWalletserver.uri);
+      await RPCModule.changeServerProcess(oldSettings.lightWalletServer.uri);
 
       // go to the seed screen for changing the wallet for another in the new server or cancel this action.
       this.setState({
         newLightWalletServer: value as ServerType,
         newSelectLightWalletServer: selectServer,
-        lightWalletserver: oldSettings.lightWalletserver,
+        lightWalletServer: oldSettings.lightWalletServer,
         selectLightWalletServer: oldSettings.selectLightWalletServer,
       });
     }
@@ -1473,12 +1473,12 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
   };
 
   onClickOKChangeWallet = async (state: LoadingAppNavigationState) => {
-    const { lightWalletserver } = this.state;
+    const { lightWalletServer } = this.state;
 
     // if the App is working with a test server
     // no need to do backups of the wallets.
     let resultStr = '';
-    if (lightWalletserver.chainName === ChainNameEnum.mainChainName) {
+    if (lightWalletServer.chainName === ChainNameEnum.mainChainName) {
       // backup
       resultStr = (await this.rpc.changeWallet()) as string;
     } else {
@@ -1533,7 +1533,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
   onClickOKServerWallet = async () => {
     if (this.state.newLightWalletServer && this.state.newSelectLightWalletServer) {
-      const beforeServer = this.state.lightWalletserver;
+      const beforeServer = this.state.lightWalletServer;
 
       const resultStrServerPromise = await RPCModule.changeServerProcess(this.state.newLightWalletServer.uri);
       const timeoutServerPromise = new Promise((_, reject) => {
@@ -1559,7 +1559,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       await SettingsFileImpl.writeSettings(SettingsNameEnum.lightWalletServer, this.state.newLightWalletServer);
       await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, this.state.newSelectLightWalletServer);
       this.setState({
-        lightWalletserver: this.state.newLightWalletServer,
+        lightWalletServer: this.state.newLightWalletServer,
         selectLightWalletServer: this.state.selectLightWalletServer,
         newLightWalletServer: {} as ServerType,
         newSelectLightWalletServer: null,
@@ -1696,7 +1696,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       setPrivacyOption: this.setPrivacyOption,
 
       // context settings
-      lightWalletserver: this.state.lightWalletserver,
+      lightWalletServer: this.state.lightWalletServer,
       selectLightWalletServer: this.state.selectLightWalletServer,
       validatorServer: this.state.validatorServer,
       selectValidatorServer: this.state.selectValidatorServer,

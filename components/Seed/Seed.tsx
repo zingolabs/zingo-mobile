@@ -54,7 +54,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
   const {
     wallet,
     translate,
-    lightWalletserver,
+    lightWalletServer,
     netInfo,
     privacy,
     mode,
@@ -145,7 +145,7 @@ const Seed: React.FunctionComponent<SeedProps> = ({
         : action === SeedActionEnum.server
         ? (translate('seed.server-warning') as string)
         : '') +
-        (lightWalletserver.chainName !== ChainNameEnum.mainChainName &&
+        (lightWalletServer.chainName !== ChainNameEnum.mainChainName &&
         (action === SeedActionEnum.change || action === SeedActionEnum.server)
           ? '\n' + (translate('seed.mainnet-warning') as string)
           : ''),
