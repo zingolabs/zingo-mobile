@@ -105,8 +105,9 @@ export default function LoadingApp(props: LoadingAppProps) {
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency); // by default none because of cTAZ
   const [lightWalletServer, setLightWalletServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [selectLightWalletServer, setSelectLightWalletserver] = useState<SelectServerEnum>(SelectServerEnum.custom);
+  const [selectLightWalletServer, setSelectLightWalletServer] = useState<SelectServerEnum>(SelectServerEnum.custom);
   const [validatorServer, setValidatorServer] = useState<ServerType>(SERVER_DEFAULT_0);
+  const [selectValidatorServer, setSelectValidatorServer] = useState<SelectServerEnum>(SelectServerEnum.custom);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
@@ -219,7 +220,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         settings.selectLightWalletServer === SelectServerEnum.list ||
         settings.selectLightWalletServer === SelectServerEnum.offline
       ) {
-        setSelectLightWalletserver(settings.selectLightWalletServer);
+        setSelectLightWalletServer(settings.selectLightWalletServer);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, selectLightWalletServer);
       }
@@ -228,6 +229,16 @@ export default function LoadingApp(props: LoadingAppProps) {
         setValidatorServer(settings.validatorServer);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.validatorServer, validatorServer);
+      }
+      if (
+        settings.selectValidatorServer === SelectServerEnum.auto ||
+        settings.selectValidatorServer === SelectServerEnum.custom ||
+        settings.selectValidatorServer === SelectServerEnum.list ||
+        settings.selectValidatorServer === SelectServerEnum.offline
+      ) {
+        setSelectValidatorServer(settings.selectValidatorServer);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectValidatorServer, selectValidatorServer);
       }
       if (settings.sendAll === true || settings.sendAll === false) {
         setSendAll(settings.sendAll);
@@ -298,6 +309,7 @@ export default function LoadingApp(props: LoadingAppProps) {
         lightWalletserver={lightWalletServer}
         selectLightWalletserver={selectLightWalletServer}
         validatorServer={validatorServer}
+        selectLightWalletServer={selectLightWalletServer}
         sendAll={sendAll}
         donation={donation}
         privacy={privacy}
@@ -324,6 +336,7 @@ type LoadingAppClassProps = {
   lightWalletserver: ServerType;
   selectLightWalletserver: SelectServerEnum;
   validatorServer: ServerType;
+  selectLightWalletServer: SelectServerEnum;
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
@@ -370,6 +383,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       lightWalletserver: props.lightWalletserver,
       selectLightWalletServer: props.selectLightWalletserver,
       validatorServer: props.validatorServer,
+      selectValidatorServer: props.selectLightWalletServer,
       currency: props.currency,
       language: props.language,
       sendAll: props.sendAll,
@@ -1418,6 +1432,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       lightWalletserver: this.state.lightWalletserver,
       selectLightWalletServer: this.state.selectLightWalletServer,
       validatorServer: this.state.validatorServer,
+      selectValidatorServer: this.state.selectValidatorServer,
       currency: this.state.currency,
       language: this.state.language,
       sendAll: this.state.sendAll,

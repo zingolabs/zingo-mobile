@@ -113,6 +113,7 @@ export default interface AppContextLoaded {
   lightWalletserver: ServerType;
   selectLightWalletServer: SelectServerEnum;
   validatorServer: ServerType;
+  selectValidatorServer: SelectServerEnum;
   currency: CurrencyEnum;
   language: LanguageEnum;
   sendAll: boolean;

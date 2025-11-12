@@ -139,8 +139,9 @@ export default function LoadedApp(props: LoadedAppProps) {
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.en);
   const [currency, setCurrency] = useState<CurrencyEnum>(CurrencyEnum.noCurrency);
   const [lightWalletServer, setLightWalletServer] = useState<ServerType>(SERVER_DEFAULT_0);
-  const [selectLightWalletServer, setSelectLightWalletserver] = useState<SelectServerEnum>(SelectServerEnum.custom);
+  const [selectLightWalletServer, setSelectLightWalletServer] = useState<SelectServerEnum>(SelectServerEnum.custom);
   const [validatorServer, setValidatorServer] = useState<ServerType>(SERVER_DEFAULT_0);
+  const [selectValidatorServer, setSelectValidatorServer] = useState<SelectServerEnum>(SelectServerEnum.custom);
   const [sendAll, setSendAll] = useState<boolean>(false);
   const [donation, setDonation] = useState<boolean>(false);
   const [privacy, setPrivacy] = useState<boolean>(false);
@@ -256,7 +257,7 @@ export default function LoadedApp(props: LoadedAppProps) {
         settings.selectLightWalletServer === SelectServerEnum.list ||
         settings.selectLightWalletServer === SelectServerEnum.offline
       ) {
-        setSelectLightWalletserver(settings.selectLightWalletServer);
+        setSelectLightWalletServer(settings.selectLightWalletServer);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.selectLightWalletServer, selectLightWalletServer);
       }
@@ -265,6 +266,16 @@ export default function LoadedApp(props: LoadedAppProps) {
         setValidatorServer(settings.validatorServer);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.validatorServer, validatorServer);
+      }
+      if (
+        settings.selectValidatorServer === SelectServerEnum.auto ||
+        settings.selectValidatorServer === SelectServerEnum.custom ||
+        settings.selectValidatorServer === SelectServerEnum.list ||
+        settings.selectValidatorServer === SelectServerEnum.offline
+      ) {
+        setSelectValidatorServer(settings.selectValidatorServer);
+      } else {
+        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectValidatorServer, selectValidatorServer);
       }
       if (settings.sendAll === true || settings.sendAll === false) {
         setSendAll(settings.sendAll);
@@ -335,8 +346,9 @@ export default function LoadedApp(props: LoadedAppProps) {
         language={language}
         currency={currency}
         lightWalletserver={lightWalletServer}
-        selectLightWalletserver={selectLightWalletServer}
+        selectLightWalletServer={selectLightWalletServer}
         validatorServer={validatorServer}
+        selectValidatorServer={selectValidatorServer}
         sendAll={sendAll}
         donation={donation}
         privacy={privacy}
@@ -386,8 +398,9 @@ type LoadedAppClassProps = {
   language: LanguageEnum;
   currency: CurrencyEnum;
   lightWalletserver: ServerType;
-  selectLightWalletserver: SelectServerEnum;
+  selectLightWalletServer: SelectServerEnum;
   validatorServer: ServerType;
+  selectValidatorServer: SelectServerEnum;
   sendAll: boolean;
   donation: boolean;
   privacy: boolean;
@@ -466,8 +479,9 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
 
       // context settings
       lightWalletserver: props.lightWalletserver,
-      selectLightWalletServer: props.selectLightWalletserver,
+      selectLightWalletServer: props.selectLightWalletServer,
       validatorServer: props.validatorServer,
+      selectValidatorServer: props.selectValidatorServer,
       currency: props.currency,
       language: props.language,
       sendAll: props.sendAll,
@@ -1685,6 +1699,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       lightWalletserver: this.state.lightWalletserver,
       selectLightWalletServer: this.state.selectLightWalletServer,
       validatorServer: this.state.validatorServer,
+      selectValidatorServer: this.state.selectValidatorServer,
       currency: this.state.currency,
       language: this.state.language,
       sendAll: this.state.sendAll,

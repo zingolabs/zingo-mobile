@@ -39,6 +39,7 @@ export const defaultAppContextLoaded: AppContextLoaded = {
   lightWalletserver: {} as ServerType,
   selectLightWalletServer: SelectServerEnum.custom,
   validatorServer: {} as ServerType,
+  selectValidatorServer: SelectServerEnum.custom,
   currency: CurrencyEnum.USDCurrency,
   language: LanguageEnum.en,
   zecPrice: {

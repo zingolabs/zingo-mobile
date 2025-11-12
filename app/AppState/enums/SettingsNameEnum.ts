@@ -3,6 +3,7 @@ export enum SettingsNameEnum {
   lightWalletServer = 'lightWalletServer',
   selectLightWalletServer = 'selectLightWalletServer',
   validatorServer = 'validatorServer',
+  selectValidatorServer = 'selectValidatorServer',
   currency = 'currency',
   language = 'language',
   sendAll = 'sendAll',

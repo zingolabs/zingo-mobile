@@ -21,8 +21,9 @@ export const defaultAppContextLoading: AppContextLoading = {
   netInfo: {} as NetInfoType,
   wallet: {} as WalletType,
   lightWalletserver: {} as ServerType,
-  selectLightWalletServer: SelectServerEnum.auto,
+  selectLightWalletServer: SelectServerEnum.custom,
   validatorServer: {} as ServerType,
+  selectValidatorServer: SelectServerEnum.custom,
   currency: CurrencyEnum.USDCurrency,
   language: LanguageEnum.en,
   zecPrice: {

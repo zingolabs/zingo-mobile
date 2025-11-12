@@ -10,6 +10,7 @@ export default class SettingsFileClass {
   lightWalletserver: ServerType;
   selectLightWalletServer: SelectServerEnum;
   validatorServer: ServerType;
+  selectValidatorServer: SelectServerEnum;
   currency: CurrencyEnum;
   language: LanguageEnum;
   sendAll: boolean;
@@ -32,6 +33,7 @@ export default class SettingsFileClass {
     lightWalletserver: ServerType,
     selectLightWalletServer: SelectServerEnum,
     validatorServer: ServerType,
+    selectValidatorServer: SelectServerEnum,
     currency: CurrencyEnum,
     language: LanguageEnum,
     sendAll: boolean,
@@ -49,6 +51,7 @@ export default class SettingsFileClass {
     this.lightWalletserver = lightWalletserver;
     this.selectLightWalletServer = selectLightWalletServer;
     this.validatorServer = validatorServer;
+    this.selectValidatorServer = selectValidatorServer;
     this.currency = currency;
     this.language = language;
     this.sendAll = sendAll;
