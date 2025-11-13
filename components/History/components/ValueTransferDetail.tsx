@@ -57,7 +57,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     language,
     privacy,
     addLastSnackbar,
-    lightWalletServer,
+    indexerServer,
     currency,
     addresses,
     zenniesDonationAddress,
@@ -65,7 +65,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     removeFirstSnackbar,
     setBackgroundError,
     netInfo,
-    selectLightWalletServer,
+    selectIndexerServer,
     readOnly,
     setPrivacyOption,
   } = context;
@@ -130,7 +130,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
       return;
     }
 
-    const url = Utils.getBlockExplorerTxIDURL(txid, lightWalletServer.chainName);
+    const url = Utils.getBlockExplorerTxIDURL(txid, indexerServer.chainName);
     Linking.canOpenURL(url).then(supported => {
       if (supported) {
         Linking.openURL(url);
@@ -178,7 +178,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
     if (!setBackgroundError || !addLastSnackbar) {
       return;
     }
-    if (!netInfo.isConnected || selectLightWalletServer === SelectServerEnum.offline) {
+    if (!netInfo.isConnected || selectIndexerServer === SelectServerEnum.offline) {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
@@ -516,7 +516,7 @@ const ValueTransferDetail: React.FunctionComponent<ValueTransferDetailProps> = (
                 {expandTxid && !!valueTransfer.txid && (
                   <>
                     <RegText>{valueTransfer.txid}</RegText>
-                    {lightWalletServer.chainName !== ChainNameEnum.regtestChainName && (
+                    {indexerServer.chainName !== ChainNameEnum.regtestChainName && (
                       <TouchableOpacity onPress={() => handleTxIDClick(valueTransfer.txid)}>
                         <Text style={{ color: colors.text, textDecorationLine: 'underline', margin: 15 }}>
                           {translate('history.viewexplorer') as string}

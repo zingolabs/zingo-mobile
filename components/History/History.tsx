@@ -88,7 +88,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
     language,
     setBackgroundError,
     addLastSnackbar,
-    lightWalletServer,
+    indexerServer,
     doRefresh,
     zenniesDonationAddress,
     snackbars,
@@ -211,7 +211,7 @@ const History: React.FunctionComponent<HistoryProps> = ({
         setLoading(false);
       }, 500);
     }
-  }, [fetchValueTransfersFiltered, numVt, valueTransfers, lightWalletServer.chainName]);
+  }, [fetchValueTransfersFiltered, numVt, valueTransfers, indexerServer.chainName]);
 
   useEffect(() => {
     setLoadMoreButton(numVt < valueTransfersFiltered.length);

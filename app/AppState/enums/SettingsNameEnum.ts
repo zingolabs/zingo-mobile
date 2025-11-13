@@ -1,9 +1,7 @@
 export enum SettingsNameEnum {
   // screen
-  lightWalletServer = 'lightWalletServer',
-  selectLightWalletServer = 'selectLightWalletServer',
-  validatorServer = 'validatorServer',
-  selectValidatorServer = 'selectValidatorServer',
+  indexerServer = 'indexerServer',
+  selectIndexerServer = 'selectIndexerServer',
   currency = 'currency',
   language = 'language',
   sendAll = 'sendAll',

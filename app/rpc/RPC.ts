@@ -73,7 +73,7 @@ export default class RPC {
   timers: NodeJS.Timeout[];
 
   readOnly: boolean;
-  lightWalletServer: ServerType;
+  indexerServer: ServerType;
   performanceLevel: RPCPerformanceLevelEnum;
 
   walletConfigPerformanceLevel: RPCPerformanceLevelEnum | undefined;
@@ -91,7 +91,7 @@ export default class RPC {
     fnSetWallet: (wallet: WalletType) => void,
     fnSetLastError: (error: string) => void,
     readOnly: boolean,
-    lightWalletServer: ServerType,
+    indexerServer: ServerType,
     performanceLevel: RPCPerformanceLevelEnum,
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
@@ -128,7 +128,7 @@ export default class RPC {
     this.timers = [];
 
     this.readOnly = readOnly;
-    this.lightWalletServer = lightWalletServer;
+    this.indexerServer = indexerServer;
     this.performanceLevel = performanceLevel;
 
   }
@@ -1063,7 +1063,7 @@ export default class RPC {
       this.fetchTandZandOValueTransfersLock = true;
       // first to get the last server block.
       const start = Date.now();
-      const heightStr: string = await RPCModule.getLatestBlockServerInfo(this.lightWalletServer.uri);
+      const heightStr: string = await RPCModule.getLatestBlockServerInfo(this.indexerServer.uri);
       if (Date.now() - start > 4000) {
         console.log('=========================================== > server height - ', Date.now() - start);
       }

@@ -60,7 +60,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   getwalletToRestore,
 }) => {
   const context = useContext(ContextAppLoading);
-  const { netInfo, mode, translate, lightWalletServer, selectLightWalletServer } = context;
+  const { netInfo, mode, translate, indexerServer, selectIndexerServer } = context;
   const { colors } = useTheme()  as ThemeType;
 
   return (
@@ -167,17 +167,17 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             />
           </View>
 
-          {selectLightWalletServer !== SelectServerEnum.offline && (
+          {selectIndexerServer !== SelectServerEnum.offline && (
             <>
               <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
                 {`${translate('loadingapp.actualserver') as string} [${
-                  translate(`settings.value-chainname-${lightWalletServer.chainName}`) as string
+                  translate(`settings.value-chainname-${indexerServer.chainName}`) as string
                 }]`}
               </BoldText>
-              <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{lightWalletServer.uri}</BoldText>
+              <BoldText style={{ fontSize: 15, marginBottom: 10 }}>{indexerServer.uri}</BoldText>
             </>
           )}
-          {selectLightWalletServer === SelectServerEnum.offline && (
+          {selectIndexerServer === SelectServerEnum.offline && (
             <View style={{ flexDirection: 'row' }}>
               <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
                 {translate('loadingapp.actualserver') as string}
@@ -200,7 +200,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              {selectLightWalletServer !== SelectServerEnum.offline && (
+              {selectIndexerServer !== SelectServerEnum.offline && (
                 <View
                   style={{
                     alignItems: 'center',
@@ -362,7 +362,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             </>
           )}
 
-          {netInfo.isConnected && selectLightWalletServer !== SelectServerEnum.offline && (
+          {netInfo.isConnected && selectIndexerServer !== SelectServerEnum.offline && (
             <Button
               testID="loadingapp.createnewwallet"
               type={ButtonTypeEnum.Primary}
@@ -390,7 +390,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             />
           )}
 
-          {netInfo.isConnected && selectLightWalletServer !== SelectServerEnum.offline && (
+          {netInfo.isConnected && selectIndexerServer !== SelectServerEnum.offline && (
             <View style={{ marginTop: 10, display: 'flex', alignItems: 'center', width: '100%' }}>
               <Button
                 testID="loadingapp.restorewalletseedufvk"
@@ -403,7 +403,7 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             </View>
           )}
 
-          {(!netInfo.isConnected || selectLightWalletServer === SelectServerEnum.offline) && !walletExists && (
+          {(!netInfo.isConnected || selectIndexerServer === SelectServerEnum.offline) && !walletExists && (
             <View
               style={{
                 display: 'flex',

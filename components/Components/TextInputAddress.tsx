@@ -31,14 +31,14 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
 }) => {
   const navigation: any = useNavigation();
   const context = useContext(ContextAppLoaded);
-  const { translate, lightWalletServer } = context;
+  const { translate, indexerServer } = context;
   const { colors } = useTheme()  as ThemeType;
 
   const [validAddress, setValidAddress] = useState<number>(0); // 1 - OK, 0 - Empty, -1 - KO
 
   useEffect(() => {
     const parseAddress = async (addr: string): Promise<{ isValid: boolean; onlyOrchardUA: string }> => {
-      return await Utils.isValidAddress(addr, lightWalletServer.chainName);
+      return await Utils.isValidAddress(addr, indexerServer.chainName);
     };
 
     if (address) {
@@ -51,7 +51,7 @@ const TextInputAddress: React.FunctionComponent<TextInputAddressProps> = ({
       setValidAddress(0);
       setError('');
     }
-  }, [address, lightWalletServer.chainName, setError, translate]);
+  }, [address, indexerServer.chainName, setError, translate]);
 
   const setQrcodeModalShow = () => {
     if (screenName === ScreenEnum.Receive) {

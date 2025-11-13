@@ -93,7 +93,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const context = useContext(ContextAppLoaded);
   const {
     translate,
-    lightWalletServer: lightWalletServerContext,
+    indexerServer: indexerServerContext,
     currency: currencyContext,
     language: languageContext,
     sendAll: sendAllContext,
@@ -103,7 +103,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     netInfo,
     addLastSnackbar,
     security: securityContext,
-    selectLightWalletServer: selectLightWalletServerContext,
+    selectIndexerServer: selectIndexerServerContext,
     rescanMenu: rescanMenuContext,
     recoveryWalletInfoOnDevice: recoveryWalletInfoOnDeviceContext,
     performanceLevel: performanceLevelContext,
@@ -197,7 +197,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   const [restoreWalletBackupScreen, setRestoreWalletBackupScreen] = useState<boolean>(
     securityContext.restoreWalletBackupScreen,
   );
-  const [selectServer, setSelectServer] = useState<SelectServerEnum>(selectLightWalletServerContext);
+  const [selectServer, setSelectServer] = useState<SelectServerEnum>(selectIndexerServerContext);
   const [rescanMenu, setRescanMenu] = useState<boolean>(rescanMenuContext);
   const [recoveryWalletInfoOnDevice, setRecoveryWalletInfoOnDevice] = useState<boolean>(
     recoveryWalletInfoOnDeviceContext,
@@ -224,36 +224,36 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
   }, [translate]);
 
   const setServer = () => {
-    if (selectLightWalletServerContext === SelectServerEnum.auto) {
+    if (selectIndexerServerContext === SelectServerEnum.auto) {
       setAutoIcon(faDotCircle); // ->
       setListIcon(farCircle);
       setCustomIcon(farCircle);
       setOfflineIcon(farCircle);
-      setAutoServerUri(lightWalletServerContext.uri);
-      setAutoServerChainName(lightWalletServerContext.chainName);
-    } else if (selectLightWalletServerContext === SelectServerEnum.list) {
+      setAutoServerUri(indexerServerContext.uri);
+      setAutoServerChainName(indexerServerContext.chainName);
+    } else if (selectIndexerServerContext === SelectServerEnum.list) {
       setAutoIcon(farCircle);
       setListIcon(faDotCircle); // ->
       setCustomIcon(farCircle);
       setOfflineIcon(farCircle);
-      setListServerUri(lightWalletServerContext.uri);
-      setListServerChainName(lightWalletServerContext.chainName);
+      setListServerUri(indexerServerContext.uri);
+      setListServerChainName(indexerServerContext.chainName);
       // I have to update them in auto as well
       // with the same server
-      setAutoServerUri(lightWalletServerContext.uri);
-      setAutoServerChainName(lightWalletServerContext.chainName);
-    } else if (selectLightWalletServerContext === SelectServerEnum.custom) {
+      setAutoServerUri(indexerServerContext.uri);
+      setAutoServerChainName(indexerServerContext.chainName);
+    } else if (selectIndexerServerContext === SelectServerEnum.custom) {
       setAutoIcon(farCircle);
       setListIcon(farCircle);
       setCustomIcon(faDotCircle); // ->
       setOfflineIcon(farCircle);
-      setCustomServerUri(lightWalletServerContext.uri);
-      setCustomServerChainName(lightWalletServerContext.chainName);
+      setCustomServerUri(indexerServerContext.uri);
+      setCustomServerChainName(indexerServerContext.chainName);
       // I have to update them in auto as well
       // with the first of the list
       setAutoServerUri(serverUris(translate).filter((s: ServerUrisType) => s.chainName === ChainNameEnum.testChainName)[0].uri);
       setAutoServerChainName(serverUris(translate).filter((s: ServerUrisType) => s.chainName === ChainNameEnum.testChainName)[0].chainName);
-    } else if (selectLightWalletServerContext === SelectServerEnum.offline) {
+    } else if (selectIndexerServerContext === SelectServerEnum.offline) {
       setAutoIcon(farCircle);
       setListIcon(farCircle);
       setCustomIcon(farCircle);
@@ -311,8 +311,8 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       chainNameParsed = ChainNameEnum.mainChainName;
     }
     if (
-      lightWalletServerContext.uri === serverUriParsed &&
-      lightWalletServerContext.chainName === chainNameParsed &&
+      indexerServerContext.uri === serverUriParsed &&
+      indexerServerContext.chainName === chainNameParsed &&
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
@@ -320,7 +320,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       privacyContext === privacy &&
       modeContext === mode &&
       isEqual(securityContext, securityObject()) &&
-      selectLightWalletServerContext === selectServer &&
+      selectIndexerServerContext === selectServer &&
       rescanMenuContext === rescanMenu &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
       performanceLevelContext === performanceLevel
@@ -355,11 +355,11 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     performanceLevelContext,
     securityContext,
     selectServer,
-    selectLightWalletServerContext,
+    selectIndexerServerContext,
     sendAll,
     sendAllContext,
-    lightWalletServerContext.chainName,
-    lightWalletServerContext.uri,
+    indexerServerContext.chainName,
+    indexerServerContext.uri,
     securityObject,
   ]);
 
@@ -380,10 +380,10 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       chainNameParsed = ChainNameEnum.mainChainName;
     }
     let sameServerChainName = true;
-    const chainName = lightWalletServerContext.chainName;
+    const chainName = indexerServerContext.chainName;
     if (
-      lightWalletServerContext.uri === serverUriParsed &&
-      lightWalletServerContext.chainName === chainNameParsed &&
+      indexerServerContext.uri === serverUriParsed &&
+      indexerServerContext.chainName === chainNameParsed &&
       currencyContext === currency &&
       languageContext === language &&
       sendAllContext === sendAll &&
@@ -391,7 +391,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       privacyContext === privacy &&
       modeContext === mode &&
       isEqual(securityContext, securityObject()) &&
-      selectLightWalletServerContext === selectServer &&
+      selectIndexerServerContext === selectServer &&
       rescanMenuContext === rescanMenu &&
       recoveryWalletInfoOnDeviceContext === recoveryWalletInfoOnDevice &&
       performanceLevelContext === performanceLevel
@@ -408,7 +408,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
-    if (lightWalletServerContext.uri !== serverUriParsed && selectServer !== SelectServerEnum.offline) {
+    if (indexerServerContext.uri !== serverUriParsed && selectServer !== SelectServerEnum.offline) {
       const resultUri = parseServerURI(serverUriParsed, translate);
       if (resultUri && resultUri.toLowerCase().startsWith(GlobalConst.error)) {
         addLastSnackbar({ message: translate('settings.isuri') as string, screenName: [screenName] });
@@ -433,7 +433,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
     }
 
     if (
-      (lightWalletServerContext.uri !== serverUriParsed || selectLightWalletServerContext !== selectServer) &&
+      (indexerServerContext.uri !== serverUriParsed || selectIndexerServerContext !== selectServer) &&
       !serverUriParsed &&
       selectServer !== SelectServerEnum.offline
     ) {
@@ -441,12 +441,12 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       return;
     }
 
-    if (lightWalletServerContext.uri !== serverUriParsed || lightWalletServerContext.chainName !== chainNameParsed) {
+    if (indexerServerContext.uri !== serverUriParsed || indexerServerContext.chainName !== chainNameParsed) {
       // if the user is changing -> to Offline mode.
       // doesn't matter is the device have or not internet connection.
       if (
         !netInfo.isConnected &&
-        !(selectLightWalletServerContext !== SelectServerEnum.offline && selectServer === SelectServerEnum.offline)
+        !(selectIndexerServerContext !== SelectServerEnum.offline && selectServer === SelectServerEnum.offline)
       ) {
         addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
         return;
@@ -455,7 +455,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       if (serverUriParsed) {
         addLastSnackbar({ message: translate('loadedapp.tryingnewserver') as string, screenName: [screenName] });
       }
-      const { result, timeout, newChainName } = await checkServerURI(serverUriParsed, lightWalletServerContext.uri);
+      const { result, timeout, newChainName } = await checkServerURI(serverUriParsed, indexerServerContext.uri);
       if (!result) {
         // if the server checking takes more then 30 seconds.
         if (timeout === true) {
@@ -468,7 +468,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
         }
         // in this point the sync process is blocked, who knows why.
         // if I save the actual server before the customization... is going to work.
-        setServerOption(lightWalletServerContext, selectLightWalletServerContext, false, sameServerChainName);
+        setServerOption(indexerServerContext, selectIndexerServerContext, false, sameServerChainName);
         setDisabled(false);
         return;
       } else {
@@ -509,7 +509,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
 
     // I need a little time in this modal because maybe the wallet cannot be open with the new server
     let ms = 100;
-    if (lightWalletServerContext.uri !== serverUriParsed || lightWalletServerContext.chainName !== chainNameParsed) {
+    if (indexerServerContext.uri !== serverUriParsed || indexerServerContext.chainName !== chainNameParsed) {
       if (languageContext !== language) {
         await setLanguageOption(language, false);
       }
@@ -521,7 +521,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       );
       ms = 1500;
     } else {
-      if (selectLightWalletServerContext !== selectServer) {
+      if (selectIndexerServerContext !== selectServer) {
         await setSelectServerOption(selectServer);
       }
       if (languageContext !== language) {
@@ -545,7 +545,7 @@ const Settings: React.FunctionComponent<SettingsProps> = ({
       setPrivacy(privacyContext);
       setSendAll(sendAllContext);
       setRescanMenu(rescanMenuContext);
-      setSelectServer(selectLightWalletServerContext);
+      setSelectServer(selectIndexerServerContext);
       setServer();
       setStartApp(securityContext.startApp);
       setForegroundApp(securityContext.foregroundApp);

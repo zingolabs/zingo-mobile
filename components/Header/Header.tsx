@@ -122,7 +122,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     somePending,
     security,
     shieldingAmount,
-    selectLightWalletServer,
+    selectIndexerServer,
     setZecPrice,
     background,
     lastError,
@@ -221,7 +221,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     };
 
     if (
-      !readOnly && setShieldingAmount && selectLightWalletServer !== SelectServerEnum.offline && somePending
+      !readOnly && setShieldingAmount && selectIndexerServer !== SelectServerEnum.offline && somePending
         ? 0
         : (totalBalance ? totalBalance.confirmedTransparentBalance : 0) > 0
     ) {
@@ -264,13 +264,13 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       setShieldingFee(0);
       setShieldingAmount && setShieldingAmount(0);
     }
-  }, [readOnly, setShieldingAmount, totalBalance, totalBalance?.confirmedTransparentBalance, somePending, selectLightWalletServer]);
+  }, [readOnly, setShieldingAmount, totalBalance, totalBalance?.confirmedTransparentBalance, somePending, selectIndexerServer]);
 
   useEffect(() => {
     setShowShieldButton(
-      !readOnly && selectLightWalletServer !== SelectServerEnum.offline && (somePending ? 0 : shieldingAmount) > 0,
+      !readOnly && selectIndexerServer !== SelectServerEnum.offline && (somePending ? 0 : shieldingAmount) > 0,
     );
-  }, [readOnly, shieldingAmount, somePending, selectLightWalletServer]);
+  }, [readOnly, shieldingAmount, somePending, selectIndexerServer]);
 
   useEffect(() => {
     const showIt = () => {
@@ -290,7 +290,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
     if (!setBackgroundError || !addLastSnackbar) {
       return;
     }
-    if (!netInfo.isConnected || selectLightWalletServer === SelectServerEnum.offline) {
+    if (!netInfo.isConnected || selectIndexerServer === SelectServerEnum.offline) {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
@@ -523,7 +523,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
               marginTop: 12,
               marginHorizontal: 5,
             }}>
-            {!noSyncingStatus && selectLightWalletServer !== SelectServerEnum.offline && (
+            {!noSyncingStatus && selectIndexerServer !== SelectServerEnum.offline && (
               <View style={{ minHeight: 29, flexDirection: 'row' }}>
                 {netInfo.isConnected && !(percentageOutputsScanned === 0) ? (
                   <>
@@ -695,7 +695,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
                 )}
               </View>
             )}
-            {selectLightWalletServer === SelectServerEnum.offline && (
+            {selectIndexerServer === SelectServerEnum.offline && (
               <View
                 style={{
                   alignItems: 'center',
@@ -825,7 +825,7 @@ const Header: React.FunctionComponent<HeaderProps> = ({
 
           {(currency === CurrencyEnum.USDCurrency || currency === CurrencyEnum.USDTORCurrency) &&
             !noBalance &&
-            selectLightWalletServer !== SelectServerEnum.offline && (
+            selectIndexerServer !== SelectServerEnum.offline && (
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <CurrencyAmount
                   style={{ marginTop: 0, marginBottom: 0 }}

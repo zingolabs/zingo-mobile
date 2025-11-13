@@ -32,7 +32,7 @@ type ImportUfvkProps = {
 };
 const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, onClickOK }) => {
   const context = useContext(ContextAppLoading);
-  const { translate, netInfo, lightWalletServer, mode, addLastSnackbar, selectLightWalletServer, snackbars, removeFirstSnackbar } = context;
+  const { translate, netInfo, indexerServer, mode, addLastSnackbar, selectIndexerServer, snackbars, removeFirstSnackbar } = context;
   const { colors } = useTheme()  as ThemeType;
   const screenName = ScreenEnum.ImportUfvk;
 
@@ -42,9 +42,9 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   const [latestBlock, setLatestBlock] = useState<number>(0);
 
   useEffect(() => {
-    if (!netInfo.isConnected || selectLightWalletServer !== SelectServerEnum.offline) {
+    if (!netInfo.isConnected || selectIndexerServer !== SelectServerEnum.offline) {
       (async () => {
-        const resp: string = await RPCModule.getLatestBlockServerInfo(lightWalletServer.uri);
+        const resp: string = await RPCModule.getLatestBlockServerInfo(indexerServer.uri);
         //console.log(resp);
         if (resp && !resp.toLowerCase().startsWith(GlobalConst.error)) {
           setLatestBlock(Number(resp));
@@ -53,7 +53,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
         }
       })();
     }
-  }, [lightWalletServer, selectLightWalletServer, netInfo.isConnected]);
+  }, [indexerServer, selectIndexerServer, netInfo.isConnected]);
 
   useEffect(() => {
     if (seedufvkText) {
@@ -95,7 +95,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
   }, [seedufvkText]);
 
   const okButton = async () => {
-    if (!netInfo.isConnected || selectLightWalletServer === SelectServerEnum.offline) {
+    if (!netInfo.isConnected || selectIndexerServer === SelectServerEnum.offline) {
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
@@ -222,7 +222,7 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
 
             <View style={{ marginTop: 10, alignItems: 'center' }}>
               <FadeText>{translate('import.birthday') as string}</FadeText>
-              {selectLightWalletServer !== SelectServerEnum.offline && (
+              {selectIndexerServer !== SelectServerEnum.offline && (
                 <FadeText style={{ textAlign: 'center' }}>
                   {translate('seed.birthday-no-readonly') + ' (1, ' + (latestBlock ? latestBlock.toString() : '--') + ')'}
                 </FadeText>
@@ -260,14 +260,14 @@ const ImportUfvk: React.FunctionComponent<ImportUfvkProps> = ({ onClickCancel, o
                       setBirthday('');
                     } else if (
                       Number(text) <= 0 ||
-                      (Number(text) > latestBlock && selectLightWalletServer !== SelectServerEnum.offline)
+                      (Number(text) > latestBlock && selectIndexerServer !== SelectServerEnum.offline)
                     ) {
                       setBirthday('');
                     } else {
                       setBirthday(Number(text.replace('.', '').replace(',', '')).toFixed(0));
                     }
                   }}
-                  editable={latestBlock ? true : selectLightWalletServer !== SelectServerEnum.offline ? false : true}
+                  editable={latestBlock ? true : selectIndexerServer !== SelectServerEnum.offline ? false : true}
                   keyboardType="numeric"
                 />
               </View>

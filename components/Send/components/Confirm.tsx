@@ -50,7 +50,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     privacy,
     totalBalance,
     addLastSnackbar,
-    lightWalletServer,
+    indexerServer,
     security,
     snackbars,
     removeFirstSnackbar,
@@ -150,7 +150,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
 
     if (
       parseAddressInfoJSON.status !== RPCParseAddressStatusEnum.successAddressParse ||
-      parseAddressInfoJSON.chain_name !== lightWalletServer.chainName
+      parseAddressInfoJSON.chain_name !== indexerServer.chainName
     ) {
       return '-';
     }
@@ -226,7 +226,7 @@ const Confirm: React.FunctionComponent<ConfirmProps> = ({
     calculatedFee,
     sendPageState.toaddr.amount,
     sendPageState.toaddr.to,
-    lightWalletServer.chainName,
+    indexerServer.chainName,
     totalBalance,
     totalBalance?.confirmedOrchardBalance,
     totalBalance?.confirmedSaplingBalance,
