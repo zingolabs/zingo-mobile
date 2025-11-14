@@ -124,7 +124,6 @@ const Stack = createNativeStackNavigator<AppDrawerParamList>();
 type LoadedAppProps = {
   navigation: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
-  toggleTheme: (mode: ModeEnum) => void;
 };
 
 const SERVER_DEFAULT_0: ServerType = {
@@ -206,10 +205,8 @@ export default function LoadedApp(props: LoadedAppProps) {
 
       if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
         setMode(settings.mode);
-        props.toggleTheme(settings.mode);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-        props.toggleTheme(mode);
       }
 
       if (
@@ -316,7 +313,7 @@ export default function LoadedApp(props: LoadedAppProps) {
 
   if (loading) {
     return (
-      <Launching translate={translate} firstLaunchingMessage={LaunchingModeEnum.opening} biometricsFailed={false} />
+      <Launching empty={false} translate={translate} firstLaunchingMessage={LaunchingModeEnum.opening} biometricsFailed={false} />
     );
   } else {
     return (
@@ -372,7 +369,6 @@ const Loading: React.FC<LoadingProps> = ({ backgroundColor, spinColor }) => {
 type LoadedAppClassProps = {
   navigationApp: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadedApp>['route'];
-  toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
   theme: ThemeType;
   language: LanguageEnum;
@@ -1377,7 +1373,6 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
       mode: value as ModeEnum,
     });
     // this function change the Theme in the App component.
-    this.props.toggleTheme(value as ModeEnum);
   };
 
   setSecurityOption = async (value: SecurityType): Promise<void> => {

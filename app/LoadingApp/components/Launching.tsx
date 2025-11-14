@@ -9,6 +9,7 @@ import { ButtonTypeEnum, LaunchingModeEnum, TranslateType } from '../../AppState
 import Button from '../../../components/Components/Button';
 
 type LaunchingProps = {
+  empty: boolean;
   translate: (key: string) => TranslateType;
   firstLaunchingMessage: LaunchingModeEnum;
   biometricsFailed: boolean;
@@ -18,6 +19,18 @@ type LaunchingProps = {
 
 const Launching: React.FunctionComponent<LaunchingProps> = props => {
   const { colors } = useTheme()  as ThemeType;
+
+  if (props.empty && !props.biometricsFailed) {
+    return (
+      <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }} />
+    );
+  } 
 
   return (
     <View
@@ -116,8 +129,7 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
             <>
               <ActivityIndicator
                 size="large"
-                color={props.firstLaunchingMessage === LaunchingModeEnum.updating ||
-                      props.firstLaunchingMessage === LaunchingModeEnum.installing
+                color={props.firstLaunchingMessage === LaunchingModeEnum.updating
                         ? colors.primary
                         : 'transparent'}
               />
@@ -127,9 +139,8 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   fontSize: 20,
                   fontWeight: 'bold',
                   marginTop: 10,
-                  opacity: (props.firstLaunchingMessage === LaunchingModeEnum.updating ||
-                            props.firstLaunchingMessage === LaunchingModeEnum.installing) &&
-                            !props.biometricsFailed
+                  opacity: props.firstLaunchingMessage === LaunchingModeEnum.updating &&
+                           !props.biometricsFailed
                               ? 1
                               : 0,
                   textAlign: 'center',
@@ -145,9 +156,8 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   color: colors.text,
                   fontSize: 15,
                   marginTop: 10,
-                  opacity: (props.firstLaunchingMessage === LaunchingModeEnum.updating ||
-                            props.firstLaunchingMessage === LaunchingModeEnum.installing) &&
-                            !props.biometricsFailed
+                  opacity: props.firstLaunchingMessage === LaunchingModeEnum.updating &&
+                           !props.biometricsFailed
                               ? 1
                               : 0,
                   textAlign: 'center',
@@ -164,9 +174,8 @@ const Launching: React.FunctionComponent<LaunchingProps> = props => {
                   fontSize: 15,
                   marginTop: 10,
                   marginBottom: 10,
-                  opacity: (props.firstLaunchingMessage === LaunchingModeEnum.updating ||
-                            props.firstLaunchingMessage === LaunchingModeEnum.installing) &&
-                            !props.biometricsFailed
+                  opacity: props.firstLaunchingMessage === LaunchingModeEnum.updating &&
+                           !props.biometricsFailed
                               ? 1
                               : 0,
                   textAlign: 'center',

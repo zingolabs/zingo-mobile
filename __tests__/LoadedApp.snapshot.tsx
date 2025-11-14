@@ -40,10 +40,9 @@ function makeDrawerProps(): StackScreenProps<AppStackParamList, RouteEnum.Loaded
 describe('Component LoadedApp - test', () => {
   //snapshot test
   test('LoadedApp - snapshot', () => {
-    const toggleTheme = jest.fn();
     const props = makeDrawerProps();
     const loadedapp = render(
-      <LoadedApp {...props} toggleTheme={toggleTheme} />,
+      <LoadedApp {...props} />,
     );
     expect(loadedapp.toJSON()).toMatchSnapshot();
   });

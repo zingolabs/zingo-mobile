@@ -1,50 +1,43 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { View, ActivityIndicator, ScrollView, TextInput, Keyboard } from 'react-native';
+import { View, ActivityIndicator, ScrollView, TextInput, Keyboard, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
 import { ThemeType } from '../../types';
-import { ButtonTypeEnum, ChainNameEnum, GlobalConst, ModeEnum, ScreenEnum } from '../../AppState';
+import { ButtonTypeEnum, GlobalConst, ScreenEnum } from '../../AppState';
 import Button from '../../../components/Components/Button';
 import { ContextAppLoading } from '../../context';
 import BoldText from '../../../components/Components/BoldText';
 import { ToastProvider, useToast } from 'react-native-toastier';
 import Snackbars from '../../../components/Components/Snackbars';
+import RegText from '../../../components/Components/RegText';
+import FadeText from '../../../components/Components/FadeText';
 
 type ServersProps = {
   actionButtonsDisabled: boolean;
-  hasRecoveryWalletInfoSaved: boolean;
-  recoverRecoveryWalletInfo: (b: boolean) => void;
-  changeMode: (v: ModeEnum) => void;
-  customServer: () => void;
-  customServerShow: boolean;
-  customServerOffline: boolean;
-  onPressServerOffline: (v: boolean) => void;
-  customServerChainName: string;
-  onPressServerChainName: (v: ChainNameEnum) => void;
-  customServerUri: string;
-  setCustomServerUri: (v: string) => void;
-  usingCustomServer: () => void;
-  setCustomServerShow: (v: boolean) => void;
-  walletExists: boolean;
-  openCurrentWallet: () => void;
-  createNewWallet: () => void;
-  getwalletToRestore: () => void;
+  setIndexerServerUri: (v: string) => void;
+  usingIndexerServer: () => void;
 };
 
 const Servers: React.FunctionComponent<ServersProps> = ({
   actionButtonsDisabled,
-  customServerUri,
-  setCustomServerUri,
-  usingCustomServer,
+  setIndexerServerUri,
+  usingIndexerServer,
 }) => {
   const context = useContext(ContextAppLoading);
-  const { netInfo, translate, snackbars, removeFirstSnackbar } = context;
+  const { netInfo, translate, snackbars, removeFirstSnackbar, indexerServer } = context;
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.Servers;
+
+  const insets = useSafeAreaInsets();
+
+  const maxW = 520; //tablets -> landscape.
+
+  console.log('Render Servers', insets);
 
   return (
     <ToastProvider>
@@ -54,55 +47,82 @@ const Servers: React.FunctionComponent<ServersProps> = ({
         screenName={screenName}
       />
 
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-        }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1, backgroundColor: colors.background }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 70}
+      >
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          style={{ height: '90%', maxHeight: '90%' }}
           contentContainerStyle={{
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
+            flexGrow: 1,
+            paddingTop: insets.top + 8,
+            paddingBottom: insets.bottom + 8,
+            paddingHorizontal: 16,
           }}>
           <View
             style={{
-              flex: 1,
-              flexDirection: 'column',
+              flexGrow: 1,
               alignItems: 'center',
               justifyContent: 'center',
             }}>
 
+            <RegText color={colors.text} style={{ fontSize: 25 }}>Indexer Server</RegText>
+
+            <FadeText style={{ marginBottom: 20, marginTop: 5 }}>texto</FadeText>
+
             <View
               style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
                 borderColor: colors.border,
                 borderWidth: 1,
+                borderRadius: 25,
                 marginBottom: 10,
+                backgroundColor: colors.secondary,
                 width: '100%',
-                maxWidth: '100%',
+                maxWidth: maxW,
                 minWidth: '50%',
                 minHeight: 48,
                 alignItems: 'center',
+                paddingHorizontal: 25,
+                paddingVertical: 7,
               }}>
               <TextInput
                 placeholder={GlobalConst.serverPlaceHolder}
                 placeholderTextColor={colors.placeholder}
                 style={{
+                  flexGrow: 1,
                   color: colors.text,
                   fontWeight: '600',
                   fontSize: 18,
-                  minWidth: '90%',
                   minHeight: 48,
                   marginLeft: 5,
                   backgroundColor: 'transparent',
                 }}
-                value={customServerUri}
-                onChangeText={setCustomServerUri}
+                value={indexerServer.uri}
+                onChangeText={setIndexerServerUri}
                 editable={!actionButtonsDisabled}
                 maxLength={100}
+                keyboardType="url"
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="done"
               />
+              <View 
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: colors.zingo,
+                  borderRadius: 11,
+                  height: 22,
+                  width: 22,
+                  padding: 0,
+              }}>
+                <TouchableOpacity onPress={() => setIndexerServerUri('')}>
+                  <RegText style={{ color: colors.background, marginTop: -3 }}>x</RegText>
+                </TouchableOpacity>
+              </View>
             </View>
 
             {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
@@ -148,26 +168,29 @@ const Servers: React.FunctionComponent<ServersProps> = ({
         </ScrollView>
         <View
           style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            justifyContent: 'center',
+            marginTop: 'auto',
             alignItems: 'center',
-            marginVertical: 5,
+            justifyContent: 'center',
+            paddingTop: 10,
+            paddingBottom: 20,
           }}>
           <Button
             type={ButtonTypeEnum.Primary}
-            title={translate('save') as string}
+            title={translate('continue') as string}
             disabled={actionButtonsDisabled}
             onPress={() => {
               clear();
-              usingCustomServer();
+              usingIndexerServer();
               Keyboard.dismiss();
             }}
-            style={{ marginBottom: 10 }}
+            style={{ 
+              marginBottom: 4,
+              maxWidth: maxW,
+            }}
             twoButtons={false}
           />
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </ToastProvider>
   );
 };

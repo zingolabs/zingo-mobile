@@ -1,42 +1,31 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { Text, View, ActivityIndicator, ScrollView, Image, TouchableOpacity, TextInput, Alert, NativeSyntheticEvent, Keyboard } from 'react-native';
+import { View, ActivityIndicator, ScrollView, Alert, NativeSyntheticEvent } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import ContextMenu, { ContextMenuOnPressNativeEvent } from 'react-native-context-menu-view';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faEllipsisV, faWifi } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
 import { NetInfoStateType } from '@react-native-community/netinfo/src/index';
 
 import { ThemeType } from '../../types';
-import { ButtonTypeEnum, ChainNameEnum, GlobalConst, ModeEnum, SelectServerEnum } from '../../AppState';
+import { ButtonTypeEnum, ModeEnum, SelectServerEnum } from '../../AppState';
 import Button from '../../../components/Components/Button';
 import { ContextAppLoading } from '../../context';
 import BoldText from '../../../components/Components/BoldText';
-import FadeText from '../../../components/Components/FadeText';
-import ChainTypeToggle from '../../../components/Components/ChainTypeToggle';
 
 type StartMenuProps = {
   actionButtonsDisabled: boolean;
   hasRecoveryWalletInfoSaved: boolean;
   recoverRecoveryWalletInfo: (b: boolean) => void;
   changeMode: (v: ModeEnum) => void;
-  customServer: () => void;
-  customServerShow: boolean;
-  customServerOffline: boolean;
-  onPressServerOffline: (v: boolean) => void;
-  customServerChainName: string;
-  onPressServerChainName: (v: ChainNameEnum) => void;
-  customServerUri: string;
-  setCustomServerUri: (v: string) => void;
-  usingCustomServer: () => void;
-  setCustomServerShow: (v: boolean) => void;
   walletExists: boolean;
   openCurrentWallet: () => void;
   createNewWallet: () => void;
   getwalletToRestore: () => void;
+  openServers: () => void;
 };
 
 const StartMenu: React.FunctionComponent<StartMenuProps> = ({
@@ -44,20 +33,11 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
   hasRecoveryWalletInfoSaved,
   recoverRecoveryWalletInfo,
   changeMode,
-  customServer,
-  customServerShow,
-  customServerOffline,
-  onPressServerOffline,
-  customServerChainName,
-  onPressServerChainName,
-  customServerUri,
-  setCustomServerUri,
-  usingCustomServer,
-  setCustomServerShow,
   walletExists,
   openCurrentWallet,
   createNewWallet,
   getwalletToRestore,
+  openServers,
 }) => {
   const context = useContext(ContextAppLoading);
   const { netInfo, mode, translate, indexerServer, selectIndexerServer } = context;
@@ -114,9 +94,9 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
                     recoverRecoveryWalletInfo(true);
                   } else if (hasRecoveryWalletInfoSaved && e.nativeEvent.index === 1) {
-                    customServer();
+                    openServers();
                   } else if (!hasRecoveryWalletInfoSaved && e.nativeEvent.index === 0) {
-                    customServer();
+                    openServers();
                   }
                 }}
               >
@@ -156,16 +136,6 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <View style={{ marginBottom: 30, display: 'flex', alignItems: 'center' }}>
-            <Text style={{ color: colors.zingo, fontSize: 40, fontWeight: 'bold' }}>
-              {translate('zingodelegator') as string}
-            </Text>
-            <Text style={{ color: colors.zingo, fontSize: 15 }}>{translate('version') as string}</Text>
-            <Image
-              source={require('../../../assets/img/logobig-zingo.png')}
-              style={{ width: 100, height: 100, resizeMode: 'contain', marginTop: 10, borderRadius: 10 }}
-            />
-          </View>
 
           {selectIndexerServer !== SelectServerEnum.offline && (
             <>
@@ -185,109 +155,6 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
               <BoldText style={{ fontSize: 15, marginBottom: 3, color: 'red' }}>
                 {' ' + (translate('settings.server-offline') as string)}
               </BoldText>
-            </View>
-          )}
-
-          {customServerShow && (
-            <View
-              style={{
-                borderColor: colors.primaryDisabled,
-                borderWidth: 1,
-                paddingTop: 10,
-                paddingLeft: 10,
-                paddingRight: 10,
-                marginBottom: 5,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              {selectIndexerServer !== SelectServerEnum.offline && (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: 0,
-                    marginBottom: 10,
-                    paddingHorizontal: 5,
-                    paddingVertical: 1,
-                    borderColor: customServerOffline ? colors.primary : colors.zingo,
-                    borderWidth: customServerOffline ? 2 : 1,
-                    borderRadius: 10,
-                    minWidth: 25,
-                    minHeight: 25,
-                  }}>
-                  <TouchableOpacity onPress={() => onPressServerOffline(!customServerOffline)}>
-                    <View style={{ flexDirection: 'row', margin: 0, padding: 0 }}>
-                      <FontAwesomeIcon icon={faWifi} color={customServerOffline ? 'red' : colors.zingo} size={18} />
-                      <FadeText style={{ marginLeft: 10, marginRight: 5 }}>
-                        {translate('settings.server-offline') as string}
-                      </FadeText>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              )}
-              {!customServerOffline && (
-                <>
-                  <ChainTypeToggle
-                    customServerChainName={customServerChainName}
-                    onPress={onPressServerChainName}
-                    translate={translate}
-                    disabled={actionButtonsDisabled}
-                  />
-                  <View
-                    style={{
-                      borderColor: colors.border,
-                      borderWidth: 1,
-                      marginBottom: 10,
-                      width: '100%',
-                      maxWidth: '100%',
-                      minWidth: '50%',
-                      minHeight: 48,
-                      alignItems: 'center',
-                    }}>
-                    <TextInput
-                      placeholder={GlobalConst.serverPlaceHolder}
-                      placeholderTextColor={colors.placeholder}
-                      style={{
-                        color: colors.text,
-                        fontWeight: '600',
-                        fontSize: 18,
-                        minWidth: '90%',
-                        minHeight: 48,
-                        marginLeft: 5,
-                        backgroundColor: 'transparent',
-                      }}
-                      value={customServerUri}
-                      onChangeText={setCustomServerUri}
-                      editable={!actionButtonsDisabled}
-                      maxLength={100}
-                    />
-                  </View>
-                </>
-              )}
-              <View style={{ flexDirection: 'row' }}>
-                <Button
-                  type={ButtonTypeEnum.Primary}
-                  title={translate('save') as string}
-                  disabled={actionButtonsDisabled}
-                  onPress={() => {
-                    usingCustomServer();
-                    Keyboard.dismiss();
-                  }}
-                  style={{ marginBottom: 10 }}
-                  twoButtons={true}
-                />
-                <Button
-                  type={ButtonTypeEnum.Secondary}
-                  title={translate('cancel') as string}
-                  disabled={actionButtonsDisabled}
-                  onPress={() => {
-                    setCustomServerShow(false);
-                    Keyboard.dismiss();
-                  }}
-                  style={{ marginBottom: 10, marginLeft: 10 }}
-                  twoButtons={true}
-                />
-              </View>
             </View>
           )}
 

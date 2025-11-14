@@ -91,7 +91,6 @@ const tr = require('../translations/tr.json');
 type LoadingAppProps = {
   navigation: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
-  toggleTheme: (mode: ModeEnum) => void;
 };
 
 const SERVER_DEFAULT_0: ServerType = {
@@ -167,10 +166,8 @@ export default function LoadingApp(props: LoadingAppProps) {
 
       if (settings.mode === ModeEnum.basic || settings.mode === ModeEnum.advanced) {
         setMode(settings.mode);
-        props.toggleTheme(settings.mode);
       } else {
         await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-        props.toggleTheme(mode);
       }
 
       if (
@@ -279,7 +276,7 @@ export default function LoadingApp(props: LoadingAppProps) {
   //console.log('render loadingApp - 2', translate('version'));
 
   if (loading) {
-    return <Launching translate={translate} firstLaunchingMessage={LaunchingModeEnum.opening} biometricsFailed={false} />;
+    return <Launching empty={true} translate={translate} firstLaunchingMessage={LaunchingModeEnum.opening} biometricsFailed={false} />;
   } else {
     return (
       <LoadingAppClass
@@ -309,7 +306,6 @@ export default function LoadingApp(props: LoadingAppProps) {
 type LoadingAppClassProps = {
   navigationApp: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['navigation'];
   route: StackScreenProps<AppStackParamList, RouteEnum.LoadingApp>['route'];
-  toggleTheme: (mode: ModeEnum) => void;
   translate: (key: string) => TranslateType;
   theme: ThemeType;
   language: LanguageEnum;
@@ -377,10 +373,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       screen: !!props.route.params && props.route.params.screen !== undefined ? props.route.params.screen : 0,
       actionButtonsDisabled: false,
       walletExists: false,
-      customServerShow: false,
-      customServerUri: '',
-      customServerChainName: ChainNameEnum.mainChainName,
-      customServerOffline: false,
       biometricsFailed:
         !!props.route.params && props.route.params.biometricsFailed !== undefined ? props.route.params.biometricsFailed : false,
       startingApp:
@@ -456,7 +448,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       this.setState({
         screen: 0.5,
         actionButtonsDisabled: false,
-      })
+      });
       return;
     }
 
@@ -663,21 +655,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           //actionButtonsDisabled: true,
         });
         if (isConnected !== state.isConnected) {
-          if (!state.isConnected) {
-            //console.log('EVENT Loading: No internet connection.');
-            this.setState({
-              customServerShow: false,
-            });
-          } else {
-            //console.log('EVENT Loading: YESSSSS internet connection.');
-            // if it is offline & there is no wallet file
-            // the screen is going to be empty
-            // show the custom server component
-            if (this.state.selectIndexerServer === SelectServerEnum.offline && !this.state.walletExists) {
-              this.setState({
-                customServerShow: true,
-              });
-            }
+          if (state.isConnected) {
             if (screen !== 0) {
               this.setState({
                 screen: screen === 3 ? 3 : screen !== 0 ? 1 : 0,
@@ -687,15 +665,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         }
       }
     });
-
-    // if it is offline & there is no wallet file
-    // the screen is going to be empty
-    // show the custom server component
-    if (netInfoState.isConnected && this.state.selectIndexerServer === SelectServerEnum.offline && !this.state.walletExists) {
-      this.setState({
-        customServerShow: true,
-      });
-    }
   };
 
   componentWillUnmount = () => {
@@ -748,6 +717,13 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       }
     }
     return someServerIsWorking;
+  };
+
+  openServers = () => {
+    this.setState({
+      screen: 0.5,
+      actionButtonsDisabled: false,
+    });
   };
 
   checkServer: (s: ServerType) => Promise<boolean> = async (server: ServerType) => {
@@ -887,76 +863,55 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.setState({ background: backgroundJson });
   };
 
-  setCustomServerUri = (customServerUri: string) => {
+  setIndexerServerUri = (indexerServerUri: string) => {
     this.setState({
-      customServerUri,
+      indexerServer: { uri: indexerServerUri, chainName: this.state.indexerServer.chainName },
     });
   };
 
-  setCustomServerShow = (customServerShow: boolean) => {
-    this.setState({
-      customServerShow,
-    });
-  };
-
-  usingCustomServer = async () => {
-    if (!this.state.customServerUri && !this.state.customServerOffline) {
+  usingIndexerServer = async () => {
+    if (!this.state.indexerServer.uri) {
       return;
     }
     this.setState({ actionButtonsDisabled: true });
-    if (this.state.customServerOffline) {
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, {
-        uri: '',
-        chainName: this.state.indexerServer.chainName,
-      });
-      await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, SelectServerEnum.offline);
+    const uri: string = parseServerURI(this.state.indexerServer.uri, this.state.translate);
+    const chainName = this.state.indexerServer.chainName;
+    if (uri && uri.toLowerCase().startsWith(GlobalConst.error)) {
+      this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, screenName: [this.screenName] });
+      this.setState({ actionButtonsDisabled: false });
+      return;
+    }
+
+    this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string, screenName: [this.screenName] });
+
+    const cs = {
+      uri: uri,
+      chainName: chainName,
+      region: '',
+      default: false,
+      latency: null,
+      obsolete: false,
+    } as ServerUrisType;
+    const serverChecked = await selectingServer([cs]);
+    if (serverChecked && serverChecked.latency) {
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, { uri, chainName });
+      await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, SelectServerEnum.custom);
       this.setState({
-        selectIndexerServer: SelectServerEnum.offline,
-        indexerServer: { uri: '', chainName: this.state.indexerServer.chainName },
-        customServerShow: false,
-        customServerUri: '',
-        customServerChainName: this.state.indexerServer.chainName,
-        customServerOffline: false,
+        selectIndexerServer: SelectServerEnum.custom,
+        indexerServer: { uri, chainName },
+      });
+      this.setState({ 
+        screen: 1,
       });
     } else {
-      const uri: string = parseServerURI(this.state.customServerUri, this.state.translate);
-      const chainName = this.state.customServerChainName;
-      if (uri && uri.toLowerCase().startsWith(GlobalConst.error)) {
-        this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, screenName: [this.screenName] });
-        this.setState({ actionButtonsDisabled: false });
-        return;
-      }
-
-      this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string, screenName: [this.screenName] });
-
-      const cs = {
-        uri: uri,
-        chainName: chainName,
-        region: '',
-        default: false,
-        latency: null,
-        obsolete: false,
-      } as ServerUrisType;
-      const serverChecked = await selectingServer([cs]);
-      if (serverChecked && serverChecked.latency) {
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, { uri, chainName });
-        await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, SelectServerEnum.custom);
-        this.setState({
-          selectIndexerServer: SelectServerEnum.custom,
-          indexerServer: { uri, chainName },
-          customServerShow: false,
-          customServerUri: '',
-          customServerChainName: this.state.indexerServer.chainName,
-          customServerOffline: false,
-        });
-      } else {
-        this.addLastSnackbar({
-          message: (this.state.translate('loadedapp.changeservernew-error') as string) + uri,
-          screenName: [this.screenName],
-        });
-      }
+      this.addLastSnackbar({
+        message: (this.state.translate('loadedapp.changeservernew-error') as string) + uri,
+        screenName: [this.screenName],
+      });
     }
-    this.setState({ actionButtonsDisabled: false });
+    this.setState({ 
+      actionButtonsDisabled: false
+    });
   };
 
   navigateToLoadedApp = (readOnly: boolean, orchardPool: boolean, saplingPool: boolean, transparentPool: boolean, firstLaunchingMessage: LaunchingModeEnum) => {
@@ -1238,18 +1193,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.setState({ backgroundError: { title, error } });
   };
 
-  customServer = () => {
-    this.setState({ customServerShow: true });
-  };
-
-  onPressServerChainName = (chain: ChainNameEnum) => {
-    this.setState({ customServerChainName: chain });
-  };
-
-  onPressServerOffline = (value: boolean) => {
-    this.setState({ customServerOffline: value });
-  };
-
   addLastSnackbar = (snackbar: SnackbarType) => {
     const newSnackbars = this.state.snackbars;
     // if the last one is the same don't do anything.
@@ -1269,7 +1212,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
   changeMode = async (mode: ModeEnum) => {
     this.setState({ mode, screen: 0 });
     await SettingsFileImpl.writeSettings(SettingsNameEnum.mode, mode);
-    this.props.toggleTheme(mode);
     // if the user selects advanced mode & wants to change to another wallet
     // and then the user wants to go to basic mode in the first screen
     // the result will be the same -> create a new wallet.
@@ -1355,10 +1297,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       wallet,
       actionButtonsDisabled,
       walletExists,
-      customServerShow,
-      customServerUri,
-      customServerChainName,
-      customServerOffline,
       snackbars,
       firstLaunchingMessage,
       biometricsFailed,
@@ -1417,6 +1355,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         <ContextAppLoadingProvider value={context}>
           {screen === 0 && (
             <Launching
+              empty={true}
               translate={translate}
               firstLaunchingMessage={firstLaunchingMessage}
               biometricsFailed={biometricsFailed}
@@ -1428,23 +1367,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           {screen === 0.5 && (
             <Servers
               actionButtonsDisabled={actionButtonsDisabled}
-              hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
-              recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
-              changeMode={this.changeMode}
-              customServer={this.customServer}
-              customServerShow={customServerShow}
-              customServerOffline={customServerOffline}
-              onPressServerOffline={this.onPressServerOffline}
-              customServerChainName={customServerChainName}
-              onPressServerChainName={this.onPressServerChainName}
-              customServerUri={customServerUri}
-              setCustomServerUri={this.setCustomServerUri}
-              usingCustomServer={this.usingCustomServer}
-              setCustomServerShow={this.setCustomServerShow}
-              walletExists={walletExists}
-              openCurrentWallet={this.openCurrentWallet}
-              createNewWallet={this.createNewWallet}
-              getwalletToRestore={this.getwalletToRestore}
+              setIndexerServerUri={this.setIndexerServerUri}
+              usingIndexerServer={this.usingIndexerServer}
             />
           )}
           {screen === 1 && (
@@ -1453,20 +1377,11 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
               recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
               changeMode={this.changeMode}
-              customServer={this.customServer}
-              customServerShow={customServerShow}
-              customServerOffline={customServerOffline}
-              onPressServerOffline={this.onPressServerOffline}
-              customServerChainName={customServerChainName}
-              onPressServerChainName={this.onPressServerChainName}
-              customServerUri={customServerUri}
-              setCustomServerUri={this.setCustomServerUri}
-              usingCustomServer={this.usingCustomServer}
-              setCustomServerShow={this.setCustomServerShow}
               walletExists={walletExists}
               openCurrentWallet={this.openCurrentWallet}
               createNewWallet={this.createNewWallet}
               getwalletToRestore={this.getwalletToRestore}
+              openServers={this.openServers}
             />
           )}
           {screen === 2 && wallet && (
