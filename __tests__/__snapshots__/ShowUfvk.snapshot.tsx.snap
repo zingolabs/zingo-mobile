@@ -571,7 +571,7 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
                     {
                       "alignItems": "center",
                       "backgroundColor": "transparent",
-                      "borderRadius": 10,
+                      "borderRadius": 25,
                       "color": "#ffffff",
                       "justifyContent": "center",
                       "maxWidth": "90%",
@@ -604,10 +604,9 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
                           "color": "#ffffff",
                           "fontFamily": "monospace",
                           "fontSize": 16,
-                          "fontWeight": "bold",
+                          "fontWeight": "light",
                           "opacity": 0.8,
                           "textAlign": "center",
-                          "textTransform": "lowercase",
                         }
                       }
                     >
@@ -682,9 +681,9 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "#18bd18",
-            "borderColor": "#18bd18",
-            "borderRadius": 10,
-            "borderWidth": 2,
+            "borderColor": "#c3c3c3",
+            "borderRadius": 25,
+            "borderWidth": 1,
             "justifyContent": "center",
             "maxWidth": "90%",
             "minHeight": 48,
@@ -714,11 +713,10 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#011401",
-                "fontSize": 16,
-                "fontWeight": "bold",
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "light",
                 "textAlign": "center",
-                "textTransform": "uppercase",
               }
             }
           />
@@ -1300,7 +1298,7 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
                     {
                       "alignItems": "center",
                       "backgroundColor": "transparent",
-                      "borderRadius": 10,
+                      "borderRadius": 25,
                       "color": "#ffffff",
                       "justifyContent": "center",
                       "maxWidth": "90%",
@@ -1333,10 +1331,9 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
                           "color": "#ffffff",
                           "fontFamily": "monospace",
                           "fontSize": 16,
-                          "fontWeight": "bold",
+                          "fontWeight": "light",
                           "opacity": 0.8,
                           "textAlign": "center",
-                          "textTransform": "lowercase",
                         }
                       }
                     >
@@ -1411,9 +1408,9 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "#18bd18",
-            "borderColor": "#18bd18",
-            "borderRadius": 10,
-            "borderWidth": 2,
+            "borderColor": "#c3c3c3",
+            "borderRadius": 25,
+            "borderWidth": 1,
             "justifyContent": "center",
             "maxWidth": "90%",
             "minHeight": 48,
@@ -1443,11 +1440,10 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#011401",
-                "fontSize": 16,
-                "fontWeight": "bold",
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "light",
                 "textAlign": "center",
-                "textTransform": "uppercase",
               }
             }
           />
@@ -2029,7 +2025,7 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
                     {
                       "alignItems": "center",
                       "backgroundColor": "transparent",
-                      "borderRadius": 10,
+                      "borderRadius": 25,
                       "color": "#ffffff",
                       "justifyContent": "center",
                       "maxWidth": "90%",
@@ -2062,10 +2058,9 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
                           "color": "#ffffff",
                           "fontFamily": "monospace",
                           "fontSize": 16,
-                          "fontWeight": "bold",
+                          "fontWeight": "light",
                           "opacity": 0.8,
                           "textAlign": "center",
-                          "textTransform": "lowercase",
                         }
                       }
                     >
@@ -2140,9 +2135,9 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "#18bd18",
-            "borderColor": "#18bd18",
-            "borderRadius": 10,
-            "borderWidth": 2,
+            "borderColor": "#c3c3c3",
+            "borderRadius": 25,
+            "borderWidth": 1,
             "justifyContent": "center",
             "maxWidth": "90%",
             "minHeight": 48,
@@ -2172,11 +2167,10 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#011401",
-                "fontSize": 16,
-                "fontWeight": "bold",
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "light",
                 "textAlign": "center",
-                "textTransform": "uppercase",
               }
             }
           />
@@ -2758,7 +2752,7 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
                     {
                       "alignItems": "center",
                       "backgroundColor": "transparent",
-                      "borderRadius": 10,
+                      "borderRadius": 25,
                       "color": "#ffffff",
                       "justifyContent": "center",
                       "maxWidth": "90%",
@@ -2791,10 +2785,9 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
                           "color": "#ffffff",
                           "fontFamily": "monospace",
                           "fontSize": 16,
-                          "fontWeight": "bold",
+                          "fontWeight": "light",
                           "opacity": 0.8,
                           "textAlign": "center",
-                          "textTransform": "lowercase",
                         }
                       }
                     >
@@ -2869,9 +2862,9 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "#18bd18",
-            "borderColor": "#18bd18",
-            "borderRadius": 10,
-            "borderWidth": 2,
+            "borderColor": "#c3c3c3",
+            "borderRadius": 25,
+            "borderWidth": 1,
             "justifyContent": "center",
             "maxWidth": "90%",
             "minHeight": 48,
@@ -2901,11 +2894,10 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#011401",
-                "fontSize": 16,
-                "fontWeight": "bold",
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "light",
                 "textAlign": "center",
-                "textTransform": "uppercase",
               }
             }
           />

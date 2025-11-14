@@ -33,9 +33,9 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
     {
       "alignItems": "center",
       "backgroundColor": "#18bd18",
-      "borderColor": "#18bd18",
-      "borderRadius": 10,
-      "borderWidth": 2,
+      "borderColor": "#c3c3c3",
+      "borderRadius": 25,
+      "borderWidth": 1,
       "justifyContent": "center",
       "maxWidth": "90%",
       "minHeight": 48,
@@ -65,11 +65,10 @@ exports[`Component Button - test Button Primary - snapshot 1`] = `
     <Text
       style={
         {
-          "color": "#011401",
-          "fontSize": 16,
-          "fontWeight": "bold",
+          "color": "#c3c3c3",
+          "fontSize": 18,
+          "fontWeight": "light",
           "textAlign": "center",
-          "textTransform": "uppercase",
         }
       }
     >
@@ -111,10 +110,10 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
   style={
     {
       "alignItems": "center",
-      "backgroundColor": "#011401",
-      "borderColor": "#18bd18",
-      "borderRadius": 10,
-      "borderWidth": 2,
+      "backgroundColor": undefined,
+      "borderColor": "#c3c3c3",
+      "borderRadius": 25,
+      "borderWidth": 1,
       "justifyContent": "center",
       "maxWidth": "90%",
       "minHeight": 48,
@@ -144,11 +143,10 @@ exports[`Component Button - test Button Secondary - snapshot 1`] = `
     <Text
       style={
         {
-          "color": "#18bd18",
-          "fontSize": 16,
-          "fontWeight": "bold",
+          "color": "#c3c3c3",
+          "fontSize": 18,
+          "fontWeight": "light",
           "textAlign": "center",
-          "textTransform": "uppercase",
         }
       }
     >

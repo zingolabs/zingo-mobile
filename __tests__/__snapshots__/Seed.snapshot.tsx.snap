@@ -553,9 +553,9 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "#18bd18",
-            "borderColor": "#18bd18",
-            "borderRadius": 10,
-            "borderWidth": 2,
+            "borderColor": "#c3c3c3",
+            "borderRadius": 25,
+            "borderWidth": 1,
             "justifyContent": "center",
             "maxWidth": "90%",
             "minHeight": 48,
@@ -586,11 +586,10 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#011401",
-                "fontSize": 16,
-                "fontWeight": "bold",
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "light",
                 "textAlign": "center",
-                "textTransform": "uppercase",
               }
             }
           />
@@ -1154,9 +1153,9 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "#18bd18",
-            "borderColor": "#18bd18",
-            "borderRadius": 10,
-            "borderWidth": 2,
+            "borderColor": "#c3c3c3",
+            "borderRadius": 25,
+            "borderWidth": 1,
             "justifyContent": "center",
             "maxWidth": "90%",
             "minHeight": 48,
@@ -1187,11 +1186,10 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#011401",
-                "fontSize": 16,
-                "fontWeight": "bold",
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "light",
                 "textAlign": "center",
-                "textTransform": "uppercase",
               }
             }
           />
@@ -1755,9 +1753,9 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "#18bd18",
-            "borderColor": "#18bd18",
-            "borderRadius": 10,
-            "borderWidth": 2,
+            "borderColor": "#c3c3c3",
+            "borderRadius": 25,
+            "borderWidth": 1,
             "justifyContent": "center",
             "maxWidth": "90%",
             "minHeight": 48,
@@ -1787,11 +1785,10 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#011401",
-                "fontSize": 16,
-                "fontWeight": "bold",
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "light",
                 "textAlign": "center",
-                "textTransform": "uppercase",
               }
             }
           />
@@ -2355,9 +2352,9 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "#18bd18",
-            "borderColor": "#18bd18",
-            "borderRadius": 10,
-            "borderWidth": 2,
+            "borderColor": "#c3c3c3",
+            "borderRadius": 25,
+            "borderWidth": 1,
             "justifyContent": "center",
             "maxWidth": "90%",
             "minHeight": 48,
@@ -2388,11 +2385,10 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#011401",
-                "fontSize": 16,
-                "fontWeight": "bold",
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "light",
                 "textAlign": "center",
-                "textTransform": "uppercase",
               }
             }
           />
@@ -2956,9 +2952,9 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "#18bd18",
-            "borderColor": "#18bd18",
-            "borderRadius": 10,
-            "borderWidth": 2,
+            "borderColor": "#c3c3c3",
+            "borderRadius": 25,
+            "borderWidth": 1,
             "justifyContent": "center",
             "maxWidth": "90%",
             "minHeight": 48,
@@ -2989,11 +2985,10 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
           <Text
             style={
               {
-                "color": "#011401",
-                "fontSize": 16,
-                "fontWeight": "bold",
+                "color": "#c3c3c3",
+                "fontSize": 18,
+                "fontWeight": "light",
                 "textAlign": "center",
-                "textTransform": "uppercase",
               }
             }
           />
