@@ -5,7 +5,6 @@
 
 set -euo pipefail
 
-cargo install --force --locked bindgen-cli
 
 cd ../lib
 cargo run --features="uniffi/cli" --release --bin uniffi-bindgen generate ./src/zingo.udl --language swift --out-dir ./Generated
