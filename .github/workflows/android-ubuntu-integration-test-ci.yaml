@@ -252,10 +252,10 @@ jobs:
         run: |
           set -euxo pipefail
           cid=$(docker create zingodevops/ci-build:009)
-          mkdir -p rust/test_binaries/bins
-          docker cp "$cid":/usr/bin/lightwalletd rust/test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcashd       rust/test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcash-cli    rust/test_binaries/bins/
+          mkdir -p ./test_binaries/bins
+          docker cp "$cid":/usr/bin/lightwalletd ./test_binaries/bins/
+          docker cp "$cid":/usr/bin/zcashd       ./test_binaries/bins/
+          docker cp "$cid":/usr/bin/zcash-cli    ./test_binaries/bins/
           docker rm "$cid"
 
       - name: Run Build
@@ -287,8 +287,6 @@ jobs:
           disable-animations: true
           script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci" --verbose --release
           working-directory: ./rust
-        env:
-          TEST_BINARIES_DIR: test_binaries/bins
 
       - name: Upload test reports
         if: ${{ always() && !cancelled() }}
