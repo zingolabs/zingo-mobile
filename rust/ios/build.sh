@@ -1,10 +1,6 @@
 #!/bin/bash
 
-# not working on xcode
-#export RUSTFLAGS="-C debuginfo=1 -C split-debuginfo=off -C symbol-mangling-version=v0"
-
 set -euo pipefail
-
 
 cd ../lib
 cargo run --features="uniffi/cli" --release --bin uniffi-bindgen generate ./src/zingo.udl --language swift --out-dir ./Generated
