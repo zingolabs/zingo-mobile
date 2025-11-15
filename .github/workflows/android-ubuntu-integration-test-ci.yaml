@@ -248,16 +248,6 @@ jobs:
       - name: Pull ci-build docker image
         run: docker pull zingodevops/ci-build:009
 
-      - name: Extract binaries & params from image
-        run: |
-          set -euxo pipefail
-          cid=$(docker create zingodevops/ci-build:009)
-          mkdir -p ./test_binaries/bins
-          docker cp "$cid":/usr/bin/lightwalletd ./test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcashd       ./test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcash-cli    ./test_binaries/bins/
-          docker rm "$cid"
-
       - name: Run Build
         working-directory: android
         run: ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release -PsplitApk=true
@@ -285,7 +275,17 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci" --verbose --release
+          script: |
+            set -euxo pipefail
+
+            cid=$(docker create zingodevops/ci-build:009)
+            mkdir -p ./test_binaries/bins
+            docker cp "$cid":/usr/bin/lightwalletd ./test_binaries/bins/
+            docker cp "$cid":/usr/bin/zcashd       ./test_binaries/bins/
+            docker cp "$cid":/usr/bin/zcash-cli    ./test_binaries/bins/
+            docker rm "$cid"
+
+            cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci" --verbose --release
           working-directory: ./rust
 
       - name: Upload test reports
