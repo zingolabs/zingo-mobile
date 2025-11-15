@@ -287,6 +287,8 @@ jobs:
           disable-animations: true
           script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci" --verbose --release
           working-directory: ./rust
+        env:
+          TEST_BINARIES_DIR: test_binaries/bins
 
       - name: Upload test reports
         if: ${{ always() && !cancelled() }}
