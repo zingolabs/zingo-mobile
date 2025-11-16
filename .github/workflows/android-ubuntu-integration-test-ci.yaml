@@ -245,18 +245,8 @@ jobs:
       - name: Yarn install
         run: yarn
 
-      - name: Pull ci-build docker image
-        run: docker pull zingodevops/ci-build:009
-
-      - name: Extract binaries & params from image
-        run: |
-          set -euxo pipefail
-          cid=$(docker create zingodevops/ci-build:009)
-          mkdir -p ./rust/test_binaries/bins
-          docker cp "$cid":/usr/bin/lightwalletd ./rust/test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcashd       ./rust/test_binaries/bins/
-          docker cp "$cid":/usr/bin/zcash-cli    ./rust/test_binaries/bins/
-          docker rm "$cid"
+      - name: Pull docker image
+        run: docker pull zingodevops/regchest:011
 
       - name: Run Build
         working-directory: android
@@ -285,7 +275,7 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci" --verbose --release
+          script: cargo nextest run android_integration::${{ env.NEXTEST-ABI }}::${{ matrix.test }} --features "ci regchest" --verbose --release
           working-directory: ./rust
 
       - name: Upload test reports
