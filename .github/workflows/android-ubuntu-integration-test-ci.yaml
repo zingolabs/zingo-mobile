@@ -198,7 +198,7 @@ jobs:
       - name: Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly
           cache-workspaces: rust -> rust/target
 
       - name: Install nextest
