@@ -195,7 +195,7 @@ final class OfflineTestSuite: XCTestCase {
           return
         }
 
-        var latest_block_height: UInt64? = nil
+        var latest_block_height: UInt64 = UInt64.zero
         do {
             let infoJson = try infoServer()
             print("\nInfo:\n\(infoJson)")
@@ -250,7 +250,7 @@ final class OfflineTestSuite: XCTestCase {
           return
         }
 
-        var latest_block_height: UInt64? = nil
+        var latest_block_height: UInt64 = UInt64.zero
         do {
             let infoJson = try infoServer()
             print("\nInfo:\n\(infoJson)")
@@ -316,7 +316,7 @@ final class OfflineTestSuite: XCTestCase {
           return
         }
 
-        var latest_block_height: UInt64? = nil
+        var latest_block_height: UInt64 = UInt64.zero
         do {
             let infoJson = try infoServer()
             print("\nInfo:\n\(infoJson)")
@@ -357,7 +357,7 @@ final class ExecuteSyncFromSeed: XCTestCase {
           return
         }
         
-        var latest_block_height: UInt64? = nil
+        var latest_block_height: UInt64 = UInt64.zero
         do {
             let infoJson = try infoServer()
             print("\nInfo:\n\(infoJson)")
@@ -420,7 +420,7 @@ final class ExecuteSendFromOrchard: XCTestCase {
           return
         }
 
-        var latest_block_height: UInt64? = nil
+        var latest_block_height: UInt64 = UInt64.zero
         do {
             let infoJson = try infoServer()
             print("\nInfo:\n\(infoJson)")
@@ -532,7 +532,7 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
           return
         }
 
-        var latest_block_height: UInt64? = nil
+        var latest_block_height: UInt64 = UInt64.zero
         do {
             let infoJson = try infoServer()
             print("\nInfo:\n\(infoJson)")
@@ -611,7 +611,7 @@ final class ExecuteSaplingBalanceFromSeed: XCTestCase {
           return
         }
 
-        var latest_block_height: UInt64? = nil
+        var latest_block_height: UInt64 = UInt64.zero
         do {
             let infoJson = try infoServer()
             print("\nInfo:\n\(infoJson)")
@@ -690,7 +690,7 @@ final class ExecuteParseAddresses: XCTestCase {
           return
         }
 
-        var latest_block_height: UInt64? = nil
+        var latest_block_height: UInt64 = UInt64.zero
         do {
             let infoJson = try infoServer()
             print("\nInfo:\n\(infoJson)")
@@ -733,7 +733,7 @@ final class ExecuteParseAddresses: XCTestCase {
           return
         }
 
-        var latest_block_height: UInt64? = nil
+        var latest_block_height: UInt64 = UInt64.zero
         do {
             let infoJson = try infoServer()
             print("\nInfo:\n\(infoJson)")
