@@ -228,6 +228,9 @@ jobs:
           xcrun simctl list runtimes
           xcrun simctl list devices
 
+      - name: rust default nightly
+        run: rustup default nightly
+
       - name: Run IOS integration tests
         working-directory: ./rust
         run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release

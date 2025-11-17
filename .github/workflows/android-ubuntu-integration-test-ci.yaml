@@ -281,6 +281,9 @@ jobs:
           echo "Disk space after post-build cleanup:"
           df -h
 
+      - name: rust default nightly
+        run: rustup default nightly
+
       - name: Run Android Integration Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
