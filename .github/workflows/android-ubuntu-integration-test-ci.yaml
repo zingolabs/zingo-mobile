@@ -242,11 +242,11 @@ jobs:
           key: avd-${{ env.ABI }}-api-${{ env.API-LEVEL }}-integ
           fail-on-cache-miss: true
 
-      - name: Yarn install
-        run: yarn
-
       - name: Pull docker image
         run: docker pull zingodevops/regchest:011
+
+      - name: Yarn install
+        run: yarn
 
       - name: Run Build
         working-directory: android

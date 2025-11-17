@@ -195,6 +195,18 @@ final class OfflineTestSuite: XCTestCase {
           return
         }
 
+        var latest_block_height: UInt64? = nil
+        do {
+            let infoJson = try infoServer()
+            print("\nInfo:\n\(infoJson)")
+            let info: Info = try decodeJSON(infoJson)
+            latest_block_height = info.latest_block_height
+            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
+        } catch {
+          XCTFail("\nInfo error:\n\(error.localizedDescription)")
+          return
+        }
+
         do {
             let addrsJson = try getUnifiedAddresses()
             print("\nAddresses:\n\(addrsJson)")
@@ -235,6 +247,18 @@ final class OfflineTestSuite: XCTestCase {
           XCTAssertEqual(initRes.birthday, 1)
         } catch {
           XCTFail("\nInit from UFVK error:\n\(error.localizedDescription)")
+          return
+        }
+
+        var latest_block_height: UInt64? = nil
+        do {
+            let infoJson = try infoServer()
+            print("\nInfo:\n\(infoJson)")
+            let info: Info = try decodeJSON(infoJson)
+            latest_block_height = info.latest_block_height
+            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
+        } catch {
+          XCTFail("\nInfo error:\n\(error.localizedDescription)")
           return
         }
 
@@ -291,7 +315,19 @@ final class OfflineTestSuite: XCTestCase {
           XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
           return
         }
-        
+
+        var latest_block_height: UInt64? = nil
+        do {
+            let infoJson = try infoServer()
+            print("\nInfo:\n\(infoJson)")
+            let info: Info = try decodeJSON(infoJson)
+            latest_block_height = info.latest_block_height
+            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
+        } catch {
+          XCTFail("\nInfo error:\n\(error.localizedDescription)")
+          return
+        }
+
         do {
             let version = try getVersion()
             print("\nVersion:\n\(version)")
@@ -321,13 +357,13 @@ final class ExecuteSyncFromSeed: XCTestCase {
           return
         }
         
-        var height: UInt64? = nil
+        var latest_block_height: UInt64? = nil
         do {
             let infoJson = try infoServer()
             print("\nInfo:\n\(infoJson)")
             let info: Info = try decodeJSON(infoJson)
-            let height = info.latest_block_height
-            XCTAssertGreaterThan(height, UInt64.zero)
+            latest_block_height = info.latest_block_height
+            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
         } catch {
           XCTFail("\nInfo error:\n\(error.localizedDescription)")
           return
@@ -356,7 +392,7 @@ final class ExecuteSyncFromSeed: XCTestCase {
             let hPostJson = try getLatestBlockWallet()
             print("\nHeight post-sync:\n\(hPostJson)")
             let hPost: Height = try decodeJSON(hPostJson)
-            XCTAssertEqual(hPost.height, height)
+            XCTAssertEqual(hPost.height, latest_block_height)
         } catch {
           XCTFail("\nHeight post-sync error:\n\(error.localizedDescription)")
           return
@@ -381,6 +417,18 @@ final class ExecuteSendFromOrchard: XCTestCase {
           XCTAssertEqual(initRes.birthday, 1)
         } catch {
           XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          return
+        }
+
+        var latest_block_height: UInt64? = nil
+        do {
+            let infoJson = try infoServer()
+            print("\nInfo:\n\(infoJson)")
+            let info: Info = try decodeJSON(infoJson)
+            latest_block_height = info.latest_block_height
+            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
+        } catch {
+          XCTFail("\nInfo error:\n\(error.localizedDescription)")
           return
         }
 
@@ -422,16 +470,16 @@ final class ExecuteSendFromOrchard: XCTestCase {
         let ta = try XCTUnwrap(taddr, "T address is nil")
         XCTAssertFalse(ta.isEmpty, "T address is empty")
       
-      do {
-        let sendJson = SendResult(address: ta, amount: 100_000, memo: nil)
-        let sendBodyData = try JSONEncoder().encode([sendJson])
-        let sendBody = String(data: sendBodyData, encoding: .utf8)!
-        let proposeJson = try send(sendJson: sendBody)
-        print("\nPropose:\n\(proposeJson)")
-      } catch {
-        XCTFail("\nPropose error:\n\(error.localizedDescription)")
-        return
-      }
+        do {
+          let sendJson = SendResult(address: ta, amount: 100_000, memo: nil)
+          let sendBodyData = try JSONEncoder().encode([sendJson])
+          let sendBody = String(data: sendBodyData, encoding: .utf8)!
+          let proposeJson = try send(sendJson: sendBody)
+          print("\nPropose:\n\(proposeJson)")
+        } catch {
+          XCTFail("\nPropose error:\n\(error.localizedDescription)")
+          return
+        }
         
         do {
           let confirmJson = try confirm()
@@ -481,6 +529,18 @@ final class UpdateCurrentPriceAndValueTransfersFromSeed: XCTestCase {
           XCTAssertEqual(initRes.birthday, 1)
         } catch {
           XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
+          return
+        }
+
+        var latest_block_height: UInt64? = nil
+        do {
+            let infoJson = try infoServer()
+            print("\nInfo:\n\(infoJson)")
+            let info: Info = try decodeJSON(infoJson)
+            latest_block_height = info.latest_block_height
+            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
+        } catch {
+          XCTFail("\nInfo error:\n\(error.localizedDescription)")
           return
         }
 
@@ -550,7 +610,19 @@ final class ExecuteSaplingBalanceFromSeed: XCTestCase {
           XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
           return
         }
-        
+
+        var latest_block_height: UInt64? = nil
+        do {
+            let infoJson = try infoServer()
+            print("\nInfo:\n\(infoJson)")
+            let info: Info = try decodeJSON(infoJson)
+            latest_block_height = info.latest_block_height
+            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
+        } catch {
+          XCTFail("\nInfo error:\n\(error.localizedDescription)")
+          return
+        }
+
         do {
             let syncJson = try runSync()
             print("\nSync:\n\(syncJson)")
@@ -617,7 +689,19 @@ final class ExecuteParseAddresses: XCTestCase {
           XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
           return
         }
-        
+
+        var latest_block_height: UInt64? = nil
+        do {
+            let infoJson = try infoServer()
+            print("\nInfo:\n\(infoJson)")
+            let info: Info = try decodeJSON(infoJson)
+            latest_block_height = info.latest_block_height
+            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
+        } catch {
+          XCTFail("\nInfo error:\n\(error.localizedDescription)")
+          return
+        }
+
         do {
           let resJson = try parseAddress(address: "texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
           print("\nParsed address:\n\(resJson)")
@@ -648,7 +732,19 @@ final class ExecuteParseAddresses: XCTestCase {
           XCTFail("\nInit from seed error:\n\(error.localizedDescription)")
           return
         }
-        
+
+        var latest_block_height: UInt64? = nil
+        do {
+            let infoJson = try infoServer()
+            print("\nInfo:\n\(infoJson)")
+            let info: Info = try decodeJSON(infoJson)
+            latest_block_height = info.latest_block_height
+            XCTAssertGreaterThan(latest_block_height, UInt64.zero)
+        } catch {
+          XCTFail("\nInfo error:\n\(error.localizedDescription)")
+          return
+        }
+
         do {
           let wrongJson = try parseAddress(address: "thiswontwork")
           print("\nWrong address:\n\(wrongJson)")
