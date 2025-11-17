@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, ActivityIndicator, ScrollView, TextInput, Keyboard, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,20 +18,24 @@ import FadeText from '../../../components/Components/FadeText';
 
 type ServersProps = {
   actionButtonsDisabled: boolean;
-  setIndexerServerUri: (v: string) => void;
-  usingIndexerServer: () => void;
+  setIndexerServerUri: (v: string) => Promise<void>;
+  checkIndexerServer: () => Promise<boolean | null>;
+  closeServers: () => void;
 };
 
 const Servers: React.FunctionComponent<ServersProps> = ({
   actionButtonsDisabled,
   setIndexerServerUri,
-  usingIndexerServer,
+  checkIndexerServer,
+  closeServers,
 }) => {
   const context = useContext(ContextAppLoading);
   const { netInfo, translate, snackbars, removeFirstSnackbar, indexerServer } = context;
   const { colors } = useTheme()  as ThemeType;
   const { clear } = useToast();
   const screenName = ScreenEnum.Servers;
+
+  const [connected, setConnected] = useState<boolean | null>(null);
 
   const insets = useSafeAreaInsets();
 
@@ -101,7 +105,10 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                   backgroundColor: 'transparent',
                 }}
                 value={indexerServer.uri}
-                onChangeText={setIndexerServerUri}
+                onChangeText={(text) => {
+                  setConnected(null);
+                  setIndexerServerUri(text);
+                }}
                 editable={!actionButtonsDisabled}
                 maxLength={100}
                 keyboardType="url"
@@ -119,11 +126,47 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                   width: 22,
                   padding: 0,
               }}>
-                <TouchableOpacity onPress={() => setIndexerServerUri('')}>
+                <TouchableOpacity disabled={actionButtonsDisabled} onPress={() => setIndexerServerUri('')}>
                   <RegText style={{ color: colors.background, marginTop: -3 }}>x</RegText>
                 </TouchableOpacity>
               </View>
             </View>
+
+            <TouchableOpacity
+              style={{
+                marginTop: 20,
+                padding: 0,
+                paddingLeft: 20,
+                paddingRight: 20,
+                borderRadius: 25,
+                borderWidth: 1,
+                backgroundColor: actionButtonsDisabled ? '#767680' : connected === null ? '#2C2C2E' : connected ? '#0E9634' : '#610102',
+              }}
+              disabled={actionButtonsDisabled}
+              onPress={async () => {
+                const _connected = await checkIndexerServer();
+                setConnected(_connected);
+                Keyboard.dismiss();
+            }}>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: 0,
+                  marginBottom: 4,
+                  minWidth: 48,
+                  minHeight: 48,
+                }}>
+                {actionButtonsDisabled && (
+                  <ActivityIndicator size="small" color={colors.text} style={{ marginRight: 20 }} />
+                )}
+                <RegText>
+                  {actionButtonsDisabled ? 'Testing...' : connected === null ? 'Test Connection' : connected ? 'Connected' : 'Error'}
+                </RegText>
+              </View>
+            </TouchableOpacity>
 
             {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
               <>
@@ -161,9 +204,6 @@ const Servers: React.FunctionComponent<ServersProps> = ({
               </>
             )}
 
-            {actionButtonsDisabled && (
-              <ActivityIndicator size="large" color={colors.primary} style={{ marginVertical: 20 }} />
-            )}
           </View>
         </ScrollView>
         <View
@@ -180,7 +220,7 @@ const Servers: React.FunctionComponent<ServersProps> = ({
             disabled={actionButtonsDisabled}
             onPress={() => {
               clear();
-              usingIndexerServer();
+              closeServers();
               Keyboard.dismiss();
             }}
             style={{ 

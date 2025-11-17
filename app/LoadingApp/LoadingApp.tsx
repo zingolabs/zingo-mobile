@@ -863,15 +863,24 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     this.setState({ background: backgroundJson });
   };
 
-  setIndexerServerUri = (indexerServerUri: string) => {
+  setIndexerServerUri = async (indexerServerUri: string) => {
+    const NewIndexerServer: ServerType = { uri: indexerServerUri, chainName: this.state.indexerServer.chainName };
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.indexerServer, NewIndexerServer);
+    await SettingsFileImpl.writeSettings(SettingsNameEnum.selectIndexerServer, SelectServerEnum.custom);
     this.setState({
-      indexerServer: { uri: indexerServerUri, chainName: this.state.indexerServer.chainName },
+      indexerServer: NewIndexerServer,
+    });
+  };
+  
+  closeServers = () => {
+    this.setState({ 
+      screen: 1,
     });
   };
 
-  usingIndexerServer = async () => {
+  checkIndexerServer = async () => {
     if (!this.state.indexerServer.uri) {
-      return;
+      return null;
     }
     this.setState({ actionButtonsDisabled: true });
     const uri: string = parseServerURI(this.state.indexerServer.uri, this.state.translate);
@@ -879,7 +888,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     if (uri && uri.toLowerCase().startsWith(GlobalConst.error)) {
       this.addLastSnackbar({ message: this.state.translate('settings.isuri') as string, screenName: [this.screenName] });
       this.setState({ actionButtonsDisabled: false });
-      return;
+      return false;
     }
 
     this.addLastSnackbar({ message: this.state.translate('loadedapp.tryingnewserver') as string, screenName: [this.screenName] });
@@ -901,17 +910,19 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
         indexerServer: { uri, chainName },
       });
       this.setState({ 
-        screen: 1,
+        actionButtonsDisabled: false
       });
+      return true;
     } else {
       this.addLastSnackbar({
         message: (this.state.translate('loadedapp.changeservernew-error') as string) + uri,
         screenName: [this.screenName],
       });
+      this.setState({ 
+        actionButtonsDisabled: false
+      });
+      return false;
     }
-    this.setState({ 
-      actionButtonsDisabled: false
-    });
   };
 
   navigateToLoadedApp = (readOnly: boolean, orchardPool: boolean, saplingPool: boolean, transparentPool: boolean, firstLaunchingMessage: LaunchingModeEnum) => {
@@ -1368,7 +1379,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
             <Servers
               actionButtonsDisabled={actionButtonsDisabled}
               setIndexerServerUri={this.setIndexerServerUri}
-              usingIndexerServer={this.usingIndexerServer}
+              checkIndexerServer={this.checkIndexerServer}
+              closeServers={this.closeServers}
             />
           )}
           {screen === 1 && (
