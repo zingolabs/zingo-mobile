@@ -1,5 +1,5 @@
 #[cfg(not(feature = "regchest"))]
-use zingolib::testutils::scenarios;
+use zingolib_testutils::scenarios;
 
 // ubuntu ci runner
 #[cfg(all(feature = "ci", feature = "regchest"))]
@@ -26,8 +26,7 @@ async fn offline_testsuite(abi: &str) {
 
 async fn execute_sync_from_seed(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
         match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
@@ -57,8 +56,7 @@ async fn execute_sync_from_seed(abi: &str) {
 
 async fn execute_send_from_orchard(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_orchard_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
         match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_mobileclient")).await {
@@ -88,8 +86,7 @@ async fn execute_send_from_orchard(abi: &str) {
 
 async fn execute_currentprice_and_value_transfers_from_seed(abi: &str) {
     #[cfg(not(feature = "regchest"))]
-    let _local_net =
-        scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
+    let _local_net = scenarios::funded_orchard_with_3_txs_mobileclient(1_000_000).await;
     #[cfg(feature = "regchest")]
     let docker =
         match regchest_utils::launch(UNIX_SOCKET, Some("funded_orchard_with_3_txs_mobileclient"))

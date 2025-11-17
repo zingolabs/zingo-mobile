@@ -80,7 +80,7 @@ jobs:
       - name: Cargo uniffi swift
         working-directory: rust/lib
         run: |
-          sudo cargo run --release --bin uniffi-bindgen \
+          sudo cargo run --features=uniffi/cli --release --bin uniffi-bindgen \
           generate ./src/zingo.udl --language swift \
           --out-dir ./Generated
 
