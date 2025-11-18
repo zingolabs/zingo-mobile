@@ -233,8 +233,6 @@ jobs:
 
       - name: Run IOS integration tests
         working-directory: ./rust
-        env:
-          CARGO_PKG_RUST_VERSION: nightly
         run: cargo nextest run ios_integration::universal::${{ matrix.test }} --features "ci regchest" --verbose --release
 
       - name: Upload IOS test reports (.xcresult)

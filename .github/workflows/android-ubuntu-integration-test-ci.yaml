@@ -297,7 +297,6 @@ jobs:
           working-directory: ./rust
         env:
           TEST_BINARIES_DIR: ${{ env.TEST_BINARIES_DIR }}
-          CARGO_PKG_RUST_VERSION: nightly
 
       - name: Upload test reports
         if: ${{ always() && !cancelled() }}
