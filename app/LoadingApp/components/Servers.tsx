@@ -181,7 +181,7 @@ const Servers: React.FunctionComponent<ServersProps> = ({
               </View>
             </TouchableOpacity>
 
-            {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && (
+            {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && false && (
               <>
                 <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
                   {translate('report.networkstatus') as string}

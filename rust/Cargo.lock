@@ -564,7 +564,7 @@ dependencies = [
  "bitflags 2.10.0",
  "cexpr",
  "clang-sys",
- "itertools 0.12.1",
+ "itertools 0.13.0",
  "log",
  "prettyplease",
  "proc-macro2",
@@ -1443,7 +1443,7 @@ checksum = "b48e8e38a4aa565da767322b5ca55fb0f8347983c5bc7f7647db069405420479"
 dependencies = [
  "heck",
  "indexmap 2.12.0",
- "itertools 0.12.1",
+ "itertools 0.14.0",
  "proc-macro-crate",
  "proc-macro2",
  "quote",
@@ -2871,6 +2871,15 @@ dependencies = [
 
 [[package]]
 name = "itertools"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
@@ -3157,7 +3166,8 @@ dependencies = [
 [[package]]
 name = "libzcash_script"
 version = "0.1.0"
-source = "git+https://github.com/ZcashFoundation/zcash_script?tag=zcash_script-v0.4.2#cae2ba1fb178f12f99318a5264573ff058b05121"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3f8ce05b56f3cbc65ec7d0908adb308ed91281e022f61c8c3a0c9388b5380b17"
 dependencies = [
  "bindgen 0.69.5",
  "cc",
@@ -4137,7 +4147,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be769465445e8c1474e9c5dac2018218498557af32d9ed057325ec9a41ae81bf"
 dependencies = [
  "heck",
- "itertools 0.12.1",
+ "itertools 0.14.0",
  "log",
  "multimap",
  "once_cell",
@@ -4157,7 +4167,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ac6c3320f9abac597dcbc668774ef006702672474aad53c6d596b62e487b40b1"
 dependencies = [
  "heck",
- "itertools 0.12.1",
+ "itertools 0.14.0",
  "log",
  "multimap",
  "once_cell",
@@ -4179,7 +4189,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a56d757972c98b346a9b766e3f02746cde6dd1cd1d1d563472929fdd74bec4d"
 dependencies = [
  "anyhow",
- "itertools 0.12.1",
+ "itertools 0.14.0",
  "proc-macro2",
  "quote",
  "syn 2.0.110",
@@ -4192,7 +4202,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9120690fafc389a67ba3803df527d0ec9cbbc9cc45e4cc20b332996dfb672425"
 dependencies = [
  "anyhow",
- "itertools 0.12.1",
+ "itertools 0.14.0",
  "proc-macro2",
  "quote",
  "syn 2.0.110",
@@ -8436,7 +8446,8 @@ dependencies = [
 [[package]]
 name = "zcash_script"
 version = "0.4.2"
-source = "git+https://github.com/ZcashFoundation/zcash_script?tag=zcash_script-v0.4.2#cae2ba1fb178f12f99318a5264573ff058b05121"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9bed6cf5b2b4361105d4ea06b2752f0c8af4641756c7fbc9858a80af186c234f"
 dependencies = [
  "bitflags 2.10.0",
  "bounded-vec",
@@ -8482,9 +8493,9 @@ dependencies = [
 
 [[package]]
 name = "zebra-chain"
-version = "3.0.0"
+version = "3.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "66e10d4094ae02f982e254ec4fee0802c62540b5b366d994608f732f1fe5834b"
+checksum = "ac69ccae2b1fdafbd0a2b020079ccdfffce6c00b3189f32dd002f6965853af96"
 dependencies = [
  "bech32",
  "bitflags 2.10.0",
@@ -8856,7 +8867,6 @@ dependencies = [
  "zcash_proofs",
  "zcash_protocol",
  "zcash_transparent",
- "zebra-chain",
  "zingo_common_components",
  "zingolib",
 ]

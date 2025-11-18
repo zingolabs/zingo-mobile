@@ -29,8 +29,6 @@ zcash_proofs = { version = "0.26" }
 zcash_protocol = { version = "0.7" }
 zcash_transparent = { version = "0.6" }
 
-zebra-chain = { version = "3.0" }
-
 zingo_common_components = { git = "https://github.com/zingolabs/zingo-common.git", branch = "dev" }
 
 http = "1"
@@ -55,8 +53,6 @@ zcash_keys = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8"
 zcash_primitives = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8"}
 zcash_protocol = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8"}
 zcash_transparent = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8"}
-zcash_script = { git = "https://github.com/ZcashFoundation/zcash_script", tag = "zcash_script-v0.4.2"}
-libzcash_script = { git = "https://github.com/ZcashFoundation/zcash_script", tag = "zcash_script-v0.4.2"}
 
 [build-dependencies]
 uniffi_build = { version = "0.29", features = ["builtin-bindgen"] }
