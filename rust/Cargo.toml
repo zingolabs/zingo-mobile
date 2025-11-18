@@ -62,6 +62,8 @@ zcash_keys = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8"
 zcash_primitives = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8"}
 zcash_protocol = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8"}
 zcash_transparent = { git = "https://github.com/zcash/librustzcash", rev = "3ba772c9b8"}
+zcash_script = { git = "https://github.com/ZcashFoundation/zcash_script", tag = "zcash_script-v0.4.2"}
+libzcash_script = { git = "https://github.com/ZcashFoundation/zcash_script", tag = "zcash_script-v0.4.2"}
 
 [profile.release]
 debug = 1
