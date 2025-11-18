@@ -604,7 +604,7 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
                           "color": "#ffffff",
                           "fontFamily": "monospace",
                           "fontSize": 16,
-                          "fontWeight": "light",
+                          "fontWeight": "normal",
                           "opacity": 0.8,
                           "textAlign": "center",
                         }
@@ -715,7 +715,7 @@ exports[`Component ShowUfvk - test ShowUfvk Backup - snapshot 1`] = `
               {
                 "color": "#c3c3c3",
                 "fontSize": 18,
-                "fontWeight": "light",
+                "fontWeight": "normal",
                 "textAlign": "center",
               }
             }
@@ -1331,7 +1331,7 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
                           "color": "#ffffff",
                           "fontFamily": "monospace",
                           "fontSize": 16,
-                          "fontWeight": "light",
+                          "fontWeight": "normal",
                           "opacity": 0.8,
                           "textAlign": "center",
                         }
@@ -1442,7 +1442,7 @@ exports[`Component ShowUfvk - test ShowUfvk Change - snapshot 1`] = `
               {
                 "color": "#c3c3c3",
                 "fontSize": 18,
-                "fontWeight": "light",
+                "fontWeight": "normal",
                 "textAlign": "center",
               }
             }
@@ -2058,7 +2058,7 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
                           "color": "#ffffff",
                           "fontFamily": "monospace",
                           "fontSize": 16,
-                          "fontWeight": "light",
+                          "fontWeight": "normal",
                           "opacity": 0.8,
                           "textAlign": "center",
                         }
@@ -2169,7 +2169,7 @@ exports[`Component ShowUfvk - test ShowUfvk Server - snapshot 1`] = `
               {
                 "color": "#c3c3c3",
                 "fontSize": 18,
-                "fontWeight": "light",
+                "fontWeight": "normal",
                 "textAlign": "center",
               }
             }
@@ -2785,7 +2785,7 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
                           "color": "#ffffff",
                           "fontFamily": "monospace",
                           "fontSize": 16,
-                          "fontWeight": "light",
+                          "fontWeight": "normal",
                           "opacity": 0.8,
                           "textAlign": "center",
                         }
@@ -2896,7 +2896,7 @@ exports[`Component ShowUfvk - test ShowUfvk View - snapshot 1`] = `
               {
                 "color": "#c3c3c3",
                 "fontSize": 18,
-                "fontWeight": "light",
+                "fontWeight": "normal",
                 "textAlign": "center",
               }
             }

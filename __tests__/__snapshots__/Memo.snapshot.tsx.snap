@@ -392,7 +392,7 @@ exports[`Component Memo - test Memo - snapshot 1`] = `
                 {
                   "color": "#c3c3c3",
                   "fontSize": 18,
-                  "fontWeight": "light",
+                  "fontWeight": "normal",
                   "textAlign": "center",
                 }
               }

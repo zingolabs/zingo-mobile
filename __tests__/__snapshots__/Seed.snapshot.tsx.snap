@@ -588,7 +588,7 @@ exports[`Component Seed - test Seed Backup - snapshot 1`] = `
               {
                 "color": "#c3c3c3",
                 "fontSize": 18,
-                "fontWeight": "light",
+                "fontWeight": "normal",
                 "textAlign": "center",
               }
             }
@@ -1188,7 +1188,7 @@ exports[`Component Seed - test Seed Change - snapshot 1`] = `
               {
                 "color": "#c3c3c3",
                 "fontSize": 18,
-                "fontWeight": "light",
+                "fontWeight": "normal",
                 "textAlign": "center",
               }
             }
@@ -1787,7 +1787,7 @@ exports[`Component Seed - test Seed New - snapshot 1`] = `
               {
                 "color": "#c3c3c3",
                 "fontSize": 18,
-                "fontWeight": "light",
+                "fontWeight": "normal",
                 "textAlign": "center",
               }
             }
@@ -2387,7 +2387,7 @@ exports[`Component Seed - test Seed Server - snapshot 1`] = `
               {
                 "color": "#c3c3c3",
                 "fontSize": 18,
-                "fontWeight": "light",
+                "fontWeight": "normal",
                 "textAlign": "center",
               }
             }
@@ -2987,7 +2987,7 @@ exports[`Component Seed - test Seed View - snapshot 1`] = `
               {
                 "color": "#c3c3c3",
                 "fontSize": 18,
-                "fontWeight": "light",
+                "fontWeight": "normal",
                 "textAlign": "center",
               }
             }
