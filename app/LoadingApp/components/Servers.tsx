@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, ActivityIndicator, ScrollView, TextInput, Keyboard, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -36,6 +36,14 @@ const Servers: React.FunctionComponent<ServersProps> = ({
   const screenName = ScreenEnum.Servers;
 
   const [connected, setConnected] = useState<boolean | null>(null);
+  const [kbOpen, setKbOpen] = React.useState(false);
+
+  useEffect(() => {
+    const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
+    const s2 = Keyboard.addListener('keyboardDidHide', () => setKbOpen(false));
+    return () => { s1.remove(); s2.remove(); };
+  }, []);
+
 
   const insets = useSafeAreaInsets();
 
@@ -52,15 +60,18 @@ const Servers: React.FunctionComponent<ServersProps> = ({
       />
 
       <KeyboardAvoidingView
-        style={{ flex: 1, backgroundColor: colors.background }}
+        style={{ 
+          flex: 1, 
+          backgroundColor: colors.background,
+        }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 70}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : kbOpen ? 50 : 0}
       >
         <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
             flexGrow: 1,
-            paddingTop: insets.top + 8,
+            paddingTop: insets.top,
             paddingBottom: insets.bottom + 8,
             paddingHorizontal: 16,
           }}>
@@ -116,20 +127,22 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                 autoCorrect={false}
                 returnKeyType="done"
               />
-              <View 
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: colors.zingo,
-                  borderRadius: 11,
-                  height: 22,
-                  width: 22,
-                  padding: 0,
-              }}>
+              {!!indexerServer.uri && (
                 <TouchableOpacity disabled={actionButtonsDisabled} onPress={() => setIndexerServerUri('')}>
-                  <RegText style={{ color: colors.background, marginTop: -3 }}>x</RegText>
+                  <View 
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      backgroundColor: colors.zingo,
+                      borderRadius: 11,
+                      height: 22,
+                      width: 22,
+                      padding: 0,
+                  }}>
+                      <RegText style={{ color: colors.background, marginTop: -3 }}>x</RegText>
+                  </View>
                 </TouchableOpacity>
-              </View>
+              )}
             </View>
 
             <TouchableOpacity
