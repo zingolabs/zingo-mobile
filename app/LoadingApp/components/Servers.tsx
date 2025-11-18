@@ -65,7 +65,7 @@ const Servers: React.FunctionComponent<ServersProps> = ({
           backgroundColor: colors.background,
         }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : kbOpen ? 50 : 0}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : kbOpen ? insets.top : 0}
       >
         <ScrollView
           keyboardShouldPersistTaps="handled"
