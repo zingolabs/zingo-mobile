@@ -100,7 +100,7 @@ const Button: React.FunctionComponent<ButtonProps> = ({
           color: colors.danger.primary,
         };
   const styleTextCommon: TextStyle = {
-    fontWeight: 'light',
+    fontWeight: 'normal',
     fontSize: 18,
     textAlign: 'center',
   };
