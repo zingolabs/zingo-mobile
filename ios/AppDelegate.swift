@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  ZingoMobile
+//  Zingo
 //
 //  Created by Juan Carlos Carmona Calvo on 4/4/24.
 //
