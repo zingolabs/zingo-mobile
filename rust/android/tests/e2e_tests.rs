@@ -1,5 +1,5 @@
 #[cfg(not(feature = "regchest"))]
-use zingolib::testutils::scenarios;
+use zingolib_testutils::scenarios;
 
 // ubuntu ci runner
 #[cfg(all(feature = "ci", feature = "regchest"))]

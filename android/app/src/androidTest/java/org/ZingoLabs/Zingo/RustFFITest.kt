@@ -152,6 +152,12 @@ class ExecuteAddressesFromSeed {
         assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
+        val infoJson: String = uniffi.zingo.infoServer()
+        println("\nInfo:")
+        println(infoJson)
+        val info: Info = mapper.readValue(infoJson)
+        assertThat(info.latest_block_height).isGreaterThan(0)
+
         val addressesJson: String = uniffi.zingo.getUnifiedAddresses()
         println("\nAddresses:")
         println(addressesJson)
@@ -190,6 +196,12 @@ class ExecuteAddressesFromUfvk {
 
         assertThat(initFromUfvk.ufvk).isEqualTo(ufvk)
         assertThat(initFromUfvk.birthday).isEqualTo(1)
+
+        val infoJson: String = uniffi.zingo.infoServer()
+        println("\nInfo:")
+        println(infoJson)
+        val info: Info = mapper.readValue(infoJson)
+        assertThat(info.latest_block_height).isGreaterThan(0)
 
         val exportUfvkJson: String = uniffi.zingo.getUfvk()
         println("\nExport Ufvk:")
@@ -236,6 +248,12 @@ class ExecuteVersionFromSeed {
 
         assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
         assertThat(initFromSeed.birthday).isEqualTo(1)
+
+        val infoJson: String = uniffi.zingo.infoServer()
+        println("\nInfo:")
+        println(infoJson)
+        val info: Info = mapper.readValue(infoJson)
+        assertThat(info.latest_block_height).isGreaterThan(0)
 
         val version: String = uniffi.zingo.getVersion()
         println("\nVersion:")
@@ -328,6 +346,12 @@ class ExecuteSendFromOrchard {
 
         assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
         assertThat(initFromSeed.birthday).isEqualTo(1)
+
+        val infoJson: String = uniffi.zingo.infoServer()
+        println("\nInfo:")
+        println(infoJson)
+        val info: Info = mapper.readValue(infoJson)
+        assertThat(info.latest_block_height).isGreaterThan(0)
 
         var syncJson: String = uniffi.zingo.runSync()
         println("\nSync:")
@@ -429,6 +453,12 @@ class UpdateCurrentPriceAndValueTransfersFromSeed {
         assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
         assertThat(initFromSeed.birthday).isEqualTo(1)
 
+        val infoJson: String = uniffi.zingo.infoServer()
+        println("\nInfo:")
+        println(infoJson)
+        val info: Info = mapper.readValue(infoJson)
+        assertThat(info.latest_block_height).isGreaterThan(0)
+
         val price: String = uniffi.zingo.zecPrice(tor)
         println("\nPrice:")
         println(price)
@@ -507,6 +537,12 @@ class ExecuteSaplingBalanceFromSeed {
 
         assertThat(initFromSeed.seed_phrase).isEqualTo(seed)
         assertThat(initFromSeed.birthday).isEqualTo(1)
+
+        val infoJson: String = uniffi.zingo.infoServer()
+        println("\nInfo:")
+        println(infoJson)
+        val info: Info = mapper.readValue(infoJson)
+        assertThat(info.latest_block_height).isGreaterThan(0)
 
         val syncJson:String = uniffi.zingo.runSync()
         println("\nSync:")
@@ -600,6 +636,12 @@ class ExecuteParseAddresses {
         assertThat(seedResult).isEqualTo(seed)
         assertThat(birthdayResult).isEqualTo(1)
 
+        val infoJson: String = uniffi.zingo.infoServer()
+        println("\nInfo:")
+        println(infoJson)
+        val info: Info = mapper.readValue(infoJson)
+        assertThat(info.latest_block_height).isGreaterThan(0)
+
         val resultJson: String = uniffi.zingo.parseAddress("texregtest1z754rp9kk9vdewx4wm7pstvm0u2rwlgy4zp82v")
         val result: ParseResult = mapper.readValue(resultJson)
         println("\nParsed Address:")
@@ -637,6 +679,12 @@ class ExecuteParseAddresses {
 
         assertThat(seedResult).isEqualTo(seed)
         assertThat(birthdayResult).isEqualTo(1)
+
+        val infoJson: String = uniffi.zingo.infoServer()
+        println("\nInfo:")
+        println(infoJson)
+        val info: Info = mapper.readValue(infoJson)
+        assertThat(info.latest_block_height).isGreaterThan(0)
 
         val wrongResultJson: String = uniffi.zingo.parseAddress("thiswontwork")
         val wrongResult: ParseResult = mapper.readValue(wrongResultJson)
