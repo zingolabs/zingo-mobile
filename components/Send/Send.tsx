@@ -392,9 +392,15 @@ const Send: React.FunctionComponent<SendProps> = ({
         if (target) {
           // redo the to addresses
           [target].forEach(tgt => {
-            setAddressText(tgt.address || '');
-            setAmountText(tgt.amount ? Utils.parseNumberFloatToStringLocale(tgt.amount, 8) : '');
-            setMemoText(tgt.memoString || '');
+            if (tgt.address) {
+              setAddressText(tgt.address);
+            }
+            if (tgt.amount) {
+              setAmountText(Utils.parseNumberFloatToStringLocale(tgt.amount, 8));
+            }
+            if (tgt.memoString) {
+              setMemoText(tgt.memoString);
+            }
           });
         }
         if (error) {
