@@ -82,7 +82,9 @@ const VerifyAddress: React.FunctionComponent<VerifyAddressProps> = ({
       if (target) {
         // redo the to addresses
         [target].forEach(tgt => {
-          setAddress(tgt.address || '');
+          if (tgt.address) {
+            setAddress(tgt.address);
+          }
         });
       }
       if (error) {

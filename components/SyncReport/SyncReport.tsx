@@ -1,8 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, Text, ActivityIndicator } from 'react-native';
 
-import { useFocusEffect, useTheme } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 
 import { AppDrawerParamList, ThemeType } from '../../app/types';
 import DetailLine from '../Components/DetailLine';
