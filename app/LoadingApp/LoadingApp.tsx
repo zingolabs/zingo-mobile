@@ -68,7 +68,7 @@ import {
 } from '../recoveryWalletInfov10';
 
 // no lazy load because slowing down screens.
-import ImportUfvk from './components/ImportUfvk';
+import Import from './components/Import';
 import { sendEmail } from '../sendEmail';
 import { RPCWalletKindEnum } from '../rpc/enums/RPCWalletKindEnum';
 import StartMenu from './components/StartMenu';
@@ -1312,7 +1312,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
       firstLaunchingMessage,
       biometricsFailed,
       translate,
-      hasRecoveryWalletInfoSaved,
       readOnly,
       orchardPool,
       saplingPool,
@@ -1386,9 +1385,6 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           {screen === 1 && (
             <StartMenu
               actionButtonsDisabled={actionButtonsDisabled}
-              hasRecoveryWalletInfoSaved={hasRecoveryWalletInfoSaved}
-              recoverRecoveryWalletInfo={this.recoverRecoveryWalletInfo}
-              changeMode={this.changeMode}
               walletExists={walletExists}
               openCurrentWallet={this.openCurrentWallet}
               createNewWallet={this.createNewWallet}
@@ -1413,7 +1409,8 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               transparent={true}
               visible={screen === 3}
               onRequestClose={() => this.setState({ screen: 1 })}>
-              <ImportUfvk
+              <Import
+                actionButtonsDisabled={actionButtonsDisabled}
                 onClickOK={(s: string, b: number) => this.doRestore(s, b)}
                 onClickCancel={() => this.setState({ screen: 1 })}
               />

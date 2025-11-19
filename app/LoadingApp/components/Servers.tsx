@@ -38,16 +38,15 @@ const Servers: React.FunctionComponent<ServersProps> = ({
   const [connected, setConnected] = useState<boolean | null>(null);
   const [kbOpen, setKbOpen] = React.useState(false);
 
+  const insets = useSafeAreaInsets();
+
+  const maxW = 520; //tablets -> landscape.
+
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
     const s2 = Keyboard.addListener('keyboardDidHide', () => setKbOpen(false));
     return () => { s1.remove(); s2.remove(); };
   }, []);
-
-
-  const insets = useSafeAreaInsets();
-
-  const maxW = 520; //tablets -> landscape.
 
   console.log('Render Servers', insets);
 
@@ -139,7 +138,7 @@ const Servers: React.FunctionComponent<ServersProps> = ({
                       width: 22,
                       padding: 0,
                   }}>
-                      <RegText style={{ color: colors.background, marginTop: -3 }}>x</RegText>
+                    <RegText style={{ color: colors.background, marginTop: -3 }}>x</RegText>
                   </View>
                 </TouchableOpacity>
               )}

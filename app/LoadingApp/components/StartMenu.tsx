@@ -53,63 +53,97 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
       />
 
       <KeyboardAvoidingView
-        style={{ flex: 1, backgroundColor: colors.background }}
+        style={{ 
+          flex: 1, 
+          backgroundColor: colors.background,
+        }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 70}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 0}
       >
 
-      <View style={{
-        backgroundColor: colors.background,
-        width: 75,
-        top: 10,
-        left: 10,
-      }}>
-        <View
-          style={{
-            borderRadius: 25,
-            borderColor: colors.text,
-            borderWidth: 1,
-            padding: 10,
-            margin: 10,
-          }}>
-            <TouchableOpacity onPress={() => {
-              clear();
-              openServers();
-            }}>
-              <FontAwesomeIcon
-                size={30}
-                icon={faChevronLeft}
-                color={colors.text}
-              />
-            </TouchableOpacity>
-        </View>
-      </View>
-
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingTop: insets.top + 8,
-          paddingBottom: insets.bottom + 8,
-          paddingHorizontal: 16,
-      }}>
-        <View
-          style={{
-            flexGrow: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
+        <View style={{
+          position: 'absolute',
+          width: 75,
+          top: 10,
+          left: 10,
+          zIndex: 999,
         }}>
+          <View
+            style={{
+              borderRadius: 25,
+              borderColor: colors.text,
+              borderWidth: 1,
+              padding: 10,
+              margin: 10,
+            }}>
+              <TouchableOpacity onPress={() => {
+                clear();
+                openServers();
+              }}>
+                <FontAwesomeIcon
+                  size={30}
+                  icon={faChevronLeft}
+                  color={colors.text}
+                />
+              </TouchableOpacity>
+          </View>
+        </View>
 
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingTop: insets.top + 8,
+            paddingBottom: insets.bottom + 8,
+            paddingHorizontal: 16,
+        }}>
+          <View
+            style={{
+              flexGrow: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+          }}>
 
-          <RegText color={colors.text} style={{ fontSize: 30 }}>Welcome to</RegText>
-          <RegText color={colors.text} style={{ fontSize: 30 }}>your wallet</RegText>
+            <RegText color={colors.text} style={{ fontSize: 30 }}>Welcome to</RegText>
+            <RegText color={colors.text} style={{ fontSize: 30 }}>your wallet</RegText>
 
+            {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && false && (
+              <>
+                <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
+                  {translate('report.networkstatus') as string}
+                </BoldText>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'flex-end',
+                    marginHorizontal: 20,
+                  }}>
+                  <View style={{ display: 'flex', flexDirection: 'column', marginBottom: 10 }}>
+                    {!netInfo.isConnected && (
+                      <BoldText style={{ fontSize: 15, color: 'red' }}>
+                        {' '}
+                        {translate('report.nointernet') as string}{' '}
+                      </BoldText>
+                    )}
+                    {netInfo.type === NetInfoStateType.cellular && (
+                      <BoldText style={{ fontSize: 15, color: 'yellow' }}>
+                        {' '}
+                        {translate('report.cellulardata') as string}{' '}
+                      </BoldText>
+                    )}
+                    {netInfo.isConnectionExpensive && (
+                      <BoldText style={{ fontSize: 15, color: 'yellow' }}>
+                        {' '}
+                        {translate('report.connectionexpensive') as string}{' '}
+                      </BoldText>
+                    )}
+                  </View>
+                </View>
+              </>
+            )}
 
-          {(!netInfo.isConnected || netInfo.type === NetInfoStateType.cellular || netInfo.isConnectionExpensive) && false && (
-            <>
-              <BoldText style={{ fontSize: 15, marginBottom: 3 }}>
-                {translate('report.networkstatus') as string}
-              </BoldText>
+            {(!netInfo.isConnected || selectIndexerServer === SelectServerEnum.offline) && !walletExists && false && (
               <View
                 style={{
                   display: 'flex',
@@ -117,57 +151,25 @@ const StartMenu: React.FunctionComponent<StartMenuProps> = ({
                   alignItems: 'flex-end',
                   marginHorizontal: 20,
                 }}>
-                <View style={{ display: 'flex', flexDirection: 'column', marginBottom: 10 }}>
-                  {!netInfo.isConnected && (
-                    <BoldText style={{ fontSize: 15, color: 'red' }}>
-                      {' '}
-                      {translate('report.nointernet') as string}{' '}
-                    </BoldText>
-                  )}
-                  {netInfo.type === NetInfoStateType.cellular && (
-                    <BoldText style={{ fontSize: 15, color: 'yellow' }}>
-                      {' '}
-                      {translate('report.cellulardata') as string}{' '}
-                    </BoldText>
-                  )}
-                  {netInfo.isConnectionExpensive && (
-                    <BoldText style={{ fontSize: 15, color: 'yellow' }}>
-                      {' '}
-                      {translate('report.connectionexpensive') as string}{' '}
-                    </BoldText>
-                  )}
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    marginTop: 20,
+                    borderColor: colors.primary,
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    padding: 5,
+                  }}>
+                  <BoldText style={{ fontSize: 15, color: colors.primaryDisabled }}>
+                    {translate('loadingapp.nointernet-message') as string}
+                  </BoldText>
                 </View>
               </View>
-            </>
-          )}
+            )}
 
-          {(!netInfo.isConnected || selectIndexerServer === SelectServerEnum.offline) && !walletExists && false && (
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-end',
-                marginHorizontal: 20,
-              }}>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  marginTop: 20,
-                  borderColor: colors.primary,
-                  borderWidth: 1,
-                  borderRadius: 5,
-                  padding: 5,
-                }}>
-                <BoldText style={{ fontSize: 15, color: colors.primaryDisabled }}>
-                  {translate('loadingapp.nointernet-message') as string}
-                </BoldText>
-              </View>
-            </View>
-          )}
-
-        </View>
-      </ScrollView>
+          </View>
+        </ScrollView>
         <View
           style={{
             marginTop: 'auto',

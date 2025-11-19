@@ -5,7 +5,7 @@ export enum ScreenEnum {
   Servers = 'Servers',
   // Launching
   StartMenu = 'StartMenu',
-  ImportUfvk = 'ImportUfvk',
+  Import = 'Import',
   ScannerUfvk = 'ScannerUfvk',
   //
   LoadedApp = 'LoadedApp',
