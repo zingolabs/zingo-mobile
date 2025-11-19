@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -44,15 +44,13 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
   const SEED_LENGTH = 24;
 
   const [words, setWords] = useState<string[]>([]);
-
-  const rows = [];
-  for (let i = 0; i < SEED_LENGTH; i += 3) {
-    rows.push(words.slice(i, i + 3));
-  }
+  const [rows, setRows] = useState<string[][]>([]);
 
   const insets = useSafeAreaInsets();
 
   const maxW = 520; //tablets -> landscape. 
+
+  const inputsRef = useRef<Array<TextInput | null>>([]);
 
   useEffect(() => {
     const s1 = Keyboard.addListener('keyboardDidShow', () => setKbOpen(true));
@@ -74,6 +72,8 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
       .trimStart()
       .replaceAll('  ', ' ');
 
+    let _words: string[] = [];
+
     //console.log(seedTextArray);
     // if the seed have 25 -> means it is a copy/paste from the stored seed in the device.
     if (seedTextArray.length === 25) {
@@ -87,21 +87,31 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
       } else {
         setSeedText(_seedText);
       }
+      _words = seedTextArray.slice(0, 24);
       setWords(seedTextArray.slice(0, 24));
       setButtonDisabled(false);
     } else if (seedTextArray.length > 0) {
       if (seedTextArray.length === 24) {
         setSeedTextVisible(false);
+        setTimeout(() => {
+          inputsRef.current[23]?.focus();
+        }, 50);
       } else {
         setSeedTextVisible(true);
       }
       const lengthWords: number = seedTextArray.length > 25 ? 24 : seedTextArray.length;
       setSeedText(_seedText);
+      _words = seedTextArray.slice(0, lengthWords);
       setWords(seedTextArray.slice(0, lengthWords));
       setButtonDisabled(false);
     } else {
       setButtonDisabled(true);
     }
+    const _rows: string[][] = [];
+    for (let i = 0; i < SEED_LENGTH; i += 3) {
+      _rows.push(_words.slice(i, i + 3));
+    }
+    setRows(_rows);
     // only if seed changed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seedText]);
@@ -199,43 +209,39 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
             {seedTextVisible && (
               <View
                 style={{
-                  margin: 10,
-                  padding: 10,
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  borderColor: colors.text,
-                  maxHeight: '40%',
                   flexDirection: 'row',
-                  justifyContent: 'space-between',
+                  justifyContent: 'flex-start',
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                  borderRadius: 25,
+                  marginBottom: 10,
+                  backgroundColor: colors.secondary,
+                  width: '100%',
+                  maxWidth: maxW,
+                  minWidth: '50%',
+                  minHeight: 48,
+                  alignItems: 'center',
+                  paddingHorizontal: 25,
+                  paddingVertical: 7,
                 }}>
-                <View
-                  accessible={true}
-                  accessibilityLabel={translate('seed.seed-acc') as string}
+                <TextInput
+                  placeholder='Paste your seed phrase (24 words)'
+                  placeholderTextColor={colors.placeholder}
+                  testID="import.seedufvkinput"
+                  multiline
                   style={{
-                    marginRight: 5,
-                    borderWidth: 1,
-                    width: 'auto',
-                    flex: 1,
-                    justifyContent: 'center',
-                  }}>
-                  <TextInput
-                    placeholder='Paste your seed phrase (24 words)'
-                    placeholderTextColor={colors.placeholder}
-                    testID="import.seedufvkinput"
-                    multiline
-                    style={{
-                      color: colors.text,
-                      fontWeight: '600',
-                      fontSize: 16,
-                      minHeight: 100,
-                      marginHorizontal: 5,
-                      backgroundColor: 'transparent',
-                      textAlignVertical: 'top',
-                    }}
-                    value={seedText}
-                    onChangeText={setSeedText}
-                  />
-                </View>
+                    flexGrow: 1,
+                    color: colors.text,
+                    fontWeight: '600',
+                    fontSize: 16,
+                    minHeight: 100,
+                    marginHorizontal: 5,
+                    backgroundColor: 'transparent',
+                    textAlignVertical: 'top',
+                  }}
+                  value={seedText}
+                  onChangeText={setSeedText}
+                />
                 {!!seedText && (
                   <TouchableOpacity 
                     disabled={actionButtonsDisabled} 
@@ -261,7 +267,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
             )}
 
             {rows.length > 0 && (
-              <View>
+              <View style={{ marginTop: 10 }}>
                 {rows.map((row, rowIndex) => (
                   <View key={rowIndex} style={{ flexDirection: 'row', gap: 8 }}>
                     {row.map((word, colIndex) => {
@@ -287,6 +293,9 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                           }}>
                           <FadeText>{`${index + 1}`}.</FadeText>
                           <TextInput
+                            ref={(el: TextInput | null) => {
+                              inputsRef.current[index] = el;
+                            }}
                             style={{
                               flexGrow: 1,
                               color: colors.text,
