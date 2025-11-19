@@ -59,7 +59,6 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
   }, []);
 
   useEffect(() => {
-    // if it is a seed
     const seedTextArray: string[] = seedText
       .replaceAll('\n', ' ')
       .trimStart()
@@ -103,15 +102,21 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
       setSeedText(_seedText);
       _words = seedTextArray.slice(0, lengthWords);
       setWords(seedTextArray.slice(0, lengthWords));
-      setButtonDisabled(false);
+      if (lengthWords === 24) {
+        setButtonDisabled(false);
+      } else {
+        setButtonDisabled(true);
+      }
     } else {
       setButtonDisabled(true);
     }
-    const _rows: string[][] = [];
-    for (let i = 0; i < SEED_LENGTH; i += 3) {
-      _rows.push(_words.slice(i, i + 3));
+    if (_words.length > 0) {
+      const _rows: string[][] = [];
+      for (let i = 0; i < SEED_LENGTH; i += 3) {
+        _rows.push(_words.slice(i, i + 3));
+      }
+      setRows(_rows);
     }
-    setRows(_rows);
     // only if seed changed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seedText]);
@@ -121,7 +126,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
       addLastSnackbar({ message: translate('loadedapp.connection-error') as string, screenName: [screenName] });
       return;
     }
-    onClickOK(seedText.trimEnd().trimStart(), Number(birthday));
+    onClickOK(words.join(' '), Number(birthday));
     Keyboard.dismiss();
   };
 
@@ -248,6 +253,7 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                     onPress={() => {
                       setSeedText('');
                       setWords([]);
+                      setRows([]);
                   }}>
                     <View 
                       style={{
@@ -318,6 +324,28 @@ const Import: React.FunctionComponent<ImportProps> = ({ actionButtonsDisabled, o
                     })}
                   </View>
                 ))}
+                {!seedTextVisible && (
+                  <TouchableOpacity 
+                    style={{ alignSelf: 'flex-end' }}
+                    disabled={actionButtonsDisabled} 
+                    onPress={() => {
+                      setSeedText('');
+                      setWords([]);
+                      setRows([]);
+                      setSeedTextVisible(true);
+                  }}>
+                    <View 
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: '30%',
+                        height: 30,
+                        padding: 0,
+                    }}>
+                      <RegText style={{ color: colors.primary, textDecorationStyle: 'solid', textDecorationLine: 'underline' }}>Clear words</RegText>
+                    </View>
+                  </TouchableOpacity>
+                ) }
               </View>
             )}
 
