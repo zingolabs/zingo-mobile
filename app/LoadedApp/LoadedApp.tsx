@@ -1010,7 +1010,7 @@ export class LoadedAppClass extends Component<LoadedAppClassProps, LoadedAppClas
           newInfo.currencyName = this.state.info.currencyName;
         } else {
           newInfo.currencyName =
-            this.state.indexerServer.chainName === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.TAZ;
+            this.state.indexerServer.chainName === ChainNameEnum.mainChainName ? CurrencyNameEnum.ZEC : CurrencyNameEnum.cTAZ;
         }
       }
       if (!newInfo.chainName) {
