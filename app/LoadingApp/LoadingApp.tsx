@@ -589,7 +589,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
               actionButtonsDisabled: false,
             });
           } else {
-            await this.createNewWallet(false);
+            await this.createNewWallet();
             this.setState({ actionButtonsDisabled: false });
             this.navigateToLoadedApp(false, true, true, true, this.state.firstLaunchingMessage);
             //console.log('navigate to LoadedApp');
@@ -937,7 +937,7 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
     });
   };
 
-  createNewWallet = async (goSeedScreen: boolean = true): Promise<void> => {
+  createNewWallet = async (): Promise<void> => {
     if (!this.state.netInfo.isConnected || this.state.selectIndexerServer === SelectServerEnum.offline) {
       this.addLastSnackbar({ message: this.state.translate('loadedapp.connection-error') as string, screenName: [this.screenName] });
       return;
@@ -993,17 +993,16 @@ export class LoadingAppClass extends Component<LoadingAppClassProps, LoadingAppC
           await removeRecoveryWalletInfo();
         }
       }
-      // basic mode -> same screen.
-      this.setState(state => ({
+      this.setState({
         wallet,
-        screen: goSeedScreen ? 2 : state.screen,
         actionButtonsDisabled: false,
         walletExists: true,
-      }));
+      });
       // creating tor cliente if needed
       if (this.state.currency === CurrencyEnum.USDTORCurrency || this.state.currency === CurrencyEnum.USDCurrency) {
         await RPCModule.createTorClientProcess();
       }
+      this.navigateToLoadedApp(false, true, true, true, this.state.firstLaunchingMessage);
     } else {
       this.walletErrorHandle(seed, this.state.translate('loadingapp.creatingwallet-label') as string, 1, false);
     }
