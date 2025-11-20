@@ -12,10 +12,10 @@ const MAC_SOCKET: Option<&str> = Some("unix:///Users/runner/.colima/default/dock
 async fn offline_testsuite() {
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::ios_integration_test("ZingoMobileTests/OfflineTestSuite");
+        zingomobile_utils::ios_integration_test("ZingoTests/OfflineTestSuite");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::ios_integration_test_ci("ZingoMobileTests/OfflineTestSuite");
+        zingomobile_utils::ios_integration_test_ci("ZingoTests/OfflineTestSuite");
 
     println!("Exit Code: {}", exit_code);
     println!("Output: {}", output);
@@ -37,10 +37,10 @@ async fn execute_sync_from_seed() {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::ios_integration_test("ZingoMobileTests/ExecuteSyncFromSeed");
+        zingomobile_utils::ios_integration_test("ZingoTests/ExecuteSyncFromSeed");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::ios_integration_test_ci("ZingoMobileTests/ExecuteSyncFromSeed");
+        zingomobile_utils::ios_integration_test_ci("ZingoTests/ExecuteSyncFromSeed");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -68,10 +68,10 @@ async fn execute_send_from_orchard() {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::ios_integration_test("ZingoMobileTests/ExecuteSendFromOrchard");
+        zingomobile_utils::ios_integration_test("ZingoTests/ExecuteSendFromOrchard");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::ios_integration_test_ci("ZingoMobileTests/ExecuteSendFromOrchard");
+        zingomobile_utils::ios_integration_test_ci("ZingoTests/ExecuteSendFromOrchard");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -101,11 +101,11 @@ async fn execute_currentprice_and_value_transfers_from_seed() {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) = zingomobile_utils::ios_integration_test(
-        "ZingoMobileTests/UpdateCurrentPriceAndValueTransfersFromSeed",
+        "ZingoTests/UpdateCurrentPriceAndValueTransfersFromSeed",
     );
     #[cfg(feature = "ci")]
     let (exit_code, output, error) = zingomobile_utils::ios_integration_test_ci(
-        "ZingoMobileTests/UpdateCurrentPriceAndValueTransfersFromSeed",
+        "ZingoTests/UpdateCurrentPriceAndValueTransfersFromSeed",
     );
 
     #[cfg(feature = "regchest")]
@@ -138,10 +138,10 @@ async fn execute_sapling_balance_from_seed() {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::ios_integration_test("ZingoMobileTests/ExecuteSaplingBalanceFromSeed");
+        zingomobile_utils::ios_integration_test("ZingoTests/ExecuteSaplingBalanceFromSeed");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::ios_integration_test_ci("ZingoMobileTests/ExecuteSaplingBalanceFromSeed");
+        zingomobile_utils::ios_integration_test_ci("ZingoTests/ExecuteSaplingBalanceFromSeed");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {
@@ -173,10 +173,10 @@ async fn execute_parse_addresses() {
 
     #[cfg(not(feature = "ci"))]
     let (exit_code, output, error) =
-        zingomobile_utils::ios_integration_test("ZingoMobileTests/ExecuteParseAddresses");
+        zingomobile_utils::ios_integration_test("ZingoTests/ExecuteParseAddresses");
     #[cfg(feature = "ci")]
     let (exit_code, output, error) =
-        zingomobile_utils::ios_integration_test_ci("ZingoMobileTests/ExecuteParseAddresses");
+        zingomobile_utils::ios_integration_test_ci("ZingoTests/ExecuteParseAddresses");
 
     #[cfg(feature = "regchest")]
     match regchest_utils::close(&docker).await {

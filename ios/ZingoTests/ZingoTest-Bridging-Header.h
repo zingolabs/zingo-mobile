@@ -1,6 +1,6 @@
 //
-//  ZingoMobileTest-Bridging-Header.h
-//  ZingoMobile
+//  ZingoTest-Bridging-Header.h
+//  Zingo
 //
 //  Created by Juan Carlos Carmona Calvo on 5/2/24.
 //
